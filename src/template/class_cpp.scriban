@@ -1,0 +1,38 @@
+{{  include 'common.scriban'
+    if !has_meta(meta)
+        ~ ret ~
+    end
+}}
+
+{{
+    class_name = cpp_class.name
+    gen_type_name = "__GenType_" + class_name
+    class_is_abstract = cpp_class.is_abstract
+    class_functions = functions
+    class_properties = properties
+}}
+#include "{{class_name}}.h"
+#include <rttr/registration_friend.h>
+#include <rttr/type>
+
+void {{gen_type_name}}::Register()
+{
+    using namespace rttr;
+
+    registration::class_<{{class_name}}>("{{class_name}}")
+    {{ if class_is_abstract }}
+        .constructor<>()
+    {{ end }}{{ for function in class_functions }}
+        {{ $function_name = function.cpp_function.name }}
+        .method("{{$function_name}}", &{{class_name}}::{{$function_name}})
+    {{ end }}{{ for property in class_properties }}
+        {{ $field_name = property.cpp_field.name }}
+        .property("{{$field_name}}", &{{class_name}}::{{$field_name}})
+    {{ end }};
+}
+
+void {{gen_type_name}}::Unregister()
+{
+    using namespace rttr;
+
+}

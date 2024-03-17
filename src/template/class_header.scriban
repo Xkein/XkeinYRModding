@@ -1,0 +1,15 @@
+{{  include 'common.scriban'
+    if !has_meta(meta)
+        ~ ret ~
+    end
+}}
+
+#include "{{cpp_class.source_file}}"
+{{ class_name = cpp_class.name }}
+
+class __GenType_{{class_name}}
+{
+public:
+    static void Register();
+    static void Unregister();
+}

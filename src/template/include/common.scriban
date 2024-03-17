@@ -1,0 +1,5 @@
+{{
+    func has_meta(meta)
+        ret meta.raw.has_meta
+    end
+}}
