@@ -103,9 +103,9 @@ protected:
     virtual void InitDescription();
 
     template<class T, DWORD hookAddress>
-    void InitHookInfo(this T& self, REGISTERS* R)
+    void InitHookInfo(REGISTERS* R)
     {
-        self.InitHookInfo_Impl<hookAddress>(R);
+        static_cast<T*>(this)->InitHookInfo_Impl<hookAddress>(R);
     }
 
 protected:

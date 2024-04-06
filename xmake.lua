@@ -1,13 +1,10 @@
 add_rules("mode.debug", "mode.release")
 
-set_defaultplat("windows")
-set_defaultarchs("windows|x86")
-
 set_allowedplats("windows")
 set_allowedarchs("x86")
 
--- add_moduledirs("xmake/modules")
-includes("xmake/modules/common.lua")
+add_moduledirs("xmake/modules")
+includes("xmake/modules/common_tool.lua")
 
 includes("xmake/options.lua")
 includes("xmake/3rdparty.lua")
@@ -26,8 +23,5 @@ target("YrScripting")
     add_headerfiles("src/**.hpp")
     add_files("src/**.cpp")
     add_includedirs("src", {public = false})
-    add_rules("codegen-cpp", {
-        files = {"src/**.h", "src/**.hpp"},
-        rootdir = "src",
-    })
+    add_rules("codegen-cpp")
     add_filegroups("Engine", {rootdir = "src"})

@@ -1,14 +1,15 @@
 
-rttr_dir = get_thirdparty_path("rttr")
-rttr_source_dir = rttr_dir.."/src"
+local rttr_dir = get_thirdparty_path("rttr")
+local rttr_source_dir = rttr_dir.."/src"
+local rttr_gen_dir = get_config_path("rttr")
 
 -- package("rttr_package")
 --     add_deps("cmake")
---     set_sourcedir("$(projectdir)/3rdparty/rttr")
---     on_install(function (package)
+--     set_sourcedir(rttr_dir)
+--     on_load(function (package)
 --         local configs = {
---             "-DCMAKE_BUILD_TYPE=" .. (package:debug() and "Debug" or "Release"),
---             "-DBUILD_SHARED_LIBS=" .. (package:config("shared") and "ON" or "OFF"),
+--             -- "-DCMAKE_BUILD_TYPE=" .. (package:debug() and "Debug" or "Release"),
+--             -- "-DBUILD_SHARED_LIBS=" .. (package:config("shared") and "ON" or "OFF"),
 --             "-DUSE_PCH=OFF",
 --             "-DBUILD_BENCHMARKS=OFF",
 --             "-DCUSTOM_DOXYGEN_STYLE=OFF",
@@ -23,13 +24,14 @@ rttr_source_dir = rttr_dir.."/src"
 --         if package:is_targetos("windows") then
 --             table.insert(configs, '-DCMAKE_CXX_FLAGS="/EHsc /MP"')
 --         end
---         import("package.tools.cmake").install(package, configs)
+--         import("common")
+--         import("package.tools.cmake").install(package, configs, {
+--             buildir = get_thirdparty_path("rttr"),
+--         })
 --     end)
 -- package_end()
 
--- add_requires("rttr")
-
-local rttr_gen_dir = get_gen_path("rttr")
+-- add_requires("rttr_package")
 
 target("rttr")
     set_kind("static")
@@ -53,4 +55,12 @@ target("rttr")
         pattern = "@([^\n]-)@",
     })
     add_includedirs(rttr_gen_dir, {public = false})
+
+    on_load(function (target)
+        import("common_tool")
+        local content = "#ifndef RTTR_VERSION_H_\n#define RTTR_VERSION_H_\n#define RTTR_VERSION_MAJOR 0\n#define RTTR_VERSION_MINOR 9\n#define RTTR_VERSION_PATCH 7\n#define RTTR_VERSION       907\n#define RTTR_VERSION_STR   \"0.9.7\"\n#endif // RTTR_VERSION_H_"
+
+        local rttr_gen_dir = common_tool.get_config_path("rttr")
+        io.writefile(rttr_gen_dir.."/rttr/detail/base/version.h", content)
+    end)
 

@@ -1,6 +1,6 @@
-{{  include 'common.scriban'
+{{  include 'include/common.scriban'
     if !has_meta(meta)
-        ~ ret ~
+        ret
     end
 }}
 
