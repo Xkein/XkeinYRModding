@@ -11,6 +11,8 @@ rule("codegen-cpp")
         target:add("deps", "codegen-policy")
     end)
     after_load(function(target)
+        local extraconf = target:extraconf("rules", "codegen-cpp")
+        
         local gendir = path.absolute(path.join(target:autogendir({root = true}), target:plat(), "codegen"))
 
         local header_list = {}
@@ -44,21 +46,31 @@ rule("codegen-cpp")
                 "NDEBUG",
                 "_CRT_USE_BUILTIN_OFFSETOF",
             }
+            table.join2(defines, target:get("defines"))
             for _, dep in pairs(target:deps()) do
-                for _, define in ipairs(dep:get("defines", {public = true})) do
-                    table.insert(defines, define)
-                end
+                table.join2(defines, dep:get("defines", {public = true}))
             end
             -- collect compiler arguments
             local arguments = {
                 "-std=c++2c",
                 "--verbose",
             }
+
+            local templates = extraconf.templates
+            local specific_headerfiles = extraconf.parserfiles
             
+            local parserfiles = header_list
+            if specific_headerfiles and #specific_headerfiles > 0 then
+                parserfiles = specific_headerfiles
+            end
+
             local runInfo = {
-                template = path.join(os.projectdir(), "src/template"),
+                templateDir = path.join(os.projectdir(), "src/template"),
+                moduleTemplates = templates.module,
+                classTemplates = templates.class,
+                enumTemplates = templates.enum,
                 module = target_name,
-                header_list = header_list,
+                header_list = parserfiles,
                 include_list = include_list,
                 sysinclude_list = sysinclude_list,
                 defines = defines,
@@ -84,6 +96,13 @@ rule("codegen-cpp")
         local genCppFiles = os.files(gendir.."/**.cpp")
         for _, file in ipairs(genCppFiles) do
             target:add("files", file)
+        end
+        local genHeaderFiles = os.files(gendir.."/**.h")
+        for _, file in ipairs(genHeaderFiles) do
+            target:add("headerfiles", file)
+        end
+        if #genCppFiles > 0 then
+            target:add("filegroups", "codegen", {rootdir = gendir})
         end
         target:add("includedirs", gendir)
     end)

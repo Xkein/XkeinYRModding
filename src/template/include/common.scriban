@@ -2,4 +2,15 @@
     func has_meta(meta)
         ret meta.raw.has_meta
     end
+
+    func get_meta_key(meta, key)
+        if !has_meta(meta)
+            ret null
+        end
+        $meta_data = meta.raw.metaData
+        if $meta_data.get_tag(key)
+            return true
+        end
+        ret $meta_data.get_string(key) 
+    end
 }}

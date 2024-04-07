@@ -23,7 +23,6 @@ target("cpp-header-tool")
         end
         import("core.project.depend")
         depend.on_changed(function ()
-            print("HeaderTool code changed, start compile job...")
             import("core.base.task")
             task.run("dotnet-compile-job")
         end, {dependfile = target:dependfile(csproj), files = files})
@@ -37,7 +36,10 @@ task("run-header-tool")
         import("core.base.json")
         local config_path = path.absolute(info.outDir.."/config.json")
         local json_data = {
-            templateDir = info.template,
+            templateDir = info.templateDir,
+            moduleTemplates = info.moduleTemplates,
+            classTemplates = info.classTemplates,
+            enumTemplates = info.enumTemplates,
             moduleName = info.module,
             headerFiles = info.header_list,
             includeDirs = info.include_list,
@@ -62,5 +64,6 @@ task("run-header-tool")
         os.execv(os.projectdir().."/build/tools/CppHeaderTool", {
             "--config", config_path,
             "--out_dir", info.outDir,
+            -- "--loop_generate", -- switch this to quickly test the scriban template
         })
     end)

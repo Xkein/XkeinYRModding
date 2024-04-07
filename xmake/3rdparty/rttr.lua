@@ -54,13 +54,17 @@ target("rttr")
         prefixdir = "rttr/detail/base",
         pattern = "@([^\n]-)@",
     })
-    add_includedirs(rttr_gen_dir, {public = false})
+    add_includedirs(rttr_gen_dir, {public = true})
 
     on_load(function (target)
         import("common_tool")
+        -- i have no idea about this but write it by hand...
         local content = "#ifndef RTTR_VERSION_H_\n#define RTTR_VERSION_H_\n#define RTTR_VERSION_MAJOR 0\n#define RTTR_VERSION_MINOR 9\n#define RTTR_VERSION_PATCH 7\n#define RTTR_VERSION       907\n#define RTTR_VERSION_STR   \"0.9.7\"\n#endif // RTTR_VERSION_H_"
 
         local rttr_gen_dir = common_tool.get_config_path("rttr")
-        io.writefile(rttr_gen_dir.."/rttr/detail/base/version.h", content)
+        local file_path = rttr_gen_dir.."/rttr/detail/base/version.h"
+        if not os.exists(file_path) then
+            io.writefile(file_path, content)
+        end
     end)
 
