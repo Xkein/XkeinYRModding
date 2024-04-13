@@ -14,7 +14,7 @@
 #include <rttr/registration_friend.h>
 
 #define GENERATED_BODY(type_name) \
-    friend class __GenType_##type_name; \
+    friend class __Gen_Type_##type_name; \
     RTTR_REGISTRATION_FRIEND;
 
 

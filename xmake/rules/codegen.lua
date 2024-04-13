@@ -11,7 +11,7 @@ rule("codegen-cpp")
         target:add("deps", "codegen-policy")
     end)
     after_load(function(target)
-        local extraconf = target:extraconf("rules", "codegen-cpp")
+        local extraconf = target:extraconf("rules", "codegen-cpp") or {}
         
         local gendir = path.absolute(path.join(target:autogendir({root = true}), target:plat(), "codegen"))
 
@@ -56,12 +56,13 @@ rule("codegen-cpp")
                 "--verbose",
             }
 
-            local templates = extraconf.templates
-            local specific_headerfiles = extraconf.parserfiles
-            
-            local parserfiles = header_list
-            if specific_headerfiles and #specific_headerfiles > 0 then
-                parserfiles = specific_headerfiles
+            import("common_tool")
+            local templates = extraconf.templates or common_tool.get_default_templates()
+            local parser_includes = extraconf.parserincludes
+            local input_text = nil
+            for _, includefile in ipairs(parser_includes or {}) do
+                local line = string.format("#include \"%s\"", includefile)
+                input_text = input_text and input_text.."\n"..line or line
             end
 
             local runInfo = {
@@ -70,7 +71,8 @@ rule("codegen-cpp")
                 classTemplates = templates.class,
                 enumTemplates = templates.enum,
                 module = target_name,
-                header_list = parserfiles,
+                input_text = input_text,
+                header_list = header_list,
                 include_list = include_list,
                 sysinclude_list = sysinclude_list,
                 defines = defines,

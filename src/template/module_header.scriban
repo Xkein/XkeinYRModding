@@ -1,0 +1,10 @@
+{{- include 'include/common.scriban'
+    init_extra_vars(this)
+-}}
+#pragma once
+class {{gen_type_name}}
+{
+public:
+    static void Register();
+    static void Unregister();
+};

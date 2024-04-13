@@ -1,17 +1,25 @@
 
+function get_build_dir()
+    if import then
+        return import("core.project.config").buildir()
+    else
+        return "$(buildir)"
+    end
+end
+
 function get_thirdparty_path(module)
-    return "$(projectdir)/3rdparty/" .. module
+    return path.join(os.projectdir(), "3rdparty", module)
 end
 
 function get_config_path(module)
-    return "$(buildir)/config/"..module
+    return path.join(get_build_dir(), "config", module)
 end
 
 function get_default_templates()
     return {
         module = {
-            ["module_header.scriban"] =  "module/{0}.gen.h",
-            ["module_cpp.scriban"] =  "module/{0}.gen.cpp",
+            ["module_header.scriban"] =  "{0}.gen.h",
+            ["module_cpp.scriban"] =  "{0}.gen.cpp",
         },
         class = {
             ["class_header.scriban"] =  "class/{0}.gen.h",
@@ -22,4 +30,10 @@ function get_default_templates()
             ["enum_cpp.scriban"] =  "enum/{0}.gen.cpp",
         },
     }
+end
+
+function get_templates(overrides)
+    local templates = get_default_templates()
+    table.join2(templates, overrides)
+    return templates
 end

@@ -1,0 +1,5 @@
+{{
+    func need_codegen(element)
+        ret ["AbstractClass"] | array.contains element.name
+    end
+}}

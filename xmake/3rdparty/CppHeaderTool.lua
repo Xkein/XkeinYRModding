@@ -41,6 +41,7 @@ task("run-header-tool")
             classTemplates = info.classTemplates,
             enumTemplates = info.enumTemplates,
             moduleName = info.module,
+            inputText = info.input_text,
             headerFiles = info.header_list,
             includeDirs = info.include_list,
             systemIncludeDirs = info.sysinclude_list,

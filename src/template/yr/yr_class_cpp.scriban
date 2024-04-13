@@ -1,9 +1,10 @@
-{{ include 'include/common.scriban'
-    if !has_meta(meta)
+{{  include 'yr/yrpp.scriban'
+    if !need_codegen(cpp_class)
         ret
     end
+    include 'include/common.scriban'
     init_extra_vars(this)
-}}
+-}}
 #include "{{class_name}}.gen.h"
 #include <rttr/registration.h>
 #include <rttr/registration_friend.h>

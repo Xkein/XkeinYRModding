@@ -13,4 +13,53 @@
         end
         ret $meta_data.get_string(key) 
     end
+
+    func init_extra_vars(htType)
+        if htType.cpp_class
+            htType.class_name = cpp_class.name
+            htType.gen_type_name = get_gen_type_name(class_name)
+            htType.class_is_abstract = cpp_class.is_abstract
+            htType.class_functions = functions
+            htType.class_properties = properties
+        else if htType.cpp_enum
+            htType.enum_name = cpp_enum.name
+            htType.gen_type_name = get_gen_type_name(enum_name)
+            htType.enum_constants = cpp_enum.constants
+        else if htType.module_name
+            htType.gen_type_name = get_gen_type_name(module_name)
+            htType.module_classes = classes
+            htType.module_enums = enums
+        end
+    end
+
+    func get_gen_type_name(name)
+        ret "__Gen_Type_"+name
+    end
+
+    # helpers to generate rttr BEGIN
+
+    func gen_rttr_class_function(htClass, htFunction)
+        if htFunction.cpp_function.is_constructor
+            $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+            ret $".constructor<{$arg_types}>()"
+        end
+        $class_name = htClass.cpp_class.name
+        $function_name = htFunction.cpp_function.name
+        ret $".method(\"{$function_name}\", &{$class_name}::{$function_name})"
+    end
+
+    func gen_rttr_class_property(htClass, htProperty)
+        $class_name = htClass.cpp_class.name
+        $field_name = property.cpp_field.name
+        ret $".property(\"{$field_name}\", &{class_name}::{$field_name})"
+    end
+
+    func gen_rttr_enum_constant(htEnum, htConstant)
+        $enum_name = htEnum.cpp_enum.name
+        $enum_const_name = htConstant.cpp_enum_item.name
+        ret $"value(\"{enum_const_name}\", {enum_name}::{enum_const_name})"
+    end
+
+    # helpers to generate rttr END
+
 }}
