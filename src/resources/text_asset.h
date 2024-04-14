@@ -2,11 +2,13 @@
 
 #include "asset_object.h"
 
+CLASS()
 class TextAsset : public AssetObject
 {
 
 public:
     TextAsset(CCFileClass* yrFile);
+    FUNCTION()
     TextAsset(std::string_view path);
 	
     virtual ~TextAsset();
@@ -15,8 +17,9 @@ public:
 
     const void* GetBytes();
 
-    long  GetDataSize();
+    long GetDataSize();
 
+    FUNCTION()
     std::string GetText();
 
 private:

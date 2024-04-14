@@ -1,34 +1,52 @@
 {{
+    # helpers for meta BEGIN
     func has_meta(meta)
-        ret meta.raw.has_meta
+        ret meta && meta.raw.has_meta
     end
 
-    func get_meta_key(meta, key)
-        if !has_meta(meta)
-            ret null
-        end
-        $meta_data = meta.raw.metaData
-        if $meta_data.get_tag(key)
-            return true
-        end
-        ret $meta_data.get_string(key) 
+    func get_meta_tag(meta, key)
+        ret meta.raw.meta_data.tags[key]
     end
+
+    func get_meta_key_value(meta, key)
+        ret meta.raw.meta_data.kvPairs[key]
+    end
+    # helpers for meta END
 
     func init_extra_vars(htType)
         if htType.cpp_class
-            htType.class_name = cpp_class.name
-            htType.gen_type_name = get_gen_type_name(class_name)
-            htType.class_is_abstract = cpp_class.is_abstract
-            htType.class_functions = functions
-            htType.class_properties = properties
+            htType.is_class = true
+            htType.class_name = htType.cpp_class.name
+            htType.gen_type_name = get_gen_type_name(htType.class_name)
+            htType.class_is_abstract = htType.cpp_class.is_abstract
+            htType.class_functions = htType.functions
+            htType.class_properties = htType.properties
         else if htType.cpp_enum
-            htType.enum_name = cpp_enum.name
-            htType.gen_type_name = get_gen_type_name(enum_name)
-            htType.enum_constants = cpp_enum.constants
+            htType.is_enum = true
+            htType.enum_name = htType.cpp_enum.name
+            htType.gen_type_name = get_gen_type_name(htType.enum_name)
+            htType.enum_constants = htType.constants
         else if htType.module_name
-            htType.gen_type_name = get_gen_type_name(module_name)
-            htType.module_classes = classes
-            htType.module_enums = enums
+            htType.is_module = true
+            htType.gen_type_name = get_gen_type_name(htType.module_name)
+            htType.module_classes = htType.classes
+            htType.module_enums = htType.enums
+        end
+        
+        $meta = htType.meta
+        if has_meta($meta)
+            htType.all_visible = get_meta_tag(meta, "AllVisible")
+            htType.all_public_visible = get_meta_tag(meta, "AllPublicVisible")
+        end
+    end
+
+    func should_skip_visibility(htType, htElement)
+        $has_meta = has_meta(htElement.meta)
+        case htElement.element.visibility
+            when 2, 3 # protected or private
+                ret !(htType.all_visible || $has_meta)
+            else
+                ret !(htType.all_visible || htType.all_public_visible || $has_meta)
         end
     end
 
@@ -36,19 +54,61 @@
         ret "__Gen_Type_"+name
     end
 
+    func get_calling_convention(callConvention)
+        case callConvention
+            when 2 # X86StdCall
+                ret "__stdcall"
+            when 3 # X86FastCall
+                ret "__fastcall"
+            else
+                ret ""
+        end
+    end
+
+    func get_function_ptr_type(htFunction, htClass)
+        $cpp_function = htFunction.cpp_function
+        $func_type = $"{$cpp_function.return_type.full_name}"
+        $func_type += "("
+        $func_type += get_calling_convention($cpp_function.calling_convention)
+        if $cpp_function.is_cxx_class_method && !$cpp_function.is_static
+            $func_type += $" {htClass.cpp_class.name}::*"
+        else
+            $func_type += "*"
+        end
+        $func_type += ")"
+
+        $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+        $func_type += $"({$arg_types})"
+        if $cpp_function.is_const
+            $func_type += " const"
+        end
+        ret $func_type
+    end
+
     # helpers to generate rttr BEGIN
 
     func gen_rttr_class_function(htClass, htFunction)
+        if should_skip_visibility(htClass, htFunction) || htFunction.cpp_function.is_destructor
+            ret null
+        end
         if htFunction.cpp_function.is_constructor
             $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
             ret $".constructor<{$arg_types}>()"
         end
         $class_name = htClass.cpp_class.name
         $function_name = htFunction.cpp_function.name
-        ret $".method(\"{$function_name}\", &{$class_name}::{$function_name})"
+        $func_type = get_function_ptr_type(htFunction, htClass)
+        if htFunction.is_overload
+            ret $".method(\"{$function_name}\", static_cast<{$func_type}>(&{$class_name}::{$function_name}))"
+        else
+            ret $".method(\"{$function_name}\", &{$class_name}::{$function_name})"
+        end
     end
 
     func gen_rttr_class_property(htClass, htProperty)
+        if should_skip_visibility(htClass, htProperty)
+            ret null
+        end
         $class_name = htClass.cpp_class.name
         $field_name = property.cpp_field.name
         ret $".property(\"{$field_name}\", &{class_name}::{$field_name})"
@@ -57,7 +117,7 @@
     func gen_rttr_enum_constant(htEnum, htConstant)
         $enum_name = htEnum.cpp_enum.name
         $enum_const_name = htConstant.cpp_enum_item.name
-        ret $"value(\"{enum_const_name}\", {enum_name}::{enum_const_name})"
+        ret $"value(\"{$enum_const_name}\", {$enum_name}::{$enum_const_name})"
     end
 
     # helpers to generate rttr END

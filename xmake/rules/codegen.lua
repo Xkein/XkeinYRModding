@@ -8,17 +8,30 @@ target("codegen-policy")
 
 rule("codegen-cpp")
     on_load(function (target, opt)
-        target:add("deps", "codegen-policy")
+        target:add("deps", "codegen-policy", { public = false })
+        target:add("deps", "CoreModule")
     end)
     after_load(function(target)
         local extraconf = target:extraconf("rules", "codegen-cpp") or {}
         
         local gendir = path.absolute(path.join(target:autogendir({root = true}), target:plat(), "codegen"))
-
         local header_list = {}
         for _, headerfile in ipairs(target:headerfiles()) do
             table.insert(header_list, path.absolute(headerfile))
         end
+
+        import("common_tool")
+        local templates = extraconf.templates or common_tool.get_default_templates()
+        local template_dir = path.join(os.projectdir(), "src/template")
+        local depend_files = {}
+        table.join2(depend_files, header_list)
+        for _, template_type in pairs(templates) do
+            for template, _ in pairs(template_type) do
+                table.insert(depend_files, path.join(template_dir, template))
+            end
+        end
+        table.insert(depend_files, path.join(common_tool.get_build_dir(), "tools/CppHeaderTool.dll"))
+        table.sort(depend_files)
         -- run codegen task
         import("core.project.depend")
         depend.on_changed(function ()
@@ -56,22 +69,25 @@ rule("codegen-cpp")
                 "--verbose",
             }
 
-            import("common_tool")
-            local templates = extraconf.templates or common_tool.get_default_templates()
-            local parser_includes = extraconf.parserincludes
+            local parser_includes = extraconf.parser_includes or {}
             local input_text = nil
-            for _, includefile in ipairs(parser_includes or {}) do
+            for _, includefile in ipairs(parser_includes) do
                 local line = string.format("#include \"%s\"", includefile)
                 input_text = input_text and input_text.."\n"..line or line
             end
 
+            local preHeaderText = extraconf.pre_header_text
+            local postHeaderText = extraconf.post_header_text
+
             local runInfo = {
-                templateDir = path.join(os.projectdir(), "src/template"),
+                templateDir = template_dir,
                 moduleTemplates = templates.module,
                 classTemplates = templates.class,
                 enumTemplates = templates.enum,
                 module = target_name,
                 input_text = input_text,
+                preHeaderText = preHeaderText,
+                postHeaderText = postHeaderText,
                 header_list = header_list,
                 include_list = include_list,
                 sysinclude_list = sysinclude_list,
@@ -93,7 +109,7 @@ rule("codegen-cpp")
             else
                 task.run("run-header-tool", {}, runInfo)
             end
-        end, {dependfile = gendir.."/codegen.d", files = header_list})
+        end, {dependfile = gendir.."/codegen.d", files = depend_files})
         
         local genCppFiles = os.files(gendir.."/**.cpp")
         for _, file in ipairs(genCppFiles) do

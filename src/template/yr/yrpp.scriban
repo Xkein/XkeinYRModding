@@ -1,5 +1,10 @@
 {{
-    func need_codegen(element)
+    func yr_need_codegen(element)
         ret ["AbstractClass"] | array.contains element.name
+    end
+
+    func yr_inject_meta(htType)
+        htType.all_public_visible = true
+
     end
 }}

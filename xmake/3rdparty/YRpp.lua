@@ -1,16 +1,26 @@
 yrpp_includes_dir = get_thirdparty_path("YRpp")
 
+local function get_pre_header_text()
+    return
+        ""
+end
+
 target("YRpp")
     set_languages("cxx20")
     set_kind("static")
     add_rules("codegen-cpp", {
-        parserincludes = {
+        parser_includes = {
             yrpp_includes_dir.."/StaticInits.cpp",
         },
+        pre_header_text = get_pre_header_text(),
         templates = get_templates({
             class = {
                 ["yr/yr_class_header.scriban"] =  "class/{0}.gen.h",
                 ["yr/yr_class_cpp.scriban"] =  "class/{0}.gen.cpp",
+            },
+            module = {
+                ["module_header.scriban"] =  "{0}.gen.h",
+                ["yr/yr_module_cpp.scriban"] =  "{0}.gen.cpp",
             },
         })
     })

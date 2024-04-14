@@ -1,7 +1,7 @@
 
 function get_build_dir()
     if import then
-        return import("core.project.config").buildir()
+        return path.absolute(import("core.project.config").buildir())
     else
         return "$(buildir)"
     end
@@ -29,6 +29,9 @@ function get_default_templates()
             ["enum_header.scriban"] =  "enum/{0}.gen.h",
             ["enum_cpp.scriban"] =  "enum/{0}.gen.cpp",
         },
+        depend_only = {
+            ["include/common.scriban"] = "not use to generate!",
+        }
     }
 end
 

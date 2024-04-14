@@ -15,9 +15,9 @@ void {{gen_type_name}}::Register()
 
     registration::enumeration<{{enum_name}}>("{{enum_name}}")
     (
-    {{ enum_constants | array.join ", " do
-        ret gen_rttr_enum_constant(this, $0)
-    end }}
+        {{(enum_constants | array.each do
+            ret gen_rttr_enum_constant(this, $0)
+        end) | array.join ", "}}
     );
 }
 
