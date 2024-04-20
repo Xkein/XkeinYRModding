@@ -1,5 +1,4 @@
 #include "transform_utils.h"
-#include "core/math.h"
 #include "yr/utils/yr_entity_dispatch.h"
 
 #include <TechnoClass.h>
