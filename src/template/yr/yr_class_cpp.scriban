@@ -10,6 +10,7 @@
 #include <rttr/registration.h>
 #include <rttr/registration_friend.h>
 #include <rttr/type>
+#include <CRC.h>
 
 void {{gen_type_name}}::Register()
 {
