@@ -1,9 +1,6 @@
 #include "engine.h"
 
-#include "read_scheduler.h"
 #include "yr/event/yr_general_event.h"
-
-#include "framework/ecs/entt.h"
 
 Engine* gEngine = new Engine();
 
@@ -17,7 +14,7 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, std::bind(&Engine::OnEndU
 
 Engine::Engine()
 {
-    _enttContext = new EnttContext();
+
 }
 
 Engine::~Engine()
@@ -36,12 +33,11 @@ void Engine::Exit()
 
 void Engine::OnScenarioStart()
 {
-    ReadScheduler::Preload();
+
 }
 
 void Engine::OnScenarioClear()
 {
-    ReadScheduler::Clear();
 
 }
 
@@ -49,10 +45,6 @@ void Engine::OnBeginUpdate()
 {
     CalDeltaTime();
 
-    ReadScheduler::Tick();
-
-    entt::registry& registry = _enttContext->GetRegistry();
-    
 }
 
 void Engine::OnEndUpdate()
@@ -68,11 +60,6 @@ void Engine::OnBeginRender()
 void Engine::OnEndRender()
 {
 
-}
-
-EnttContext* Engine::GetEnttContext()
-{
-    return _enttContext;
 }
 
 void Engine::CalDeltaTime()

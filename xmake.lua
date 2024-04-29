@@ -21,7 +21,7 @@ target("CoreModule")
     add_filegroups("CoreModule", {rootdir = "src"})
 
 target("YrExtensionCore")
-    set_kind("shared")
+    set_kind("static")
     set_languages("cxxlatest")
     add_rules("codegen-cpp")
     add_deps("CoreModule", "spdlog", { public = false })
