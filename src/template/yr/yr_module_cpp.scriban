@@ -5,6 +5,9 @@
 {{- for klass in module_classes }}
 {{- if has_meta(klass.meta) }}
 #include "class/{{klass.cpp_class.name}}.gen.h"
+{{- if get_meta_tag(klass.meta, "HookEvent") }}
+__IMPLEMENT_YR_HOOK_EVENT({{klass.cpp_class.name}})
+{{ end }}
 {{- end; end }}
 
 void {{gen_type_name}}::Register()

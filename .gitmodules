@@ -19,3 +19,6 @@
 [submodule "3rdparty/imgui-node-editor"]
 	path = 3rdparty/imgui-node-editor
 	url = git@github.com:thedmd/imgui-node-editor.git
+[submodule "3rdparty/json"]
+	path = 3rdparty/json
+	url = git@github.com:nlohmann/json.git

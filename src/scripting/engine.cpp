@@ -40,11 +40,12 @@ void Engine::OnScenarioClear()
 {
 
 }
-
+#include <MessageListClass.h>
 void Engine::OnBeginUpdate()
 {
     CalDeltaTime();
 
+    MessageListClass::Instance->PrintMessage(L"Engine::OnBeginUpdate");
 }
 
 void Engine::OnEndUpdate()

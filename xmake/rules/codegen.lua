@@ -1,6 +1,6 @@
 
 target("codegen-policy")
-    set_kind("static")
+    set_kind("phony")
     add_deps("cpp-header-tool")
     set_policy("build.across_targets_in_parallel", false)
     before_build(function(target)
@@ -9,7 +9,7 @@ target("codegen-policy")
 rule("codegen-cpp")
     on_load(function (target, opt)
         target:add("deps", "codegen-policy", { public = false })
-        target:add("deps", "CoreModule")
+        target:add("deps", "Core")
     end)
     after_load(function(target)
         local extraconf = target:extraconf("rules", "codegen-cpp") or {}
@@ -46,7 +46,7 @@ rule("codegen-cpp")
             -- collect system include dirs
             local sysinclude_list = {}
             for _, dep in pairs(target:deps()) do
-                for _, includeDir in ipairs(dep:get("includedirs")) do
+                for _, includeDir in ipairs(dep:get("includedirs", {interface = true})) do
                     table.insert(sysinclude_list, path.absolute(includeDir))
                 end
             end
@@ -61,7 +61,7 @@ rule("codegen-cpp")
             }
             table.join2(defines, target:get("defines"))
             for _, dep in pairs(target:deps()) do
-                table.join2(defines, dep:get("defines", {public = true}))
+                table.join2(defines, dep:get("defines", {interface = true}))
             end
             -- collect compiler arguments
             local arguments = {

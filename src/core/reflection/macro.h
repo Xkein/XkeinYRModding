@@ -4,7 +4,6 @@
 #define META(...)
 #define CLASS(...)
 #define STRUCT(...)
-#define INTERFACE(...)
 #define PROPERTY(...)
 #define ENUM(...)
 #define ENUM_CLASS(...)
