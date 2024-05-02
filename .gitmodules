@@ -1,6 +1,6 @@
 [submodule "3rdparty/YRpp"]
 	path = 3rdparty/YRpp
-	url = git@github.com:Phobos-developers/YRpp.git
+	url = git@github.com:Xkein/YRpp.git
 [submodule "3rdparty/CppHeaderTool"]
 	path = 3rdparty/CppHeaderTool
 	url = git@github.com:Xkein/CppHeaderTool.git
@@ -21,4 +21,4 @@
 	url = git@github.com:nlohmann/json.git
 [submodule "3rdparty/stb"]
 	path = 3rdparty/stb
-	url = https://github.com/nothings/stb.git
+	url = git@github.com:nothings/stb.git
