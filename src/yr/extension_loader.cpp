@@ -1,40 +1,21 @@
+#include <Windows.h>
+#include "yr/extcore_config.h"
 
-#include <filesystem>
-
-void LoadExtension();
-struct Loader
+struct LoadExtension
 {
-    Loader()
+    LoadExtension()
     {
-        LoadExtension();
+        YrExtCoreConfig* config = YrExtCoreConfig::getInstance();
+        if (config->extensions.size() == 0)
+        {
+            return;
+        }
+        AddDllDirectory(config->path);
+
+        for (auto ext : config->extensions)
+        {
+            std::string extName = ext;
+            LoadLibraryA(extName.c_str());
+        }
     }
 } _;
-
-#include <Windows.h>
-#include <fstream>
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
-namespace fs = std::filesystem;
-
-void LoadExtension()
-{
-    auto dir = fs::absolute("YrExtensions");
-    if (!fs::is_directory(dir))
-    {
-        return;
-    }
-    AddDllDirectory(dir.c_str());
-
-    std::ifstream f("YrExtensions/config.json");
-    json          data = json::parse(f);
-    for (auto ext : data["extensions"])
-    {
-        if (!ext.is_string())
-        {
-            continue;
-        }
-        std::string extName = ext;
-        LoadLibraryA(extName.c_str());
-    }
-}

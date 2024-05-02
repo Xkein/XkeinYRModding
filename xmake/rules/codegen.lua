@@ -33,83 +33,87 @@ rule("codegen-cpp")
         table.insert(depend_files, path.join(common_tool.get_build_dir(), "tools/CppHeaderTool.dll"))
         table.sort(depend_files)
         -- run codegen task
-        import("core.project.depend")
-        depend.on_changed(function ()
-            local target_name = target:name()
-            local target_dir = target:targetdir()
-            print(string.format("generating code for target: %s, gendir: %s", target_name, gendir))
-            -- collect include dirs
-            local include_list = {}
-            for _, includeDir in ipairs(target:get("includedirs")) do
-                table.insert(include_list, path.absolute(includeDir))
-            end
-            -- collect system include dirs
-            local sysinclude_list = {}
-            for _, dep in pairs(target:deps()) do
-                for _, includeDir in ipairs(dep:get("includedirs", {interface = true})) do
-                    table.insert(sysinclude_list, path.absolute(includeDir))
+        if has_config("skip_codegen") then
+            print(string.format("skip codegen for %s", target:name()))
+        else
+            import("core.project.depend")
+            depend.on_changed(function ()
+                local target_name = target:name()
+                local target_dir = target:targetdir()
+                print(string.format("generating code for target: %s, gendir: %s", target_name, gendir))
+                -- collect include dirs
+                local include_list = {}
+                for _, includeDir in ipairs(target:get("includedirs")) do
+                    table.insert(include_list, path.absolute(includeDir))
                 end
-            end
-            for _, sysincludeDir in ipairs(target:get("sysincludedirs")) do
-                table.insert(sysinclude_list, path.absolute(sysincludeDir))
-            end
-            -- collect defines
-            local defines = {
-                "__HEADER_TOOL__",
-                "NDEBUG",
-                "_CRT_USE_BUILTIN_OFFSETOF",
-            }
-            table.join2(defines, target:get("defines"))
-            for _, dep in pairs(target:deps()) do
-                table.join2(defines, dep:get("defines", {interface = true}))
-            end
-            -- collect compiler arguments
-            local arguments = {
-                "-std=c++2c",
-                "--verbose",
-            }
-
-            local parser_includes = extraconf.parser_includes or {}
-            local input_text = nil
-            for _, includefile in ipairs(parser_includes) do
-                local line = string.format("#include \"%s\"", includefile)
-                input_text = input_text and input_text.."\n"..line or line
-            end
-
-            local preHeaderText = extraconf.pre_header_text
-            local postHeaderText = extraconf.post_header_text
-
-            local runInfo = {
-                templateDir = template_dir,
-                moduleTemplates = templates.module,
-                classTemplates = templates.class,
-                enumTemplates = templates.enum,
-                module = target_name,
-                input_text = input_text,
-                preHeaderText = preHeaderText,
-                postHeaderText = postHeaderText,
-                header_list = header_list,
-                include_list = include_list,
-                sysinclude_list = sysinclude_list,
-                defines = defines,
-                arguments = arguments,
-                outDir = gendir,
-                targetCpu = "X86",
-                isWindowsMsvc = true,
-                isParseSystemIncludes = false,
-            }
-
-            import("core.base.task")
-            local iDontKnowWtfError = false
-            if iDontKnowWtfError then
-                for _, headerfile in ipairs(header_list) do
-                    runInfo.header_list = { headerfile }
+                -- collect system include dirs
+                local sysinclude_list = {}
+                for _, dep in pairs(target:deps()) do
+                    for _, includeDir in ipairs(dep:get("includedirs", {interface = true})) do
+                        table.insert(sysinclude_list, path.absolute(includeDir))
+                    end
+                end
+                for _, sysincludeDir in ipairs(target:get("sysincludedirs")) do
+                    table.insert(sysinclude_list, path.absolute(sysincludeDir))
+                end
+                -- collect defines
+                local defines = {
+                    "__HEADER_TOOL__",
+                    "NDEBUG",
+                    "_CRT_USE_BUILTIN_OFFSETOF",
+                }
+                table.join2(defines, target:get("defines"))
+                for _, dep in pairs(target:deps()) do
+                    table.join2(defines, dep:get("defines", {interface = true}))
+                end
+                -- collect compiler arguments
+                local arguments = {
+                    "-std=c++2c",
+                    "--verbose",
+                }
+    
+                local parser_includes = extraconf.parser_includes or {}
+                local input_text = nil
+                for _, includefile in ipairs(parser_includes) do
+                    local line = string.format("#include \"%s\"", includefile)
+                    input_text = input_text and input_text.."\n"..line or line
+                end
+    
+                local preHeaderText = extraconf.pre_header_text
+                local postHeaderText = extraconf.post_header_text
+    
+                local runInfo = {
+                    templateDir = template_dir,
+                    moduleTemplates = templates.module,
+                    classTemplates = templates.class,
+                    enumTemplates = templates.enum,
+                    module = target_name,
+                    input_text = input_text,
+                    preHeaderText = preHeaderText,
+                    postHeaderText = postHeaderText,
+                    header_list = header_list,
+                    include_list = include_list,
+                    sysinclude_list = sysinclude_list,
+                    defines = defines,
+                    arguments = arguments,
+                    outDir = gendir,
+                    targetCpu = "X86",
+                    isWindowsMsvc = true,
+                    isParseSystemIncludes = false,
+                }
+    
+                import("core.base.task")
+                local iDontKnowWtfError = false
+                if iDontKnowWtfError then
+                    for _, headerfile in ipairs(header_list) do
+                        runInfo.header_list = { headerfile }
+                        task.run("run-header-tool", {}, runInfo)
+                    end
+                else
                     task.run("run-header-tool", {}, runInfo)
                 end
-            else
-                task.run("run-header-tool", {}, runInfo)
-            end
-        end, {dependfile = gendir.."/codegen.d", files = depend_files})
+            end, {dependfile = gendir.."/codegen.d", files = depend_files})
+        end
         
         local genCppFiles = os.files(gendir.."/**.cpp")
         for _, file in ipairs(genCppFiles) do

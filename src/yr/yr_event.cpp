@@ -6,7 +6,7 @@ class StdFunctionHelper : std::function<HookEventListenerFuncType>
 public:
     inline const void* GetTarget()
     {
-        return this->_Target(this->target_type());
+        return this->_Target(this->_Target_type());
     }
 };
 inline const void* GetStdFunctionTarget(std::function<HookEventListenerFuncType>& func)
@@ -19,15 +19,17 @@ YrHookEvent::YrHookEvent() : _callTimes(0), _disable(false) {
     
 }
 
-void YrHookEvent::Register(HookEventListener listener)
+HookEventListenerHandle YrHookEvent::Register(HookEventListener listener)
 {
     _listeners.push_back(std::move(listener));
+    return GetStdFunctionTarget(_listeners.back());
 }
 
-void YrHookEvent::Unregister(HookEventListener listener)
+void YrHookEvent::Unregister(HookEventListenerHandle handle)
 {
-    auto iter = std::find_if(_listeners.begin(), _listeners.end(), [&listener](HookEventListener& cur) {
-        return GetStdFunctionTarget(cur) == GetStdFunctionTarget(listener);
+    auto iter = std::find_if(_listeners.begin(), _listeners.end(), [handle](HookEventListener& cur) {
+        const void* curTarget = GetStdFunctionTarget(cur);
+        return curTarget == handle;
     });
     if (iter == _listeners.end())
         return;

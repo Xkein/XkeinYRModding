@@ -13,6 +13,7 @@ struct YrHookContext;
 
 using HookEventListenerFuncType = void(YrHookContext*, void*);
 using HookEventListener         = std::function<HookEventListenerFuncType>;
+using HookEventListenerHandle   = const void*;
 
 template<class T>
 class YrHookEventListenerRegister;
@@ -39,9 +40,9 @@ class YrHookEvent
 private:
     YrHookEvent();
 
-    YREXTCORE_API void Register(HookEventListener listener);
+    YREXTCORE_API HookEventListenerHandle Register(HookEventListener listener);
 
-    YREXTCORE_API void Unregister(HookEventListener listener);
+    YREXTCORE_API void Unregister(HookEventListenerHandle handle);
 
     DWORD Broadcast(REGISTERS* R, void* E);
 
@@ -79,15 +80,15 @@ public:
     }
 
     template<class T>
-    static void Register(HookEventListener listener)
+    static HookEventListenerHandle Register(HookEventListener listener)
     {
-        GetEvent<T>()->Register(std::move(listener));
+        return GetEvent<T>()->Register(std::move(listener));
     }
 
     template<class T>
-    static void Unregister(HookEventListener listener)
+    static void Unregister(HookEventListenerHandle handle)
     {
-        GetEvent<T>()->Unregister(std::move(listener));
+        GetEvent<T>()->Unregister(handle);
     }
 #ifdef YREXTCORE_IMPL
     template<class T, DWORD HookAddress>
@@ -116,8 +117,7 @@ class YrHookEventListenerRegister
 public:
     YrHookEventListenerRegister(HookEventListener listener)
     {
-        _listener = listener;
-        YrHookEventSystem::Register<T>(std::move(listener));
+        _handle = YrHookEventSystem::Register<T>(std::move(listener));
     }
 
     YrHookEventListenerRegister(std::function<void(YrHookContext*, T*)> listener) :
@@ -140,12 +140,12 @@ public:
 
     ~YrHookEventListenerRegister()
     {
-        if (_listener)
+        if (_handle)
         {
-            YrHookEventSystem::Unregister<T>(std::move(_listener));
+            YrHookEventSystem::Unregister<T>(_handle);
         }
     }
 
 private:
-    HookEventListener _listener;
+    HookEventListenerHandle _handle;
 };

@@ -10,7 +10,9 @@ includes("xmake/options.lua")
 includes("xmake/3rdparty.lua")
 includes("xmake/rules.lua")
 
-add_rules("CoreRule")
+option("skip_codegen")
+    set_default(false)
+
 rule("CoreRule")
     after_load(function (target)
         if target:kind() == "phony" or (target:name() ~= "Core" and target:dep("Core") == nil) then
@@ -21,7 +23,8 @@ rule("CoreRule")
         target:add("defines", api.."_API=__declspec(dllimport)", {interface=true})
         target:add("defines", api.."_API=__declspec(dllexport)", {private=true})
     end)
-
+rule_end()
+add_rules("CoreRule")
 
 target("Core")
     set_kind("static")
