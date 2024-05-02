@@ -7,18 +7,4 @@
 #include "class/{{klass.cpp_class.name}}.gen.h"
 {{- end; end }}
 
-void {{gen_type_name}}::Register()
-{
-{{- for klass in module_classes }}
-{{- if has_meta(klass.meta) }}
-    {{get_gen_type_name(klass.cpp_class.name)}}::Register();
-{{- end; end}}
-}
-
-void {{gen_type_name}}::Unregister()
-{
-{{- for klass in module_classes }}
-{{- if has_meta(klass.meta) }}
-    {{get_gen_type_name(klass.cpp_class.name)}}::Unregister();
-{{- end; end}}
-}
+{{gen_meta_register_snippet(this)}}

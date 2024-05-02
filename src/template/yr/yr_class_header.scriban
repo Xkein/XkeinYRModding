@@ -1,5 +1,5 @@
 {{  include 'yr/yrpp.scriban'
-    if !yr_need_codegen(cpp_class)
+    if !yr_need_codegen(this)
         ret
     end
     include 'include/common.scriban'
@@ -7,8 +7,9 @@
     yr_inject_meta(this)
 -}}
 #pragma once
-#include "{{cpp_class.source_file}}" // screw you clang
+#include <EventClass.h>
 #include <YRPP.h>
+#include "{{cpp_class.source_file}}" // screw you clang
 
 class {{gen_type_name}}
 {

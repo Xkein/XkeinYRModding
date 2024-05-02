@@ -1,9 +1,14 @@
 {{- include 'include/common.scriban'
     init_extra_vars(this)
+    include 'yr/yrpp.scriban'
+    is_yrpp = module_name == "YRpp"
+    func need_codegen(htType)
+        ret has_meta(klass.meta) || (is_yrpp && yr_need_codegen(htType))
+    end
 -}}
 #include "{{module_name}}.gen.h"
 {{- for klass in module_classes }}
-{{- if has_meta(klass.meta) }}
+{{- if need_codegen(klass) }}
 #include "class/{{klass.cpp_class.name}}.gen.h"
 {{- if get_meta_tag(klass.meta, "HookEvent") }}
 __IMPLEMENT_YR_HOOK_EVENT({{klass.cpp_class.name}})
@@ -13,7 +18,7 @@ __IMPLEMENT_YR_HOOK_EVENT({{klass.cpp_class.name}})
 void {{gen_type_name}}::Register()
 {
 {{- for klass in module_classes }}
-{{- if has_meta(klass.meta) }}
+{{- if need_codegen(klass) }}
     {{get_gen_type_name(klass.cpp_class.name)}}::Register();
 {{- end; end}}
 }
@@ -21,7 +26,7 @@ void {{gen_type_name}}::Register()
 void {{gen_type_name}}::Unregister()
 {
 {{- for klass in module_classes }}
-{{- if has_meta(klass.meta) }}
+{{- if need_codegen(klass) }}
     {{get_gen_type_name(klass.cpp_class.name)}}::Unregister();
 {{- end; end}}
 }

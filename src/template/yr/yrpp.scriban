@@ -1,6 +1,7 @@
 {{
-    func yr_need_codegen(element)
-        ret ["AbstractClass"] | array.contains element.name
+    func yr_need_codegen(htType)
+        $element = htType.element
+        ret ["AbstractClass", "AbstractTypeClass", "TechnoClass", "TechnoTypeClass"] | array.contains $element.name
     end
 
     func yr_inject_meta(htType)

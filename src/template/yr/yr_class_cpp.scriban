@@ -1,5 +1,5 @@
 {{  include 'yr/yrpp.scriban'
-    if !yr_need_codegen(cpp_class)
+    if !yr_need_codegen(this)
         ret
     end
     include 'include/common.scriban'
@@ -7,26 +7,7 @@
     yr_inject_meta(this)
 -}}
 #include "{{class_name}}.gen.h"
-#include <rttr/registration.h>
-#include <rttr/registration_friend.h>
-#include <rttr/type>
 #include <CRC.h>
 
-void {{gen_type_name}}::Register()
-{
-    using namespace rttr;
-
-    registration::class_<{{class_name}}>("{{class_name}}")
-    {{- for function in class_functions }}
-        {{ gen_rttr_class_function(this, function) }}
-    {{- end -}}
-    {{ for property in class_properties }}
-        {{ gen_rttr_class_property(this, property) }}
-    {{- end -}};
-}
-
-void {{gen_type_name}}::Unregister()
-{
-    using namespace rttr;
-
-}
+{{get_meta_gen_header()}}
+{{gen_meta_register_snippet(this)}}

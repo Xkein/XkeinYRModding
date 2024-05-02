@@ -1,6 +1,6 @@
 #include "engine.h"
 
-#include "yr/event/yr_general_event.h"
+#include "yr/event/general_event.h"
 
 Engine* gEngine = new Engine();
 
@@ -14,12 +14,10 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, std::bind(&Engine::OnEndU
 
 Engine::Engine()
 {
-
 }
 
 Engine::~Engine()
 {
-
 }
 
 void Engine::Start() {

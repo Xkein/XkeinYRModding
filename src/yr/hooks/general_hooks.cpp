@@ -1,5 +1,5 @@
 #include "yr/yr_hook.h"
-#include "yr/event/yr_general_event.h"
+#include "yr/event/general_event.h"
 
 
 BROADCAST_HOOK_EVENT(0x52BA60, 0x5, YrBootEvent) {}

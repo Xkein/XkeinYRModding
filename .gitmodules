@@ -7,9 +7,6 @@
 [submodule "3rdparty/entt"]
 	path = 3rdparty/entt
 	url = git@github.com:skypjack/entt.git
-[submodule "3rdparty/rttr"]
-	path = 3rdparty/rttr
-	url = git@github.com:rttrorg/rttr.git
 [submodule "3rdparty/imgui"]
 	path = 3rdparty/imgui
 	url = git@github.com:ocornut/imgui.git
@@ -22,3 +19,6 @@
 [submodule "3rdparty/json"]
 	path = 3rdparty/json
 	url = git@github.com:nlohmann/json.git
+[submodule "3rdparty/stb"]
+	path = 3rdparty/stb
+	url = https://github.com/nothings/stb.git

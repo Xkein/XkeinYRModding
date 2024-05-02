@@ -57,6 +57,7 @@ private:
 private:
     std::vector<HookEventListener> _listeners;
     
+    bool _disable;
     int _callTimes;
 };
 

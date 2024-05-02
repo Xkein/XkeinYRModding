@@ -6,11 +6,11 @@ target("imgui")
     add_files(imgui_includes_dir.."/*.cpp")
 
     add_headerfiles(
-        imgui_includes_dir.."/backends/imgui_impl_dx12.h",
+        imgui_includes_dir.."/backends/imgui_impl_dx11.h",
         imgui_includes_dir.."/backends/imgui_impl_win32.h"
     )
     add_files(
-        imgui_includes_dir.."/backends/imgui_impl_dx12.cpp",
+        imgui_includes_dir.."/backends/imgui_impl_dx11.cpp",
         imgui_includes_dir.."/backends/imgui_impl_win32.cpp"
     )
 

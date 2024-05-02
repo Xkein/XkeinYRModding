@@ -13,6 +13,7 @@ struct Loader
 #include <Windows.h>
 #include <fstream>
 #include <nlohmann/json.hpp>
+
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 

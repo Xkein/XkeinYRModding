@@ -15,8 +15,7 @@ inline const void* GetStdFunctionTarget(std::function<HookEventListenerFuncType>
     return helper.GetTarget();
 }
 
-YrHookEvent::YrHookEvent() : _callTimes(0)
-{
+YrHookEvent::YrHookEvent() : _callTimes(0), _disable(false) {
     
 }
 
@@ -37,6 +36,8 @@ void YrHookEvent::Unregister(HookEventListener listener)
 
 DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
 {
+    if (_disable)
+        return 0;
     _callTimes++;
 
     YrHookContext context {
