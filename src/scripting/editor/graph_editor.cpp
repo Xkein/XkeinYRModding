@@ -767,7 +767,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     ImGui::EndChild();
 }
- void GraphEditor::OnFrame(float deltaTime)
+ void GraphEditor::OnFrame()
 {
     UpdateTouch();
 

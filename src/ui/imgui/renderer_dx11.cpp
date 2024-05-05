@@ -15,7 +15,8 @@
 
 #include <vector>
 #include <map>
-
+#include <core/logger/logger.h>
+#include <yr/extcore_config.h>
 
 static ID3D11Device* g_pd3dDevice = NULL;
 
@@ -195,11 +196,12 @@ struct RendererDX11 final
     void CreateRenderTarget();
     void CleanupRenderTarget();
 
-    Platform*               m_Platform = nullptr;
     ID3D11Device*           m_device = nullptr;
     ID3D11DeviceContext*    m_deviceContext = nullptr;
     IDXGISwapChain*         m_swapChain = nullptr;
     ID3D11RenderTargetView* m_mainRenderTargetView = nullptr;
+    ID3D11Debug*            m_debug                = nullptr;
+    ID3D11InfoQueue*        m_debugInfoQueue       = nullptr;
 };
 
 std::unique_ptr<Renderer> CreateRenderer()
@@ -226,7 +228,7 @@ bool RendererDX11::Create(HWND hWnd)
 
 void RendererDX11::Destroy()
 {
-    if (!m_Platform)
+    if (!m_device)
         return;
 
     ImGui_ImplDX11_Shutdown();
@@ -284,11 +286,17 @@ HRESULT RendererDX11::CreateDeviceD3D(HWND hWnd)
     }
 
     UINT createDeviceFlags = 0;
-    //createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+    if (gYrExtConfig->rawData.value("enable_graphic_debug_layer", true))
+    {
+        createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+    }
     D3D_FEATURE_LEVEL featureLevel;
     const D3D_FEATURE_LEVEL featureLevelArray[1] = { D3D_FEATURE_LEVEL_11_0, };
     if (D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlags, featureLevelArray, 1, D3D11_SDK_VERSION, &sd, &m_swapChain, &m_device, &featureLevel, &m_deviceContext) != S_OK)
         return E_FAIL;
+
+    m_device->QueryInterface(IID_PPV_ARGS(&m_debug));
+    m_device->QueryInterface(IID_PPV_ARGS(&m_debugInfoQueue));
 
     CreateRenderTarget();
 
@@ -315,9 +323,20 @@ void RendererDX11::CreateRenderTarget()
     render_target_view_desc.Format = sd.BufferDesc.Format;
     render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
     m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
-    m_device->CreateRenderTargetView(pBackBuffer, &render_target_view_desc, &m_mainRenderTargetView);
-    m_deviceContext->OMSetRenderTargets(1, &m_mainRenderTargetView, nullptr);
-    pBackBuffer->Release();
+    if (pBackBuffer)
+    {
+        m_device->CreateRenderTargetView(pBackBuffer, &render_target_view_desc, &m_mainRenderTargetView);
+        m_deviceContext->OMSetRenderTargets(1, &m_mainRenderTargetView, nullptr);
+        pBackBuffer->Release();
+    }
+    else
+    {
+        gLogger->error("RendererDX11::CreateRenderTarget could not get back buffer!");
+        if (m_debug)
+        {
+            m_debug->ReportLiveDeviceObjects(D3D11_RLDO_SUMMARY);
+        }
+    }
 }
 
 void RendererDX11::CleanupRenderTarget()

@@ -1,7 +1,7 @@
 #include "yr_event.h"
 #include "yr_hook.h"
 #include "core/logger/logger.h"
-#include "stack_trace.h"
+#include "debug_util.h"
 
 // is there a bette solution?
 class StdFunctionHelper : std::function<HookEventListenerFuncType>
@@ -100,12 +100,6 @@ YrHookMeta YrHookEvent::GetHookMeta(HookEventListenerHandle handle)
     return {};
 }
 
-LONG WINAPI ExceptionFilter(EXCEPTION_POINTERS* info, std::string*& stackTrace)
-{
-    stackTrace = new std::string(DumpStackTrace(info));
-    return EXCEPTION_EXECUTE_HANDLER;
-}
-
 DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
 {
     YrHookEvent_Impl* const impl = _impl;
@@ -127,7 +121,7 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
         {
             listener(&context, E);
         }
-        __except (ExceptionFilter(GetExceptionInformation(), stackTrace))
+        __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
         {
             if (impl->_infos.size() > idx)
             {

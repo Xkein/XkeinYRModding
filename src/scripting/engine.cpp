@@ -44,11 +44,24 @@ void Engine::OnScenarioClear()
     gLogger->info("Engine::OnScenarioClear()");
 }
 
+#include "editor/graph_editor.h"
+std::shared_ptr<GraphEditor> editor;
 void Engine::OnBeginUpdate()
 {
-    gConsole->info("Engine::OnBeginUpdate()");
+    //gConsole->info("Engine::OnBeginUpdate()");
     CalDeltaTime();
 
+    if (ImGui::IsKeyReleased(ImGuiKey_F12))
+    {
+        if (editor)
+        {
+            editor.reset();
+        }
+        else
+        {
+            editor = std::make_shared<GraphEditor>();
+        }
+    }
 }
 
 void Engine::OnEndUpdate()
@@ -57,7 +70,7 @@ void Engine::OnEndUpdate()
 
 void Engine::OnBeginRender()
 {
-    gConsole->info("Engine::OnBeginRender()");
+    //gConsole->info("Engine::OnBeginRender()");
 
 }
 

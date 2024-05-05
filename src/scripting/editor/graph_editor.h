@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/imgui/yr_imgui.h"
 #include "scripting/graph/node.h"
 #include <imgui_node_editor.h>
 #include <vector>
@@ -7,7 +8,7 @@
 
 namespace ed = ax::NodeEditor;
 
-struct GraphEditor
+struct GraphEditor : YrImGuiWindow
 {
     int GetNextId();
 
@@ -86,9 +87,11 @@ struct GraphEditor
 
     void BuildNodes();
 
-    void OnStart();
+    void OnStart() override;
 
-    void OnStop();
+    void OnFrame() override;
+
+    void OnStop() override;
 
     ImColor GetIconColor(PinType type);
     ;
@@ -99,8 +102,6 @@ struct GraphEditor
     void ShowStyleEditor(bool* show = nullptr);
 
     void ShowLeftPane(float paneWidth);
-
-    void OnFrame(float deltaTime);
 
     int                                     m_NextId      = 1;
     const int                               m_PinIconSize = 24;

@@ -1,6 +1,24 @@
 #pragma once
 
-# include <imgui.h>
+#include <imgui.h>
+#include <memory>
+#include <vector>
+
+class YrImGuiWindow
+{
+protected:
+    YREXTUI_API YrImGuiWindow();
+    virtual void OnStart() {}
+    virtual void OnFrame() {}
+    virtual void OnStop() {}
+
+public:
+    YREXTUI_API virtual ~YrImGuiWindow();
+    void NewFrame();
+
+private:
+    bool _started {false};
+};
 
 namespace YrImGui
 {
@@ -16,6 +34,6 @@ namespace YrImGui
     void SetDpiScale(float dpiScale);
 
     void Render();
-    
-    extern YREXTUI_API void (*OnFrame)(float deltaTime);
+
+    extern YREXTUI_API std::vector<YrImGuiWindow*> gWindows;
 };

@@ -10,7 +10,7 @@ struct YrHookContext;
 class REGISTERS;
 typedef unsigned long DWORD;
 
-using HookEventListenerFuncType = void(YrHookContext* const, void* const);
+using HookEventListenerFuncType = void(YrHookContext* const C, void* const E);
 using HookEventListener         = std::function<HookEventListenerFuncType>;
 using HookEventListenerHandle   = const void*;
 
@@ -135,7 +135,7 @@ public:
         YrHookEventSystem::SetHookMeta<T>(_handle, meta);
     }
 
-    YrHookEventListenerRegister(std::function<void(YrHookContext*, T*)> listener) :
+    YrHookEventListenerRegister(std::function<void(YrHookContext* const, T* const)> listener) :
         YrHookEventListenerRegister(HookEventListener(
             [listener = std::move(listener)](YrHookContext* context, void* E) {
                 listener(context, reinterpret_cast<T*>(E));
