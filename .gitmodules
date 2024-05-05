@@ -1,24 +1,24 @@
 [submodule "3rdparty/YRpp"]
 	path = 3rdparty/YRpp
-	url = git@github.com:Xkein/YRpp.git
+	url = https://github.com/Xkein/YRpp.git
 [submodule "3rdparty/CppHeaderTool"]
 	path = 3rdparty/CppHeaderTool
-	url = git@github.com:Xkein/CppHeaderTool.git
+	url = https://github.com/Xkein/CppHeaderTool.git
 [submodule "3rdparty/entt"]
 	path = 3rdparty/entt
-	url = git@github.com:skypjack/entt.git
+	url = https://github.com/skypjack/entt.git
 [submodule "3rdparty/imgui"]
 	path = 3rdparty/imgui
-	url = git@github.com:ocornut/imgui.git
+	url = https://github.com/ocornut/imgui.git
 [submodule "3rdparty/spdlog"]
 	path = 3rdparty/spdlog
-	url = git@github.com:gabime/spdlog.git
+	url = https://github.com/gabime/spdlog.git
 [submodule "3rdparty/imgui-node-editor"]
 	path = 3rdparty/imgui-node-editor
-	url = git@github.com:thedmd/imgui-node-editor.git
+	url = https://github.com/thedmd/imgui-node-editor.git
 [submodule "3rdparty/json"]
 	path = 3rdparty/json
-	url = git@github.com:nlohmann/json.git
+	url = https://github.com/nlohmann/json.git
 [submodule "3rdparty/stb"]
 	path = 3rdparty/stb
-	url = git@github.com:nothings/stb.git
+	url = https://github.com/nothings/stb.git
