@@ -37,6 +37,8 @@
         if has_meta($meta)
             htType.all_visible = get_meta_tag(meta, "AllVisible")
             htType.all_public_visible = get_meta_tag(meta, "AllPublicVisible")
+
+            htType.is_yr_extension = get_meta_tag(meta, "YrExtension")
         end
     end
 

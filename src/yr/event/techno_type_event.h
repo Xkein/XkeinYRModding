@@ -4,6 +4,7 @@
 
 class TechnoTypeClass;
 class CCINIClass;
+struct IStream;
 
 CLASS(HookEvent)
 class YrTechnoTypeCtorEvent

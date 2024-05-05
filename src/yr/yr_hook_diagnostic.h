@@ -5,7 +5,6 @@
 class YrHookDiagnostic
 {
 public:
-    int GetHookCallTimes(YrHookEvent* hookEvent);
 
 };
 

@@ -3,51 +3,55 @@
 #include "core/reflection/macro.h"
 #include "core/macro.h"
 
-#include <Syringe.h>
-
 #include <functional>
 #include <vector>
 
-class YrHookEvent;
 struct YrHookContext;
+class REGISTERS;
+typedef unsigned long DWORD;
 
-using HookEventListenerFuncType = void(YrHookContext*, void*);
+using HookEventListenerFuncType = void(YrHookContext* const, void* const);
 using HookEventListener         = std::function<HookEventListenerFuncType>;
 using HookEventListenerHandle   = const void*;
 
-template<class T>
-class YrHookEventListenerRegister;
-
-
-struct YrHookContext final
+struct YrHookMeta final
 {
-    REGISTERS* const R;
-    DWORD returnAddress;
-    YrHookEvent* const hookEvent;
+    const char* listener;
+    const char* sourcefile;
+    int         line;
+};
 
-    DWORD GetHookAddress() const {
-        return R->Origin();
-    }
+struct YrHookInfo final
+{
+    HookEventListenerHandle handle;
+    YrHookMeta              meta;
+
+    int errors;
 };
 
 // HookEvent meta keywords:
 // HookEvent
 
-class YrHookEvent
+class YrHookEvent final
 {
     friend class YrHookEventSystem;
     friend class YrHookDiagnostic;
 private:
     YrHookEvent();
+    ~YrHookEvent();
 
     YREXTCORE_API HookEventListenerHandle Register(HookEventListener listener);
 
     YREXTCORE_API void Unregister(HookEventListenerHandle handle);
 
+    YREXTCORE_API void SetHookMeta(HookEventListenerHandle handle, YrHookMeta meta);
+
+    YREXTCORE_API YrHookMeta GetHookMeta(HookEventListenerHandle handle);
+
     DWORD Broadcast(REGISTERS* R, void* E);
 
     template<class T, DWORD hookAddress>
-    void InitHookInfo(REGISTERS* R, T* E)
+    inline void InitHookInfo(REGISTERS* R, T* E)
     {
         InitHookInfo_Impl<T, hookAddress>(R, E);
     }
@@ -56,10 +60,7 @@ private:
     void InitHookInfo_Impl(REGISTERS* R, T* E);
 
 private:
-    std::vector<HookEventListener> _listeners;
-    
-    bool _disable;
-    int _callTimes;
+    class YrHookEvent_Impl* _impl;
 };
 
 // used by header tool
@@ -70,29 +71,42 @@ private:
         return &gHookEvent; \
     }
 
-class YREXTCORE_API YrHookEventSystem
+class YrHookEventSystem final
 {
 public:
     template<class T>
-    static YrHookEvent* GetEvent()
+    inline static YrHookEvent* GetEvent()
     {
         return GetEvent_Impl<T>();
     }
 
     template<class T>
-    static HookEventListenerHandle Register(HookEventListener listener)
+    inline static HookEventListenerHandle Register(HookEventListener listener)
     {
         return GetEvent<T>()->Register(std::move(listener));
     }
 
     template<class T>
-    static void Unregister(HookEventListenerHandle handle)
+    inline static void Unregister(HookEventListenerHandle handle)
     {
         GetEvent<T>()->Unregister(handle);
     }
+
+    template<class T>
+    inline static void SetHookMeta(HookEventListenerHandle handle, YrHookMeta meta)
+    {
+        GetEvent<T>()->SetHookMeta(handle, meta);
+    }
+
+    template<class T>
+    inline static YrHookMeta GetHookMeta(HookEventListenerHandle handle)
+    {
+        return GetEvent<T>()->meta(handle);
+    }
+
 #ifdef YREXTCORE_IMPL
     template<class T, DWORD HookAddress>
-    static DWORD Broadcast(REGISTERS* R)
+    inline static DWORD Broadcast(REGISTERS* R)
     {
         YrHookEvent* hookEvent = GetEvent<T>();
         T            e;
@@ -108,16 +122,17 @@ private:
 
 #define REGISTER_YR_HOOK_EVENT_LISTENER(EventType, Listener) \
     namespace { \
-        YrHookEventListenerRegister<EventType> CONCAT(AutoRegister__, __LINE__) (Listener); \
+        YrHookEventListenerRegister<EventType, YrHookMeta {#Listener, __FILE__, __LINE__}> CONCAT(AutoRegister__, __LINE__)(Listener); \
     }
 
-template<class T>
-class YrHookEventListenerRegister
+template<class T, YrHookMeta meta>
+class YrHookEventListenerRegister final
 {
 public:
     YrHookEventListenerRegister(HookEventListener listener)
     {
         _handle = YrHookEventSystem::Register<T>(std::move(listener));
+        YrHookEventSystem::SetHookMeta<T>(_handle, meta);
     }
 
     YrHookEventListenerRegister(std::function<void(YrHookContext*, T*)> listener) :

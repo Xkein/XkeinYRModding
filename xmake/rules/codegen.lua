@@ -34,7 +34,7 @@ rule("codegen-cpp")
         table.sort(depend_files)
         -- run codegen task
         if has_config("skip_codegen") then
-            print(string.format("skip codegen for %s", target:name()))
+            print(string.format("======= %s codegen is skipped, remember before release!! =======", target:name()))
         else
             import("core.project.depend")
             depend.on_changed(function ()

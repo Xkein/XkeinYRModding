@@ -1,21 +1,31 @@
 #include <Windows.h>
-#include "yr/extcore_config.h"
+#include "extension_loader.h"
+#include "core/logger/logger.h"
+#include <filesystem>
 
-struct LoadExtension
+bool ExtensionLoader::AddDirectory(const wchar_t* dir)
 {
-    LoadExtension()
+    static bool _not_config = true;
+    if (_not_config)
     {
-        YrExtCoreConfig* config = YrExtCoreConfig::getInstance();
-        if (config->extensions.size() == 0)
-        {
-            return;
-        }
-        AddDllDirectory(config->path);
-
-        for (auto ext : config->extensions)
-        {
-            std::string extName = ext;
-            LoadLibraryA(extName.c_str());
-        }
+        SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+        _not_config = false;
     }
-} _;
+    gLogger->info("Add dll search directory {}", std::filesystem::path(dir).string());
+    return AddDllDirectory(dir);
+}
+
+bool ExtensionLoader::LoadExtension(const char* extension)
+{
+    gLogger->info("Loading extension {}", extension);
+    return LoadLibraryA(extension);
+}
+
+bool ExtensionLoader::UnloadExtension(const char* extension)
+{
+    HMODULE hModule = GetModuleHandleA(extension);
+    if (hModule == NULL)
+        return false;
+    gLogger->info("Unloading extension {}", extension);
+    return FreeLibrary(hModule);
+}

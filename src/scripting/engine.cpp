@@ -1,6 +1,7 @@
 #include "engine.h"
 
 #include "yr/event/general_event.h"
+#include "core/logger/logger.h"
 
 Engine* gEngine = new Engine();
 
@@ -12,6 +13,9 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent, std::bind(&Engine::OnScena
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, std::bind(&Engine::OnBeginUpdate, gEngine));
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, std::bind(&Engine::OnEndUpdate, gEngine));
 
+REGISTER_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent, std::bind(&Engine::OnBeginRender, gEngine));
+REGISTER_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent, std::bind(&Engine::OnEndRender, gEngine));
+
 Engine::Engine()
 {
 }
@@ -20,39 +24,40 @@ Engine::~Engine()
 {
 }
 
-void Engine::Start() {
-
+void Engine::Start()
+{
+    gLogger->info("Engine::Start()");
 }
 
 void Engine::Exit()
 {
-
+    gLogger->info("Engine::Exit()");
 }
 
 void Engine::OnScenarioStart()
 {
-
+    gLogger->info("Engine::OnScenarioStart()");
 }
 
 void Engine::OnScenarioClear()
 {
-
+    gLogger->info("Engine::OnScenarioClear()");
 }
-#include <MessageListClass.h>
+
 void Engine::OnBeginUpdate()
 {
+    gConsole->info("Engine::OnBeginUpdate()");
     CalDeltaTime();
 
-    MessageListClass::Instance->PrintMessage(L"Engine::OnBeginUpdate");
 }
 
 void Engine::OnEndUpdate()
 {
-    
 }
 
 void Engine::OnBeginRender()
 {
+    gConsole->info("Engine::OnBeginRender()");
 
 }
 

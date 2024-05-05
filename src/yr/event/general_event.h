@@ -2,6 +2,8 @@
 
 #include "yr/yr_event.h"
 
+struct IStream;
+
 CLASS(HookEvent)
 class YrBootEvent { };
 
@@ -15,6 +17,16 @@ class YrLogicBeginUpdateEvent { };
 
 CLASS(HookEvent)
 class YrLogicEndUpdateEvent { };
+
+// ======================= render =======================
+
+CLASS(HookEvent)
+class YrBeginRenderEvent
+{};
+
+CLASS(HookEvent)
+class YrEndRenderEvent
+{};
 
 // ======================= scenario =======================
 

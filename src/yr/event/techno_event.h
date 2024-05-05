@@ -3,6 +3,7 @@
 #include "yr/yr_event.h"
 
 class TechnoClass;
+struct IStream;
 
 CLASS(HookEvent)
 class YrTechnoCtorEvent

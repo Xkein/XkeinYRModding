@@ -3,8 +3,21 @@
 -}}
 #include "{{module_name}}.gen.h"
 {{- for klass in module_classes }}
-{{- if has_meta(klass.meta) }}
+    {{- if has_meta(klass.meta) }}
 #include "class/{{klass.cpp_class.name}}.gen.h"
-{{- end; end }}
+        {{- init_extra_vars(klass)
+            if klass.is_yr_extension }}
+struct ModuleImpl_{{klass.class_name}} {
+    {{klass.class_name}} ext;
+    ModuleImpl_{{klass.class_name}}() {
+        ext.OnLoad();
+    }
+    ~ModuleImpl_{{klass.class_name}}() {
+        ext.OnUnload();
+    }
+} _ModuleImpl_{{klass.class_name}};
+        {{- end }}
+    {{- end }}
+{{- end }}
 
 {{gen_meta_register_snippet(this)}}
