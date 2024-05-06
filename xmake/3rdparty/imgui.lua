@@ -3,7 +3,7 @@ imgui_includes_dir = get_thirdparty_path("imgui")
 target("imgui")
     set_kind("shared")
     add_headerfiles(imgui_includes_dir.."/*.h")
-    add_files(imgui_includes_dir.."/*.cpp|imgui_demo.cpp")
+    add_files(imgui_includes_dir.."/*.cpp")
     add_headerfiles(
         imgui_includes_dir.."/backends/imgui_impl_dx11.h",
         imgui_includes_dir.."/backends/imgui_impl_win32.h"

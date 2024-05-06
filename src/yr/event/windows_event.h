@@ -3,7 +3,7 @@
 #include "yr/yr_event.h"
 #include <Windows.h>
 
-
+CLASS()
 class YrWndProcEvent
 {
 public:

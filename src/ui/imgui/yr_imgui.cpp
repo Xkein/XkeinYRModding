@@ -38,14 +38,21 @@ ImGuiWindowFlags_NoBringToFrontOnFocus;
 
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+static ImGuiMouseSource GetMouseSourceFromMessageExtraInfo()
 {
-    if (!inited)
-    {
-        return;
-    }
+    LPARAM extra_info = ::GetMessageExtraInfo();
+    if ((extra_info & 0xFFFFFF80) == 0xFF515700)
+        return ImGuiMouseSource_Pen;
+    if ((extra_info & 0xFFFFFF80) == 0xFF515780)
+        return ImGuiMouseSource_TouchScreen;
+    return ImGuiMouseSource_Mouse;
+}
+// remove SetCapture and ReleaseCapture
+LRESULT ImGui_ImplWin32_WndProcHandler_NoCapture(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    ImGuiIO& io = ImGui::GetIO();
 
-    switch (uMsg)
+    switch (msg)
     {
         case WM_LBUTTONDOWN:
         case WM_LBUTTONDBLCLK:
@@ -54,20 +61,73 @@ void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case WM_MBUTTONDOWN:
         case WM_MBUTTONDBLCLK:
         case WM_XBUTTONDOWN:
-        case WM_XBUTTONDBLCLK:
+        case WM_XBUTTONDBLCLK: {
+            ImGuiMouseSource mouse_source = GetMouseSourceFromMessageExtraInfo();
+            int              button       = 0;
+            if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK)
+            {
+                button = 0;
+            }
+            if (msg == WM_RBUTTONDOWN || msg == WM_RBUTTONDBLCLK)
+            {
+                button = 1;
+            }
+            if (msg == WM_MBUTTONDOWN || msg == WM_MBUTTONDBLCLK)
+            {
+                button = 2;
+            }
+            if (msg == WM_XBUTTONDOWN || msg == WM_XBUTTONDBLCLK)
+            {
+                button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4;
+            }
+            if (::GetCapture() == nullptr && YrImGui::gWindows.size() > 0)
+                ::SetCapture(hWnd);
+            io.AddMouseSourceEvent(mouse_source);
+            io.AddMouseButtonEvent(button, true);
+            break;
+        }
         case WM_LBUTTONUP:
         case WM_RBUTTONUP:
         case WM_MBUTTONUP:
-        case WM_XBUTTONUP:
-            break;
-        case WM_MOUSEMOVE:
-        case WM_NCMOUSEMOVE:
-        case WM_MOUSELEAVE:
-        case WM_NCMOUSELEAVE:
+        case WM_XBUTTONUP: {
+            ImGuiMouseSource mouse_source = GetMouseSourceFromMessageExtraInfo();
+            int              button       = 0;
+            if (msg == WM_LBUTTONUP)
+            {
+                button = 0;
+            }
+            if (msg == WM_RBUTTONUP)
+            {
+                button = 1;
+            }
+            if (msg == WM_MBUTTONUP)
+            {
+                button = 2;
+            }
+            if (msg == WM_XBUTTONUP)
+            {
+                button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4;
+            }
+            if (::GetCapture() == hWnd && YrImGui::gWindows.size() > 0)
+                ::ReleaseCapture();
+            io.AddMouseSourceEvent(mouse_source);
+            io.AddMouseButtonEvent(button, false);
+            return 0;
+        }
         default:
-            ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
-            break;
+            return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
     }
+    return 0;
+}
+
+void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (!inited)
+    {
+        return;
+    }
+
+    ImGui_ImplWin32_WndProcHandler_NoCapture(hWnd, uMsg, wParam, lParam);
 
     switch (uMsg)
     {
@@ -280,6 +340,7 @@ YrImGuiWindow::~YrImGuiWindow() {
     if (_started)
     {
         this->OnStop();
+        _started = false;
     }
     if (auto iter = std::find(YrImGui::gWindows.begin(), YrImGui::gWindows.end(), this); iter != YrImGui::gWindows.end())
     {
@@ -291,6 +352,7 @@ void YrImGuiWindow::NewFrame() {
     if (!_started)
     {
         this->OnStart();
+        _started = true;
     }
     this->OnFrame();
 }

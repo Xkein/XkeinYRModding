@@ -46,12 +46,34 @@ void Engine::OnScenarioClear()
 
 #include "editor/graph_editor.h"
 std::shared_ptr<GraphEditor> editor;
+class DemoWindow : public YrImGuiWindow
+{
+    virtual void OnFrame() override
+    {
+        ImGui::ShowDemoWindow(&showWindow);
+    }
+
+public:
+    bool showWindow {true};
+};
+std::shared_ptr<DemoWindow>  demo;
 void Engine::OnBeginUpdate()
 {
     //gConsole->info("Engine::OnBeginUpdate()");
     CalDeltaTime();
 
     if (ImGui::IsKeyReleased(ImGuiKey_F12))
+    {
+        if (demo)
+        {
+            demo.reset();
+        }
+        else
+        {
+            demo = std::make_shared<DemoWindow>();
+        }
+    }
+    if (ImGui::IsKeyReleased(ImGuiKey_F11))
     {
         if (editor)
         {

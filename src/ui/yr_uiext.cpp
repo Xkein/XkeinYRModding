@@ -17,14 +17,13 @@ struct ImGuiThread
     ~ImGuiThread()
     {
         shouldStop = true;
-        _thread.detach();
-        // wait imgui destruction
+        _thread.detach(); // prevent thread error and endless
+        // wait 1s for imgui destruction
         std::this_thread::sleep_for(1s);
     }
 
     void ImGuiThreadFunc()
     {
-        std::string* stackTrace;
         __try
         {
             std::this_thread::sleep_for(200ms);
@@ -39,18 +38,8 @@ struct ImGuiThread
 
             while (!shouldStop)
             {
-                __try
-                {
-                    YrImGui::Render();
-                    std::this_thread::sleep_for(16ms);
-                }
-                __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
-                {
-                    gLogger->error("YrExtUI: ImGuiThread render error!");
-                    gLogger->error("stack trace : {}", *stackTrace);
-                    delete stackTrace;
-                    stackTrace = nullptr;
-                }
+                TickSafe();
+                std::this_thread::sleep_for(16ms);
             }
 
             gLogger->info("YrExtUI: imgui thread loop stop.");
@@ -67,13 +56,45 @@ struct ImGuiThread
         }
     }
 
-    bool        shouldStop;
+    void TickSafe()
+    {
+        __try
+        {
+            Tick();
+        }
+        __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
+        {
+            gLogger->error("YrExtUI: ImGuiThread render error!");
+            gLogger->error("stack trace : {}", *stackTrace);
+            delete stackTrace;
+            stackTrace = nullptr;
+        }
+    }
+
+    void Tick()
+    {
+        std::unique_lock lk(mtx);
+        cv.wait(lk);
+        YrImGui::Render();
+    }
+
+    std::string* stackTrace;
+    bool         shouldStop {false};
     std::thread _thread;
+
+    std::mutex              mtx;
+    std::condition_variable cv;
 };
 
 std::unique_ptr<ImGuiThread> imguiThread;
 
-#include <core/logger/logger.h> 
+REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, []() {
+    imguiThread->cv.notify_one();
+})
+REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, []() {
+
+})
+
 GLOBAL_INVOKE_ON_CTOR_DTOR([]() {
     gLogger->info("Yr Extension UI module load.");
     imguiThread = std::make_unique<ImGuiThread>();
