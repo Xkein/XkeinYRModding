@@ -45,6 +45,7 @@ void Engine::OnScenarioClear()
 }
 
 #include "editor/graph_editor.h"
+#include "imgui_internal.h"
 std::shared_ptr<GraphEditor> editor;
 class DemoWindow : public YrImGuiWindow
 {

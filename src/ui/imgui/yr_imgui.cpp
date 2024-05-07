@@ -188,8 +188,6 @@ void YrImGui::Init()
 
     ImGui::StyleColorsDark();
 
-    YrImGui::Render();
-
     inited = true;
 }
 
@@ -230,34 +228,13 @@ void YrImGui::Render()
         m_FramebufferScaleChanged = false;
     }
 
-    const float windowScale      = m_WindowScale;
-    const float framebufferScale = m_FramebufferScale;
-
-    if (io.WantSetMousePos)
-    {
-        io.MousePos.x *= windowScale;
-        io.MousePos.y *= windowScale;
-    }
-
     ImGui_ImplWin32_NewFrame();
 
     if (m_WasMinimized)
     {
-        ImGui::GetIO().DeltaTime = 0.1e-6f;
+        //ImGui::GetIO().DeltaTime = 0.1e-6f;
         m_WasMinimized           = false;
     }
-
-    // Don't touch "uninitialized" mouse position
-    if (io.MousePos.x > -FLT_MAX && io.MousePos.y > -FLT_MAX)
-    {
-        io.MousePos.x /= windowScale;
-        io.MousePos.y /= windowScale;
-    }
-    io.DisplaySize.x /= windowScale;
-    io.DisplaySize.y /= windowScale;
-
-    io.DisplayFramebufferScale.x = framebufferScale;
-    io.DisplayFramebufferScale.y = framebufferScale;
 
     m_Renderer->NewFrame();
 
@@ -272,13 +249,18 @@ void YrImGui::Render()
     ImGui::Render();
     //m_Renderer->RenderDrawData(ImGui::GetDrawData());
 
+    //m_Renderer->Present();
+}
+
+
+void YrImGui::RenderPlatform()
+{
+    auto& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
     }
-
-    //m_Renderer->Present();
 }
 
 void SetWindowScale(float windowScale)

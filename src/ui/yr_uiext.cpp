@@ -1,5 +1,6 @@
 #include "core/raii_invoker.h"
 #include "yr/event/general_event.h"
+#include "yr/event/ui_event.h"
 #include "ui/imgui/yr_imgui.h"
 #include <Unsorted.h>
 #include "core/logger/logger.h"
@@ -38,7 +39,7 @@ struct ImGuiThread
 
             while (!shouldStop)
             {
-                TickSafe();
+                //TickSafe();
                 std::this_thread::sleep_for(16ms);
             }
 
@@ -73,9 +74,15 @@ struct ImGuiThread
 
     void Tick()
     {
-        std::unique_lock lk(mtx);
-        cv.wait(lk);
-        YrImGui::Render();
+        __try
+        {
+            mtx.lock();
+            YrImGui::Render();
+        }
+        __finally
+        {
+            mtx.unlock();
+        }
     }
 
     std::string* stackTrace;
@@ -83,16 +90,33 @@ struct ImGuiThread
     std::thread _thread;
 
     std::mutex              mtx;
-    std::condition_variable cv;
 };
 
 std::unique_ptr<ImGuiThread> imguiThread;
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, []() {
-    imguiThread->cv.notify_one();
-})
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, []() {
+void UIMainThread()
+{
+    YrImGui::Render();
+    YrImGui::RenderPlatform();
+}
 
+REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, []() {
+    ImGui::GetIO().MouseDrawCursor = false;
+    UIMainThread();
+})
+
+REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, []() {
+})
+
+REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, []() {
+    ImGui::GetIO().MouseDrawCursor = true;
+    UIMainThread();
+})
+
+REGISTER_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent, []() {
+})
+
+REGISTER_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent, []() {
 })
 
 GLOBAL_INVOKE_ON_CTOR_DTOR([]() {
