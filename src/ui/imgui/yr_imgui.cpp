@@ -216,6 +216,10 @@ void YrImGui::Destory()
 
 void YrImGui::Render()
 {
+    if (gWindows.size() == 0)
+    {
+        return;
+    }
     auto& io = ImGui::GetIO();
 
     if (m_WindowScaleChanged)
