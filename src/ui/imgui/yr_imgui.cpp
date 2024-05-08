@@ -16,16 +16,19 @@ HWND GetGameHwnd() {
     return Game::hWnd;
 }
 
-bool                      inited = false;
-ImGuiContext* g_Context = nullptr;
-std::unique_ptr<Renderer> m_Renderer;
-bool                      m_WindowScaleChanged = false;
-float                     m_WindowScale = 1.0f;
-bool                      m_FramebufferScaleChanged = false;
-float                     m_FramebufferScale = 1.0f;
-bool                      m_IsMinimized = false;
-bool                      m_WasMinimized = false;
-bool                      m_CanCloseResult = false;
+static bool                      inited = false;
+static ImGuiContext* g_Context = nullptr;
+static std::unique_ptr<Renderer> m_Renderer;
+static bool                      m_WindowScaleChanged = false;
+static float                     m_WindowScale = 1.0f;
+static bool                      m_FramebufferScaleChanged = false;
+static float                     m_FramebufferScale = 1.0f;
+static bool                      m_IsMinimized = false;
+static bool                      m_WasMinimized = false;
+static bool                      m_CanCloseResult = false;
+
+
+std::mutex windowMtx;
 
 ImGuiWindowFlags g_WindowFlags =
 ImGuiWindowFlags_NoTitleBar |
@@ -216,10 +219,6 @@ void YrImGui::Destory()
 
 void YrImGui::Render()
 {
-    if (gWindows.size() == 0)
-    {
-        return;
-    }
     auto& io = ImGui::GetIO();
 
     if (m_WindowScaleChanged)
@@ -254,12 +253,7 @@ void YrImGui::Render()
     //m_Renderer->RenderDrawData(ImGui::GetDrawData());
 
     //m_Renderer->Present();
-}
 
-
-void YrImGui::RenderPlatform()
-{
-    auto& io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
         ImGui::UpdatePlatformWindows();
@@ -319,15 +313,18 @@ YREXTUI_API std::vector<YrImGuiWindow*> YrImGui::gWindows;
 
 YrImGuiWindow::YrImGuiWindow()
 {
+    std::lock_guard lock(windowMtx);
     YrImGui::gWindows.push_back(this);
 }
 
-YrImGuiWindow::~YrImGuiWindow() {
+YrImGuiWindow::~YrImGuiWindow()
+{
     if (_started)
     {
         this->OnStop();
         _started = false;
     }
+    std::lock_guard lock(windowMtx);
     if (auto iter = std::find(YrImGui::gWindows.begin(), YrImGui::gWindows.end(), this); iter != YrImGui::gWindows.end())
     {
         YrImGui::gWindows.erase(iter);

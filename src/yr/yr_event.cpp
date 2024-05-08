@@ -127,7 +127,7 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
             {
                 YrHookInfo& info = impl->_infos[idx];
                 YrHookMeta& meta = info.meta;
-                gLogger->error("{} line {}: '{}' encounter errors ({} times)!", meta.sourcefile, meta.line, meta.listener, ++info.errors);
+                //gLogger->error("{} line {}: '{}' encounter errors ({} times)!", meta.sourcefile, meta.line, meta.listener, ++info.errors);
                 gLogger->error("stack trace : {}", *stackTrace);
             }
             else

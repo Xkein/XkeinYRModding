@@ -34,7 +34,6 @@ namespace YrImGui
     void SetDpiScale(float dpiScale);
 
     void Render();
-    void RenderPlatform();
 
     extern YREXTUI_API std::vector<YrImGuiWindow*> gWindows;
 };

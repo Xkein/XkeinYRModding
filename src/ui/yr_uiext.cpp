@@ -9,6 +9,9 @@
 
 using namespace std::chrono_literals;
 
+extern std::mutex windowMtx;
+static bool       isMainThread = false;
+
 struct ImGuiThread
 {
     ImGuiThread()
@@ -39,7 +42,7 @@ struct ImGuiThread
 
             while (!shouldStop)
             {
-                //TickSafe();
+                TickSafe();
                 std::this_thread::sleep_for(16ms);
             }
 
@@ -76,28 +79,38 @@ struct ImGuiThread
     {
         __try
         {
-            mtx.lock();
-            YrImGui::Render();
+            windowMtx.lock();
+
+            if (YrImGui::gWindows.size() == 0 && !isMainThread)
+            {
+                YrImGui::Render();
+            }
         }
         __finally
         {
-            mtx.unlock();
+            windowMtx.unlock();
         }
     }
 
     std::string* stackTrace;
     bool         shouldStop {false};
     std::thread _thread;
-
-    std::mutex              mtx;
 };
 
 std::unique_ptr<ImGuiThread> imguiThread;
 
 void UIMainThread()
 {
-    YrImGui::Render();
-    YrImGui::RenderPlatform();
+    if (YrImGui::gWindows.size() > 0)
+    {
+        isMainThread = true;
+        YrImGui::Render();
+    }
+    else if (isMainThread)
+    {
+        YrImGui::Render();
+        isMainThread = false;
+    }
 }
 
 REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, []() {

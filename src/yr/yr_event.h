@@ -16,9 +16,6 @@ using HookEventListenerHandle   = const void*;
 
 struct YrHookMeta final
 {
-    const char* listener;
-    const char* sourcefile;
-    int         line;
 };
 
 struct YrHookInfo final
@@ -121,18 +118,16 @@ private:
 };
 
 #define REGISTER_YR_HOOK_EVENT_LISTENER(EventType, Listener) \
-    namespace { \
-        YrHookEventListenerRegister<EventType, YrHookMeta {#Listener, __FILE__, __LINE__}> CONCAT(AutoRegister__, __LINE__)(Listener); \
-    }
+    YrHookEventListenerRegister<EventType> CONCAT(AutoRegister__, __LINE__)(Listener);
 
-template<class T, YrHookMeta meta>
+template<class T>
 class YrHookEventListenerRegister final
 {
 public:
     YrHookEventListenerRegister(HookEventListener listener)
     {
         _handle = YrHookEventSystem::Register<T>(std::move(listener));
-        YrHookEventSystem::SetHookMeta<T>(_handle, meta);
+        //YrHookEventSystem::SetHookMeta<T>(_handle, meta);
     }
 
     YrHookEventListenerRegister(std::function<void(YrHookContext* const, T* const)> listener) :
