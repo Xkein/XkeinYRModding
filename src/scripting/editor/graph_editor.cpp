@@ -78,58 +78,7 @@ static ed::EditorContext* m_Editor = nullptr;
             entry.second -= deltaTime;
     }
 }
- Node* GraphEditor::FindNode(ed::NodeId id)
-{
-    for (auto& node : m_Nodes)
-        if (node.ID == id)
-            return &node;
 
-    return nullptr;
-}
- Link* GraphEditor::FindLink(ed::LinkId id)
-{
-    for (auto& link : m_Links)
-        if (link.ID == id)
-            return &link;
-
-    return nullptr;
-}
- Pin* GraphEditor::FindPin(ed::PinId id)
-{
-    if (!id)
-        return nullptr;
-
-    for (auto& node : m_Nodes)
-    {
-        for (auto& pin : node.Inputs)
-            if (pin.ID == id)
-                return &pin;
-
-        for (auto& pin : node.Outputs)
-            if (pin.ID == id)
-                return &pin;
-    }
-
-    return nullptr;
-}
- bool GraphEditor::IsPinLinked(ed::PinId id)
-{
-    if (!id)
-        return false;
-
-    for (auto& link : m_Links)
-        if (link.StartPinID == id || link.EndPinID == id)
-            return true;
-
-    return false;
-}
- bool GraphEditor::CanCreateLink(Pin* a, Pin* b)
-{
-    if (!a || !b || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
-        return false;
-
-    return true;
-}
  void GraphEditor::BuildNode(Node* node)
 {
     for (auto& input : node->Inputs)
@@ -347,7 +296,7 @@ static ed::EditorContext* m_Editor = nullptr;
     config.LoadNodeSettings = [](ed::NodeId nodeId, char* data, void* userPointer) -> size_t {
         auto self = static_cast<GraphEditor*>(userPointer);
 
-        auto node = self->FindNode(nodeId);
+        auto node = self->m_graph->FindNode(nodeId);
         if (!node)
             return 0;
 
@@ -359,7 +308,7 @@ static ed::EditorContext* m_Editor = nullptr;
     config.SaveNodeSettings = [](ed::NodeId nodeId, const char* data, size_t size, ed::SaveReasonFlags reason, void* userPointer) -> bool {
         auto self = static_cast<GraphEditor*>(userPointer);
 
-        auto node = self->FindNode(nodeId);
+        auto node = self->m_graph->FindNode(nodeId);
         if (!node)
             return false;
 
@@ -840,7 +789,7 @@ static ed::EditorContext* m_Editor = nullptr;
                             continue;
 
                         auto alpha = ImGui::GetStyle().Alpha;
-                        if (newLinkPin && !CanCreateLink(newLinkPin, &output) && &output != newLinkPin)
+                        if (newLinkPin && !m_graph->CanCreateLink(newLinkPin, &output) && &output != newLinkPin)
                             alpha = alpha * (48.0f / 255.0f);
 
                         ed::BeginPin(output.ID, ed::PinKind::Output);
@@ -853,7 +802,7 @@ static ed::EditorContext* m_Editor = nullptr;
                             ImGui::TextUnformatted(output.Name.c_str());
                             ImGui::Spring(0);
                         }
-                        DrawPinIcon(output, IsPinLinked(output.ID), (int)(alpha * 255));
+                        DrawPinIcon(output, m_graph->IsPinLinked(output.ID), (int)(alpha * 255));
                         ImGui::Spring(0, ImGui::GetStyle().ItemSpacing.x / 2);
                         ImGui::EndHorizontal();
                         ImGui::PopStyleVar();
@@ -873,12 +822,12 @@ static ed::EditorContext* m_Editor = nullptr;
             for (auto& input : node.Inputs)
             {
                 auto alpha = ImGui::GetStyle().Alpha;
-                if (newLinkPin && !CanCreateLink(newLinkPin, &input) && &input != newLinkPin)
+                if (newLinkPin && !m_graph->CanCreateLink(newLinkPin, &input) && &input != newLinkPin)
                     alpha = alpha * (48.0f / 255.0f);
 
                 builder.Input(input.ID);
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
-                DrawPinIcon(input, IsPinLinked(input.ID), (int)(alpha * 255));
+                DrawPinIcon(input, m_graph->IsPinLinked(input.ID), (int)(alpha * 255));
                 ImGui::Spring(0);
                 if (!input.Name.empty())
                 {
@@ -909,7 +858,7 @@ static ed::EditorContext* m_Editor = nullptr;
                     continue;
 
                 auto alpha = ImGui::GetStyle().Alpha;
-                if (newLinkPin && !CanCreateLink(newLinkPin, &output) && &output != newLinkPin)
+                if (newLinkPin && !m_graph->CanCreateLink(newLinkPin, &output) && &output != newLinkPin)
                     alpha = alpha * (48.0f / 255.0f);
 
                 ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
@@ -940,7 +889,7 @@ static ed::EditorContext* m_Editor = nullptr;
                     ImGui::TextUnformatted(output.Name.c_str());
                 }
                 ImGui::Spring(0);
-                DrawPinIcon(output, IsPinLinked(output.ID), (int)(alpha * 255));
+                DrawPinIcon(output, m_graph->IsPinLinked(output.ID), (int)(alpha * 255));
                 ImGui::PopStyleVar();
                 builder.EndOutput();
             }
@@ -998,7 +947,7 @@ static ed::EditorContext* m_Editor = nullptr;
                 ed::EndPin();
                 ed::PopStyleVar(3);
 
-                if (newLinkPin && !CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
+                if (newLinkPin && !m_graph->CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
                     inputAlpha = (int)(255 * ImGui::GetStyle().Alpha * (48.0f / 255.0f));
             }
             else
@@ -1044,7 +993,7 @@ static ed::EditorContext* m_Editor = nullptr;
                 ed::EndPin();
                 ed::PopStyleVar();
 
-                if (newLinkPin && !CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
+                if (newLinkPin && !m_graph->CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
                     outputAlpha = (int)(255 * ImGui::GetStyle().Alpha * (48.0f / 255.0f));
             }
             else
@@ -1178,7 +1127,7 @@ static ed::EditorContext* m_Editor = nullptr;
                                       4.0f,
                                       allRoundCornersFlags);
 
-                    if (newLinkPin && !CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
+                    if (newLinkPin && !m_graph->CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
                         inputAlpha = (int)(255 * ImGui::GetStyle().Alpha * (48.0f / 255.0f));
                 }
 
@@ -1244,7 +1193,7 @@ static ed::EditorContext* m_Editor = nullptr;
                                       4.0f,
                                       allRoundCornersFlags);
 
-                    if (newLinkPin && !CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
+                    if (newLinkPin && !m_graph->CanCreateLink(newLinkPin, &pin) && &pin != newLinkPin)
                         outputAlpha = (int)(255 * ImGui::GetStyle().Alpha * (48.0f / 255.0f));
                 }
 
@@ -1372,8 +1321,8 @@ static ed::EditorContext* m_Editor = nullptr;
                 ed::PinId startPinId = 0, endPinId = 0;
                 if (ed::QueryNewLink(&startPinId, &endPinId))
                 {
-                    auto startPin = FindPin(startPinId);
-                    auto endPin   = FindPin(endPinId);
+                    auto startPin = m_graph->FindPin(startPinId);
+                    auto endPin   = m_graph->FindPin(endPinId);
 
                     newLinkPin = startPin ? startPin : endPin;
 
@@ -1419,14 +1368,14 @@ static ed::EditorContext* m_Editor = nullptr;
                 ed::PinId pinId = 0;
                 if (ed::QueryNewNode(&pinId))
                 {
-                    newLinkPin = FindPin(pinId);
+                    newLinkPin = m_graph->FindPin(pinId);
                     if (newLinkPin)
                         showLabel("+ Create Node", ImColor(32, 45, 32, 180));
 
                     if (ed::AcceptNewItem())
                     {
                         createNewNode  = true;
-                        newNodeLinkPin = FindPin(pinId);
+                        newNodeLinkPin = m_graph->FindPin(pinId);
                         newLinkPin     = nullptr;
                         ed::Suspend();
                         ImGui::OpenPopup("Create New Node");
@@ -1446,7 +1395,9 @@ static ed::EditorContext* m_Editor = nullptr;
                 {
                     if (ed::AcceptDeletedItem())
                     {
-                        auto id = std::find_if(m_Nodes.begin(), m_Nodes.end(), [nodeId](auto& node) { return node.ID == nodeId; });
+                        auto id = std::find_if(m_Nodes.begin(), m_Nodes.end(), [nodeId](auto& node) {
+                            return node.ID == nodeId;
+                        });
                         if (id != m_Nodes.end())
                             m_Nodes.erase(id);
                     }
@@ -1457,7 +1408,9 @@ static ed::EditorContext* m_Editor = nullptr;
                 {
                     if (ed::AcceptDeletedItem())
                     {
-                        auto id = std::find_if(m_Links.begin(), m_Links.end(), [linkId](auto& link) { return link.ID == linkId; });
+                        auto id = std::find_if(m_Links.begin(), m_Links.end(), [linkId](auto& link) {
+                            return link.ID == linkId;
+                        });
                         if (id != m_Links.end())
                             m_Links.erase(id);
                     }
@@ -1489,7 +1442,7 @@ static ed::EditorContext* m_Editor = nullptr;
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
     if (ImGui::BeginPopup("Node Context Menu"))
     {
-        auto node = FindNode(contextNodeId);
+        auto node = m_graph->FindNode(contextNodeId);
 
         ImGui::TextUnformatted("Node Context Menu");
         ImGui::Separator();
@@ -1510,7 +1463,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     if (ImGui::BeginPopup("Pin Context Menu"))
     {
-        auto pin = FindPin(contextPinId);
+        auto pin = m_graph->FindPin(contextPinId);
 
         ImGui::TextUnformatted("Pin Context Menu");
         ImGui::Separator();
@@ -1530,7 +1483,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     if (ImGui::BeginPopup("Link Context Menu"))
     {
-        auto link = FindLink(contextLinkId);
+        auto link = m_graph->FindLink(contextLinkId);
 
         ImGui::TextUnformatted("Link Context Menu");
         ImGui::Separator();
@@ -1608,7 +1561,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
                 for (auto& pin : pins)
                 {
-                    if (CanCreateLink(startPin, &pin))
+                    if (m_graph->CanCreateLink(startPin, &pin))
                     {
                         auto endPin = &pin;
                         if (startPin->Kind == PinKind::Input)

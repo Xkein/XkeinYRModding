@@ -1,7 +1,8 @@
 #pragma once
 
 #include "ui/imgui/yr_imgui.h"
-#include "scripting/graph/node.h"
+#include "scripting/editor/node.h"
+#include "scripting/editor/graph.h"
 #include <imgui_node_editor.h>
 #include <vector>
 #include <map>
@@ -24,16 +25,6 @@ struct GraphEditor : YrImGuiWindow
     float GetTouchProgress(ed::NodeId id);
 
     void UpdateTouch();
-
-    Node* FindNode(ed::NodeId id);
-
-    Link* FindLink(ed::LinkId id);
-
-    Pin* FindPin(ed::PinId id);
-
-    bool IsPinLinked(ed::PinId id);
-
-    bool CanCreateLink(Pin* a, Pin* b);
 
     // void DrawItemRect(ImColor color, float expand = 0.0f)
     //{
@@ -105,6 +96,7 @@ struct GraphEditor : YrImGuiWindow
 
     int                                     m_NextId      = 1;
     const int                               m_PinIconSize = 24;
+    std::shared_ptr<Graph>                  m_graph;
     std::vector<Node>                       m_Nodes;
     std::vector<Link>                       m_Links;
     ImTextureID                             m_HeaderBackground = nullptr;

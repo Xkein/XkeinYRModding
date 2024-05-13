@@ -83,8 +83,8 @@ LRESULT ImGui_ImplWin32_WndProcHandler_NoCapture(HWND hWnd, UINT msg, WPARAM wPa
             {
                 button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4;
             }
-            if (::GetCapture() == nullptr && YrImGui::gWindows.size() > 0)
-                ::SetCapture(hWnd);
+            //if (::GetCapture() == nullptr && YrImGui::gWindows.size() > 0)
+            //    ::SetCapture(hWnd);
             io.AddMouseSourceEvent(mouse_source);
             io.AddMouseButtonEvent(button, true);
             break;
@@ -111,8 +111,8 @@ LRESULT ImGui_ImplWin32_WndProcHandler_NoCapture(HWND hWnd, UINT msg, WPARAM wPa
             {
                 button = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? 3 : 4;
             }
-            if (::GetCapture() == hWnd && YrImGui::gWindows.size() > 0)
-                ::ReleaseCapture();
+            //if (::GetCapture() == hWnd && YrImGui::gWindows.size() > 0)
+            //    ::ReleaseCapture();
             io.AddMouseSourceEvent(mouse_source);
             io.AddMouseButtonEvent(button, false);
             return 0;
@@ -311,31 +311,52 @@ int YrImGui::GetTextureHeight(ImTextureID texture)
 
 YREXTUI_API std::vector<YrImGuiWindow*> YrImGui::gWindows;
 
+class YrImGuiWindow_Impl
+{
+public:
+    YrImGuiWindow_Impl(YrImGuiWindow* window) : window(window)
+    {
+        std::lock_guard lock(windowMtx);
+        YrImGui::gWindows.push_back(window);
+    }
+    ~YrImGuiWindow_Impl()
+    {
+        if (_started)
+        {
+            window->OnStop();
+            _started = false;
+        }
+        std::lock_guard lock(windowMtx);
+        if (auto iter = std::find(YrImGui::gWindows.begin(), YrImGui::gWindows.end(), window); iter != YrImGui::gWindows.end())
+        {
+            YrImGui::gWindows.erase(iter);
+        }
+    }
+
+    void NewFrame()
+    {
+        if (!_started)
+        {
+            window->OnStart();
+            _started = true;
+        }
+        window->OnFrame();
+    }
+
+    YrImGuiWindow* window;
+    bool _started {false};
+};
+
 YrImGuiWindow::YrImGuiWindow()
 {
-    std::lock_guard lock(windowMtx);
-    YrImGui::gWindows.push_back(this);
+    _impl = std::make_shared<YrImGuiWindow_Impl>(this);
 }
 
 YrImGuiWindow::~YrImGuiWindow()
 {
-    if (_started)
-    {
-        this->OnStop();
-        _started = false;
-    }
-    std::lock_guard lock(windowMtx);
-    if (auto iter = std::find(YrImGui::gWindows.begin(), YrImGui::gWindows.end(), this); iter != YrImGui::gWindows.end())
-    {
-        YrImGui::gWindows.erase(iter);
-    }
+    _impl.reset();
 }
 
 void YrImGuiWindow::NewFrame() {
-    if (!_started)
-    {
-        this->OnStart();
-        _started = true;
-    }
-    this->OnFrame();
+    _impl->NewFrame();
 }

@@ -4,20 +4,23 @@
 #include <memory>
 #include <vector>
 
+class YrImGuiWindow_Impl;
 class YrImGuiWindow
 {
+    friend class YrImGuiWindow_Impl;
+
 protected:
     YREXTUI_API YrImGuiWindow();
     virtual void OnStart() {}
     virtual void OnFrame() {}
     virtual void OnStop() {}
-
+    
 public:
     YREXTUI_API virtual ~YrImGuiWindow();
     void NewFrame();
 
 private:
-    bool _started {false};
+    std::shared_ptr<YrImGuiWindow_Impl> _impl;
 };
 
 namespace YrImGui
