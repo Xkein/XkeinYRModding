@@ -1,7 +1,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "graph_editor.h"
-#include "blueprints/utilities/builders.h"
-#include "blueprints/utilities/widgets.h"
+#include "editor/blueprints/utilities/builders.h"
+#include "editor/blueprints/utilities/widgets.h"
 
 #include <imgui_node_editor.h>
 #include <imgui_internal.h>

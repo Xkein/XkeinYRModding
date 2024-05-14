@@ -44,7 +44,7 @@ void Engine::OnScenarioClear()
     gLogger->info("Engine::OnScenarioClear()");
 }
 
-#include "editor/graph_editor.h"
+#include "editor/graph/graph_editor.h"
 #include "imgui_internal.h"
 std::shared_ptr<GraphEditor> editor;
 class DemoWindow : public YrImGuiWindow

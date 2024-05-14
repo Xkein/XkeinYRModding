@@ -42,7 +42,7 @@ struct ImGuiThread
 
             while (!shouldStop)
             {
-                TickSafe();
+                Tick();
                 std::this_thread::sleep_for(16ms);
             }
 
@@ -54,21 +54,6 @@ struct ImGuiThread
         __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
         {
             gLogger->error("YrExtUI: ImGuiThread error!");
-            gLogger->error("stack trace : {}", *stackTrace);
-            delete stackTrace;
-            stackTrace = nullptr;
-        }
-    }
-
-    void TickSafe()
-    {
-        __try
-        {
-            Tick();
-        }
-        __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
-        {
-            gLogger->error("YrExtUI: ImGuiThread render error!");
             gLogger->error("stack trace : {}", *stackTrace);
             delete stackTrace;
             stackTrace = nullptr;
