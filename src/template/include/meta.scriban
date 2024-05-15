@@ -1,0 +1,160 @@
+{{ include 'include/common.scriban'
+
+func gen_meta_function_register(htFunction, htClass)
+    $cpp_function = htFunction.cpp_function
+
+    case $cpp_function.calling_convention
+        when 2 # X86StdCall
+            ret "__stdcall"
+        when 3 # X86FastCall
+            ret "__fastcall"
+        else
+            ret ""
+    end
+end
+
+func meta_should_use_lambda(htFunction)
+    case htFunction.cpp_function.calling_convention
+        when 2, 3 # X86StdCall, X86FastCall
+            ret true
+        else
+            ret false
+    end
+end
+
+func gen_meta_class_function(htClass, htFunction)
+    if should_skip_visibility(htClass, htFunction)
+        ret null
+    end
+    if htFunction.cpp_function.is_destructor
+        ret null # dtor not supported yet
+    end
+    if htFunction.cpp_function.is_static 
+        ret null # static not supported yet
+    end
+    $function_name = htFunction.cpp_function.name
+    if $function_name | string.contains "operator"
+        ret null # operator not supported yet
+    end
+
+    $use_lambda = meta_should_use_lambda(htFunction)
+    $lambda = $use_lambda ? get_function_lambda_wrap(htFunction, htClass) : null
+    if htFunction.cpp_function.is_constructor
+        if htClass.class_is_abstract
+            ret null
+        end
+        $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+        if $use_lambda
+            ret $".ctor<{$lambda}>()"
+        else
+            ret $".ctor<{$arg_types}>()"
+        end
+    end
+    $class_name = htClass.cpp_class.name
+    $func_type = get_function_ptr_type(htFunction, htClass)
+    
+    if $use_lambda
+        ret $".func<{$lambda}>(\"{$function_name}\"_hs)"
+    else if htFunction.is_overload
+        ret $".func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>(\"{$function_name}\"_hs)"
+    else
+        ret $".func<&{$class_name}::{$function_name}>(\"{$function_name}\"_hs)"
+    end
+end
+
+func gen_meta_class_property(htClass, htProperty)
+    if should_skip_visibility(htClass, htProperty) || htProperty.cpp_field.storage_qualifier == 2 # static not considered
+        ret null
+    end
+    $field_name = property.cpp_field.name
+    if string.empty($field_name)
+        ret null
+    end
+    $class_name = htClass.cpp_class.name
+    ret $".data<&{class_name}::{$field_name}>(\"{$field_name}\"_hs)"
+end
+
+func gen_meta_enum_constant(htEnum, htConstant)
+    $enum_name = htEnum.cpp_enum.name
+    $enum_const_name = htConstant.cpp_enum_item.name
+    ret $".data<{$enum_name}::{$enum_const_name}>(\"{$enum_const_name}\"_hs)"
+end
+
+func gen_meta_class(htClass)
+    $klass = $"entt::meta<{htClass.class_name}>().type(\"{htClass.class_name}\"_hs)"
+    for function in class_functions
+        $klass += "   " + gen_meta_class_function(htClass, function) + "\n"
+    end
+    for property in class_properties
+        $klass += "   " + gen_meta_class_property(htClass, property) + "\n"
+    end
+    $klass += ";\n"
+    ret $klass
+end
+
+func gen_meta_enum(htEnum)
+    $enum = $"entt::meta<{htEnum.enum_name}>().type(\"{htEnum.enum_name}\"_hs)"
+    $enum += (enum_constants | array.each do
+            ret "   " + gen_meta_enum_constant(htEnum, $0)
+        end) | array.join ", \n"
+    $enum += "; \n"
+    ret $enum
+end
+
+func get_meta_gen_header()
+    ret "// meta gen headers
+#include <entt/core/hashed_string.hpp>
+#include <entt/meta/meta.hpp>
+#include <entt/meta/factory.hpp>
+#include <entt/meta/policy.hpp>
+using namespace entt::literals;
+"
+end
+
+func gen_meta_register_snippet(htType)
+    $snippet = ""
+    if htType.is_class
+        $snippet += $"void {htType.gen_type_name}::Register() \n"
+        $snippet += "{ \n"
+        $snippet += "   " + gen_meta_class(htType)
+        $snippet += "} \n"
+        
+        $snippet += $"void {htType.gen_type_name}::Unregister() \n"
+        $snippet += "{ \n"
+        $snippet += $"   entt::meta_reset<{htType.class_name}>(); \n"
+        $snippet += "} \n"
+
+    else if htType.is_enum
+        $snippet += $"void {htType.gen_type_name}::Register() \n"
+        $snippet += "{ \n"
+        $snippet += gen_meta_enum(htType)
+        $snippet += "} \n"
+        
+        $snippet += $"void {htType.gen_type_name}::Unregister() \n"
+        $snippet += "{ \n"
+        $snippet += $"   entt::meta_reset<{htType.enum_name}>(); \n"
+        $snippet += "} \n"
+
+    else if htType.is_module
+        $snippet += $"void {htType.gen_type_name}::Register() \n"
+        $snippet += "{ \n"
+        for klass in module_classes
+            if has_meta(klass.meta)
+                $snippet += $"   {get_gen_type_name(htType.cpp_class.name)}::Register(); \n"
+            end
+        end
+        $snippet += "} \n"
+        
+        $snippet += $"void {htType.gen_type_name}::Unregister() \n"
+        $snippet += "{ \n"
+        for klass in module_classes
+            if has_meta(klass.meta)
+                $snippet += $"   {get_gen_type_name(htType.cpp_class.name)}::Unregister(); \n"
+            end
+        end
+        $snippet += "} \n"
+    end
+        
+    ret $snippet
+end
+}}

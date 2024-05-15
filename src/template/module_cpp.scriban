@@ -1,4 +1,4 @@
-{{- include 'include/common.scriban'
+{{- include 'include/meta.scriban'
     init_extra_vars(this)
 -}}
 #include "{{module_name}}.gen.h"

@@ -61,9 +61,14 @@ public:
         ImGui::Begin("JavaScript Terminal");
 
         ImGui::Text("terminal");
+        ImGui::Checkbox("EnterToRun", &isEnterToRun);
         ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
-        ImGui::InputTextMultiline("##command", buffer, IM_ARRAYSIZE(buffer), ImVec2(800, ImGui::GetTextLineHeight() * 16), flags);
-        if (ImGui::Button("Run"))
+        if (isEnterToRun)
+        {
+            flags |= ImGuiInputTextFlags_EnterReturnsTrue;
+        }
+        bool isEnter = ImGui::InputTextMultiline("##command", buffer, IM_ARRAYSIZE(buffer), ImVec2(800, ImGui::GetTextLineHeight() * 16), flags);
+        if (isEnterToRun ? isEnter : ImGui::Button("Run"))
         {
             if (!context->IsEmpty())
             {
@@ -78,6 +83,10 @@ public:
                 // handles on the stack, as this may trigger a stackless GC.
                 while (v8::platform::PumpMessageLoop(platform.get(), isolate))
                     continue;
+            }
+            if (isEnter)
+            {
+                buffer[0] = '/0';
             }
         }
         
@@ -99,6 +108,7 @@ public:
     std::unique_ptr<v8::Global<v8::Context>> context;
 
     char buffer[1024 * 16];
+    bool isEnterToRun {true};
 };
 
 
@@ -170,7 +180,7 @@ bool ExecuteString(v8::Isolate* isolate, v8::Local<v8::String> source, v8::Local
 {
     v8::HandleScope        handle_scope(isolate);
     v8::TryCatch           try_catch(isolate);
-    v8::ScriptOrigin       origin(name);
+    v8::ScriptOrigin       origin(isolate, name);
     v8::Local<v8::Context> context(isolate->GetCurrentContext());
     v8::Local<v8::Script>  script;
     if (!v8::Script::Compile(context, source, &origin).ToLocal(&script))

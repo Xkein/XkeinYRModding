@@ -31,12 +31,22 @@ function get_default_templates()
         },
         depend_only = {
             ["include/common.scriban"] = "not use to generate!",
+            ["include/meta.scriban"] = "not use to generate!",
         }
     }
 end
 
-function get_templates(overrides)
+function get_templates(overrides, additions)
     local templates = get_default_templates()
-    table.join2(templates, overrides)
+    if overrides then
+        table.join2(templates, overrides)
+    end
+
+    if additions then
+        for key, templates in pairs(additions) do
+            templates[key] = table.join(templates[key] or {}, templates)
+        end
+    end
+
     return templates
 end

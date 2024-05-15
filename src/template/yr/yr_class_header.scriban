@@ -2,7 +2,7 @@
     if !yr_need_codegen(this)
         ret
     end
-    include 'include/common.scriban'
+    include 'include/meta.scriban'
     init_extra_vars(this)
     yr_inject_meta(this)
 -}}

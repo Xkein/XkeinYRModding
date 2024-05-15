@@ -1,288 +1,125 @@
 {{
-    # helpers for meta BEGIN
-    func has_meta(meta)
-        ret meta && meta.raw.has_meta
+# helpers for meta BEGIN
+func has_meta(meta)
+    ret meta && meta.raw.has_meta
+end
+
+func get_meta_tag(meta, key)
+    ret has_meta(meta) ? meta.raw.meta_data.tags[key] : null
+end
+
+func get_meta_key_value(meta, key)
+    ret has_meta(meta) ? meta.raw.meta_data.kvPairs[key] : null
+end
+# helpers for meta END
+
+func init_extra_vars(htType)
+    if htType.cpp_class
+        htType.is_class = true
+        htType.class_name = htType.cpp_class.name
+        htType.gen_type_name = get_gen_type_name(htType.class_name)
+        htType.class_is_abstract = htType.cpp_class.is_abstract
+        htType.class_functions = htType.functions
+        htType.class_properties = htType.properties
+    else if htType.cpp_enum
+        htType.is_enum = true
+        htType.enum_name = htType.cpp_enum.name
+        htType.gen_type_name = get_gen_type_name(htType.enum_name)
+        htType.enum_constants = htType.constants
+    else if htType.module_name
+        htType.is_module = true
+        htType.gen_type_name = get_gen_type_name(htType.module_name)
+        htType.module_classes = htType.classes
+        htType.module_enums = htType.enums
     end
+    
+    $meta = htType.meta
+    if has_meta($meta)
+        htType.all_visible = get_meta_tag(meta, "AllVisible")
+        htType.all_public_visible = get_meta_tag(meta, "AllPublicVisible")
 
-    func get_meta_tag(meta, key)
-        ret has_meta(meta) ? meta.raw.meta_data.tags[key] : null
+        htType.is_yr_extension = get_meta_tag(meta, "YrExtension")
     end
+end
 
-    func get_meta_key_value(meta, key)
-        ret has_meta(meta) ? meta.raw.meta_data.kvPairs[key] : null
-    end
-    # helpers for meta END
-
-    func init_extra_vars(htType)
-        if htType.cpp_class
-            htType.is_class = true
-            htType.class_name = htType.cpp_class.name
-            htType.gen_type_name = get_gen_type_name(htType.class_name)
-            htType.class_is_abstract = htType.cpp_class.is_abstract
-            htType.class_functions = htType.functions
-            htType.class_properties = htType.properties
-        else if htType.cpp_enum
-            htType.is_enum = true
-            htType.enum_name = htType.cpp_enum.name
-            htType.gen_type_name = get_gen_type_name(htType.enum_name)
-            htType.enum_constants = htType.constants
-        else if htType.module_name
-            htType.is_module = true
-            htType.gen_type_name = get_gen_type_name(htType.module_name)
-            htType.module_classes = htType.classes
-            htType.module_enums = htType.enums
-        end
-        
-        $meta = htType.meta
-        if has_meta($meta)
-            htType.all_visible = get_meta_tag(meta, "AllVisible")
-            htType.all_public_visible = get_meta_tag(meta, "AllPublicVisible")
-
-            htType.is_yr_extension = get_meta_tag(meta, "YrExtension")
-        end
-    end
-
-    func should_skip_visibility(htType, htElement)
-        $has_meta = has_meta(htElement.meta)
-        case htElement.element.visibility
-            when 2, 3 # protected or private
-                ret !(htType.all_visible || $has_meta)
-            else
-                ret !(htType.all_visible || htType.all_public_visible || $has_meta)
-        end
-    end
-
-    func get_gen_type_name(name)
-        ret "__Gen_Type_"+name
-    end
-
-    func get_calling_convention(callConvention)
-        case callConvention
-            when 2 # X86StdCall
-                ret "__stdcall"
-            when 3 # X86FastCall
-                ret "__fastcall"
-            else
-                ret ""
-        end
-    end
-
-    func get_function_ptr_type(htFunction, htClass)
-        $cpp_function = htFunction.cpp_function
-        $func_type = $"{$cpp_function.return_type.full_name}"
-        $func_type += "("
-        $func_type += get_calling_convention($cpp_function.calling_convention)
-        if $cpp_function.is_cxx_class_method && !$cpp_function.is_static
-            $func_type += $" {htClass.cpp_class.name}::*"
+func should_skip_visibility(htType, htElement)
+    $has_meta = has_meta(htElement.meta)
+    case htElement.element.visibility
+        when 2, 3 # protected or private
+            ret !(htType.all_visible || $has_meta)
         else
-            $func_type += "*"
-        end
-        $func_type += ")"
+            ret !(htType.all_visible || htType.all_public_visible || $has_meta)
+    end
+end
 
-        $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
-        $func_type += $"({$arg_types})"
+func get_gen_type_name(name)
+    ret "__Gen_Type_"+name
+end
+
+func get_calling_convention(callConvention)
+    case callConvention
+        when 2 # X86StdCall
+            ret "__stdcall"
+        when 3 # X86FastCall
+            ret "__fastcall"
+        else
+            ret ""
+    end
+end
+
+func get_function_ptr_type(htFunction, htClass)
+    $cpp_function = htFunction.cpp_function
+    $func_type = $"{$cpp_function.return_type.full_name}"
+    $func_type += "("
+    $func_type += get_calling_convention($cpp_function.calling_convention)
+    if $cpp_function.is_cxx_class_method && !$cpp_function.is_static
+        $func_type += $" {htClass.cpp_class.name}::*"
+    else
+        $func_type += "*"
+    end
+    $func_type += ")"
+
+    $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+    $func_type += $"({$arg_types})"
+    if $cpp_function.is_const
+        $func_type += " const"
+    end
+    ret $func_type
+end
+
+func get_function_lambda_wrap(htFunction, htClass)
+    $cpp_function = htFunction.cpp_function
+    $return_type = $cpp_function.return_type.full_name
+    $lambda = $"[]("
+    if $cpp_function.is_cxx_class_method && !$cpp_function.is_static
         if $cpp_function.is_const
-            $func_type += " const"
+            $lambda += "const " 
         end
-        ret $func_type
-    end
-
-    func get_function_lambda_wrap(htFunction, htClass)
-        $cpp_function = htFunction.cpp_function
-        $return_type = $cpp_function.return_type.full_name
-        $lambda = $"[]("
-        if $cpp_function.is_cxx_class_method && !$cpp_function.is_static
-            if $cpp_function.is_const
-               $lambda += "const " 
-            end
-            $lambda += $"{htClass.cpp_class.name}* _this"
-            if array.size(htFunction.cpp_function.parameters) > 0
-                $lambda += ", "
-            end
-        end
-        $lambda += (htFunction.cpp_function.parameters | array.each do; ret $0; end) | array.join ", "
-        $lambda += ")"
-        $lambda += $" -> {$return_type} "
-        $lambda += "{ "
-        if $return_type != "void"
-            $lambda += "return "
-        end
-        
-        $function_name = htFunction.cpp_function.name
-        if $cpp_function.is_cxx_class_method
-            $class_name = htClass.cpp_class.name
-            if $cpp_function.is_static
-                $lambda += $"{$class_name}::{$function_name}"
-            else
-                $lambda += $"_this->{$function_name}"
-            end
-        end
-        $lambda += "("
-        $lambda += (htFunction.cpp_function.parameters | array.each do; ret $0.name; end) | array.join ", "
-        $lambda += "); }"
-        ret $lambda
-    end
-
-    # helpers to generate meta BEGIN
-
-    func gen_meta_function_register(htFunction, htClass)
-        $cpp_function = htFunction.cpp_function
-
-        case $cpp_function.calling_convention
-            when 2 # X86StdCall
-                ret "__stdcall"
-            when 3 # X86FastCall
-                ret "__fastcall"
-            else
-                ret ""
+        $lambda += $"{htClass.cpp_class.name}* _this"
+        if array.size(htFunction.cpp_function.parameters) > 0
+            $lambda += ", "
         end
     end
-
-    func meta_should_use_lambda(htFunction)
-        case htFunction.cpp_function.calling_convention
-            when 2, 3 # X86StdCall, X86FastCall
-                ret true
-            else
-                ret false
-        end
+    $lambda += (htFunction.cpp_function.parameters | array.each do; ret $0; end) | array.join ", "
+    $lambda += ")"
+    $lambda += $" -> {$return_type} "
+    $lambda += "{ "
+    if $return_type != "void"
+        $lambda += "return "
     end
-
-    func gen_meta_class_function(htClass, htFunction)
-        if should_skip_visibility(htClass, htFunction)
-            ret null
-        end
-        if htFunction.cpp_function.is_destructor
-            ret null # dtor not supported yet
-        end
-        if htFunction.cpp_function.is_static 
-            ret null # static not supported yet
-        end
-        $function_name = htFunction.cpp_function.name
-        if $function_name | string.contains "operator"
-            ret null # operator not supported yet
-        end
-
-        $use_lambda = meta_should_use_lambda(htFunction)
-        $lambda = $use_lambda ? get_function_lambda_wrap(htFunction, htClass) : null
-        if htFunction.cpp_function.is_constructor
-            if htClass.class_is_abstract
-                ret null
-            end
-            $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
-            if $use_lambda
-                ret $".ctor<{$lambda}>()"
-            else
-                ret $".ctor<{$arg_types}>()"
-            end
-        end
+    
+    $function_name = htFunction.cpp_function.name
+    if $cpp_function.is_cxx_class_method
         $class_name = htClass.cpp_class.name
-        $func_type = get_function_ptr_type(htFunction, htClass)
-        
-        if $use_lambda
-            ret $".func<{$lambda}>(\"{$function_name}\"_hs)"
-        else if htFunction.is_overload
-            ret $".func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>(\"{$function_name}\"_hs)"
+        if $cpp_function.is_static
+            $lambda += $"{$class_name}::{$function_name}"
         else
-            ret $".func<&{$class_name}::{$function_name}>(\"{$function_name}\"_hs)"
+            $lambda += $"_this->{$function_name}"
         end
     end
-
-    func gen_meta_class_property(htClass, htProperty)
-        if should_skip_visibility(htClass, htProperty) || htProperty.cpp_field.storage_qualifier == 2 # static not considered
-            ret null
-        end
-        $field_name = property.cpp_field.name
-        if string.empty($field_name)
-            ret null
-        end
-        $class_name = htClass.cpp_class.name
-        ret $".data<&{class_name}::{$field_name}>(\"{$field_name}\"_hs)"
-    end
-
-    func gen_meta_enum_constant(htEnum, htConstant)
-        $enum_name = htEnum.cpp_enum.name
-        $enum_const_name = htConstant.cpp_enum_item.name
-        ret $".data<{$enum_name}::{$enum_const_name}>(\"{$enum_const_name}\"_hs)"
-    end
-
-    func gen_meta_class(htClass)
-        $klass = $"entt::meta<{htClass.class_name}>().type(\"{htClass.class_name}\"_hs)"
-        for function in class_functions
-            $klass += "   " + gen_meta_class_function(htClass, function) + "\n"
-        end
-        for property in class_properties
-            $klass += "   " + gen_meta_class_property(htClass, property) + "\n"
-        end
-        $klass += ";\n"
-        ret $klass
-    end
-
-    func gen_meta_enum(htEnum)
-        $enum = $"entt::meta<{htEnum.enum_name}>().type(\"{htEnum.enum_name}\"_hs)"
-        $enum += (enum_constants | array.each do
-                ret "   " + gen_meta_enum_constant(htEnum, $0)
-            end) | array.join ", \n"
-        $enum += "; \n"
-        ret $enum
-    end
-
-    func get_meta_gen_header()
-        ret "// meta gen headers
-#include <entt/core/hashed_string.hpp>
-#include <entt/meta/meta.hpp>
-#include <entt/meta/factory.hpp>
-#include <entt/meta/policy.hpp>
-using namespace entt::literals;
-"
-    end
-
-    func gen_meta_register_snippet(htType)
-        $snippet = ""
-        if htType.is_class
-            $snippet += $"void {htType.gen_type_name}::Register() \n"
-            $snippet += "{ \n"
-            $snippet += "   " + gen_meta_class(htType)
-            $snippet += "} \n"
-            
-            $snippet += $"void {htType.gen_type_name}::Unregister() \n"
-            $snippet += "{ \n"
-            $snippet += $"   entt::meta_reset<{htType.class_name}>(); \n"
-            $snippet += "} \n"
-
-        else if htType.is_enum
-            $snippet += $"void {htType.gen_type_name}::Register() \n"
-            $snippet += "{ \n"
-            $snippet += gen_meta_enum(htType)
-            $snippet += "} \n"
-            
-            $snippet += $"void {htType.gen_type_name}::Unregister() \n"
-            $snippet += "{ \n"
-            $snippet += $"   entt::meta_reset<{htType.enum_name}>(); \n"
-            $snippet += "} \n"
-
-        else if htType.is_module
-            $snippet += $"void {htType.gen_type_name}::Register() \n"
-            $snippet += "{ \n"
-            for klass in module_classes
-                if has_meta(klass.meta)
-                    $snippet += $"   {get_gen_type_name(htType.cpp_class.name)}::Register(); \n"
-                end
-            end
-            $snippet += "} \n"
-            
-            $snippet += $"void {htType.gen_type_name}::Unregister() \n"
-            $snippet += "{ \n"
-            for klass in module_classes
-                if has_meta(klass.meta)
-                    $snippet += $"   {get_gen_type_name(htType.cpp_class.name)}::Unregister(); \n"
-                end
-            end
-            $snippet += "} \n"
-        end
-            
-        ret $snippet
-    end
-
-    # helpers to generate meta END
-
+    $lambda += "("
+    $lambda += (htFunction.cpp_function.parameters | array.each do; ret $0.name; end) | array.join ", "
+    $lambda += "); }"
+    ret $lambda
+end
 }}
