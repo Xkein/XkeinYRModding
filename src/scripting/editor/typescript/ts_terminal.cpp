@@ -16,7 +16,7 @@ public:
         ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
         if (isEnterToRun)
         {
-            flags |= ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CtrlEnterForNewLine;
+            flags |= ImGuiInputTextFlags_EnterReturnsTrue;
         }
         bool isEnter = ImGui::InputTextMultiline("##command", buffer, IM_ARRAYSIZE(buffer), ImVec2(800, ImGui::GetTextLineHeight() * 16), flags);
         if (isEnterToRun ? isEnter : ImGui::Button("Run"))
@@ -24,7 +24,7 @@ public:
             gJsEnv->ExecuteString(buffer, "(terminal)");
             if (isEnter)
             {
-                buffer[0] = '/0';
+                buffer[0] = '\0';
             }
         }
         ImGui::End();

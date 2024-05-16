@@ -130,14 +130,14 @@ public:
         //YrHookEventSystem::SetHookMeta<T>(_handle, meta);
     }
 
-    YrHookEventListenerRegister(std::function<void(YrHookContext* const, T* const)> listener) :
+    inline YrHookEventListenerRegister(std::function<void(YrHookContext* const, T* const)> listener) :
         YrHookEventListenerRegister(HookEventListener(
             [listener = std::move(listener)](YrHookContext* context, void* E) {
                 listener(context, reinterpret_cast<T*>(E));
             })
         ) {}
 
-    YrHookEventListenerRegister(std::function<void()> listener) :
+    inline YrHookEventListenerRegister(std::function<void()> listener) :
         YrHookEventListenerRegister(HookEventListener(
             [listener = std::move(listener)](YrHookContext* context, void* E) {
                 listener();
@@ -145,7 +145,7 @@ public:
         ) {}
     
     template<class TFunc, std::enable_if_t<std::is_bind_expression_v<TFunc>, int> = 0>
-    YrHookEventListenerRegister(TFunc&& listener) :
+    inline YrHookEventListenerRegister(TFunc&& listener) :
         YrHookEventListenerRegister(std::function<void()>(std::forward<TFunc>(listener))) {}
 
     ~YrHookEventListenerRegister()

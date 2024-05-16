@@ -15,6 +15,10 @@
 
 YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
 
+GLOBAL_INVOKE_ON_CTOR([]() {
+    gJsEnv = std::make_shared<JsEnv>();
+})
+
 // Extracts a C string from a V8 Utf8Value.
 static const char* ToCString(const v8::String::Utf8Value& value)
 {
@@ -48,13 +52,14 @@ static void Print(const v8::FunctionCallbackInfo<v8::Value>& info)
 
 // Creates a new execution environment containing the built-in
 // functions.
-v8::Global<v8::Context>* CreateShellContext(v8::Isolate* isolate)
+v8::Global<v8::Context>* JsEnv::CreateContext()
 {
     v8::HandleScope handle_scope(isolate);
     // Create a template for the global object.
     v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
     // Bind the global 'print' function to the C++ Print callback.
     global->Set(isolate, "print", v8::FunctionTemplate::New(isolate, Print));
+    global->Set(isolate, "Cpp", CreateCppObjects());
     // Return the context.
     v8::Local<v8::Context> context = v8::Context::New(isolate, nullptr, global);
     return new v8::Global<v8::Context>(isolate, context);
@@ -72,12 +77,14 @@ JsEnv::JsEnv()
 
     isolate       = v8::Isolate::New(create_params);
     isolate_scope = new v8::Isolate::Scope(isolate);
-    context       = CreateShellContext(isolate);
+    context       = CreateContext();
     if (context->IsEmpty())
     {
         gLogger->error("Error creating context\n");
         return;
     }
+
+    gLogger->info("v8 engine started.");
 }
 
 JsEnv::~JsEnv()
@@ -88,6 +95,7 @@ JsEnv::~JsEnv()
     v8::V8::Dispose();
     v8::V8::DisposePlatform();
     delete create_params.array_buffer_allocator;
+    gLogger->info("v8 engine disposed.");
 }
 
 bool JsEnv::ExecuteString(v8::Local<v8::String> source, v8::Local<v8::Value> name, bool print_result, bool report_exceptions)
@@ -133,7 +141,10 @@ bool JsEnv::ExecuteString(v8::Local<v8::String> source, v8::Local<v8::Value> nam
 
 bool JsEnv::ExecuteString(const char* source, const char* name, bool print_result, bool report_exceptions)
 {
-    return ExecuteString(v8::String::NewFromUtf8(isolate, source).ToLocalChecked(), v8::String::NewFromUtf8(isolate, name).ToLocalChecked(), print_result, report_exceptions);
+    v8::HandleScope       handle_scope(isolate);
+    v8::Context::Scope    context_scope(context->Get(isolate));
+    v8::Local<v8::String> run_name = v8::String::NewFromUtf8(isolate, name).ToLocalChecked();
+    return ExecuteString(v8::String::NewFromUtf8(isolate, source).ToLocalChecked(), run_name, print_result, report_exceptions);
 }
 
 void JsEnv::ReportException(v8::TryCatch* try_catch)
