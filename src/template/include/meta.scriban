@@ -45,20 +45,20 @@ func gen_meta_class_function(htClass, htFunction)
         end
         $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
         if $use_lambda
-            ret $".ctor<{$lambda}>()"
+            ret $'.ctor<{$lambda}>()'
         else
-            ret $".ctor<{$arg_types}>()"
+            ret $'.ctor<{$arg_types}>()'
         end
     end
     $class_name = htClass.cpp_class.name
     $func_type = get_function_ptr_type(htFunction, htClass)
     
     if $use_lambda
-        ret $".func<{$lambda}>(\"{$function_name}\"_hs)"
+        ret $'.func<{$lambda}>("{$function_name}"_hs)'
     else if htFunction.is_overload
-        ret $".func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>(\"{$function_name}\"_hs)"
+        ret $'.func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>("{$function_name}"_hs)'
     else
-        ret $".func<&{$class_name}::{$function_name}>(\"{$function_name}\"_hs)"
+        ret $'.func<&{$class_name}::{$function_name}>("{$function_name}"_hs)'
     end
 end
 
@@ -71,17 +71,17 @@ func gen_meta_class_property(htClass, htProperty)
         ret null
     end
     $class_name = htClass.cpp_class.name
-    ret $".data<&{class_name}::{$field_name}>(\"{$field_name}\"_hs)"
+    ret $'.data<&{class_name}::{$field_name}>("{$field_name}"_hs).prop("name"_hs, "{field_name}")'
 end
 
 func gen_meta_enum_constant(htEnum, htConstant)
     $enum_name = htEnum.cpp_enum.name
     $enum_const_name = htConstant.cpp_enum_item.name
-    ret $".data<{$enum_name}::{$enum_const_name}>(\"{$enum_const_name}\"_hs)"
+    ret $'.data<{$enum_name}::{$enum_const_name}>("{$enum_const_name}"_hs).prop("name"_hs, "{enum_const_name}")'
 end
 
 func gen_meta_class(htClass)
-    $klass = $"entt::meta<{htClass.class_name}>().type(\"{htClass.class_name}\"_hs)"
+    $klass = $'entt::meta<{htClass.class_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}")'
     for function in class_functions
         $klass += "   " + gen_meta_class_function(htClass, function) + "\n"
     end
@@ -93,7 +93,7 @@ func gen_meta_class(htClass)
 end
 
 func gen_meta_enum(htEnum)
-    $enum = $"entt::meta<{htEnum.enum_name}>().type(\"{htEnum.enum_name}\"_hs)"
+    $enum = $'entt::meta<{htEnum.enum_name}>().type("{htEnum.enum_name}"_hs).prop("name"_hs, "{htClass.enum_name}")'
     $enum += (enum_constants | array.each do
             ret "   " + gen_meta_enum_constant(htEnum, $0)
         end) | array.join ", \n"

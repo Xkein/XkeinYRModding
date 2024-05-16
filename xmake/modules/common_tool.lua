@@ -29,7 +29,7 @@ function get_default_templates()
             ["enum_header.scriban"] =  "enum/{0}.gen.h",
             ["enum_cpp.scriban"] =  "enum/{0}.gen.cpp",
         },
-        depend_only = {
+        depends = {
             ["include/common.scriban"] = "not use to generate!",
             ["include/meta.scriban"] = "not use to generate!",
         }

@@ -22,6 +22,10 @@ target("YRpp")
                 ["module_header.scriban"] =  "{0}.gen.h",
                 ["yr/yr_module_cpp.scriban"] =  "{0}.gen.cpp",
             },
+        }, {
+            depends = {
+                ["yr/yrpp.scriban"] = "not use to generate!",
+            }
         })
     })
     set_optimize("fastest")
