@@ -78,11 +78,11 @@ struct GraphEditor : YrImGuiWindow
 
     void BuildNodes();
 
-    void OnStart() override;
+    void OnOpen() override;
 
     void OnFrame() override;
 
-    void OnStop() override;
+    void OnClose() override;
 
     ImColor GetIconColor(PinType type);
     ;

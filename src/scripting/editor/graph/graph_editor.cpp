@@ -285,7 +285,7 @@ static ed::EditorContext* m_Editor = nullptr;
     for (auto& node : m_Nodes)
         BuildNode(&node);
 }
- void GraphEditor::OnStart()
+void GraphEditor::OnOpen()
 {
     ed::Config config;
 
@@ -377,7 +377,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     // auto& io = ImGui::GetIO();
 }
- void GraphEditor::OnStop()
+ void GraphEditor::OnClose()
 {
     auto releaseTexture = [this](ImTextureID& id) {
         if (id)

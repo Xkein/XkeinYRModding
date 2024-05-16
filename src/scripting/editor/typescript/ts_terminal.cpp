@@ -37,7 +37,7 @@ static void                       ReportException(v8::Isolate* isolate, v8::TryC
 class TerminalWindow : public YrImGuiWindow
 {
 public:
-    virtual void OnStart() override
+    virtual void OnOpen() override
     {
         //v8::V8::InitializeICUDefaultLocation(argv[0]);
         //v8::V8::InitializeExternalStartupData(argv[0]);
@@ -92,7 +92,7 @@ public:
         
         ImGui::End();
     }
-    virtual void OnStop() override
+    virtual void OnClose() override
     {
         isolate_scope.reset();
         isolate->Dispose();
@@ -119,11 +119,13 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, []() {
     {
         if (terminal)
         {
+            terminal->Close();
             terminal.reset();
         }
         else
         {
             terminal = std::make_shared<TerminalWindow>();
+            terminal->Open();
         }
     }
 })

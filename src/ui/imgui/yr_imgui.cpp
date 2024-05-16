@@ -321,6 +321,7 @@ int YrImGui::GetTextureHeight(ImTextureID texture)
 }
 
 YREXTUI_API std::vector<YrImGuiWindow*> YrImGui::gWindows;
+int                                     gOpenedWindowCount = 0;
 
 class YrImGuiWindow_Impl
 {
@@ -332,11 +333,7 @@ public:
     }
     ~YrImGuiWindow_Impl()
     {
-        if (_started)
-        {
-            window->OnStop();
-            _started = false;
-        }
+        Close();
         std::lock_guard lock(windowMtx);
         if (auto iter = std::find(YrImGui::gWindows.begin(), YrImGui::gWindows.end(), window); iter != YrImGui::gWindows.end())
         {
@@ -346,17 +343,39 @@ public:
 
     void NewFrame()
     {
-        if (!_started)
+        if (_opened)
         {
-            window->OnStart();
-            _started = true;
+            window->OnFrame();
         }
-        window->OnFrame();
+    }
+
+    void Open()
+    {
+        if (_opened)
+            return;
+
+        gOpenedWindowCount++;
+        _opened = true;
+        window->OnOpen();
+    }
+    void Close()
+    {
+        if (!_opened)
+            return;
+
+        gOpenedWindowCount--;
+        _opened = false;
+        window->OnClose();
     }
 
     YrImGuiWindow* window;
-    bool _started {false};
+    bool _opened {false};
 };
+
+int YrImGui::GetOpenedWinCount()
+{
+    return gOpenedWindowCount;
+}
 
 YrImGuiWindow::YrImGuiWindow()
 {
@@ -368,6 +387,17 @@ YrImGuiWindow::~YrImGuiWindow()
     _impl.reset();
 }
 
-void YrImGuiWindow::NewFrame() {
+void YrImGuiWindow::NewFrame()
+{
     _impl->NewFrame();
+}
+
+void YrImGuiWindow::Open()
+{
+    _impl->Open();
+}
+
+void YrImGuiWindow::Close()
+{
+    _impl->Close();
 }

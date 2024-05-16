@@ -11,13 +11,15 @@ class YrImGuiWindow
 
 protected:
     YREXTUI_API YrImGuiWindow();
-    virtual void OnStart() {}
+    virtual void OnOpen() {}
     virtual void OnFrame() {}
-    virtual void OnStop() {}
+    virtual void OnClose() {}
     
 public:
     YREXTUI_API virtual ~YrImGuiWindow();
-    void NewFrame();
+    YREXTUI_API void  NewFrame();
+    YREXTUI_API void Open();
+    YREXTUI_API void Close();
 
 private:
     std::shared_ptr<YrImGuiWindow_Impl> _impl;
@@ -37,6 +39,8 @@ namespace YrImGui
     void SetDpiScale(float dpiScale);
 
     void Render();
+
+    YREXTUI_API int GetOpenedWinCount();
 
     extern YREXTUI_API std::vector<YrImGuiWindow*> gWindows;
 };
