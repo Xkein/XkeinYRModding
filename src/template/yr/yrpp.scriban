@@ -1,11 +1,19 @@
-{{
-    func yr_need_codegen(htType)
-        $element = htType.element
-        ret ["AbstractClass", "AbstractTypeClass", "TechnoClass", "TechnoTypeClass"] | array.contains $element.name
-    end
+{{  include 'include/common.scriban'
+func get_yr_game_types()
+    ret ["AbstractClass", "AbstractTypeClass", "TechnoClass", "TechnoTypeClass"]
+end
 
-    func yr_inject_meta(htType)
-        htType.all_public_visible = true
+func get_yr_types()
 
-    end
+end
+
+func yr_need_codegen(htType)
+    $element = htType.element
+    ret get_yr_types() | array.contains $element.name
+end
+
+func yr_inject_meta(htType)
+    htType.all_public_visible = true
+
+end
 }}

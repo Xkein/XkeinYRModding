@@ -122,4 +122,26 @@ func get_function_lambda_wrap(htFunction, htClass)
     $lambda += "); }"
     ret $lambda
 end
+
+func get_cpp_primitives()
+    ret [
+        "signed char",
+        "unsigned char",
+        "short",
+        "unsigned short",
+        "int",
+        "unsigned int",
+        "long",
+        "unsigned long",
+        "long long",
+        "unsigned long long",
+        "bool",
+        "float",
+        "double"
+        ]
+end
+
+func get_template_specialized_list(template, speTypes)
+    ret speTypes | array.each do; ret string.replace(template, "{T}", $0); end
+end
 }}

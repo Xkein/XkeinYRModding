@@ -18,6 +18,8 @@ public:
 
     bool RegisterFromMeta(size_t enttId);
     bool UnregisterFromMeta(size_t enttId);
+    v8::Local<v8::ObjectTemplate> GetCppObjects();
+
 
     v8::Isolate*                  isolate;
     std::unique_ptr<v8::Platform> platform;

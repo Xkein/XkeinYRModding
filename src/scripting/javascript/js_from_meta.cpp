@@ -16,6 +16,8 @@
 
 using namespace entt::literals;
 
+std::map<size_t, bool> gRegistered;
+
 bool JsEnv::RegisterFromMeta(size_t enttId)
 {
     auto meta = entt::resolve(enttId);
@@ -40,7 +42,14 @@ bool JsEnv::UnregisterFromMeta(size_t enttId)
     return true;
 }
 
-std::map<int, bool> gRegistered;
+v8::Local<v8::ObjectTemplate> JsEnv::GetCppObjects()
+{
+    auto localContext = context->Get(isolate);
+
+    auto global = localContext->Global();
+    auto cpp    = global->Get(localContext, v8::String::NewFromUtf8(isolate, "Cpp").ToLocalChecked());
+    return cpp.ToLocalChecked();
+}
 
 v8::Intercepted CppMapGet(v8::Local<v8::Name> name, const v8::PropertyCallbackInfo<v8::Value>& info)
 {
@@ -49,6 +58,7 @@ v8::Intercepted CppMapGet(v8::Local<v8::Name> name, const v8::PropertyCallbackIn
     {
         return v8::Intercepted::kYes;
     }
+
     auto nameStr = name.As<v8::String>();
     info.GetReturnValue().;
     gRegistered[id] = true;
