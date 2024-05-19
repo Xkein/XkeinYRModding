@@ -52,7 +52,7 @@ static void Print(const v8::FunctionCallbackInfo<v8::Value>& info)
 
 // Creates a new execution environment containing the built-in
 // functions.
-v8::Global<v8::Context>* JsEnv::CreateContext()
+v8::Global<v8::Context> JsEnv::CreateContext()
 {
     v8::HandleScope handle_scope(isolate);
     // Create a template for the global object.
@@ -62,7 +62,7 @@ v8::Global<v8::Context>* JsEnv::CreateContext()
     global->Set(isolate, "Cpp", CreateCppObjects());
     // Return the context.
     v8::Local<v8::Context> context = v8::Context::New(isolate, nullptr, global);
-    return new v8::Global<v8::Context>(isolate, context);
+    return v8::Global<v8::Context>(isolate, context);
 }
 
 JsEnv::JsEnv()
@@ -78,7 +78,7 @@ JsEnv::JsEnv()
     isolate       = v8::Isolate::New(create_params);
     isolate_scope = new v8::Isolate::Scope(isolate);
     context       = CreateContext();
-    if (context->IsEmpty())
+    if (context.IsEmpty())
     {
         gLogger->error("Error creating context\n");
         return;
@@ -89,7 +89,7 @@ JsEnv::JsEnv()
 
 JsEnv::~JsEnv()
 {
-    delete context;
+    context.Reset();
     delete isolate_scope;
     isolate->Dispose();
     v8::V8::Dispose();

@@ -18,17 +18,16 @@ public:
 
     bool RegisterFromMeta(size_t enttId);
     bool UnregisterFromMeta(size_t enttId);
-    v8::Local<v8::ObjectTemplate> GetCppObjects();
-
 
     v8::Isolate*                  isolate;
     std::unique_ptr<v8::Platform> platform;
     v8::Isolate::CreateParams     create_params;
     v8::Isolate::Scope*           isolate_scope;
-    v8::Global<v8::Context>*      context;
+    v8::Global<v8::Context>      context;
+    v8::Global<v8::Object>        cpp;
 
 private:
-    v8::Global<v8::Context>*      CreateContext();
+    v8::Global<v8::Context>      CreateContext();
     v8::Local<v8::ObjectTemplate> CreateCppObjects();
 };
 
