@@ -1,9 +1,5 @@
 #pragma once
 
-#include <v8-isolate.h>
-#include <v8-initialization.h>
-#include <v8-exception.h>
-#include <v8-context.h>
 #include <memory>
 
 class JsEnv final

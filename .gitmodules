@@ -22,3 +22,6 @@
 [submodule "3rdparty/stb"]
 	path = 3rdparty/stb
 	url = https://github.com/nothings/stb.git
+[submodule "3rdparty/puerts"]
+	path = 3rdparty/puerts
+	url = https://github.com/Tencent/puerts.git
