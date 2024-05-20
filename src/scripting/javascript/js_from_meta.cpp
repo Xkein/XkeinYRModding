@@ -24,9 +24,47 @@ std::map<size_t, bool> gRegistered;
 
 bool GetReturnValue(const entt::meta_any& any, v8::ReturnValue<v8::Value> returnVal)
 {
-    any.type();
-    if (any.type())
-    returnVal.Set(, );
+    entt::meta_type type = any.type();
+    if (type.is_pointer_like())
+    {
+        returnVal.Set(any.cast<void*>());
+    }
+    else if (type == entt::resolve<bool>())
+    {
+        returnVal.Set(any.cast<bool>());
+    }
+    else if (type == entt::resolve<int64_t>())
+    {
+        returnVal.Set(any.cast<int64_t>());
+    }
+    else if (type == entt::resolve<int32_t>())
+    {
+        returnVal.Set(any.cast<int32_t>());
+    }
+    else if (type == entt::resolve<int16_t>())
+    {
+        returnVal.Set(any.cast<int16_t>());
+    }
+    else if (type == entt::resolve<uint64_t>())
+    {
+        returnVal.Set(any.cast<uint64_t>());
+    }
+    else if (type == entt::resolve<uint32_t>())
+    {
+        returnVal.Set(any.cast<uint32_t>());
+    }
+    else if (type == entt::resolve<uint16_t>())
+    {
+        returnVal.Set(any.cast<uint16_t>());
+    }
+    else if (type == entt::resolve<double>())
+    {
+        returnVal.Set(any.cast<double>());
+    }
+    else
+    {
+    
+    }
 }
 
 bool SetReturnValue() {
@@ -59,11 +97,11 @@ bool JsEnv::RegisterFromMeta(size_t enttId)
             v8::Local<v8::External> wrap  = v8::Local<v8::External>::Cast(self->GetInternalField(0));
             void*                   ptr   = wrap->Value();
             entt::meta_any val = field.get(ptr);
-            GetReturnValue(val, info.GetReturnValue(), v8::External::New(isolate, ));
+            GetReturnValue(val, info.GetReturnValue());
         },
         [](v8::Local<v8::Name> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void>& info) {
 
-        });
+        }, v8::External::New(isolate, ));
     }
 
 

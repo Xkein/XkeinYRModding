@@ -142,7 +142,7 @@ bool JsEnv::ExecuteString(v8::Local<v8::String> source, v8::Local<v8::Value> nam
 bool JsEnv::ExecuteString(const char* source, const char* name, bool print_result, bool report_exceptions)
 {
     v8::HandleScope       handle_scope(isolate);
-    v8::Context::Scope    context_scope(context->Get(isolate));
+    v8::Context::Scope    context_scope(context.Get(isolate));
     v8::Local<v8::String> run_name = v8::String::NewFromUtf8(isolate, name).ToLocalChecked();
     return ExecuteString(v8::String::NewFromUtf8(isolate, source).ToLocalChecked(), run_name, print_result, report_exceptions);
 }
