@@ -328,13 +328,11 @@ class YrImGuiWindow_Impl
 public:
     YrImGuiWindow_Impl(YrImGuiWindow* window) : window(window)
     {
-        std::lock_guard lock(windowMtx);
         YrImGui::gWindows.push_back(window);
     }
     ~YrImGuiWindow_Impl()
     {
         Close();
-        std::lock_guard lock(windowMtx);
         if (auto iter = std::find(YrImGui::gWindows.begin(), YrImGui::gWindows.end(), window); iter != YrImGui::gWindows.end())
         {
             YrImGui::gWindows.erase(iter);
@@ -379,11 +377,13 @@ int YrImGui::GetOpenedWinCount()
 
 YrImGuiWindow::YrImGuiWindow()
 {
+    std::lock_guard lock(windowMtx);
     _impl = std::make_shared<YrImGuiWindow_Impl>(this);
 }
 
 YrImGuiWindow::~YrImGuiWindow()
 {
+    std::lock_guard lock(windowMtx);
     _impl.reset();
 }
 

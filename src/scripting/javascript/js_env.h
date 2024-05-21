@@ -36,6 +36,8 @@ public:
 
     std::string GetJSStackTrace();
 
+    std::string ObjectToString(v8::Local<v8::Value> value);
+    std::string ObjectToString(const v8::PersistentBase<v8::Value>& value);
 
     PUERTS_NAMESPACE::FBackendEnv      BackendEnv;
     PUERTS_NAMESPACE::FResultInfo      ResultInfo;
@@ -50,4 +52,3 @@ public:
 };
 
 extern YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
-

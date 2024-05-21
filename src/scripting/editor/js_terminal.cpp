@@ -2,6 +2,7 @@
 #include <ui/imgui/yr_imgui.h>
 #include <core/logger/logger.h>
 #include "yr/event/general_event.h"
+#include "yr/event/ui_event.h"
 #include <sstream>
 
 class TerminalWindow : public YrImGuiWindow
@@ -14,15 +15,18 @@ public:
         ImGui::Text("terminal");
         ImGui::Checkbox("EnterToRun", &isEnterToRun);
         ImGuiInputTextFlags flags = ImGuiInputTextFlags_AllowTabInput;
-        if (isEnterToRun)
+        ImGui::InputTextMultiline("##command", buffer, IM_ARRAYSIZE(buffer), ImVec2(800, ImGui::GetTextLineHeight() * 16), flags);
+        if (isEnterToRun ? ImGui::IsKeyReleased(ImGuiKey_Enter) : ImGui::Button("Run"))
         {
-            flags |= ImGuiInputTextFlags_EnterReturnsTrue;
-        }
-        bool isEnter = ImGui::InputTextMultiline("##command", buffer, IM_ARRAYSIZE(buffer), ImVec2(800, ImGui::GetTextLineHeight() * 16), flags);
-        if (isEnterToRun ? isEnter : ImGui::Button("Run"))
-        {
-            gJsEnv->Eval(buffer, "(terminal)");
-            if (isEnter)
+            if (gJsEnv->Eval(buffer, "(terminal)"))
+            {
+                gLogger->info(gJsEnv->ObjectToString(gJsEnv->ResultInfo.Result));
+            }
+            else
+            {
+                gLogger->error(gJsEnv->LastExceptionInfo);
+            }
+            if (isEnterToRun)
             {
                 buffer[0] = '\0';
             }
@@ -36,7 +40,8 @@ public:
 
 std::shared_ptr<TerminalWindow> terminal;
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, []() {
+static void Update()
+{
     if (ImGui::IsKeyReleased(ImGuiKey_GraveAccent))
     {
         if (terminal)
@@ -50,4 +55,7 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, []() {
             terminal->Open();
         }
     }
-})
+}
+
+REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, Update)
+REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, Update)

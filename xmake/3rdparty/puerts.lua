@@ -19,6 +19,8 @@ target("puerts")
         {public = true})
     add_headerfiles(
         puerts_native_dir.."/Inc/*.h",
+        puerts_unreal_puerts_dir.."/Source/JsEnv/Private/*.h",
+        puerts_unreal_puerts_dir.."/Source/JsEnv/Public/*.h",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/V8InspectorImpl.h",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/PromiseRejectCallback.h"
     )
@@ -28,6 +30,7 @@ target("puerts")
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/DataTransfer.cpp",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/JSClassRegister.cpp",
         puerts_native_dir.."/Src/BackendEnv.cpp",
+        puerts_native_dir.."/Src/JSFunction.cpp",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/V8InspectorImpl.cpp"
     )
     add_defines("MAPPER_ISOLATE_DATA_POS=2", {public = true})

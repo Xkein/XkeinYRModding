@@ -184,3 +184,21 @@ std::string JsEnv::GetJSStackTrace()
 {
     return BackendEnv.GetJSStackTrace();
 }
+
+// Convert a JavaScript string to a std::string.  To not bother too
+// much with string encodings we just use ascii.
+std::string JsEnv::ObjectToString(v8::Local<v8::Value> value)
+{
+    v8::String::Utf8Value utf8_value(MainIsolate, value);
+    return std::string(*utf8_value);
+}
+
+std::string JsEnv::ObjectToString(const v8::PersistentBase<v8::Value>& value)
+{
+    v8::Isolate::Scope     IsolateScope(MainIsolate);
+    v8::HandleScope        HandleScope(MainIsolate);
+    v8::Local<v8::Context> Context = ResultInfo.Context.Get(MainIsolate);
+    v8::Context::Scope     ContextScope(Context);
+    
+    return ObjectToString(value.Get(MainIsolate));
+}
