@@ -21,7 +21,7 @@ public:
         bool isEnter = ImGui::InputTextMultiline("##command", buffer, IM_ARRAYSIZE(buffer), ImVec2(800, ImGui::GetTextLineHeight() * 16), flags);
         if (isEnterToRun ? isEnter : ImGui::Button("Run"))
         {
-            gJsEnv->ExecuteString(buffer, "(terminal)");
+            gJsEnv->Eval(buffer, "(terminal)");
             if (isEnter)
             {
                 buffer[0] = '\0';

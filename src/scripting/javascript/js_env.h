@@ -1,30 +1,53 @@
 #pragma once
 
+#include <BackendEnv.h>
+#include <JSFunction.h>
+#include <CppObjectMapper.h>
+#include <DataTransfer.h>
 #include <memory>
 
-class JsEnv final
+class JsEnv
 {
 public:
     JsEnv();
     ~JsEnv();
 
-    bool ExecuteString(v8::Local<v8::String> source, v8::Local<v8::Value> name, bool print_result = true, bool report_exceptions = true);
-    bool ExecuteString(const char* source, const char* name, bool print_result = true, bool report_exceptions = true);
-    void ReportException(v8::TryCatch* try_catch);
+    bool Eval(const char* Code, const char* Path);
 
-    bool RegisterFromMeta(size_t enttId);
-    bool UnregisterFromMeta(size_t enttId);
+    void SetLastException(v8::Local<v8::Value> Exception);
 
-    v8::Isolate*                  isolate;
-    std::unique_ptr<v8::Platform> platform;
-    v8::Isolate::CreateParams     create_params;
-    v8::Isolate::Scope*           isolate_scope;
-    v8::Global<v8::Context>      context;
-    v8::Global<v8::Object>        cpp;
+    void LowMemoryNotification();
 
-private:
-    v8::Global<v8::Context>      CreateContext();
-    v8::Local<v8::ObjectTemplate> CreateCppObjects();
+    bool IdleNotificationDeadline(double DeadlineInSeconds);
+
+    void RequestMinorGarbageCollectionForTesting();
+
+    void RequestFullGarbageCollectionForTesting();
+
+    void CreateInspector(int32_t Port);
+
+    void DestroyInspector();
+
+    bool InspectorTick();
+
+    void LogicTick();
+
+    bool ClearModuleCache(const char* Path);
+
+    std::string GetJSStackTrace();
+
+
+    PUERTS_NAMESPACE::FBackendEnv      BackendEnv;
+    PUERTS_NAMESPACE::FResultInfo      ResultInfo;
+    PUERTS_NAMESPACE::FCppObjectMapper CppObjectMapper;
+
+    std::vector<char>               StrBuffer;
+    v8::UniquePersistent<v8::Value> LastException;
+    std::string                     LastExceptionInfo;
+    v8::UniquePersistent<v8::Function> JsPromiseRejectCallback;
+
+    v8::Isolate* MainIsolate;
 };
 
 extern YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
+
