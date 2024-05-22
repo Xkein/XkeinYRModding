@@ -3,7 +3,7 @@
     include 'yr/yrpp.scriban'
     is_yrpp = module_name == "YRpp"
     func need_codegen(htType)
-        ret has_meta(klass.meta) || (is_yrpp && yr_need_codegen(htType))
+        ret has_meta(htType.meta) || (is_yrpp && yr_need_codegen(htType))
     end
 -}}
 #include "{{module_name}}.gen.h"

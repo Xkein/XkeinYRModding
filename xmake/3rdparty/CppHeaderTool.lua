@@ -38,8 +38,7 @@ task("run-header-tool")
         local json_data = {
             templateDir = info.templateDir,
             moduleTemplates = info.moduleTemplates,
-            classTemplates = info.classTemplates,
-            enumTemplates = info.enumTemplates,
+            typeTemplates = info.typeTemplates,
             moduleName = info.module,
             inputText = info.input_text,
             preHeaderText = info.preHeaderText,

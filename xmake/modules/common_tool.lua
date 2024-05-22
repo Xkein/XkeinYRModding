@@ -21,13 +21,10 @@ function get_default_templates()
             ["module_header.scriban"] =  "{0}.gen.h",
             ["module_cpp.scriban"] =  "{0}.gen.cpp",
         },
-        class = {
-            ["class_header.scriban"] =  "class/{0}.gen.h",
-            ["class_cpp.scriban"] =  "class/{0}.gen.cpp",
-        },
-        enum = {
-            ["enum_header.scriban"] =  "enum/{0}.gen.h",
-            ["enum_cpp.scriban"] =  "enum/{0}.gen.cpp",
+        type = {
+            ["type_header.scriban"] =  "type/{0}.gen.h",
+            ["type_cpp.scriban"] =  "type/{0}.gen.cpp",
+            ["js_type_cpp.scriban"] =  "../YrScripting/{1}/type/{0}.gen.cpp",
         },
         depends = {
             ["include/common.scriban"] = "not use to generate!",

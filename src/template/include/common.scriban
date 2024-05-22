@@ -17,15 +17,22 @@ func init_extra_vars(htType)
     if htType.cpp_class
         htType.is_class = true
         htType.class_name = htType.cpp_class.name
-        htType.gen_type_name = get_gen_type_name(htType.class_name)
         htType.class_is_abstract = htType.cpp_class.is_abstract
         htType.class_functions = htType.functions
         htType.class_properties = htType.properties
+        
+        htType.type_name = htType.class_name
+        htType.gen_type_name = get_gen_type_name(htType.type_name)
+        htType.source_file = htType.cpp_class.source_file
     else if htType.cpp_enum
         htType.is_enum = true
         htType.enum_name = htType.cpp_enum.name
         htType.gen_type_name = get_gen_type_name(htType.enum_name)
         htType.enum_constants = htType.constants
+        
+        htType.type_name = htType.enum_name
+        htType.gen_type_name = get_gen_type_name(htType.type_name)
+        htType.source_file = htType.cpp_enum.source_file
     else if htType.module_name
         htType.is_module = true
         htType.gen_type_name = get_gen_type_name(htType.module_name)

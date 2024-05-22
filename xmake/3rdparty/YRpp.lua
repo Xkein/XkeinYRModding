@@ -14,9 +14,10 @@ target("YRpp")
         },
         pre_header_text = get_pre_header_text(),
         templates = get_templates({
-            class = {
-                ["yr/yr_class_header.scriban"] =  "class/{0}.gen.h",
-                ["yr/yr_class_cpp.scriban"] =  "class/{0}.gen.cpp",
+            type = {
+                ["yr/yr_type_header.scriban"] =  "type/{0}.gen.h",
+                ["yr/yr_type_cpp.scriban"] =  "type/{0}.gen.cpp",
+                ["js_type_cpp.scriban"] =  "../YrScripting/{1}/type/{0}.gen.cpp",
             },
             module = {
                 ["module_header.scriban"] =  "{0}.gen.h",

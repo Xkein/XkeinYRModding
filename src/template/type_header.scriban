@@ -5,7 +5,7 @@
     init_extra_vars(this)
 -}}
 #pragma once
-#include "{{cpp_class.source_file}}"
+#include "{{source_file}}"
 
 class {{gen_type_name}}
 {

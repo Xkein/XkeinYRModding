@@ -14,7 +14,7 @@ rule("codegen-cpp")
     after_load(function(target)
         local extraconf = target:extraconf("rules", "codegen-cpp") or {}
         
-        local gendir = path.absolute(path.join(target:autogendir({root = true}), target:plat(), "codegen"))
+        local gendir = path.absolute(path.join(target:autogendir({root = true}), "codegen"))
         local header_list = {}
         for _, headerfile in ipairs(target:headerfiles()) do
             table.insert(header_list, path.absolute(headerfile))
@@ -85,8 +85,7 @@ rule("codegen-cpp")
                 local runInfo = {
                     templateDir = template_dir,
                     moduleTemplates = templates.module,
-                    classTemplates = templates.class,
-                    enumTemplates = templates.enum,
+                    typeTemplates = templates.type,
                     module = target_name,
                     input_text = input_text,
                     preHeaderText = preHeaderText,

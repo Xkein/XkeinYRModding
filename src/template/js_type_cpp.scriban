@@ -1,0 +1,38 @@
+{{- include 'include/meta.scriban'
+    is_yrpp = module_name == "YRpp"
+    if is_yrpp
+        include 'yr/yrpp.scriban'
+        func need_codegen(htType)
+            ret has_meta(htType.meta) || (is_yrpp && yr_need_codegen(htType))
+        end
+        if !yr_need_codegen(this)
+            ret
+        end
+    else
+        if !has_meta(meta)
+            ret
+        end
+    end
+    init_extra_vars(this)
+    if is_yrpp
+        yr_inject_meta(this)
+    end
+-}}
+#include "{{type_name}}.gen.h"
+#include "core/raii_invoker.h"
+#include <Binding.hpp>
+
+{{ if is_class }}
+GLOBAL_INVOKE_ON_CTOR([](){
+    puerts::DefineClass<{{type_name}}>()
+    {{ for function in class_functions }}
+    
+    {{ end }}
+    {{ for property in class_properties }}
+    
+    {{ end }}
+    .Register();
+})
+{{ else if is_enum }}
+
+{{ end }}
