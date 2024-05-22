@@ -1,5 +1,5 @@
 {{- include 'include/meta.scriban'
-    is_yrpp = module_name == "YRpp"
+    is_yrpp = module.module_name == "YRpp"
     if is_yrpp
         include 'yr/yrpp.scriban'
         func need_codegen(htType)
@@ -9,7 +9,7 @@
             ret
         end
     else
-        if !has_meta(meta)
+        if !has_meta(meta) || get_meta_tag(meta, "HookEvent")
             ret
         end
     end
@@ -18,21 +18,43 @@
         yr_inject_meta(this)
     end
 -}}
-#include "{{type_name}}.gen.h"
+#include "{{source_file}}"
 #include "core/raii_invoker.h"
 #include <Binding.hpp>
-
+{{ if is_yrpp }}
+#include "scripting/javascript/yr_binding.h"
+#include <EventClass.h>
+#include <YRPP.h>
+#include <CRC.h>
+{{- end }}
+UsingCppType({{type_name}});
+static void Register() {
 {{ if is_class }}
-GLOBAL_INVOKE_ON_CTOR([](){
-    puerts::DefineClass<{{type_name}}>()
-    {{ for function in class_functions }}
-    
-    {{ end }}
-    {{ for property in class_properties }}
-    
-    {{ end }}
+    PUERTS_NAMESPACE::DefineClass<{{type_name}}>()
+    {{- for function in class_functions ; $cpp_function = function.cpp_function }}
+        {{- if should_skip_visibility(this, function) || $cpp_function.is_destructor || $cpp_function.is_constructor || $cpp_function.is_static
+            continue
+        else if $cpp_function.flags == 1024 # delete
+            continue
+        end
+        $use_lambda = meta_should_use_lambda(function)
+        if $use_lambda ; $lambda = $use_lambda ? get_function_lambda_wrap(function, this) : null }}
+        //.Function("{{$cpp_function.name}}", MakeFunction({{$lambda}}))
+        {{- else if function.is_overload ; $func_type = get_function_ptr_type(function, this)}}
+        .Method("{{$cpp_function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{$cpp_function.name}})))
+        {{- else }}
+        .Method("{{$cpp_function.name}}", MakeFunction(&{{type_name}}::{{$cpp_function.name}}))
+        {{- end -}}
+    {{- end }}
+    {{- for property in class_properties ; $cpp_field = property.cpp_field }}
+        {{- if string.empty($cpp_field.name) || should_skip_visibility(this, property)
+            continue
+        end }}
+        .Property("{{$cpp_field.name}}", MakeProperty(&{{type_name}}::{{$cpp_field.name}}))
+    {{- end }}
     .Register();
-})
 {{ else if is_enum }}
 
 {{ end }}
+}
+GLOBAL_INVOKE_ON_CTOR(Register);

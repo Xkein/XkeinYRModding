@@ -4,7 +4,8 @@ func get_yr_game_types()
 end
 
 func get_yr_types()
-
+    $types = get_yr_game_types()
+    ret $types
 end
 
 func yr_need_codegen(htType)
@@ -15,6 +16,5 @@ end
 func yr_inject_meta(htType)
     htType.meta.raw.has_meta = true
     htType.all_public_visible = true
-
 end
 }}

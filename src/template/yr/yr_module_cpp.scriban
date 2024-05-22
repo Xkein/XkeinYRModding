@@ -9,7 +9,7 @@
 #include "{{module_name}}.gen.h"
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-#include "class/{{klass.cpp_class.name}}.gen.h"
+#include "type/{{klass.cpp_class.name}}.gen.h"
 {{- if get_meta_tag(klass.meta, "HookEvent") }}
 __IMPLEMENT_YR_HOOK_EVENT({{klass.cpp_class.name}})
 {{ end }}

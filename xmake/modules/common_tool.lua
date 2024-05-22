@@ -24,7 +24,7 @@ function get_default_templates()
         type = {
             ["type_header.scriban"] =  "type/{0}.gen.h",
             ["type_cpp.scriban"] =  "type/{0}.gen.cpp",
-            ["js_type_cpp.scriban"] =  "../YrScripting/{1}/type/{0}.gen.cpp",
+            ["js_type_cpp.scriban"] =  "../../YrScripting/codegen/{1}/{0}.js_binding.cpp",
         },
         depends = {
             ["include/common.scriban"] = "not use to generate!",
