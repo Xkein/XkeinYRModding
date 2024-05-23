@@ -23,10 +23,7 @@ func meta_should_use_lambda(htFunction)
 end
 
 func gen_meta_class_function(htClass, htFunction)
-    if should_skip_visibility(htClass, htFunction)
-        ret null
-    end
-    if htFunction.cpp_function.flags == 1024 # delete
+    if should_skip_visibility(htClass, htFunction) || htFunction.is_deleted
         ret null
     end
     if htFunction.cpp_function.is_destructor

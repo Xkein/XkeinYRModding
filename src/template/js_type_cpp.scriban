@@ -26,15 +26,15 @@
 #include <EventClass.h>
 #include <YRPP.h>
 #include <CRC.h>
+#include <HouseClass.h>
+#include <ColorScheme.h>
 {{- end }}
 UsingCppType({{type_name}});
 static void Register() {
 {{ if is_class }}
     PUERTS_NAMESPACE::DefineClass<{{type_name}}>()
     {{- for function in class_functions ; $cpp_function = function.cpp_function }}
-        {{- if should_skip_visibility(this, function) || $cpp_function.is_destructor || $cpp_function.is_constructor || $cpp_function.is_static
-            continue
-        else if $cpp_function.flags == 1024 # delete
+        {{- if should_skip_visibility(this, function) || function.is_deleted || $cpp_function.is_destructor || $cpp_function.is_constructor || $cpp_function.is_static
             continue
         end
         $use_lambda = meta_should_use_lambda(function)
@@ -50,7 +50,13 @@ static void Register() {
         {{- if string.empty($cpp_field.name) || should_skip_visibility(this, property)
             continue
         end }}
+        {{- if property.is_static # static }}
+        .Property("{{$cpp_field.name}}", MakeProperty(std::addressof({{type_name}}::{{$cpp_field.name}})))
+        {{- else if property.is_const }}
+        .Property("{{$cpp_field.name}}", MakeReadonlyProperty(&{{type_name}}::{{$cpp_field.name}}))
+        {{- else }}
         .Property("{{$cpp_field.name}}", MakeProperty(&{{type_name}}::{{$cpp_field.name}}))
+        {{- end -}}
     {{- end }}
     .Register();
 {{ else if is_enum }}
