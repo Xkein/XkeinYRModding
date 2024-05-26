@@ -17,7 +17,6 @@ target("YRpp")
             type = {
                 ["yr/yr_type_header.scriban"] =  "type/{0}.gen.h",
                 ["yr/yr_type_cpp.scriban"] =  "type/{0}.gen.cpp",
-                ["js_type_cpp.scriban"] =  "../../YrScripting/codegen/{1}/{0}.js_binding.cpp",
             },
             module = {
                 ["module_header.scriban"] =  "{0}.gen.h",

@@ -82,10 +82,13 @@ rule("codegen-cpp")
                 local preHeaderText = extraconf.pre_header_text
                 local postHeaderText = extraconf.post_header_text
     
+                local mmoduleTemplates = table.join(templates.module, templates.js_module)
+                local typeTemplates = table.join(templates.type, templates.js_type)
+
                 local runInfo = {
                     templateDir = template_dir,
-                    moduleTemplates = templates.module,
-                    typeTemplates = templates.type,
+                    moduleTemplates = mmoduleTemplates,
+                    typeTemplates = typeTemplates,
                     module = target_name,
                     input_text = input_text,
                     preHeaderText = preHeaderText,

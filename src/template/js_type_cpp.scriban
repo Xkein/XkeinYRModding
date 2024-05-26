@@ -22,40 +22,46 @@
 #include "core/raii_invoker.h"
 #include <Binding.hpp>
 {{ if is_yrpp }}
-#include "scripting/javascript/yr_binding.h"
+#include "scripting/javascript/yr_data_bindings.h"
 #include <EventClass.h>
 #include <YRPP.h>
 #include <CRC.h>
 #include <HouseClass.h>
 #include <ColorScheme.h>
 {{- end }}
-UsingCppType({{type_name}});
-static void Register() {
+void __JsRegister_{{type_name}}() {
 {{ if is_class }}
     PUERTS_NAMESPACE::DefineClass<{{type_name}}>()
+    {{- for base in base_classes }}
+        {{- if base.klass && !base.klass.is_interface}}
+        .Extends<{{base.full_display_name}}>()
+        {{- end }}
+    {{- end }}
     {{- for function in class_functions ; $cpp_function = function.cpp_function }}
-        {{- if should_skip_visibility(this, function) || function.is_deleted || $cpp_function.is_destructor || $cpp_function.is_constructor || $cpp_function.is_static
+        {{- if should_skip_visibility(this, function) || function.is_deleted || function.is_destructor || function.is_constructor || function.is_static
             continue
         end
         $use_lambda = meta_should_use_lambda(function)
         if $use_lambda ; $lambda = $use_lambda ? get_function_lambda_wrap(function, this) : null }}
-        //.Function("{{$cpp_function.name}}", MakeFunction({{$lambda}}))
+        //.Function("{{function.name}}", MakeFunction({{$lambda}}))
         {{- else if function.is_overload ; $func_type = get_function_ptr_type(function, this)}}
-        .Method("{{$cpp_function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{$cpp_function.name}})))
+        .Method("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})))
         {{- else }}
-        .Method("{{$cpp_function.name}}", MakeFunction(&{{type_name}}::{{$cpp_function.name}}))
+        .Method("{{function.name}}", MakeFunction(&{{type_name}}::{{function.name}}))
         {{- end -}}
     {{- end }}
     {{- for property in class_properties ; $cpp_field = property.cpp_field }}
-        {{- if string.empty($cpp_field.name) || should_skip_visibility(this, property)
+        {{- if string.empty(property.name) || should_skip_visibility(this, property)
             continue
         end }}
-        {{- if property.is_static # static }}
-        .Property("{{$cpp_field.name}}", MakeProperty(std::addressof({{type_name}}::{{$cpp_field.name}})))
+        {{- if property.is_static && (property.is_const || property.is_constexpr) }}
+        .Property("{{property.name}}", MakeReadonlyProperty(std::addressof({{type_name}}::{{property.name}})))
+        {{- else if property.is_static }}
+        .Property("{{property.name}}", MakeProperty(std::addressof({{type_name}}::{{property.name}})))
         {{- else if property.is_const }}
-        .Property("{{$cpp_field.name}}", MakeReadonlyProperty(&{{type_name}}::{{$cpp_field.name}}))
+        .Property("{{property.name}}", MakeReadonlyProperty(&{{type_name}}::{{property.name}}))
         {{- else }}
-        .Property("{{$cpp_field.name}}", MakeProperty(&{{type_name}}::{{$cpp_field.name}}))
+        .Property("{{property.name}}", MakeProperty(&{{type_name}}::{{property.name}}))
         {{- end -}}
     {{- end }}
     .Register();
@@ -63,4 +69,4 @@ static void Register() {
 
 {{ end }}
 }
-GLOBAL_INVOKE_ON_CTOR(Register);
+GLOBAL_INVOKE_ON_CTOR(__JsRegister_{{type_name}});

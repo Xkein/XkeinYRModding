@@ -1,18 +1,5 @@
 {{ include 'include/common.scriban'
 
-func gen_meta_function_register(htFunction, htClass)
-    $cpp_function = htFunction.cpp_function
-
-    case $cpp_function.calling_convention
-        when 2 # X86StdCall
-            ret "__stdcall"
-        when 3 # X86FastCall
-            ret "__fastcall"
-        else
-            ret ""
-    end
-end
-
 func meta_should_use_lambda(htFunction)
     case htFunction.cpp_function.calling_convention
         when 2, 3 # X86StdCall, X86FastCall
@@ -26,21 +13,21 @@ func gen_meta_class_function(htClass, htFunction)
     if should_skip_visibility(htClass, htFunction) || htFunction.is_deleted
         ret null
     end
-    if htFunction.cpp_function.is_destructor
+    if htFunction.is_destructor
         ret null # dtor not supported yet
     end
-    if htFunction.cpp_function.is_static 
+    if htFunction.is_static 
         ret null # static not supported yet
     end
-    $function_name = htFunction.cpp_function.name
+    $function_name = htFunction.name
     if $function_name | string.contains "operator"
         ret null # operator not supported yet
     end
 
     $use_lambda = meta_should_use_lambda(htFunction)
     $lambda = $use_lambda ? get_function_lambda_wrap(htFunction, htClass) : null
-    if htFunction.cpp_function.is_constructor
-        if htClass.class_is_abstract
+    if htFunction.is_constructor
+        if htClass.is_abstract
             ret null
         end
         $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
@@ -63,29 +50,32 @@ func gen_meta_class_function(htClass, htFunction)
 end
 
 func gen_meta_class_property(htClass, htProperty)
-    if should_skip_visibility(htClass, htProperty) || htProperty.cpp_field.storage_qualifier == 2 # static not considered
+    if should_skip_visibility(htClass, htProperty) || htProperty.is_static
         ret null
     end
-    $field_name = property.cpp_field.name
+    $field_name = property.name
     if string.empty($field_name)
         ret null
     end
-    $class_name = htClass.cpp_class.name
+    $class_name = htClass.name
     ret $'.data<&{class_name}::{$field_name}>("{$field_name}"_hs).prop("name"_hs, "{$field_name}")'
 end
 
 func gen_meta_enum_constant(htEnum, htConstant)
-    $enum_name = htEnum.cpp_enum.name
-    $enum_const_name = htConstant.cpp_enum_item.name
+    $enum_name = htEnum.name
+    $enum_const_name = htConstant.name
     ret $'.data<{$enum_name}::{$enum_const_name}>("{$enum_const_name}"_hs).prop("name"_hs, "{$enum_const_name}")'
 end
 
 func gen_meta_class(htClass)
-    $klass = $'entt::meta<{htClass.class_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}")'
-    for function in class_functions
+    $klass = $'entt::meta<{htClass.class_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}")' + "\n"
+    for base in htClass.base_classes
+        $klass += $"   .base<{base.full_display_name}>()" + "\n"
+    end
+    for function in htClass.all_functions
         $klass += "   " + gen_meta_class_function(htClass, function) + "\n"
     end
-    for property in class_properties
+    for property in htClass.properties
         $klass += "   " + gen_meta_class_property(htClass, property) + "\n"
     end
     $klass += ";\n"

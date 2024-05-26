@@ -3,7 +3,97 @@
 #include <ScriptBackend.hpp>
 #include <DataTransfer.h>
 #include <PuertsNamespaceDef.h>
+#include <core/logger/logger.h>
+#include <core/macro.h>
+#include <timeapi.h>
 #include <AbstractClass.h>
+
+#define UsingYrClass(CLS) UsingCppType(CLS)
+
+#define UsingYrStruct(CLS) UsingYrClass(CLS)                                                         \
+    namespace PUERTS_NAMESPACE                                                                       \
+    {                                                                                                \
+    template<size_t Size>                                                                            \
+    struct ScriptTypeName<CLS[Size]>                                                                 \
+    {                                                                                                \
+        static constexpr auto value()                                                                \
+        {                                                                                            \
+            return ScriptTypeNameWithNamespace<CLS>::value() + internal::Literal("[]");              \
+        }                                                                                            \
+    };                                                                                               \
+    }                                                                                                \
+    namespace PUERTS_NAMESPACE                                                                       \
+    {                                                                                                \
+    namespace v8_impl                                                                                \
+    {                                                                                                \
+        template<size_t Size>                                                                        \
+        struct Converter<CLS[Size], typename std::enable_if<!std::is_const<CLS>::value>::type>       \
+        {                                                                                            \
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, CLS value[Size])    \
+            {                                                                                        \
+                return DataTransfer::NewArrayBuffer(context, &(value[0]), sizeof(CLS) * Size);       \
+            }                                                                                        \
+                                                                                                     \
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)    \
+            {                                                                                        \
+                if (value->IsArrayBufferView())                                                      \
+                {                                                                                    \
+                    v8::Local<v8::ArrayBufferView> buffView = value.As<v8::ArrayBufferView>();       \
+                    return buffView->ByteLength() >= sizeof(CLS) * Size;                             \
+                }                                                                                    \
+                if (value->IsArrayBuffer())                                                          \
+                {                                                                                    \
+                    auto   ab = v8::Local<v8::ArrayBuffer>::Cast(value);                             \
+                    size_t byteLength;                                                               \
+                    (void)(DataTransfer::GetArrayBufferData(ab, byteLength));                        \
+                    return byteLength >= sizeof(CLS) * Size;                                         \
+                }                                                                                    \
+                return false;                                                                        \
+            }                                                                                        \
+        };                                                                                           \
+    }                                                                                                \
+    }
+
+#define UsingContainer(CLS) __DefObjectType(CLS) __DefCDataPointerConverter(CLS)
+
+#define __UsingIndexClass(TKEY, TVALUE, TYPEDEF) \
+typedef IndexClass<TKEY, TVALUE> TYPEDEF; \
+UsingContainer(TYPEDEF)
+
+#define UsingIndexClass(TKEY, TVALUE) __UsingIndexClass(TKEY, TVALUE, CONCAT(__IndexClass__, CONCAT(__LINE__, __COUNTER__)));
+
+#define RegisterDynamicVectorClass(CLS) \
+    PUERTS_NAMESPACE::DefineClass<DynamicVectorClass<CLS>>() \
+        .Method("SetCapacity", MakeFunction(&DynamicVectorClass<CLS>::SetCapacity)) \
+        .Method("Clear", MakeFunction(&DynamicVectorClass<CLS>::Clear)) \
+        .Method("FindItemIndex", MakeFunction(&DynamicVectorClass<CLS>::FindItemIndex)) \
+        .Method("ValidIndex", MakeFunction(&DynamicVectorClass<CLS>::ValidIndex)) \
+        .Method("GetItemOrDefault", SelectFunction(CLS (DynamicVectorClass<CLS>::*)(int) const, &DynamicVectorClass<CLS>::GetItemOrDefault)) \
+        .Method("GetItemOrDefault", SelectFunction(CLS (DynamicVectorClass<CLS>::*)(int, CLS) const, &DynamicVectorClass<CLS>::GetItemOrDefault)) \
+        .Method("AddItem", MakeFunction(&DynamicVectorClass<CLS>::AddItem)) \
+        .Method("AddUnique", MakeFunction(&DynamicVectorClass<CLS>::AddUnique)) \
+        .Method("RemoveItem", MakeFunction(&DynamicVectorClass<CLS>::RemoveItem)) \
+        .Method("Remove", MakeFunction(&DynamicVectorClass<CLS>::Remove)) \
+        .Property("Count", MakeProperty(&DynamicVectorClass<CLS>::Count)) \
+        .Register()
+
+#define RegisterTypeList(CLS) \
+    PUERTS_NAMESPACE::DefineClass<TypeList<CLS>>() \
+        .Extends<DynamicVectorClass<CLS>>() \
+        .Register()
+
+#define RegisterIndexClass(TKEY, TVALUE) {\
+    typedef IndexClass<TKEY, TVALUE> __IndexClass; \
+    PUERTS_NAMESPACE::DefineClass<__IndexClass>() \
+        .Method("AddIndex", SelectFunction(bool (__IndexClass::*)(TKEY, TVALUE&&), &__IndexClass::AddIndex)) \
+        .Method("RemoveIndex", MakeFunction(&__IndexClass::RemoveIndex)) \
+        .Method("IsPresent", MakeFunction(&__IndexClass::IsPresent)) \
+        .Method("Count", MakeFunction(&__IndexClass::Count)) \
+        .Method("FetchIndex", SelectFunction(TVALUE& (__IndexClass::*)(TKEY), &__IndexClass::FetchIndex)) \
+        .Method("Clear", MakeFunction(&__IndexClass::Clear)) \
+        .Method("Reverse", MakeFunction(&__IndexClass::Reverse)) \
+        .Method("Sort", MakeFunction(&__IndexClass::Sort)) \
+        .Register(); }
 
 namespace PUERTS_NAMESPACE
 {
@@ -26,6 +116,10 @@ namespace PUERTS_NAMESPACE
                 auto context = API::GetContext(info);
                 **Variable   = DecayTypeConverter<Ret>::toCpp(context, API::GetArg(info, 0));
             }
+            else
+            {
+                gLogger->error("{} could not be assign!", typeid(constant_ptr<Ret, Address>).name());
+            }
         }
 
         static const CTypeInfo* info()
@@ -43,7 +137,7 @@ namespace PUERTS_NAMESPACE
         static void getter(typename API::CallbackInfoType info)
         {
             auto context = API::GetContext(info);
-            API::SetReturn(info, DecayTypeConverter<Ret>::toScript(context, *Variable));
+            API::SetReturn(info, DecayTypeConverter<Ret>::toScript(context, Variable->get()));
         }
 
         static void setter(typename API::CallbackInfoType info)
@@ -51,7 +145,11 @@ namespace PUERTS_NAMESPACE
             if constexpr (std::is_move_assignable_v<Ret>)
             {
                 auto context = API::GetContext(info);
-                **Variable   = DecayTypeConverter<Ret>::toCpp(context, API::GetArg(info, 0));
+                Variable->get() = DecayTypeConverter<Ret>::toCpp(context, API::GetArg(info, 0));
+            }
+            else
+            {
+                gLogger->error("{} could not be assign!", typeid(reference<Ret, Address, Count>).name());
             }
         }
 
@@ -66,17 +164,17 @@ namespace PUERTS_NAMESPACE
         template<typename T, unsigned int Address>
         struct Converter<constant_ptr<T, Address>>
         {
-            static API::ValueType toScript(API::ContextType context, const constant_ptr<T, Address>& value)
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const constant_ptr<T, Address>& value)
             {
                 return Converter<decltype(constant_ptr<T, Address>().get())>::toScript(context, value.get());
             }
-            
-            static decltype(auto) toCpp(API::ContextType context, const API::ValueType value)
+
+            static decltype(auto) toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
                 return constant_ptr<T, Address>().get();
             }
 
-            static bool accept(API::ContextType context, const API::ValueType value)
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
                 return Converter<decltype(constant_ptr<T, Address>().get())>::accept(context, value);
             }
@@ -84,64 +182,19 @@ namespace PUERTS_NAMESPACE
         template<typename T, unsigned int Address, size_t Count>
         struct Converter<reference<T, Address, Count>>
         {
-            static API::ValueType toScript(API::ContextType context, const reference<T, Address, Count>& value)
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const reference<T, Address, Count>& value)
             {
                 return Converter<decltype(reference<T, Address, Count>().get())>::toScript(context, value.get());
             }
-            
-            static decltype(auto) toCpp(API::ContextType context, const API::ValueType value)
+
+            static decltype(auto) toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
                 return reference<T, Address, Count>().get();
             }
 
-            static bool accept(API::ContextType context, const API::ValueType value)
-            {
-                return Converter<decltype(reference<T, Address, Count>().get())>::accept(context, value);
-            }
-        };
-
-        template<typename T>
-        struct Converter<DynamicVectorClass<T>>
-        {
-            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const DynamicVectorClass<T>& value)
-            {
-                v8::Local<v8::ArrayBuffer> Ab   = v8::ArrayBuffer::New(context->GetIsolate(), value.Count);
-                void*                      Buff = static_cast<char*>(DataTransfer::GetArrayBufferData(Ab));
-                ::memcpy(Buff, value.Items, value.Count);
-                return Ab;
-            }
-
-            static DynamicVectorClass<T> toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
-            {
-                DynamicVectorClass<T> Ret;
-                size_t                Len  = 0;
-                void*                 Data = nullptr;
-                if (value->IsArrayBufferView())
-                {
-                    v8::Local<v8::ArrayBufferView> BuffView = value.As<v8::ArrayBufferView>();
-                    v8::Local<v8::ArrayBuffer>     Ab       = BuffView->Buffer();
-
-                    Data = static_cast<char*>(DataTransfer::GetArrayBufferData(Ab)) + BuffView->ByteOffset();
-                    Len  = BuffView->ByteLength();
-                }
-                else if (value->IsArrayBuffer())
-                {
-                    auto Ab = v8::Local<v8::ArrayBuffer>::Cast(value);
-                    Data    = DataTransfer::GetArrayBufferData(Ab, Len);
-                }
-                if (Len > 0 && Data)
-                {
-                    Ret.SetCapacity(Len);
-                    Ret.Count = Len;
-                    ::memcpy(Ret.Items, Data, Len);
-                }
-
-                return Ret;
-            }
-
             static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
-                return value->IsArrayBuffer() || value->IsArrayBufferView();
+                return Converter<decltype(reference<T, Address, Count>().get())>::accept(context, value);
             }
         };
 
@@ -168,6 +221,34 @@ namespace PUERTS_NAMESPACE
         //    }
         //};
     } // namespace v8_impl
+    ;
+
+    template<typename T>
+    struct ScriptTypeName<DynamicVectorClass<T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("DynamicVectorClass<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
+    template<typename T>
+    struct ScriptTypeName<TypeList<T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("TypeList<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
+    template<typename TKey, typename TValue>
+    struct ScriptTypeName<IndexClass<TKey, TValue>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("IndexClass<") + ScriptTypeNameWithNamespace<TKey>::value() + internal::Literal(", ") + ScriptTypeNameWithNamespace<TValue>::value() + internal::Literal(">");
+        }
+    };
 } // namespace PUERTS_NAMESPACE
 
 #endif

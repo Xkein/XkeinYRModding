@@ -3,7 +3,7 @@ task("dotnet-compile-job")
     on_run(function ()
         print("compiling CppHeaderTool projects...")
         os.execv("dotnet", {
-            "publish", os.projectdir().."/3rdparty/CppHeaderTool/CppHeaderTool.csproj",
+            "publish", os.projectdir().."/3rdparty/CppHeaderTool/src/CppHeaderTool/CppHeaderTool.csproj",
             "--output", os.projectdir().."/build/tools",
         })
     end)
@@ -13,7 +13,7 @@ target("cpp-header-tool")
     on_load(function (target)
         local header_tool_project_dir = os.projectdir().."/3rdparty/CppHeaderTool"
         local obj_dir = path.absolute(header_tool_project_dir.."/obj")
-        local csproj = header_tool_project_dir.."/CppHeaderTool.csproj"
+        local csproj = header_tool_project_dir.."/src/CppHeaderTool/CppHeaderTool.csproj"
         local files = { csproj }
         local csfiles = os.files(header_tool_project_dir.."/**.cs")
         for _, file in ipairs(csfiles) do
@@ -55,6 +55,7 @@ task("run-header-tool")
             targetCpu = info.targetCpu,
             isWindowsMsvc = info.isWindowsMsvc,
             isParseSystemIncludes = info.isParseSystemIncludes,
+            parseTokenAttributes = false,
         }
         
         for _, t in ipairs({ json_data.headerFiles, json_data.includeDirs, json_data.systemIncludeDirs, json_data.defines, json_data.arguments }) do

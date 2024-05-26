@@ -16,6 +16,8 @@ function get_config_path(module)
 end
 
 function get_default_templates()
+    -- module: {0} = module name
+    -- type: {0} = type name, {1} = module name
     return {
         module = {
             ["module_header.scriban"] =  "{0}.gen.h",
@@ -24,7 +26,11 @@ function get_default_templates()
         type = {
             ["type_header.scriban"] =  "type/{0}.gen.h",
             ["type_cpp.scriban"] =  "type/{0}.gen.cpp",
+        },
+        js_type = {
             ["js_type_cpp.scriban"] =  "../../YrScripting/codegen/{1}/{0}.js_binding.cpp",
+        },
+        js_module = {
         },
         depends = {
             ["include/common.scriban"] = "not use to generate!",
