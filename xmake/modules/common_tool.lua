@@ -18,6 +18,8 @@ end
 function get_default_templates()
     -- module: {0} = module name
     -- type: {0} = type name, {1} = module name
+    local codegen_dir = "../.."
+    local root_dir = "../../../.."
     return {
         module = {
             ["module_header.scriban"] =  "{0}.gen.h",
@@ -28,9 +30,10 @@ function get_default_templates()
             ["type_cpp.scriban"] =  "type/{0}.gen.cpp",
         },
         js_type = {
-            ["js_type_cpp.scriban"] =  "../../YrScripting/codegen/{1}/{0}.js_binding.cpp",
+            ["js_type_cpp.scriban"] =  codegen_dir.."/YrScripting/codegen/{1}/{0}.js_binding.cpp",
         },
         js_module = {
+            ["ts_index.scriban"] = root_dir.."src/scripts/{0}.d.ts",
         },
         depends = {
             ["include/common.scriban"] = "not use to generate!",

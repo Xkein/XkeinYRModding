@@ -60,3 +60,9 @@ target("YrScripting")
     after_build(function (target)
         
     end)
+
+target("Scripts")
+    set_kind("phony")
+    add_extrafiles("src/scripts/**.js")
+    add_extrafiles("src/scripts/**.ts")
+    add_filegroups("Scripts", {rootdir = "src/scripts"})

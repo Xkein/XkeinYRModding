@@ -20,7 +20,9 @@ target("puerts")
     add_headerfiles(
         puerts_native_dir.."/Inc/*.h",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/*.h",
+        puerts_unreal_puerts_dir.."/Source/JsEnv/Private/*.hpp",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Public/*.h",
+        puerts_unreal_puerts_dir.."/Source/JsEnv/Public/*.hpp",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/V8InspectorImpl.h",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/PromiseRejectCallback.h"
     )
@@ -33,7 +35,7 @@ target("puerts")
         puerts_native_dir.."/Src/JSFunction.cpp",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/V8InspectorImpl.cpp"
     )
-    add_defines("MAPPER_ISOLATE_DATA_POS=2", {public = true})
+    add_defines("MAPPER_ISOLATE_DATA_POS=2", "PLATFORM_WINDOWS", {public = true})
     add_defines("puerts_API=__declspec(dllexport)", "BUILDING_V8_SHARED", {public = true}) -- static lib
     -- add_defines("puerts_API=__declspec(dllexport)", "BUILDING_V8_SHARED", {private=true})
     -- add_defines("puerts_API=__declspec(dllimport)", "USING_V8_SHARED", {interface=true})

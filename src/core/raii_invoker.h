@@ -3,9 +3,9 @@
 #include "core/macro.h"
 #include <functional>
 
-#define GLOBAL_INVOKE_ON_CTOR(func) RAII_Invoker CONCAT(RAII_Invoker__, __LINE__)(func, true);
-#define GLOBAL_INVOKE_ON_DTOR(func) RAII_Invoker CONCAT(RAII_Invoker__, __LINE__)(func, false);
-#define GLOBAL_INVOKE_ON_CTOR_DTOR(ctor, dtor) RAII_Invoker CONCAT(RAII_Invoker__, __LINE__)(ctor, dtor);
+#define GLOBAL_INVOKE_ON_CTOR(func) static RAII_Invoker CONCAT(RAII_Invoker__, __LINE__)(func, true);
+#define GLOBAL_INVOKE_ON_DTOR(func) static RAII_Invoker CONCAT(RAII_Invoker__, __LINE__)(func, false);
+#define GLOBAL_INVOKE_ON_CTOR_DTOR(ctor, dtor) static RAII_Invoker CONCAT(RAII_Invoker__, __LINE__)(ctor, dtor);
 
 class RAII_Invoker
 {

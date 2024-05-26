@@ -12,8 +12,79 @@ GLOBAL_INVOKE_ON_CTOR([]() {
 
 using namespace PUERTS_NAMESPACE;
 
+typedef void (JsEnv::*V8MethodCallback)(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
+template<V8MethodCallback callback>
+struct MethodBindingHelper
+{
+    static void Bind(v8::Isolate* Isolate, v8::Local<v8::Context> Context, v8::Local<v8::Object> Obj, const char* Key, v8::Local<v8::External> This)
+    {
+        Obj->Set(Context, FV8Utils::V8String(Isolate, Key),
+                 v8::FunctionTemplate::New(Isolate,
+                     [](const v8::FunctionCallbackInfo<v8::Value>& Info) {
+                        auto Self = static_cast<JsEnv*>((v8::Local<v8::External>::Cast(Info.Data()))->Value());
+                        (Self->*callback)(Info);
+                     },
+                     This)
+                     ->GetFunction(Context)
+                     .ToLocalChecked())
+            .Check();
+    }
+};
+
+
+static v8::Local<v8::String> ToV8StringFromFileContent(v8::Isolate* Isolate, const std::vector<uint8_t>& FileContent)
+{
+    const auto* Buffer = FileContent.data();
+    auto        Size   = FileContent.size();
+
+    if (Size >= 2 && !(Size & 1) && ((Buffer[0] == 0xff && Buffer[1] == 0xfe) || (Buffer[0] == 0xfe && Buffer[1] == 0xff)))
+    {
+        std::string Content;
+        gLogger->error("ToV8StringFromFileContent not implement!");
+        //FFileHelper::BufferToString(Content, Buffer, Size);
+        return FV8Utils::V8String(Isolate, Content.c_str());
+    }
+    else
+    {
+        if (Size >= 3 && Buffer[0] == 0xef && Buffer[1] == 0xbb && Buffer[2] == 0xbf)
+        {
+            // Skip over UTF-8 BOM if there is one
+            Buffer += 3;
+            Size -= 3;
+        }
+        return v8::String::NewFromUtf8(Isolate, (const char*)Buffer, v8::NewStringType::kNormal, Size).ToLocalChecked();
+    }
+}
+
+namespace puerts
+{
+    void PLog(LogLevel Level, const std::string Fmt, ...) {
+        auto& buffer = gJsEnv->StrBuffer;
+        va_list argptr;
+        va_start(argptr, Fmt);
+        vsprintf_s(buffer.data(), buffer.size(), Fmt.c_str(), argptr);
+        va_end(argptr);
+        switch (Level)
+        {
+            case puerts::Log:
+                gLogger->info(buffer.data());
+                break;
+            case puerts::Warning:
+                gLogger->warn(buffer.data());
+                break;
+            case puerts::Error:
+                gLogger->error(buffer.data());
+                break;
+        }
+    }
+
+} // namespace puerts
+
 JsEnv::JsEnv()
 {
+    StrBuffer.resize(1024);
+
     FBackendEnv::GlobalPrepare();
     BackendEnv.Initialize(nullptr, nullptr);
     MainIsolate = BackendEnv.MainIsolate;
@@ -31,12 +102,11 @@ JsEnv::JsEnv()
 
     v8::Local<v8::Context> Context = BackendEnv.MainContext.Get(Isolate);
     v8::Context::Scope     ContextScope(Context);
-    ResultInfo.Context.Reset(Isolate, Context);
+    DefaultContext.Reset(Isolate, Context);
     v8::Local<v8::Object> Global = Context->Global();
 
     CppObjectMapper.Initialize(Isolate, Context);
     Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
-
 
     BackendEnv.StartPolling();
 
@@ -59,7 +129,7 @@ JsEnv::~JsEnv()
 #endif
         v8::Isolate::Scope IsolateScope(Isolate);
         v8::HandleScope    HandleScope(Isolate);
-        auto               Context = ResultInfo.Context.Get(Isolate);
+        auto               Context = DefaultContext.Get(Isolate);
         v8::Context::Scope ContextScope(Context);
 
         CppObjectMapper.UnInitialize(Isolate);
@@ -68,6 +138,7 @@ JsEnv::~JsEnv()
         BackendEnv.ScriptIdToPathMap.clear();
     }
 
+    DefaultContext.Reset();
     ResultInfo.Context.Reset();
     ResultInfo.Result.Reset();
 
@@ -83,7 +154,7 @@ bool JsEnv::Eval(const char* Code, const char* Path)
 #endif
     v8::Isolate::Scope     IsolateScope(Isolate);
     v8::HandleScope        HandleScope(Isolate);
-    v8::Local<v8::Context> Context = ResultInfo.Context.Get(Isolate);
+    v8::Local<v8::Context> Context = DefaultContext.Get(Isolate);
     v8::Context::Scope     ContextScope(Context);
 
     v8::Local<v8::String> Url    = FV8Utils::V8String(Isolate, Path == nullptr ? "" : Path);
@@ -114,6 +185,11 @@ bool JsEnv::Eval(const char* Code, const char* Path)
     }
 
     return true;
+}
+
+void JsEnv::ExecuteModule(const char* ModuleName)
+{
+
 }
 
 void JsEnv::SetLastException(v8::Local<v8::Value> Exception)
@@ -152,12 +228,12 @@ void JsEnv::RequestFullGarbageCollectionForTesting()
 
 void JsEnv::CreateInspector(int32_t Port)
 {
-    BackendEnv.CreateInspector(MainIsolate, &ResultInfo.Context, Port);
+    BackendEnv.CreateInspector(MainIsolate, &DefaultContext, Port);
 }
 
 void JsEnv::DestroyInspector()
 {
-    BackendEnv.DestroyInspector(MainIsolate, &ResultInfo.Context);
+    BackendEnv.DestroyInspector(MainIsolate, &DefaultContext);
 }
 
 void JsEnv::LogicTick()
@@ -174,11 +250,21 @@ bool JsEnv::ClearModuleCache(const char* Path)
 {
     v8::Isolate::Scope     IsolateScope(MainIsolate);
     v8::HandleScope        HandleScope(MainIsolate);
-    v8::Local<v8::Context> Context = ResultInfo.Context.Get(MainIsolate);
+    v8::Local<v8::Context> Context = DefaultContext.Get(MainIsolate);
     v8::Context::Scope     ContextScope(Context);
 
     return BackendEnv.ClearModuleCache(MainIsolate, Context, Path);
 }
+
+void JsEnv::InitExtensionMethodsMap() {}
+
+void JsEnv::JsHotReload(const char* ModuleName, const char* JsSource) {}
+
+void JsEnv::ReloadModule(const char* ModuleName, const char* JsSource) {}
+
+void JsEnv::ReloadSource(const char* Path, const std::string& JsSource) {}
+
+void JsEnv::OnSourceLoaded(std::function<void(const char*)> Callback) {}
 
 std::string JsEnv::GetJSStackTrace()
 {
@@ -197,8 +283,48 @@ std::string JsEnv::ObjectToString(const v8::PersistentBase<v8::Value>& value)
 {
     v8::Isolate::Scope     IsolateScope(MainIsolate);
     v8::HandleScope        HandleScope(MainIsolate);
-    v8::Local<v8::Context> Context = ResultInfo.Context.Get(MainIsolate);
+    v8::Local<v8::Context> Context = DefaultContext.Get(MainIsolate);
     v8::Context::Scope     ContextScope(Context);
     
     return ObjectToString(value.Get(MainIsolate));
+}
+
+std::string JsEnv::TryCatchToString(v8::Isolate* Isolate, v8::TryCatch* TryCatch)
+{
+    return FV8Utils::ExceptionToString(Isolate, TryCatch->Exception());
+}
+
+bool JsEnv::LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8_t>& Data, std::string& ErrInfo)
+{
+    return false;
+}
+
+void JsEnv::EvalScript(const v8::FunctionCallbackInfo<v8::Value>& Info) {}
+
+void JsEnv::Log(const v8::FunctionCallbackInfo<v8::Value>& Info) {}
+
+void JsEnv::SearchModule(const v8::FunctionCallbackInfo<v8::Value>& Info) {}
+
+void JsEnv::LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    v8::Isolate*           Isolate = Info.GetIsolate();
+    v8::Isolate::Scope     IsolateScope(Isolate);
+    v8::HandleScope        HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope     ContextScope(Context);
+
+    std::string   Path = ObjectToString(Info[0]);
+    std::vector<uint8_t> Data;
+    if (!ModuleLoader->Load(Path.c_str(), Data))
+    {
+        FV8Utils::ThrowException(Isolate, "can not load module");
+        return;
+    }
+
+    Info.GetReturnValue().Set(ToV8StringFromFileContent(Isolate, Data));
+}
+
+void JsEnv::LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    CppObjectMapper.LoadCppType(Info);
 }

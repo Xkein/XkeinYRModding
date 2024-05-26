@@ -28,4 +28,9 @@ void YrExtCoreConfig::Init()
     this->assetsPath  = fs::absolute(rawData.value("assets_dir", "assets")).string();
     this->pluginsPath = fs::absolute(rawData.value("plugins_dir", "plugins")).string();
     this->extensions  = rawData["extensions"];
+
+    if (rawData.value("break_on_start", false))
+    {
+        DebugBreak();
+    }
 }
