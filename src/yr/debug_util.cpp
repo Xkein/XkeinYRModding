@@ -32,3 +32,56 @@ LONG WINAPI ExceptionFilterGetInfo(EXCEPTION_POINTERS* info, std::string*& stack
     stackTrace = new std::string(DumpStackTrace(info));
     return EXCEPTION_EXECUTE_HANDLER;
 }
+
+static LONG WINAPI ExceptionFilterGetInfo(EXCEPTION_POINTERS* info, EXCEPTION_POINTERS*& refInfo, std::string*& stackTrace)
+{
+    refInfo    = info;
+    stackTrace = new std::string(DumpStackTrace(info));
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+static inline void InvokeErrorCallback(const std::function<void(std::string)>& errorCallBack, std::string* stackTrace)
+{
+    std::string tmp = std::move(*stackTrace);
+    delete stackTrace;
+    stackTrace = nullptr;
+    errorCallBack(tmp);
+}
+
+YREXTCORE_API void GuardExecute(const std::function<void()>& func, const std::function<void(std::string)>& errorCallBack)
+{
+    EXCEPTION_POINTERS* info;
+    std::string*        stackTrace;
+    __try
+    {
+        func();
+    }
+    __except (ExceptionFilterGetInfo(GetExceptionInformation(), info, stackTrace))
+    {
+        InvokeErrorCallback(errorCallBack, stackTrace);
+    }
+}
+
+YREXTCORE_API void GuardExecute(const std::function<void()>& func, const std::function<void()>& finallyCallBack)
+{
+    __try
+    {
+        func();
+    }
+    __finally
+    {
+        finallyCallBack();
+    }
+}
+
+YREXTCORE_API void GuardExecute(const std::function<void()>& func, const std::function<void(std::string)>& errorCallBack, const std::function<void()>& finallyCallBack)
+{
+    __try
+    {
+        GuardExecute(func, errorCallBack);
+    }
+    __finally
+    {
+        finallyCallBack();
+    }
+}

@@ -17,7 +17,7 @@ protected:
     
 public:
     YREXTUI_API virtual ~YrImGuiWindow();
-    YREXTUI_API void  NewFrame();
+    YREXTUI_API void NewFrame();
     YREXTUI_API void Open();
     YREXTUI_API void Close();
 

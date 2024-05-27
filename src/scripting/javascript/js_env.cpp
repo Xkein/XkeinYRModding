@@ -103,7 +103,20 @@ JsEnv::JsEnv()
     v8::Local<v8::Context> Context = BackendEnv.MainContext.Get(Isolate);
     v8::Context::Scope     ContextScope(Context);
     DefaultContext.Reset(Isolate, Context);
-    v8::Local<v8::Object> Global = Context->Global();
+
+    v8::Local<v8::Object> Global    = Context->Global();
+    v8::Local<v8::Object> PuertsObj = v8::Object::New(Isolate);
+    Global->Set(Context, FV8Utils::V8String(Isolate, "puerts"), PuertsObj).Check();
+    
+    auto This = v8::External::New(Isolate, this);
+
+    MethodBindingHelper<&JsEnv::EvalScript>::Bind(Isolate, Context, Global, "__tgjsEvalScript", This);
+
+    MethodBindingHelper<&JsEnv::Log>::Bind(Isolate, Context, Global, "__tgjsLog", This);
+
+    MethodBindingHelper<&JsEnv::LoadCppType>::Bind(Isolate, Context, PuertsObj, "loadCPPType", This);
+
+
 
     CppObjectMapper.Initialize(Isolate, Context);
     Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
@@ -301,7 +314,33 @@ bool JsEnv::LoadFile(const char* RequiringDir, const char* ModuleName, std::stri
 
 void JsEnv::EvalScript(const v8::FunctionCallbackInfo<v8::Value>& Info) {}
 
-void JsEnv::Log(const v8::FunctionCallbackInfo<v8::Value>& Info) {}
+void JsEnv::Log(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    v8::Isolate*           Isolate = Info.GetIsolate();
+    v8::Isolate::Scope     IsolateScope(Isolate);
+    v8::HandleScope        HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope     ContextScope(Context);
+
+    auto Level = Info[0]->Int32Value(Context).ToChecked();
+
+    std::string Msg = ObjectToString(Info[1]);
+    switch (Level)
+    {
+        case 1:
+            gLogger->info(Msg);
+            break;
+        case 2:
+            gLogger->warn(Msg);
+            break;
+        case 3:
+            gLogger->error(Msg);
+            break;
+        default:
+            gLogger->info(Msg);
+            break;
+    }
+}
 
 void JsEnv::SearchModule(const v8::FunctionCallbackInfo<v8::Value>& Info) {}
 

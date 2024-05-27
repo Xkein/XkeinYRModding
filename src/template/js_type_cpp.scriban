@@ -38,12 +38,18 @@ void __JsRegister_{{type_name}}() {
         {{- end }}
     {{- end }}
     {{- for function in class_functions ; $cpp_function = function.cpp_function }}
-        {{- if should_skip_visibility(this, function) || function.is_deleted || function.is_destructor || function.is_constructor || function.is_static
+        {{- if should_skip_visibility(this, function) || function.is_deleted || function.is_destructor || function.is_constructor
             continue
         end
         $use_lambda = meta_should_use_lambda(function)
         if $use_lambda ; $lambda = $use_lambda ? get_function_lambda_wrap(function, this) : null }}
         //.Function("{{function.name}}", MakeFunction({{$lambda}}))
+        {{- else if function.is_static }}
+            {{- if function.is_overload ; $func_type = get_function_ptr_type(function, this)}}
+        .Function("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})))
+            {{- else }}
+        .Function("{{function.name}}", MakeFunction(&{{type_name}}::{{function.name}}))
+            {{- end }}
         {{- else if function.is_overload ; $func_type = get_function_ptr_type(function, this)}}
         .Method("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})))
         {{- else }}
@@ -54,12 +60,12 @@ void __JsRegister_{{type_name}}() {
         {{- if string.empty(property.name) || should_skip_visibility(this, property)
             continue
         end }}
-        {{- if property.is_static && (property.is_const || property.is_constexpr) }}
-        .Property("{{property.name}}", MakeReadonlyProperty(std::addressof({{type_name}}::{{property.name}})))
-        {{- else if property.is_static }}
-        .Property("{{property.name}}", MakeProperty(std::addressof({{type_name}}::{{property.name}})))
-        {{- else if property.is_const }}
+        {{- if property.is_static && (property.is_const || property.is_constexpr || property.is_array) }}
+        .Variable("{{property.name}}", MakeReadonlyVariable(std::addressof({{type_name}}::{{property.name}})))
+        {{- else if property.is_const || property.is_array }}
         .Property("{{property.name}}", MakeReadonlyProperty(&{{type_name}}::{{property.name}}))
+        {{- else if property.is_static }}
+        .Variable("{{property.name}}", MakeVariable(std::addressof({{type_name}}::{{property.name}})))
         {{- else }}
         .Property("{{property.name}}", MakeProperty(&{{type_name}}::{{property.name}}))
         {{- end -}}

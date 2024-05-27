@@ -28,8 +28,7 @@ struct ImGuiThread
 
     void ImGuiThreadFunc()
     {
-        __try
-        {
+        GuardExecute([this]() {
             std::this_thread::sleep_for(200ms);
             while (!Game::hWnd)
             {
@@ -50,34 +49,26 @@ struct ImGuiThread
 
             YrImGui::Destory();
             gLogger->info("YrExtUI: imgui thread end.");
-        }
-        __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
-        {
+        }, [](std::string stackTrace) {
             gLogger->error("YrExtUI: ImGuiThread error!");
-            gLogger->error("stack trace : {}", *stackTrace);
-            delete stackTrace;
-            stackTrace = nullptr;
-        }
+            gLogger->error("stack trace : {}", stackTrace);
+        });
     }
 
     void Tick()
     {
-        __try
-        {
+        GuardExecute([]() {
             windowMtx.lock();
 
             if (YrImGui::GetOpenedWinCount() == 0 && !isMainThread)
             {
                 YrImGui::Render();
             }
-        }
-        __finally
-        {
+        }, []() {
             windowMtx.unlock();
-        }
+        });
     }
 
-    std::string* stackTrace;
     bool         shouldStop {false};
     std::thread _thread;
 };

@@ -62,6 +62,58 @@ UsingContainer(TYPEDEF)
 
 #define UsingIndexClass(TKEY, TVALUE) __UsingIndexClass(TKEY, TVALUE, CONCAT(__IndexClass__, CONCAT(__LINE__, __COUNTER__)));
 
+#define UsingEnumArray(TENUM) \
+namespace PUERTS_NAMESPACE                                                                           \
+    {                                                                                                \
+    template<>                                                                                       \
+    struct ScriptTypeName<TENUM>                                                                     \
+    {                                                                                                \
+        static constexpr auto value()                                                                \
+        {                                                                                            \
+            return internal::Literal(#TENUM);                                                        \
+        }                                                                                            \
+    };                                                                                               \
+    template<size_t Size>                                                                            \
+    struct ScriptTypeName<TENUM[Size]>                                                               \
+    {                                                                                                \
+        static constexpr auto value()                                                                \
+        {                                                                                            \
+            return ScriptTypeNameWithNamespace<TENUM>::value() + internal::Literal("[]");            \
+        }                                                                                            \
+    };                                                                                               \
+    }                                                                                                \
+    namespace PUERTS_NAMESPACE                                                                       \
+    {                                                                                                \
+    namespace v8_impl                                                                                \
+    {                                                                                                \
+        template<size_t Size>                                                                        \
+        struct Converter<TENUM[Size]>                                                                \
+        {                                                                                            \
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, TENUM value[Size])  \
+            {                                                                                        \
+                return DataTransfer::NewArrayBuffer(context, &(value[0]), sizeof(TENUM) * Size);     \
+            }                                                                                        \
+                                                                                                     \
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)    \
+            {                                                                                        \
+                if (value->IsArrayBufferView())                                                      \
+                {                                                                                    \
+                    v8::Local<v8::ArrayBufferView> buffView = value.As<v8::ArrayBufferView>();       \
+                    return buffView->ByteLength() >= sizeof(TENUM) * Size;                           \
+                }                                                                                    \
+                if (value->IsArrayBuffer())                                                          \
+                {                                                                                    \
+                    auto   ab = v8::Local<v8::ArrayBuffer>::Cast(value);                             \
+                    size_t byteLength;                                                               \
+                    (void)(DataTransfer::GetArrayBufferData(ab, byteLength));                        \
+                    return byteLength >= sizeof(TENUM) * Size;                                       \
+                }                                                                                    \
+                return false;                                                                        \
+            }                                                                                        \
+        };                                                                                           \
+    }                                                                                                \
+    }
+
 #define RegisterDynamicVectorClass(CLS) \
     PUERTS_NAMESPACE::DefineClass<DynamicVectorClass<CLS>>() \
         .Method("SetCapacity", MakeFunction(&DynamicVectorClass<CLS>::SetCapacity)) \

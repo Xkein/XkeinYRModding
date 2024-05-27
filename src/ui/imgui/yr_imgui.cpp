@@ -243,20 +243,14 @@ void YrImGui::Render()
 
     ImGui::NewFrame();
 
-    std::string* stackTrace;
     for (auto& window : gWindows)
     {
-        __try
-        {
+        GuardExecute([=]() {
             window->NewFrame();
-        }
-        __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
-        {
+        }, [](std::string stackTrace) {
             gLogger->error("YrExtUI: ImGuiThread render error!");
-            gLogger->error("stack trace : {}", *stackTrace);
-            delete stackTrace;
-            stackTrace = nullptr;
-        }
+            gLogger->error("stack trace : {}", stackTrace);
+        });
     }
 
     //m_Renderer->Clear(ImColor(0, 0, 0, 0));

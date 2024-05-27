@@ -1,6 +1,14 @@
 {{  include 'include/common.scriban'
 func get_yr_game_types()
-    ret ["AbstractClass", "AbstractTypeClass", "TechnoClass", "TechnoTypeClass"]
+    ret [
+     "AbstractClass",
+     "AbstractTypeClass",
+     "RadioClass",
+     "MissionClass",
+     "ObjectClass",
+     "ObjectTypeClass",
+     "TechnoClass",
+     "TechnoTypeClass"]
 end
 
 func get_yr_types()

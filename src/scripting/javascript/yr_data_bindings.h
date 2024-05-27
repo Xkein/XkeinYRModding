@@ -46,12 +46,17 @@ UsingYrClass(LightConvertClass);
 UsingYrClass(Surface);
 UsingYrClass(LaserDrawClass);
 UsingYrClass(CellClass);
+UsingYrClass(RadioClass);
+UsingYrClass(MissionClass);
+UsingYrClass(BombClass);
+UsingYrClass(LineTrail);
+UsingYrClass(TagClass);
+UsingYrClass(WarheadTypeClass);
 
 UsingYrClass(CRCEngine);
 UsingYrClass(CCINIClass);
 UsingYrClass(ColorScheme);
 UsingYrClass(SHPStruct);
-UsingYrClass(VoxelStruct);
 UsingYrClass(VoxelCacheStruct);
 UsingYrClass(VoxelIndexKey);
 UsingYrClass(MainVoxelIndexKey);
@@ -59,12 +64,16 @@ UsingYrClass(TurretWeaponVoxelIndexKey);
 UsingYrClass(TurretBarrelVoxelIndexKey);
 UsingYrClass(ShadowVoxelIndexKey);
 
+UsingEnumArray(RadioCommand)
+
 UsingYrStruct(TurretControl);
 UsingYrStruct(WeaponStruct);
 UsingYrStruct(CoordStruct);
 UsingYrStruct(Point2D);
 UsingYrStruct(CellStruct);
+UsingYrStruct(ColorStruct);
 UsingYrStruct(RectangleStruct);
+UsingYrStruct(VoxelStruct);
 UsingYrClass(Matrix3D);
 UsingYrClass(DirStruct);
 UsingYrClass(GUID);
