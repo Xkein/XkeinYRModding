@@ -10,7 +10,7 @@
 
 #define UsingYrClass(CLS) UsingCppType(CLS)
 
-#define UsingYrStruct(CLS) UsingYrClass(CLS)                                                         \
+#define UsingYrStruct(CLS) UsingCppType(CLS)                                                         \
     namespace PUERTS_NAMESPACE                                                                       \
     {                                                                                                \
     template<size_t Size>                                                                            \
@@ -61,6 +61,8 @@ typedef IndexClass<TKEY, TVALUE> TYPEDEF; \
 UsingContainer(TYPEDEF)
 
 #define UsingIndexClass(TKEY, TVALUE) __UsingIndexClass(TKEY, TVALUE, CONCAT(__IndexClass__, CONCAT(__LINE__, __COUNTER__)));
+
+#define UsingPointerArray()
 
 #define UsingEnumArray(TENUM) \
 namespace PUERTS_NAMESPACE                                                                           \
@@ -116,7 +118,7 @@ namespace PUERTS_NAMESPACE                                                      
 
 #define RegisterDynamicVectorClass(CLS) \
     PUERTS_NAMESPACE::DefineClass<DynamicVectorClass<CLS>>() \
-        .Method("SetCapacity", MakeFunction(&DynamicVectorClass<CLS>::SetCapacity)) \
+        /*.Method("SetCapacity", MakeFunction(&DynamicVectorClass<CLS>::SetCapacity))*/ \
         .Method("Clear", MakeFunction(&DynamicVectorClass<CLS>::Clear)) \
         .Method("FindItemIndex", MakeFunction(&DynamicVectorClass<CLS>::FindItemIndex)) \
         .Method("ValidIndex", MakeFunction(&DynamicVectorClass<CLS>::ValidIndex)) \

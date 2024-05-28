@@ -8,6 +8,9 @@
 -}}
 #include "{{class_name}}.gen.h"
 #include <CRC.h>
+#include <TubeClass.h>
+#include <PixelFXClass.h>
+#define wchar wchar_t
 
 {{get_meta_gen_header()}}
 {{gen_meta_register_snippet(this)}}
