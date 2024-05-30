@@ -1,7 +1,6 @@
 {{  include 'include/common.scriban'
 func get_yr_game_types()
-    ret [
-        "AbstractClass",
+    ret ["AbstractClass",
         "AbstractTypeClass",
         "ObjectClass",
         "ObjectTypeClass",
@@ -36,16 +35,28 @@ func get_yr_game_types()
         "AirstrikeClass",
         "TemporalClass",
         "VoxelAnimTypeClass",
-        "LightConvertClass",
-        "Surface",
-        "LaserDrawClass",
         "CellClass",
         "RadioClass",
         "MissionClass",
         "BombClass",
-        "LineTrail",
         "TagClass",
-        "WarheadTypeClass"]
+        "TagTypeClass",
+        "WarheadTypeClass",
+        "OverlayClass",
+        "OverlayTypeClass",
+        "ParasiteClass",
+        "RadSiteClass",
+        "LightSourceClass",
+        "BuildingLightClass",
+        "TiberiumClass",
+        "FactoryClass",
+        "TerrainClass",
+        "WaypointClass",
+        "WaypointPathClass",
+        "SuperClass",
+        "LaserDrawClass",
+        "TriggerClass",
+        "TriggerTypeClass"]
 end
 
 func get_yr_types()

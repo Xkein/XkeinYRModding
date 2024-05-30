@@ -32,20 +32,20 @@ func gen_meta_class_function(htClass, htFunction)
         end
         $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
         if $use_lambda
-            ret $'.ctor<{$lambda}>()'
+            ret $'factory.ctor<{$lambda}>();'
         else
-            ret $'.ctor<{$arg_types}>()'
+            ret $'factory.ctor<{$arg_types}>();'
         end
     end
     $class_name = htClass.cpp_class.name
     $func_type = get_function_ptr_type(htFunction, htClass)
     
     if $use_lambda
-        ret $'.func<{$lambda}>("{$function_name}"_hs).prop("name"_hs, "{$function_name}")'
+        ret $'factory.func<{$lambda}>("{$function_name}"_hs).prop("name"_hs, "{$function_name}");'
     else if htFunction.is_overload
-        ret $'.func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>("{$function_name}"_hs).prop("name"_hs, "{$function_name}")'
+        ret $'factory.func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>("{$function_name}"_hs).prop("name"_hs, "{$function_name}");'
     else
-        ret $'.func<&{$class_name}::{$function_name}>("{$function_name}"_hs).prop("name"_hs, "{$function_name}")'
+        ret $'factory.func<&{$class_name}::{$function_name}>("{$function_name}"_hs).prop("name"_hs, "{$function_name}");'
     end
 end
 
@@ -58,7 +58,7 @@ func gen_meta_class_property(htClass, htProperty)
         ret null
     end
     $class_name = htClass.name
-    ret $'.data<&{class_name}::{$field_name}>("{$field_name}"_hs).prop("name"_hs, "{$field_name}")'
+    ret $'register_data<{class_name}, &{class_name}::{$field_name}>(factory, "{$field_name}"_hs).prop("name"_hs, "{$field_name}");'
 end
 
 func gen_meta_enum_constant(htEnum, htConstant)
@@ -68,15 +68,15 @@ func gen_meta_enum_constant(htEnum, htConstant)
 end
 
 func gen_meta_class(htClass)
-    $klass = $'entt::meta<{htClass.class_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}")' + "\n"
+    $klass = $'auto factory = entt::meta<{htClass.class_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}");' + "\n"
     for base in htClass.base_classes
-        $klass += $"   .base<{base.full_display_name}>()" + "\n"
+        $klass += $"factory.base<{base.full_display_name}>();" + "\n"
     end
     for function in htClass.all_functions
-        $klass += "   " + gen_meta_class_function(htClass, function) + "\n"
+        $klass += gen_meta_class_function(htClass, function) + "\n"
     end
     for property in htClass.properties
-        $klass += "   " + gen_meta_class_property(htClass, property) + "\n"
+        $klass += gen_meta_class_property(htClass, property) + "\n"
     end
     $klass += ";\n"
     ret $klass
@@ -92,13 +92,14 @@ func gen_meta_enum(htEnum)
 end
 
 func get_meta_gen_header()
-    ret "// meta gen headers
+    ret '// meta gen headers
+#include "core/reflection/reflection_register.h"
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/policy.hpp>
 using namespace entt::literals;
-"
+'
 end
 
 func gen_meta_register_snippet(htType)

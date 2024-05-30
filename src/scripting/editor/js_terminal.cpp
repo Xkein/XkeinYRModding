@@ -1,4 +1,4 @@
-#include "javascript/js_env.h"
+#include "scripting/javascript/js_env.h"
 #include <ui/imgui/yr_imgui.h>
 #include <core/logger/logger.h>
 #include "yr/event/general_event.h"

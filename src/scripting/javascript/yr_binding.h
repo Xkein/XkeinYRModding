@@ -7,52 +7,58 @@
 #include <core/macro.h>
 #include <timeapi.h>
 #include <AbstractClass.h>
+#include <AbstractTypeClass.h>
+#include <Helpers/String.h>
+#include <Helpers/Template.h>
+
+#define UsingArray(CLS)                                                                             \
+namespace PUERTS_NAMESPACE                                                                          \
+    {                                                                                               \
+    template<size_t Size>                                                                           \
+    struct ScriptTypeName<CLS[Size]>                                                                \
+    {                                                                                               \
+        static constexpr auto value()                                                               \
+        {                                                                                           \
+            return ScriptTypeNameWithNamespace<CLS>::value() + internal::Literal("[]");             \
+        }                                                                                           \
+    };                                                                                              \
+    }                                                                                               \
+    namespace PUERTS_NAMESPACE                                                                      \
+    {                                                                                               \
+    namespace v8_impl                                                                               \
+    {                                                                                               \
+        template<size_t Size>                                                                       \
+        struct Converter<CLS[Size]>                                                                 \
+        {                                                                                           \
+            using data_type = CLS[Size];                                                            \
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, data_type& value)  \
+            {                                                                                       \
+                return DataTransfer::NewArrayBuffer(context, &(value[0]), sizeof(data_type));       \
+            }                                                                                       \
+                                                                                                    \
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)   \
+            {                                                                                       \
+                if (value->IsArrayBufferView())                                                     \
+                {                                                                                   \
+                    v8::Local<v8::ArrayBufferView> buffView = value.As<v8::ArrayBufferView>();      \
+                    return buffView->ByteLength() >= sizeof(data_type);                             \
+                }                                                                                   \
+                if (value->IsArrayBuffer())                                                         \
+                {                                                                                   \
+                    auto   ab = v8::Local<v8::ArrayBuffer>::Cast(value);                            \
+                    size_t byteLength;                                                              \
+                    (void)(DataTransfer::GetArrayBufferData(ab, byteLength));                       \
+                    return byteLength >= sizeof(data_type);                                         \
+                }                                                                                   \
+                return false;                                                                       \
+            }                                                                                       \
+        };                                                                                          \
+    }                                                                                               \
+    }
 
 #define UsingYrClass(CLS) UsingCppType(CLS)
 
-#define UsingYrStruct(CLS) UsingCppType(CLS)                                                         \
-    namespace PUERTS_NAMESPACE                                                                       \
-    {                                                                                                \
-    template<size_t Size>                                                                            \
-    struct ScriptTypeName<CLS[Size]>                                                                 \
-    {                                                                                                \
-        static constexpr auto value()                                                                \
-        {                                                                                            \
-            return ScriptTypeNameWithNamespace<CLS>::value() + internal::Literal("[]");              \
-        }                                                                                            \
-    };                                                                                               \
-    }                                                                                                \
-    namespace PUERTS_NAMESPACE                                                                       \
-    {                                                                                                \
-    namespace v8_impl                                                                                \
-    {                                                                                                \
-        template<size_t Size>                                                                        \
-        struct Converter<CLS[Size], typename std::enable_if<!std::is_const<CLS>::value>::type>       \
-        {                                                                                            \
-            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, CLS value[Size])    \
-            {                                                                                        \
-                return DataTransfer::NewArrayBuffer(context, &(value[0]), sizeof(CLS) * Size);       \
-            }                                                                                        \
-                                                                                                     \
-            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)    \
-            {                                                                                        \
-                if (value->IsArrayBufferView())                                                      \
-                {                                                                                    \
-                    v8::Local<v8::ArrayBufferView> buffView = value.As<v8::ArrayBufferView>();       \
-                    return buffView->ByteLength() >= sizeof(CLS) * Size;                             \
-                }                                                                                    \
-                if (value->IsArrayBuffer())                                                          \
-                {                                                                                    \
-                    auto   ab = v8::Local<v8::ArrayBuffer>::Cast(value);                             \
-                    size_t byteLength;                                                               \
-                    (void)(DataTransfer::GetArrayBufferData(ab, byteLength));                        \
-                    return byteLength >= sizeof(CLS) * Size;                                         \
-                }                                                                                    \
-                return false;                                                                        \
-            }                                                                                        \
-        };                                                                                           \
-    }                                                                                                \
-    }
+#define UsingYrStruct(CLS) UsingCppType(CLS) UsingArray(CLS)
 
 #define UsingContainer(CLS) __DefObjectType(CLS) __DefCDataPointerConverter(CLS)
 
@@ -62,65 +68,26 @@ UsingContainer(TYPEDEF)
 
 #define UsingIndexClass(TKEY, TVALUE) __UsingIndexClass(TKEY, TVALUE, CONCAT(__IndexClass__, CONCAT(__LINE__, __COUNTER__)));
 
-#define UsingPointerArray()
+#define UsingVectorClass(CLS) UsingContainer(VectorClass<CLS>)
+#define UsingDynamicVectorClass(CLS) UsingVectorClass(CLS) UsingContainer(DynamicVectorClass<CLS>)
+#define UsingTypeList(CLS) UsingDynamicVectorClass(CLS) UsingContainer(TypeList<CLS>)
 
-#define UsingEnumArray(TENUM) \
-namespace PUERTS_NAMESPACE                                                                           \
-    {                                                                                                \
-    template<>                                                                                       \
-    struct ScriptTypeName<TENUM>                                                                     \
-    {                                                                                                \
-        static constexpr auto value()                                                                \
-        {                                                                                            \
-            return internal::Literal(#TENUM);                                                        \
-        }                                                                                            \
-    };                                                                                               \
-    template<size_t Size>                                                                            \
-    struct ScriptTypeName<TENUM[Size]>                                                               \
-    {                                                                                                \
-        static constexpr auto value()                                                                \
-        {                                                                                            \
-            return ScriptTypeNameWithNamespace<TENUM>::value() + internal::Literal("[]");            \
-        }                                                                                            \
-    };                                                                                               \
-    }                                                                                                \
-    namespace PUERTS_NAMESPACE                                                                       \
-    {                                                                                                \
-    namespace v8_impl                                                                                \
-    {                                                                                                \
-        template<size_t Size>                                                                        \
-        struct Converter<TENUM[Size]>                                                                \
-        {                                                                                            \
-            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, TENUM value[Size])  \
-            {                                                                                        \
-                return DataTransfer::NewArrayBuffer(context, &(value[0]), sizeof(TENUM) * Size);     \
-            }                                                                                        \
-                                                                                                     \
-            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)    \
-            {                                                                                        \
-                if (value->IsArrayBufferView())                                                      \
-                {                                                                                    \
-                    v8::Local<v8::ArrayBufferView> buffView = value.As<v8::ArrayBufferView>();       \
-                    return buffView->ByteLength() >= sizeof(TENUM) * Size;                           \
-                }                                                                                    \
-                if (value->IsArrayBuffer())                                                          \
-                {                                                                                    \
-                    auto   ab = v8::Local<v8::ArrayBuffer>::Cast(value);                             \
-                    size_t byteLength;                                                               \
-                    (void)(DataTransfer::GetArrayBufferData(ab, byteLength));                        \
-                    return byteLength >= sizeof(TENUM) * Size;                                       \
-                }                                                                                    \
-                return false;                                                                        \
-            }                                                                                        \
-        };                                                                                           \
-    }                                                                                                \
-    }
+#define RegisterVectorClass(CLS) \
+    PUERTS_NAMESPACE::DefineClass<VectorClass<CLS>>() \
+        /*.Method("SetCapacity", MakeFunction(&VectorClass<CLS>::SetCapacity))*/ \
+        .Method("Clear", MakeFunction(&VectorClass<CLS>::Clear)) \
+        /*.Method("FindItemIndex", MakeFunction(&VectorClass<CLS>::FindItemIndex))*/ \
+        /*.Method("GetItemIndex", MakeFunction(&VectorClass<CLS>::GetItemIndex))*/ \
+        .Method("GetItem", MakeFunction(&VectorClass<CLS>::GetItem)) \
+        .Method("Reserve", MakeFunction(&VectorClass<CLS>::Reserve)) \
+        .Property("Capacity", MakeProperty(&VectorClass<CLS>::Capacity)) \
+        .Register()
 
 #define RegisterDynamicVectorClass(CLS) \
+    RegisterVectorClass(CLS); \
     PUERTS_NAMESPACE::DefineClass<DynamicVectorClass<CLS>>() \
+        .Extends<VectorClass<CLS>>() \
         /*.Method("SetCapacity", MakeFunction(&DynamicVectorClass<CLS>::SetCapacity))*/ \
-        .Method("Clear", MakeFunction(&DynamicVectorClass<CLS>::Clear)) \
-        .Method("FindItemIndex", MakeFunction(&DynamicVectorClass<CLS>::FindItemIndex)) \
         .Method("ValidIndex", MakeFunction(&DynamicVectorClass<CLS>::ValidIndex)) \
         .Method("GetItemOrDefault", SelectFunction(CLS (DynamicVectorClass<CLS>::*)(int) const, &DynamicVectorClass<CLS>::GetItemOrDefault)) \
         .Method("GetItemOrDefault", SelectFunction(CLS (DynamicVectorClass<CLS>::*)(int, CLS) const, &DynamicVectorClass<CLS>::GetItemOrDefault)) \
@@ -132,6 +99,7 @@ namespace PUERTS_NAMESPACE                                                      
         .Register()
 
 #define RegisterTypeList(CLS) \
+    RegisterDynamicVectorClass(CLS); \
     PUERTS_NAMESPACE::DefineClass<TypeList<CLS>>() \
         .Extends<DynamicVectorClass<CLS>>() \
         .Register()
@@ -252,6 +220,46 @@ namespace PUERTS_NAMESPACE
             }
         };
 
+        template<size_t Capacity, typename T>
+        struct Converter<FixedString<Capacity, T>>
+        {
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const FixedString<Capacity, T>& value)
+            {
+                return v8::String::NewFromUtf8(context->GetIsolate(), static_cast<const T*>(value), v8::NewStringType::kNormal).ToLocalChecked();
+            }
+
+            static FixedString<Capacity, T> toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return FixedString<Capacity, T>(*v8::String::Utf8Value(context->GetIsolate(), value));
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return value->IsString();
+            }
+        };
+
+        template<>
+        struct Converter<LARGE_INTEGER>
+        {
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, LARGE_INTEGER value)
+            {
+                return Converter<decltype(LARGE_INTEGER::QuadPart)>::toScript(context, value.QuadPart);
+            }
+
+            static LARGE_INTEGER toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                LARGE_INTEGER ret;
+                ret.QuadPart = Converter<decltype(LARGE_INTEGER::QuadPart)>::toCpp(context, value);
+                return ret;
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return Converter<decltype(LARGE_INTEGER::QuadPart)>::accept(context, value);
+            }
+        };
+
         //template<typename T>
         //struct Converter<T*, typename std::enable_if<std::is_convertible<T*, const AbstractClass*>::value>::type>
         //{
@@ -278,6 +286,15 @@ namespace PUERTS_NAMESPACE
     ;
 
     template<typename T>
+    struct ScriptTypeName<VectorClass<T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("VectorClass<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
+    template<typename T>
     struct ScriptTypeName<DynamicVectorClass<T>>
     {
         static constexpr auto value()
@@ -295,6 +312,15 @@ namespace PUERTS_NAMESPACE
         }
     };
 
+    template<typename T>
+    struct ScriptTypeName<IndexBitfield<T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("IndexBitfield<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
     template<typename TKey, typename TValue>
     struct ScriptTypeName<IndexClass<TKey, TValue>>
     {
@@ -303,6 +329,45 @@ namespace PUERTS_NAMESPACE
             return internal::Literal("IndexClass<") + ScriptTypeNameWithNamespace<TKey>::value() + internal::Literal(", ") + ScriptTypeNameWithNamespace<TValue>::value() + internal::Literal(">");
         }
     };
+
+    template<size_t Capacity, typename T>
+    struct ScriptTypeName<FixedString<Capacity, T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("FixedString<") + internal::Literal("N, ") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
+    template<>
+    struct ScriptTypeName<LARGE_INTEGER>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("LARGE_INTEGER");
+        }
+    };
 } // namespace PUERTS_NAMESPACE
+
+template<auto Data, typename T, typename API, typename RegisterAPI>
+void MakePropertyCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
+{
+    if constexpr (std::is_member_object_pointer_v<decltype(Data)>)
+    {
+        using data_type = std::invoke_result_t<decltype(Data), T&>;
+        if constexpr (std::is_move_assignable_v<data_type>)
+        {
+            builder.Property(name, MakeProperty(Data));
+        }
+        else
+        {
+            builder.Property(name, MakeReadonlyProperty(Data));
+        }
+    }
+    else
+    {
+        builder.Property(name, MakeProperty(Data));
+    }
+}
 
 #endif

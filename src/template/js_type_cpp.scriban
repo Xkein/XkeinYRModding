@@ -18,23 +18,24 @@
         yr_inject_meta(this)
     end
 -}}
-#include "{{source_file}}"
-#include "core/raii_invoker.h"
-#include <Binding.hpp>
-{{ if is_yrpp }}
+{{- if is_yrpp -}}
 #include "scripting/javascript/yr_data_bindings.h"
 #include <EventClass.h>
 #include <YRPP.h>
 #include <CRC.h>
 #include <HouseClass.h>
 #include <ColorScheme.h>
+#include <TriggerTypeClass.h>
 {{- end }}
+#include "{{source_file}}"
+#include "core/raii_invoker.h"
+#include <Binding.hpp>
 void __JsRegister_{{type_name}}() {
 {{ if is_class }}
-    PUERTS_NAMESPACE::DefineClass<{{type_name}}>()
+    auto builder = PUERTS_NAMESPACE::DefineClass<{{type_name}}>();
     {{- for base in base_classes }}
         {{- if base.klass && !base.klass.is_interface}}
-        .Extends<{{base.full_display_name}}>()
+    builder.Extends<{{base.full_display_name}}>();
         {{- end }}
     {{- end }}
     {{- for function in class_functions ; $cpp_function = function.cpp_function }}
@@ -46,14 +47,14 @@ void __JsRegister_{{type_name}}() {
         //.Function("{{function.name}}", MakeFunction({{$lambda}}))
         {{- else if function.is_static }}
             {{- if function.is_overload ; $func_type = get_function_ptr_type(function, this)}}
-        .Function("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})))
+    builder.Function("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})));
             {{- else }}
-        .Function("{{function.name}}", MakeFunction(&{{type_name}}::{{function.name}}))
+    builder.Function("{{function.name}}", MakeFunction(&{{type_name}}::{{function.name}}));
             {{- end }}
         {{- else if function.is_overload ; $func_type = get_function_ptr_type(function, this)}}
-        .Method("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})))
+    builder.Method("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})));
         {{- else }}
-        .Method("{{function.name}}", MakeFunction(&{{type_name}}::{{function.name}}))
+    builder.Method("{{function.name}}", MakeFunction(&{{type_name}}::{{function.name}}));
         {{- end -}}
     {{- end }}
     {{- for property in class_properties ; $cpp_field = property.cpp_field }}
@@ -61,16 +62,16 @@ void __JsRegister_{{type_name}}() {
             continue
         end }}
         {{- if property.is_static && (property.is_const || property.is_constexpr || property.is_array) }}
-        .Variable("{{property.name}}", MakeReadonlyVariable(std::addressof({{type_name}}::{{property.name}})))
+    builder.Variable("{{property.name}}", MakeReadonlyVariable(std::addressof({{type_name}}::{{property.name}})));
         {{- else if property.is_const || property.is_array }}
-        .Property("{{property.name}}", MakeReadonlyProperty(&{{type_name}}::{{property.name}}))
+    builder.Property("{{property.name}}", MakeReadonlyProperty(&{{type_name}}::{{property.name}}));
         {{- else if property.is_static }}
-        .Variable("{{property.name}}", MakeVariable(std::addressof({{type_name}}::{{property.name}})))
+    builder.Variable("{{property.name}}", MakeVariable(std::addressof({{type_name}}::{{property.name}})));
         {{- else }}
-        .Property("{{property.name}}", MakeProperty(&{{type_name}}::{{property.name}}))
+    MakePropertyCheck<&{{type_name}}::{{property.name}}>(builder, "{{property.name}}");
         {{- end -}}
     {{- end }}
-    .Register();
+    builder.Register();
 {{ else if is_enum }}
 
 {{ end }}

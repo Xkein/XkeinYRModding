@@ -9,7 +9,7 @@
 #pragma once
 #include <EventClass.h>
 #include <YRPP.h>
-#include "{{cpp_class.source_file}}" // screw you clang
+#include "{{source_file}}"
 
 class {{gen_type_name}}
 {
