@@ -84,7 +84,7 @@ end
 
 func gen_meta_enum(htEnum)
     $enum = $'entt::meta<{htEnum.enum_name}>().type("{htEnum.enum_name}"_hs).prop("name"_hs, "{htClass.enum_name}")'
-    $enum += (enum_constants | array.each do
+    $enum += (htEnum.enum_constants | array.each do
             ret "   " + gen_meta_enum_constant(htEnum, $0)
         end) | array.join ", \n"
     $enum += "; \n"

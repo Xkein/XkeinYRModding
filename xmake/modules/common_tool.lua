@@ -33,7 +33,7 @@ function get_default_templates()
             ["js_type_cpp.scriban"] =  codegen_dir.."/YrScripting/codegen/{1}/{0}.js_binding.cpp",
         },
         js_module = {
-            ["ts_index.scriban"] = root_dir.."src/scripts/{0}.d.ts",
+            ["ts_index.scriban"] = root_dir.."/src/scripts/typescript/gen/{0}.d.ts",
         },
         depends = {
             ["include/common.scriban"] = "not use to generate!",

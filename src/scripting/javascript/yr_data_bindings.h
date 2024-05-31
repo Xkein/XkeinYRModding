@@ -88,13 +88,13 @@ UsingYrClass(ParticleClass);
 UsingYrClass(ParticleTypeClass);
 UsingYrClass(FacingClass);
 
+// not implement, declare only
 UsingYrClass(IAIHouse);
 UsingYrClass(TubeClass);
 UsingYrClass(LightConvertClass);
 UsingYrClass(Surface);
 UsingYrClass(FoggedObjectClass);
 UsingYrClass(LineTrail);
-
 UsingYrClass(CRCEngine);
 UsingYrClass(CCINIClass);
 UsingYrClass(ColorScheme);
@@ -118,14 +118,9 @@ UsingYrClass(SpawnControl);
 UsingYrClass(PlanningNodeClass);
 UsingYrClass(ScriptActionNode);
 UsingYrClass(TaskForceEntryStruct);
+UsingYrClass(RGBClass);
 
-UsingArray(RadioCommand);
-UsingArray(BuildingTypeClass*);
-UsingArray(AnimClass*);
-UsingArray(WaypointPathClass*);
-UsingArray(TaskForceEntryStruct);
-UsingArray(unsigned int[130]);
-
+// hand write registration
 UsingYrStruct(TurretControl);
 UsingYrStruct(WeaponStruct);
 UsingYrStruct(CoordStruct);
@@ -146,6 +141,14 @@ UsingYrClass(ControlNode);
 UsingYrClass(BulletData);
 UsingYrStruct(LineTrailNode);
 UsingYrStruct(TintStruct);
+
+UsingArray(RadioCommand);
+UsingArray(BuildingTypeClass*);
+UsingArray(AnimClass*);
+UsingArray(WaypointPathClass*);
+UsingArray(TaskForceEntryStruct);
+UsingArray(ScriptActionNode);
+UsingArray(unsigned int[130]);
 
 UsingContainer(IndexBitfield<HouseClass*>);
 
@@ -203,6 +206,9 @@ UsingDynamicVectorClass(ParticleClass*);
 UsingDynamicVectorClass(ParticleTypeClass*);
 UsingDynamicVectorClass(CellClass*);
 UsingDynamicVectorClass(WaypointClass);
+UsingDynamicVectorClass(EBolt*);
+UsingDynamicVectorClass(ScriptTypeClass*);
+UsingDynamicVectorClass(TaskForceClass*);
 
 UsingTypeList(AircraftTypeClass*);
 UsingTypeList(InfantryTypeClass*);
@@ -211,6 +217,7 @@ UsingTypeList(ParticleSystemTypeClass*);
 UsingTypeList(AnimTypeClass*);
 UsingTypeList(BuildingTypeClass*);
 UsingTypeList(VoxelAnimTypeClass*);
+UsingTypeList(RGBClass*);
 UsingTypeList(int);
 
 UsingIndexClass(int, int);

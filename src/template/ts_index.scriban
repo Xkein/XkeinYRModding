@@ -6,7 +6,17 @@
         ret has_meta(htType.meta) || (is_yrpp && yr_need_codegen(htType))
     end
 -}}
+declare module "{{module_name}}" {
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-
 {{- end; end }}
+
+{{- for enum in module_enums }}
+{{- if need_codegen(enum) || is_yrpp }}
+export enum {{enum.name}} {
+    {{- for enum_item in enum.constants }}
+    {{enum_item.name}} = {{enum_item.value}},
+    {{- end}}
+}
+{{- end; end }}
+}

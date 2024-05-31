@@ -1,6 +1,6 @@
 #include "js_env.h"
 #include "core/raii_invoker.h"
-
+#include <yr/debug_util.h>
 #include <core/logger/logger.h>
 #include <sstream>
 
@@ -155,7 +155,13 @@ JsEnv::~JsEnv()
     ResultInfo.Context.Reset();
     ResultInfo.Result.Reset();
 
-    BackendEnv.UnInitialize();
+    GuardExecute(
+        [&]() {
+        BackendEnv.UnInitialize();
+    },
+        [](std::string stackTrace) {
+        gLogger->error(stackTrace);
+    });
     gLogger->info("JsEnv disposed.");
 }
 

@@ -239,6 +239,21 @@ namespace PUERTS_NAMESPACE
             }
         };
 
+        template<size_t Capacity>
+        struct Converter<char[Capacity]>
+        {
+            using data_type = char[Capacity];
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const data_type& value)
+            {
+                return Converter<const char*>::toScript(context, value);
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return value->IsString();
+            }
+        };
+
         template<>
         struct Converter<LARGE_INTEGER>
         {

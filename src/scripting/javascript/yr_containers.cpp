@@ -1,6 +1,7 @@
 #include "scripting/javascript/yr_data_bindings.h"
 #include <Binding.hpp>
 #include <core/raii_invoker.h>
+#include <WaypointPathClass.h>
 
 void __JsRegister_YrContainers()
 {
@@ -15,16 +16,61 @@ void __JsRegister_YrContainers()
     RegisterDynamicVectorClass(BuildingClass*);
     RegisterDynamicVectorClass(ColorScheme*);
     RegisterDynamicVectorClass(ParticleSystemClass*);
-    RegisterDynamicVectorClass(ParticleSystemTypeClass*);
     RegisterDynamicVectorClass(AnimClass*);
     RegisterDynamicVectorClass(HouseClass*);
     RegisterDynamicVectorClass(HouseTypeClass*);
     RegisterDynamicVectorClass(BulletClass*);
+    RegisterDynamicVectorClass(BulletTypeClass*);
+    RegisterDynamicVectorClass(ControlNode*);
+    RegisterDynamicVectorClass(FootClass*);
+    RegisterDynamicVectorClass(CaptureManagerClass*);
+    RegisterDynamicVectorClass(OverlayClass*);
+    RegisterDynamicVectorClass(OverlayTypeClass*);
+    RegisterDynamicVectorClass(FoggedObjectClass*);
+    RegisterDynamicVectorClass(CoordStruct);
+    RegisterDynamicVectorClass(FactoryClass*);
+    RegisterDynamicVectorClass(ParasiteClass*);
+    RegisterDynamicVectorClass(LightConvertClass*);
+    RegisterDynamicVectorClass(BuildingLightClass*);
+    RegisterDynamicVectorClass(PlanningTokenClass*);
+    RegisterDynamicVectorClass(PlanningNodeClass*);
+    RegisterDynamicVectorClass(RadBeam*);
+    RegisterDynamicVectorClass(RadSiteClass*);
+    RegisterDynamicVectorClass(SuperClass*);
+    RegisterDynamicVectorClass(SuperWeaponTypeClass*);
+    RegisterDynamicVectorClass(SlaveManagerClass*);
+    RegisterDynamicVectorClass(SlaveManagerClass::SlaveControl*);
+    RegisterDynamicVectorClass(SpawnManagerClass*);
+    RegisterDynamicVectorClass(SpawnControl*);
+    RegisterDynamicVectorClass(TagClass*);
+    RegisterDynamicVectorClass(TagTypeClass*);
+    RegisterDynamicVectorClass(TriggerClass*);
+    RegisterDynamicVectorClass(TriggerTypeClass*);
+    RegisterDynamicVectorClass(TeamClass*);
+    RegisterDynamicVectorClass(TeamTypeClass*);
+    RegisterDynamicVectorClass(TerrainClass*);
+    RegisterDynamicVectorClass(TerrainTypeClass*);
+    RegisterDynamicVectorClass(TemporalClass*);
+    RegisterDynamicVectorClass(TiberiumClass*);
+    RegisterDynamicVectorClass(WaveClass*);
+    RegisterDynamicVectorClass(WarheadTypeClass*);
+    RegisterDynamicVectorClass(WeaponTypeClass*);
+    RegisterDynamicVectorClass(ParticleClass*);
+    RegisterDynamicVectorClass(ParticleTypeClass*);
+    RegisterDynamicVectorClass(CellClass*);
+    RegisterDynamicVectorClass(WaypointClass);
+    RegisterDynamicVectorClass(EBolt*);
+    RegisterDynamicVectorClass(ScriptTypeClass*);
+    RegisterDynamicVectorClass(TaskForceClass*);
 
+    RegisterTypeList(AircraftTypeClass*);
+    RegisterTypeList(InfantryTypeClass*);
+    RegisterTypeList(UnitTypeClass*);
     RegisterTypeList(ParticleSystemTypeClass*);
     RegisterTypeList(AnimTypeClass*);
     RegisterTypeList(BuildingTypeClass*);
     RegisterTypeList(VoxelAnimTypeClass*);
+    RegisterTypeList(RGBClass*);
     RegisterTypeList(int);
 
     RegisterIndexClass(int, int);

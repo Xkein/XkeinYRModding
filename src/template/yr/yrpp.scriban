@@ -51,12 +51,21 @@ func get_yr_game_types()
         "TiberiumClass",
         "FactoryClass",
         "TerrainClass",
+        "TerrainTypeClass",
         "WaypointClass",
         "WaypointPathClass",
         "SuperClass",
+        "SuperWeaponTypeClass",
         "LaserDrawClass",
         "TriggerClass",
-        "TriggerTypeClass"]
+        "TriggerTypeClass",
+        "ScriptClass",
+        "ScriptTypeClass",
+        "TaskForceClass",
+        "EBolt",
+        "ParticleClass",
+        "ParticleTypeClass",
+        "FacingClass"]
 end
 
 func get_yr_types()
