@@ -5,6 +5,16 @@
 
 void __JsRegister_YrContainers()
 {
+    RegisterVectorClass(int);
+    PUERTS_NAMESPACE::DefineClass<CounterClass>()
+        .Extends<VectorClass<int>>()
+        .Method("EnsureItem", MakeFunction(&CounterClass::EnsureItem))
+        .Method("GetItemCount", SelectFunction(int (CounterClass::*)(int) const, &CounterClass::GetItemCount))
+        .Method("Increment", MakeFunction(&CounterClass::Increment))
+        .Method("Decrement", MakeFunction(&CounterClass::Decrement))
+        .Property("Total", MakeProperty(&CounterClass::Total))
+        .Register();
+
     RegisterDynamicVectorClass(AbstractClass*);
     RegisterDynamicVectorClass(AbstractTypeClass*);
     RegisterDynamicVectorClass(ObjectClass*);
@@ -34,6 +44,8 @@ void __JsRegister_YrContainers()
     RegisterDynamicVectorClass(BuildingLightClass*);
     RegisterDynamicVectorClass(PlanningTokenClass*);
     RegisterDynamicVectorClass(PlanningNodeClass*);
+    RegisterDynamicVectorClass(PlanningMemberClass*);
+    RegisterDynamicVectorClass(PlanningBranchClass*);
     RegisterDynamicVectorClass(RadBeam*);
     RegisterDynamicVectorClass(RadSiteClass*);
     RegisterDynamicVectorClass(SuperClass*);
@@ -62,6 +74,13 @@ void __JsRegister_YrContainers()
     RegisterDynamicVectorClass(EBolt*);
     RegisterDynamicVectorClass(ScriptTypeClass*);
     RegisterDynamicVectorClass(TaskForceClass*);
+    RegisterDynamicVectorClass(BaseNodeClass);
+    RegisterDynamicVectorClass(LineTrail*);
+    RegisterDynamicVectorClass(StartingTechnoStruct*);
+    RegisterDynamicVectorClass(AngerStruct);
+    RegisterDynamicVectorClass(ScoutStruct);
+    RegisterDynamicVectorClass(CellStruct);
+    RegisterDynamicVectorClass(IConnectionPoint*);
 
     RegisterTypeList(AircraftTypeClass*);
     RegisterTypeList(InfantryTypeClass*);

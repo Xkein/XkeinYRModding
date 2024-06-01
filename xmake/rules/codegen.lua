@@ -13,8 +13,8 @@ rule("codegen-cpp")
     end)
     after_load(function(target)
         local extraconf = target:extraconf("rules", "codegen-cpp") or {}
-        
-        local gendir = path.absolute(path.join(target:autogendir({root = true}), "codegen"))
+        local auto_gendir = target:autogendir({root = true})
+        local gendir = path.absolute(path.join(auto_gendir, "codegen"))
         local header_list = {}
         for _, headerfile in ipairs(target:headerfiles()) do
             table.insert(header_list, path.absolute(headerfile))
@@ -128,5 +128,5 @@ rule("codegen-cpp")
         if #genCppFiles > 0 then
             target:add("filegroups", "codegen", {rootdir = gendir})
         end
-        target:add("includedirs", gendir)
+        target:add("includedirs", auto_gendir, { public = true })
     end)

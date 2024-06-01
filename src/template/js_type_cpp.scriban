@@ -32,46 +32,67 @@
 #include <Binding.hpp>
 void __JsRegister_{{type_name}}() {
 {{ if is_class }}
-    auto builder = PUERTS_NAMESPACE::DefineClass<{{type_name}}>();
-    {{- for base in base_classes }}
-        {{- if base.klass && !base.klass.is_interface}}
-    builder.Extends<{{base.full_display_name}}>();
-        {{- end }}
-    {{- end }}
-    {{- for function in class_functions ; $cpp_function = function.cpp_function }}
-        {{- if should_skip_visibility(this, function) || function.is_deleted || function.is_destructor || function.is_constructor
+{{- func gen_js_class(htClass)
+    $klass = append_line("", $'auto builder = PUERTS_NAMESPACE::DefineClass<{htClass.type_name}>();')
+    for base in htClass.base_classes
+        if base.klass && !base.klass.is_interface
+            $klass = append_line($klass, $'builder.Extends<{base.full_display_name}>();')
+        end
+    end
+    for function in class_functions ; $cpp_function = function.cpp_function
+        if should_skip_visibility(htClass, function) || function.is_deleted || function.is_destructor || function.is_constructor
             continue
         end
         $use_lambda = meta_should_use_lambda(function)
-        if $use_lambda ; $lambda = $use_lambda ? get_function_lambda_wrap(function, this) : null }}
-        //.Function("{{function.name}}", MakeFunction({{$lambda}}))
-        {{- else if function.is_static }}
-            {{- if function.is_overload ; $func_type = get_function_ptr_type(function, this)}}
-    builder.Function("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})));
-            {{- else }}
-    builder.Function("{{function.name}}", MakeFunction(&{{type_name}}::{{function.name}}));
-            {{- end }}
-        {{- else if function.is_overload ; $func_type = get_function_ptr_type(function, this)}}
-    builder.Method("{{function.name}}", MakeFunction(static_cast<{{$func_type}}>(&{{type_name}}::{{function.name}})));
-        {{- else }}
-    builder.Method("{{function.name}}", MakeFunction(&{{type_name}}::{{function.name}}));
-        {{- end -}}
-    {{- end }}
-    {{- for property in class_properties ; $cpp_field = property.cpp_field }}
-        {{- if string.empty(property.name) || should_skip_visibility(this, property)
+        if $use_lambda ; $lambda = $use_lambda ? get_function_lambda_wrap(function, htClass) : null
+            $klass = append_line($klass, $'//.Function("{function.name}", MakeFunction({$lambda}))')
+        else if function.is_static
+            if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
+                $klass = append_line($klass, $'builder.Function("{function.name}", MakeFunction(static_cast<{$func_type}>(&{htClass.type_name}::{function.name})));')
+            else
+                $klass = append_line($klass, $'builder.Function("{function.name}", MakeFunction(&{htClass.type_name}::{function.name}));')
+            end
+        else if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
+            $klass = append_line($klass, $'builder.Method("{function.name}", MakeFunction(static_cast<{$func_type}>(&{htClass.type_name}::{function.name})));')
+        else
+            $klass = append_line($klass, $'MakeMethodCheck<&{htClass.type_name}::{function.name}>(builder, "{function.name}");')
+        end
+    end
+    for property in class_properties ; $cpp_field = property.cpp_field
+        if should_skip_visibility(htClass, property)
             continue
-        end }}
-        {{- if property.is_static && (property.is_const || property.is_constexpr || property.is_array) }}
-    builder.Variable("{{property.name}}", MakeReadonlyVariable(std::addressof({{type_name}}::{{property.name}})));
-        {{- else if property.is_const || property.is_array }}
-    builder.Property("{{property.name}}", MakeReadonlyProperty(&{{type_name}}::{{property.name}}));
-        {{- else if property.is_static }}
-    builder.Variable("{{property.name}}", MakeVariable(std::addressof({{type_name}}::{{property.name}})));
-        {{- else }}
-    MakePropertyCheck<&{{type_name}}::{{property.name}}>(builder, "{{property.name}}");
-        {{- end -}}
-    {{- end }}
-    builder.Register();
+        end
+        if string.empty(property.name)
+            if property.is_anonymous
+                for inner_property in property.anonymous_class.properties
+                    if inner_property.is_const || inner_property.is_array
+                        $klass = append_line($klass, $'builder.Property("{inner_property.name}", MakeReadonlyProperty(&{htClass.type_name}::{inner_property.name}));')
+                    else
+                        $klass = append_line($klass, $'MakePropertyCheck<&{htClass.type_name}::{inner_property.name}>(builder, "{inner_property.name}");')
+                    end
+                end
+            end
+            continue
+        end
+        if property.is_static && (property.is_const || property.is_constexpr || property.is_array)
+            $klass = append_line($klass, $'builder.Variable("{property.name}", MakeReadonlyVariable(std::addressof({htClass.type_name}::{property.name})));')
+        else if property.is_const || property.is_array
+            $klass = append_line($klass, $'builder.Property("{property.name}", MakeReadonlyProperty(&{htClass.type_name}::{property.name}));')
+        else if property.is_static
+            $klass = append_line($klass, $'builder.Variable("{property.name}", MakeVariable(std::addressof({htClass.type_name}::{property.name})));')
+        else
+            $klass = append_line($klass, $'MakePropertyCheck<&{htClass.type_name}::{property.name}>(builder, "{property.name}");')
+        end
+    end
+    $klass = append_line($klass, 'builder.Register();')
+    ret $klass
+end -}}
+{{gen_js_class(this)}}
+{{- for property in class_properties
+    if property.is_anonymous && !string.empty(property.name)
+        gen_js_class(property.anonymous_class)
+    end
+end -}}
 {{ else if is_enum }}
 
 {{ end }}

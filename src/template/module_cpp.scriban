@@ -20,4 +20,5 @@ struct ModuleImpl_{{klass.class_name}} {
     {{- end }}
 {{- end }}
 
+#include "core/reflection/reflection_register.h"
 {{gen_meta_register_snippet(this)}}

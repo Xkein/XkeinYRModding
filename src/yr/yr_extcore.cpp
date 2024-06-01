@@ -5,18 +5,32 @@
 #include "core/raii_invoker.h"
 #include <filesystem>
 
-CORE_API std::shared_ptr<spdlog::logger> gLogger;
-CORE_API std::shared_ptr<spdlog::logger> gConsole;
-
 void InitLogger();
 void LoadExtensions();
 
+#include "codegen/YRpp.gen.h"
+#include "codegen/YrExtCore.gen.h"
+struct MetaRegistration
+{
+    static void Register() {
+        __Gen_Type_YRpp::Register();
+        __Gen_Type_YrExtCore::Register();
+    }
+    static void Unregister()
+    {
+        __Gen_Type_YrExtCore::Unregister();
+        __Gen_Type_YRpp::Unregister();
+    }
+};
+
 GLOBAL_INVOKE_ON_CTOR_DTOR([]() {
+    MetaRegistration::Register();
     gYrExtConfig = std::make_unique<YrExtCoreConfig>();
     InitLogger();
     LoadExtensions();
-}, []() {
-
+},
+    []() {
+    MetaRegistration::Register();
 })
 
 #include <spdlog/async.h>

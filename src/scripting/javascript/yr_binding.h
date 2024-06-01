@@ -275,6 +275,26 @@ namespace PUERTS_NAMESPACE
             }
         };
 
+        template<typename _Interface, const IID* _IID /*= &__uuidof(_Interface)*/>
+        struct Converter<_COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>>
+        {
+            using com_ptr = _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>;
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const com_ptr& value)
+            {
+                return Converter<_Interface*>::toScript(context, value.GetInterfacePtr());
+            }
+
+            static com_ptr toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return Converter<_Interface*>::toCpp(context, value);
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return Converter<_Interface*>::accept(context, value);
+            }
+        };
+
         //template<typename T>
         //struct Converter<T*, typename std::enable_if<std::is_convertible<T*, const AbstractClass*>::value>::type>
         //{
@@ -362,6 +382,24 @@ namespace PUERTS_NAMESPACE
             return internal::Literal("LARGE_INTEGER");
         }
     };
+
+    template<>
+    struct ScriptTypeName<CounterClass>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("CounterClass");
+        }
+    };
+
+    template<typename _Interface, const IID* _IID /*= &__uuidof(_Interface)*/>
+    struct ScriptTypeName<_COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("com_ptr<") + ScriptTypeNameWithNamespace<_Interface>::value() + internal::Literal(">");
+        }
+    };
 } // namespace PUERTS_NAMESPACE
 
 template<auto Data, typename T, typename API, typename RegisterAPI>
@@ -383,6 +421,13 @@ void MakePropertyCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>
     {
         builder.Property(name, MakeProperty(Data));
     }
+}
+
+#include "core/tool/function.hpp"
+template<auto Candidate, typename T, typename API, typename RegisterAPI>
+void MakeMethodCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
+{
+    builder.Method(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
 }
 
 #endif

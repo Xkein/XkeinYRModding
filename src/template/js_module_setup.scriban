@@ -1,0 +1,15 @@
+{{- include 'include/meta.scriban'
+    init_extra_vars(this)
+    include 'yr/yrpp.scriban'
+    is_yrpp = module_name == "YRpp"
+    func need_codegen(htType)
+        ret has_meta(htType.meta) || (is_yrpp && yr_need_codegen(htType))
+    end
+-}}
+{{- for klass in module_classes }}
+{{- if need_codegen(klass) }}
+{{- end; end }}
+
+{{- for enum in module_enums }}
+{{- if need_codegen(enum) || is_yrpp }}
+{{- end; end }}

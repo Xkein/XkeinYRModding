@@ -8,11 +8,11 @@ rule("CoreRule")
         end
 
         if target:name() == "YrExtCore" then
-            target:add("defines", "ENTT_API=ENTT_EXPORT", {private=true})
+            -- target:add("defines", "ENTT_API=ENTT_EXPORT", {private=true})
             target:add("defines", "CORE_IMPL", {private=true})
             target:add("defines", "CORE_API=__declspec(dllexport)", {private=true})
         else
-            target:add("defines", "ENTT_API=ENTT_IMPORT", {private=true})
+            -- target:add("defines", "ENTT_API=ENTT_IMPORT", {private=true})
             target:add("defines", "CORE_API=__declspec(dllimport)", {private=true})
         end
 

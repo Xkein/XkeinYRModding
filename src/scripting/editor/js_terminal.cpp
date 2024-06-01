@@ -3,6 +3,7 @@
 #include <core/logger/logger.h>
 #include "yr/event/general_event.h"
 #include "yr/event/ui_event.h"
+#include "yr/debug_util.h"
 #include <sstream>
 
 class TerminalWindow : public YrImGuiWindow
@@ -268,14 +269,20 @@ public:
         History.push_back(Strdup(command_line));
 
         // Process command
-        if (gJsEnv->Eval(command_line, "(terminal)"))
-        {
-            gLogger->info(gJsEnv->ObjectToString(gJsEnv->ResultInfo.Result));
-        }
-        else
-        {
-            gLogger->error(gJsEnv->LastExceptionInfo);
-        }
+        GuardExecute(
+            [command_line]() {
+            if (gJsEnv->Eval(command_line, "(terminal)"))
+            {
+                gLogger->info(gJsEnv->ObjectToString(gJsEnv->ResultInfo.Result));
+            }
+            else
+            {
+                gLogger->error(gJsEnv->LastExceptionInfo);
+            }
+        },
+            [](std::string stackTrace) {
+            gLogger->error(stackTrace);
+        });
 
         // On command input, we scroll to bottom even if AutoScroll==false
         ScrollToBottom = true;

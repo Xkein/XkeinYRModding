@@ -33,7 +33,8 @@ function get_default_templates()
             ["js_type_cpp.scriban"] =  codegen_dir.."/YrScripting/codegen/{1}/{0}.js_binding.cpp",
         },
         js_module = {
-            ["ts_index.scriban"] = root_dir.."/src/scripts/typescript/gen/{0}.d.ts",
+            ["ts_module_index.scriban"] = root_dir.."/src/scripts/typescript/gen/{0}.d.ts",
+            ["js_module_setup.scriban"] = root_dir.."/src/scripts/javascript/gen/{0}.d.ts",
         },
         depends = {
             ["include/common.scriban"] = "not use to generate!",
@@ -49,8 +50,8 @@ function get_templates(overrides, additions)
     end
 
     if additions then
-        for key, templates in pairs(additions) do
-            templates[key] = table.join(templates[key] or {}, templates)
+        for key, val in pairs(additions) do
+            templates[key] = table.join(templates[key] or {}, val)
         end
     end
 

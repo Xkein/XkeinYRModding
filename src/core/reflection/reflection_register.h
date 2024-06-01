@@ -1,8 +1,15 @@
 #pragma once
 
 #include <entt/meta/factory.hpp>
+#include "core/tool/function.hpp"
 
-template<typename Type, auto Data>
+template<auto Candidate, typename Type>
+auto register_func(entt::meta_factory<Type>& factory, const entt::id_type id)
+{
+    return factory.func<static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)>(id);
+}
+
+template<auto Data, typename Type>
 auto register_data(entt::meta_factory<Type>& factory, const entt::id_type id)
 {
     if constexpr (std::is_member_object_pointer_v<decltype(Data)>)
@@ -28,5 +35,12 @@ auto register_data(entt::meta_factory<Type>& factory, const entt::id_type id)
     {
         return factory.data<Data>(id);
     }
+}
+
+CORE_API entt::locator<entt::meta_ctx>::node_type get_meta_ctx_handle();
+
+static void sync_meta_ctx() {
+    auto handle = get_meta_ctx_handle();
+    entt::locator<entt::meta_ctx>::reset(handle);
 }
 

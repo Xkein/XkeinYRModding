@@ -15,6 +15,7 @@ __IMPLEMENT_YR_HOOK_EVENT({{klass.cpp_class.name}})
 {{ end }}
 {{- end; end }}
 
+#include "core/reflection/reflection_register.h"
 void {{gen_type_name}}::Register()
 {
 {{- for klass in module_classes }}

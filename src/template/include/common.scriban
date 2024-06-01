@@ -147,6 +147,13 @@ func get_cpp_primitives()
         ]
 end
 
+func append_line(src, line)
+    if string.empty(line)
+        ret src
+    end
+    ret src + line + "\n"
+end
+
 func get_template_specialized_list(template, speTypes)
     ret speTypes | array.each do; ret string.replace(template, "{T}", $0); end
 end

@@ -20,6 +20,7 @@
 #include <SuperWeaponTypeClass.h>
 #include <WarheadTypeClass.h>
 #include <ParticleClass.h>
+#include <BounceClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -70,6 +71,7 @@ UsingYrClass(RadSiteClass);
 UsingYrClass(LightSourceClass);
 UsingYrClass(BuildingLightClass);
 UsingYrClass(TiberiumClass);
+UsingYrClass(TiberiumLogic);
 UsingYrClass(FactoryClass);
 UsingYrClass(TerrainClass);
 UsingYrClass(TerrainTypeClass);
@@ -87,18 +89,72 @@ UsingYrClass(EBolt);
 UsingYrClass(ParticleClass);
 UsingYrClass(ParticleTypeClass);
 UsingYrClass(FacingClass);
+UsingYrClass(StorageClass);
+UsingYrClass(BounceClass);
+
+UsingYrStruct(TurretControl);
+UsingYrStruct(WeaponStruct);
+UsingYrStruct(BuildingAnimStruct);
+UsingYrStruct(BuildingAnimFrameStruct);
+UsingYrClass(AbilitiesStruct);
+UsingYrClass(ControlNode);
+UsingYrClass(BulletData);
+UsingYrClass(LineTrail);
+UsingYrStruct(LineTrailNode);
+UsingYrStruct(TintStruct);
+UsingYrClass(VeterancyStruct);
+UsingYrClass(PassengersClass);
+UsingYrClass(FlashData);
+UsingYrClass(RecoilData);
+UsingYrClass(CDTimerClass);
+UsingYrClass(RateTimer);
+UsingYrClass(TransitionTimer);
+UsingYrClass(RandomStruct);
+UsingYrClass(SpawnControl);
+UsingYrClass(SlaveManagerClass::SlaveControl);
+UsingYrClass(StageClass);
+UsingYrClass(BaseClass);
+UsingYrClass(BaseNodeClass);
+UsingYrClass(PlanningNodeClass);
+UsingYrClass(PlanningMemberClass);
+UsingYrClass(PlanningBranchClass);
+UsingYrStruct(ScriptActionNode);
+UsingYrStruct(TaskForceEntryStruct);
+UsingYrClass(RGBClass);
+UsingYrClass(UnitTrackerClass);
+UsingYrStruct(ZoneInfoStruct);
+UsingYrClass(StartingTechnoStruct);
+UsingYrClass(AngerStruct);
+UsingYrClass(ScoutStruct);
+UsingYrStruct(DropshipStruct);
+
+// hand write registration
+UsingYrStruct(CoordStruct);
+UsingYrStruct(Point2D);
+UsingYrStruct(CellStruct);
+UsingYrStruct(ColorStruct);
+UsingYrStruct(BulletVelocity);
+UsingYrStruct(Vector3D<float>);
+UsingYrStruct(Quaternion);
+UsingYrStruct(RectangleStruct);
+UsingYrClass(Matrix3D);
+UsingYrClass(DirStruct);
+UsingYrClass(GUID);
 
 // not implement, declare only
 UsingYrClass(IAIHouse);
+UsingYrClass(IConnectionPoint);
+UsingYrClass(ILocomotion);
+UsingYrClass(IPiggyback);
 UsingYrClass(TubeClass);
 UsingYrClass(LightConvertClass);
 UsingYrClass(Surface);
 UsingYrClass(FoggedObjectClass);
-UsingYrClass(LineTrail);
 UsingYrClass(CRCEngine);
 UsingYrClass(CCINIClass);
 UsingYrClass(ColorScheme);
 UsingYrClass(SHPStruct);
+UsingYrStruct(VoxelStruct);
 UsingYrClass(SequenceStruct);
 UsingYrClass(VoxelCacheStruct);
 UsingYrClass(VoxelIndexKey);
@@ -108,49 +164,18 @@ UsingYrClass(TurretBarrelVoxelIndexKey);
 UsingYrClass(ShadowVoxelIndexKey);
 UsingYrClass(AudioController);
 UsingYrClass(PixelFXClass);
-UsingYrClass(CDTimerClass);
-UsingYrClass(RateTimer);
-UsingYrClass(RandomStruct);
-UsingYrClass(StageClass);
-UsingYrClass(BaseClass);
-UsingYrClass(SlaveManagerClass::SlaveControl);
-UsingYrClass(SpawnControl);
-UsingYrClass(PlanningNodeClass);
-UsingYrClass(ScriptActionNode);
-UsingYrClass(TaskForceEntryStruct);
-UsingYrClass(RGBClass);
-
-// hand write registration
-UsingYrStruct(TurretControl);
-UsingYrStruct(WeaponStruct);
-UsingYrStruct(CoordStruct);
-UsingYrStruct(Point2D);
-UsingYrStruct(CellStruct);
-UsingYrStruct(ColorStruct);
-UsingYrStruct(BulletVelocity);
-UsingYrStruct(Vector3D<float>);
-UsingYrStruct(RectangleStruct);
-UsingYrStruct(VoxelStruct);
-UsingYrStruct(BuildingAnimStruct);
-UsingYrStruct(BuildingAnimFrameStruct);
-UsingYrClass(Matrix3D);
-UsingYrClass(DirStruct);
-UsingYrClass(GUID);
-UsingYrClass(AbilitiesStruct);
-UsingYrClass(ControlNode);
-UsingYrClass(BulletData);
-UsingYrStruct(LineTrailNode);
-UsingYrStruct(TintStruct);
+UsingYrClass(PriorityQueueClassNode);
+UsingYrClass(PriorityQueueClass<PriorityQueueClassNode>);
 
 UsingArray(RadioCommand);
 UsingArray(BuildingTypeClass*);
+UsingArray(TechnoTypeClass*);
 UsingArray(AnimClass*);
 UsingArray(WaypointPathClass*);
-UsingArray(TaskForceEntryStruct);
-UsingArray(ScriptActionNode);
 UsingArray(unsigned int[130]);
 
 UsingContainer(IndexBitfield<HouseClass*>);
+UsingContainer(CounterClass);
 
 UsingDynamicVectorClass(AbstractClass*);
 UsingDynamicVectorClass(AbstractTypeClass*);
@@ -181,6 +206,8 @@ UsingDynamicVectorClass(LightConvertClass*);
 UsingDynamicVectorClass(BuildingLightClass*);
 UsingDynamicVectorClass(PlanningTokenClass*);
 UsingDynamicVectorClass(PlanningNodeClass*);
+UsingDynamicVectorClass(PlanningMemberClass*);
+UsingDynamicVectorClass(PlanningBranchClass*);
 UsingDynamicVectorClass(RadBeam*);
 UsingDynamicVectorClass(RadSiteClass*);
 UsingDynamicVectorClass(SuperClass*);
@@ -209,6 +236,13 @@ UsingDynamicVectorClass(WaypointClass);
 UsingDynamicVectorClass(EBolt*);
 UsingDynamicVectorClass(ScriptTypeClass*);
 UsingDynamicVectorClass(TaskForceClass*);
+UsingDynamicVectorClass(BaseNodeClass);
+UsingDynamicVectorClass(LineTrail*);
+UsingDynamicVectorClass(StartingTechnoStruct*);
+UsingDynamicVectorClass(AngerStruct);
+UsingDynamicVectorClass(ScoutStruct);
+UsingDynamicVectorClass(CellStruct);
+UsingDynamicVectorClass(IConnectionPoint*);
 
 UsingTypeList(AircraftTypeClass*);
 UsingTypeList(InfantryTypeClass*);
