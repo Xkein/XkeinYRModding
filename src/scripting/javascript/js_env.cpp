@@ -3,6 +3,7 @@
 #include <yr/debug_util.h>
 #include <core/logger/logger.h>
 #include <sstream>
+#include <boost/algorithm/string/replace.hpp>
 
 YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
 
@@ -85,6 +86,8 @@ JsEnv::JsEnv()
 {
     StrBuffer.resize(1024);
 
+    ModuleLoader = std::make_shared<DefaultJSModuleLoader>();
+
     FBackendEnv::GlobalPrepare();
     BackendEnv.Initialize(nullptr, nullptr);
     MainIsolate = BackendEnv.MainIsolate;
@@ -116,7 +119,8 @@ JsEnv::JsEnv()
 
     MethodBindingHelper<&JsEnv::LoadCppType>::Bind(Isolate, Context, PuertsObj, "loadCPPType", This);
 
-
+    ExecuteModule("setup.js");
+    ExecuteModule("main.js");
 
     CppObjectMapper.Initialize(Isolate, Context);
     Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
@@ -208,7 +212,84 @@ bool JsEnv::Eval(const char* Code, const char* Path)
 
 void JsEnv::ExecuteModule(const char* ModuleName)
 {
+    std::string          OutPath;
+    std::string          DebugPath;
+    std::vector<uint8_t> Data;
 
+    std::string ErrInfo;
+    if (!LoadFile(TEXT(""), ModuleName, OutPath, DebugPath, Data, ErrInfo))
+    {
+        gLogger->error(ErrInfo);
+        return;
+    }
+
+    // #if UE_BUILD_DEBUG || UE_BUILD_DEVELOPMENT
+    //     if (!DebugPath.IsEmpty())
+    //         OutPath = DebugPath;
+    // #endif
+
+    auto               Isolate = MainIsolate;
+    v8::Isolate::Scope IsolateScope(Isolate);
+    v8::HandleScope    HandleScope(Isolate);
+    auto               Context = v8::Local<v8::Context>::New(Isolate, DefaultContext);
+    v8::Context::Scope ContextScope(Context);
+#ifndef WITH_QUICKJS
+    if (OutPath.ends_with(".mjs"))
+    {
+        v8::TryCatch          TryCatch(Isolate);
+        v8::Local<v8::Module> RootModule;
+
+        if (!FetchESModuleTree(Context, OutPath).ToLocal(&RootModule))
+        {
+            assert(TryCatch.HasCaught());
+            gLogger->error(TryCatchToString(Isolate, &TryCatch));
+            return;
+        }
+
+        if (RootModule->InstantiateModule(Context, ResolveModuleCallback).FromMaybe(false))
+        {
+            RootModule->Evaluate(Context);
+        }
+
+        if (TryCatch.HasCaught())
+        {
+            gLogger->error(TryCatchToString(Isolate, &TryCatch));
+            return;
+        }
+    }
+    else
+#endif
+    {
+        v8::Local<v8::String> Source = ToV8StringFromFileContent(Isolate, Data);
+
+#if PLATFORM_WINDOWS
+        // 修改URL分隔符格式，否则无法匹配Inspector协议在打断点时发送的正则表达式，导致断点失败
+        std::string FormattedScriptUrl = DebugPath;
+        boost::replace_all(FormattedScriptUrl, TEXT("/"), TEXT("\\"));
+#else
+        std::string FormattedScriptUrl = DebugPath;
+#endif
+        v8::Local<v8::String> Name = FV8Utils::V8String(Isolate, FormattedScriptUrl.c_str());
+#if V8_MAJOR_VERSION > 8
+        v8::ScriptOrigin Origin(Isolate, Name);
+#else
+        v8::ScriptOrigin Origin(Name);
+#endif
+        v8::TryCatch TryCatch(Isolate);
+
+        auto CompiledScript = v8::Script::Compile(Context, Source, &Origin);
+        if (CompiledScript.IsEmpty())
+        {
+            gLogger->error(TryCatchToString(Isolate, &TryCatch));
+            return;
+        }
+        (void)(CompiledScript.ToLocalChecked()->Run(Context));
+        if (TryCatch.HasCaught())
+        {
+            gLogger->error(TryCatchToString(Isolate, &TryCatch));
+            return;
+        }
+    }
 }
 
 void JsEnv::SetLastException(v8::Local<v8::Value> Exception)
@@ -315,6 +396,8 @@ std::string JsEnv::TryCatchToString(v8::Isolate* Isolate, v8::TryCatch* TryCatch
 
 bool JsEnv::LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8_t>& Data, std::string& ErrInfo)
 {
+
+
     return false;
 }
 
