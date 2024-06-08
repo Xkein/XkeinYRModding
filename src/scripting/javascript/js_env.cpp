@@ -2,8 +2,11 @@
 #include "core/raii_invoker.h"
 #include <yr/debug_util.h>
 #include <core/logger/logger.h>
+#include <core/string/string_tool.h>
+#include <core/platform/path.h>
 #include <sstream>
 #include <boost/algorithm/string/replace.hpp>
+#include <filesystem>
 
 YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
 
@@ -34,7 +37,7 @@ struct MethodBindingHelper
 };
 
 
-static v8::Local<v8::String> ToV8StringFromFileContent(v8::Isolate* Isolate, const std::vector<uint8_t>& FileContent)
+static v8::Local<v8::String> ToV8StringFromFileContent(v8::Isolate* Isolate, const std::vector<uint8>& FileContent)
 {
     const auto* Buffer = FileContent.data();
     auto        Size   = FileContent.size();
@@ -42,7 +45,7 @@ static v8::Local<v8::String> ToV8StringFromFileContent(v8::Isolate* Isolate, con
     if (Size >= 2 && !(Size & 1) && ((Buffer[0] == 0xff && Buffer[1] == 0xfe) || (Buffer[0] == 0xfe && Buffer[1] == 0xff)))
     {
         std::string Content;
-        gLogger->error("ToV8StringFromFileContent not implement!");
+        buffer_to_string(Content, Buffer, Size);
         //FFileHelper::BufferToString(Content, Buffer, Size);
         return FV8Utils::V8String(Isolate, Content.c_str());
     }
@@ -86,7 +89,7 @@ JsEnv::JsEnv()
 {
     StrBuffer.resize(1024);
 
-    ModuleLoader = std::make_shared<DefaultJSModuleLoader>();
+    ModuleLoader = std::make_shared<DefaultJSModuleLoader>("assets/js");
 
     FBackendEnv::GlobalPrepare();
     BackendEnv.Initialize(nullptr, nullptr);
@@ -214,10 +217,10 @@ void JsEnv::ExecuteModule(const char* ModuleName)
 {
     std::string          OutPath;
     std::string          DebugPath;
-    std::vector<uint8_t> Data;
+    std::vector<uint8> Data;
 
     std::string ErrInfo;
-    if (!LoadFile(TEXT(""), ModuleName, OutPath, DebugPath, Data, ErrInfo))
+    if (!LoadFile("", ModuleName, OutPath, DebugPath, Data, ErrInfo))
     {
         gLogger->error(ErrInfo);
         return;
@@ -239,7 +242,7 @@ void JsEnv::ExecuteModule(const char* ModuleName)
         v8::TryCatch          TryCatch(Isolate);
         v8::Local<v8::Module> RootModule;
 
-        if (!FetchESModuleTree(Context, OutPath).ToLocal(&RootModule))
+        if (!FetchESModuleTree(Context, OutPath.c_str()).ToLocal(&RootModule))
         {
             assert(TryCatch.HasCaught());
             gLogger->error(TryCatchToString(Isolate, &TryCatch));
@@ -265,7 +268,7 @@ void JsEnv::ExecuteModule(const char* ModuleName)
 #if PLATFORM_WINDOWS
         // 修改URL分隔符格式，否则无法匹配Inspector协议在打断点时发送的正则表达式，导致断点失败
         std::string FormattedScriptUrl = DebugPath;
-        boost::replace_all(FormattedScriptUrl, TEXT("/"), TEXT("\\"));
+        boost::replace_all(FormattedScriptUrl, "/", "\\");
 #else
         std::string FormattedScriptUrl = DebugPath;
 #endif
@@ -394,7 +397,7 @@ std::string JsEnv::TryCatchToString(v8::Isolate* Isolate, v8::TryCatch* TryCatch
     return FV8Utils::ExceptionToString(Isolate, TryCatch->Exception());
 }
 
-bool JsEnv::LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8_t>& Data, std::string& ErrInfo)
+bool JsEnv::LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8>& Data, std::string& ErrInfo)
 {
 
 
@@ -442,7 +445,7 @@ void JsEnv::LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
     v8::Context::Scope     ContextScope(Context);
 
     std::string   Path = ObjectToString(Info[0]);
-    std::vector<uint8_t> Data;
+    std::vector<uint8> Data;
     if (!ModuleLoader->Load(Path.c_str(), Data))
     {
         FV8Utils::ThrowException(Isolate, "can not load module");
@@ -455,4 +458,112 @@ void JsEnv::LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
 void JsEnv::LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
 {
     CppObjectMapper.LoadCppType(Info);
+}
+
+v8::MaybeLocal<v8::Module> JsEnv::FetchESModuleTree(v8::Local<v8::Context> Context, const char* FileName)
+{
+    const auto Isolate = Context->GetIsolate();
+    if (PathToModule.contains(FileName))
+    {
+        return PathToModule[FileName].Get(Isolate);
+    }
+
+    gLogger->info("Fetch ES Module: {}", FileName);
+    std::vector<uint8> Data;
+    if (!ModuleLoader->Load(FileName, Data))
+    {
+        FV8Utils::ThrowException(MainIsolate, std::format("can not load [{}]", FileName).c_str());
+        return v8::MaybeLocal<v8::Module>();
+    }
+
+    std::string Script;
+    buffer_to_string(Script, Data.data(), Data.size());
+
+    v8::ScriptOrigin Origin(Isolate, FV8Utils::V8String(Isolate, FileName), 0, 0, false, -1, v8::Local<v8::Value>(), false, false, true);
+    v8::ScriptCompiler::Source Source(FV8Utils::V8String(Isolate, Script.c_str()), Origin);
+
+    v8::Local<v8::Module> Module;
+    if (!v8::ScriptCompiler::CompileModule(Isolate, &Source).ToLocal(&Module))
+    {
+        return v8::MaybeLocal<v8::Module>();
+    }
+
+    PathToModule[FileName] = v8::Global<v8::Module>(Isolate, Module);
+    FModuleInfo* Info = new FModuleInfo;
+    Info->Module.Reset(Isolate, Module);
+    HashToModuleInfo.emplace(Module->GetIdentityHash(), Info);
+
+    auto DirName = Paths::GetPath(FileName).string();
+
+    for (int i = 0, Length = Module->GetModuleRequestsLength(); i < Length; ++i)
+    {
+        auto RefModuleName = ObjectToString(Module->GetModuleRequest(i));
+
+        std::string OutPath;
+        std::string OutDebugPath;
+        if (ModuleLoader->Search(DirName.c_str(), RefModuleName.c_str(), OutPath, OutDebugPath))
+        {
+            if (OutPath.ends_with("package.json"))
+            {
+                std::vector<uint8> PackageData;
+                if (ModuleLoader->Load(OutPath.c_str(), PackageData))
+                {
+                    std::string PackageScript;
+                    buffer_to_string(PackageScript, PackageData.data(), PackageData.size());
+                    v8::Local<v8::Value> Args[] = {FV8Utils::V8String(Isolate, PackageScript.c_str())};
+
+                    auto MaybeRet = GetESMMain.Get(Isolate)->Call(Context, v8::Undefined(Isolate), 1, Args);
+
+                    v8::Local<v8::Value> ESMMainValue;
+                    if (MaybeRet.ToLocal(&ESMMainValue) && ESMMainValue->IsString())
+                    {
+                        std::string ESMMain = ObjectToString(ESMMainValue);
+                        std::string ESMMainOutPath;
+                        std::string ESMMainOutDebugPath;
+                        if (ModuleLoader->Search(Paths::GetPath(OutPath).string().c_str(), ESMMain.c_str(), ESMMainOutPath, ESMMainOutDebugPath))
+                        {
+                            OutPath = ESMMainOutPath;
+                        }
+                    }
+                }
+            }
+            if (OutPath.ends_with(".mjs") || OutPath.ends_with(".js"))
+            {
+                auto RefModule = FetchESModuleTree(Context, OutPath.c_str());
+                if (RefModule.IsEmpty())
+                {
+                    return v8::MaybeLocal<v8::Module>();
+                }
+                Info->ResolveCache[RefModuleName] = v8::Global<v8::Module>(Isolate, RefModule.ToLocalChecked());
+                continue;
+            }
+        }
+
+        auto RefModule = FetchCJSModuleAsESModule(Context, (OutPath.ends_with(".cjs") ? OutPath : RefModuleName).c_str());
+
+        if (RefModule.IsEmpty())
+        {
+            FV8Utils::ThrowException(MainIsolate, std::format("can not resolve [{}], import by [{}]", RefModuleName, FileName).c_str());
+            return v8::MaybeLocal<v8::Module>();
+        }
+
+        Info->ResolveCache[RefModuleName] = v8::Global<v8::Module>(Isolate, RefModule.ToLocalChecked());
+    }
+
+    return Module;
+}
+
+v8::MaybeLocal<v8::Module> JsEnv::FetchCJSModuleAsESModule(v8::Local<v8::Context> Context, const char* ModuleName)
+{
+    return v8::MaybeLocal<v8::Module>();
+}
+
+std::unordered_multimap<int, JsEnv::FModuleInfo*>::iterator JsEnv::FindModuleInfo(v8::Local<v8::Module> Module)
+{
+    return std::unordered_multimap<int, FModuleInfo*>::iterator();
+}
+
+v8::MaybeLocal<v8::Module> JsEnv::ResolveModuleCallback(v8::Local<v8::Context> Context, v8::Local<v8::String> Specifier, v8::Local<v8::Module> Referrer)
+{
+    return v8::MaybeLocal<v8::Module>();
 }

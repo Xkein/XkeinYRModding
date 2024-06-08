@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <filesystem>
 
 class YrExtCoreConfig
 {
@@ -14,8 +15,8 @@ public:
 
 
     nlohmann::json           rawData;
-    std::string              assetsPath;
-    std::string              pluginsPath;
+    std::filesystem::path    assetsPath;
+    std::filesystem::path    pluginsPath;
     std::vector<std::string> extensions;
 };
 

@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <filesystem>
 #include <fstream>
+#include "core/platform/path.h"
 
 using json   = nlohmann::json;
 namespace fs = std::filesystem;
@@ -25,8 +26,8 @@ void YrExtCoreConfig::Init()
     std::ifstream f("assets/config.json");
 
     this->rawData = json::parse(f);
-    this->assetsPath  = fs::absolute(rawData.value("assets_dir", "assets")).string();
-    this->pluginsPath = fs::absolute(rawData.value("plugins_dir", "plugins")).string();
+    this->assetsPath  = Paths::GetLaunchDir() / rawData.value("assets_dir", "assets");
+    this->pluginsPath = Paths::GetLaunchDir() / rawData.value("plugins_dir", "plugins");
     this->extensions  = rawData["extensions"];
 
     if (rawData.value("break_on_start", false))

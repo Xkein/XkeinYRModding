@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/platform/platform.h"
 #include <string>
 #include <vector>
 
@@ -8,7 +9,7 @@ class IJSModuleLoader
 public:
     virtual bool Search(const char* RequiredDir, const char* RequiredModule, std::string& Path, std::string& AbsolutePath) = 0;
 
-    virtual bool Load(const char* Path, std::vector<uint8_t>& Content) = 0;
+    virtual bool Load(const char* Path, std::vector<uint8>& Content) = 0;
 
     virtual std::string& GetScriptRoot() = 0;
 
@@ -26,7 +27,7 @@ public:
 
     virtual bool Search(const char* RequiredDir, const char* RequiredModule, std::string& Path, std::string& AbsolutePath) override;
 
-    virtual bool Load(const char* Path, std::vector<uint8_t>& Content) override;
+    virtual bool Load(const char* Path, std::vector<uint8>& Content) override;
 
     virtual std::string& GetScriptRoot() override;
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/platform/platform.h"
 #include "js_module_loader.h"
 #include <BackendEnv.h>
 #include <JSFunction.h>
@@ -69,7 +70,7 @@ public:
     v8::Isolate* MainIsolate;
 
 private:
-    bool LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8_t>& Data, std::string& ErrInfo);
+    bool LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8>& Data, std::string& ErrInfo);
 
     void EvalScript(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
@@ -80,6 +81,34 @@ private:
     void LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
     void LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
+#ifndef WITH_QUICKJS
+    struct FModuleInfo
+    {
+        v8::Global<v8::Module>                        Module;
+        std::map<std::string, v8::Global<v8::Module>> ResolveCache;
+        v8::Global<v8::Value>                         CJSValue;
+    };
+
+
+    v8::MaybeLocal<v8::Module> FetchESModuleTree(v8::Local<v8::Context> Context, const char* FileName);
+
+    v8::MaybeLocal<v8::Module> FetchCJSModuleAsESModule(v8::Local<v8::Context> Context, const char* ModuleName);
+
+    std::unordered_multimap<int, FModuleInfo*>::iterator FindModuleInfo(v8::Local<v8::Module> Module);
+
+    static v8::MaybeLocal<v8::Module> ResolveModuleCallback(v8::Local<v8::Context> Context, v8::Local<v8::String> Specifier, v8::Local<v8::Module> Referrer);
+
+    std::map<std::string, v8::Global<v8::Module>> PathToModule;
+
+    std::unordered_multimap<int, FModuleInfo*> HashToModuleInfo;
+
+    v8::Global<v8::Function> Require;
+
+    v8::Global<v8::Function> GetESMMain;
+
+    v8::Global<v8::Function> ReloadJs;
+#endif
 
     std::shared_ptr<IJSModuleLoader> ModuleLoader;
 };

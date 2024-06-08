@@ -89,7 +89,7 @@ void InitLogger()
 
 void LoadExtensions()
 {
-    ExtensionLoader::AddDirectory(std::filesystem::path(gYrExtConfig->pluginsPath).c_str());
+    ExtensionLoader::AddDirectory(gYrExtConfig->pluginsPath.wstring().c_str());
 
     for (auto ext : gYrExtConfig->extensions)
     {
