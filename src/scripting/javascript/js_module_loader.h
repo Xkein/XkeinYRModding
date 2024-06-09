@@ -3,11 +3,12 @@
 #include "core/platform/platform.h"
 #include <string>
 #include <vector>
+#include <filesystem>
 
 class IJSModuleLoader
 {
 public:
-    virtual bool Search(const char* RequiredDir, const char* RequiredModule, std::string& Path, std::string& AbsolutePath) = 0;
+    virtual bool Search(const std::string& RequiredDir, const std::string& RequiredModule, std::string& Path, std::string& AbsolutePath) = 0;
 
     virtual bool Load(const char* Path, std::vector<uint8>& Content) = 0;
 
@@ -25,17 +26,17 @@ public:
     {
     }
 
-    virtual bool Search(const char* RequiredDir, const char* RequiredModule, std::string& Path, std::string& AbsolutePath) override;
+    virtual bool Search(const std::string& RequiredDir, const std::string& RequiredModule, std::string& Path, std::string& AbsolutePath) override;
 
     virtual bool Load(const char* Path, std::vector<uint8>& Content) override;
 
     virtual std::string& GetScriptRoot() override;
 
-    virtual bool CheckExists(const char* PathIn, std::string& Path, std::string& AbsolutePath);
+    virtual bool CheckExists(const std::string& PathIn, std::string& Path, std::string& AbsolutePath);
 
-    virtual bool SearchModuleInDir(const char* Dir, const char* RequiredModule, std::string& Path, std::string& AbsolutePath);
+    virtual bool SearchModuleInDir(const std::string& Dir, const std::string& RequiredModule, std::string& Path, std::string& AbsolutePath);
 
-    virtual bool SearchModuleWithExtInDir(const char* Dir, const char* RequiredModule, std::string& Path, std::string& AbsolutePath);
+    virtual bool SearchModuleWithExtInDir(const std::string& Dir, const std::string& RequiredModule, std::string& Path, std::string& AbsolutePath);
 
     std::string ScriptRoot;
 };

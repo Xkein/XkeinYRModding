@@ -15,8 +15,8 @@ public:
 
 
     nlohmann::json           rawData;
-    std::filesystem::path    assetsPath;
-    std::filesystem::path    pluginsPath;
+    std::string              assetsPath;
+    std::string              pluginsPath;
     std::vector<std::string> extensions;
 };
 

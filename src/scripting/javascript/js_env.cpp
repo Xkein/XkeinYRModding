@@ -7,6 +7,9 @@
 #include <sstream>
 #include <boost/algorithm/string/replace.hpp>
 #include <filesystem>
+#include <core/assertion_macro.h>
+
+#define CHECK_V8_ARGS(...)
 
 YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
 
@@ -85,11 +88,11 @@ namespace puerts
 
 } // namespace puerts
 
-JsEnv::JsEnv()
+JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
 {
     StrBuffer.resize(1024);
 
-    ModuleLoader = std::make_shared<DefaultJSModuleLoader>("assets/js");
+    ModuleLoader = std::make_shared<DefaultJSModuleLoader>("assets/JavaScript");
 
     FBackendEnv::GlobalPrepare();
     BackendEnv.Initialize(nullptr, nullptr);
@@ -117,6 +120,10 @@ JsEnv::JsEnv()
     auto This = v8::External::New(Isolate, this);
 
     MethodBindingHelper<&JsEnv::EvalScript>::Bind(Isolate, Context, Global, "__tgjsEvalScript", This);
+
+    MethodBindingHelper<&JsEnv::SearchModule>::Bind(Isolate, Context, Global, "__tgjsSearchModule", This);
+
+    MethodBindingHelper<&JsEnv::LoadModule>::Bind(Isolate, Context, Global, "__tgjsLoadModule", This);
 
     MethodBindingHelper<&JsEnv::Log>::Bind(Isolate, Context, Global, "__tgjsLog", This);
 
@@ -359,15 +366,89 @@ bool JsEnv::ClearModuleCache(const char* Path)
     return BackendEnv.ClearModuleCache(MainIsolate, Context, Path);
 }
 
-void JsEnv::InitExtensionMethodsMap() {}
+void JsEnv::InitExtensionMethodsMap()
+{
 
-void JsEnv::JsHotReload(const char* ModuleName, const char* JsSource) {}
+    ExtensionMethodsMapInited = true;
+}
 
-void JsEnv::ReloadModule(const char* ModuleName, const char* JsSource) {}
+void JsEnv::JsHotReload(const char* ModuleName, const char* JsSource)
+{
+#ifdef SINGLE_THREAD_VERIFY
+    ensureMsgf(BoundThreadId == FPlatformTLS::GetCurrentThreadId(), TEXT("Access by illegal thread!"));
+#endif
+    auto               Isolate = MainIsolate;
+    v8::Isolate::Scope IsolateScope(Isolate);
+    v8::HandleScope    HandleScope(Isolate);
+    auto               Context = DefaultContext.Get(Isolate);
+    v8::Context::Scope ContextScope(Context);
+    auto               LocalReloadJs = ReloadJs.Get(Isolate);
 
-void JsEnv::ReloadSource(const char* Path, const std::string& JsSource) {}
+    std::string OutPath, OutDebugPath;
+    if (ModuleLoader->Search("", ModuleName, OutPath, OutDebugPath))
+    {
+        OutPath = Paths::Absolute(OutPath);
+        gLogger->info("reload js module [{}]", OutPath);
+        v8::TryCatch          TryCatch(Isolate);
+        v8::Handle<v8::Value> Args[] = {FV8Utils::V8String(Isolate, ModuleName), FV8Utils::V8String(Isolate, OutPath.c_str()), FV8Utils::V8String(Isolate, JsSource)};
 
-void JsEnv::OnSourceLoaded(std::function<void(const char*)> Callback) {}
+        (void)(LocalReloadJs->Call(Context, v8::Undefined(Isolate), 3, Args));
+
+        if (TryCatch.HasCaught())
+        {
+            gLogger->error("reload module exception {}", TryCatchToString(Isolate, &TryCatch));
+        }
+    }
+    else
+    {
+        gLogger->warn("not find js module [{}]", ModuleName);
+        return;
+    }
+}
+
+void JsEnv::ReloadModule(const char* ModuleName, const char* JsSource)
+{
+#ifdef SINGLE_THREAD_VERIFY
+    ensureMsgf(BoundThreadId == FPlatformTLS::GetCurrentThreadId(), TEXT("Access by illegal thread!"));
+#endif
+#ifdef THREAD_SAFE
+    v8::Locker Locker(MainIsolate);
+#endif
+    // Logger->Info(FString::Printf(TEXT("start reload js module [%s]"), *ModuleName.ToString()));
+    JsHotReload(ModuleName, JsSource);
+}
+
+void JsEnv::ReloadSource(const char* Path, const std::string& JsSource)
+{
+#ifdef SINGLE_THREAD_VERIFY
+    ensureMsgf(BoundThreadId == FPlatformTLS::GetCurrentThreadId(), TEXT("Access by illegal thread!"));
+#endif
+#ifdef THREAD_SAFE
+    v8::Locker Locker(MainIsolate);
+#endif
+    auto               Isolate = MainIsolate;
+    v8::Isolate::Scope IsolateScope(Isolate);
+    v8::HandleScope    HandleScope(Isolate);
+    auto               Context = DefaultContext.Get(Isolate);
+    v8::Context::Scope ContextScope(Context);
+    auto               LocalReloadJs = ReloadJs.Get(Isolate);
+
+    gLogger->info("reload js [%s]", Path);
+    v8::TryCatch          TryCatch(Isolate);
+    v8::Handle<v8::Value> Args[] = {v8::Undefined(Isolate), FV8Utils::V8String(Isolate, Path), FV8Utils::V8String(Isolate, JsSource.c_str())};
+
+    (void)(LocalReloadJs->Call(Context, v8::Undefined(Isolate), 3, Args));
+
+    if (TryCatch.HasCaught())
+    {
+        gLogger->error("reload module exception %s", TryCatchToString(Isolate, &TryCatch));
+    }
+}
+
+void JsEnv::OnSourceLoaded(std::function<void(const char*)> Callback)
+{
+    OnSourceLoadedCallback = Callback;
+}
 
 std::string JsEnv::GetJSStackTrace()
 {
@@ -399,12 +480,108 @@ std::string JsEnv::TryCatchToString(v8::Isolate* Isolate, v8::TryCatch* TryCatch
 
 bool JsEnv::LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8>& Data, std::string& ErrInfo)
 {
-
-
-    return false;
+    if (ModuleLoader->Search(RequiringDir, ModuleName, OutPath, OutDebugPath))
+    {
+        if (!ModuleLoader->Load(OutPath.c_str(), Data))
+        {
+            ErrInfo = std::format("can not load [{}]", ModuleName);
+            return false;
+        }
+    }
+    else
+    {
+        ErrInfo = std::format("can not find [{}]", ModuleName);
+        return false;
+    }
+    return true;
 }
 
-void JsEnv::EvalScript(const v8::FunctionCallbackInfo<v8::Value>& Info) {}
+void JsEnv::EvalScript(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    v8::Isolate*           Isolate = Info.GetIsolate();
+    v8::Isolate::Scope     IsolateScope(Isolate);
+    v8::HandleScope        HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope     ContextScope(Context);
+
+    CHECK_V8_ARGS(EArgString, EArgString);
+
+    v8::Local<v8::String> Source = Info[0]->ToString(Context).ToLocalChecked();
+
+#ifndef WITH_QUICKJS
+    bool IsESM = Info[2]->BooleanValue(Isolate);
+
+    if (IsESM)
+    {
+        std::string           FullPath = ObjectToString(Info[3]);
+        v8::Local<v8::Module> RootModule;
+
+        if (!FetchESModuleTree(Context, FullPath.c_str()).ToLocal(&RootModule))
+        {
+            return;
+        }
+
+        if (RootModule->InstantiateModule(Context, ResolveModuleCallback).FromMaybe(false))
+        {
+            auto                 MaybeResult = RootModule->Evaluate(Context);
+            v8::Local<v8::Value> Result;
+            if (MaybeResult.ToLocal(&Result))
+            {
+                if (Result->IsPromise())
+                {
+                    v8::Local<v8::Promise> ResultPromise(Result.As<v8::Promise>());
+                    while (ResultPromise->State() == v8::Promise::kPending)
+                    {
+                        Isolate->PerformMicrotaskCheckpoint();
+                    }
+
+                    if (ResultPromise->State() == v8::Promise::kRejected)
+                    {
+                        ResultPromise->MarkAsHandled();
+                        Isolate->ThrowException(ResultPromise->Result());
+                        return;
+                    }
+                }
+                Info.GetReturnValue().Set(RootModule->GetModuleNamespace());
+            }
+        }
+
+        return;
+    }
+#endif
+
+    v8::String::Utf8Value UrlArg(Isolate, Info[1]);
+    std::string           ScriptUrl = *UrlArg;
+#if PLATFORM_WINDOWS
+    // 修改URL分隔符格式，否则无法匹配Inspector协议在打断点时发送的正则表达式，导致断点失败
+    std::string FormattedScriptUrl = ScriptUrl;
+    boost::replace_all(FormattedScriptUrl, "/", "\\");
+#else
+    FString FormattedScriptUrl = ScriptUrl;
+#endif
+    v8::Local<v8::String> Name = FV8Utils::V8String(Isolate, FormattedScriptUrl.c_str());
+#if V8_MAJOR_VERSION > 8
+    v8::ScriptOrigin Origin(Isolate, Name);
+#else
+    v8::ScriptOrigin Origin(Name);
+#endif
+    auto Script = v8::Script::Compile(Context, Source, &Origin);
+    if (Script.IsEmpty())
+    {
+        return;
+    }
+    auto Result = Script.ToLocalChecked()->Run(Context);
+    if (Result.IsEmpty())
+    {
+        return;
+    }
+    Info.GetReturnValue().Set(Result.ToLocalChecked());
+
+    if (OnSourceLoadedCallback)
+    {
+        OnSourceLoadedCallback(FormattedScriptUrl.c_str());
+    }
+}
 
 void JsEnv::Log(const v8::FunctionCallbackInfo<v8::Value>& Info)
 {
@@ -413,6 +590,8 @@ void JsEnv::Log(const v8::FunctionCallbackInfo<v8::Value>& Info)
     v8::HandleScope        HandleScope(Isolate);
     v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
     v8::Context::Scope     ContextScope(Context);
+
+    CHECK_V8_ARGS(EArgInt32, EArgString);
 
     auto Level = Info[0]->Int32Value(Context).ToChecked();
 
@@ -434,7 +613,25 @@ void JsEnv::Log(const v8::FunctionCallbackInfo<v8::Value>& Info)
     }
 }
 
-void JsEnv::SearchModule(const v8::FunctionCallbackInfo<v8::Value>& Info) {}
+void JsEnv::SearchModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    v8::Isolate*           Isolate = Info.GetIsolate();
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+
+    CHECK_V8_ARGS(EArgString, EArgString);
+
+    std::string ModuleName   = ObjectToString(Info[0]);
+    std::string RequiringDir = ObjectToString(Info[1]);
+    std::string OutPath;
+    std::string OutDebugPath;
+    if (ModuleLoader->Search(RequiringDir, ModuleName, OutPath, OutDebugPath))
+    {
+        auto Result = v8::Array::New(Isolate);
+        Result->Set(Context, 0, FV8Utils::V8String(Isolate, OutPath.c_str())).Check();
+        Result->Set(Context, 1, FV8Utils::V8String(Isolate, OutDebugPath.c_str())).Check();
+        Info.GetReturnValue().Set(Result);
+    }
+}
 
 void JsEnv::LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
 {
@@ -443,6 +640,8 @@ void JsEnv::LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
     v8::HandleScope        HandleScope(Isolate);
     v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
     v8::Context::Scope     ContextScope(Context);
+
+    CHECK_V8_ARGS(EArgString);
 
     std::string   Path = ObjectToString(Info[0]);
     std::vector<uint8> Data;
@@ -493,7 +692,7 @@ v8::MaybeLocal<v8::Module> JsEnv::FetchESModuleTree(v8::Local<v8::Context> Conte
     Info->Module.Reset(Isolate, Module);
     HashToModuleInfo.emplace(Module->GetIdentityHash(), Info);
 
-    auto DirName = Paths::GetPath(FileName).string();
+    auto DirName = Paths::GetPath(FileName);
 
     for (int i = 0, Length = Module->GetModuleRequestsLength(); i < Length; ++i)
     {
@@ -520,7 +719,7 @@ v8::MaybeLocal<v8::Module> JsEnv::FetchESModuleTree(v8::Local<v8::Context> Conte
                         std::string ESMMain = ObjectToString(ESMMainValue);
                         std::string ESMMainOutPath;
                         std::string ESMMainOutDebugPath;
-                        if (ModuleLoader->Search(Paths::GetPath(OutPath).string().c_str(), ESMMain.c_str(), ESMMainOutPath, ESMMainOutDebugPath))
+                        if (ModuleLoader->Search(Paths::GetPath(OutPath).c_str(), ESMMain.c_str(), ESMMainOutPath, ESMMainOutDebugPath))
                         {
                             OutPath = ESMMainOutPath;
                         }
@@ -555,15 +754,100 @@ v8::MaybeLocal<v8::Module> JsEnv::FetchESModuleTree(v8::Local<v8::Context> Conte
 
 v8::MaybeLocal<v8::Module> JsEnv::FetchCJSModuleAsESModule(v8::Local<v8::Context> Context, const char* ModuleName)
 {
+#if V8_MAJOR_VERSION < 8
+    FV8Utils::ThrowException(MainIsolate, FString::Printf(TEXT("V8_MAJOR_VERSION < 8 not support fetch CJS module [%s] from ESM"), *ModuleName));
     return v8::MaybeLocal<v8::Module>();
+#else
+    const auto Isolate = Context->GetIsolate();
+
+    gLogger->info("ESM Fetch CJS Module: %s", ModuleName);
+
+    v8::Local<v8::Value> Args[] = {FV8Utils::V8String(Isolate, ModuleName)};
+
+    auto MaybeRet = Require.Get(Isolate)->Call(Context, v8::Undefined(Isolate), 1, Args);
+
+    if (MaybeRet.IsEmpty())
+    {
+        return v8::MaybeLocal<v8::Module>();
+    }
+
+    auto                               CJSValue    = MaybeRet.ToLocalChecked();
+    std::vector<v8::Local<v8::String>> ExportNames = {v8::String::NewFromUtf8(Isolate, "default", v8::NewStringType::kNormal).ToLocalChecked()};
+
+    if (CJSValue->IsObject())
+    {
+        auto JsObject = CJSValue->ToObject(Context).ToLocalChecked();
+        auto Keys     = JsObject->GetOwnPropertyNames(Context).ToLocalChecked();
+        for (decltype(Keys->Length()) i = 0; i < Keys->Length(); ++i)
+        {
+            v8::Local<v8::Value> Key;
+            if (Keys->Get(Context, i).ToLocal(&Key))
+            {
+                // UE_LOG(LogTemp, Warning, TEXT("---'%s' '%s'"), *ModuleName, *FV8Utils::ToFString(Isolate, Key));
+                ExportNames.push_back(Key->ToString(Context).ToLocalChecked());
+            }
+        }
+    }
+
+    v8::Local<v8::Module> SyntheticModule = v8::Module::CreateSyntheticModule(
+        Isolate, FV8Utils::V8String(Isolate, ModuleName), ExportNames, [](v8::Local<v8::Context> ContextInner, v8::Local<v8::Module> Module) -> v8::MaybeLocal<v8::Value> {
+        const auto IsolateInner = ContextInner->GetIsolate();
+        auto       Self         = FV8Utils::IsolateData<JsEnv>(IsolateInner);
+
+        const auto ModuleInfoIt = Self->FindModuleInfo(Module);
+        check(ModuleInfoIt != Self->HashToModuleInfo.end());
+        auto CJSValueInner = ModuleInfoIt->second->CJSValue.Get(IsolateInner);
+
+        Module->SetSyntheticModuleExport(IsolateInner, v8::String::NewFromUtf8(IsolateInner, "default", v8::NewStringType::kNormal).ToLocalChecked(), CJSValueInner);
+
+        if (CJSValueInner->IsObject())
+        {
+            auto JsObjectInner = CJSValueInner->ToObject(ContextInner).ToLocalChecked();
+            auto KeysInner     = JsObjectInner->GetOwnPropertyNames(ContextInner).ToLocalChecked();
+            for (decltype(KeysInner->Length()) ii = 0; ii < KeysInner->Length(); ++ii)
+            {
+                v8::Local<v8::Value> KeyInner;
+                v8::Local<v8::Value> ValueInner;
+                if (KeysInner->Get(ContextInner, ii).ToLocal(&KeyInner) && JsObjectInner->Get(ContextInner, KeyInner).ToLocal(&ValueInner))
+                {
+                    // UE_LOG(LogTemp, Warning, TEXT("-----set '%s'"), *FV8Utils::ToFString(IsolateInner, KeyInner));
+                    Module->SetSyntheticModuleExport(IsolateInner, KeyInner->ToString(ContextInner).ToLocalChecked(), ValueInner);
+                }
+            }
+        }
+
+        return v8::MaybeLocal<v8::Value>(v8::True(IsolateInner));
+    });
+
+    FModuleInfo* Info = new FModuleInfo;
+    Info->Module.Reset(Isolate, SyntheticModule);
+    Info->CJSValue.Reset(Isolate, CJSValue);
+    HashToModuleInfo.emplace(SyntheticModule->GetIdentityHash(), Info);
+
+    return SyntheticModule;
+#endif
 }
 
 std::unordered_multimap<int, JsEnv::FModuleInfo*>::iterator JsEnv::FindModuleInfo(v8::Local<v8::Module> Module)
 {
-    return std::unordered_multimap<int, FModuleInfo*>::iterator();
+    auto Range = HashToModuleInfo.equal_range(Module->GetIdentityHash());
+    for (auto It = Range.first; It != Range.second; ++It)
+    {
+        if (It->second->Module == Module)
+        {
+            return It;
+        }
+    }
+    return HashToModuleInfo.end();
 }
 
 v8::MaybeLocal<v8::Module> JsEnv::ResolveModuleCallback(v8::Local<v8::Context> Context, v8::Local<v8::String> Specifier, v8::Local<v8::Module> Referrer)
 {
-    return v8::MaybeLocal<v8::Module>();
+    auto       Self         = FV8Utils::IsolateData<JsEnv>(Context->GetIsolate());
+    const auto ItModuleInfo = Self->FindModuleInfo(Referrer);
+    check(ItModuleInfo != Self->HashToModuleInfo.end());
+    const auto RefModuleName = Self->ObjectToString(Specifier);
+    auto       ItRefModule   = ItModuleInfo->second->ResolveCache.find(RefModuleName);
+    check(ItRefModule != ItModuleInfo->second->ResolveCache.end());
+    return (ItRefModule->second).Get(Context->GetIsolate());
 }

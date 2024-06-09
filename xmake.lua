@@ -57,9 +57,6 @@ target("YrScripting")
     add_headerfiles("src/scripting/**.h")
     add_files("src/scripting/**.cpp")
     add_filegroups("YrScripting", {rootdir = "src"})
-    after_build(function (target)
-        
-    end)
 
 target("Scripts")
     set_kind("phony")
@@ -68,3 +65,48 @@ target("Scripts")
     add_extrafiles("src/scripts/**.ts")
     add_filegroups("Scripts", {rootdir = "src/scripts"})
     add_filegroups("puerts", {rootdir = "3rdparty/puerts/unreal/Puerts/Content"})
+target_end()
+
+target("make_artifacts")
+    set_kind("phony")
+    add_deps("Scripts", "YrScripting")
+    after_build(function (target)
+        if not has_config("make_artifacts") then
+            return
+        end
+        import("core.project.config")
+        local build_dir = path.join(config.buildir(), config.plat(), config.arch(), config.mode())
+        print("making artifacts...")
+        local output_dir = path.join(config.buildir(), "artifacts", config.mode())
+        local copy_pairs = {
+            [build_dir.."/YrExtCore.dll"] = output_dir.."/YrExtCore.dll",
+            [build_dir.."/imgui.dll"] = output_dir.."/plugins/imgui.dll",
+            [build_dir.."/ImguiNodeEditor.dll"] = output_dir.."/plugins/ImguiNodeEditor.dll",
+            [build_dir.."/YrExtUI.dll"] = output_dir.."/plugins/YrExtUI.dll",
+            [build_dir.."/YrScripting.dll"] = output_dir.."/plugins/YrScripting.dll",
+        }
+
+        local function get_copy_files(dir, pattern, out_dir)
+            local files = os.files(path.join(dir, pattern))
+            for _, file in ipairs(files) do
+                local rel = path.relative(path.relative(file), dir)
+                copy_pairs[path.join(dir, rel)] = path.join(out_dir, rel)
+            end
+        end
+        
+        get_copy_files("src/scripts/javascript/", "**", output_dir.."/assets/JavaScript/")
+        get_copy_files("assets/", "**", output_dir.."/assets/")
+
+        local depend_files = {}
+        for src, dst in pairs(copy_pairs) do
+            table.insert(depend_files, path.absolute(src))
+        end
+        
+        import("core.project.depend")
+        depend.on_changed(function ()
+            for src, dst in pairs(copy_pairs) do
+                print(string.format("copy %s -> %s", src, dst))
+                os.cp(src, dst)
+            end
+        end, {dependfile = output_dir.."/../files.d", files = depend_files})
+    end)

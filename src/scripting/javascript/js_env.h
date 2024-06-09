@@ -111,6 +111,8 @@ private:
 #endif
 
     std::shared_ptr<IJSModuleLoader> ModuleLoader;
+
+    bool ExtensionMethodsMapInited;
 };
 
 extern YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;

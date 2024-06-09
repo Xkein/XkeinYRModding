@@ -2,9 +2,10 @@
 task("dotnet-compile-job")
     on_run(function ()
         print("compiling CppHeaderTool projects...")
+        import("core.project.config")
         os.execv("dotnet", {
             "publish", os.projectdir().."/3rdparty/CppHeaderTool/src/CppHeaderTool/CppHeaderTool.csproj",
-            "--output", os.projectdir().."/build/tools",
+            "--output", path.join(config.buildir(), "tools"),
         })
     end)
 
@@ -63,8 +64,9 @@ task("run-header-tool")
         end
         io.writefile(config_path, json.encode(json_data))
         
+        import("core.project.config")
         -- print(argument_list)
-        os.execv(os.projectdir().."/build/tools/CppHeaderTool", {
+        os.execv(path.join(config.buildir(), "tools/CppHeaderTool"), {
             "--config", config_path,
             "--out_dir", info.outDir,
             -- "--loop_generate", -- switch this to quickly test the scriban template

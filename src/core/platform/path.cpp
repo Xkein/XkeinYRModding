@@ -1,35 +1,44 @@
 #include "core/platform//path.h"
 
-std::filesystem::path Paths::GetLaunchDir()
+std::string Paths::GetLaunchDir()
 {
-    return std::filesystem::current_path();
+    return std::filesystem::current_path().string();
 }
 
-std::filesystem::path Paths::GetPath(const std::filesystem::path& path)
+std::string Paths::GetPath(const std::string& path)
 {
-    return path.parent_path();
+    return std::filesystem::path(path).parent_path().string();
 }
 
-std::filesystem::path Paths::ChangeExtension(const std::filesystem::path& path, const char* newExtension)
+std::string Paths::ChangeExtension(const std::string& path, const char* newExtension)
 {
-    if (!path.has_extension())
+    std::filesystem::path ret = path;
+    if (!ret.has_extension())
         return path;
-    std::filesystem::path ret = path;
-    return ret.replace_extension(newExtension);
+    return ret.replace_extension(newExtension).string();
 }
 
-std::filesystem::path Paths::SetExtension(const std::filesystem::path& path, const char* newExtension)
+std::string Paths::SetExtension(const std::string& path, const char* newExtension)
 {
-    std::filesystem::path ret = path;
-    return ret.replace_extension(newExtension);
+    return std::filesystem::path(path).replace_extension(newExtension).string();
 }
 
-bool Paths::IsFileExists(const std::filesystem::path& path)
+std::string Paths::GetExtension(const std::string& path)
+{
+    return std::filesystem::path(path).extension().string();
+}
+
+bool Paths::IsFileExists(const std::string& path)
 {
     return std::filesystem::is_regular_file(path);
 }
 
-bool Paths::IsDirectoryExists(const std::filesystem::path& path)
+bool Paths::IsDirectoryExists(const std::string& path)
 {
     return std::filesystem::is_directory(path);
+}
+
+std::string Paths::Absolute(const std::string& path)
+{
+    return std::filesystem::absolute(path).string();
 }
