@@ -25,7 +25,12 @@ std::string Paths::SetExtension(const std::string& path, const char* newExtensio
 
 std::string Paths::GetExtension(const std::string& path)
 {
-    return std::filesystem::path(path).extension().string();
+    std::string ret = std::filesystem::path(path).extension().string();
+    if (ret.size() > 1 && ret[0] == '.')
+    {
+        ret.erase(0, 1);
+    }
+    return std::move(ret);
 }
 
 bool Paths::IsFileExists(const std::string& path)

@@ -5,8 +5,8 @@
     "jsx": "react",
     "sourceMap": true,
     "typeRoots": [
-      ".",
+      "../../typescript",
     ],
-    "outDir": "../../../build/.gens/Scripts/codegen"
+    "outDir": "../javascript/gen"
   },
 }

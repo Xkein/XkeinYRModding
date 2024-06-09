@@ -65,6 +65,17 @@ target("Scripts")
     add_extrafiles("src/scripts/**.ts")
     add_filegroups("Scripts", {rootdir = "src/scripts"})
     add_filegroups("puerts", {rootdir = "3rdparty/puerts/unreal/Puerts/Content"})
+    on_build(function (target)
+        local auto_gendir = target:autogendir({root = true})
+        local gendir = path.absolute(auto_gendir)
+        import("core.project.depend")
+        depend.on_changed(function ()
+            print("compiling typescript...")
+            os.execv("tsc.cmd", {
+                "-p", path.absolute("src/scripts/typescript/tsconfig.json"),
+            })
+        end, {dependfile = gendir.."/compile.d", files = target:get("extrafiles")})
+    end)
 target_end()
 
 target("make_artifacts")
@@ -101,7 +112,7 @@ target("make_artifacts")
         for src, dst in pairs(copy_pairs) do
             table.insert(depend_files, path.absolute(src))
         end
-        
+
         import("core.project.depend")
         depend.on_changed(function ()
             for src, dst in pairs(copy_pairs) do

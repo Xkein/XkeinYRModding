@@ -286,7 +286,7 @@ HRESULT RendererDX11::CreateDeviceD3D(HWND hWnd)
     }
 
     UINT createDeviceFlags = 0;
-    if (gYrExtConfig->rawData.value("enable_graphic_debug_layer", true))
+    if (gYrExtConfig->rawData.value("enable_graphic_debug_layer", false))
     {
         createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
     }

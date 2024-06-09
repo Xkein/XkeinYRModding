@@ -1,5 +1,12 @@
 {
-    "extensions":[
+    "extensions": [
         "YrScripting"
-    ]
+    ],
+    "assets_dir": "assets",
+    "plugins_dir": "plugins",
+    
+    "log_level": 0,
+    "enable_graphic_debug_layer": true,
+    "debug_console": true,
+    "break_on_start": true
 }

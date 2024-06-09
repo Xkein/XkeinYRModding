@@ -47,7 +47,7 @@ void InitLogger()
     spdlog::init_thread_pool(8192, 1);
 
     std::vector<spdlog::sink_ptr> sinks;
-    bool useConsonle = json.value("console", true);
+    bool useConsonle = json.value("debug_console", true);
     if (useConsonle)
     {
         AllocConsole();
