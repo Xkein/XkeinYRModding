@@ -123,12 +123,13 @@ private:
 template<class T>
 class YrHookEventListenerRegister final
 {
-public:
     YrHookEventListenerRegister(HookEventListener listener)
     {
         _handle = YrHookEventSystem::Register<T>(std::move(listener));
-        //YrHookEventSystem::SetHookMeta<T>(_handle, meta);
+        // YrHookEventSystem::SetHookMeta<T>(_handle, meta);
     }
+
+public:
 
     inline YrHookEventListenerRegister(std::function<void(YrHookContext* const, T* const)> listener) :
         YrHookEventListenerRegister(HookEventListener(

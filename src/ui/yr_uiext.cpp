@@ -1,4 +1,4 @@
-#include "core/raii_invoker.h"
+#include "ui/yr_uiext.h"
 #include "yr/event/general_event.h"
 #include "yr/event/ui_event.h"
 #include "ui/imgui/yr_imgui.h"
@@ -108,9 +108,13 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent, []() {
 REGISTER_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent, []() {
 })
 
-GLOBAL_INVOKE_ON_CTOR_DTOR([]() {
+void YrExtUIModule::Startup()
+{
     gLogger->info("Yr Extension UI module load.");
     imguiThread = std::make_unique<ImGuiThread>();
-}, []() {
-	gLogger->info("Yr Extension UI module unload.");
-})
+}
+
+void YrExtUIModule::Shutdown()
+{
+    gLogger->info("Yr Extension UI module unload.");
+}

@@ -1,6 +1,6 @@
 
 #include "yr/extcore_config.h"
-#include "yr/extension_loader.h"
+#include "yr/extension_manager.h"
 #include "core/logger/logger.h"
 #include "core/raii_invoker.h"
 #include <filesystem>
@@ -89,12 +89,12 @@ void InitLogger()
 
 void LoadExtensions()
 {
-    ExtensionLoader::AddDirectory(gYrExtConfig->pluginsPath.c_str());
+    ExtensionManager::AddDirectory(gYrExtConfig->pluginsPath.c_str());
 
     for (auto ext : gYrExtConfig->extensions)
     {
         std::string extName = ext;
-        ExtensionLoader::LoadExtension(extName.c_str());
+        ExtensionManager::LoadExtension(extName.c_str());
     }
 
     gLogger->info("All extension loaded");

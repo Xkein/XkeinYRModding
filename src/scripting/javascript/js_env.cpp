@@ -13,10 +13,6 @@
 
 YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
 
-GLOBAL_INVOKE_ON_CTOR([]() {
-    gJsEnv = std::make_shared<JsEnv>();
-})
-
 using namespace PUERTS_NAMESPACE;
 
 typedef void (JsEnv::*V8MethodCallback)(const v8::FunctionCallbackInfo<v8::Value>& Info);

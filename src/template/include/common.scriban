@@ -46,6 +46,10 @@ func init_extra_vars(htType)
 
         htType.is_yr_extension = get_meta_tag(meta, "YrExtension")
     end
+
+    if user_init_extra_vars
+        user_init_extra_vars(htType)
+    end
 end
 
 func should_skip_visibility(htType, htElement)
