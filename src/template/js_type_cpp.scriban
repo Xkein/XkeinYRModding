@@ -9,7 +9,7 @@
             ret
         end
     else
-        if !has_meta(meta) || get_meta_tag(meta, "HookEvent")
+        if !get_meta_tag(meta, "BindJs")
             ret
         end
     end
@@ -33,7 +33,7 @@
 void __JsRegister_{{type_name}}() {
 {{ if is_class }}
 {{- func gen_js_class(htClass)
-    $klass = append_line("", $'auto builder = PUERTS_NAMESPACE::DefineClass<{htClass.type_name}>();')
+    $klass = $'auto builder = PUERTS_NAMESPACE::DefineClass<{htClass.type_name}>();'
     for base in htClass.base_classes
         if base.klass && !base.klass.is_interface
             $klass = append_line($klass, $'builder.Extends<{base.full_display_name}>();')

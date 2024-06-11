@@ -91,6 +91,11 @@ UsingYrClass(ParticleTypeClass);
 UsingYrClass(FacingClass);
 UsingYrClass(StorageClass);
 UsingYrClass(BounceClass);
+UsingYrClass(LayerClass);
+UsingYrClass(LogicClass);
+UsingYrClass(DisplayClass);
+UsingYrClass(GScreenClass);
+UsingYrClass(MapClass);
 
 UsingYrStruct(TurretControl);
 UsingYrStruct(WeaponStruct);

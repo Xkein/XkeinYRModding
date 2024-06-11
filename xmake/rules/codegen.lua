@@ -56,6 +56,16 @@ rule("codegen-cpp")
                 for _, sysincludeDir in ipairs(target:get("sysincludedirs")) do
                     table.insert(sysinclude_list, path.absolute(sysincludeDir))
                 end
+                -- collect package include dirs
+                local function collect_package(target)
+                    for package_name, package in pairs(target:orderpkgs()) do
+                        table.insert(sysinclude_list, path.absolute(package:installdir() .. "/include"))
+                    end
+                end
+                for _, dep in pairs(target:deps()) do
+                    collect_package(dep)
+                end
+                collect_package(target)
                 -- collect defines
                 local defines = {
                     "__HEADER_TOOL__",

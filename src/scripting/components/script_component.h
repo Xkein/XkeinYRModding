@@ -13,7 +13,7 @@ struct ScriptTypeComponent
     std::string jsScript;
 };
 
-CLASS()
+CLASS(BindJs)
 struct ScriptComponent
 {
     JsBehaviour BeginUpdate;

@@ -6,5 +6,52 @@
 }}
 #include "{{type_name}}.gen.h"
 
+{{- ini_component_list = get_meta_list(meta, "IniComponent")
+func gen_register_component_loader(target_type)
+    if target_type == "ObjectTypeClass"
+        ret $'// ObjectTypeClass
+RegisterIniComponentLoader<AnimTypeClass, {type_name}>();
+RegisterIniComponentLoader<BulletTypeClass, {type_name}>();
+RegisterIniComponentLoader<IsometricTileTypeClass, {type_name}>();
+RegisterIniComponentLoader<OverlayTypeClass, {type_name}>();
+RegisterIniComponentLoader<ParticleSystemTypeClass, {type_name}>();
+RegisterIniComponentLoader<ParticleTypeClass, {type_name}>();
+RegisterIniComponentLoader<SmudgeTypeClass, {type_name}>();
+RegisterIniComponentLoader<TerrainTypeClass, {type_name}>();
+{gen_register_component_loader("TechnoTypeClass")}
+RegisterIniComponentLoader<VoxelAnimTypeClass, {type_name}>();'
+    else if target_type == "TechnoTypeClass"
+        ret $'// TechnoTypeClass
+RegisterIniComponentLoader<AircraftTypeClass, {type_name}>();
+RegisterIniComponentLoader<BuildingTypeClass, {type_name}>();
+RegisterIniComponentLoader<InfantryTypeClass, {type_name}>();
+RegisterIniComponentLoader<UnitTypeClass, {type_name}>();'
+    end
+    ret $'RegisterIniComponentLoader<{target_type}, {type_name}>();'
+end
+func user_gen_meta_class(htClass)
+    $result = $'IniComponentLoader::Register<{type_name}, LoadIni_{type_name}}>(factory);'
+    for target_type in ini_component_list
+        $result = append_line($result, gen_register_component_loader(target_type))
+    end
+    ret $result
+end
+if ini_component_list }}
+#include "yr/parse/ini_reader.h"
+static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader, const char* pSection)
+{
+{{- for property in class_properties ; $cpp_field = property.cpp_field
+    if should_skip_visibility(this, property) || string.empty(property.name) || property.is_static || property.is_const || property.is_constexpr
+        continue
+    end
+    $ini_key = get_meta_value(property.meta, "IniField") ?? property.name
+    -}}
+    if (!IniComponentLoader::Load(reader, pSection, {{$ini_key}}, iniComponent.{{property.name}}))
+        return false
+{{- end }}
+    return true;
+}
+{{- end }}
+
 {{get_meta_gen_header()}}
 {{gen_meta_register_snippet(this)}}

@@ -8,8 +8,12 @@ func get_meta_tag(meta, key)
     ret has_meta(meta) ? meta.raw.meta_data.tags[key] : null
 end
 
-func get_meta_key_value(meta, key)
-    ret has_meta(meta) ? meta.raw.meta_data.kvPairs[key] : null
+func get_meta_value(meta, key)
+    ret has_meta(meta) ? meta.raw.meta_data.kv_pairs[key] : null
+end
+
+func get_meta_list(meta, key)
+    ret has_meta(meta) ? meta.raw.meta_data.string_list[key] : null
 end
 # helpers for meta END
 
@@ -47,8 +51,8 @@ func init_extra_vars(htType)
         htType.is_yr_extension = get_meta_tag(meta, "YrExtension")
     end
 
-    if user_init_extra_vars
-        user_init_extra_vars(htType)
+    if htType.user_init_extra_vars
+        htType.user_init_extra_vars(htType)
     end
 end
 
@@ -155,7 +159,7 @@ func append_line(src, line)
     if string.empty(line)
         ret src
     end
-    ret src + line + "\n"
+    ret src + "\n" + line 
 end
 
 func get_template_specialized_list(template, speTypes)
