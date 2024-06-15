@@ -160,9 +160,9 @@ void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrMainWndProcEvent, [](YrHookContext* const C, YrMainWndProcEvent* const E) {
+DEFINE_YR_HOOK_EVENT_LISTENER(YrMainWndProcEvent) {
     WndProc(E->hWnd, E->uMsg, E->wParam, E->lParam);
-});
+}
 
 void YrImGui::Init()
 {

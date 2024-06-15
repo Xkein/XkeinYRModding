@@ -78,7 +78,7 @@ entt::entity GetEntity(T* pObject)
 
 #define CASE_DESTROY_ENTITY(Type, Object) \
     case Type::AbsID: \
-        CREATE_ENTITY(Type, Object); \
+        DESTROY_ENTITY(Type, Object); \
         break;
 
 #define CASE_GET_ENTITY(Type, Object) \
@@ -194,47 +194,70 @@ YREXTCORE_API entt::entity api::GetEntity(AbstractClass* pObject)
     return entity;
 }
 
+DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftCtorEvent)
+{
+    CREATE_ENTITY(AircraftClass, E->pAircraft);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingCtorEvent)
+{
+    CREATE_ENTITY(BuildingClass, E->pBuilding);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryCtorEvent)
+{
+    CREATE_ENTITY(InfantryClass, E->pInfantry);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitCtorEvent)
+{
+    CREATE_ENTITY(UnitClass, E->pUnit);
+}
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrTechnoCtorEvent, [](YrHookContext* const C, YrTechnoCtorEvent* const E) {
-    auto* pObject = E->pTechno;
-    switch (pObject->WhatAmI())
-    {
-        CASE_CREATE_ENTITY(AircraftClass, pObject);
-        CASE_CREATE_ENTITY(InfantryClass, pObject);
-        CASE_CREATE_ENTITY(UnitClass, pObject);
-        CASE_CREATE_ENTITY(BuildingClass, pObject);
-    }
-});
+DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftDtorEvent)
+{
+    DESTROY_ENTITY(AircraftClass, E->pAircraft);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingDtorEvent)
+{
+    DESTROY_ENTITY(BuildingClass, E->pBuilding);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryDtorEvent)
+{
+    DESTROY_ENTITY(InfantryClass, E->pInfantry);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitDtorEvent)
+{
+    DESTROY_ENTITY(UnitClass, E->pUnit);
+}
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrTechnoDtorEvent, [](YrHookContext* const C, YrTechnoDtorEvent* const E) {
-    auto* pObject = E->pTechno;
-    switch (pObject->WhatAmI())
-    {
-        CASE_DESTROY_ENTITY(AircraftClass, pObject);
-        CASE_DESTROY_ENTITY(InfantryClass, pObject);
-        CASE_DESTROY_ENTITY(UnitClass, pObject);
-        CASE_DESTROY_ENTITY(BuildingClass, pObject);
-    }
-});
+DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftTypeCtorEvent)
+{
+    CREATE_ENTITY(AircraftTypeClass, E->pAircraftType);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingTypeCtorEvent)
+{
+    CREATE_ENTITY(BuildingTypeClass, E->pBuildingType);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryTypeCtorEvent)
+{
+    CREATE_ENTITY(InfantryTypeClass, E->pInfantryType);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitTypeCtorEvent)
+{
+    CREATE_ENTITY(UnitTypeClass, E->pUnitType);
+}
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrTechnoTypeCtorEvent, [](YrHookContext* const C, YrTechnoTypeCtorEvent* const E) {
-    auto* pObject = E->pTechnoType;
-    switch (pObject->WhatAmI())
-    {
-        CASE_CREATE_ENTITY(AircraftTypeClass, pObject);
-        CASE_CREATE_ENTITY(InfantryTypeClass, pObject);
-        CASE_CREATE_ENTITY(UnitTypeClass, pObject);
-        CASE_CREATE_ENTITY(BuildingTypeClass, pObject);
-    }
-});
-
-REGISTER_YR_HOOK_EVENT_LISTENER(YrTechnoTypeDtorEvent, [](YrHookContext* const C, YrTechnoTypeDtorEvent* const E) {
-    auto* pObject = E->pTechnoType;
-    switch (pObject->WhatAmI())
-    {
-        CASE_DESTROY_ENTITY(AircraftTypeClass, pObject);
-        CASE_DESTROY_ENTITY(InfantryTypeClass, pObject);
-        CASE_DESTROY_ENTITY(UnitTypeClass, pObject);
-        CASE_DESTROY_ENTITY(BuildingTypeClass, pObject);
-    }
-});
+DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftTypeDtorEvent)
+{
+    DESTROY_ENTITY(AircraftTypeClass, E->pAircraftType);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingTypeDtorEvent)
+{
+    DESTROY_ENTITY(BuildingTypeClass, E->pBuildingType);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryTypeDtorEvent)
+{
+    DESTROY_ENTITY(InfantryTypeClass, E->pInfantryType);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitTypeDtorEvent)
+{
+    DESTROY_ENTITY(UnitTypeClass, E->pUnitType);
+}

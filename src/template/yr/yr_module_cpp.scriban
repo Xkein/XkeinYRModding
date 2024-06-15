@@ -7,19 +7,23 @@
     end
 -}}
 #include "{{module_name}}.gen.h"
+{{- if module_name == "YrExtCore" }}
+#include "yr/yr_all_events.h"
+{{- end }}
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-#include "type/{{klass.cpp_class.name}}.gen.h"
 {{- if get_meta_tag(klass.meta, "HookEvent") }}
 __IMPLEMENT_YR_HOOK_EVENT({{klass.cpp_class.name}})
-{{ end }}
+{{- else }}
+#include "type/{{klass.cpp_class.name}}.gen.h"
+{{- end }}
 {{- end; end }}
 
 #include "core/reflection/reflection_register.h"
 void {{gen_type_name}}::Register()
 {
 {{- for klass in module_classes }}
-{{- if need_codegen(klass) }}
+{{- if need_codegen(klass) && !get_meta_tag(klass.meta, "HookEvent") }}
     {{get_gen_type_name(klass.cpp_class.name)}}::Register();
 {{- end; end}}
 }
@@ -27,7 +31,7 @@ void {{gen_type_name}}::Register()
 void {{gen_type_name}}::Unregister()
 {
 {{- for klass in module_classes }}
-{{- if need_codegen(klass) }}
+{{- if need_codegen(klass) && !get_meta_tag(klass.meta, "HookEvent") }}
     {{get_gen_type_name(klass.cpp_class.name)}}::Unregister();
 {{- end; end}}
 }

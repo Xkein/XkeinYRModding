@@ -1,5 +1,5 @@
 {{ include 'include/meta.scriban'
-    if !has_meta(meta)
+    if !has_meta(meta) || get_meta_tag(meta, "HookEvent")
         ret
     end
     init_extra_vars(this)
@@ -55,10 +55,17 @@ static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader
 {{- end }}
     return true;
 }
-#include "yr/event/techno_type_event.h"
-REGISTER_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent, [](YrHookContext* const C, YrTechnoTypeLoadIniEvent* const E) {
+#include "yr/yr_all_events.h"
+{{- for target_type in ini_component_list
+    if array.contains(["TechnoTypeClass", "AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"], target_type) }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{type_name}}>(E->pTechnoType, E->pIni);
-});
+}
+    {{- else if array.contains(["ObjectTypeClass"], target_type) }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pTechnoType, E->pIni);
+}
+{{- end; end }}
 {{- end }}
 
 {{get_meta_gen_header()}}

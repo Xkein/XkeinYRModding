@@ -1,5 +1,5 @@
 {{ include 'include/meta.scriban'
-    if !has_meta(meta)
+    if !has_meta(meta) || get_meta_tag(meta, "HookEvent")
         ret
     end
     init_extra_vars(this)

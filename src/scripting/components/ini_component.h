@@ -38,8 +38,13 @@ struct IniComponentLoader
     template<typename Type, typename TargetType>
     static void LoadComponent(TargetType* pObject, CCINIClass* pIni)
     {
-        Type* pCom = GetYrComponent<Type>(pObject);
         const char* pID  = pObject->ID;
+        Type* pCom = GetYrComponent<Type>(pObject);
+        if (pCom == nullptr)
+        {
+            gLogger->error("could not get {} for {}[{}]", typeid(Type).name(), typeid(TargetType).name(), pID);
+            return;
+        }
         IniReader reader {pIni};
         IniComponentLoader::Load(reader, pID, nullptr, *pCom);
     }

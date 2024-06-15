@@ -89,24 +89,24 @@ void UIMainThread()
     }
 }
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, []() {
+DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) {
     ImGui::GetIO().MouseDrawCursor = false;
     UIMainThread();
-})
+}
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, []() {
-})
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent) {
+}
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, []() {
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent) {
     ImGui::GetIO().MouseDrawCursor = true;
     UIMainThread();
-})
+}
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent, []() {
-})
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent) {
+}
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent, []() {
-})
+DEFINE_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent) {
+}
 
 void YrExtUIModule::Startup()
 {
