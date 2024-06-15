@@ -17,6 +17,9 @@ func get_meta_list(meta, key)
 end
 # helpers for meta END
 
+func user_init_extra_vars(htType)
+end
+
 func init_extra_vars(htType)
     if htType.cpp_class
         htType.is_class = true
@@ -51,9 +54,7 @@ func init_extra_vars(htType)
         htType.is_yr_extension = get_meta_tag(meta, "YrExtension")
     end
 
-    if htType.user_init_extra_vars
-        htType.user_init_extra_vars(htType)
-    end
+    user_init_extra_vars(htType)
 end
 
 func should_skip_visibility(htType, htElement)

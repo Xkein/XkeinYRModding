@@ -5,7 +5,6 @@
 #include <PuertsNamespaceDef.h>
 #include <core/logger/logger.h>
 #include <core/macro.h>
-#include <timeapi.h>
 #include <AbstractClass.h>
 #include <AbstractTypeClass.h>
 #include <Helpers/String.h>
@@ -31,6 +30,51 @@ namespace PUERTS_NAMESPACE                                                      
         struct Converter<CLS[Size]>                                                                 \
         {                                                                                           \
             using data_type = CLS[Size];                                                            \
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, data_type& value)  \
+            {                                                                                       \
+                return DataTransfer::NewArrayBuffer(context, &(value[0]), sizeof(data_type));       \
+            }                                                                                       \
+                                                                                                    \
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)   \
+            {                                                                                       \
+                if (value->IsArrayBufferView())                                                     \
+                {                                                                                   \
+                    v8::Local<v8::ArrayBufferView> buffView = value.As<v8::ArrayBufferView>();      \
+                    return buffView->ByteLength() >= sizeof(data_type);                             \
+                }                                                                                   \
+                if (value->IsArrayBuffer())                                                         \
+                {                                                                                   \
+                    auto   ab = v8::Local<v8::ArrayBuffer>::Cast(value);                            \
+                    size_t byteLength;                                                              \
+                    (void)(DataTransfer::GetArrayBufferData(ab, byteLength));                       \
+                    return byteLength >= sizeof(data_type);                                         \
+                }                                                                                   \
+                return false;                                                                       \
+            }                                                                                       \
+        };                                                                                          \
+    }                                                                                               \
+    }
+
+#define UsingArray2D(CLS)                                                                           \
+namespace PUERTS_NAMESPACE                                                                          \
+    {                                                                                               \
+    template<size_t X, size_t Y>                                                                    \
+    struct ScriptTypeName<CLS[Y][X]>                                                                \
+    {                                                                                               \
+        static constexpr auto value()                                                               \
+        {                                                                                           \
+            return ScriptTypeNameWithNamespace<CLS>::value() + internal::Literal("[][]");           \
+        }                                                                                           \
+    };                                                                                              \
+    }                                                                                               \
+    namespace PUERTS_NAMESPACE                                                                      \
+    {                                                                                               \
+    namespace v8_impl                                                                               \
+    {                                                                                               \
+        template<size_t X, size_t Y>                                                                \
+        struct Converter<CLS[Y][X]>                                                                 \
+        {                                                                                           \
+            using data_type = CLS[Y][X];                                                            \
             static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, data_type& value)  \
             {                                                                                       \
                 return DataTransfer::NewArrayBuffer(context, &(value[0]), sizeof(data_type));       \
@@ -128,25 +172,17 @@ namespace PUERTS_NAMESPACE
         static void getter(typename API::CallbackInfoType info)
         {
             auto context = API::GetContext(info);
-            API::SetReturn(info, DecayTypeConverter<Ret>::toScript(context, **Variable));
+            API::SetReturn(info, DecayTypeConverter<Ret*>::toScript(context, Variable->get()));
         }
 
         static void setter(typename API::CallbackInfoType info)
         {
-            if constexpr (std::is_move_assignable_v<Ret>)
-            {
-                auto context = API::GetContext(info);
-                **Variable   = DecayTypeConverter<Ret>::toCpp(context, API::GetArg(info, 0));
-            }
-            else
-            {
-                gLogger->error("{} could not be assign!", typeid(constant_ptr<Ret, Address>).name());
-            }
+            gLogger->error("{} could not be assign!", typeid(constant_ptr<Ret, Address>).name());
         }
 
         static const CTypeInfo* info()
         {
-            return CTypeInfoImpl<Ret, false>::get();
+            return CTypeInfoImpl<Ret*, false>::get();
         }
     };
 
@@ -159,7 +195,18 @@ namespace PUERTS_NAMESPACE
         static void getter(typename API::CallbackInfoType info)
         {
             auto context = API::GetContext(info);
-            API::SetReturn(info, DecayTypeConverter<Ret>::toScript(context, Variable->get()));
+            if constexpr (Count > 1)
+            {
+                API::SetReturn(info, typename API::template Converter<Ret[Count]>::toScript(context, Variable->get()));
+            }
+            else if constexpr (std::is_pointer_v<Ret>)
+            {
+                API::SetReturn(info, DecayTypeConverter<Ret>::toScript(context, Variable->get()));
+            }
+            else
+            {
+                API::SetReturn(info, DecayTypeConverter<Ret*>::toScript(context, &Variable->get()));
+            }
         }
 
         static void setter(typename API::CallbackInfoType info)

@@ -2,7 +2,7 @@
 #include "yr/yr_extbase.h"
 
 CLASS(YrExtension)
-class YrExtUIModule final : IYrExtension
+class YrExtUIModule final : public IYrExtension
 {
 private:
     virtual void Startup();

@@ -21,6 +21,7 @@
 #include <WarheadTypeClass.h>
 #include <ParticleClass.h>
 #include <BounceClass.h>
+#include <DisplayClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -96,6 +97,8 @@ UsingYrClass(LogicClass);
 UsingYrClass(DisplayClass);
 UsingYrClass(GScreenClass);
 UsingYrClass(MapClass);
+UsingYrClass(Crate);
+UsingYrClass(GadgetClass);
 
 UsingYrStruct(TurretControl);
 UsingYrStruct(WeaponStruct);
@@ -115,6 +118,7 @@ UsingYrClass(CDTimerClass);
 UsingYrClass(RateTimer);
 UsingYrClass(TransitionTimer);
 UsingYrClass(RandomStruct);
+UsingYrStruct(LTRBStruct);
 UsingYrClass(SpawnControl);
 UsingYrClass(SlaveManagerClass::SlaveControl);
 UsingYrClass(StageClass);
@@ -151,6 +155,7 @@ UsingYrClass(IAIHouse);
 UsingYrClass(IConnectionPoint);
 UsingYrClass(ILocomotion);
 UsingYrClass(IPiggyback);
+UsingYrClass(IStream);
 UsingYrClass(TubeClass);
 UsingYrClass(LightConvertClass);
 UsingYrClass(Surface);
@@ -171,13 +176,24 @@ UsingYrClass(AudioController);
 UsingYrClass(PixelFXClass);
 UsingYrClass(PriorityQueueClassNode);
 UsingYrClass(PriorityQueueClass<PriorityQueueClassNode>);
+UsingYrClass(ObjectClass*);
+UsingYrClass(ZoneConnectionClass);
+UsingYrClass(CellLevelPassabilityStruct);
+UsingYrClass(LevelAndPassabilityStruct2);
+UsingYrClass(SubzoneConnectionStruct);
+UsingYrClass(SubzoneTrackingStruct);
 
 UsingArray(RadioCommand);
+UsingArray(Crate);
+UsingArray(LayerClass);
 UsingArray(BuildingTypeClass*);
 UsingArray(TechnoTypeClass*);
 UsingArray(AnimClass*);
 UsingArray(WaypointPathClass*);
-UsingArray(unsigned int[130]);
+UsingArray(int);
+UsingArray2D(int);
+UsingArray2D(unsigned int);
+UsingArray(void*);
 
 UsingContainer(IndexBitfield<HouseClass*>);
 UsingContainer(CounterClass);
@@ -248,6 +264,8 @@ UsingDynamicVectorClass(AngerStruct);
 UsingDynamicVectorClass(ScoutStruct);
 UsingDynamicVectorClass(CellStruct);
 UsingDynamicVectorClass(IConnectionPoint*);
+UsingDynamicVectorClass(ZoneConnectionClass);
+UsingDynamicVectorClass(SubzoneTrackingStruct);
 
 UsingTypeList(AircraftTypeClass*);
 UsingTypeList(InfantryTypeClass*);

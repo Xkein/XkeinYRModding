@@ -1,5 +1,10 @@
 {{ include 'include/common.scriban'
 
+func user_gen_meta_class(htClass)
+end
+func user_gen_meta_enum(htEnum)
+end
+
 func meta_should_use_lambda(htFunction)
     case htFunction.cpp_function.calling_convention
         when 2, 3 # X86StdCall, X86FastCall
@@ -79,9 +84,7 @@ func gen_meta_class(htClass)
         $klass = append_line($klass, gen_meta_class_property(htClass, property))
     end
 
-    if htClass.user_gen_meta_class
-        $klass = append_line($klass, htClass.user_gen_meta_class(htClass))
-    end
+    $klass = append_line($klass, user_gen_meta_class(htClass))
     ret $klass
 end
 
@@ -93,9 +96,7 @@ func gen_meta_enum(htEnum)
         end) | array.join ", \n"
     $enum += "; \n"
     
-    if htEnum.user_gen_meta_enum
-        $klass = append_line($klass, htEnum.user_gen_meta_enum(htEnum))
-    end
+    $klass = append_line($klass, user_gen_meta_enum(htEnum))
     ret $enum
 end
 
@@ -136,18 +137,18 @@ func gen_meta_register_snippet(htType)
         $snippet = append_line($snippet, $'void {htType.gen_type_name}::Register()')
         $snippet = append_line($snippet, '{')
         $snippet = append_line($snippet, $'   sync_meta_ctx();')
-        for klass in module_classes
+        for klass in array.concat(module_classes, module_enums)
             if has_meta(klass.meta)
-        $snippet = append_line($snippet, $'   {get_gen_type_name(htType.cpp_class.name)}::Register();')
+        $snippet = append_line($snippet, $'   {get_gen_type_name(klass.name)}::Register();')
             end
         end
         $snippet = append_line($snippet, '}')
         
         $snippet = append_line($snippet, $'void {htType.gen_type_name}::Unregister()')
         $snippet = append_line($snippet, '{')
-        for klass in module_classes
+        for klass in array.concat(module_classes, module_enums)
             if has_meta(klass.meta)
-        $snippet = append_line($snippet, $'   {get_gen_type_name(htType.cpp_class.name)}::Unregister();')
+        $snippet = append_line($snippet, $'   {get_gen_type_name(klass.name)}::Unregister();')
             end
         end
         $snippet = append_line($snippet, '}')

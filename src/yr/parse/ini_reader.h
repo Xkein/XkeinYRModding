@@ -1,12 +1,14 @@
 #pragma once
 
 #include "yr/parse/parser.h"
+#include "core/platform/platform.h"
+#include <Interfaces.h>
 #include <CCINIClass.h>
 
 class IniReader
 {
     CCINIClass* IniFile;
-    static char _readBuffer[2048];
+    YREXTCORE_API static char _readBuffer[2048];
 
 public:
     explicit IniReader(CCINIClass* pIni) : IniFile(pIni) {}

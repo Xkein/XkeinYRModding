@@ -6,30 +6,6 @@
 #include "scripting/components/script_component.h"
 #include "yr/api/yr_entity.h"
 
-#include <UnitClass.h>
-#include <InfantryClass.h>
-#include <AircraftClass.h>
-#include <BuildingClass.h>
-#include <BulletClass.h>
-#include <OverlayClass.h>
-#include <HouseClass.h>
-#include <CampaignClass.h>
-#include <CellClass.h>
-#include <TerrainClass.h>
-#include <IsometricTileClass.h>
-#include <IsometricTileTypeClass.h>
-#include <ParticleClass.h>
-#include <SmudgeClass.h>
-#include <VoxelAnimClass.h>
-#include <TActionClass.h>
-#include <TEventClass.h>
-#include <EMPulseClass.h>
-#include <AITriggerTypeClass.h>
-#include <VeinholeMonsterClass.h>
-#include <TriggerTypeClass.h>
-#include <WaypointPathClass.h>
-
-
 Engine* gEngine = new Engine();
 
 REGISTER_YR_HOOK_EVENT_LISTENER(YrBootEvent, std::bind(&Engine::Start, gEngine));
@@ -44,16 +20,8 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent, std::bind(&Engine::OnBeginRe
 REGISTER_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent, std::bind(&Engine::OnEndRender, gEngine));
 
 
-template<typename T>
-void LoadComponentTypes(entt::registry& reg, entt::entity entity) {
-    auto& com = reg.get<YrEntityComponent<T>>(entity);
-    AbstractTypeClass* pType = com.yrObject;
-    reg.emplace<ScriptTypeComponent>();
-}
-
 Engine::Engine()
 {
-    gEntt->on_construct<YrEntityComponent<UnitTypeClass>>().connect<&LoadComponentTypes>();
 }
 
 Engine::~Engine()

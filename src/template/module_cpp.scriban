@@ -2,20 +2,20 @@
     init_extra_vars(this)
 -}}
 #include "{{module_name}}.gen.h"
+#include "yr/extension_manager.h"
 {{- for klass in module_classes }}
     {{- if has_meta(klass.meta) }}
-#include "class/{{klass.cpp_class.name}}.gen.h"
-        {{- init_extra_vars(klass)
-            if klass.is_yr_extension }}
-struct ModuleImpl_{{klass.class_name}} {
-    {{klass.class_name}} ext;
-    ModuleImpl_{{klass.class_name}}() {
-        ext.OnLoad();
+#include "type/{{klass.name}}.gen.h"
+        {{- if get_meta_tag(klass.meta, "YrExtension") }}
+struct ModuleImpl_{{klass.name}} {
+    {{klass.name}} ext;
+    ModuleImpl_{{klass.name}}() {
+        ExtensionManager::AddExtension(&ext);
     }
-    ~ModuleImpl_{{klass.class_name}}() {
-        ext.OnUnload();
+    ~ModuleImpl_{{klass.name}}() {
+        ExtensionManager::RemoveExtension(&ext);
     }
-} _ModuleImpl_{{klass.class_name}};
+} _ModuleImpl_{{klass.name}};
         {{- end }}
     {{- end }}
 {{- end }}

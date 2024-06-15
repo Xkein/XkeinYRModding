@@ -28,6 +28,6 @@ template<typename TCom, typename T>
 TCom* GetYrComponent(T* pObject)
 {
     entt::entity entity = GetYrEntity(pObject);
-    return gEntt->try_get<T>(entity);
+    return gEntt->try_get<TCom>(entity);
 }
 

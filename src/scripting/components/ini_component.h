@@ -24,19 +24,19 @@ struct IniComponentLoader
     }
 
     template<typename Type, bool (*Func)(Type&, IniReader&, const char*)>
-    void Register(entt::meta_factory<Type>& factory)
+    static void Register(entt::meta_factory<Type>& factory)
     {
         factory.func<Func>("LoadIniComponent"_hs).prop("name"_hs, "LoadIniComponent");
     }
 
-    template<typename TargetType, typename Type>
-    void CreateComponent(entt::registry& reg, entt::entity entity)
+    template<typename Type, typename TargetType>
+    static void CreateComponent(entt::registry& reg, entt::entity entity)
     {
-        reg.emplace<Type>();
+        reg.emplace<Type>(entity);
     }
 
-    template<typename TargetType, typename Type>
-    void LoadComponent(TargetType* pObject, CCINIClass* pIni)
+    template<typename Type, typename TargetType>
+    static void LoadComponent(TargetType* pObject, CCINIClass* pIni)
     {
         Type* pCom = GetYrComponent<Type>(pObject);
         const char* pID  = pObject->ID;
@@ -50,7 +50,7 @@ void RegisterIniComponentLoader()
 {
     if constexpr (sizeof...(TargetType) == 1u)
     {
-        (gEntt->on_construct<YrEntityComponent<TargetType>>().template connect<&IniComponentLoader::CreateComponent<TargetType, Type>>(), ...);
+        (gEntt->on_construct<YrEntityComponent<TargetType>>().template connect<&IniComponentLoader::CreateComponent<Type, TargetType>>(), ...);
     }
     else
     {

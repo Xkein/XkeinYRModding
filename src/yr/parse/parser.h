@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef __HEADER_TOOL__
 #include "core/logger/logger.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -16,22 +16,61 @@ namespace detail
         using NotImplement = void;
     };
 
+    template<typename T>
+    concept parser_has_implement = requires(T a) {
+        {
+            std::declval<Parser<T>>().Read("", a)
+        } -> std::same_as<bool>;
+    };
+
+} // namespace detail
+
+template <typename T>
+constexpr bool IsParserImplemented = detail::parser_has_implement<T>;
+
+template<typename T>
+struct Parser : private ::detail::Parser<T>
+{
+    inline static bool Read(std::string_view str, T& result)
+    {
+        if (str.size() == 0)
+            return false;
+        str = boost::trim_copy(str);
+        if (str.size() == 0)
+            return false;
+        if constexpr (IsParserImplemented<T>)
+        {
+            return detail::Parser<T>::Read(str, result);
+        }
+        else
+        {
+            gLogger->error("parser not implement");
+            return false;
+        }
+    }
+};
+
+
+#include <BasicStructures.h>
+#include <YRMathVector.h>
+namespace detail
+{
     struct ParserHelper
     {
         template<typename T>
         static bool Read(std::string_view str, T* result, size_t size)
         {
             auto view = std::ranges::split_view(str, ',');
-            if (view.size() != size)
-                return false;
+            int  idx  = 0;
             for (const auto word : view)
             {
                 if (!::Parser<T>::Read(std::string_view(word), result[idx]))
                 {
                     return false;
                 }
+                idx++;
             }
-            return true;
+            return idx == size;
         }
     };
 
@@ -108,9 +147,6 @@ namespace detail
         }
     };
 
-#include <BasicStructures.h>
-#include <YRMathVector.h>
-
     template<typename T>
     struct Parser<Vector2D<T>>
     {
@@ -180,36 +216,6 @@ namespace detail
             return ParserHelper::Read(str, reinterpret_cast<int*>(&result.Min), 2);
         }
     };
-
-    template<typename T>
-    concept parser_has_implement = requires(T a) {
-        {
-            std::declval<Parser<T>>().Read("", a)
-        } -> std::same_as<bool>;
-    };
 } // namespace detail
 
-template <typename T>
-constexpr bool IsParserImplemented = detail::parser_has_implement<T>;
-
-template<typename T>
-struct Parser : private ::detail::Parser<T>
-{
-    inline static bool Read(std::string_view str, T& result)
-    {
-        if (str.size() == 0)
-            return false;
-        str = boost::trim_copy(str);
-        if (str.size() == 0)
-            return false;
-        if constexpr (IsParserImplemented<T>)
-        {
-            return detail::Parser<T>::Read(str, result);
-        }
-        else
-        {
-            gLogger->error("parser not implement");
-            return false;
-        }
-    }
-};
+#endif

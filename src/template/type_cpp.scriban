@@ -10,47 +10,55 @@
 func gen_register_component_loader(target_type)
     if target_type == "ObjectTypeClass"
         ret $'// ObjectTypeClass
-RegisterIniComponentLoader<AnimTypeClass, {type_name}>();
-RegisterIniComponentLoader<BulletTypeClass, {type_name}>();
-RegisterIniComponentLoader<IsometricTileTypeClass, {type_name}>();
-RegisterIniComponentLoader<OverlayTypeClass, {type_name}>();
-RegisterIniComponentLoader<ParticleSystemTypeClass, {type_name}>();
-RegisterIniComponentLoader<ParticleTypeClass, {type_name}>();
-RegisterIniComponentLoader<SmudgeTypeClass, {type_name}>();
-RegisterIniComponentLoader<TerrainTypeClass, {type_name}>();
-{gen_register_component_loader("TechnoTypeClass")}
-RegisterIniComponentLoader<VoxelAnimTypeClass, {type_name}>();'
+RegisterIniComponentLoader<{type_name},
+    AnimTypeClass,
+    BulletTypeClass,
+    IsometricTileTypeClass,
+    OverlayTypeClass,
+    ParticleSystemTypeClass,
+    ParticleTypeClass,
+    SmudgeTypeClass,
+    TerrainTypeClass, 
+    VoxelAnimTypeClass>();
+{gen_register_component_loader("TechnoTypeClass")}'
     else if target_type == "TechnoTypeClass"
         ret $'// TechnoTypeClass
-RegisterIniComponentLoader<AircraftTypeClass, {type_name}>();
-RegisterIniComponentLoader<BuildingTypeClass, {type_name}>();
-RegisterIniComponentLoader<InfantryTypeClass, {type_name}>();
-RegisterIniComponentLoader<UnitTypeClass, {type_name}>();'
+RegisterIniComponentLoader<{type_name}, AircraftTypeClass, BuildingTypeClass, InfantryTypeClass, UnitTypeClass>();'
     end
-    ret $'RegisterIniComponentLoader<{target_type}, {type_name}>();'
+    ret $'RegisterIniComponentLoader<{type_name}, {target_type}>();'
 end
 func user_gen_meta_class(htClass)
-    $result = $'IniComponentLoader::Register<{type_name}, LoadIni_{type_name}}>(factory);'
-    for target_type in ini_component_list
-        $result = append_line($result, gen_register_component_loader(target_type))
+    $result = ""
+    if ini_component_list
+        $result = append_line($result, $'IniComponentLoader::Register<{type_name}, &LoadIni_{type_name}>(factory);')
+        for target_type in ini_component_list
+            $result = append_line($result, gen_register_component_loader(target_type))
+        end
     end
     ret $result
 end
 if ini_component_list }}
 #include "yr/parse/ini_reader.h"
+#include "scripting/components/ini_component.h"
+#include <GameClasses.h>
+#include <IsometricTileTypeClass.h>
 static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader, const char* pSection)
 {
-{{- for property in class_properties ; $cpp_field = property.cpp_field
+{{ for property in class_properties ; $cpp_field = property.cpp_field
     if should_skip_visibility(this, property) || string.empty(property.name) || property.is_static || property.is_const || property.is_constexpr
         continue
     end
     $ini_key = get_meta_value(property.meta, "IniField") ?? property.name
     -}}
-    if (!IniComponentLoader::Load(reader, pSection, {{$ini_key}}, iniComponent.{{property.name}}))
-        return false
+    if (!IniComponentLoader::Load(reader, pSection, "{{$ini_key}}", iniComponent.{{property.name}}))
+        return false;
 {{- end }}
     return true;
 }
+#include "yr/event/techno_type_event.h"
+REGISTER_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent, [](YrHookContext* const C, YrTechnoTypeLoadIniEvent* const E) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pTechnoType, E->pIni);
+});
 {{- end }}
 
 {{get_meta_gen_header()}}
