@@ -8,5 +8,5 @@
     "log_level": 0,
     "enable_graphic_debug_layer": true,
     "debug_console": true,
-    "break_on_start": true
+    "break_on_start": false
 }

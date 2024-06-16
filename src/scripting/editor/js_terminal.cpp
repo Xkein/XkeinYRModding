@@ -271,9 +271,10 @@ public:
         // Process command
         GuardExecute(
             [command_line]() {
-            if (gJsEnv->Eval(command_line, "(terminal)"))
+            v8::Global<v8::Value> result;
+            if (gJsEnv->Eval(command_line, "(terminal)", &result))
             {
-                gLogger->info(gJsEnv->ObjectToString(gJsEnv->ResultInfo.Result));
+                gLogger->info(gJsEnv->ObjectToString(result));
             }
             else
             {

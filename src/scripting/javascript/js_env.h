@@ -2,11 +2,24 @@
 
 #include "core/platform/platform.h"
 #include "js_module_loader.h"
-#include <BackendEnv.h>
-#include <JSFunction.h>
 #include <CppObjectMapper.h>
 #include <DataTransfer.h>
 #include <memory>
+
+namespace PUERTS_NAMESPACE
+{
+    class FBackendEnv;
+}
+class AbstractClass;
+
+struct JsResultInfo
+{
+    v8::Isolate* Isolate;
+
+    v8::UniquePersistent<v8::Context> Context;
+
+    v8::UniquePersistent<v8::Value> Result;
+};
 
 class JsEnv
 {
@@ -14,7 +27,7 @@ public:
     JsEnv();
     ~JsEnv();
 
-    bool Eval(const char* Code, const char* Path);
+    bool Eval(const char* Code, const char* Path, v8::Global<v8::Value>* result = nullptr);
 
     void ExecuteModule(const char* ModuleName);
 
@@ -55,12 +68,16 @@ public:
     std::string ObjectToString(v8::Local<v8::Value> value);
     std::string ObjectToString(const v8::PersistentBase<v8::Value>& value);
 
+    v8::Local<v8::Value> FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial);
+
     static std::string TryCatchToString(v8::Isolate* Isolate, v8::TryCatch* TryCatch);
 
-    PUERTS_NAMESPACE::FBackendEnv      BackendEnv;
-    PUERTS_NAMESPACE::FResultInfo      ResultInfo;
-    PUERTS_NAMESPACE::FCppObjectMapper CppObjectMapper;
+    static v8::Local<v8::String> ToV8String(v8::Isolate* Isolate, const char* String);
 
+    std::unique_ptr<PUERTS_NAMESPACE::FBackendEnv> BackendEnv;
+    PUERTS_NAMESPACE::FCppObjectMapper             CppObjectMapper;
+
+    JsResultInfo                       ResultInfo;
     v8::Global<v8::Context>            DefaultContext;
     std::vector<char>                  StrBuffer;
     v8::UniquePersistent<v8::Value>    LastException;
@@ -79,6 +96,8 @@ private:
     void SearchModule(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
     void LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
+    void FindModule(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
     void LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
@@ -109,6 +128,8 @@ private:
 
     v8::Global<v8::Function> ReloadJs;
 #endif
+    
+    std::unordered_map<AbstractClass*, v8::UniquePersistent<v8::Value>> ObjectMap;
 
     std::shared_ptr<IJSModuleLoader> ModuleLoader;
 

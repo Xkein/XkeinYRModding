@@ -1,4 +1,6 @@
 #include "js_env.h"
+#include <BackendEnv.h>
+#include <V8Utils.h>
 #include "core/raii_invoker.h"
 #include <yr/debug_util.h>
 #include <core/logger/logger.h>
@@ -89,10 +91,11 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
     StrBuffer.resize(1024);
 
     ModuleLoader = std::make_shared<DefaultJSModuleLoader>("assets/JavaScript");
+    BackendEnv   = std::make_unique<PUERTS_NAMESPACE::FBackendEnv>();
 
     FBackendEnv::GlobalPrepare();
-    BackendEnv.Initialize(nullptr, nullptr);
-    MainIsolate = BackendEnv.MainIsolate;
+    BackendEnv->Initialize(nullptr, nullptr);
+    MainIsolate = BackendEnv->MainIsolate;
 
     auto Isolate = MainIsolate;
 #ifdef MULT_BACKENDS
@@ -100,12 +103,12 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
 #endif
     ResultInfo.Isolate = Isolate;
     Isolate->SetData(0, this);
-    Isolate->SetData(1, &BackendEnv);
+    Isolate->SetData(1, BackendEnv.get());
 
     v8::Isolate::Scope Isolatescope(Isolate);
     v8::HandleScope    HandleScope(Isolate);
 
-    v8::Local<v8::Context> Context = BackendEnv.MainContext.Get(Isolate);
+    v8::Local<v8::Context> Context = BackendEnv->MainContext.Get(Isolate);
     v8::Context::Scope     ContextScope(Context);
     DefaultContext.Reset(Isolate, Context);
 
@@ -121,17 +124,29 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
 
     MethodBindingHelper<&JsEnv::LoadModule>::Bind(Isolate, Context, Global, "__tgjsLoadModule", This);
 
+    MethodBindingHelper<&JsEnv::FindModule>::Bind(Isolate, Context, Global, "__tgjsFindModule", This);
+
     MethodBindingHelper<&JsEnv::Log>::Bind(Isolate, Context, Global, "__tgjsLog", This);
 
     MethodBindingHelper<&JsEnv::LoadCppType>::Bind(Isolate, Context, PuertsObj, "loadCPPType", This);
 
     ExecuteModule("setup.js");
+    ExecuteModule("log.js");
+    ExecuteModule("modular.js");
+    ExecuteModule("yrlazyload.js");
+    ExecuteModule("hot_reload.js");
     ExecuteModule("main.js");
+
+    Require.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::V8String(Isolate, "__require")).ToLocalChecked().As<v8::Function>());
+
+    GetESMMain.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::V8String(Isolate, "getESMMain")).ToLocalChecked().As<v8::Function>());
+
+    ReloadJs.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::V8String(Isolate, "__reload")).ToLocalChecked().As<v8::Function>());
 
     CppObjectMapper.Initialize(Isolate, Context);
     Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
 
-    BackendEnv.StartPolling();
+    BackendEnv->StartPolling();
 
     gLogger->info("JsEnv started.");
 }
@@ -139,12 +154,14 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
 JsEnv::~JsEnv()
 {
     LogicTick();
-    BackendEnv.StopPolling();
+    BackendEnv->StopPolling();
     DestroyInspector();
 
-    BackendEnv.JsPromiseRejectCallback.Reset();
+    BackendEnv->JsPromiseRejectCallback.Reset();
     LastException.Reset();
-
+    Require.Reset();
+    GetESMMain.Reset();
+    ReloadJs.Reset();
     {
         auto Isolate = MainIsolate;
 #ifdef THREAD_SAFE
@@ -157,8 +174,8 @@ JsEnv::~JsEnv()
 
         CppObjectMapper.UnInitialize(Isolate);
 
-        BackendEnv.PathToModuleMap.clear();
-        BackendEnv.ScriptIdToPathMap.clear();
+        BackendEnv->PathToModuleMap.clear();
+        BackendEnv->ScriptIdToPathMap.clear();
     }
 
     DefaultContext.Reset();
@@ -167,7 +184,7 @@ JsEnv::~JsEnv()
 
     GuardExecute(
         [&]() {
-        BackendEnv.UnInitialize();
+        BackendEnv->UnInitialize();
     },
         [](std::string stackTrace) {
         gLogger->error(stackTrace);
@@ -175,7 +192,7 @@ JsEnv::~JsEnv()
     gLogger->info("JsEnv disposed.");
 }
 
-bool JsEnv::Eval(const char* Code, const char* Path)
+bool JsEnv::Eval(const char* Code, const char* Path, v8::Global<v8::Value>* result)
 {
     v8::Isolate* Isolate = MainIsolate;
 #ifdef THREAD_SAFE
@@ -210,11 +227,99 @@ bool JsEnv::Eval(const char* Code, const char* Path)
 
     if (!maybeValue.IsEmpty())
     {
+        if (result)
+            result->Reset(Isolate, maybeValue.ToLocalChecked());
         ResultInfo.Result.Reset(Isolate, maybeValue.ToLocalChecked());
     }
 
     return true;
 }
+
+//void JsEnv::Execute(const char* ModuleNameOrScript, const std::vector<std::pair<std::string, v8::Local<v8::Value>>>& Arguments, bool IsScript)
+//{
+//#ifdef SINGLE_THREAD_VERIFY
+//    ensureMsgf(BoundThreadId == FPlatformTLS::GetCurrentThreadId(), TEXT("Access by illegal thread!"));
+//#endif
+//
+//    auto Isolate = MainIsolate;
+//#ifdef THREAD_SAFE
+//    v8::Locker Locker(Isolate);
+//#endif
+//    v8::Isolate::Scope IsolateScope(Isolate);
+//    v8::HandleScope    HandleScope(Isolate);
+//    auto               Context = v8::Local<v8::Context>::New(Isolate, DefaultContext);
+//    v8::Context::Scope ContextScope(Context);
+//
+//    auto MaybeTGameTGJS = Context->Global()->Get(Context, FV8Utils::V8String(Isolate, "puerts"));
+//
+//    if (MaybeTGameTGJS.IsEmpty() || !MaybeTGameTGJS.ToLocalChecked()->IsObject())
+//    {
+//        gLogger->error("global.puerts not found!");
+//        return;
+//    }
+//
+//    auto TGJS = MaybeTGameTGJS.ToLocalChecked()->ToObject(Context).ToLocalChecked();
+//
+//    auto MaybeArgv = TGJS->Get(Context, FV8Utils::V8String(Isolate, "argv"));
+//
+//    if (MaybeArgv.IsEmpty() || !MaybeArgv.ToLocalChecked()->IsObject())
+//    {
+//        gLogger->error("global.puerts.argv not found!");
+//        return;
+//    }
+//
+//    auto Argv = MaybeArgv.ToLocalChecked()->ToObject(Context).ToLocalChecked();
+//
+//    auto MaybeArgvAdd = Argv->Get(Context, FV8Utils::V8String(Isolate, "add"));
+//
+//    if (MaybeArgvAdd.IsEmpty() || !MaybeArgvAdd.ToLocalChecked()->IsFunction())
+//    {
+//        gLogger->error("global.puerts.argv.add not found!");
+//        return;
+//    }
+//
+//    auto ArgvAdd = MaybeArgvAdd.ToLocalChecked().As<v8::Function>();
+//
+//    for (int i = 0; i < Arguments.size(); i++)
+//    {
+//        auto                 Object  = Arguments[i].second;
+//        v8::Local<v8::Value> Args[2] = {FV8Utils::V8String(Isolate, Arguments[i].first.c_str()), Object};
+//        (void)(ArgvAdd->Call(Context, Argv, 2, Args));
+//    }
+//
+//    if (IsScript)
+//    {
+//#if V8_MAJOR_VERSION > 8
+//        v8::ScriptOrigin Origin(Isolate, FV8Utils::V8String(Isolate, "chunk"));
+//#else
+//        v8::ScriptOrigin Origin(FV8Utils::V8String(Isolate, "chunk"));
+//#endif
+//        v8::Local<v8::String> Source = FV8Utils::V8String(Isolate, ModuleNameOrScript);
+//        v8::TryCatch          TryCatch(Isolate);
+//
+//        auto CompiledScript = v8::Script::Compile(Context, Source, &Origin);
+//        if (CompiledScript.IsEmpty())
+//        {
+//            gLogger->error(TryCatchToString(Isolate, &TryCatch));
+//            return;
+//        }
+//        (void)(CompiledScript.ToLocalChecked()->Run(Context));
+//        if (TryCatch.HasCaught())
+//        {
+//            gLogger->error(TryCatchToString(Isolate, &TryCatch));
+//        }
+//    }
+//    else
+//    {
+//        v8::TryCatch         TryCatch(Isolate);
+//        v8::Local<v8::Value> Args[] = {FV8Utils::V8String(Isolate, ModuleNameOrScript)};
+//        Require.Get(Isolate)->Call(Context, v8::Undefined(Isolate), 1, Args);
+//        if (TryCatch.HasCaught())
+//        {
+//            gLogger->error(TryCatchToString(Isolate, &TryCatch));
+//        }
+//    }
+//}
 
 void JsEnv::ExecuteModule(const char* ModuleName)
 {
@@ -334,22 +439,22 @@ void JsEnv::RequestFullGarbageCollectionForTesting()
 
 void JsEnv::CreateInspector(int32_t Port)
 {
-    BackendEnv.CreateInspector(MainIsolate, &DefaultContext, Port);
+    BackendEnv->CreateInspector(MainIsolate, &DefaultContext, Port);
 }
 
 void JsEnv::DestroyInspector()
 {
-    BackendEnv.DestroyInspector(MainIsolate, &DefaultContext);
+    BackendEnv->DestroyInspector(MainIsolate, &DefaultContext);
 }
 
 void JsEnv::LogicTick()
 {
-    BackendEnv.LogicTick();
+    BackendEnv->LogicTick();
 }
 
 bool JsEnv::InspectorTick()
 {
-    return BackendEnv.InspectorTick() ? 1 : 0;
+    return BackendEnv->InspectorTick() ? 1 : 0;
 }
 
 bool JsEnv::ClearModuleCache(const char* Path)
@@ -359,7 +464,7 @@ bool JsEnv::ClearModuleCache(const char* Path)
     v8::Local<v8::Context> Context = DefaultContext.Get(MainIsolate);
     v8::Context::Scope     ContextScope(Context);
 
-    return BackendEnv.ClearModuleCache(MainIsolate, Context, Path);
+    return BackendEnv->ClearModuleCache(MainIsolate, Context, Path);
 }
 
 void JsEnv::InitExtensionMethodsMap()
@@ -448,7 +553,7 @@ void JsEnv::OnSourceLoaded(std::function<void(const char*)> Callback)
 
 std::string JsEnv::GetJSStackTrace()
 {
-    return BackendEnv.GetJSStackTrace();
+    return BackendEnv->GetJSStackTrace();
 }
 
 // Convert a JavaScript string to a std::string.  To not bother too
@@ -472,6 +577,11 @@ std::string JsEnv::ObjectToString(const v8::PersistentBase<v8::Value>& value)
 std::string JsEnv::TryCatchToString(v8::Isolate* Isolate, v8::TryCatch* TryCatch)
 {
     return FV8Utils::ExceptionToString(Isolate, TryCatch->Exception());
+}
+
+v8::Local<v8::String> JsEnv::ToV8String(v8::Isolate* Isolate, const char* String)
+{
+    return FV8Utils::V8String(Isolate, String);
 }
 
 bool JsEnv::LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8>& Data, std::string& ErrInfo)
@@ -648,6 +758,28 @@ void JsEnv::LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
     }
 
     Info.GetReturnValue().Set(ToV8StringFromFileContent(Isolate, Data));
+}
+
+void JsEnv::FindModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    //v8::Isolate*           Isolate = Info.GetIsolate();
+    //v8::Isolate::Scope     Isolatescope(Isolate);
+    //v8::HandleScope        HandleScope(Isolate);
+    //v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    //v8::Context::Scope     ContextScope(Context);
+
+    //CHECK_V8_ARGS(EArgString);
+
+    //std::string Name = *(v8::String::Utf8Value(Isolate, Info[0]));
+
+    //auto Func = FindAddonRegisterFunc(Name);
+
+    //if (Func)
+    //{
+    //    auto Exports = v8::Object::New(Isolate);
+    //    Func(Context, Exports);
+    //    Info.GetReturnValue().Set(Exports);
+    //}
 }
 
 void JsEnv::LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
@@ -846,4 +978,53 @@ v8::MaybeLocal<v8::Module> JsEnv::ResolveModuleCallback(v8::Local<v8::Context> C
     auto       ItRefModule   = ItModuleInfo->second->ResolveCache.find(RefModuleName);
     check(ItRefModule != ItModuleInfo->second->ResolveCache.end());
     return (ItRefModule->second).Get(Context->GetIsolate());
+}
+
+
+namespace PUERTS_NAMESPACE
+{
+    namespace v8_impl
+    {
+        v8::Local<v8::Value> FindOrAddYrObject(v8::Isolate* InIsolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial)
+        {
+            return gJsEnv->FindOrAdd(InIsolate, Context, YrObject, SkipTypeScriptInitial);
+        }
+    } // namespace v8_impl
+} // namespace PUERTS_NAMESPACE
+
+#include <AbstractClass.h>
+#include "yr/api/yr_entity.h"
+using namespace entt::literals;
+
+static const void* gYrJsTypeID[static_cast<size_t>(AbstractType::DiskLaser) + 1] {};
+
+v8::Local<v8::Value> JsEnv::FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial)
+{
+    // create and link
+    if (!YrObject)
+    {
+        return v8::Undefined(Isolate);
+    }
+
+    auto PersistentValuePtr = ObjectMap.find(YrObject);
+    if (PersistentValuePtr == ObjectMap.end()) // create and link
+    {
+        size_t WhatAmI = static_cast<size_t>(YrObject->WhatAmI());
+        const void* TypeId  = gYrJsTypeID[WhatAmI];
+        if (!TypeId)
+        {
+            auto        meta     = GetYrClassMeta(YrObject);
+            const char* TypeName = meta.prop("name"_hs).value().cast<const char*>();
+
+            auto JsRegistration  = FindCppTypeClassByName(TypeName);
+            gYrJsTypeID[WhatAmI] = TypeId = JsRegistration->TypeId;
+        }
+        
+        v8::Local<v8::Value> Result = DataTransfer::FindOrAddCData(Isolate, Context, TypeId, YrObject, true);
+        return Result;
+    }
+    else
+    {
+        return v8::Local<v8::Value>::New(Isolate, PersistentValuePtr->second);
+    }
 }

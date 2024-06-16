@@ -18,8 +18,8 @@
         yr_inject_meta(this)
     end
 -}}
-{{- if is_yrpp -}}
 #include "scripting/javascript/yr_data_bindings.h"
+{{- if is_yrpp }}
 #include <EventClass.h>
 #include <YRPP.h>
 #include <CRC.h>
@@ -84,7 +84,7 @@ void __JsRegister_{{type_name}}() {
             $klass = append_line($klass, $'MakePropertyCheck<&{htClass.type_name}::{property.name}>(builder, "{property.name}");')
         end
     end
-    $klass = append_line($klass, 'builder.Register();')
+    $klass = append_line($klass, 'RegisterCheck(builder);')
     ret $klass
 end -}}
 {{gen_js_class(this)}}

@@ -2,6 +2,14 @@
 #include <Binding.hpp>
 #include "core/raii_invoker.h"
 #include <WaypointPathClass.h>
+#include <VoxelAnimTypeClass.h>
+#include <ParticleSystemClass.h>
+#include <TriggerClass.h>
+#include <TriggerTypeClass.h>
+#include <WaveClass.h>
+#include <SuperClass.h>
+#include <FactoryClass.h>
+#include <AnimClass.h>
 
 void __JsRegister_YrContainers()
 {

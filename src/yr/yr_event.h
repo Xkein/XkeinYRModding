@@ -118,11 +118,11 @@ private:
 };
 
 #define REGISTER_YR_HOOK_EVENT_LISTENER(EventType, Listener) \
-    YrHookEventListenerRegister<EventType> CONCAT(AutoRegister__, __LINE__)(Listener);
+    static YrHookEventListenerRegister<EventType> CONCAT(AutoRegister__, __LINE__)(Listener);
 
 #define DEFINE_YR_HOOK_EVENT_LISTENER(EventType) \
     static void CONCAT(EventType##_Listener_, __LINE__)(YrHookContext* const C, EventType* const E); \
-    REGISTER_YR_HOOK_EVENT_LISTENER(EventType, CONCAT(EventType##_Listener_, __LINE__)); \
+    REGISTER_YR_HOOK_EVENT_LISTENER(EventType, CONCAT(EventType##_Listener_, __LINE__));             \
     void CONCAT(EventType##_Listener_, __LINE__)(YrHookContext* const C, EventType* const E)
 
 template<class T>

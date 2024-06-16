@@ -55,6 +55,13 @@ void DestroyEntity(T* pObject)
     entt::entity entity = iter->second;
     gEntt->destroy(entity);
     extMap.erase(iter);
+
+    auto& cacheExtMap = GetExtMap<AbstractClass>();
+    auto  cacheIter   = cacheExtMap.find(pObject);
+    if (cacheIter != cacheExtMap.end())
+    {
+        cacheExtMap.erase(cacheIter);
+    }
 }
 
 template<typename T>
@@ -167,6 +174,8 @@ inline entt::entity get_entity_by_switch(AbstractClass* pObject)
         CASE_GET_ENTITY(AirstrikeClass, pObject);
         CASE_GET_ENTITY(SlaveManagerClass, pObject);
         CASE_GET_ENTITY(DiskLaserClass, pObject);
+        default:
+            break;
     }
     return entt::null;
 }
@@ -192,6 +201,98 @@ YREXTCORE_API entt::entity api::GetEntity(AbstractClass* pObject)
     //    gEntt->on_destroy<RemoveCacheComponent>().con;
     //}
     return entity;
+}
+
+#define CASE_GET_CLASS_META(CLASS)  \
+    case CLASS::AbsID: \
+        return entt::resolve<CLASS>();
+#define NULL_CLASS_META entt::resolve(entt::type_id<void>())
+YREXTCORE_API entt::meta_type api::GetYrClassMeta(AbstractClass const* pAbstract)
+{
+    switch (pAbstract->WhatAmI())
+    {
+        CASE_GET_CLASS_META(UnitClass);
+        CASE_GET_CLASS_META(AircraftClass);
+        CASE_GET_CLASS_META(AircraftTypeClass);
+        CASE_GET_CLASS_META(AnimClass);
+        CASE_GET_CLASS_META(AnimTypeClass);
+        CASE_GET_CLASS_META(BuildingClass);
+        CASE_GET_CLASS_META(BuildingTypeClass);
+        CASE_GET_CLASS_META(BulletClass);
+        CASE_GET_CLASS_META(BulletTypeClass);
+        CASE_GET_CLASS_META(CampaignClass);
+        CASE_GET_CLASS_META(CellClass);
+        CASE_GET_CLASS_META(FactoryClass);
+        CASE_GET_CLASS_META(HouseClass);
+        CASE_GET_CLASS_META(HouseTypeClass);
+        CASE_GET_CLASS_META(InfantryClass);
+        CASE_GET_CLASS_META(InfantryTypeClass);
+        CASE_GET_CLASS_META(IsometricTileClass);
+        CASE_GET_CLASS_META(IsometricTileTypeClass);
+        CASE_GET_CLASS_META(BuildingLightClass);
+        CASE_GET_CLASS_META(OverlayClass);
+        CASE_GET_CLASS_META(OverlayTypeClass);
+        CASE_GET_CLASS_META(ParticleClass);
+        CASE_GET_CLASS_META(ParticleTypeClass);
+        CASE_GET_CLASS_META(ParticleSystemClass);
+        CASE_GET_CLASS_META(ParticleSystemTypeClass);
+        CASE_GET_CLASS_META(ScriptClass);
+        CASE_GET_CLASS_META(ScriptTypeClass);
+        CASE_GET_CLASS_META(SideClass);
+        CASE_GET_CLASS_META(SmudgeClass);
+        CASE_GET_CLASS_META(SmudgeTypeClass);
+        case AbstractType::Special:
+            return NULL_CLASS_META; // absence
+        CASE_GET_CLASS_META(SuperWeaponTypeClass);
+        CASE_GET_CLASS_META(TaskForceClass);
+        CASE_GET_CLASS_META(TeamClass);
+        CASE_GET_CLASS_META(TeamTypeClass);
+        CASE_GET_CLASS_META(TerrainClass);
+        CASE_GET_CLASS_META(TerrainTypeClass);
+        CASE_GET_CLASS_META(TriggerClass);
+        CASE_GET_CLASS_META(TriggerTypeClass);
+        CASE_GET_CLASS_META(UnitTypeClass);
+        CASE_GET_CLASS_META(VoxelAnimClass);
+        CASE_GET_CLASS_META(VoxelAnimTypeClass);
+        CASE_GET_CLASS_META(WaveClass);
+        CASE_GET_CLASS_META(TagClass);
+        CASE_GET_CLASS_META(TagTypeClass);
+        CASE_GET_CLASS_META(TiberiumClass);
+        CASE_GET_CLASS_META(TActionClass);
+        CASE_GET_CLASS_META(TEventClass);
+        CASE_GET_CLASS_META(WeaponTypeClass);
+        CASE_GET_CLASS_META(WarheadTypeClass);
+        CASE_GET_CLASS_META(WaypointPathClass);
+        case AbstractType::Abstract:
+            return NULL_CLASS_META; // not sealed type
+        //CASE_GET_ENTITY(TubeClass);
+        CASE_GET_CLASS_META(LightSourceClass);
+        CASE_GET_CLASS_META(EMPulseClass);
+        case AbstractType::TacticalMap:
+            return NULL_CLASS_META; // absence
+        CASE_GET_CLASS_META(SuperClass);
+        case AbstractType::AITrigger:
+            return NULL_CLASS_META; // absence
+        CASE_GET_CLASS_META(AITriggerTypeClass);
+        CASE_GET_CLASS_META(NeuronClass);
+        //CASE_GET_CLASS_META(FoggedObjectClass);
+        CASE_GET_CLASS_META(AlphaShapeClass);
+        CASE_GET_CLASS_META(VeinholeMonsterClass);
+        case AbstractType::NavyType:
+            return NULL_CLASS_META; // absence
+        CASE_GET_CLASS_META(SpawnManagerClass);
+        CASE_GET_CLASS_META(CaptureManagerClass);
+        CASE_GET_CLASS_META(ParasiteClass);
+        CASE_GET_CLASS_META(BombClass);
+        CASE_GET_CLASS_META(RadSiteClass);
+        CASE_GET_CLASS_META(TemporalClass);
+        CASE_GET_CLASS_META(AirstrikeClass);
+        CASE_GET_CLASS_META(SlaveManagerClass);
+        CASE_GET_CLASS_META(DiskLaserClass);
+        default:
+            break;
+    }
+    return NULL_CLASS_META;
 }
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftCtorEvent)

@@ -20,7 +20,7 @@ BROADCAST_HOOK_EVENT(0x414080, 0x5, YrAircraftDtorEvent)
 
 BROADCAST_HOOK_EVENT(0x41C9E1, 0x7, YrAircraftTypeCtorEvent)
 {
-    E->pAircraftType = R->ECX<AircraftTypeClass*>();
+    E->pAircraftType = R->ESI<AircraftTypeClass*>();
 }
 BROADCAST_HOOK_EVENT(0x41CFE0, 0x6, YrAircraftTypeDtorEvent)
 {

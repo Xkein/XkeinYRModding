@@ -16,6 +16,7 @@ struct YrEntityComponent
 namespace api
 {
     YREXTCORE_API entt::entity GetEntity(AbstractClass* pObject);
+    YREXTCORE_API entt::meta_type GetYrClassMeta(AbstractClass const* pAbstract);
 }
 
 template<typename T>
@@ -31,3 +32,6 @@ TCom* GetYrComponent(T* pObject)
     return gEntt->try_get<TCom>(entity);
 }
 
+inline entt::meta_type GetYrClassMeta(AbstractClass const* pAbstract) {
+    return api::GetYrClassMeta(pAbstract);
+}

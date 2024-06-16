@@ -1,28 +1,20 @@
-#include <yr/yr_all_events.h>
 #include "scripting/yr_scripting.h"
-#include "javascript/js_env.h"
+#include "scripting/javascript/js_env.h"
+#include "scripting/engine.h"
 #include <imgui.h>
-static void Update()
-{
-    if (gJsEnv)
-    {
-        gJsEnv->InspectorTick();
-        gJsEnv->LogicTick();
-    }
-}
-
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, Update)
-REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, Update)
+#include <yr/yr_all_events.h>
 
 #include "codegen/YrScripting.gen.h"
 void YrScriptingModule::Startup()
 {
     __Gen_Type_YrScripting::Register();
     gJsEnv = std::make_shared<JsEnv>();
+    gEngine->Start();
 }
 
 void YrScriptingModule::Shutdown()
 {
+    gEngine->Exit();
     gJsEnv.reset();
     __Gen_Type_YrScripting::Unregister();
 }

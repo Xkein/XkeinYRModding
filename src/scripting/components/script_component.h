@@ -3,8 +3,8 @@
 #include <string>
 #include <functional>
 
-class AbstractClass;
-using JsBehaviour = std::function<void(AbstractClass*)>;
+template<typename TFunc>
+using JsBehaviour = std::function<TFunc>;
 
 CLASS(IniComponent = [ObjectTypeClass])
 struct ScriptTypeComponent
@@ -13,10 +13,25 @@ struct ScriptTypeComponent
     std::string jsScript;
 };
 
-CLASS()
+#include "scripting/javascript/yr_data_bindings.h"
+#include <v8.h>
+
+CLASS(BindJs)
 struct ScriptComponent
 {
-    JsBehaviour BeginUpdate;
-    JsBehaviour EndUpdate;
-};
+    v8::Global<v8::Object> JsObject;
+    PROPERTY()
+    JsBehaviour<void()> OnBeginUpdate;
+    PROPERTY()
+    JsBehaviour<void()> OnEndUpdate;
 
+    void BeginUpdate() {
+        if (OnBeginUpdate)
+            OnBeginUpdate();
+    }
+    void EndUpdate() {
+        if (OnEndUpdate)
+            OnEndUpdate();
+    }
+};
+UsingCppType(ScriptComponent);
