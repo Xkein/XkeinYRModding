@@ -30,12 +30,6 @@ struct IniComponentLoader
     }
 
     template<typename Type, typename TargetType>
-    static void CreateComponent(entt::registry& reg, entt::entity entity)
-    {
-        reg.emplace<Type>(entity);
-    }
-
-    template<typename Type, typename TargetType>
     static void LoadComponent(TargetType* pObject, CCINIClass* pIni)
     {
         const char* pID  = pObject->ID;
@@ -49,17 +43,4 @@ struct IniComponentLoader
         IniComponentLoader::Load(reader, pID, nullptr, *pCom);
     }
 };
-
-template<typename Type, typename... TargetType>
-void RegisterIniComponentLoader()
-{
-    if constexpr (sizeof...(TargetType) == 1u)
-    {
-        (gEntt->on_construct<YrEntityComponent<TargetType>>().template connect<&IniComponentLoader::CreateComponent<Type, TargetType>>(), ...);
-    }
-    else
-    {
-        (RegisterIniComponentLoader<Type, TargetType>(), ...);
-    }
-}
 #endif

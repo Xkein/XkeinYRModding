@@ -30,14 +30,14 @@ template<typename T>
 using ExtMap = std::unordered_map<T*, entt::entity>;
 
 template<typename T>
-ExtMap<T>& GetExtMap()
+inline ExtMap<T>& GetExtMap()
 {
     static ExtMap<T> singleton;
     return singleton;
 }
 
 template<typename T>
-void CreateEntity(T* pObject)
+inline void CreateEntity(T* pObject)
 {
     auto&        extMap = GetExtMap<T>();
     entt::entity entity = gEntt->create();
@@ -46,7 +46,7 @@ void CreateEntity(T* pObject)
 }
 
 template<typename T>
-void DestroyEntity(T* pObject)
+inline void DestroyEntity(T* pObject)
 {
     auto& extMap = GetExtMap<T>();
     auto  iter   = extMap.find(pObject);
@@ -65,7 +65,7 @@ void DestroyEntity(T* pObject)
 }
 
 template<typename T>
-entt::entity GetEntity(T* pObject)
+inline entt::entity GetEntity(T* pObject)
 {
     auto& extMap = GetExtMap<T>();
     auto  iter   = extMap.find(pObject);

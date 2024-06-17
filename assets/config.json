@@ -8,5 +8,6 @@
     "log_level": 0,
     "enable_graphic_debug_layer": true,
     "debug_console": true,
+    "js_debug_port": 9229,
     "break_on_start": false
 }

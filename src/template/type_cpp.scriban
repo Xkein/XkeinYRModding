@@ -6,40 +6,26 @@
 }}
 #include "{{type_name}}.gen.h"
 
-{{- ini_component_list = get_meta_list(meta, "IniComponent")
-func gen_register_component_loader(target_type)
-    if target_type == "ObjectTypeClass"
-        ret $'// ObjectTypeClass
-RegisterIniComponentLoader<{type_name},
-    AnimTypeClass,
-    BulletTypeClass,
-    IsometricTileTypeClass,
-    OverlayTypeClass,
-    ParticleSystemTypeClass,
-    ParticleTypeClass,
-    SmudgeTypeClass,
-    TerrainTypeClass, 
-    VoxelAnimTypeClass>();
-{gen_register_component_loader("TechnoTypeClass")}'
-    else if target_type == "TechnoTypeClass"
-        ret $'// TechnoTypeClass
-RegisterIniComponentLoader<{type_name}, AircraftTypeClass, BuildingTypeClass, InfantryTypeClass, UnitTypeClass>();'
-    end
-    ret $'RegisterIniComponentLoader<{type_name}, {target_type}>();'
-end
+{{- include 'yr/yrpp.scriban'
+component_target_list = get_derived_classes_by_list(get_meta_list(meta, "ComponentTarget"))
+has_component_target = array.size(component_target_list) > 0
+is_ini_component = get_meta_tag(meta, "IniComponent")
 func user_gen_meta_class(htClass)
     $result = ""
-    if ini_component_list
+    for target_type in component_target_list
+        $result = append_line($result, $'ComponentInstantiation::RegisterComponentInstantiation<{type_name}, {target_type}>();')
+    end
+    if is_ini_component
         $result = append_line($result, $'IniComponentLoader::Register<{type_name}, &LoadIni_{type_name}>(factory);')
-        for target_type in ini_component_list
-            $result = append_line($result, gen_register_component_loader(target_type))
-        end
     end
     ret $result
-end
-if ini_component_list }}
+end }}
+{{- if has_component_target }}
+#include "yr/component/component.h"
+{{- end }}
+{{- if is_ini_component }}
 #include "yr/parse/ini_reader.h"
-#include "scripting/components/ini_component.h"
+#include "yr/component/ini_component.h"
 #include <GameClasses.h>
 #include <IsometricTileTypeClass.h>
 static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader, const char* pSection)
@@ -56,16 +42,11 @@ static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader
     return true;
 }
 #include "yr/yr_all_events.h"
-{{- for target_type in ini_component_list
-    if array.contains(["TechnoTypeClass", "AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"], target_type) }}
+{{- if is_ini_component }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{type_name}}>(E->pTechnoType, E->pIni);
 }
-    {{- else if array.contains(["ObjectTypeClass"], target_type) }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pTechnoType, E->pIni);
-}
-{{- end; end }}
+{{- end }}
 {{- end }}
 
 {{get_meta_gen_header()}}

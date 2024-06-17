@@ -3,9 +3,6 @@
 #include "runtime/ecs/entt.h"
 
 class AbstractClass;
-class TechnoClass;
-class BulletClass;
-class HouseClass;
 
 template<typename T>
 struct YrEntityComponent

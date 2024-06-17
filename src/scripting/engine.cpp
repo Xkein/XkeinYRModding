@@ -1,8 +1,9 @@
 #include "engine.h"
 
-#include "yr/yr_all_events.h"
 #include "core/logger/logger.h"
 #include "runtime/ecs/entt.h"
+#include "yr/yr_all_events.h"
+#include "yr/extcore_config.h"
 #include "scripting/components/script_component.h"
 #include "scripting/javascript/js_env.h"
 #include "scripting/javascript/yr_binding.h"
@@ -32,6 +33,7 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, JsUpdate)
 
 Engine::Engine()
 {
+
 }
 
 Engine::~Engine()
@@ -70,7 +72,7 @@ struct JsScriptTemplate
         }
     }
 
-    void Instantiate(ScriptComponent* scriptCom, ObjectClass* pYrObject)
+    void Instantiate(ScriptComponent* scriptCom, AbstractClass* pYrObject)
     {
         if (!ScriptCtor)
             return;
@@ -79,7 +81,7 @@ struct JsScriptTemplate
     }
 
 private:
-    std::function<void(ScriptComponent* scriptCom, ObjectClass* pYrObject)> ScriptCtor;
+    std::function<void(ScriptComponent* scriptCom, AbstractClass* pYrObject)> ScriptCtor;
 
     v8::Global<v8::Value> ScriptTemplate;
     std::string_view      ScriptName;
@@ -87,49 +89,36 @@ private:
 
 std::map<std::string, JsScriptTemplate> gJsScripts;
 
-void CreateScriptComponent(ObjectClass* pYrObject)
-{
-    auto const* const pScriptType = GetYrComponent<ScriptTypeComponent>(pYrObject->GetTechnoType());
+void ScriptComponent::CreateScriptComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType) {
+    ScriptTypeComponent const* const pScriptType = GetYrComponent<ScriptTypeComponent>(pYrType);
     if (pScriptType && !pScriptType->jsScript.empty())
     {
-        auto& name   = pScriptType->jsScript;
-        auto  entity = GetYrEntity(pYrObject);
-        auto& script = gEntt->emplace<ScriptComponent>(entity);
-        auto  iter   = gJsScripts.find(name);
+        auto& name = pScriptType->jsScript;
+        auto  iter = gJsScripts.find(name);
         if (iter == gJsScripts.end())
         {
             iter = gJsScripts.insert_or_assign(name, JsScriptTemplate(name)).first;
         }
 
+        ScriptComponent& script = reg.emplace<ScriptComponent>(entity);
         iter->second.Instantiate(&script, pYrObject);
     }
-}
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftCtorEvent)
-{
-    CreateScriptComponent(E->pAircraft);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingCtorEvent)
-{
-    CreateScriptComponent(E->pBuilding);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryCtorEvent)
-{
-    CreateScriptComponent(E->pInfantry);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitCtorEvent)
-{
-    CreateScriptComponent(E->pUnit);
 }
 
 void Engine::Start()
 {
     gLogger->info("Engine::Start()");
+    gJsEnv = std::make_shared<JsEnv>();
+#ifndef NDEBUG
+    int32 port = gYrExtConfig->rawData.value("js_debug_port", 9229);
+    gJsEnv->CreateInspector(port);
+#endif // DEBUG
 }
 
 void Engine::Exit()
 {
     gLogger->info("Engine::Exit()");
+    gJsEnv.reset();
 }
 
 void Engine::OnScenarioStart()

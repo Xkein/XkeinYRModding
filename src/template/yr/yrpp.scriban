@@ -128,4 +128,61 @@ func yr_inject_meta(htType)
     htType.meta.raw.has_meta = true
     htType.all_public_visible = true
 end
+
+func get_yr_derived_classes(klass)
+    if klass == "AbstractClass"
+        ret array.concat(["AirstrikeClass", "AlphaShapeClass", "BombClass",
+            "CaptureManagerClass", "CellClass", "DiskLaserClass", "EMPulseClass",
+            "FactoryClass", "HouseClass", "LightSourceClass", "NeuronClass",
+            "ParasiteClass", "RadSiteClass", "ScriptClass", "SlaveManagerClass",
+            "SpawnManagerClass", "SuperClass", "TacticalClass", "TActionClass",
+            "TagClass", "TeamClass", "TemporalClass", "TEventClass",
+            "TriggerClass", "WaypointPathClass"], array.concat(get_yr_derived_classes("AbstractTypeClass"), get_yr_derived_classes("ObjectClass")))
+
+    else if klass == "ObjectClass"
+        ret array.concat(["AnimClass", "BuildingLightClass", "BulletClass",
+            "IsometricTileClass", "OverlayClass", "ParticleClass",
+            "ParticleSystemClass", "SmudgeClass", "TerrainClass", "VeinholeMonsterClass",
+            "VoxelAnimClass", "WaveClass"], get_yr_derived_classes("MissionClass"))
+
+    else if klass == "MissionClass"
+        ret get_yr_derived_classes("RadioClass")
+
+    else if klass == "RadioClass"
+        ret get_yr_derived_classes("TechnoClass")
+
+    else if klass == "TechnoClass"
+        ret array.concat(["BuildingClass"], get_yr_derived_classes("FootClass"))
+
+    else if klass == "FootClass"
+        ret ["AircraftClass", "InfantryClass", "UnitClass"]
+
+    else if klass == "AbstractTypeClass"
+        ret array.concat(["AITriggerTypeClass", "CampaignClass", "HouseTypeClass",
+            "ScriptTypeClass", "SideClass", "SuperWeaponTypeClass", "TagTypeClass",
+            "TaskForceClass", "TeamTypeClass", "TiberiumClass", "TriggerTypeClass",
+            "WarheadTypeClass", "WeaponTypeClass"], get_yr_derived_classes("ObjectTypeClass"))
+
+    else if klass == "ObjectTypeClass"
+        ret array.concat(["AnimTypeClass", "BulletTypeClass", "IsometricTileTypeClass",
+            "OverlayTypeClass", "ParticleSystemTypeClass", "ParticleTypeClass", "SmudgeTypeClass",
+            "TerrainTypeClass", "VoxelAnimTypeClass"], get_yr_derived_classes("TechnoTypeClass"))
+
+    else if klass == "TechnoTypeClass"
+        ret ["AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"]
+    end
+    ret [klass]
+end
+
+func get_derived_classes_by_list(klass_list)
+    if klass_list == null
+        ret []
+    end
+    $result = []
+    for target_type in klass_list
+        $result = array.concat($result, get_yr_derived_classes(target_type))
+    end
+    ret $result
+end
+
 }}
