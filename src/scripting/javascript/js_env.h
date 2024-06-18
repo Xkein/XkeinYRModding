@@ -9,6 +9,8 @@
 namespace PUERTS_NAMESPACE
 {
     class FBackendEnv;
+    class V8Inspector;
+    class V8InspectorChannel;
 }
 class AbstractClass;
 
@@ -42,6 +44,8 @@ public:
     void RequestFullGarbageCollectionForTesting();
 
     void CreateInspector(int32_t Port);
+    
+    void WaitDebugger(double Timeout = 0);
 
     void DestroyInspector();
 
@@ -82,7 +86,6 @@ public:
     std::vector<char>                  StrBuffer;
     v8::UniquePersistent<v8::Value>    LastException;
     std::string                        LastExceptionInfo;
-    v8::UniquePersistent<v8::Function> JsPromiseRejectCallback;
 
     v8::Isolate* MainIsolate;
 
@@ -98,6 +101,10 @@ private:
     void LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
     void FindModule(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
+    void SetInspectorCallback(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
+    void DispatchProtocolMessage(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
     void LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
@@ -117,6 +124,12 @@ private:
     std::unordered_multimap<int, FModuleInfo*>::iterator FindModuleInfo(v8::Local<v8::Module> Module);
 
     static v8::MaybeLocal<v8::Module> ResolveModuleCallback(v8::Local<v8::Context> Context, v8::Local<v8::String> Specifier, v8::Local<v8::Module> Referrer);
+
+    PUERTS_NAMESPACE::V8Inspector* Inspector;
+
+    PUERTS_NAMESPACE::V8InspectorChannel* InspectorChannel;
+
+    v8::Global<v8::Function> InspectorMessageHandler;
 
     std::map<std::string, v8::Global<v8::Module>> PathToModule;
 

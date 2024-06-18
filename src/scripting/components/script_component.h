@@ -6,7 +6,7 @@
 
 class AbstractTypeClass;
 template<typename TFunc>
-using JsBehaviour = std::function<TFunc>;
+using ScriptBehaviour = std::function<TFunc>;
 
 CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass])
 struct ScriptTypeComponent
@@ -16,7 +16,6 @@ struct ScriptTypeComponent
 };
 
 #include "scripting/javascript/yr_data_bindings.h"
-#include <v8.h>
 
 CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass])
 struct ScriptComponent
@@ -26,12 +25,6 @@ struct ScriptComponent
         CreateScriptComponent(reg, entity, pYrObject, pYrObject->Type);
     }
 
-    v8::Global<v8::Object> JsObject;
-    PROPERTY()
-    JsBehaviour<void()> OnBeginUpdate;
-    PROPERTY()
-    JsBehaviour<void()> OnEndUpdate;
-
     void BeginUpdate() {
         if (OnBeginUpdate)
             OnBeginUpdate();
@@ -40,6 +33,11 @@ struct ScriptComponent
         if (OnEndUpdate)
             OnEndUpdate();
     }
+    
+    PROPERTY()
+    ScriptBehaviour<void()> OnBeginUpdate;
+    PROPERTY()
+    ScriptBehaviour<void()> OnEndUpdate;
 private:
     static void CreateScriptComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);
 };

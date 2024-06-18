@@ -23,14 +23,31 @@ struct MetaRegistration
     }
 };
 
-GLOBAL_INVOKE_ON_CTOR_DTOR([]() {
+struct YrExtCore {
+    YrExtCore();
+    ~YrExtCore();
+};
+
+YrExtCore::YrExtCore() {
     MetaRegistration::Register();
     gYrExtConfig = std::make_unique<YrExtCoreConfig>();
     InitLogger();
     LoadExtensions();
-},
-    []() {
-    MetaRegistration::Register();
+}
+YrExtCore::~YrExtCore() {
+    MetaRegistration::Unregister();
+}
+
+std::unique_ptr<YrExtCore> gYrExtCore;
+
+GLOBAL_INVOKE_ON_CTOR([]() {
+    wchar_t system_buffer[MAX_PATH];
+    GetModuleFileNameW(NULL, system_buffer, MAX_PATH);
+    system_buffer[MAX_PATH - 1] = L'\0';
+    std::filesystem::path exePath = system_buffer;
+    if (exePath.filename() == "gamemd.exe") {
+        gYrExtCore = std::make_unique<YrExtCore>();
+    }
 })
 
 #include <spdlog/async.h>

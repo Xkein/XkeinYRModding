@@ -9,5 +9,6 @@
     "enable_graphic_debug_layer": true,
     "debug_console": true,
     "js_debug_port": 9229,
+    "js_wait_debugger_timeout": 0,
     "break_on_start": false
 }

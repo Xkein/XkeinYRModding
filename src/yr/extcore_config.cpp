@@ -1,6 +1,6 @@
 #include "extcore_config.h"
 
-#include <Windows.h>
+#include "core/assertion_macro.h"
 #include <filesystem>
 #include <fstream>
 #include "core/platform/path.h"
@@ -32,14 +32,7 @@ void YrExtCoreConfig::Init()
 
     if (rawData.value("break_on_start", false))
     {
-        wchar_t system_buffer[MAX_PATH];
-        GetModuleFileNameW(NULL, system_buffer, MAX_PATH);
-        system_buffer[MAX_PATH - 1] = L'\0';
-        std::filesystem::path exePath = system_buffer;
-        if (exePath.filename() == "gamemd.exe")
-        {
-            assert(false);
-            // DebugBreak();
-        }
+        assert(false);
+        // DebugBreak();
     }
 }

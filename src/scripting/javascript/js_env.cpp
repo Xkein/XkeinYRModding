@@ -2,14 +2,15 @@
 #include <BackendEnv.h>
 #include <V8Utils.h>
 #include "core/raii_invoker.h"
-#include <yr/debug_util.h>
-#include <core/logger/logger.h>
-#include <core/string/string_tool.h>
-#include <core/platform/path.h>
 #include <sstream>
 #include <boost/algorithm/string/replace.hpp>
 #include <filesystem>
-#include <core/assertion_macro.h>
+#include "yr/debug_util.h"
+#include "yr/extcore_config.h"
+#include "core/logger/logger.h"
+#include "core/string/string_tool.h"
+#include "core/platform/path.h"
+#include "core/assertion_macro.h"
 
 #define CHECK_V8_ARGS(...)
 
@@ -130,11 +131,33 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
 
     MethodBindingHelper<&JsEnv::LoadCppType>::Bind(Isolate, Context, PuertsObj, "loadCPPType", This);
 
-    ExecuteModule("setup.js");
-    ExecuteModule("log.js");
-    ExecuteModule("modular.js");
+    MethodBindingHelper<&JsEnv::SetInspectorCallback>::Bind(Isolate, Context, Global, "__tgjsSetInspectorCallback", This);
+
+    MethodBindingHelper<&JsEnv::DispatchProtocolMessage>::Bind(Isolate, Context, Global, "__tgjsDispatchProtocolMessage", This);
+
+    CppObjectMapper.Initialize(Isolate, Context);
+    Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
+
+#ifndef NDEBUG
+    int32 port = gYrExtConfig->rawData.value("js_debug_port", 9229);
+    this->CreateInspector(port);
+    this->WaitDebugger(gYrExtConfig->rawData.value("js_wait_debugger_timeout", 0));
+#endif // DEBUG
+
+    ExecuteModule("puerts/first_run.js");
+#if !defined(WITH_NODEJS)
+    ExecuteModule("puerts/polyfill.js");
+#endif
+    ExecuteModule("puerts/log.js");
+    ExecuteModule("puerts/modular.js");
+    ExecuteModule("puerts/events.js");
+    ExecuteModule("puerts/promises.js");
+    ExecuteModule("puerts/argv.js");
+    ExecuteModule("puerts/jit_stub.js");
+    ExecuteModule("puerts/hot_reload.js");
+    ExecuteModule("puerts/pesaddon.js");
+
     ExecuteModule("yrlazyload.js");
-    ExecuteModule("hot_reload.js");
     ExecuteModule("main.js");
 
     Require.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::V8String(Isolate, "__require")).ToLocalChecked().As<v8::Function>());
@@ -142,10 +165,6 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
     GetESMMain.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::V8String(Isolate, "getESMMain")).ToLocalChecked().As<v8::Function>());
 
     ReloadJs.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::V8String(Isolate, "__reload")).ToLocalChecked().As<v8::Function>());
-
-    CppObjectMapper.Initialize(Isolate, Context);
-    Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
-
     BackendEnv->StartPolling();
 
     gLogger->info("JsEnv started.");
@@ -440,11 +459,41 @@ void JsEnv::RequestFullGarbageCollectionForTesting()
 void JsEnv::CreateInspector(int32_t Port)
 {
     BackendEnv->CreateInspector(MainIsolate, &DefaultContext, Port);
+    Inspector = BackendEnv->Inspector;
 }
 
 void JsEnv::DestroyInspector()
 {
+    if (InspectorChannel) {
+        delete InspectorChannel;
+        InspectorChannel = nullptr;
+    }
     BackendEnv->DestroyInspector(MainIsolate, &DefaultContext);
+    Inspector = nullptr;
+}
+
+#include <chrono>
+void JsEnv::WaitDebugger(double timeout)
+{
+    if (timeout == 0)
+        return;
+#ifdef THREAD_SAFE
+    v8::Locker Locker(MainIsolate);
+#endif
+    using namespace std::chrono;
+    steady_clock::time_point startTime = steady_clock::now();
+    while (!this->InspectorTick())
+    {
+        if (timeout > 0)
+        {
+            steady_clock::time_point now = steady_clock::now();
+            duration<float> timeSpan = duration_cast<duration<float>>(now - startTime);
+            if (timeSpan.count() >= timeout)
+            {
+                break;
+            }
+        }
+    }
 }
 
 void JsEnv::LogicTick()
@@ -758,6 +807,67 @@ void JsEnv::LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
     }
 
     Info.GetReturnValue().Set(ToV8StringFromFileContent(Isolate, Data));
+}
+
+void JsEnv::SetInspectorCallback(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+#ifndef WITH_QUICKJS
+    v8::Isolate* Isolate = Info.GetIsolate();
+    v8::Isolate::Scope Isolatescope(Isolate);
+    v8::HandleScope HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope ContextScope(Context);
+
+    if (!Inspector)
+        return;
+
+    CHECK_V8_ARGS(EArgFunction);
+
+    if (!InspectorChannel)
+    {
+        InspectorChannel = Inspector->CreateV8InspectorChannel();
+        InspectorChannel->OnMessage(
+            [this](std::string Message)
+            {
+                // UE_LOG(LogTemp, Warning, TEXT("<-- %s"), UTF8_TO_TCHAR(Message.c_str()));
+                v8::Isolate::Scope IsolatescopeObject(MainIsolate);
+                v8::HandleScope HandleScopeObject(MainIsolate);
+                v8::Local<v8::Context> ContextInner = DefaultContext.Get(MainIsolate);
+                v8::Context::Scope ContextScopeObject(ContextInner);
+
+                auto Handler = InspectorMessageHandler.Get(MainIsolate);
+
+                v8::Local<v8::Value> Args[] = { FV8Utils::V8String(MainIsolate, Message.c_str()) };
+
+                v8::TryCatch TryCatch(MainIsolate);
+                Handler->Call(ContextInner, ContextInner->Global(), 1, Args);
+                if (TryCatch.HasCaught())
+                {
+                    gLogger->error("inspector callback exception {}", TryCatchToString(MainIsolate, &TryCatch));
+                }
+            });
+    }
+
+    InspectorMessageHandler.Reset(Isolate, v8::Local<v8::Function>::Cast(Info[0]));
+#endif    // !WITH_QUICKJS
+}
+
+void JsEnv::DispatchProtocolMessage(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+#ifndef WITH_QUICKJS
+    v8::Isolate* Isolate = Info.GetIsolate();
+    v8::Isolate::Scope Isolatescope(Isolate);
+    v8::HandleScope HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope ContextScope(Context);
+
+    CHECK_V8_ARGS(EArgString);
+
+    if (InspectorChannel)
+    {
+        InspectorChannel->DispatchProtocolMessage(ObjectToString(Info[0]));
+    }
+#endif    // !WITH_QUICKJS
 }
 
 void JsEnv::FindModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
