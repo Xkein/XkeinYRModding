@@ -22,6 +22,7 @@
 #include <ParticleClass.h>
 #include <BounceClass.h>
 #include <DisplayClass.h>
+#include <GadgetClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -99,6 +100,7 @@ UsingCppType(GScreenClass);
 UsingCppType(MapClass);
 UsingCppType(Crate);
 UsingCppType(GadgetClass);
+UsingCppType(LinkClass);
 UsingCppType(LaserDrawClass);
 UsingYrStruct(TurretControl);
 UsingYrStruct(WeaponStruct);

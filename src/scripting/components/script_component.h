@@ -25,6 +25,12 @@ struct ScriptComponent
         CreateScriptComponent(reg, entity, pYrObject, pYrObject->Type);
     }
 
+    ScriptComponent() = default;
+    ScriptComponent(ScriptComponent&&) = default;
+    ~ScriptComponent() {
+        if (OnDtor)
+            OnDtor();
+    }
     void BeginUpdate() {
         if (OnBeginUpdate)
             OnBeginUpdate();
@@ -34,6 +40,8 @@ struct ScriptComponent
             OnEndUpdate();
     }
     
+    PROPERTY()
+    ScriptBehaviour<void()> OnDtor;
     PROPERTY()
     ScriptBehaviour<void()> OnBeginUpdate;
     PROPERTY()

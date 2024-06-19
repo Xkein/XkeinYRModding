@@ -73,10 +73,10 @@ target("Scripts")
         local gendir = path.absolute(auto_gendir)
         import("core.project.depend")
         depend.on_changed(function ()
-            print("compiling typescript...")
-            os.execv("tsc.cmd", {
-                "-p", path.absolute("src/scripts/typescript/tsconfig.json"),
-            })
+            -- print("compiling typescript...")
+            -- os.execv("tsc.cmd", {
+            --     "-p", path.absolute("src/scripts/typescript/tsconfig.json"),
+            -- })
         end, {dependfile = gendir.."/compile.d", files = target:get("extrafiles")})
     end)
 target_end()

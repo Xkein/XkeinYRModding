@@ -76,6 +76,7 @@ func get_yr_game_types()
         "MapClass",
         "Crate",
         "GadgetClass",
+        "LinkClass",
         "TurretControl",
         "WeaponStruct",
         "BuildingAnimStruct",

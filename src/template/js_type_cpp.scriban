@@ -66,22 +66,22 @@ void __JsRegister_{{type_name}}() {
             if property.is_anonymous
                 for inner_property in property.anonymous_class.properties
                     if inner_property.is_const || inner_property.is_array
-                        $klass = append_line($klass, $'builder.Property("{inner_property.name}", MakeReadonlyProperty(&{htClass.type_name}::{inner_property.name}));')
+                        $klass = append_line($klass, $'builder.Property("m{inner_property.name}", MakeReadonlyProperty(&{htClass.type_name}::{inner_property.name}));')
                     else
-                        $klass = append_line($klass, $'MakePropertyCheck<&{htClass.type_name}::{inner_property.name}>(builder, "{inner_property.name}");')
+                        $klass = append_line($klass, $'MakePropertyCheck<&{htClass.type_name}::{inner_property.name}>(builder, "m{inner_property.name}");')
                     end
                 end
             end
             continue
         end
         if property.is_static && (property.is_const || property.is_constexpr || property.is_array)
-            $klass = append_line($klass, $'builder.Variable("{property.name}", MakeReadonlyVariable(std::addressof({htClass.type_name}::{property.name})));')
+            $klass = append_line($klass, $'builder.Variable("s{property.name}", MakeReadonlyVariable(std::addressof({htClass.type_name}::{property.name})));')
         else if property.is_const || property.is_array
-            $klass = append_line($klass, $'builder.Property("{property.name}", MakeReadonlyProperty(&{htClass.type_name}::{property.name}));')
+            $klass = append_line($klass, $'builder.Property("m{property.name}", MakeReadonlyProperty(&{htClass.type_name}::{property.name}));')
         else if property.is_static
-            $klass = append_line($klass, $'builder.Variable("{property.name}", MakeVariable(std::addressof({htClass.type_name}::{property.name})));')
+            $klass = append_line($klass, $'builder.Variable("s{property.name}", MakeVariable(std::addressof({htClass.type_name}::{property.name})));')
         else
-            $klass = append_line($klass, $'MakePropertyCheck<&{htClass.type_name}::{property.name}>(builder, "{property.name}");')
+            $klass = append_line($klass, $'MakePropertyCheck<&{htClass.type_name}::{property.name}>(builder, "m{property.name}");')
         end
     end
     $klass = append_line($klass, 'RegisterCheck(builder);')

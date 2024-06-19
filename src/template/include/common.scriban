@@ -53,17 +53,20 @@ func init_extra_vars(htType)
 
         htType.is_yr_extension = get_meta_tag(meta, "YrExtension")
     end
+    htType.__extra_inited = true
 
     user_init_extra_vars(htType)
 end
 
 func should_skip_visibility(htType, htElement)
     $has_meta = has_meta(htElement.meta)
+    $is_all_visible = htType.__extra_inited ? htType.all_visible : get_meta_tag(htType.meta, "AllVisible")
+    $is_all_all_public_visible = htType.__extra_inited ? htType.all_public_visible : get_meta_tag(htType.meta, "AllPublicVisible")
     case htElement.element.visibility
         when 2, 3 # protected or private
-            ret !(htType.all_visible || $has_meta)
+            ret !($is_all_visible || $has_meta)
         else
-            ret !(htType.all_visible || htType.all_public_visible || $has_meta)
+            ret !($is_all_visible || $is_all_all_public_visible || $has_meta)
     end
 end
 

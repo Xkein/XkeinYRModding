@@ -3,13 +3,117 @@
     include 'yr/yrpp.scriban'
     is_yrpp = module_name == "YRpp"
     func need_codegen(htType)
-        ret has_meta(htType.meta) || (is_yrpp && yr_need_codegen(htType))
+        ret get_meta_tag(htType.meta, "BindJs") || (is_yrpp && yr_need_codegen(htType))
+    end
+    type_map = {}
+    type_map["void"] = "void"
+    type_map["char"] = "number"
+    type_map["wchar"] = "number"
+    type_map["unsigned char"] = "number"
+    type_map["short"] = "number"
+    type_map["unsigned short"] = "number"
+    type_map["int"] = "number"
+    type_map["unsigned int"] = "number"
+    type_map["long"] = "number"
+    type_map["unsigned long"] = "number"
+    type_map["long long"] = "number"
+    type_map["unsigned long long"] = "number"
+    type_map["float"] = "number"
+    type_map["double"] = "number"
+    type_map["long double"] = "number"
+    type_map["bool"] = "boolean"
+    type_map["char *"] = "string"
+    type_map["char const*"] = "string"
+    any_types = []
+    if is_yrpp 
+        any_types = array.concat(any_types, ["IndexClass"])
+        yr_types = get_yr_game_types()
+    end
+    func get_ts_type(type)
+        $type_name = type.full_name
+        for any_type in any_types
+            if string.contains($type_name, any_type)
+                ret "any"
+            end
+        end
+        $mapped_type = type_map[$type_name]
+        if $mapped_type
+            ret $mapped_type
+        end
+        $unwrap = httype.unwrap_type(type)
+        $unwrap_name = $unwrap.full_name
+        $mapped_type = type_map[$unwrap_name]
+        if $mapped_type
+            ret $mapped_type
+        end
+        if $unwrap_name | string.ends_with ">" # template
+            ret "any"
+        end
+        if $unwrap_name | string.contains "::"
+            ret "any"
+        end
+        if is_yrpp && !array.contains(yr_types, $unwrap_name)
+            ret "any"
+        end
+        ret $unwrap_name
+    end
+    func should_skip_visibility_ex(htType, htElement)
+        if is_yrpp
+            case htElement.element.visibility
+                when 2, 3 # protected or private
+                    ret true
+                else
+                    ret false
+            end
+        else
+            ret should_skip_visibility(htType, htElement)
+        end
+    end
+    func gen_property(property)
+        ret (property.is_static ? 's' : 'm') + $'{property.name} : {get_ts_type(property.cpp_field.type)};'
     end
 -}}
+/// <reference path = "../index.d.ts"/>
 declare module "{{module_name}}" {
+import { CDTimerClass } from "yr";
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-{{- end; end }}
+{{ klass.is_interface ? "interface" : "class" }} {{klass.name}}
+{{- if array.size(klass.base_classes) > 0 && klass.base_classes[0].klass && !klass.base_classes[0].klass.is_interface
+$base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
+    {{- if $base_name != "any"}}
+    extends {{$base_name}}
+    {{- end }}
+{{- end }}
+{
+{{- for function in klass.functions ; $cpp_function = function.cpp_function }}
+        {{- if function.name | string.contains "operator";
+            continue
+        end
+        if should_skip_visibility_ex(klass, function) || function.is_deleted || function.is_destructor || function.is_constructor
+            continue
+        end
+        param_idx = 0
+        }}
+    {{function.name}}({{($cpp_function.parameters | array.each do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)}'); end) | array.join ", "}}) : {{get_ts_type($cpp_function.return_type)}};
+{{- end }}
+{{- for property in klass.properties ; $cpp_field = property.cpp_field }}
+    {{- if should_skip_visibility_ex(klass, property)
+            continue
+        end
+        if string.empty(property.name)
+            if property.is_anonymous
+                for inner_property in property.anonymous_class.properties }}
+    {{gen_property(inner_property)}}
+            {{- end
+            end
+            continue
+        end }}
+    {{gen_property(property)}}
+    {{- end }}
+}
+{{- end }}
+{{- end }}
 
 {{- for enum in module_enums }}
 {{- if need_codegen(enum) || is_yrpp }}
