@@ -1,5 +1,6 @@
 add_requires("boost", {configs = {context = true, coroutine = true}})
 add_requires("utfcpp")
+add_requires("efsw")
 
 includes("3rdparty/YRpp.lua")
 includes("3rdparty/entt.lua")

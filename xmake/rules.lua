@@ -6,6 +6,10 @@ rule("CoreRule")
         if target:kind() == "phony" or (target:name() ~= "Core" and target:dep("Core") == nil) then
             return
         end
+        
+        if is_mode("debug") then
+            target:add("defines", "IS_EDITOR")
+        end
 
         if target:name() == "YrExtCore" then
             -- target:add("defines", "ENTT_API=ENTT_EXPORT", {private=true})

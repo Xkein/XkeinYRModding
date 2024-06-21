@@ -11,6 +11,7 @@
 #include "core/string/string_tool.h"
 #include "core/platform/path.h"
 #include "core/assertion_macro.h"
+#include <efsw/efsw.hpp>
 
 #define CHECK_V8_ARGS(...)
 
@@ -138,11 +139,15 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
     CppObjectMapper.Initialize(Isolate, Context);
     Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
 
-#ifndef NDEBUG
+#ifdef IS_EDITOR
     int32 port = gYrExtConfig->rawData.value("js_debug_port", 9229);
     this->CreateInspector(port);
     this->WaitDebugger(gYrExtConfig->rawData.value("js_wait_debugger_timeout", 0));
-#endif // DEBUG
+
+    if (gYrExtConfig->rawData.value("js_watch_files", false)) {
+        efsw::FileWatcher watcher;
+    }
+#endif // IS_EDITOR
 
     ExecuteModule("puerts/first_run.js");
 #if !defined(WITH_NODEJS)
