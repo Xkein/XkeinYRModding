@@ -20,20 +20,12 @@ struct Paths
     static bool IsDirectoryExists(const std::string& path);
 
     static std::string Absolute(const std::string& path);
+
+    static std::string Normalize(const std::string& path);
+
+    static std::string Relative(const std::string& path, const std::string& base);
 };
 
-static std::string& operator/=(std::string& left, std::string_view right)
-{
-    if (left.back() != '/' && left.back() != '\\')
-    {
-        left += '/';
-    }
-    left += right;
-    return left;
-}
+std::string& operator/=(std::string& left, std::string_view right);
 
-static std::string operator/(const std::string& left, std::string_view right) {
-    std::string ret = left;
-    ret /= right;
-    return std::move(ret);
-}
+std::string operator/(const std::string& left, std::string_view right);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <mutex>
 
 class Engine
 {
@@ -23,6 +24,7 @@ public:
 public:
     float                                 deltaTime;
     std::chrono::steady_clock::time_point lastTickTimePoint {std::chrono::steady_clock::now()};
+    std::mutex                            mutex;
 
 private:
     void CalDeltaTime();

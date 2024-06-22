@@ -3,15 +3,14 @@
 #include <string>
 #include <vector>
 
-class FileHelper
+struct FileHelper
 {
+	static bool LoadFileToBytes(const char* path, std::vector<uint8>& bytes);
 
-	bool LoadFileToBytes(const char* path, std::vector<uint8>& bytes);
+	static bool LoadFileToString(const char* path, std::string& str);
 
-	bool LoadFileToString(const char* path, std::string& str);
+	static bool SaveBytesToFile(const char* path, const std::vector<uint8>& bytes);
 
-	bool SaveBytesToFile(const char* path, const std::vector<uint8>& bytes);
-
-	bool SaveStringToFile(const char* path, const std::string_view str);
+	static bool SaveStringToFile(const char* path, const std::string_view str);
 
 };

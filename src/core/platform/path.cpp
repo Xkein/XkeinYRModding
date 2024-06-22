@@ -47,3 +47,30 @@ std::string Paths::Absolute(const std::string& path)
 {
     return std::filesystem::absolute(path).string();
 }
+
+std::string Paths::Normalize(const std::string& path)
+{
+    return std::filesystem::path(path).lexically_normal().string();
+}
+
+std::string Paths::Relative(const std::string& path, const std::string& base)
+{
+    return std::filesystem::relative(path, base).string();
+}
+
+std::string& operator/=(std::string& left, std::string_view right)
+{
+    if (left.back() != '/' && left.back() != '\\')
+    {
+        left += '/';
+    }
+    left += right;
+    return left;
+}
+
+std::string operator/(const std::string& left, std::string_view right)
+{
+    std::string ret = left;
+    ret /= right;
+    return std::move(ret);
+}

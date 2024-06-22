@@ -9,6 +9,9 @@ rule("CoreRule")
         
         if is_mode("debug") then
             target:add("defines", "IS_EDITOR")
+            target:add("defines", "DEBUG")
+        else
+            target:add("defines", "RELEASE")
         end
 
         if target:name() == "YrExtCore" then

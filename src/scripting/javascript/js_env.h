@@ -57,11 +57,7 @@ public:
 
     void InitExtensionMethodsMap();
 
-    void JsHotReload(const char* ModuleName, const char* JsSource);
-
     void ReloadModule(const char* ModuleName, const char* JsSource);
-
-    void ReloadSource(const char* Path, const std::string& JsSource);
 
     std::function<void(const char*)> OnSourceLoadedCallback;
 
@@ -101,6 +97,10 @@ private:
     void LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
     void FindModule(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
+    void JsHotReload(const char* ModuleName, const char* JsSource);
+
+    void ReloadSource(const char* Path, const char* JsSource);
 
     void SetInspectorCallback(const v8::FunctionCallbackInfo<v8::Value>& Info);
 

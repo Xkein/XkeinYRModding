@@ -11,7 +11,6 @@
 #include "core/string/string_tool.h"
 #include "core/platform/path.h"
 #include "core/assertion_macro.h"
-#include <efsw/efsw.hpp>
 
 #define CHECK_V8_ARGS(...)
 
@@ -143,10 +142,6 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
     int32 port = gYrExtConfig->rawData.value("js_debug_port", 9229);
     this->CreateInspector(port);
     this->WaitDebugger(gYrExtConfig->rawData.value("js_wait_debugger_timeout", 0));
-
-    if (gYrExtConfig->rawData.value("js_watch_files", false)) {
-        efsw::FileWatcher watcher;
-    }
 #endif // IS_EDITOR
 
     ExecuteModule("puerts/first_run.js");
@@ -573,7 +568,7 @@ void JsEnv::ReloadModule(const char* ModuleName, const char* JsSource)
     JsHotReload(ModuleName, JsSource);
 }
 
-void JsEnv::ReloadSource(const char* Path, const std::string& JsSource)
+void JsEnv::ReloadSource(const char* Path, const char* JsSource)
 {
 #ifdef SINGLE_THREAD_VERIFY
     ensureMsgf(BoundThreadId == FPlatformTLS::GetCurrentThreadId(), TEXT("Access by illegal thread!"));
@@ -590,7 +585,7 @@ void JsEnv::ReloadSource(const char* Path, const std::string& JsSource)
 
     gLogger->info("reload js [%s]", Path);
     v8::TryCatch          TryCatch(Isolate);
-    v8::Handle<v8::Value> Args[] = {v8::Undefined(Isolate), FV8Utils::V8String(Isolate, Path), FV8Utils::V8String(Isolate, JsSource.c_str())};
+    v8::Handle<v8::Value> Args[] = {v8::Undefined(Isolate), FV8Utils::V8String(Isolate, Path), FV8Utils::V8String(Isolate, JsSource)};
 
     (void)(LocalReloadJs->Call(Context, v8::Undefined(Isolate), 3, Args));
 

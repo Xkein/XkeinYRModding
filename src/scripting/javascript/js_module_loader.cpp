@@ -1,5 +1,6 @@
 #include "js_module_loader.h"
 #include "core/platform/file_manager.h"
+#include "core/platform/file_helper.h"
 #include "core/platform/path.h"
 #include "yr/extcore_config.h"
 
@@ -16,20 +17,7 @@ bool DefaultJSModuleLoader::Search(const std::string& RequiredDir, const std::st
 
 bool DefaultJSModuleLoader::Load(const char* Path, std::vector<uint8>& Content)
 {
-    // return (FPaths::FileExists(FullPath) && FFileHelper::LoadFileToString(Content, *FullPath));
-    IPlatformFile& PlatformFile = PlatformFileManager::Get().GetPlatformFile();
-    IFileHandle*   FileHandle   = PlatformFile.OpenRead(Path);
-    if (FileHandle)
-    {
-        int len = FileHandle->Size();
-        Content.reserve(len + 2);
-        Content.resize(len);
-        const bool Success = FileHandle->Read(Content.data(), len);
-        delete FileHandle;
-        return Success;
-
-    }
-    return false;
+    return Paths::IsFileExists(Path) && FileHelper::LoadFileToBytes(Path, Content);
 }
 
 std::string& DefaultJSModuleLoader::GetScriptRoot()
