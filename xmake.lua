@@ -61,6 +61,7 @@ target("YrScripting")
     add_headerfiles("src/scripting/**.h")
     add_files("src/scripting/**.cpp")
     add_filegroups("YrScripting", {rootdir = "src"})
+    add_cxxflags("/bigobj")
 
 target("Scripts")
     set_kind("phony")
