@@ -10,18 +10,12 @@
 [submodule "3rdparty/imgui"]
 	path = 3rdparty/imgui
 	url = https://github.com/thedmd/imgui.git
-[submodule "3rdparty/spdlog"]
-	path = 3rdparty/spdlog
-	url = https://github.com/gabime/spdlog.git
 [submodule "3rdparty/imgui-node-editor"]
 	path = 3rdparty/imgui-node-editor
 	url = https://github.com/thedmd/imgui-node-editor.git
 [submodule "3rdparty/json"]
 	path = 3rdparty/json
 	url = https://github.com/nlohmann/json.git
-[submodule "3rdparty/stb"]
-	path = 3rdparty/stb
-	url = https://github.com/nothings/stb.git
 [submodule "3rdparty/puerts"]
 	path = 3rdparty/puerts
 	url = https://github.com/Tencent/puerts.git
