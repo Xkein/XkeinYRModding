@@ -1,5 +1,5 @@
-#include "core/platform/file.h"
-#include "core/logger/logger.h"
+#include "runtime/platform/file.h"
+#include "runtime/logger/logger.h"
 
 int64 IFileHandle::Size()
 {

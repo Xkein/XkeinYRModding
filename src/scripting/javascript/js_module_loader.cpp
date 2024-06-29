@@ -1,7 +1,7 @@
 #include "js_module_loader.h"
-#include "core/platform/file_manager.h"
-#include "core/platform/file_helper.h"
-#include "core/platform/path.h"
+#include "runtime/platform/file_manager.h"
+#include "runtime/platform/file_helper.h"
+#include "runtime/platform/path.h"
 #include "yr/extcore_config.h"
 
 bool DefaultJSModuleLoader::Search(const std::string& RequiredDir, const std::string& RequiredModule, std::string& Path, std::string& AbsolutePath)

@@ -1,7 +1,7 @@
 
 #include "yr/extcore_config.h"
 #include "yr/extension_manager.h"
-#include "core/logger/logger.h"
+#include "runtime/logger/logger.h"
 #include "core/raii_invoker.h"
 #include <filesystem>
 

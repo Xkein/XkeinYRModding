@@ -3,7 +3,7 @@
 #include <ScriptBackend.hpp>
 #include <DataTransfer.h>
 #include <PuertsNamespaceDef.h>
-#include <core/logger/logger.h>
+#include <runtime/logger/logger.h>
 #include <core/macro.h>
 #include <AbstractClass.h>
 #include <AbstractTypeClass.h>

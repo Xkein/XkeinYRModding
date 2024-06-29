@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/platform/platform.h"
+#include "runtime/platform/platform.h"
 #include "js_module_loader.h"
 #include <CppObjectMapper.h>
 #include <DataTransfer.h>

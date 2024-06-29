@@ -3,7 +3,7 @@
 #include "core/assertion_macro.h"
 #include <filesystem>
 #include <fstream>
-#include "core/platform/path.h"
+#include "runtime/platform/path.h"
 
 using json   = nlohmann::json;
 namespace fs = std::filesystem;

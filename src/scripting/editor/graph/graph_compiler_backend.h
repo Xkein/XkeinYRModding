@@ -1,14 +1,29 @@
 #pragma once
 
-class IGraphCompilerBackend
+class IEdGraphCompilerBackend;
+class EdGraph;
+
+struct EdGraphCompilerContext
+{
+    IEdGraphCompilerBackend* compiler;
+    EdGraph*                 graph;
+
+
+};
+
+class IEdGraphCompilerBackend
 {
 
 };
 
-class GraphCompilerVMBackend : IGraphCompilerBackend
+ class EdGraphCompilerVMBackend : IEdGraphCompilerBackend
+ {
+ public:
+
+ };
+
+class EdGraphCompilerJsBackend : public IEdGraphCompilerBackend
 {
-public:
 
 };
-
 

@@ -13,7 +13,11 @@ rule("codegen-cpp")
     end)
     after_load(function(target)
         local extraconf = target:extraconf("rules", "codegen-cpp") or {}
-        local auto_gendir = target:autogendir({root = true})
+        import("core.project.config")
+        local auto_gendir = path.join(
+            target:autogendir({root = true}), 
+            string.format("%s_%s_%s", target:plat(), config.mode(), target:arch())
+        )
         local gendir = path.absolute(path.join(auto_gendir, "codegen"))
         local header_list = {}
         for _, headerfile in ipairs(target:headerfiles()) do

@@ -2,7 +2,7 @@
 #ifdef IS_EDITOR
 #include "scripting/editor/editor.h"
 #endif
-#include "core/logger/logger.h"
+#include "runtime/logger/logger.h"
 #include "runtime/ecs/entt.h"
 #include "yr/yr_all_events.h"
 #include "yr/extcore_config.h"

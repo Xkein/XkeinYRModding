@@ -1,19 +1,19 @@
 #pragma once
 #include "node.h"
 
-struct Graph
+struct EdGraph
 {
 
-    Node* FindNode(ed::NodeId id);
+    EdGraphNode* FindNode(ed::NodeId id);
 
-    Link* FindLink(ed::LinkId id);
+    EdGraphLink* FindLink(ed::LinkId id);
 
-    Pin* FindPin(ed::PinId id);
+    EdGraphPin* FindPin(ed::PinId id);
 
     bool IsPinLinked(ed::PinId id);
 
-    bool CanCreateLink(Pin* a, Pin* b);
+    bool CanCreateLink(EdGraphPin* a, EdGraphPin* b);
 
-    std::vector<Node> nodes;
-    std::vector<Link> links;
+    std::vector<EdGraphNode> nodes;
+    std::vector<EdGraphLink> links;
 };

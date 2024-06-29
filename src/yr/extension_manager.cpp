@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include "extension_manager.h"
-#include "core/logger/logger.h"
+#include "runtime/logger/logger.h"
 #include <filesystem>
 #include <boost/nowide/convert.hpp>
 using boost::nowide::widen;

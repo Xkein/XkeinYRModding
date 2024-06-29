@@ -1,7 +1,7 @@
 #include "graph.h"
 
 
- Node* Graph::FindNode(ed::NodeId id)
+ EdGraphNode* EdGraph::FindNode(ed::NodeId id)
 {
     for (auto& node : nodes)
         if (node.ID == id)
@@ -9,7 +9,7 @@
 
     return nullptr;
 }
-Link* Graph::FindLink(ed::LinkId id)
+EdGraphLink* EdGraph::FindLink(ed::LinkId id)
 {
     for (auto& link : links)
         if (link.ID == id)
@@ -17,7 +17,7 @@ Link* Graph::FindLink(ed::LinkId id)
 
     return nullptr;
 }
-Pin* Graph::FindPin(ed::PinId id)
+EdGraphPin* EdGraph::FindPin(ed::PinId id)
 {
     if (!id)
         return nullptr;
@@ -35,7 +35,7 @@ Pin* Graph::FindPin(ed::PinId id)
 
     return nullptr;
 }
-bool Graph::IsPinLinked(ed::PinId id)
+bool EdGraph::IsPinLinked(ed::PinId id)
 {
     if (!id)
         return false;
@@ -46,7 +46,7 @@ bool Graph::IsPinLinked(ed::PinId id)
 
     return false;
 }
-bool Graph::CanCreateLink(Pin* a, Pin* b)
+bool EdGraph::CanCreateLink(EdGraphPin* a, EdGraphPin* b)
 {
     if (!a || !b || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
         return false;

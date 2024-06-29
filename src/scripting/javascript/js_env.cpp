@@ -7,9 +7,9 @@
 #include <filesystem>
 #include "yr/debug_util.h"
 #include "yr/extcore_config.h"
-#include "core/logger/logger.h"
+#include "runtime/logger/logger.h"
 #include "core/string/string_tool.h"
-#include "core/platform/path.h"
+#include "runtime/platform/path.h"
 #include "core/assertion_macro.h"
 
 #define CHECK_V8_ARGS(...)

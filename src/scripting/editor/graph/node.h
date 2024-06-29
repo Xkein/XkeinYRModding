@@ -38,25 +38,26 @@ enum class NodeType
     Houdini
 };
 
-struct Node;
+struct EdGraphNode;
 
-struct Pin
+struct EdGraphPin
 {
     ed::PinId   ID;
-    ::Node*     Node;
+    EdGraphNode*     Node;
     std::string Name;
     PinType     Type;
     PinKind     Kind;
 
-    Pin(int id, const char* name, PinType type) : ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input) {}
+    EdGraphPin(int id, const char* name, PinType type) : ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input) {}
 };
 
-struct Node
+class EdGraphNode
 {
+public:
     ed::NodeId       ID;
     std::string      Name;
-    std::vector<Pin> Inputs;
-    std::vector<Pin> Outputs;
+    std::vector<EdGraphPin> Inputs;
+    std::vector<EdGraphPin> Outputs;
     ImColor          Color;
     NodeType         Type;
     ImVec2           Size;
@@ -64,10 +65,14 @@ struct Node
     std::string State;
     std::string SavedState;
 
-    Node(int id, const char* name, ImColor color = ImColor(255, 255, 255)) : ID(id), Name(name), Color(color), Type(NodeType::Blueprint), Size(0, 0) {}
+    EdGraphNode(int id, const char* name, ImColor color = ImColor(255, 255, 255)) : ID(id), Name(name), Color(color), Type(NodeType::Blueprint), Size(0, 0) {}
+
+    virtual void OnDraw() = 0;
+    virtual void OnBeforeCompile() {}
+    virtual void OnCompile() = 0;
 };
 
-struct Link
+struct EdGraphLink
 {
     ed::LinkId ID;
 
@@ -76,10 +81,10 @@ struct Link
 
     ImColor Color;
 
-    Link(ed::LinkId id, ed::PinId startPinId, ed::PinId endPinId) : ID(id), StartPinID(startPinId), EndPinID(endPinId), Color(255, 255, 255) {}
+    EdGraphLink(ed::LinkId id, ed::PinId startPinId, ed::PinId endPinId) : ID(id), StartPinID(startPinId), EndPinID(endPinId), Color(255, 255, 255) {}
 };
 
-struct NodeIdLess
+struct EdNodeIdLess
 {
     bool operator()(const ed::NodeId& lhs, const ed::NodeId& rhs) const
     {
@@ -87,4 +92,11 @@ struct NodeIdLess
     }
 };
 
+struct EdCommentNode : public EdGraphNode {
+
+};
+
+struct EdCodeNode : public EdGraphNode {
+
+};
 

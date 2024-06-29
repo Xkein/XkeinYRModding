@@ -15,7 +15,7 @@
 
 #include <vector>
 #include <map>
-#include <core/logger/logger.h>
+#include <runtime/logger/logger.h>
 #include <yr/extcore_config.h>
 
 static ID3D11Device* g_pd3dDevice = NULL;

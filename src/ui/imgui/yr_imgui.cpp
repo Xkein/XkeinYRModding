@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 #include <imgui_impl_dx11.h>
-#include "core/logger/logger.h"
+#include "runtime/logger/logger.h"
 #include "yr/debug_util.h"
 #include <CommCtrl.h>
 #include "yr/event/windows_event.h"
@@ -394,4 +394,9 @@ void YrImGuiWindow::Open()
 void YrImGuiWindow::Close()
 {
     _impl->Close();
+}
+
+void YrImGuiWindow::IsOpened()
+{
+    return _impl->_opened;
 }

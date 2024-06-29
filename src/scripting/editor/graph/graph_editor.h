@@ -42,39 +42,39 @@ struct GraphEditor : YrImGuiWindow
     //         color, rounding);
     // };
 
-    void BuildNode(Node* node);
+    void BuildNode(EdGraphNode* node);
 
-    Node* SpawnInputActionNode();
+    EdGraphNode* SpawnInputActionNode();
 
-    Node* SpawnBranchNode();
+    EdGraphNode* SpawnBranchNode();
 
-    Node* SpawnDoNNode();
+    EdGraphNode* SpawnDoNNode();
 
-    Node* SpawnOutputActionNode();
+    EdGraphNode* SpawnOutputActionNode();
 
-    Node* SpawnPrintStringNode();
+    EdGraphNode* SpawnPrintStringNode();
 
-    Node* SpawnMessageNode();
+    EdGraphNode* SpawnMessageNode();
 
-    Node* SpawnSetTimerNode();
+    EdGraphNode* SpawnSetTimerNode();
 
-    Node* SpawnLessNode();
+    EdGraphNode* SpawnLessNode();
 
-    Node* SpawnWeirdNode();
+    EdGraphNode* SpawnWeirdNode();
 
-    Node* SpawnTraceByChannelNode();
+    EdGraphNode* SpawnTraceByChannelNode();
 
-    Node* SpawnTreeSequenceNode();
+    EdGraphNode* SpawnTreeSequenceNode();
 
-    Node* SpawnTreeTaskNode();
+    EdGraphNode* SpawnTreeTaskNode();
 
-    Node* SpawnTreeTask2Node();
+    EdGraphNode* SpawnTreeTask2Node();
 
-    Node* SpawnComment();
+    EdGraphNode* SpawnComment();
 
-    Node* SpawnHoudiniTransformNode();
+    EdGraphNode* SpawnHoudiniTransformNode();
 
-    Node* SpawnHoudiniGroupNode();
+    EdGraphNode* SpawnHoudiniGroupNode();
 
     void BuildNodes();
 
@@ -87,7 +87,7 @@ struct GraphEditor : YrImGuiWindow
     ImColor GetIconColor(PinType type);
     ;
 
-    void DrawPinIcon(const Pin& pin, bool connected, int alpha);
+    void DrawPinIcon(const EdGraphPin& pin, bool connected, int alpha);
     ;
 
     void ShowStyleEditor(bool* show = nullptr);
@@ -96,13 +96,13 @@ struct GraphEditor : YrImGuiWindow
 
     int                                     m_NextId      = 1;
     const int                               m_PinIconSize = 24;
-    std::shared_ptr<Graph>                  m_graph;
-    std::vector<Node>                       m_Nodes;
-    std::vector<Link>                       m_Links;
+    std::shared_ptr<EdGraph>                  m_graph;
+    std::vector<EdGraphNode>                       m_Nodes;
+    std::vector<EdGraphLink>                       m_Links;
     ImTextureID                             m_HeaderBackground = nullptr;
     ImTextureID                             m_SaveIcon         = nullptr;
     ImTextureID                             m_RestoreIcon      = nullptr;
     const float                             m_TouchTime        = 1.0f;
-    std::map<ed::NodeId, float, NodeIdLess> m_NodeTouchTime;
+    std::map<ed::NodeId, float, EdNodeIdLess> m_NodeTouchTime;
     bool                                    m_ShowOrdinals = false;
 };

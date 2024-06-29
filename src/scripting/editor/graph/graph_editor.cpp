@@ -79,7 +79,7 @@ static ed::EditorContext* m_Editor = nullptr;
     }
 }
 
- void GraphEditor::BuildNode(Node* node)
+ void GraphEditor::BuildNode(EdGraphNode* node)
 {
     for (auto& input : node->Inputs)
     {
@@ -93,7 +93,7 @@ static ed::EditorContext* m_Editor = nullptr;
         output.Kind = PinKind::Output;
     }
 }
- Node* GraphEditor::SpawnInputActionNode()
+ EdGraphNode* GraphEditor::SpawnInputActionNode()
 {
     m_Nodes.emplace_back(GetNextId(), "InputAction Fire", ImColor(255, 128, 128));
     m_Nodes.back().Outputs.emplace_back(GetNextId(), "", PinType::Delegate);
@@ -104,7 +104,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnBranchNode()
+ EdGraphNode* GraphEditor::SpawnBranchNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Branch");
     m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
@@ -116,7 +116,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnDoNNode()
+ EdGraphNode* GraphEditor::SpawnDoNNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Do N");
     m_Nodes.back().Inputs.emplace_back(GetNextId(), "Enter", PinType::Flow);
@@ -129,7 +129,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnOutputActionNode()
+ EdGraphNode* GraphEditor::SpawnOutputActionNode()
 {
     m_Nodes.emplace_back(GetNextId(), "OutputAction");
     m_Nodes.back().Inputs.emplace_back(GetNextId(), "Sample", PinType::Float);
@@ -140,7 +140,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnPrintStringNode()
+ EdGraphNode* GraphEditor::SpawnPrintStringNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Print String");
     m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
@@ -151,7 +151,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnMessageNode()
+ EdGraphNode* GraphEditor::SpawnMessageNode()
 {
     m_Nodes.emplace_back(GetNextId(), "", ImColor(128, 195, 248));
     m_Nodes.back().Type = NodeType::Simple;
@@ -161,7 +161,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnSetTimerNode()
+ EdGraphNode* GraphEditor::SpawnSetTimerNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Set Timer", ImColor(128, 195, 248));
     m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
@@ -175,7 +175,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnLessNode()
+ EdGraphNode* GraphEditor::SpawnLessNode()
 {
     m_Nodes.emplace_back(GetNextId(), "<", ImColor(128, 195, 248));
     m_Nodes.back().Type = NodeType::Simple;
@@ -187,7 +187,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnWeirdNode()
+ EdGraphNode* GraphEditor::SpawnWeirdNode()
 {
     m_Nodes.emplace_back(GetNextId(), "o.O", ImColor(128, 195, 248));
     m_Nodes.back().Type = NodeType::Simple;
@@ -199,7 +199,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnTraceByChannelNode()
+ EdGraphNode* GraphEditor::SpawnTraceByChannelNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Single Line Trace by Channel", ImColor(255, 128, 64));
     m_Nodes.back().Inputs.emplace_back(GetNextId(), "", PinType::Flow);
@@ -218,7 +218,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnTreeSequenceNode()
+ EdGraphNode* GraphEditor::SpawnTreeSequenceNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Sequence");
     m_Nodes.back().Type = NodeType::Tree;
@@ -229,7 +229,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnTreeTaskNode()
+ EdGraphNode* GraphEditor::SpawnTreeTaskNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Move To");
     m_Nodes.back().Type = NodeType::Tree;
@@ -239,7 +239,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnTreeTask2Node()
+ EdGraphNode* GraphEditor::SpawnTreeTask2Node()
 {
     m_Nodes.emplace_back(GetNextId(), "Random Wait");
     m_Nodes.back().Type = NodeType::Tree;
@@ -249,7 +249,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnComment()
+ EdGraphNode* GraphEditor::SpawnComment()
 {
     m_Nodes.emplace_back(GetNextId(), "Test Comment");
     m_Nodes.back().Type = NodeType::Comment;
@@ -257,7 +257,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnHoudiniTransformNode()
+ EdGraphNode* GraphEditor::SpawnHoudiniTransformNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Transform");
     m_Nodes.back().Type = NodeType::Houdini;
@@ -268,7 +268,7 @@ static ed::EditorContext* m_Editor = nullptr;
 
     return &m_Nodes.back();
 }
- Node* GraphEditor::SpawnHoudiniGroupNode()
+ EdGraphNode* GraphEditor::SpawnHoudiniGroupNode()
 {
     m_Nodes.emplace_back(GetNextId(), "Group");
     m_Nodes.back().Type = NodeType::Houdini;
@@ -322,7 +322,7 @@ void GraphEditor::OnOpen()
     m_Editor = ed::CreateEditor(&config);
     ed::SetCurrentEditor(m_Editor);
 
-    Node* node;
+    EdGraphNode* node;
     node = SpawnInputActionNode();
     ed::SetNodePosition(node->ID, ImVec2(-252, 220));
     node = SpawnBranchNode();
@@ -366,10 +366,10 @@ void GraphEditor::OnOpen()
 
     BuildNodes();
 
-    m_Links.push_back(Link(GetNextLinkId(), m_Nodes[5].Outputs[0].ID, m_Nodes[6].Inputs[0].ID));
-    m_Links.push_back(Link(GetNextLinkId(), m_Nodes[5].Outputs[0].ID, m_Nodes[7].Inputs[0].ID));
+    m_Links.push_back(EdGraphLink(GetNextLinkId(), m_Nodes[5].Outputs[0].ID, m_Nodes[6].Inputs[0].ID));
+    m_Links.push_back(EdGraphLink(GetNextLinkId(), m_Nodes[5].Outputs[0].ID, m_Nodes[7].Inputs[0].ID));
 
-    m_Links.push_back(Link(GetNextLinkId(), m_Nodes[14].Outputs[0].ID, m_Nodes[15].Inputs[0].ID));
+    m_Links.push_back(EdGraphLink(GetNextLinkId(), m_Nodes[14].Outputs[0].ID, m_Nodes[15].Inputs[0].ID));
 
     m_HeaderBackground = YrImGui::LoadTexture("assets/BlueprintBackground.png");
     m_SaveIcon         = YrImGui::LoadTexture("assets/ic_save_white_24dp.png");
@@ -420,7 +420,7 @@ void GraphEditor::OnOpen()
             return ImColor(255, 48, 48);
     }
 }
- void GraphEditor::DrawPinIcon(const Pin& pin, bool connected, int alpha)
+ void GraphEditor::DrawPinIcon(const EdGraphPin& pin, bool connected, int alpha)
 {
     IconType iconType;
     ImColor  color = GetIconColor(pin.Type);
@@ -742,8 +742,8 @@ void GraphEditor::OnOpen()
     static ed::LinkId contextLinkId  = 0;
     static ed::PinId  contextPinId   = 0;
     static bool       createNewNode  = false;
-    static Pin*       newNodeLinkPin = nullptr;
-    static Pin*       newLinkPin     = nullptr;
+    static EdGraphPin*       newNodeLinkPin = nullptr;
+    static EdGraphPin*       newLinkPin     = nullptr;
 
     static float leftPaneWidth  = 400.0f;
     static float rightPaneWidth = 800.0f;
@@ -1343,7 +1343,7 @@ void GraphEditor::OnOpen()
                             showLabel("x Incompatible Pin Kind", ImColor(45, 32, 32, 180));
                             ed::RejectNewItem(ImColor(255, 0, 0), 2.0f);
                         }
-                        // else if (endPin->Node == startPin->Node)
+                        // else if (endPin->EdNodeBase == startPin->EdNodeBase)
                         //{
                         //     showLabel("x Cannot connect to self", ImColor(45, 32, 32, 180));
                         //     ed::RejectNewItem(ImColor(255, 0, 0), 1.0f);
@@ -1358,7 +1358,7 @@ void GraphEditor::OnOpen()
                             showLabel("+ Create Link", ImColor(32, 45, 32, 180));
                             if (ed::AcceptNewItem(ImColor(128, 255, 128), 4.0f))
                             {
-                                m_Links.emplace_back(Link(GetNextId(), startPinId, endPinId));
+                                m_Links.emplace_back(EdGraphLink(GetNextId(), startPinId, endPinId));
                                 m_Links.back().Color = GetIconColor(startPin->Type);
                             }
                         }
@@ -1509,7 +1509,7 @@ void GraphEditor::OnOpen()
         // auto drawList = ImGui::GetWindowDrawList();
         // drawList->AddCircleFilled(ImGui::GetMousePosOnOpeningCurrentPopup(), 10.0f, 0xFFFF00FF);
 
-        Node* node = nullptr;
+        EdGraphNode* node = nullptr;
         if (ImGui::MenuItem("Input Action"))
             node = SpawnInputActionNode();
         if (ImGui::MenuItem("Output Action"))
@@ -1567,7 +1567,7 @@ void GraphEditor::OnOpen()
                         if (startPin->Kind == PinKind::Input)
                             std::swap(startPin, endPin);
 
-                        m_Links.emplace_back(Link(GetNextId(), startPin->ID, endPin->ID));
+                        m_Links.emplace_back(EdGraphLink(GetNextId(), startPin->ID, endPin->ID));
                         m_Links.back().Color = GetIconColor(startPin->Type);
 
                         break;

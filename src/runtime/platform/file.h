@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/platform/platform.h"
+#include "runtime/platform/platform.h"
 #include "core/assertion_macro.h"
 #include <vector>
 #include <string>

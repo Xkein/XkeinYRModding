@@ -1,4 +1,4 @@
-#include "core/platform//path.h"
+#include "runtime/platform//path.h"
 
 std::string Paths::GetLaunchDir()
 {

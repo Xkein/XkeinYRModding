@@ -1,6 +1,6 @@
 #include "scripting/javascript/js_env.h"
 #include <ui/imgui/yr_imgui.h>
-#include <core/logger/logger.h>
+#include <runtime/logger/logger.h>
 #include "yr/event/general_event.h"
 #include "yr/event/ui_event.h"
 #include "yr/debug_util.h"
@@ -340,10 +340,10 @@ static void Update()
 {
     if (ImGui::IsKeyReleased(ImGuiKey_GraveAccent))
     {
-        if (terminal)
+        if (terminal->IsOpened())
         {
             terminal->Close();
-            terminal.reset();
+            // terminal.reset();
         }
         else
         {

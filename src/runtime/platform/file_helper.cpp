@@ -1,5 +1,5 @@
-#include "core/platform/file_helper.h"
-#include "core/platform/file_manager.h"
+#include "runtime/platform/file_helper.h"
+#include "runtime/platform/file_manager.h"
 #include "core/string/string_tool.h"
 
 bool FileHelper::LoadFileToBytes(const char* path, std::vector<uint8>& bytes)

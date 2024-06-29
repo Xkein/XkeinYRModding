@@ -20,6 +20,7 @@ public:
     YREXTUI_API void NewFrame();
     YREXTUI_API void Open();
     YREXTUI_API void Close();
+    YREXTUI_API bool IsOpened() const;
 
 private:
     std::shared_ptr<YrImGuiWindow_Impl> _impl;

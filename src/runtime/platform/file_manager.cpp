@@ -1,4 +1,4 @@
-#include "core/platform/file_manager.h"
+#include "runtime/platform/file_manager.h"
 #include "core/assertion_macro.h"
 
 PlatformFileManager::PlatformFileManager() : TopmostPlatformFile(nullptr) {}

@@ -4,9 +4,9 @@
 #include "scripting/editor/editor.h"
 #include "scripting/javascript/js_env.h"
 #include "yr/extcore_config.h"
-#include "core/platform/path.h"
-#include "core/platform/file_helper.h"
-#include "core/logger/logger.h"
+#include "runtime/platform/path.h"
+#include "runtime/platform/file_helper.h"
+#include "runtime/logger/logger.h"
 #include "scripting/engine.h"
 #include <efsw/efsw.hpp>
 std::shared_ptr<GraphEditor> editor;
