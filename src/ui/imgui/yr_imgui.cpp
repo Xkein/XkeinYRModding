@@ -396,7 +396,7 @@ void YrImGuiWindow::Close()
     _impl->Close();
 }
 
-void YrImGuiWindow::IsOpened()
+bool YrImGuiWindow::IsOpened() const
 {
     return _impl->_opened;
 }

@@ -1,9 +1,10 @@
 #pragma once
 #include "node.h"
+#include <memory>
 
-struct EdGraph
+class EdGraph
 {
-
+public:
     EdGraphNode* FindNode(ed::NodeId id);
 
     EdGraphLink* FindLink(ed::LinkId id);
@@ -14,6 +15,14 @@ struct EdGraph
 
     bool CanCreateLink(EdGraphPin* a, EdGraphPin* b);
 
-    std::vector<EdGraphNode> nodes;
+    void AddLink(EdGraphLink link);
+    void RemoveLink(ed::LinkId id);
+    void RemoveLink(const EdGraphLink &link);
+    
+    void AddNode(std::shared_ptr<EdGraphNode> node);
+    void RemoveNode(ed::NodeId id);
+    void RemoveNode(EdGraphNode* node);
+    
+    std::vector<std::shared_ptr<EdGraphNode>> nodes;
     std::vector<EdGraphLink> links;
 };

@@ -2,15 +2,23 @@
 
 #include "ui/imgui/yr_imgui.h"
 #include "scripting/editor/graph/node.h"
-#include "scripting/editor/graph/graph.h"
 #include <imgui_node_editor.h>
 #include <vector>
 #include <map>
 
 namespace ed = ax::NodeEditor;
+class EdGraph;
+class EdMetaCodeNodeFactory;
 
 struct GraphEditor : YrImGuiWindow
 {
+    void OnOpen() override;
+
+    void OnFrame() override;
+
+    void OnClose() override;
+
+
     int GetNextId();
 
     // ed::NodeId GetNextNodeId()
@@ -44,61 +52,21 @@ struct GraphEditor : YrImGuiWindow
 
     void BuildNode(EdGraphNode* node);
 
-    EdGraphNode* SpawnInputActionNode();
-
-    EdGraphNode* SpawnBranchNode();
-
-    EdGraphNode* SpawnDoNNode();
-
-    EdGraphNode* SpawnOutputActionNode();
-
-    EdGraphNode* SpawnPrintStringNode();
-
-    EdGraphNode* SpawnMessageNode();
-
-    EdGraphNode* SpawnSetTimerNode();
-
-    EdGraphNode* SpawnLessNode();
-
-    EdGraphNode* SpawnWeirdNode();
-
-    EdGraphNode* SpawnTraceByChannelNode();
-
-    EdGraphNode* SpawnTreeSequenceNode();
-
-    EdGraphNode* SpawnTreeTaskNode();
-
-    EdGraphNode* SpawnTreeTask2Node();
-
-    EdGraphNode* SpawnComment();
-
-    EdGraphNode* SpawnHoudiniTransformNode();
-
-    EdGraphNode* SpawnHoudiniGroupNode();
-
     void BuildNodes();
 
-    void OnOpen() override;
-
-    void OnFrame() override;
-
-    void OnClose() override;
-
     ImColor GetIconColor(PinType type);
-    ;
 
     void DrawPinIcon(const EdGraphPin& pin, bool connected, int alpha);
-    ;
 
     void ShowStyleEditor(bool* show = nullptr);
 
     void ShowLeftPane(float paneWidth);
 
+    std::shared_ptr<EdGraph>               m_graph;
+    std::shared_ptr<EdMetaCodeNodeFactory> factory;
+
     int                                     m_NextId      = 1;
     const int                               m_PinIconSize = 24;
-    std::shared_ptr<EdGraph>                  m_graph;
-    std::vector<EdGraphNode>                       m_Nodes;
-    std::vector<EdGraphLink>                       m_Links;
     ImTextureID                             m_HeaderBackground = nullptr;
     ImTextureID                             m_SaveIcon         = nullptr;
     ImTextureID                             m_RestoreIcon      = nullptr;

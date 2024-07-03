@@ -81,7 +81,7 @@ struct EdGraphLink
 
     ImColor Color;
 
-    EdGraphLink(ed::LinkId id, ed::PinId startPinId, ed::PinId endPinId) : ID(id), StartPinID(startPinId), EndPinID(endPinId), Color(255, 255, 255) {}
+    EdGraphLink(ed::LinkId id, ed::PinId startPinId, ed::PinId endPinId, ImColor color = ImColor(255, 255, 255)) : ID(id), StartPinID(startPinId), EndPinID(endPinId), Color(color) {}
 };
 
 struct EdNodeIdLess
@@ -96,7 +96,11 @@ struct EdCommentNode : public EdGraphNode {
 
 };
 
-struct EdCodeNode : public EdGraphNode {
+struct EdMetaCodeNode : public EdGraphNode
+{
+    EdMetaCodeNode(int id, const char* name, ImColor color = ImColor(255, 255, 255)) : EdGraphNode(id, name, color) {}
 
+    void OnDraw() override;
+    void OnCompile() override;
 };
 

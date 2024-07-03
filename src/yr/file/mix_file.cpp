@@ -1,4 +1,5 @@
 #include "yr/file/mix_file.h"
+#include "yr/tool/ptr.h"
 #include <MixFileClass.h>
 #include <CCFileClass.h>
 
@@ -8,22 +9,27 @@
 
 class MixFileHandle : public IFileHandle
 {
-    CCFileClass* CCFile;
+    std::shared_ptr<CCFileClass> CCFile;
 
 public:
     MixFileHandle(const char* name)
     {
-        CCFile = GameCreate<CCFileClass>(name);
+        CCFile = yr_make_shared<CCFileClass>(name);
     }
 
     virtual ~MixFileHandle()
     {
-        GameDelete(CCFile);
     }
 
     bool IsValid()
     {
+        return CCFile && CCFile->HasHandle();
+    }
 
+    bool Exists()
+    {
+        check(IsValid());
+        return CCFile->Exists();
     }
 
     virtual int64 Tell(void) override
@@ -31,40 +37,48 @@ public:
         check(IsValid());
         return CCFile->Seek(0, FileSeekMode::Current);
     }
+
     virtual int64 Size() override
     {
         check(IsValid());
         return CCFile->GetFileSize();
     }
+
     virtual bool Seek(int64 NewPosition) override
     {
         check(IsValid());
         CCFile->Seek(NewPosition, FileSeekMode::Set);
         return true;
     }
+
     virtual bool SeekFromEnd(int64 NewPositionRelativeToEnd = 0) override
     {
         check(IsValid());
-
+        check(NewPositionRelativeToEnd <= 0);
+        return Seek(Size() + NewPositionRelativeToEnd);
     }
+
     virtual bool Read(uint8* Destination, int64 BytesToRead) override
     {
         check(IsValid());
-
+        return CCFile->ReadBytes(Destination, BytesToRead);
     }
     virtual bool Write(const uint8* Source, int64 BytesToWrite) override
     {
         check(IsValid());
-        return false;
+        return CCFile->WriteBytes(const_cast<uint8*>(Source), BytesToWrite);
     }
+
     virtual bool Flush(const bool bFullFlush = false) override
     {
         check(IsValid());
-        return false;
+        return FlushFileBuffers(CCFile->Handle) != 0;
     }
+
     virtual bool Truncate(int64 NewSize) override
     {
         check(IsValid());
+        // TODO
         return false;
     }
 };
@@ -87,12 +101,14 @@ const char* MixPlatformFile::GetName() const
 
 bool MixPlatformFile::FileExists(const char* Filename)
 {
-    return false;
+    MixFileHandle mixFile {Filename};
+    return mixFile.Exists();
 }
 
 int64 MixPlatformFile::FileSize(const char* Filename)
 {
-    return int64();
+    MixFileHandle mixFile {Filename};
+    return mixFile.Size();
 }
 
 bool MixPlatformFile::DeleteFile(const char* Filename)
@@ -102,7 +118,7 @@ bool MixPlatformFile::DeleteFile(const char* Filename)
 
 bool MixPlatformFile::IsReadOnly(const char* Filename)
 {
-    return false;
+    return true;
 }
 
 bool MixPlatformFile::MoveFile(const char* To, const char* From)
@@ -112,7 +128,18 @@ bool MixPlatformFile::MoveFile(const char* To, const char* From)
 
 IFileHandle* MixPlatformFile::OpenRead(const char* Filename, bool bAllowWrite)
 {
-    return nullptr;
+    check(!bAllowWrite);
+    MixFileHandle* FileHandle = new MixFileHandle(Filename);
+    if (FileHandle->IsValid())
+    {
+        return FileHandle;
+    }
+    else
+    {
+        delete FileHandle;
+
+        return nullptr;
+    }
 }
 
 IFileHandle* MixPlatformFile::OpenWrite(const char* Filename, bool bAppend, bool bAllowRead)
