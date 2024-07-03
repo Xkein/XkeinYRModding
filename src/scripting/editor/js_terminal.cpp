@@ -340,10 +340,16 @@ static void Update()
 {
     if (ImGui::IsKeyReleased(ImGuiKey_GraveAccent))
     {
-        if (terminal->IsOpened())
+        if (terminal)
         {
-            terminal->Close();
-            // terminal.reset();
+            if (terminal->IsOpened())
+            {
+                terminal->Close();
+            }
+            else
+            {
+                terminal->Open();
+            }
         }
         else
         {

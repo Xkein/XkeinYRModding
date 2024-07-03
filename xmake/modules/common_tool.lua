@@ -15,11 +15,19 @@ function get_config_path(module)
     return path.join(get_build_dir(), "config", module)
 end
 
+function get_auto_gendir(targetName)
+    import("core.project.config")
+    import("core.project.project")
+    local target = project.target(targetName)
+    return path.join(config.buildir(), ".gens", string.format("%s_%s_%s", target:plat(), config.mode(), target:arch()), targetName)
+end
+
 function get_default_templates()
     -- module: {0} = module name
     -- type: {0} = type name, {1} = module name
     local codegen_dir = "../.."
-    local root_dir = "../../../.."
+    local root_dir = "../../../../.."
+
     return {
         module = {
             ["module_header.scriban"] =  "{0}.gen.h",

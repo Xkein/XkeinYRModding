@@ -141,6 +141,7 @@ void GraphEditor::OnOpen()
 
     ed::NavigateToContent();
 
+    m_graph = std::make_shared<EdGraph>();
     BuildNodes();
 
     m_HeaderBackground = YrImGui::LoadTexture("assets/BlueprintBackground.png");

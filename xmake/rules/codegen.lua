@@ -13,18 +13,14 @@ rule("codegen-cpp")
     end)
     after_load(function(target)
         local extraconf = target:extraconf("rules", "codegen-cpp") or {}
-        import("core.project.config")
-        local auto_gendir = path.join(
-            target:autogendir({root = true}), 
-            string.format("%s_%s_%s", target:plat(), config.mode(), target:arch())
-        )
+        import("common_tool")
+        local auto_gendir = common_tool.get_auto_gendir(target:name())
         local gendir = path.absolute(path.join(auto_gendir, "codegen"))
         local header_list = {}
         for _, headerfile in ipairs(target:headerfiles()) do
             table.insert(header_list, path.absolute(headerfile))
         end
 
-        import("common_tool")
         local templates = extraconf.templates or common_tool.get_default_templates()
         local template_dir = path.join(os.projectdir(), "src/template")
         local depend_files = {}
@@ -139,7 +135,7 @@ rule("codegen-cpp")
         for _, file in ipairs(genHeaderFiles) do
             target:add("headerfiles", file)
         end
-        if #genCppFiles > 0 then
+        if #genCppFiles > 0 or #genHeaderFiles > 0 then
             target:add("filegroups", "codegen", {rootdir = gendir})
         end
         target:add("includedirs", auto_gendir, { public = true })

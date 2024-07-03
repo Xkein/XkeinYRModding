@@ -5,12 +5,12 @@ option("download_v8")
 option_end()
 
 if(has_config("download_v8")) then
-    print("TODO: support download v8")
+    error("TODO: support download v8")
     v8_dir = nil
 else
     v8_dir = os.getenv("V8_PATH")
     if v8_dir == nil then
-        print("could not get v8 path from env!")
+        error("could not get v8 path from env!")
     end
 end
 
@@ -18,7 +18,7 @@ v8_includes_dir = v8_dir.."/Inc"
 v8_lib_dir = v8_dir.."/Lib/Win32"
 
 if not os.exists(v8_includes_dir) or not os.exists(v8_includes_dir) then
-    print("v8 include or library directory not exists")
+    error("v8 include or library directory not exists")
 end
 
 target("v8")
