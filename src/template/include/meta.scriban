@@ -45,12 +45,17 @@ func gen_meta_class_function(htClass, htFunction)
     $class_name = htClass.cpp_class.name
     $func_type = get_function_ptr_type(htFunction, htClass)
     
+    $meta_args = ""
+    for arg in htFunction.cpp_function.parameters
+        $meta_args += $'.prop("arg{for.index}"_hs, "{arg.name}")'
+    end
+
     if $use_lambda
-        ret $'factory.func<{$lambda}>("{$function_name}"_hs).prop("name"_hs, "{$function_name}");'
+        ret $'factory.func<{$lambda}>("{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
     else if htFunction.is_overload
-        ret $'factory.func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>("{$function_name}"_hs).prop("name"_hs, "{$function_name}");'
+        ret $'factory.func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>("{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
     else
-        ret $'register_func<&{$class_name}::{$function_name}>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}");'
+        ret $'register_func<&{$class_name}::{$function_name}>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
     end
 end
 

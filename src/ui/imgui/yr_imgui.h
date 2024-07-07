@@ -44,4 +44,21 @@ namespace YrImGui
     YREXTUI_API int GetOpenedWinCount();
 
     extern YREXTUI_API std::vector<YrImGuiWindow*> gWindows;
+
+    template<typename T>
+    void SwitchWindow(std::shared_ptr<T>& ptr)
+    {
+        if (!ptr)
+        {
+            ptr = std::make_shared<T>();
+        }
+        if (ptr->IsOpened())
+        {
+            ptr->Close();
+        }
+        else
+        {
+            ptr->Open();
+        }
+    }
 };

@@ -340,22 +340,7 @@ static void Update()
 {
     if (ImGui::IsKeyReleased(ImGuiKey_GraveAccent))
     {
-        if (terminal)
-        {
-            if (terminal->IsOpened())
-            {
-                terminal->Close();
-            }
-            else
-            {
-                terminal->Open();
-            }
-        }
-        else
-        {
-            terminal = std::make_shared<TerminalWindow>();
-            terminal->Open();
-        }
+        YrImGui::SwitchWindow(terminal);
     }
 }
 

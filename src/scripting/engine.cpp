@@ -16,6 +16,7 @@ REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioStartEvent, std::bind(&Engine::OnScena
 REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent, std::bind(&Engine::OnScenarioClear, gEngine));
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, std::bind(&Engine::OnBeginUpdate, gEngine));
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, std::bind(&Engine::OnEndUpdate, gEngine));
+REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, std::bind(&Engine::OnUIUpdate, gEngine));
 
 REGISTER_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent, std::bind(&Engine::OnBeginRender, gEngine));
 REGISTER_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent, std::bind(&Engine::OnEndRender, gEngine));
@@ -92,6 +93,13 @@ void Engine::OnEndUpdate()
         script.EndUpdate();
     }
     mutex.unlock();
+}
+
+void Engine::OnUIUpdate()
+{
+#ifdef IS_EDITOR
+    EngineEditor::Tick();
+#endif
 }
 
 void Engine::OnBeginRender()

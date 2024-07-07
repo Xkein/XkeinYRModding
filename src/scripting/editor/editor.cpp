@@ -80,19 +80,35 @@ void EngineEditor::End()
     editor.reset();
 }
 
+struct DemoWindow: YrImGuiWindow
+{
+    virtual void OnOpen() override
+    {
+        isShow = true;
+    }
+    virtual void OnClose()
+    {
+        isShow = false;
+    }
+
+    virtual void OnFrame() override
+    {
+        ImGui::ShowDemoWindow(&isShow);
+        if (!isShow)
+            this->Close();
+    }
+    bool isShow {false};
+};
 void EngineEditor::Tick()
 {
+    static std::shared_ptr<DemoWindow> demo;
+    if (ImGui::IsKeyReleased(ImGuiKey_KeypadAdd))
+    {
+        YrImGui::SwitchWindow(demo);
+    }
 
     if (ImGui::IsKeyReleased(ImGuiKey_F11))
     {
-        if (editor)
-        {
-            editor.reset();
-        }
-        else
-        {
-            editor = std::make_shared<GraphEditor>();
-            editor->Open();
-        }
+        YrImGui::SwitchWindow(editor);
     }
 }

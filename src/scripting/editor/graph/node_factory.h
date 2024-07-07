@@ -6,6 +6,8 @@
 
 struct EdGraphNodeMeta {
     std::string id;
+    const char* category;
+    std::string name;
 };
 
 struct EdGraphNodeCreateInfo
@@ -15,6 +17,8 @@ struct EdGraphNodeCreateInfo
     std::function<int()>   getNextId;
 };
 
+
+
 class EdNodeFactory
 {
 public:
@@ -22,13 +26,31 @@ public:
     virtual void RemoveNodeMeta(EdGraphNodeMeta* meta)              = 0;
 
     virtual std::shared_ptr<EdGraphNode> CreateNode(EdGraphNodeCreateInfo const& info) = 0;
-
-    std::vector<std::unique_ptr<EdGraphNodeMeta>> metaList;
 };
 
 struct EdMetaCodeNodeMeta : public EdGraphNodeMeta
 {
-    entt::meta_type type;
+    bool IsFunction() const
+    {
+        return static_cast<bool>(func);
+    }
+    bool IsField() const
+    {
+        return static_cast<bool>(data);
+    }
+    bool IsSetter() const
+    {
+        return IsField() && isSetter;
+    }
+    bool IsGetter() const
+    {
+        return IsField() && !isSetter;
+    }
+
+    entt::meta_type klass;
+    entt::meta_func func;
+    entt::meta_data data;
+    bool            isSetter;
 };
 
 class EdMetaCodeNodeFactory : public EdNodeFactory
@@ -41,4 +63,7 @@ public:
     void RemoveNodeMeta(EdGraphNodeMeta* meta) override;
 
     std::shared_ptr<EdGraphNode> CreateNode(EdGraphNodeCreateInfo const& info) override;
+
+    std::vector<std::unique_ptr<EdGraphNodeMeta>>        metaList;
+    std::map<std::string, std::vector<EdGraphNodeMeta*>> metaListByCategory;
 };

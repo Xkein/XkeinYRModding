@@ -17,6 +17,7 @@ public:
 
     void OnBeginUpdate();
     void OnEndUpdate();
+    void OnUIUpdate();
 
     void OnBeginRender();
     void OnEndRender();

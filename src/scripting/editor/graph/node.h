@@ -9,7 +9,23 @@
 #include <algorithm>
 #include <utility>
 
+#include "scripting/editor/blueprints/utilities/builders.h"
+
 namespace ed   = ax::NodeEditor;
+class GraphEditor;
+struct EdGraphPin;
+
+struct EdGraphNodeDrawContext
+{
+    GraphEditor*                         editor;
+    ed::Utilities::BlueprintNodeBuilder* builder;
+    EdGraphPin*                          newLinkPin;
+};
+
+struct EdGraphNodeCompileContext
+{
+
+};
 
 enum class PinType
 {
@@ -42,11 +58,12 @@ struct EdGraphNode;
 
 struct EdGraphPin
 {
-    ed::PinId   ID;
-    EdGraphNode*     Node;
-    std::string Name;
-    PinType     Type;
-    PinKind     Kind;
+    ed::PinId    ID;
+    EdGraphNode* Node;
+    std::string  Name;
+    PinType      Type;
+    PinKind      Kind;
+    EdGraphNode* LinkedTo {nullptr};
 
     EdGraphPin(int id, const char* name, PinType type) : ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input) {}
 };
@@ -67,9 +84,9 @@ public:
 
     EdGraphNode(int id, const char* name, ImColor color = ImColor(255, 255, 255)) : ID(id), Name(name), Color(color), Type(NodeType::Blueprint), Size(0, 0) {}
 
-    virtual void OnDraw() = 0;
-    virtual void OnBeforeCompile() {}
-    virtual void OnCompile() = 0;
+    virtual void OnDraw(EdGraphNodeDrawContext const& context) = 0;
+    virtual void OnBeforeCompile(EdGraphNodeCompileContext const& context) {}
+    virtual void OnCompile(EdGraphNodeCompileContext const& context) = 0;
 };
 
 struct EdGraphLink
@@ -100,7 +117,7 @@ struct EdMetaCodeNode : public EdGraphNode
 {
     EdMetaCodeNode(int id, const char* name, ImColor color = ImColor(255, 255, 255)) : EdGraphNode(id, name, color) {}
 
-    void OnDraw() override;
-    void OnCompile() override;
+    void OnDraw(EdGraphNodeDrawContext const& context) override;
+    void OnCompile(EdGraphNodeCompileContext const& context) override;
 };
 
