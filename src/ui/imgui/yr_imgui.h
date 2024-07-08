@@ -46,7 +46,7 @@ namespace YrImGui
     extern YREXTUI_API std::vector<YrImGuiWindow*> gWindows;
 
     template<typename T>
-    void SwitchWindow(std::shared_ptr<T>& ptr)
+    void SwitchWindow(std::shared_ptr<T>& ptr, bool destroyClose = false)
     {
         if (!ptr)
         {
@@ -55,6 +55,8 @@ namespace YrImGui
         if (ptr->IsOpened())
         {
             ptr->Close();
+            if (destroyClose)
+                ptr.reset();
         }
         else
         {

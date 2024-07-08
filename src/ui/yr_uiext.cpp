@@ -60,7 +60,7 @@ struct ImGuiThread
         GuardExecute([]() {
             windowMtx.lock();
 
-            if (YrImGui::GetOpenedWinCount() == 0 && !isMainThread)
+            if (YrImGui::gWindows.size() == 0 && !isMainThread)
             {
                 YrImGui::Render();
             }
@@ -77,7 +77,7 @@ std::unique_ptr<ImGuiThread> imguiThread;
 
 void UIMainThread()
 {
-    if (YrImGui::GetOpenedWinCount() > 0)
+    if (YrImGui::gWindows.size() > 0)
     {
         isMainThread = true;
         YrImGui::Render();

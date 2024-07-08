@@ -104,7 +104,7 @@ void EngineEditor::Tick()
     static std::shared_ptr<DemoWindow> demo;
     if (ImGui::IsKeyReleased(ImGuiKey_KeypadAdd))
     {
-        YrImGui::SwitchWindow(demo);
+        YrImGui::SwitchWindow(demo, true);
     }
 
     if (ImGui::IsKeyReleased(ImGuiKey_F11))
