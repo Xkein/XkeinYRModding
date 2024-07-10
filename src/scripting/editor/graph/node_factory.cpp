@@ -71,23 +71,23 @@ void EdMetaCodeNodeFactory::RemoveNodeMeta(EdGraphNodeMeta* meta)
     metaList.erase(iter);
 }
 
-PinType GetPinType(entt::meta_type type) {
+EPinType GetPinType(entt::meta_type type) {
     if (type.is_class())
     {
-        return PinType::Object;
+        return EPinType::Object;
     }
     else if (type.is_integral())
     {
-        return PinType::Int;
+        return EPinType::Int;
     }
     else if (type.is_arithmetic())
     {
-        return PinType::Float;
+        return EPinType::Float;
     }
     else
     {
         // not valid
-        return PinType::Object;
+        return EPinType::Object;
     }
 }
 
@@ -98,27 +98,31 @@ std::shared_ptr<EdGraphNode> EdMetaCodeNodeFactory::CreateNode(EdGraphNodeCreate
 
     entt::meta_type klass    = meta->klass;
     const char*     className = klass.prop("name"_hs).value().cast<const char*>();
+    auto            AddPin    = [&info](std::vector<EdGraphPin>& pins, const char* name, entt::meta_type type) {
+        EdGraphPin& pin = pins.emplace_back(info.getNextId(), name, GetPinType(type));
+        pin.PinType.type = type;
+    };
     if (meta->IsFunction())
     {
-        node->Inputs.emplace_back(info.getNextId(), "", PinType::Flow);
+        node->Inputs.emplace_back(info.getNextId(), "", EPinType::Flow);
         entt::meta_func func = meta->func;
         bool            isStatic = func.is_static();
         if (!isStatic)
         {
-            node->Inputs.emplace_back(info.getNextId(), className, GetPinType(klass));
+            AddPin(node->Inputs, className, klass);
         }
         size_t argCount = func.arity();
         for (size_t idx = 0; idx < argCount; idx++)
         {
             entt::meta_type arg = func.arg(idx);
-            node->Inputs.emplace_back(info.getNextId(), func.prop(entt::hashed_string{std::format("arg{}", idx).c_str()}).value().cast<const char*>(), GetPinType(arg));
+            AddPin(node->Inputs, func.prop(entt::hashed_string {std::format("arg{}", idx).c_str()}).value().cast<const char*>(), arg);
         }
 
-        node->Outputs.emplace_back(info.getNextId(), "", PinType::Flow);
+        node->Outputs.emplace_back(info.getNextId(), "", EPinType::Flow);
         entt::meta_type ret = func.ret();
         if (ret)
         {
-            node->Outputs.emplace_back(info.getNextId(), "Value", GetPinType(ret));
+            AddPin(node->Outputs, "Value", ret);
         }
     }
     else if (meta->IsField())
@@ -127,15 +131,15 @@ std::shared_ptr<EdGraphNode> EdMetaCodeNodeFactory::CreateNode(EdGraphNodeCreate
         bool            isSetter = meta->IsSetter();
         if (isSetter)
         {
-            node->Inputs.emplace_back(info.getNextId(), "", PinType::Flow);
-            node->Outputs.emplace_back(info.getNextId(), "", PinType::Flow);
+            node->Inputs.emplace_back(info.getNextId(), "", EPinType::Flow);
+            node->Outputs.emplace_back(info.getNextId(), "", EPinType::Flow);
         }
-        node->Inputs.emplace_back(info.getNextId(), className, GetPinType(klass));
+        AddPin(node->Inputs, className, klass);
         if (isSetter)
         {
-            node->Inputs.emplace_back(info.getNextId(), "Value", GetPinType(data.type()));
+            AddPin(node->Inputs, "Value", data.type());
         }
-        node->Outputs.emplace_back(info.getNextId(), "Value", GetPinType(data.type()));
+        AddPin(node->Outputs, "Value", data.type());
     }
 
     return std::shared_ptr<EdGraphNode>(node);

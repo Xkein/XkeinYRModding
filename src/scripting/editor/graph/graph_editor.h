@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ui/imgui/yr_imgui.h"
-#include "scripting/editor/graph/node.h"
+#include "scripting/editor/graph/graph_node.h"
 #include <imgui_node_editor.h>
 #include <vector>
 #include <map>
@@ -54,7 +54,7 @@ struct GraphEditor : YrImGuiWindow
 
     void BuildNodes();
 
-    ImColor GetIconColor(PinType type);
+    ImColor GetIconColor(EPinType type);
 
     void DrawPinIcon(const EdGraphPin& pin, bool connected, int alpha);
 

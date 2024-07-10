@@ -50,6 +50,10 @@ bool EdGraph::CanCreateLink(EdGraphPin* a, EdGraphPin* b)
 {
     if (!a || !b || a == b || a->Kind == b->Kind || a->Type != b->Type || a->Node == b->Node)
         return false;
+    if (a->Type == EPinType::Object)
+    {
+        return a->PinType.type == b->PinType.type;
+    }
 
     return true;
 }

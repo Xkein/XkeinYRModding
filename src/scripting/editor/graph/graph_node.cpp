@@ -1,4 +1,4 @@
-#include "scripting/editor/graph/node.h"
+#include "scripting/editor/graph/graph_node.h"
 #include "scripting/editor/graph/graph.h"
 #include "scripting/editor/graph/graph_editor.h"
 
@@ -16,7 +16,7 @@ void EdMetaCodeNode::OnDraw(EdGraphNodeDrawContext const& context)
 
     bool hasOutputDelegates = false;
     for (auto& output : node.Outputs)
-        if (output.Type == PinType::Delegate)
+        if (output.Type == EPinType::Delegate)
             hasOutputDelegates = true;
 
     builder.Begin(node.ID);
@@ -33,7 +33,7 @@ void EdMetaCodeNode::OnDraw(EdGraphNodeDrawContext const& context)
             ImGui::Spring(1, 0);
             for (auto& output : node.Outputs)
             {
-                if (output.Type != PinType::Delegate)
+                if (output.Type != EPinType::Delegate)
                     continue;
 
                 auto alpha = ImGui::GetStyle().Alpha;
@@ -82,7 +82,7 @@ void EdMetaCodeNode::OnDraw(EdGraphNodeDrawContext const& context)
             ImGui::TextUnformatted(input.Name.c_str());
             ImGui::Spring(0);
         }
-        if (input.Type == PinType::Bool)
+        if (input.Type == EPinType::Bool)
         {
             ImGui::Button("Hello");
             ImGui::Spring(0);
@@ -102,7 +102,7 @@ void EdMetaCodeNode::OnDraw(EdGraphNodeDrawContext const& context)
 
     for (auto& output : node.Outputs)
     {
-        if (!isSimple && output.Type == PinType::Delegate)
+        if (!isSimple && output.Type == EPinType::Delegate)
             continue;
 
         auto alpha = ImGui::GetStyle().Alpha;
@@ -111,7 +111,7 @@ void EdMetaCodeNode::OnDraw(EdGraphNodeDrawContext const& context)
 
         ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
         builder.Output(output.ID);
-        if (output.Type == PinType::String)
+        if (output.Type == EPinType::String)
         {
             static char buffer[128] = "Edit Me\nMultiline!";
             static bool wasActive   = false;

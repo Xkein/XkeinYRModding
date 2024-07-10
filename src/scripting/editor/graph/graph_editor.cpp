@@ -171,26 +171,26 @@ void GraphEditor::OnOpen()
         m_Editor = nullptr;
     }
 }
- ImColor GraphEditor::GetIconColor(PinType type)
+ ImColor GraphEditor::GetIconColor(EPinType type)
 {
     switch (type)
     {
         default:
-        case PinType::Flow:
+        case EPinType::Flow:
             return ImColor(255, 255, 255);
-        case PinType::Bool:
+        case EPinType::Bool:
             return ImColor(220, 48, 48);
-        case PinType::Int:
+        case EPinType::Int:
             return ImColor(68, 201, 156);
-        case PinType::Float:
+        case EPinType::Float:
             return ImColor(147, 226, 74);
-        case PinType::String:
+        case EPinType::String:
             return ImColor(124, 21, 153);
-        case PinType::Object:
+        case EPinType::Object:
             return ImColor(51, 150, 215);
-        case PinType::Function:
+        case EPinType::Function:
             return ImColor(218, 0, 183);
-        case PinType::Delegate:
+        case EPinType::Delegate:
             return ImColor(255, 48, 48);
     }
 }
@@ -201,28 +201,28 @@ void GraphEditor::OnOpen()
     color.Value.w  = alpha / 255.0f;
     switch (pin.Type)
     {
-        case PinType::Flow:
+        case EPinType::Flow:
             iconType = IconType::Flow;
             break;
-        case PinType::Bool:
+        case EPinType::Bool:
             iconType = IconType::Circle;
             break;
-        case PinType::Int:
+        case EPinType::Int:
             iconType = IconType::Circle;
             break;
-        case PinType::Float:
+        case EPinType::Float:
             iconType = IconType::Circle;
             break;
-        case PinType::String:
+        case EPinType::String:
             iconType = IconType::Circle;
             break;
-        case PinType::Object:
+        case EPinType::Object:
             iconType = IconType::Circle;
             break;
-        case PinType::Function:
+        case EPinType::Function:
             iconType = IconType::Circle;
             break;
-        case PinType::Delegate:
+        case EPinType::Delegate:
             iconType = IconType::Square;
             break;
         default:

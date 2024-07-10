@@ -2,18 +2,17 @@
 
 #include <imgui_node_editor.h>
 #include <imgui_internal.h>
+#include "scripting/editor/graph/graph_pin.h"
 
 #include <string>
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <utility>
-
 #include "scripting/editor/blueprints/utilities/builders.h"
 
 namespace ed   = ax::NodeEditor;
 class GraphEditor;
-struct EdGraphPin;
 
 struct EdGraphNodeDrawContext
 {
@@ -27,24 +26,6 @@ struct EdGraphNodeCompileContext
 
 };
 
-enum class PinType
-{
-    Flow,
-    Bool,
-    Int,
-    Float,
-    String,
-    Object,
-    Function,
-    Delegate,
-};
-
-enum class PinKind
-{
-    Output,
-    Input
-};
-
 enum class NodeType
 {
     Blueprint,
@@ -52,20 +33,6 @@ enum class NodeType
     Tree,
     Comment,
     Houdini
-};
-
-struct EdGraphNode;
-
-struct EdGraphPin
-{
-    ed::PinId    ID;
-    EdGraphNode* Node;
-    std::string  Name;
-    PinType      Type;
-    PinKind      Kind;
-    EdGraphNode* LinkedTo {nullptr};
-
-    EdGraphPin(int id, const char* name, PinType type) : ID(id), Node(nullptr), Name(name), Type(type), Kind(PinKind::Input) {}
 };
 
 class EdGraphNode

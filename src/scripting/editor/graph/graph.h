@@ -1,5 +1,5 @@
 #pragma once
-#include "node.h"
+#include "graph_node.h"
 #include <memory>
 
 class EdGraph
