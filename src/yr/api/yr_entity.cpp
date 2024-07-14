@@ -311,6 +311,10 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitCtorEvent)
 {
     CREATE_ENTITY(UnitClass, E->pUnit);
 }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletCtorEvent)
+{
+    CREATE_ENTITY(BulletClass, E->pBullet);
+}
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftDtorEvent)
 {
@@ -327,6 +331,10 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryDtorEvent)
 DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitDtorEvent)
 {
     DESTROY_ENTITY(UnitClass, E->pUnit);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletDtorEvent)
+{
+    DESTROY_ENTITY(BulletClass, E->pBullet);
 }
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftTypeCtorEvent)
@@ -345,6 +353,10 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitTypeCtorEvent)
 {
     CREATE_ENTITY(UnitTypeClass, E->pUnitType);
 }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeCtorEvent)
+{
+    CREATE_ENTITY(BulletTypeClass, E->pBulletType);
+}
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftTypeDtorEvent)
 {
@@ -361,4 +373,8 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryTypeDtorEvent)
 DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitTypeDtorEvent)
 {
     DESTROY_ENTITY(UnitTypeClass, E->pUnitType);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeDtorEvent)
+{
+    DESTROY_ENTITY(BulletTypeClass, E->pBulletType);
 }

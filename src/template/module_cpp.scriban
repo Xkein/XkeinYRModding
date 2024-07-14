@@ -3,6 +3,11 @@
 -}}
 #include "{{module_name}}.gen.h"
 #include "yr/extension_manager.h"
+{{- for enum in module_enums}}
+    {{- if has_meta(enum.meta) }}
+#include "type/{{enum.name}}.gen.h"
+    {{- end }}
+{{- end }}
 {{- for klass in module_classes }}
     {{- if has_meta(klass.meta) }}
 #include "type/{{klass.name}}.gen.h"

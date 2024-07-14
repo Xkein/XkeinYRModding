@@ -71,12 +71,6 @@ func gen_meta_class_property(htClass, htProperty)
     ret $'register_data<&{$class_name}::{$field_name}>(factory, "{$field_name}"_hs).prop("name"_hs, "{$field_name}");'
 end
 
-func gen_meta_enum_constant(htEnum, htConstant)
-    $enum_name = htEnum.name
-    $enum_const_name = htConstant.name
-    ret $'.data<{$enum_name}::{$enum_const_name}>("{$enum_const_name}"_hs).prop("name"_hs, "{$enum_const_name}")'
-end
-
 func gen_meta_class(htClass)
     $klass = $'auto factory = entt::meta<{htClass.class_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}");'
     for base in htClass.base_classes
@@ -93,15 +87,19 @@ func gen_meta_class(htClass)
     ret $klass
 end
 
+func gen_meta_enum_constant(htEnum, htConstant)
+    $enum_name = htEnum.name
+    $enum_const_name = htConstant.name
+    ret $'factory.data<{$enum_name}::{$enum_const_name}>("{$enum_const_name}"_hs).prop("name"_hs, "{$enum_const_name}");'
+end
+
 func gen_meta_enum(htEnum)
-    $enum = $'auto factory = entt::meta<{htEnum.enum_name}>().type("{htEnum.enum_name}"_hs).prop("name"_hs, "{htClass.enum_name}");'
-    $enum = $'factory.'
-    $enum += (htEnum.enum_constants | array.each do
+    $enum = $'auto factory = entt::meta<{htEnum.enum_name}>().type("{htEnum.enum_name}"_hs).prop("name"_hs, "{htEnum.enum_name}");'
+    $enum = append_line($enum, (htEnum.enum_constants | array.each do
             ret "   " + gen_meta_enum_constant(htEnum, $0)
-        end) | array.join ", \n"
-    $enum += "; \n"
+        end) | array.join "\n")
     
-    $klass = append_line($klass, user_gen_meta_enum(htEnum))
+    $enum = append_line($enum, user_gen_meta_enum(htEnum))
     ret $enum
 end
 

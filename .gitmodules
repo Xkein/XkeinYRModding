@@ -19,3 +19,6 @@
 [submodule "3rdparty/puerts"]
 	path = 3rdparty/puerts
 	url = https://github.com/Tencent/puerts.git
+[submodule "3rdparty/JoltPhysics"]
+	path = 3rdparty/JoltPhysics
+	url = https://github.com/jrouwe/JoltPhysics.git

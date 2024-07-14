@@ -22,6 +22,7 @@ func user_gen_meta_class(htClass)
 end }}
 {{- if has_component_target }}
 #include "yr/component/component.h"
+#include <GameClasses.h>
 {{- end }}
 {{- if is_ini_component }}
 #include "yr/parse/ini_reader.h"
@@ -30,12 +31,12 @@ end }}
 #include <IsometricTileTypeClass.h>
 static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader, const char* pSection)
 {
-{{ for property in class_properties ; $cpp_field = property.cpp_field
+{{- for property in class_properties ; $cpp_field = property.cpp_field
     if should_skip_visibility(this, property) || string.empty(property.name) || property.is_static || property.is_const || property.is_constexpr
         continue
     end
     $ini_key = get_meta_value(property.meta, "IniField") ?? property.name
-    -}}
+    }}
     if (!IniComponentLoader::Load(reader, pSection, "{{$ini_key}}", iniComponent.{{property.name}}))
         return false;
 {{- end }}
