@@ -104,3 +104,26 @@ void ScriptComponent::CreateScriptComponent(entt::registry& reg, entt::entity en
         iter->second.Instantiate(&script, pYrObject);
     }
 }
+
+#include "yr/event/techno_event.h"
+#include "yr/event/object_event.h"
+#include "yr/api/yr_entity.h"
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent) {
+    ScriptComponent* script = GetYrComponent<ScriptComponent>(E->pObject);
+    if (script) {
+        std::optional<DamageState> damageState = script->Invoke(script->OnReceiveDamage, E->pDamage, E->DistanceFromEpicenter, E->pWH, E->Attacker, E->IgnoreDefenses, E-> PreventPassengerEscape, E->pAttackingHouse);
+        if (damageState) {
+            E->OverrideReturn(damageState.value());
+        }
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoFireEvent) {
+    ScriptComponent* script = GetYrComponent<ScriptComponent>(E->pTechno);
+    if (script) {
+        std::optional<BulletClass*> pBullet = script->Invoke(script->OnFire, E->pTarget, E->nWeaponIndex);
+        if (pBullet) {
+            E->OverrideReturn(pBullet.value());
+        }
+    }
+}

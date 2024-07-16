@@ -63,10 +63,35 @@ private:
 // used by header tool
 #define __IMPLEMENT_YR_HOOK_EVENT(HookEventType) \
     template<> \
-    YREXTCORE_API YrHookEvent* YrHookEventSystem::GetEvent_Impl<HookEventType>() { \
+    inline YREXTCORE_API YrHookEvent* YrHookEventSystem::GetEvent_Impl<HookEventType>() { \
         static YrHookEvent gHookEvent; \
         return &gHookEvent; \
     }
+
+template<typename TRet>
+class YrHookOverrideReturn
+{
+    friend class YrHookEvent;
+    friend class YrHookEventSystem;
+
+    bool hasSet;
+    TRet returnValue {};
+public:
+    void OverrideReturn(TRet val) {
+        returnValue = val;
+        hasSet = true;
+    }
+};
+namespace detail
+{
+    template<typename THookEvent>
+    concept hook_event_override_return = requires(THookEvent e) {
+        e.OverrideReturn({});
+    };
+
+    template<typename THookEvent, DWORD hookAddress>
+    DWORD get_hook_override_return_address();
+}
 
 class YrHookEventSystem final
 {
@@ -108,7 +133,13 @@ public:
         YrHookEvent* hookEvent = GetEvent<T>();
         T            e;
         hookEvent->InitHookInfo<T, HookAddress>(R, &e);
-        return hookEvent->Broadcast(R, &e);
+        if constexpr(detail::hook_event_override_return<T>) {
+            auto retAddr = hookEvent->Broadcast(R, &e);
+            return e.hasSet ? detail::get_hook_override_return_address<T, HookAddress>() : retAddr;
+        }
+        else {
+            return hookEvent->Broadcast(R, &e);
+        }
     }
 #endif // YREXTCORE_IMPL
 

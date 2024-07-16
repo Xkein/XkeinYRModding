@@ -6,5 +6,7 @@ class ScriptComponent
     mOnDtor : any;
     mOnBeginUpdate : any;
     mOnEndUpdate : any;
+    mOnReceiveDamage : any;
+    mOnFire : any;
 }
 }

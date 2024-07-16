@@ -80,7 +80,7 @@ void Engine::OnBeginUpdate()
 #endif
     for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
     {
-        script.BeginUpdate();
+        script.Invoke(script.OnBeginUpdate);
     }
 }
 
@@ -90,7 +90,7 @@ void Engine::OnEndUpdate()
 
     for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
     {
-        script.EndUpdate();
+        script.Invoke(script.OnEndUpdate);
     }
     mutex.unlock();
 }
