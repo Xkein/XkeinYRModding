@@ -372,7 +372,7 @@ int YrImGui::GetOpenedWinCount()
 YrImGuiWindow::YrImGuiWindow()
 {
     std::lock_guard lock(windowMtx);
-    _impl = std::make_shared<YrImGuiWindow_Impl>(this);
+    _impl = std::make_unique<YrImGuiWindow_Impl>(this);
 }
 
 YrImGuiWindow::~YrImGuiWindow()

@@ -1,12 +1,14 @@
 #pragma once
 #ifndef __HEADER_TOOL__
 #include "runtime/logger/logger.h"
+#include "core/reflection/reflection.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <ranges>
+using namespace entt::literals;
 
 namespace detail
 {
@@ -88,6 +90,30 @@ namespace detail
             {
                 return false;
             }
+        }
+    };
+    
+    template<typename T>
+    struct Parser<T, typename std::enable_if_t<std::is_enum_v<T>>>
+    {
+        static bool Read(std::string_view str, T& result)
+        {
+            entt::meta_type type = entt::resolve<T>();
+            if (!type)
+            {
+                gLogger->error("could not parse enum {} because no meta", typeid(T).name());
+                return false;
+            }
+            for (auto&& [id, data] : type.data())
+            {
+                auto name = data.prop("name"_hs).value().cast<const char*>();
+                if (str == name)
+                {
+                    result = data.get({}).cast<T>();
+                    return true;
+                }
+            }
+            return false;
         }
     };
 

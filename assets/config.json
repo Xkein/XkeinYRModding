@@ -1,6 +1,7 @@
 {
     "extensions": [
-        "YrScripting"
+        "YrScripting",
+        "XkeinExt"
     ],
     "assets_dir": "assets",
     "plugins_dir": "plugins",

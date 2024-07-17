@@ -23,7 +23,7 @@ public:
     YREXTUI_API bool IsOpened() const;
 
 private:
-    std::shared_ptr<YrImGuiWindow_Impl> _impl;
+    std::unique_ptr<YrImGuiWindow_Impl> _impl;
 };
 
 namespace YrImGui

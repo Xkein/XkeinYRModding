@@ -16,11 +16,17 @@ struct IniComponentLoader
         {
             return parser.Read(pSection, pKey, value);
         }
-        else
+        entt::meta_type type = entt::resolve<T>();
+        if (type)
         {
-            auto func = entt::resolve<T>().func("LoadIniComponent"_hs);
-            return func.invoke(value, parser, pSection).cast<bool>();
+            entt::meta_func func = type.func("LoadIniComponent"_hs);
+            if (func)
+            {
+                return func.invoke(value, parser, pSection).cast<bool>();
+            }
         }
+        gLogger->error("could not load {} for [{}]->{}", typeid(T).name(), pSection, pKey);
+        return false;
     }
 
     template<typename Type, bool (*Func)(Type&, IniReader&, const char*)>

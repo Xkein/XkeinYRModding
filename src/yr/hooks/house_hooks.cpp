@@ -13,7 +13,7 @@ BROADCAST_HOOK_EVENT(0x4F6532, 0x5, YrHouseCtorEvent)
 {
     E->pHouse = R->EAX<HouseClass*>();
 }
-BROADCAST_HOOK_EVENT(0x4F7140, 0x5, YrHouseDtorEvent)
+BROADCAST_HOOK_EVENT(0x4F7140, 0x6, YrHouseDtorEvent)
 {
     E->pHouse = R->ECX<HouseClass*>();
 }

@@ -4,7 +4,7 @@ task("dotnet-compile-job")
         print("compiling CppHeaderTool projects...")
         import("core.project.config")
         os.execv("dotnet", {
-            "publish", os.projectdir().."/3rdparty/CppHeaderTool/src/CppHeaderTool/CppHeaderTool.csproj",
+            "build", os.projectdir().."/3rdparty/CppHeaderTool/src/CppHeaderTool/CppHeaderTool.csproj",
             "--output", path.join(config.buildir(), "tools"),
         })
     end)

@@ -29,7 +29,7 @@ public:
     {
         show_app_console = true;
     }
-    virtual void OnClose()
+    virtual void OnClose() override
     {
         show_app_console = false;
     }

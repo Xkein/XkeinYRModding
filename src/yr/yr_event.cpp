@@ -106,6 +106,10 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
     if (impl->_disable)
         return 0;
     impl->_callTimes++;
+// #define _LOG_HOOK
+#ifdef _LOG_HOOK
+    gConsole->info("broadcast hook at {}", R->Origin());
+#endif
 
     YrHookContext context {
         .R             = R,
