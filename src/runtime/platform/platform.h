@@ -10,6 +10,7 @@ typedef unsigned int       uint32;
 typedef unsigned long long uint64;
 
 typedef unsigned char byte;
+typedef unsigned int  uint;
 
 //~ Character types.
 /// An ANSI character. Normally a signed type.

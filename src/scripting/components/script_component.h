@@ -13,7 +13,7 @@ template<typename TFunc>
 using ScriptBehaviour = std::function<TFunc>;
 
 CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass])
-struct ScriptTypeComponent
+struct ScriptTypeComponent final
 {
     PROPERTY(IniField = "Script.Js")
     std::string jsScript;
@@ -22,7 +22,7 @@ struct ScriptTypeComponent
 #include "scripting/javascript/yr_data_bindings.h"
 #include <GeneralDefinitions.h>
 CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass])
-struct ScriptComponent
+struct ScriptComponent final
 {
     template<typename TargetType>
     static void OnEntityConstruct(entt::registry& reg, entt::entity entity, TargetType* pYrObject) {
