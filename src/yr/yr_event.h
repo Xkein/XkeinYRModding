@@ -74,7 +74,7 @@ class YrHookOverrideReturn
     friend class YrHookEvent;
     friend class YrHookEventSystem;
 
-    bool hasSet;
+    bool hasSet {false};
     TRet returnValue {};
 public:
     void OverrideReturn(TRet val) {

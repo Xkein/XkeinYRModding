@@ -5,6 +5,6 @@ CLASS(YrExtension)
 class YrScriptingModule final : public IYrExtension
 {
 private:
-    virtual void Startup();
-    virtual void Shutdown();
+    virtual void Startup() override;
+    virtual void Shutdown() override;
 };

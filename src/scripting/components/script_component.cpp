@@ -90,6 +90,8 @@ private:
 std::map<std::string, JsScriptTemplate> gJsScripts;
 
 void ScriptComponent::CreateScriptComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType) {
+    if (!pYrType)
+        return;
     ScriptTypeComponent const* const pScriptType = GetYrComponent<ScriptTypeComponent>(pYrType);
     if (pScriptType && !pScriptType->jsScript.empty())
     {
@@ -107,6 +109,7 @@ void ScriptComponent::CreateScriptComponent(entt::registry& reg, entt::entity en
 
 #include "yr/event/techno_event.h"
 #include "yr/event/object_event.h"
+#include "yr/event/bullet_event.h"
 #include "yr/api/yr_entity.h"
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent) {
@@ -126,4 +129,9 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoFireEvent) {
             E->OverrideReturn(pBullet.value());
         }
     }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletConstructEvent)
+{
+    ScriptComponent::OnEntityConstruct(*gEntt, GetYrEntity(E->pBullet), E->pBullet);
 }

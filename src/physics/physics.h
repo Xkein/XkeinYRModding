@@ -1,16 +1,20 @@
 #pragma once
 
 #include "physics/jolt/jolt.h"
+class TerrainHeightMap;
 
 class Physics
 {
 public:
     static void Init();
     static void Destroy();
-    static void Tick();
+    static void BeginTick();
+    static void EndTick();
 
     static void InitWorld();
     static void DestroyWorld();
+
+    static XKEINEXT_API TerrainHeightMap* gTerrainHeightMap;
 };
 
 extern XKEINEXT_API JPH::JobSystem*		                gJobSystem;

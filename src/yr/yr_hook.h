@@ -2,6 +2,7 @@
 
 #include "yr_event.h"
 #include <YRPP.h>
+#include <Helpers/Macro.h>
 
 #define BROADCAST_HOOK_EVENT(HookAddress, Size, HookEvent) \
     DEFINE_HOOK(HookAddress, HOOK_##HookAddress##_##Size, Size) { \

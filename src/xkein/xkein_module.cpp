@@ -12,5 +12,6 @@ void YrXkeinModule::Startup()
 void YrXkeinModule::Shutdown()
 {
     __Gen_Type_XkeinExt::Unregister();
+    
     Physics::Destroy();
 }
