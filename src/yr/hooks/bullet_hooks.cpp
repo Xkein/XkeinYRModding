@@ -37,3 +37,14 @@ BROADCAST_HOOK_EVENT(0x46C8B6, 0x6, YrBulletTypeDtorEvent)
 {
     E->pBulletType = R->ESI<BulletTypeClass*>();
 }
+
+BROADCAST_HOOK_EVENT(0x46C429, 0xA, YrBulletTypeLoadIniEvent)
+{
+    E->pBulletType = R->ESI<BulletTypeClass*>();
+    E->pIni        = R->Stack<CCINIClass*>(0x90);
+}
+BROADCAST_HOOK_EVENT(0x46C41C, 0x5, YrBulletTypeLoadIniEvent)
+{
+    E->pBulletType = R->ESI<BulletTypeClass*>();
+    E->pIni        = R->Stack<CCINIClass*>(0x90);
+}

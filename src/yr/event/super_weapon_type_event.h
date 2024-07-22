@@ -19,3 +19,11 @@ class YrSuperWeaponTypeDtorEvent
 public:
     SuperWeaponTypeClass* pSuperWeaponType {nullptr};
 };
+
+CLASS(HookEvent)
+class YrSuperWeaponTypeLoadIniEvent
+{
+public:
+    SuperWeaponTypeClass* pSuperWeaponType {nullptr};
+    CCINIClass*           pIni {nullptr};
+};

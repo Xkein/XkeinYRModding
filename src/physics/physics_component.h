@@ -13,7 +13,7 @@ enum class EPhysicShapeType : unsigned int {
     // Cube,
 };
 
-CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass])
+CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass])
 struct PhysicsTypeComponent final
 {
     PROPERTY(IniField = "Physics.Enable")
@@ -26,7 +26,7 @@ struct PhysicsTypeComponent final
     float radius;
 };
 
-CLASS(ComponentTarget = [TechnoClass, BulletClass])
+CLASS(ComponentTarget = [TechnoClass, BulletClass, TerrainClass])
 class PhysicsComponent final
 {
 public:

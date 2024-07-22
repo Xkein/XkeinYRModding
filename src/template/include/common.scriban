@@ -169,4 +169,13 @@ end
 func get_template_specialized_list(template, speTypes)
     ret speTypes | array.each do; ret string.replace(template, "{T}", $0); end
 end
+
+func array_contains_any_of(list, anyList)
+    for key in anyList
+        if array.contains(list, key)
+            ret true
+        end
+    end
+    ret false
+end
 }}

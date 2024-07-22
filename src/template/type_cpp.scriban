@@ -10,6 +10,14 @@
 component_target_list = get_derived_classes_by_list(get_meta_list(meta, "ComponentTarget"))
 has_component_target = array.size(component_target_list) > 0
 is_ini_component = get_meta_tag(meta, "IniComponent")
+is_ini_component_techno = is_ini_component && array_contains_any_of(component_target_list, ["AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"])
+is_ini_component_terrain = is_ini_component && array.contains(component_target_list, "TerrainTypeClass")
+is_ini_component_bullet = is_ini_component && array.contains(component_target_list, "BulletTypeClass")
+is_ini_component_anim = is_ini_component && array.contains(component_target_list, "AnimTypeClass")
+is_ini_component_house = is_ini_component && array.contains(component_target_list, "HouseTypeClass")
+is_ini_component_super = is_ini_component && array.contains(component_target_list, "SuperWeaponTypeClass")
+is_ini_component_weapon = is_ini_component && array.contains(component_target_list, "WeaponTypeClass")
+is_ini_component_warhead = is_ini_component && array.contains(component_target_list, "WarheadTypeClass")
 func user_gen_meta_class(htClass)
     $result = ""
     for target_type in component_target_list
@@ -43,9 +51,44 @@ static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader
     return true;
 }
 #include "yr/yr_all_events.h"
-{{- if is_ini_component }}
+{{- if is_ini_component_techno }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{type_name}}>(E->pTechnoType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_terrain }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pTerrainType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_bullet }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pBulletType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_anim }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pAnimType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_house }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pHouseType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_super }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pTerrainType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_weapon }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pWeaponType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_warhead }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pWarheadType, E->pIni);
 }
 {{- end }}
 {{- end }}

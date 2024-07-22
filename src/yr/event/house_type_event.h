@@ -3,6 +3,8 @@
 #include "yr/yr_event.h"
 
 class HouseTypeClass;
+class CCINIClass;
+struct IStream;
 
 CLASS(HookEvent)
 class YrHouseTypeCtorEvent
@@ -16,4 +18,12 @@ class YrHouseTypeDtorEvent
 {
 public:
     HouseTypeClass* pHouseType {nullptr};
+};
+
+CLASS(HookEvent)
+class YrHouseTypeLoadIniEvent
+{
+public:
+    HouseTypeClass* pHouseType {nullptr};
+    CCINIClass*     pIni {nullptr};
 };

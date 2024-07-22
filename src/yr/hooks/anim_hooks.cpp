@@ -2,9 +2,9 @@
 #include "yr/event/anim_type_event.h"
 #include "yr/yr_hook.h"
 
-#include <FootClass.h>
 #include <AnimClass.h>
 #include <AnimTypeClass.h>
+#include <FootClass.h>
 
 static AbstractClass* gSavingObject;
 static IStream*       gSavingStream;
@@ -34,4 +34,15 @@ BROADCAST_HOOK_EVENT(0x42784B, 0x5, YrAnimTypeCtorEvent)
 BROADCAST_HOOK_EVENT(0x428EA8, 0x5, YrAnimTypeDtorEvent)
 {
     E->pAnimType = R->ECX<AnimTypeClass*>();
+}
+
+BROADCAST_HOOK_EVENT(0x4287E9, 0xA, YrAnimTypeLoadIniEvent)
+{
+    E->pAnimType = R->ESI<AnimTypeClass*>();
+    E->pIni      = R->Stack<CCINIClass*>(0xBC);
+}
+BROADCAST_HOOK_EVENT(0x4287DC, 0xA, YrAnimTypeLoadIniEvent)
+{
+    E->pAnimType = R->ESI<AnimTypeClass*>();
+    E->pIni      = R->Stack<CCINIClass*>(0xBC);
 }

@@ -30,3 +30,14 @@ BROADCAST_HOOK_EVENT(0x512760, 0x6, YrHouseTypeDtorEvent)
 {
     E->pHouseType = R->ECX<HouseTypeClass*>();
 }
+
+BROADCAST_HOOK_EVENT(0x51215A, 0x5, YrHouseTypeLoadIniEvent)
+{
+    E->pHouseType = R->EBX<HouseTypeClass*>();
+    E->pIni       = R->Stack<CCINIClass*>(0x8);
+}
+BROADCAST_HOOK_EVENT(0x51214F, 0x5, YrHouseTypeLoadIniEvent)
+{
+    E->pHouseType = R->EBX<HouseTypeClass*>();
+    E->pIni       = R->Stack<CCINIClass*>(0x8);
+}

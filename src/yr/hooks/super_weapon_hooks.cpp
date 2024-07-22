@@ -26,3 +26,14 @@ BROADCAST_HOOK_EVENT(0x6CEFE0, 0x8, YrSuperWeaponTypeDtorEvent)
 {
     E->pSuperWeaponType = R->ECX<SuperWeaponTypeClass*>();
 }
+
+BROADCAST_HOOK_EVENT(0x6CEE50, 0xA, YrSuperWeaponTypeLoadIniEvent)
+{
+    E->pSuperWeaponType = R->EBP<SuperWeaponTypeClass*>();
+    E->pIni             = R->Stack<CCINIClass*>(0x3FC);
+}
+BROADCAST_HOOK_EVENT(0x6CEE43, 0xA, YrSuperWeaponTypeLoadIniEvent)
+{
+    E->pSuperWeaponType = R->EBP<SuperWeaponTypeClass*>();
+    E->pIni             = R->Stack<CCINIClass*>(0x3FC);
+}

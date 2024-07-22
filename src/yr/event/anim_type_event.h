@@ -19,3 +19,11 @@ class YrAnimTypeDtorEvent
 public:
     AnimTypeClass* pAnimType {nullptr};
 };
+
+CLASS(HookEvent)
+class YrAnimTypeLoadIniEvent
+{
+public:
+    AnimTypeClass* pAnimType {nullptr};
+    CCINIClass*    pIni {nullptr};
+};
