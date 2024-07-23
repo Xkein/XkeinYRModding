@@ -3,6 +3,7 @@
 #include "yr/component/component.h"
 #include <Jolt/Jolt.h>
 #include <jolt/Physics/Body/Body.h>
+#include <memory>
 
 class AbstractTypeClass;
 
@@ -24,6 +25,8 @@ struct PhysicsTypeComponent final
     float mass;
     PROPERTY(IniField = "Physics.Radius")
     float radius;
+
+    std::shared_ptr<JPH::ShapeSettings> shapeSettings;
 };
 
 CLASS(ComponentTarget = [TechnoClass, BulletClass, TerrainClass])

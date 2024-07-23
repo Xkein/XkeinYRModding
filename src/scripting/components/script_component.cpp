@@ -44,7 +44,10 @@ struct JsScriptTemplate
     JsScriptTemplate(std::string_view scriptName) : ScriptName(scriptName)
     {
         if (!gJsEnv->Eval(std::format("yr.createScriptTemplate(\"{}\")", scriptName).c_str(), "game script", &ScriptTemplate))
+        {
+            gLogger->error(gJsEnv->LastExceptionInfo);
             return;
+        }
 
         auto Isolate = gJsEnv->MainIsolate;
 #ifdef THREAD_SAFE

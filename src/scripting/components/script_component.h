@@ -13,7 +13,7 @@ class BulletClass;
 template<typename TFunc>
 using ScriptBehaviour = std::function<TFunc>;
 
-CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, SuperWeaponTypeClass])
+CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, SuperWeaponTypeClass, AnimTypeClass, HouseTypeClass])
 struct ScriptTypeComponent final
 {
     PROPERTY(IniField = "Script.Js")
@@ -22,7 +22,7 @@ struct ScriptTypeComponent final
 
 #include "scripting/javascript/yr_data_bindings.h"
 #include <GeneralDefinitions.h>
-CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, SuperClass])
+CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, SuperClass, AnimClass, HouseClass])
 struct ScriptComponent final
 {
     template<typename TargetType>

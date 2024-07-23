@@ -27,15 +27,15 @@ inline static Quaternion GetObjectRotation(AbstractClass* pYrObject)
             VoxelIndexKey indexKey;
             indexKey.MainVoxel.RampType = pFoot->GetCell()->SlopeIndex;
             Matrix3D matrix =  pFoot->Locomotor->Draw_Matrix(&indexKey);
-            Quaternion ret;
-            ret.FromMatrix3D(ret, matrix);
+            Quaternion ret = Quaternion::FromMatrix3D(matrix);
+            ret.Normalize();
             return ret;
         }
         case AbstractType::Bullet:
         {
-            Quaternion ret;
             BulletVelocity velocity = static_cast<BulletClass*>(pYrObject)->Velocity;
-            ret.FromAxis(ret, ToVector3f(velocity), 0);
+            Quaternion ret = Quaternion::FromAxis(ToVector3f(velocity), 0);
+            ret.Normalize();
             return ret;
         }
         case AbstractType::Anim:
@@ -126,15 +126,19 @@ inline static void SetObjectRotation(AbstractClass* pYrObject, Quaternion quat)
         {
             FootClass* pFoot = static_cast<FootClass*>(pYrObject);
             // TODO
+            break;
         }
         case AbstractType::Bullet:
         {
-            // TODO
+            static_cast<BulletClass*>(pYrObject)->Velocity = ToVector3d(QuaternionToEuler(quat));
+            break;
         }
         case AbstractType::Anim:
             static_cast<AnimClass*>(pYrObject)->Bounce.CurrentAngle = quat;
+            break;
         case AbstractType::VoxelAnim:
             static_cast<VoxelAnimClass*>(pYrObject)->Bounce.CurrentAngle = quat;
+            break;
     }
 }
 
@@ -155,8 +159,10 @@ inline static void SetObjectLinearVelocity(AbstractClass* pYrObject, Vector3D<fl
             break;
         case AbstractType::Anim:
             static_cast<AnimClass*>(pYrObject)->Bounce.Velocity = vec;
+            break;
         case AbstractType::VoxelAnim:
             static_cast<VoxelAnimClass*>(pYrObject)->Bounce.Velocity = vec;
+            break;
     }
 }
 

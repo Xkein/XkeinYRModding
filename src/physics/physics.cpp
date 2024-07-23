@@ -349,6 +349,13 @@ void Physics::BeginTick()
         JPH::Vec3        position   = ToVec3(GetObjectCoords(pYrObject));
         JPH::Quat        quat       = ToQuat(GetObjectRotation(pYrObject));
         JPH::EActivation activation = body->IsStatic() ? JPH::EActivation::DontActivate : JPH::EActivation::Activate;
+        if (quat.IsNaN()) {
+            quat = JPH::Quat::sIdentity();
+            gLogger->error("{} rotation is NaN!", (void*)pYrObject);
+        }
+        else {
+            quat = quat.Normalized();
+        }
         gBodyInterface->SetPositionAndRotationWhenChanged(body->GetID(), position, quat, activation);
     }
 

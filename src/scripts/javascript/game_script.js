@@ -2,7 +2,7 @@
 function bindScriptComponent(scriptComponent, inst, funcName) {
     let func = inst[funcName]
     if (typeof func === "function") {
-        scriptComponent[`m${funcName}`] = () => func.apply(inst, arguments)
+        scriptComponent[`m${funcName}`] = (...args) => func.apply(inst, args)
     }
 }
 yr.createScriptTemplate = function (scriptName) {

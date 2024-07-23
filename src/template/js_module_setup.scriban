@@ -6,10 +6,18 @@
         ret has_meta(htType.meta) || (is_yrpp && yr_need_codegen(htType))
     end
 -}}
+let {{module_name}} = {}
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
 {{- end; end }}
 
 {{- for enum in module_enums }}
 {{- if need_codegen(enum) || is_yrpp }}
+const {{enum.name}} = {
+    {{- for enum_item in enum.constants }}
+    {{enum_item.name}} : {{enum_item.value}},
+    {{- end}}
+}
+{{module_name}}.{{enum.name}} = {{enum.name}}
 {{- end; end }}
+let {{module_name}}_1 = {{module_name}}

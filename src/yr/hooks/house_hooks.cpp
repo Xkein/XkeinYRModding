@@ -32,5 +32,5 @@ BROADCAST_HOOK_EVENT_AGAIN(0x51215A, 0x5, YrHouseTypeLoadIniEvent, 0x51214F)
 BROADCAST_HOOK_EVENT(0x51214F, 0x5, YrHouseTypeLoadIniEvent)
 {
     E->pHouseType = R->EBX<HouseTypeClass*>();
-    E->pIni       = R->Stack<CCINIClass*>(0x8);
+    E->pIni       = R->Base<CCINIClass*>(0x8);
 }

@@ -4835,7 +4835,7 @@ class DisplayClass
     munknown_11DC : number;
     munknown_11E0 : number;
 }
-export enum DirType {
+enum DirType {
     North = 0,
     NorthEast = 32,
     East = 64,
@@ -4846,13 +4846,13 @@ export enum DirType {
     NorthWest = -32,
     Max = -1,
 }
-export enum AbstractFlags {
+enum AbstractFlags {
     None = 0,
     Techno = 1,
     Object = 2,
     Foot = 4,
 }
-export enum AbstractType {
+enum AbstractType {
     None = 0,
     Unit = 1,
     Aircraft = 2,
@@ -4928,12 +4928,12 @@ export enum AbstractType {
     SlaveManager = 72,
     DiskLaser = 73,
 }
-export enum RecordFlag {
+enum RecordFlag {
     Write = 1,
     Read = 2,
     Attract = 4,
 }
-export enum Action {
+enum Action {
     None = 0,
     Move = 1,
     NoMove = 2,
@@ -5008,7 +5008,7 @@ export enum Action {
     Airstrike = 71,
     PsychicReveal = 72,
 }
-export enum Ability {
+enum Ability {
     Faster = 0,
     Stronger = 1,
     Firepower = 2,
@@ -5028,12 +5028,12 @@ export enum Ability {
     GuardArea = 16,
     Crusher = 17,
 }
-export enum AIDifficulty {
+enum AIDifficulty {
     Hard = 0,
     Normal = 1,
     Easy = 2,
 }
-export enum TextPrintType {
+enum TextPrintType {
     LASTPOINT = 0,
     LASTSHADOW = 0,
     Point6 = 1,
@@ -5061,12 +5061,12 @@ export enum TextPrintType {
     UnknownColor = 32768,
     GradAll = 61440,
 }
-export enum TriggerPersistence {
+enum TriggerPersistence {
     Volatile = 0,
     SemiPersistant = 1,
     Persistent = 2,
 }
-export enum TriggerEvent {
+enum TriggerEvent {
     None = 0,
     EnteredBy = 1,
     SpiedBy = 2,
@@ -5130,7 +5130,7 @@ export enum TriggerEvent {
     TechTypeExists = 60,
     TechTypeDoesntExist = 61,
 }
-export enum TriggerAction {
+enum TriggerAction {
     None = 0,
     Win = 1,
     Lose = 2,
@@ -5278,14 +5278,14 @@ export enum TriggerAction {
     RetintBlue = 144,
     JumpCameraHome = 145,
 }
-export enum TriggerAttachType {
+enum TriggerAttachType {
     Global = 1,
     Object = 2,
     Map = 4,
     House = 8,
     Logic = 16,
 }
-export enum LogicNeedType {
+enum LogicNeedType {
     None = 0,
     Theme = 1,
     Movie = 2,
@@ -5335,13 +5335,13 @@ export enum LogicNeedType {
     NumberNSuper = 46,
     BuildingNNumber = 47,
 }
-export enum AIMode {
+enum AIMode {
     General = 0,
     LowOnCash = 1,
     BuildBase = 3,
     SellAll = 4,
 }
-export enum AITriggerCondition {
+enum AITriggerCondition {
     Pool = -1,
     AIOwns = 0,
     EnemyOwns = 1,
@@ -5352,12 +5352,12 @@ export enum AITriggerCondition {
     ChronoCharged = 6,
     NeutralOwns = 7,
 }
-export enum AITriggerHouseType {
+enum AITriggerHouseType {
     None = 0,
     Single = 1,
     Any = 2,
 }
-export enum Armor {
+enum Armor {
     None = 0,
     Flak = 1,
     Plate = 2,
@@ -5370,34 +5370,34 @@ export enum Armor {
     Special_1 = 9,
     Special_2 = 10,
 }
-export enum SpotlightBehaviour {
+enum SpotlightBehaviour {
     None = 0,
     Sweep = 1,
     Circle = 2,
     Follow = 3,
 }
-export enum SpotlightFlags {
+enum SpotlightFlags {
     None = 0,
     NoColor = 1,
     NoRed = 2,
     NoGreen = 4,
     NoBlue = 8,
 }
-export enum BehavesLike {
+enum BehavesLike {
     Smoke = 0,
     Gas = 1,
     Fire = 2,
     Spark = 3,
     Railgun = 4,
 }
-export enum ParticleSystemHoldsWhat {
+enum ParticleSystemHoldsWhat {
     Gas = 0,
     Smoke = 1,
     Fire = 2,
     Spark = 3,
     Railgun = 4,
 }
-export enum BuildCat {
+enum BuildCat {
     DontCare = 0,
     Tech = 1,
     Resoure = 2,
@@ -5405,7 +5405,7 @@ export enum BuildCat {
     Infrastructure = 4,
     Combat = 5,
 }
-export enum BuildingAnimSlot {
+enum BuildingAnimSlot {
     All = -2,
     None = -1,
     Upgrade1 = 0,
@@ -5430,7 +5430,7 @@ export enum BuildingAnimSlot {
     LowPower = 19,
     SuperLowPower = 20,
 }
-export enum Category {
+enum Category {
     Invalid = -1,
     Soldier = 0,
     Civilian = 1,
@@ -5444,7 +5444,7 @@ export enum Category {
     AirPower = 9,
     AirLift = 10,
 }
-export enum CellFlags {
+enum CellFlags {
     Empty = 0,
     CenterRevealed = 1,
     EdgeRevealed = 2,
@@ -5472,7 +5472,7 @@ export enum CellFlags {
     Revealed = 3,
     Bridge = 1280,
 }
-export enum AltCellFlags {
+enum AltCellFlags {
     Unknown_1 = 1,
     ContainsBuilding = 2,
     Unknown_4 = 4,
@@ -5484,7 +5484,7 @@ export enum AltCellFlags {
     Unknown_100 = 256,
     Clear = 24,
 }
-export enum PassabilityType {
+enum PassabilityType {
     Passable = 0,
     Crushable = 1,
     Destroyable = 2,
@@ -5494,7 +5494,7 @@ export enum PassabilityType {
     Impassable = 6,
     OutsideMap = 7,
 }
-export enum FacingType {
+enum FacingType {
     North = 0,
     NorthEast = 1,
     East = 2,
@@ -5506,13 +5506,13 @@ export enum FacingType {
     Count = 8,
     None = -1,
 }
-export enum CloakState {
+enum CloakState {
     Uncloaked = 0,
     Cloaking = 1,
     Cloaked = 2,
     Uncloaking = 3,
 }
-export enum DamageState {
+enum DamageState {
     Unaffected = 0,
     Unchanged = 1,
     NowYellow = 2,
@@ -5520,22 +5520,22 @@ export enum DamageState {
     NowDead = 4,
     PostMortem = 5,
 }
-export enum DamageAreaResult {
+enum DamageAreaResult {
     Hit = 0,
     Missed = 1,
     Nullified = 2,
 }
-export enum KickOutResult {
+enum KickOutResult {
     Failed = 0,
     Busy = 1,
     Succeeded = 2,
 }
-export enum CanBuildResult {
+enum CanBuildResult {
     TemporarilyUnbuildable = -1,
     Unbuildable = 0,
     Buildable = 1,
 }
-export enum FireError {
+enum FireError {
     NONE = -1,
     OK = 0,
     AMMO = 1,
@@ -5550,12 +5550,12 @@ export enum FireError {
     BUSY = 10,
     MUST_DEPLOY = 11,
 }
-export enum HealthState {
+enum HealthState {
     Red = 0,
     Yellow = 1,
     Green = 2,
 }
-export enum Foundation {
+enum Foundation {
     _1x1 = 0,
     _2x1 = 1,
     _1x2 = 2,
@@ -5579,13 +5579,13 @@ export enum Foundation {
     _6x4 = 20,
     _0x0 = 21,
 }
-export enum GameMode {
+enum GameMode {
     Campaign = 0,
     LAN = 3,
     Internet = 4,
     Skirmish = 5,
 }
-export enum InfDeath {
+enum InfDeath {
     None = 0,
     Die1 = 1,
     Die2 = 2,
@@ -5598,7 +5598,7 @@ export enum InfDeath {
     Mutate = 9,
     Brute = 10,
 }
-export enum LandType {
+enum LandType {
     Clear = 0,
     Road = 1,
     Water = 2,
@@ -5612,7 +5612,7 @@ export enum LandType {
     Tunnel = 10,
     Weeds = 11,
 }
-export enum Layer {
+enum Layer {
     None = -1,
     Underground = 0,
     Surface = 1,
@@ -5620,7 +5620,7 @@ export enum Layer {
     Air = 3,
     Top = 4,
 }
-export enum MarkType {
+enum MarkType {
     Up = 0,
     Down = 1,
     Change = 2,
@@ -5628,17 +5628,17 @@ export enum MarkType {
     OverlapDown = 4,
     OverlapUp = 5,
 }
-export enum MouseHotSpotX {
+enum MouseHotSpotX {
     Left = 0,
     Center = 12345,
     Right = 54321,
 }
-export enum MouseHotSpotY {
+enum MouseHotSpotY {
     Top = 0,
     Middle = 12345,
     Bottom = 54321,
 }
-export enum Mission {
+enum Mission {
     None = -1,
     Sleep = 0,
     Attack = 1,
@@ -5673,7 +5673,7 @@ export enum Mission {
     SpyplaneApproach = 30,
     SpyplaneOverfly = 31,
 }
-export enum MovementZone {
+enum MovementZone {
     None = -1,
     Normal = 0,
     Crusher = 1,
@@ -5689,7 +5689,7 @@ export enum MovementZone {
     WaterBeach = 11,
     CrusherAll = 12,
 }
-export enum PipIndex {
+enum PipIndex {
     Empty = 0,
     Green = 1,
     Yellow = 2,
@@ -5704,7 +5704,7 @@ export enum PipIndex {
     PersonBlue = 11,
     PersonPurple = 12,
 }
-export enum PipScale {
+enum PipScale {
     None = 0,
     Ammo = 1,
     Tiberium = 2,
@@ -5712,7 +5712,7 @@ export enum PipScale {
     Power = 4,
     MindControl = 5,
 }
-export enum Powerup {
+enum Powerup {
     Money = 0,
     Unit = 1,
     HealBase = 2,
@@ -5733,7 +5733,7 @@ export enum Powerup {
     Tiberium = 17,
     Pod = 18,
 }
-export enum Prerequisite {
+enum Prerequisite {
     Proc = -6,
     Tech = -5,
     Radar = -4,
@@ -5741,12 +5741,12 @@ export enum Prerequisite {
     Factory = -2,
     Power = -1,
 }
-export enum PrismChargeState {
+enum PrismChargeState {
     Idle = 0,
     Master = 1,
     Slave = 2,
 }
-export enum RadarEventType {
+enum RadarEventType {
     Combat = 0,
     Noncombat = 1,
     DropZone = 2,
@@ -5765,7 +5765,7 @@ export enum RadarEventType {
     GarrisonAbandoned = 15,
     AllyBaseAttacked = 16,
 }
-export enum PsychicDominatorStatus {
+enum PsychicDominatorStatus {
     Inactive = 0,
     FirstAnim = 1,
     Fire = 2,
@@ -5773,18 +5773,18 @@ export enum PsychicDominatorStatus {
     Reset = 4,
     Over = 5,
 }
-export enum NukeFlashStatus {
+enum NukeFlashStatus {
     Inactive = 0,
     FadeIn = 1,
     FadeOut = 2,
 }
-export enum ChargeDrainState {
+enum ChargeDrainState {
     None = -1,
     Charging = 0,
     Ready = 1,
     Draining = 2,
 }
-export enum SuperWeaponType {
+enum SuperWeaponType {
     Invalid = -1,
     Nuke = 0,
     IronCurtain = 1,
@@ -5799,7 +5799,7 @@ export enum SuperWeaponType {
     ForceShield = 10,
     PsychicReveal = 11,
 }
-export enum MouseCursorType {
+enum MouseCursorType {
     Default = 0,
     Move_N = 1,
     Move_NE = 2,
@@ -5887,18 +5887,18 @@ export enum MouseCursorType {
     PsychicReveal = 84,
     SpyPlane = 85,
 }
-export enum RadBeamType {
+enum RadBeamType {
     Temporal = 0,
     RadBeam = 1,
     Eruption = 2,
 }
-export enum Rank {
+enum Rank {
     Invalid = -1,
     Elite = 0,
     Veteran = 1,
     Rookie = 2,
 }
-export enum Sequence {
+enum Sequence {
     Ready = 0,
     Guard = 1,
     Prone = 2,
@@ -5943,7 +5943,7 @@ export enum Sequence {
     SecondaryProne = 41,
     Nothing = -1,
 }
-export enum SequenceFacing {
+enum SequenceFacing {
     N = 0,
     NE = 1,
     E = 2,
@@ -5953,7 +5953,7 @@ export enum SequenceFacing {
     W = 6,
     NW = 7,
 }
-export enum SpeedType {
+enum SpeedType {
     None = -1,
     Foot = 0,
     Track = 1,
@@ -5964,7 +5964,7 @@ export enum SpeedType {
     Amphibious = 6,
     FloatBeach = 7,
 }
-export enum TheaterType {
+enum TheaterType {
     None = -1,
     Temperate = 0,
     Snow = 1,
@@ -5973,7 +5973,7 @@ export enum TheaterType {
     NewUrban = 4,
     Lunar = 5,
 }
-export enum VisualType {
+enum VisualType {
     Normal = 0,
     Indistinct = 1,
     Darken = 2,
@@ -5981,7 +5981,7 @@ export enum VisualType {
     Ripple = 4,
     Hidden = 5,
 }
-export enum RadioCommand {
+enum RadioCommand {
     AnswerInvalid = 0,
     AnswerPositive = 1,
     RequestLink = 2,
@@ -6023,7 +6023,7 @@ export enum RadioCommand {
     QueryOnBuilding = 35,
     QueryCanTote = 36,
 }
-export enum EventType {
+enum EventType {
     Empty = 0,
     PowerOn = 1,
     PowerOff = 2,
@@ -6073,14 +6073,14 @@ export enum EventType {
     AbandonAll = 46,
     LAST_EVENT = 47,
 }
-export enum SoundPriority {
+enum SoundPriority {
     Lowest = 0,
     Low = 1,
     Normal = 2,
     High = 3,
     Critical = 4,
 }
-export enum SoundType {
+enum SoundType {
     Normal = 0,
     Violent = 1,
     Movement = 2,
@@ -6096,7 +6096,7 @@ export enum SoundType {
     Shroud = 2048,
     Ambient = 4096,
 }
-export enum SoundControl {
+enum SoundControl {
     None = 0,
     Loop = 1,
     Random = 2,
@@ -6107,25 +6107,25 @@ export enum SoundControl {
     Decay = 64,
     Ambient = 128,
 }
-export enum VoxType {
+enum VoxType {
     Standard = 0,
     Queue = 1,
     Interrupt = 2,
     QueuedInterrupt = 3,
 }
-export enum VoxPriority {
+enum VoxPriority {
     Low = 0,
     Normal = 1,
     Important = 2,
     Critical = 3,
 }
-export enum WaveType {
+enum WaveType {
     Sonic = 0,
     BigLaser = 1,
     Laser = 2,
     Magnetron = 3,
 }
-export enum TargetType {
+enum TargetType {
     None = 0,
     Anything = 1,
     Buildings = 2,
@@ -6138,7 +6138,7 @@ export enum TargetType {
     Occupiable = 10,
     TechBuildings = 11,
 }
-export enum TargetFlags {
+enum TargetFlags {
     None = 0,
     unknown_1 = 1,
     unknown_2 = 2,
@@ -6158,7 +6158,7 @@ export enum TargetFlags {
     Occupiable = 32768,
     TechCapture = 65536,
 }
-export enum BlitterFlags {
+enum BlitterFlags {
     None = 0,
     Darken = 1,
     TransLucent25 = 2,
@@ -6181,7 +6181,7 @@ export enum BlitterFlags {
     Zero = 65536,
     Nonzero = 131072,
 }
-export enum MouseEvent {
+enum MouseEvent {
     None = 0,
     LeftDown = 1,
     LeftHeld = 2,
@@ -6191,7 +6191,7 @@ export enum MouseEvent {
     RightHeld = 32,
     RightUp = 64,
 }
-export enum Edge {
+enum Edge {
     None = -1,
     North = 0,
     East = 1,
@@ -6199,7 +6199,7 @@ export enum Edge {
     West = 3,
     Air = 4,
 }
-export enum Move {
+enum Move {
     OK = 0,
     Cloak = 1,
     MovingBlock = 2,
@@ -6209,21 +6209,21 @@ export enum Move {
     Temp = 6,
     No = 7,
 }
-export enum ZGradient {
+enum ZGradient {
     None = -1,
     Ground = 0,
     Deg45 = 1,
     Deg90 = 2,
     Deg135 = 3,
 }
-export enum ParasiteState {
+enum ParasiteState {
     Start = 0,
     Grab = 1,
     PushLeft = 2,
     PushRight = 3,
     Damage = 4,
 }
-export enum WWKey {
+enum WWKey {
     Shift = 256,
     Ctrl = 512,
     Alt = 1024,
@@ -6232,7 +6232,7 @@ export enum WWKey {
     DoubleClick = 8192,
     Button = 32768,
 }
-export enum AirAttackStatus {
+enum AirAttackStatus {
     ValidateAZ = 0,
     PickAttackLocation = 1,
     TakeOff = 2,
@@ -6245,12 +6245,12 @@ export enum AirAttackStatus {
     FireAtTarget5_Strafe = 9,
     ReturnToBase = 10,
 }
-export enum LandTargetingType {
+enum LandTargetingType {
     Land_OK = 0,
     Land_Not_OK = 1,
     Land_Secondary = 2,
 }
-export enum NavalTargetingType {
+enum NavalTargetingType {
     Underwater_Never = 0,
     Underwater_Secondary = 1,
     Underwater_Only = 2,
@@ -6260,14 +6260,14 @@ export enum NavalTargetingType {
     Naval_None = 6,
     Naval_Primary = 7,
 }
-export enum RGBMode {
+enum RGBMode {
     RGB555 = 0,
     RGB556 = 1,
     RGB565 = 2,
     RGB655 = 3,
     Invalid = -1,
 }
-export enum ZoneType {
+enum ZoneType {
     None = -1,
     Core = 0,
     North = 1,
@@ -6275,7 +6275,7 @@ export enum ZoneType {
     South = 3,
     West = 4,
 }
-export enum BStateType {
+enum BStateType {
     Construction = 0,
     Idle = 1,
     Active = 2,
@@ -6285,18 +6285,18 @@ export enum BStateType {
     Count = 6,
     None = -1,
 }
-export enum FileAccessMode {
+enum FileAccessMode {
     None = 0,
     Read = 1,
     Write = 2,
     ReadWrite = 3,
 }
-export enum FileSeekMode {
+enum FileSeekMode {
     Set = 0,
     Current = 1,
     End = 2,
 }
-export enum SpawnNodeStatus {
+enum SpawnNodeStatus {
     Idle = 0,
     TakeOff = 1,
     Preparing = 2,
@@ -6305,12 +6305,12 @@ export enum SpawnNodeStatus {
     Reloading = 6,
     Dead = 7,
 }
-export enum SpawnManagerStatus {
+enum SpawnManagerStatus {
     Idle = 0,
     Launching = 1,
     CoolDown = 2,
 }
-export enum SlaveControlStatus {
+enum SlaveControlStatus {
     Unknown = 0,
     ScanningForTiberium = 1,
     MovingToTiberium = 2,
@@ -6319,7 +6319,7 @@ export enum SlaveControlStatus {
     Respawning = 5,
     Dead = 6,
 }
-export enum SlaveManagerStatus {
+enum SlaveManagerStatus {
     Ready = 0,
     Scanning = 1,
     Travelling = 2,
@@ -6328,7 +6328,7 @@ export enum SlaveManagerStatus {
     ScanningAgain = 5,
     PackingUp = 6,
 }
-export enum CSFLanguages {
+enum CSFLanguages {
     US = 0,
     UK = 1,
     German = 2,
@@ -6341,13 +6341,13 @@ export enum CSFLanguages {
     Chinese = 9,
     Unknown = 10,
 }
-export enum KeyModifier {
+enum KeyModifier {
     None = 0,
     Shift = 1,
     Ctrl = 2,
     Alt = 4,
 }
-export enum GadgetFlag {
+enum GadgetFlag {
     LeftPress = 1,
     LeftHeld = 2,
     LeftRelease = 4,

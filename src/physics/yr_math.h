@@ -63,3 +63,8 @@ inline Vector3D<double> ToVector3d(Vector3D<float> vec)
     double z = static_cast<double>(vec.Z);
     return {x, y, z};
 }
+
+inline Vector3D<float> QuaternionToEuler(Quaternion const& quat)
+{
+    return ToVector3f(ToQuat(quat).GetEulerAngles());
+}

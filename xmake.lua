@@ -105,7 +105,7 @@ target("XkeinEditor")
 
 target("make_artifacts")
     set_kind("phony")
-    add_deps("Scripts", "YrScripting")
+    add_deps("Scripts", "YrScripting", "XkeinExt", "XkeinEditor")
     after_build(function (target)
         if not has_config("make_artifacts") then
             return

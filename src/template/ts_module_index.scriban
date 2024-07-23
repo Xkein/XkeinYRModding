@@ -114,10 +114,9 @@ $base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
 }
 {{- end }}
 {{- end }}
-
 {{- for enum in module_enums }}
 {{- if need_codegen(enum) || is_yrpp }}
-export enum {{enum.name}} {
+enum {{enum.name}} {
     {{- for enum_item in enum.constants }}
     {{enum_item.name}} = {{enum_item.value}},
     {{- end}}
