@@ -10,20 +10,20 @@ CLASS(HookEvent)
 class YrAnimTypeCtorEvent
 {
 public:
-    AnimTypeClass* pAnimType {nullptr};
+    AnimTypeClass* pAnimType;
 };
 
 CLASS(HookEvent)
 class YrAnimTypeDtorEvent
 {
 public:
-    AnimTypeClass* pAnimType {nullptr};
+    AnimTypeClass* pAnimType;
 };
 
 CLASS(HookEvent)
 class YrAnimTypeLoadIniEvent
 {
 public:
-    AnimTypeClass* pAnimType {nullptr};
-    CCINIClass*    pIni {nullptr};
+    AnimTypeClass* pAnimType;
+    CCINIClass*    pIni;
 };

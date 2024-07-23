@@ -8,5 +8,7 @@ class ScriptComponent
     mOnEndUpdate : any;
     mOnReceiveDamage : any;
     mOnFire : any;
+    mOnDetonate : any;
+    mOnLaunch : any;
 }
 }

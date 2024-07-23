@@ -295,86 +295,55 @@ YREXTCORE_API entt::meta_type api::GetYrClassMeta(AbstractClass const* pAbstract
     return NULL_CLASS_META;
 }
 
-DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftCtorEvent)
-{
-    CREATE_ENTITY(AircraftClass, E->pAircraft);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingCtorEvent)
-{
-    CREATE_ENTITY(BuildingClass, E->pBuilding);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryCtorEvent)
-{
-    CREATE_ENTITY(InfantryClass, E->pInfantry);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitCtorEvent)
-{
-    CREATE_ENTITY(UnitClass, E->pUnit);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletCtorEvent)
-{
-    CREATE_ENTITY(BulletClass, E->pBullet);
-}
+#define DO_ENTITY_ACTION(EntityAction, HookEvent, Class, Member) DEFINE_YR_HOOK_EVENT_LISTENER(HookEvent) { EntityAction(Class, Member); }
 
-DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftDtorEvent)
-{
-    DESTROY_ENTITY(AircraftClass, E->pAircraft);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingDtorEvent)
-{
-    DESTROY_ENTITY(BuildingClass, E->pBuilding);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryDtorEvent)
-{
-    DESTROY_ENTITY(InfantryClass, E->pInfantry);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitDtorEvent)
-{
-    DESTROY_ENTITY(UnitClass, E->pUnit);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletDtorEvent)
-{
-    DESTROY_ENTITY(BulletClass, E->pBullet);
-}
+DO_ENTITY_ACTION(CREATE_ENTITY, YrAircraftCtorEvent, AircraftClass, E->pAircraft)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrAircraftDtorEvent, AircraftClass, E->pAircraft)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrAircraftTypeCtorEvent, AircraftTypeClass, E->pAircraftType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrAircraftTypeDtorEvent, AircraftTypeClass, E->pAircraftType)
 
-DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftTypeCtorEvent)
-{
-    CREATE_ENTITY(AircraftTypeClass, E->pAircraftType);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingTypeCtorEvent)
-{
-    CREATE_ENTITY(BuildingTypeClass, E->pBuildingType);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryTypeCtorEvent)
-{
-    CREATE_ENTITY(InfantryTypeClass, E->pInfantryType);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitTypeCtorEvent)
-{
-    CREATE_ENTITY(UnitTypeClass, E->pUnitType);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeCtorEvent)
-{
-    CREATE_ENTITY(BulletTypeClass, E->pBulletType);
-}
+DO_ENTITY_ACTION(CREATE_ENTITY, YrBuildingCtorEvent, BuildingClass, E->pBuilding)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrBuildingDtorEvent, BuildingClass, E->pBuilding)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrBuildingTypeCtorEvent, BuildingTypeClass, E->pBuildingType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrBuildingTypeDtorEvent, BuildingTypeClass, E->pBuildingType)
 
-DEFINE_YR_HOOK_EVENT_LISTENER(YrAircraftTypeDtorEvent)
-{
-    DESTROY_ENTITY(AircraftTypeClass, E->pAircraftType);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBuildingTypeDtorEvent)
-{
-    DESTROY_ENTITY(BuildingTypeClass, E->pBuildingType);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrInfantryTypeDtorEvent)
-{
-    DESTROY_ENTITY(InfantryTypeClass, E->pInfantryType);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrUnitTypeDtorEvent)
-{
-    DESTROY_ENTITY(UnitTypeClass, E->pUnitType);
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeDtorEvent)
-{
-    DESTROY_ENTITY(BulletTypeClass, E->pBulletType);
-}
+DO_ENTITY_ACTION(CREATE_ENTITY, YrInfantryCtorEvent, InfantryClass, E->pInfantry)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrInfantryDtorEvent, InfantryClass, E->pInfantry)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrInfantryTypeCtorEvent, InfantryTypeClass, E->pInfantryType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrInfantryTypeDtorEvent, InfantryTypeClass, E->pInfantryType)
+
+DO_ENTITY_ACTION(CREATE_ENTITY, YrUnitCtorEvent, UnitClass, E->pUnit)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrUnitDtorEvent, UnitClass, E->pUnit)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrUnitTypeCtorEvent, UnitTypeClass, E->pUnitType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrUnitTypeDtorEvent, UnitTypeClass, E->pUnitType)
+
+DO_ENTITY_ACTION(CREATE_ENTITY, YrBulletCtorEvent, BulletClass, E->pBullet)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrBulletDtorEvent, BulletClass, E->pBullet)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrBulletTypeCtorEvent, BulletTypeClass, E->pBulletType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrBulletTypeDtorEvent, BulletTypeClass, E->pBulletType)
+
+DO_ENTITY_ACTION(CREATE_ENTITY, YrAnimCtorEvent, AnimClass, E->pAnim)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrAnimDtorEvent, AnimClass, E->pAnim)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrAnimTypeCtorEvent, AnimTypeClass, E->pAnimType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrAnimTypeDtorEvent, AnimTypeClass, E->pAnimType)
+
+DO_ENTITY_ACTION(CREATE_ENTITY, YrHouseCtorEvent, HouseClass, E->pHouse)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrHouseDtorEvent, HouseClass, E->pHouse)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrHouseTypeCtorEvent, HouseTypeClass, E->pHouseType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrHouseTypeDtorEvent, HouseTypeClass, E->pHouseType)
+
+DO_ENTITY_ACTION(CREATE_ENTITY, YrTerrainCtorEvent, TerrainClass, E->pTerrain)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrTerrainDtorEvent, TerrainClass, E->pTerrain)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrTerrainTypeCtorEvent, TerrainTypeClass, E->pTerrainType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrTerrainTypeDtorEvent, TerrainTypeClass, E->pTerrainType)
+
+DO_ENTITY_ACTION(CREATE_ENTITY, YrSuperCtorEvent, SuperClass, E->pSuper)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrSuperDtorEvent, SuperClass, E->pSuper)
+DO_ENTITY_ACTION(CREATE_ENTITY, YrSuperWeaponTypeCtorEvent, SuperWeaponTypeClass, E->pSuperWeaponType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrSuperWeaponTypeDtorEvent, SuperWeaponTypeClass, E->pSuperWeaponType)
+
+DO_ENTITY_ACTION(CREATE_ENTITY, YrWeaponTypeCtorEvent, WeaponTypeClass, E->pWeaponType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrWeaponTypeDtorEvent, WeaponTypeClass, E->pWeaponType)
+
+DO_ENTITY_ACTION(CREATE_ENTITY, YrWarheadTypeCtorEvent, WarheadTypeClass, E->pWarheadType)
+DO_ENTITY_ACTION(DESTROY_ENTITY, YrWarheadTypeDtorEvent, WarheadTypeClass, E->pWarheadType)

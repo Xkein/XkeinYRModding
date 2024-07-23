@@ -10,12 +10,12 @@ CLASS(HookEvent)
 class YrBuildingTypeCtorEvent
 {
 public:
-    BuildingTypeClass* pBuildingType {nullptr};
+    BuildingTypeClass* pBuildingType;
 };
 
 CLASS(HookEvent)
 class YrBuildingTypeDtorEvent
 {
 public:
-    BuildingTypeClass* pBuildingType {nullptr};
+    BuildingTypeClass* pBuildingType;
 };

@@ -12,12 +12,12 @@ CLASS(HookEvent)
 class YrObjectReceiveDamageEvent : public YrHookOverrideReturn<DamageState>
 {
 public:
-    ObjectClass*      pObject {nullptr};
-    int*              pDamage {nullptr};
-    int               DistanceFromEpicenter {false};
-    WarheadTypeClass* pWH {nullptr};
-    ObjectClass*      Attacker {nullptr};
-    bool              IgnoreDefenses {false};
-    bool              PreventPassengerEscape {false};
-    HouseClass*       pAttackingHouse {nullptr};
+    ObjectClass*      pObject;
+    int*              pDamage;
+    int               DistanceFromEpicenter;
+    WarheadTypeClass* pWH;
+    ObjectClass*      Attacker;
+    bool              IgnoreDefenses;
+    bool              PreventPassengerEscape;
+    HouseClass*       pAttackingHouse;
 };

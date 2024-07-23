@@ -42,28 +42,28 @@ CLASS(HookEvent)
 class YrSaveGameBeginEvent
 {
 public:
-    const char* fileName {nullptr};
+    const char* fileName;
 };
 
 CLASS(HookEvent)
 class YrSaveGameEndEvent
 {
 public:
-    const char* fileName {nullptr};
+    const char* fileName;
 };
 
 CLASS(HookEvent)
 class YrSaveGameBeginStreamEvent
 {
 public:
-    IStream* stream {nullptr};
+    IStream* stream;
 };
 
 CLASS(HookEvent)
 class YrSaveGameEndStreamEvent
 {
 public:
-    IStream* stream {nullptr};
+    IStream* stream;
 };
 
 // ======================= load game =======================
@@ -72,26 +72,26 @@ CLASS(HookEvent)
 class YrLoadGameBeginEvent
 {
 public:
-    const char* fileName {nullptr};
+    const char* fileName;
 };
 
 CLASS(HookEvent)
 class YrLoadGameEndEvent
 {
 public:
-    const char* fileName {nullptr};
+    const char* fileName;
 };
 
 CLASS(HookEvent)
 class YrLoadGameBeginStreamEvent
 {
 public:
-    IStream* stream {nullptr};
+    IStream* stream;
 };
 
 CLASS(HookEvent)
 class YrLoadGameEndStreamEvent
 {
 public:
-    IStream* stream {nullptr};
+    IStream* stream;
 };

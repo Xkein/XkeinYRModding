@@ -10,20 +10,20 @@ CLASS(HookEvent)
 class YrBulletTypeCtorEvent
 {
 public:
-    BulletTypeClass* pBulletType {nullptr};
+    BulletTypeClass* pBulletType;
 };
 
 CLASS(HookEvent)
 class YrBulletTypeDtorEvent
 {
 public:
-    BulletTypeClass* pBulletType {nullptr};
+    BulletTypeClass* pBulletType;
 };
 
 CLASS(HookEvent)
 class YrBulletTypeLoadIniEvent
 {
 public:
-    BulletTypeClass* pBulletType {nullptr};
-    CCINIClass*      pIni {nullptr};
+    BulletTypeClass* pBulletType;
+    CCINIClass*      pIni;
 };

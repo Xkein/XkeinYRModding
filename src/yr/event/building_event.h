@@ -9,12 +9,12 @@ CLASS(HookEvent)
 class YrBuildingCtorEvent
 {
 public:
-    BuildingClass* pBuilding {nullptr};
+    BuildingClass* pBuilding;
 };
 
 CLASS(HookEvent)
 class YrBuildingDtorEvent
 {
 public:
-    BuildingClass* pBuilding {nullptr};
+    BuildingClass* pBuilding;
 };

@@ -53,11 +53,7 @@ BROADCAST_HOOK_EVENT(0x711AE0, 0x5, YrTechnoTypeDtorEvent)
     E->pTechnoType = R->ECX<TechnoTypeClass*>();
 }
 
-BROADCAST_HOOK_EVENT(0x716132, 0x5, YrTechnoTypeLoadIniEvent)
-{
-    E->pTechnoType = R->EBP<TechnoTypeClass*>();
-    E->pIni        = R->Stack<CCINIClass*>(0x380);
-}
+BROADCAST_HOOK_EVENT_AGAIN(0x716132, 0x5, YrTechnoTypeLoadIniEvent, 0x716123)
 BROADCAST_HOOK_EVENT(0x716123, 0x5, YrTechnoTypeLoadIniEvent)
 {
     E->pTechnoType = R->EBP<TechnoTypeClass*>();

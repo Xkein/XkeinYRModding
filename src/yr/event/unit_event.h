@@ -9,12 +9,12 @@ CLASS(HookEvent)
 class YrUnitCtorEvent
 {
 public:
-    UnitClass* pUnit {nullptr};
+    UnitClass* pUnit;
 };
 
 CLASS(HookEvent)
 class YrUnitDtorEvent
 {
 public:
-    UnitClass* pUnit {nullptr};
+    UnitClass* pUnit;
 };

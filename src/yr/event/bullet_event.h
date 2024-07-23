@@ -1,6 +1,7 @@
 #pragma once
 
 #include "yr/yr_event.h"
+#include <GeneralStructures.h>
 
 class BulletClass;
 class BulletTypeClass;
@@ -13,26 +14,34 @@ CLASS(HookEvent)
 class YrBulletCtorEvent
 {
 public:
-    BulletClass* pBullet {nullptr};
+    BulletClass* pBullet;
 };
 
 CLASS(HookEvent)
 class YrBulletDtorEvent
 {
 public:
-    BulletClass* pBullet {nullptr};
+    BulletClass* pBullet;
 };
 
 CLASS(HookEvent)
 class YrBulletConstructEvent
 {
 public:
-    BulletClass*      pBullet {nullptr};
-    BulletTypeClass*  pBulletType {nullptr};
-    AbstractClass*    pTarget {nullptr};
-    TechnoClass*      pOwner {nullptr};
-    int               damage {0};
-    WarheadTypeClass* pWarhead {nullptr};
-    int               speed {0};
-    bool              bright {false};
+    BulletClass*      pBullet;
+    BulletTypeClass*  pBulletType;
+    AbstractClass*    pTarget;
+    TechnoClass*      pOwner;
+    int               damage;
+    WarheadTypeClass* pWarhead;
+    int               speed;
+    bool              bright;
+};
+
+CLASS(HookEvent)
+class YrBulletDetonateEvent
+{
+public:
+    BulletClass*       pBullet;
+    CoordStruct const* pCoords;
 };

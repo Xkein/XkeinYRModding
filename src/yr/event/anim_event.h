@@ -9,12 +9,12 @@ CLASS(HookEvent)
 class YrAnimCtorEvent
 {
 public:
-    AnimClass* pAnim {nullptr};
+    AnimClass* pAnim;
 };
 
 CLASS(HookEvent)
 class YrAnimDtorEvent
 {
 public:
-    AnimClass* pAnim {nullptr};
+    AnimClass* pAnim;
 };

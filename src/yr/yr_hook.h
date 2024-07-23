@@ -11,6 +11,11 @@
     template<> \
     inline void YrHookEvent::InitHookInfo_Impl<HookEvent, HookAddress>(REGISTERS* const R, HookEvent* const E)
 
+#define BROADCAST_HOOK_EVENT_AGAIN(HookAddress, Size, HookEvent, BroadAddress) \
+    DEFINE_HOOK(HookAddress, HOOK_##HookAddress##_##Size, Size) { \
+        return YrHookEventSystem::Broadcast<HookEvent, BroadAddress>(R); \
+    }
+
 #define IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(HookEvent, HookAddress, ReturnAddress) \
 namespace detail { \
     template<> \

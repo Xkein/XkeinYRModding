@@ -67,27 +67,27 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadIniEvent) {
 }
 {{- end }}
 {{- if is_ini_component_anim }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+DEFINE_YR_HOOK_EVENT_LISTENER(YrAnimTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{type_name}}>(E->pAnimType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_house }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{type_name}}>(E->pHouseType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_super }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pTerrainType, E->pIni);
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->pSuperWeaponType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_weapon }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+DEFINE_YR_HOOK_EVENT_LISTENER(YrWeaponTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{type_name}}>(E->pWeaponType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_warhead }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+DEFINE_YR_HOOK_EVENT_LISTENER(YrWarheadTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{type_name}}>(E->pWarheadType, E->pIni);
 }
 {{- end }}

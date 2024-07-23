@@ -9,12 +9,12 @@ CLASS(HookEvent)
 class YrHouseCtorEvent
 {
 public:
-    HouseClass* pHouse {nullptr};
+    HouseClass* pHouse;
 };
 
 CLASS(HookEvent)
 class YrHouseDtorEvent
 {
 public:
-    HouseClass* pHouse {nullptr};
+    HouseClass* pHouse;
 };

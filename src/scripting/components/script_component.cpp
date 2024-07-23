@@ -107,10 +107,14 @@ void ScriptComponent::CreateScriptComponent(entt::registry& reg, entt::entity en
     }
 }
 
-#include "yr/event/techno_event.h"
-#include "yr/event/object_event.h"
-#include "yr/event/bullet_event.h"
+#include "yr/yr_all_events.h"
 #include "yr/api/yr_entity.h"
+#include <SuperClass.h>
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletConstructEvent)
+{
+    ScriptComponent::OnEntityConstruct(*gEntt, GetYrEntity(E->pBullet), E->pBullet);
+}
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent) {
     ScriptComponent* script = GetYrComponent<ScriptComponent>(E->pObject);
@@ -130,8 +134,15 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoFireEvent) {
         }
     }
 }
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletConstructEvent)
-{
-    ScriptComponent::OnEntityConstruct(*gEntt, GetYrEntity(E->pBullet), E->pBullet);
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletDetonateEvent) {
+    ScriptComponent* script = GetYrComponent<ScriptComponent>(E->pBullet);
+    if (script) {
+        script->Invoke(script->OnDetonate, *E->pCoords);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperLaunchEvent) {
+    ScriptComponent* script = GetYrComponent<ScriptComponent>(E->pSuper);
+    if (script) {
+        script->Invoke(script->OnLaunch, *E->pCell, E->isPlayer);
+    }
 }

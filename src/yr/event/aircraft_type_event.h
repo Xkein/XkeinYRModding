@@ -10,12 +10,12 @@ CLASS(HookEvent)
 class YrAircraftTypeCtorEvent
 {
 public:
-    AircraftTypeClass* pAircraftType {nullptr};
+    AircraftTypeClass* pAircraftType;
 };
 
 CLASS(HookEvent)
 class YrAircraftTypeDtorEvent
 {
 public:
-    AircraftTypeClass* pAircraftType {nullptr};
+    AircraftTypeClass* pAircraftType;
 };

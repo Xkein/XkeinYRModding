@@ -10,20 +10,20 @@ CLASS(HookEvent)
 class YrSuperWeaponTypeCtorEvent
 {
 public:
-    SuperWeaponTypeClass* pSuperWeaponType {nullptr};
+    SuperWeaponTypeClass* pSuperWeaponType;
 };
 
 CLASS(HookEvent)
 class YrSuperWeaponTypeDtorEvent
 {
 public:
-    SuperWeaponTypeClass* pSuperWeaponType {nullptr};
+    SuperWeaponTypeClass* pSuperWeaponType;
 };
 
 CLASS(HookEvent)
 class YrSuperWeaponTypeLoadIniEvent
 {
 public:
-    SuperWeaponTypeClass* pSuperWeaponType {nullptr};
-    CCINIClass*           pIni {nullptr};
+    SuperWeaponTypeClass* pSuperWeaponType;
+    CCINIClass*           pIni;
 };

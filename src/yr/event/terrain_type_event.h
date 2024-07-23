@@ -10,20 +10,20 @@ CLASS(HookEvent)
 class YrTerrainTypeCtorEvent
 {
 public:
-    TerrainTypeClass* pTerrainType {nullptr};
+    TerrainTypeClass* pTerrainType;
 };
 
 CLASS(HookEvent)
 class YrTerrainTypeDtorEvent
 {
 public:
-    TerrainTypeClass* pTerrainType {nullptr};
+    TerrainTypeClass* pTerrainType;
 };
 
 CLASS(HookEvent)
 class YrTerrainTypeLoadIniEvent
 {
 public:
-    TerrainTypeClass* pTerrainType {nullptr};
-    CCINIClass*       pIni {nullptr};
+    TerrainTypeClass* pTerrainType;
+    CCINIClass*       pIni;
 };

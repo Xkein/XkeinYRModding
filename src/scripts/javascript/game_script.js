@@ -13,6 +13,10 @@ yr.createScriptTemplate = function (scriptName) {
         bindScriptComponent(ScriptComponent, inst, "OnDtor")
         bindScriptComponent(ScriptComponent, inst, "OnBeginUpdate")
         bindScriptComponent(ScriptComponent, inst, "OnEndUpdate")
+        bindScriptComponent(ScriptComponent, inst, "OnReceiveDamage")
+        bindScriptComponent(ScriptComponent, inst, "OnFire")
+        bindScriptComponent(ScriptComponent, inst, "OnDetonate")
+        bindScriptComponent(ScriptComponent, inst, "OnLaunch")
     }
     return scriptTemplate
 }

@@ -10,52 +10,52 @@ CLASS(HookEvent)
 class YrTechnoTypeCtorEvent
 {
 public:
-    TechnoTypeClass* pTechnoType {nullptr};
+    TechnoTypeClass* pTechnoType;
 };
 
 CLASS(HookEvent)
 class YrTechnoTypeDtorEvent
 {
 public:
-    TechnoTypeClass* pTechnoType {nullptr};
+    TechnoTypeClass* pTechnoType;
 };
 
 CLASS(HookEvent)
 class YrTechnoTypeLoadIniEvent
 {
 public:
-    TechnoTypeClass* pTechnoType {nullptr};
-    CCINIClass* pIni {nullptr};
+    TechnoTypeClass* pTechnoType;
+    CCINIClass* pIni;
 };
 
 CLASS(HookEvent)
 class YrTechnoTypeSaveGameBeginEvent
 {
 public:
-    TechnoTypeClass* pTechnoType {nullptr};
-    IStream* stream {nullptr};
+    TechnoTypeClass* pTechnoType;
+    IStream* stream;
 };
 
 CLASS(HookEvent)
 class YrTechnoTypeSaveGameEndEvent
 {
 public:
-    TechnoTypeClass* pTechnoType {nullptr};
-    IStream* stream {nullptr};
+    TechnoTypeClass* pTechnoType;
+    IStream* stream;
 };
 
 CLASS(HookEvent)
 class YrTechnoTypeLoadGameBeginEvent
 {
 public:
-    TechnoTypeClass* pTechnoType {nullptr};
-    IStream* stream {nullptr};
+    TechnoTypeClass* pTechnoType;
+    IStream* stream;
 };
 
 CLASS(HookEvent)
 class YrTechnoTypeLoadGameEndEvent
 {
 public:
-    TechnoTypeClass* pTechnoType {nullptr};
-    IStream* stream {nullptr};
+    TechnoTypeClass* pTechnoType;
+    IStream* stream;
 };

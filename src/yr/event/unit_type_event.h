@@ -10,13 +10,13 @@ CLASS(HookEvent)
 class YrUnitTypeCtorEvent
 {
 public:
-    UnitTypeClass* pUnitType {nullptr};
+    UnitTypeClass* pUnitType;
 };
 
 CLASS(HookEvent)
 class YrUnitTypeDtorEvent
 {
 public:
-    UnitTypeClass* pUnitType {nullptr};
+    UnitTypeClass* pUnitType;
 };
 

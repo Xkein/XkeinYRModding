@@ -10,20 +10,20 @@ CLASS(HookEvent)
 class YrHouseTypeCtorEvent
 {
 public:
-    HouseTypeClass* pHouseType {nullptr};
+    HouseTypeClass* pHouseType;
 };
 
 CLASS(HookEvent)
 class YrHouseTypeDtorEvent
 {
 public:
-    HouseTypeClass* pHouseType {nullptr};
+    HouseTypeClass* pHouseType;
 };
 
 CLASS(HookEvent)
 class YrHouseTypeLoadIniEvent
 {
 public:
-    HouseTypeClass* pHouseType {nullptr};
-    CCINIClass*     pIni {nullptr};
+    HouseTypeClass* pHouseType;
+    CCINIClass*     pIni;
 };

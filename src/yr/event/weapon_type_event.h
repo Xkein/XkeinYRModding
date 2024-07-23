@@ -11,42 +11,42 @@ CLASS(HookEvent)
 class YrWeaponTypeCtorEvent
 {
 public:
-    WeaponTypeClass* pWeaponType {nullptr};
+    WeaponTypeClass* pWeaponType;
 };
 
 CLASS(HookEvent)
 class YrWeaponTypeDtorEvent
 {
 public:
-    WeaponTypeClass* pWeaponType {nullptr};
+    WeaponTypeClass* pWeaponType;
 };
 
 CLASS(HookEvent)
 class YrWeaponTypeLoadIniEvent
 {
 public:
-    WeaponTypeClass* pWeaponType {nullptr};
-    CCINIClass*      pIni {nullptr};
+    WeaponTypeClass* pWeaponType;
+    CCINIClass*      pIni;
 };
 
 CLASS(HookEvent)
 class YrWarheadTypeCtorEvent
 {
 public:
-    WarheadTypeClass* pWarheadType {nullptr};
+    WarheadTypeClass* pWarheadType;
 };
 
 CLASS(HookEvent)
 class YrWarheadTypeDtorEvent
 {
 public:
-    WarheadTypeClass* pWarheadType {nullptr};
+    WarheadTypeClass* pWarheadType;
 };
 
 CLASS(HookEvent)
 class YrWarheadTypeLoadIniEvent
 {
 public:
-    WarheadTypeClass* pWarheadType {nullptr};
-    CCINIClass*       pIni {nullptr};
+    WarheadTypeClass* pWarheadType;
+    CCINIClass*       pIni;
 };

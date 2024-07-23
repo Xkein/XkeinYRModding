@@ -19,14 +19,19 @@ BROADCAST_HOOK_EVENT(0x4665E9, 0xA, YrBulletDtorEvent)
 }
 BROADCAST_HOOK_EVENT(0x466556, 0x6, YrBulletConstructEvent)
 {
-    E->pBullet = R->ESI<BulletClass*>();
+    E->pBullet     = R->ESI<BulletClass*>();
     E->pBulletType = R->Stack<BulletTypeClass*>(STACK_OFFSET(0x4, 0x4));
-    E->pTarget = R->Stack<AbstractClass*>(STACK_OFFSET(0x4, 0x8));
-    E->pOwner = R->Stack<TechnoClass*>(STACK_OFFSET(0x4, 0xC));
-    E->damage = R->Stack<int>(STACK_OFFSET(0x4, 0x10));
-    E->pWarhead = R->Stack<WarheadTypeClass*>(STACK_OFFSET(0x4, 0x14));
-    E->speed = R->Stack<int>(STACK_OFFSET(0x4, 0x18));
-    E->bright = R->Stack<bool>(STACK_OFFSET(0x4, 0x1C));
+    E->pTarget     = R->Stack<AbstractClass*>(STACK_OFFSET(0x4, 0x8));
+    E->pOwner      = R->Stack<TechnoClass*>(STACK_OFFSET(0x4, 0xC));
+    E->damage      = R->Stack<int>(STACK_OFFSET(0x4, 0x10));
+    E->pWarhead    = R->Stack<WarheadTypeClass*>(STACK_OFFSET(0x4, 0x14));
+    E->speed       = R->Stack<int>(STACK_OFFSET(0x4, 0x18));
+    E->bright      = R->Stack<bool>(STACK_OFFSET(0x4, 0x1C));
+}
+BROADCAST_HOOK_EVENT(0x4690B0, 0x6, YrBulletDetonateEvent)
+{
+    E->pBullet = R->ECX<BulletClass*>();
+    E->pCoords = R->Stack<CoordStruct const*>(0x4);
 }
 
 BROADCAST_HOOK_EVENT(0x46BDD9, 0x5, YrBulletTypeCtorEvent)
@@ -38,11 +43,7 @@ BROADCAST_HOOK_EVENT(0x46C8B6, 0x6, YrBulletTypeDtorEvent)
     E->pBulletType = R->ESI<BulletTypeClass*>();
 }
 
-BROADCAST_HOOK_EVENT(0x46C429, 0xA, YrBulletTypeLoadIniEvent)
-{
-    E->pBulletType = R->ESI<BulletTypeClass*>();
-    E->pIni        = R->Stack<CCINIClass*>(0x90);
-}
+BROADCAST_HOOK_EVENT_AGAIN(0x46C429, 0xA, YrBulletTypeLoadIniEvent, 0x46C41C)
 BROADCAST_HOOK_EVENT(0x46C41C, 0x5, YrBulletTypeLoadIniEvent)
 {
     E->pBulletType = R->ESI<BulletTypeClass*>();

@@ -10,12 +10,12 @@ CLASS(HookEvent)
 class YrInfantryTypeCtorEvent
 {
 public:
-    InfantryTypeClass* pInfantryType {nullptr};
+    InfantryTypeClass* pInfantryType;
 };
 
 CLASS(HookEvent)
 class YrInfantryTypeDtorEvent
 {
 public:
-    InfantryTypeClass* pInfantryType {nullptr};
+    InfantryTypeClass* pInfantryType;
 };
