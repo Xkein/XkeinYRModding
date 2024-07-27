@@ -1,9 +1,9 @@
 #include "physics/physics.h"
+#include "physics/jolt/debug_renderer.h"
 #include "physics/layers.h"
 #include "physics/physics_component.h"
 #include "physics/terrain_height_map.h"
 #include "physics/yr_tools.h"
-#include "physics/jolt/debug_renderer.h"
 #include "runtime/logger/logger.h"
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -22,9 +22,13 @@ public:
         switch (inObject1)
         {
             case PhysicsLayers::NON_MOVING:
-                return inObject2 == PhysicsLayers::MOVING;
+                return inObject2 == PhysicsLayers::MOVING || inObject2 == PhysicsLayers::DEBRIS;
             case PhysicsLayers::MOVING:
-                return inObject2 == PhysicsLayers::NON_MOVING || inObject2 == PhysicsLayers::MOVING;
+                return inObject2 == PhysicsLayers::NON_MOVING || inObject2 == PhysicsLayers::MOVING || inObject2 == PhysicsLayers::SENSOR;
+            case PhysicsLayers::DEBRIS:
+                return inObject2 == PhysicsLayers::NON_MOVING;
+            case PhysicsLayers::SENSOR:
+                return inObject2 == PhysicsLayers::MOVING;
             default:
                 JPH_ASSERT(false);
                 return false;
@@ -41,6 +45,8 @@ public:
         // Create a mapping table from object to broad phase layer
         mObjectToBroadPhase[PhysicsLayers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
         mObjectToBroadPhase[PhysicsLayers::MOVING]     = BroadPhaseLayers::MOVING;
+        mObjectToBroadPhase[PhysicsLayers::DEBRIS]     = BroadPhaseLayers::DEBRIS;
+        mObjectToBroadPhase[PhysicsLayers::SENSOR]     = BroadPhaseLayers::SENSOR;
     }
 
     virtual uint GetNumBroadPhaseLayers() const override
@@ -89,10 +95,13 @@ public:
         switch (inLayer1)
         {
             case PhysicsLayers::NON_MOVING:
-                return inLayer2 == BroadPhaseLayers::MOVING;
+                return inLayer2 == BroadPhaseLayers::MOVING || inLayer2 == BroadPhaseLayers::DEBRIS;
             case PhysicsLayers::MOVING:
-                return inLayer2 == BroadPhaseLayers::NON_MOVING || inLayer2 == BroadPhaseLayers::MOVING;
-                return false;
+                return inLayer2 == BroadPhaseLayers::NON_MOVING || inLayer2 == BroadPhaseLayers::MOVING || inLayer2 == BroadPhaseLayers::SENSOR;
+            case PhysicsLayers::DEBRIS:
+                return inLayer2 == BroadPhaseLayers::NON_MOVING;
+            case PhysicsLayers::SENSOR:
+                return inLayer2 == BroadPhaseLayers::MOVING;
             default:
                 JPH_ASSERT(false);
                 return false;
@@ -249,7 +258,7 @@ static constexpr uint cMaxContactConstraints = 20480;
 
 static JPH::PhysicsSettings gPhysicsSettings;
 static ContactListenerImpl* gContactListener = nullptr;
-static DebugRendererImpl* gDebugRenderer = nullptr;
+static DebugRendererImpl*   gDebugRenderer   = nullptr;
 
 static void JoltTrace(const char* inFMT, ...)
 {
@@ -339,6 +348,7 @@ void Physics::BeginTick()
         switch (pYrObject->WhatAmI())
         {
             case AbstractType::Bullet:
+            case AbstractType::Anim:
             case AbstractType::VoxelAnim: {
                 JPH::Vec3 linearVelocity  = ToVec3(GetObjectLinearVelocity(pYrObject));
                 JPH::Vec3 angularVelocity = ToVec3(GetObjectAngularVelocity(pYrObject));
@@ -349,11 +359,13 @@ void Physics::BeginTick()
         JPH::Vec3        position   = ToVec3(GetObjectCoords(pYrObject));
         JPH::Quat        quat       = ToQuat(GetObjectRotation(pYrObject));
         JPH::EActivation activation = body->IsStatic() ? JPH::EActivation::DontActivate : JPH::EActivation::Activate;
-        if (quat.IsNaN()) {
+        if (quat.IsNaN())
+        {
             quat = JPH::Quat::sIdentity();
             gLogger->error("{} rotation is NaN!", (void*)pYrObject);
         }
-        else {
+        else
+        {
             quat = quat.Normalized();
         }
         gBodyInterface->SetPositionAndRotationWhenChanged(body->GetID(), position, quat, activation);
@@ -378,9 +390,10 @@ void Physics::BeginTick()
             switch (pYrObject->WhatAmI())
             {
                 case AbstractType::Bullet:
+                case AbstractType::Anim:
                 case AbstractType::VoxelAnim: {
                     SetObjectLinearVelocity(pYrObject, ToVector3f(linearVelocity));
-                    SetObjectAngularVelocity(pYrObject, ToVector3f(angularVelocity));
+                    SetObjectAngularVelocity(pYrObject, ToQuaternion(JPH::Quat::sEulerAngles(angularVelocity)));
                     break;
                 }
             }

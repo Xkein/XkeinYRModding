@@ -8,6 +8,7 @@
 #include <string_view>
 #include <type_traits>
 #include <ranges>
+#include <optional>
 using namespace entt::literals;
 
 namespace detail
@@ -170,6 +171,22 @@ namespace detail
         static bool Read(std::string_view str, data_type& result)
         {
             return ParserHelper::Read(str, result, Size);
+        }
+    };
+
+    template<typename T>
+    struct Parser<std::optional<T>>
+    {
+        using data_type = std::optional<T>;
+        static bool Read(std::string_view str, data_type& result)
+        {
+            T tmp;
+            if (::Parser<T>::Read(str, tmp))
+            {
+                result = std::move(tmp);
+                return true;
+            }
+            return false;
         }
     };
 

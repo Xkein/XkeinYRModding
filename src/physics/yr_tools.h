@@ -166,7 +166,15 @@ inline static void SetObjectLinearVelocity(AbstractClass* pYrObject, Vector3D<fl
     }
 }
 
-inline static void SetObjectAngularVelocity(AbstractClass* pYrObject, Vector3D<float> vec)
+inline static void SetObjectAngularVelocity(AbstractClass* pYrObject, Quaternion quat)
 {
-    // TODO
+    switch (pYrObject->WhatAmI())
+    {
+        case AbstractType::Anim:
+            static_cast<AnimClass*>(pYrObject)->Bounce.AngularVelocity = quat;
+            break;
+        case AbstractType::VoxelAnim:
+            static_cast<VoxelAnimClass*>(pYrObject)->Bounce.AngularVelocity = quat;
+            break;
+    }
 }

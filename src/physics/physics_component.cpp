@@ -4,6 +4,7 @@
 #include "physics/yr_math.h"
 #include "physics/yr_tools.h"
 
+#include "runtime/logger/logger.h"
 #include <AbstractTypeClass.h>
 #include <BuildingClass.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
@@ -11,9 +12,9 @@
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/CylinderShape.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <ObjectClass.h>
-#include "runtime/logger/logger.h"
 
 // TODO: using https://stackoverflow.com/questions/5919298/algorithm-for-finding-the-fewest-rectangles-to-cover-a-set-of-rectangles-without
 JPH::ShapeSettings* GetBuildingShape(BuildingTypeClass* pBuildingType)
@@ -27,32 +28,61 @@ bool InitShapeSetting(PhysicsTypeComponent* pPhysicsType, AbstractTypeClass* pYr
 {
     if (pPhysicsType->shapeSettings)
         return true;
-    JPH::ShapeSettings* settings;
-    AbstractType        whamAmI = pYrType->WhatAmI();
-    switch (whamAmI)
+    JPH::ShapeSettings* settings = nullptr;
+    if (pPhysicsType->shapeType == EPhysicShapeType::Auto)
     {
-        case AbstractType::TerrainType:
-        case AbstractType::InfantryType:
-            settings = new JPH::CapsuleShapeSettings(0.5f, 0.5f);
-            break;
-        case AbstractType::BuildingType:
-            settings = GetBuildingShape(static_cast<BuildingTypeClass*>(pYrType));
-            break;
-        case AbstractType::AircraftType:
-        case AbstractType::UnitType:
-            settings = new JPH::BoxShapeSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
-            break;
-        case AbstractType::BulletType:
-        case AbstractType::VoxelAnimType:
-            settings = new JPH::SphereShapeSettings(0.5f);
-            break;
+        AbstractType        whamAmI = pYrType->WhatAmI();
+        switch (whamAmI)
+        {
+            case AbstractType::TerrainType:
+            case AbstractType::InfantryType:
+                settings = new JPH::CapsuleShapeSettings(0.5f, 0.5f);
+                break;
+            case AbstractType::BuildingType:
+                settings = GetBuildingShape(static_cast<BuildingTypeClass*>(pYrType));
+                break;
+            case AbstractType::AircraftType:
+            case AbstractType::UnitType:
+                settings = new JPH::BoxShapeSettings(JPH::Vec3(0.5f, 0.5f, 0.5f));
+                break;
+            case AbstractType::BulletType:
+            case AbstractType::AnimType:
+            case AbstractType::VoxelAnimType:
+                settings = new JPH::SphereShapeSettings(0.5f);
+                break;
+        }
     }
+    switch (pPhysicsType->shapeType)
+    {
+        case EPhysicShapeType::Box:
+            settings = new JPH::BoxShapeSettings(ToVec3(pPhysicsType->halfExtent));
+            break;
+        case EPhysicShapeType::Sphere:
+            settings = new JPH::SphereShapeSettings(pPhysicsType->radius);
+            break;
+        case EPhysicShapeType::Cylinder:
+            settings = new JPH::CylinderShapeSettings(pPhysicsType->halfHeight, pPhysicsType->radius);
+            break;
+        case EPhysicShapeType::Capsule:
+            settings = new JPH::CapsuleShapeSettings(pPhysicsType->halfHeight, pPhysicsType->radius);
+            break;
+        default:
+            if (settings == nullptr) {
+                gLogger->error("{} could not create physics shape settings!", pYrType->ID);
+                return false;
+            }
+            break;
+        }
+
     pPhysicsType->shapeSettings = std::shared_ptr<JPH::ShapeSettings>(settings);
     return true;
 }
 
-JPH::EMotionType GetMotionType(AbstractType whamAmI)
+JPH::EMotionType GetMotionType(PhysicsTypeComponent const* pPhysicsType, AbstractType whamAmI)
 {
+    if (pPhysicsType->isKinematic) {
+        return JPH::EMotionType::Kinematic;
+    }
     switch (whamAmI)
     {
         case AbstractType::Terrain:
@@ -63,6 +93,7 @@ JPH::EMotionType GetMotionType(AbstractType whamAmI)
         case AbstractType::Unit:
             return JPH::EMotionType::Kinematic;
         case AbstractType::Bullet:
+        case AbstractType::Anim:
         case AbstractType::VoxelAnim:
             return JPH::EMotionType::Dynamic;
         default:
@@ -70,8 +101,11 @@ JPH::EMotionType GetMotionType(AbstractType whamAmI)
     }
 }
 
-JPH::ObjectLayer GetObjectLayer(AbstractType whamAmI)
+JPH::ObjectLayer GetObjectLayer(PhysicsTypeComponent const* pPhysicsType, AbstractType whamAmI)
 {
+    if (pPhysicsType->isSensor) {
+        return PhysicsLayers::SENSOR;
+    }
     switch (whamAmI)
     {
         case AbstractType::Terrain:
@@ -81,8 +115,10 @@ JPH::ObjectLayer GetObjectLayer(AbstractType whamAmI)
         case AbstractType::Aircraft:
         case AbstractType::Unit:
         case AbstractType::Bullet:
-        case AbstractType::VoxelAnim:
             return PhysicsLayers::MOVING;
+        case AbstractType::Anim:
+        case AbstractType::VoxelAnim:
+            return PhysicsLayers::DEBRIS;
         default:
             return PhysicsLayers::MOVING;
     }
@@ -93,10 +129,11 @@ JPH::BodyCreationSettings GetBodySettings(PhysicsTypeComponent const* pPhysicsTy
     JPH::Vec3        position    = ToVec3(GetObjectCoords(pYrObject));
     JPH::Quat        quat        = ToQuat(GetObjectRotation(pYrObject));
     AbstractType     whatAmI     = pYrObject->WhatAmI();
-    JPH::EMotionType motionType  = GetMotionType(whatAmI);
-    JPH::ObjectLayer objectLayer = GetObjectLayer(whatAmI);
+    JPH::EMotionType motionType  = GetMotionType(pPhysicsType, whatAmI);
+    JPH::ObjectLayer objectLayer = GetObjectLayer(pPhysicsType, whatAmI);
     JPH::Shape*      shape       = pPhysicsType->shapeSettings->Create().Get();
-    if (quat.IsNaN()) {
+    if (quat.IsNaN())
+    {
         quat = JPH::Quat::sIdentity();
         gLogger->error("{} rotation is NaN!", (void*)pYrObject);
     }
@@ -117,9 +154,10 @@ void PhysicsComponent::CreatePhysicsComponent(entt::registry& reg, entt::entity 
         JPH::Body*                body       = gBodyInterface->CreateBody(settings);
         JPH::EActivation          activation = settings.mMotionType == JPH::EMotionType::Static ? JPH::EActivation::DontActivate : JPH::EActivation::Activate;
         gBodyInterface->AddBody(body->GetID(), activation);
-
+        body->SetUserData(reinterpret_cast<uint64>(&com));
         com.owner = pYrObject;
         com.body  = body;
+        com.type  = pPhysicsType;
     }
 }
 

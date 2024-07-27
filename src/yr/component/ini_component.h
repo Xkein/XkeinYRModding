@@ -6,15 +6,25 @@
 #include "yr/parse/ini_reader.h"
 #include <entt/meta/factory.hpp>
 using namespace entt::literals;
+namespace detail
+{
+    template<typename Type>
+    concept ini_component_has_after = requires(Type& com, IniReader& parser, const char* pSection, const char* pKey) {
+        com.AfterLoadIni(parser, pSection, pKey);
+    };
+}
 
 struct IniComponentLoader
 {
     template<typename T>
     static bool Load(IniReader& parser, const char* pSection, const char* pKey, T& value, bool allocate = false)
     {
+        bool hasLoader = false;
+        bool success = false;
         if constexpr (IsParserImplemented<T>)
         {
-            return parser.Read(pSection, pKey, value);
+            hasLoader = true;
+            success = parser.Read(pSection, pKey, value);
         }
         entt::meta_type type = entt::resolve<T>();
         if (type)
@@ -22,10 +32,19 @@ struct IniComponentLoader
             entt::meta_func func = type.func("LoadIniComponent"_hs);
             if (func)
             {
-                return func.invoke(value, parser, pSection).cast<bool>();
+                hasLoader = true;
+                success = func.invoke(value, parser, pSection).cast<bool>();
             }
         }
-        gLogger->error("could not load {} for [{}]->{}", typeid(T).name(), pSection, pKey);
+        if (success) {
+            if constexpr (detail::ini_component_has_after<T>) {
+                value.AfterLoadIni(parser, pSection, pKey);
+            }
+            return true;
+        }
+        if (!hasLoader) {
+            gLogger->error("could not load {} for [{}]->{}", typeid(T).name(), pSection, pKey);
+        }
         return false;
     }
 
