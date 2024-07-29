@@ -129,3 +129,37 @@ SYRINGE_HANDSHAKE(pInfo)
 
     return E_POINTER;
 }
+
+void UnloadAllExtensions()
+{
+    for (auto ext : ExtensionManager::GetExtensions()) {
+        ExtensionManager::RemoveExtension(ext);
+    }
+}
+
+#include <Windows.h>
+#include "yr/event/windows_event.h"
+__declspec(dllexport) BOOL WINAPI DllMain(HANDLE hInstance, DWORD dwReason, LPVOID v)
+{
+    if (dwReason == DLL_PROCESS_DETACH)
+    {
+        UnloadAllExtensions();
+    }
+
+    return true;
+}
+
+void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        case WM_CLOSE:
+        case WM_DESTROY:
+            UnloadAllExtensions();
+            break;
+    }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrMainWndProcEvent) {
+    WndProc(E->hWnd, E->uMsg, E->wParam, E->lParam);
+}

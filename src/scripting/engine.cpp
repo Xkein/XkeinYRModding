@@ -10,7 +10,7 @@
 #include "scripting/javascript/js_env.h"
 #include <GameClasses.h>
 
-Engine* gEngine = new Engine();
+Engine* gEngine;
 
 REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioStartEvent, std::bind(&Engine::OnScenarioStart, gEngine));
 REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent, std::bind(&Engine::OnScenarioClear, gEngine));
@@ -39,6 +39,7 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+    this->Exit();
 }
 
 void Engine::Start()

@@ -7,11 +7,15 @@
 void YrScriptingModule::Startup()
 {
     __Gen_Type_YrScripting::Register();
+    gEngine = new Engine();
     gEngine->Start();
 }
 
 void YrScriptingModule::Shutdown()
 {
-    gEngine->Exit();
+    if (gEngine) {
+        delete gEngine;
+        gEngine = nullptr;
+    }
     __Gen_Type_YrScripting::Unregister();
 }

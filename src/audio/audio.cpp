@@ -1,10 +1,12 @@
 #include "audio/audio.h"
-#include "audio.h"
+#include "audio/audio_component.h"
 #include "audio/wwise/wwise.h"
 #include "core/assertion_macro.h"
+#include "physics/yr_tools.h"
 #include "runtime/logger/logger.h"
 
 XKEINEXT_API std::shared_ptr<WwiseSettings> AudioSystem::gWwiseSettings;
+static AkGameObjectID                       gNextId;
 
 #include <AK/../../samples/SoundEngine/Common/AkFilePackageLowLevelIODeferred.h>
 // We're using the default Low-Level I/O implementation that's part
@@ -37,11 +39,9 @@ void LocalErrorCallback(AK::Monitor::ErrorCode in_eErrorCode, const AkOSChar* in
         if (in_eErrorCode == AK::Monitor::ErrorCode_PluginFileNotFound || in_eErrorCode == AK::Monitor::ErrorCode_PluginNotRegistered ||
             in_eErrorCode == AK::Monitor::ErrorCode_PluginFileRegisterFailed)
         {
-
         }
         else
         {
-
         }
         gLogger->error("AK Error: {}", pszErrorStr);
     }
@@ -51,10 +51,9 @@ void LocalErrorCallback(AK::Monitor::ErrorCode in_eErrorCode, const AkOSChar* in
     }
 }
 
-void AudioSystem::Init()
+void InitWwise()
 {
-    gWwiseSettings = std::make_shared<WwiseSettings>();
-
+    const auto& gWwiseSettings = AudioSystem::gWwiseSettings;
     AKRESULT res = AK::MemoryMgr::Init(&gWwiseSettings->memSettings);
     if (res != AK_Success)
     {
@@ -106,6 +105,15 @@ void AudioSystem::Init()
     AK::SoundEngine::RegisterResourceMonitorCallback(ResourceMonitorDataCallback);
 
     AK::Monitor::SetLocalOutput(AK::Monitor::ErrorLevel_All, LocalErrorCallback);
+
+    AK::SoundEngine::RegisterGameObj(LISTENER_ID, "Listener (Default)");
+    AK::SoundEngine::SetDefaultListeners(&LISTENER_ID, 1);
+}
+
+void AudioSystem::Init()
+{
+    gWwiseSettings = std::make_shared<WwiseSettings>();
+    std::thread(InitWwise).detach();
 }
 
 void AudioSystem::Destroy()
@@ -114,8 +122,8 @@ void AudioSystem::Destroy()
     // Terminate Communication Services
     AK::Comm::Term();
 #endif // AK_OPTIMIZED
-    //AK::SpatialAudio::Term();
-    // Terminate the music engine
+    // AK::SpatialAudio::Term();
+    //  Terminate the music engine
     AK::MusicEngine::Term();
     // Terminate the sound engine
     AK::SoundEngine::Term();
@@ -131,22 +139,57 @@ void AudioSystem::Destroy()
     gWwiseSettings.reset();
 }
 
+void AudioSystem::InitWorld()
+{
+    gNextId = 10000;
+}
+
+void AudioSystem::DestroyWorld() {}
+
+inline AkVector ToAkVector(JPH::Vec3 vec)
+{
+    return AkVector {vec.GetX(), vec.GetY(), vec.GetZ()};
+}
+
+inline AkVector ToAkVector(CoordStruct coord)
+{
+    return ToAkVector(ToVec3(coord));
+}
+
+inline void GetAkOrientation(Quaternion rot, AkVector& orientationFront, AkVector& orientationTop)
+{
+    JPH::Quat quat   = ToQuat(rot);
+    orientationFront = ToAkVector(quat.GetEulerAngles());
+    orientationTop   = ToAkVector(quat * JPH::Vec3 {0, 0, 1});
+}
+
 void AudioSystem::Tick()
 {
+    for (auto&& [entity, audioCom] : gEntt->view<AudioComponent>().each())
+    {
+        AbstractClass* pYrObject = audioCom.owner;
+        // update audio position
+        AkVector position = ToAkVector(GetObjectCoords(pYrObject));
+        AkVector orientationFront;
+        AkVector orientationTop;
+        GetAkOrientation(GetObjectRotation(pYrObject), orientationFront, orientationTop);
+
+        AkSoundPosition soundPos;
+        soundPos.Set(position, orientationFront, orientationTop);
+        AK::SoundEngine::SetPosition(audioCom.akGameObjId, soundPos);
+    }
+
     AK::SoundEngine::RenderAudio();
 }
 
-void AudioSystem::InitWorld()
+AkGameObjectID AudioSystem::GetNextGameObjId()
 {
-
-}
-
-void AudioSystem::DestroyWorld()
-{
-
+    return gNextId++;
 }
 
 #include "yr/event/general_event.h"
+#include "yr/event/ui_event.h"
 REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioStartEvent, AudioSystem::InitWorld);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent, AudioSystem::DestroyWorld);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, AudioSystem::Tick);
+REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, AudioSystem::Tick);
