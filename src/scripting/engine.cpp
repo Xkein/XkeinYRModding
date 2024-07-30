@@ -12,14 +12,14 @@
 
 Engine* gEngine;
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioStartEvent, std::bind(&Engine::OnScenarioStart, gEngine));
-REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent, std::bind(&Engine::OnScenarioClear, gEngine));
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, std::bind(&Engine::OnBeginUpdate, gEngine));
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, std::bind(&Engine::OnEndUpdate, gEngine));
-REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, std::bind(&Engine::OnUIUpdate, gEngine));
+DEFINE_YR_HOOK_EVENT_LISTENER(YrScenarioStartEvent) { if(gEngine) gEngine->OnScenarioStart(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent) { if(gEngine) gEngine->OnScenarioClear(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent) { if(gEngine) gEngine->OnBeginUpdate(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent) { if(gEngine) gEngine->OnEndUpdate(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) { if(gEngine) gEngine->OnUIUpdate(); }
 
-REGISTER_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent, std::bind(&Engine::OnBeginRender, gEngine));
-REGISTER_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent, std::bind(&Engine::OnEndRender, gEngine));
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent) { if(gEngine) gEngine->OnBeginRender(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent) { if(gEngine) gEngine->OnEndRender(); }
 
 static void JsUpdate()
 {
@@ -45,7 +45,7 @@ Engine::~Engine()
 void Engine::Start()
 {
     gLogger->info("Engine::Start()");
-    gJsEnv = std::make_shared<JsEnv>();
+    gJsEnv = new JsEnv();
 #ifdef IS_EDITOR
     EngineEditor::Start();
 #endif
@@ -57,7 +57,8 @@ void Engine::Exit()
 #ifdef IS_EDITOR
     EngineEditor::End();
 #endif
-    gJsEnv.reset();
+    delete gJsEnv;
+    gJsEnv = nullptr;
 }
 
 void Engine::OnScenarioStart()

@@ -34,6 +34,8 @@ struct ImGuiThread
             {
                 gConsole->info("YrExtUI: could not acquire HWND!");
                 std::this_thread::sleep_for(50ms);
+                if (shouldStop)
+                    return;
             }
 
             gLogger->info("YrExtUI: imgui thread begin.");
@@ -77,6 +79,8 @@ std::unique_ptr<ImGuiThread> imguiThread;
 
 void UIMainThread()
 {
+    if (!imguiThread)
+        return;
     if (YrImGui::gWindows.size() > 0)
     {
         isMainThread = true;
@@ -117,4 +121,5 @@ void YrExtUIModule::Startup()
 void YrExtUIModule::Shutdown()
 {
     gLogger->info("Yr Extension UI module unload.");
+    imguiThread.reset();
 }

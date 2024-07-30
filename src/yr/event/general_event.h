@@ -4,12 +4,6 @@
 
 struct IStream;
 
-CLASS(HookEvent)
-class YrBootEvent { };
-
-CLASS(HookEvent)
-class YrTerminateEvent { };
-
 // ======================= logic =======================
 
 CLASS(HookEvent)

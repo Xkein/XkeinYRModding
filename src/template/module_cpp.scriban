@@ -12,15 +12,20 @@
     {{- if has_meta(klass.meta) }}
 #include "type/{{klass.name}}.gen.h"
         {{- if get_meta_tag(klass.meta, "YrExtension") }}
+void OnExit_{{klass.name}}();
 struct ModuleImpl_{{klass.name}} {
     {{klass.name}} ext;
     ModuleImpl_{{klass.name}}() {
         ExtensionManager::AddExtension(&ext);
+        atexit(OnExit_{{klass.name}});
     }
     ~ModuleImpl_{{klass.name}}() {
         ExtensionManager::RemoveExtension(&ext);
     }
 } _ModuleImpl_{{klass.name}};
+void OnExit_{{klass.name}}() {
+    ExtensionManager::RemoveExtension(&_ModuleImpl_{{klass.name}}.ext);
+}
         {{- end }}
     {{- end }}
 {{- end }}

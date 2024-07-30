@@ -2,5 +2,5 @@
 
 #include <entt/entt.hpp>
 
-extern CORE_API std::shared_ptr<entt::registry> gEntt;
+extern CORE_API entt::registry* gEntt;
 

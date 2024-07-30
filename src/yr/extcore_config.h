@@ -20,4 +20,4 @@ public:
     std::vector<std::string> extensions;
 };
 
-extern YREXTCORE_API std::unique_ptr<YrExtCoreConfig> gYrExtConfig;
+extern YREXTCORE_API YrExtCoreConfig* gYrExtConfig;

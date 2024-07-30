@@ -53,7 +53,10 @@ inline void DestroyEntity(T* pObject)
     if (iter == extMap.end())
         return;
     entt::entity entity = iter->second;
-    gEntt->destroy(entity);
+    if (gEntt)
+    {
+        gEntt->destroy(entity);
+    }
     extMap.erase(iter);
 
     auto& cacheExtMap = GetExtMap<AbstractClass>();

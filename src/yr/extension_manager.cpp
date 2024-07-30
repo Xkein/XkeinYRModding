@@ -52,12 +52,12 @@ YREXTCORE_API void ExtensionManager::RemoveExtension(IYrExtension* extension)
     if (auto iter = std::find(gExtensions.begin(), gExtensions.end(), extension); iter != gExtensions.end())
     {
         gExtensions.erase(iter);
+        extension->PreUnload();
+        extension->Shutdown();
     }
-    extension->PreUnload();
-    extension->Shutdown();
 }
 
-YREXTCORE_API std::vector<IYrExtension*> ExtensionManager::GetExtensions()
+YREXTCORE_API const std::vector<IYrExtension*>& ExtensionManager::GetExtensions()
 {
     return gExtensions;
 }

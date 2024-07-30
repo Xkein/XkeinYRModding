@@ -16,3 +16,9 @@ public:
 CLASS(HookEvent)
 class YrMainWndProcEvent : public YrWndProcEvent
 {};
+
+CLASS(HookEvent)
+class YrBootEvent { };
+
+CLASS(HookEvent)
+class YrTerminateEvent { };

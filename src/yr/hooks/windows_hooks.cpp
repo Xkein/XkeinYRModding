@@ -8,3 +8,7 @@ BROADCAST_HOOK_EVENT(0x7775C0, 0x7, YrMainWndProcEvent)
     E->wParam = R->Stack<WPARAM>(0xC);
     E->lParam = R->Stack<LPARAM>(0x10);
 }
+
+BROADCAST_HOOK_EVENT(0x52BA60, 0x5, YrBootEvent) {}
+
+BROADCAST_HOOK_EVENT(0x7CD8EF, 0x9, YrTerminateEvent) {}

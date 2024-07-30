@@ -1,6 +1,5 @@
 #include "extcore_config.h"
 
-#include "core/assertion_macro.h"
 #include <filesystem>
 #include <fstream>
 #include "runtime/platform/path.h"
@@ -8,7 +7,7 @@
 using json   = nlohmann::json;
 namespace fs = std::filesystem;
 
-YREXTCORE_API std::unique_ptr<YrExtCoreConfig> gYrExtConfig;
+YREXTCORE_API YrExtCoreConfig* gYrExtConfig = nullptr;
 
 YrExtCoreConfig::YrExtCoreConfig()
 {
@@ -29,10 +28,4 @@ void YrExtCoreConfig::Init()
     this->assetsPath  = Paths::GetLaunchDir() / rawData.value("assets_dir", "assets");
     this->pluginsPath = Paths::GetLaunchDir() / rawData.value("plugins_dir", "plugins");
     this->extensions  = rawData["extensions"];
-
-    if (rawData.value("break_on_start", false))
-    {
-        assert(false);
-        // DebugBreak();
-    }
 }

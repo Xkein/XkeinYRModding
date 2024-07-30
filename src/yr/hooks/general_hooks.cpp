@@ -1,11 +1,6 @@
 #include "yr/yr_hook.h"
 #include "yr/event/general_event.h"
 
-
-BROADCAST_HOOK_EVENT(0x52BA60, 0x5, YrBootEvent) {}
-
-BROADCAST_HOOK_EVENT(0x7CD8EF, 0x9, YrTerminateEvent) {}
-
 BROADCAST_HOOK_EVENT(0x55AFB3, 0x6, YrLogicBeginUpdateEvent) {}
 BROADCAST_HOOK_EVENT(0x55B719, 0x5, YrLogicEndUpdateEvent) {}
 

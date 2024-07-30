@@ -149,4 +149,4 @@ private:
     bool ExtensionMethodsMapInited;
 };
 
-extern YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
+extern YRSCRIPTING_API JsEnv* gJsEnv;

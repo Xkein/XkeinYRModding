@@ -14,7 +14,7 @@
 
 #define CHECK_V8_ARGS(...)
 
-YRSCRIPTING_API std::shared_ptr<JsEnv> gJsEnv;
+YRSCRIPTING_API JsEnv* gJsEnv = nullptr;
 
 using namespace PUERTS_NAMESPACE;
 
@@ -87,7 +87,7 @@ namespace puerts
 
 } // namespace puerts
 
-JsEnv::JsEnv() : ExtensionMethodsMapInited(false)
+JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), Inspector(nullptr)
 {
     StrBuffer.resize(1024);
 

@@ -7,6 +7,7 @@
 
 XKEINEXT_API std::shared_ptr<WwiseSettings> AudioSystem::gWwiseSettings;
 static AkGameObjectID                       gNextId;
+static bool                                 gInited = false;
 
 #include <AK/../../samples/SoundEngine/Common/AkFilePackageLowLevelIODeferred.h>
 // We're using the default Low-Level I/O implementation that's part
@@ -54,7 +55,7 @@ void LocalErrorCallback(AK::Monitor::ErrorCode in_eErrorCode, const AkOSChar* in
 void InitWwise()
 {
     const auto& gWwiseSettings = AudioSystem::gWwiseSettings;
-    AKRESULT res = AK::MemoryMgr::Init(&gWwiseSettings->memSettings);
+    AKRESULT    res            = AK::MemoryMgr::Init(&gWwiseSettings->memSettings);
     if (res != AK_Success)
     {
         assert(!"Could not create the wwise memory manager.");
@@ -108,6 +109,9 @@ void InitWwise()
 
     AK::SoundEngine::RegisterGameObj(LISTENER_ID, "Listener (Default)");
     AK::SoundEngine::SetDefaultListeners(&LISTENER_ID, 1);
+
+    gInited = true;
+    atexit(AudioSystem::Destroy);
 }
 
 void AudioSystem::Init()
@@ -118,6 +122,9 @@ void AudioSystem::Init()
 
 void AudioSystem::Destroy()
 {
+    if (!gInited)
+        return;
+    gInited = false;
 #ifndef AK_OPTIMIZED
     // Terminate Communication Services
     AK::Comm::Term();
@@ -165,6 +172,9 @@ inline void GetAkOrientation(Quaternion rot, AkVector& orientationFront, AkVecto
 
 void AudioSystem::Tick()
 {
+    if (!gInited)
+        return;
+        
     for (auto&& [entity, audioCom] : gEntt->view<AudioComponent>().each())
     {
         AbstractClass* pYrObject = audioCom.owner;

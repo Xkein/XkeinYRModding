@@ -10,9 +10,11 @@ void LoadExtensions();
 
 #include "codegen/YRpp.gen.h"
 #include "codegen/YrExtCore.gen.h"
+#include "runtime/ecs/entt.h"
 struct MetaRegistration
 {
     static void Register() {
+        gEntt = new entt::registry();
         __Gen_Type_YRpp::Register();
         __Gen_Type_YrExtCore::Register();
     }
@@ -20,35 +22,10 @@ struct MetaRegistration
     {
         __Gen_Type_YrExtCore::Unregister();
         __Gen_Type_YRpp::Unregister();
+        delete gEntt;
+        gEntt = nullptr;
     }
 };
-
-struct YrExtCore {
-    YrExtCore();
-    ~YrExtCore();
-};
-
-YrExtCore::YrExtCore() {
-    MetaRegistration::Register();
-    gYrExtConfig = std::make_unique<YrExtCoreConfig>();
-    InitLogger();
-    LoadExtensions();
-}
-YrExtCore::~YrExtCore() {
-    MetaRegistration::Unregister();
-}
-
-std::unique_ptr<YrExtCore> gYrExtCore;
-
-GLOBAL_INVOKE_ON_CTOR([]() {
-    wchar_t system_buffer[MAX_PATH];
-    GetModuleFileNameW(NULL, system_buffer, MAX_PATH);
-    system_buffer[MAX_PATH - 1] = L'\0';
-    std::filesystem::path exePath = system_buffer;
-    if (exePath.filename() == "gamemd.exe") {
-        gYrExtCore = std::make_unique<YrExtCore>();
-    }
-})
 
 #include <spdlog/async.h>
 #include <spdlog/spdlog.h>
@@ -130,36 +107,115 @@ SYRINGE_HANDSHAKE(pInfo)
     return E_POINTER;
 }
 
-void UnloadAllExtensions()
+#include <Windows.h>
+#include <csignal>
+struct YrExtCore
 {
-    for (auto ext : ExtensionManager::GetExtensions()) {
-        ExtensionManager::RemoveExtension(ext);
+    YrExtCore();
+    ~YrExtCore();
+};
+
+void OnAppOpen();
+void OnAppExit();
+
+YrExtCore::YrExtCore()
+{
+    OnAppOpen();
+}
+YrExtCore::~YrExtCore()
+{
+    OnAppExit();
+}
+
+std::unique_ptr<YrExtCore> gYrExtCore;
+
+GLOBAL_INVOKE_ON_CTOR([]() {
+    wchar_t system_buffer[MAX_PATH];
+    GetModuleFileNameW(NULL, system_buffer, MAX_PATH);
+    system_buffer[MAX_PATH - 1]   = L'\0';
+    std::filesystem::path exePath = system_buffer;
+    if (exePath.filename() == "gamemd.exe")
+    {
+        gYrExtCore = std::make_unique<YrExtCore>();
+    }
+})
+
+BOOL WINAPI CtrlHandler(DWORD fdwCtrlType) {
+    OnAppExit();
+    return FALSE;
+}
+static bool appInited = false;
+static bool breakOnExit = false;
+void OnAppOpen()
+{
+    MetaRegistration::Register();
+    gYrExtConfig = new YrExtCoreConfig();
+    if (gYrExtConfig->rawData.value("break_on_start", false))
+    {
+        assert(false);
+    }
+    breakOnExit = gYrExtConfig->rawData.value("break_on_exit", false);
+    InitLogger();
+    LoadExtensions();
+
+    SetConsoleCtrlHandler(CtrlHandler, true);
+    appInited = true;
+}
+
+void OnAppExit()
+{
+    if (appInited) {
+        appInited = false;
+        gLogger->info("OnAppExit!");
+        if (breakOnExit) {
+            assert(false);
+        }
+        const auto& extensions = ExtensionManager::GetExtensions();
+        while (extensions.size() > 0)
+        {
+            ExtensionManager::RemoveExtension(*extensions.rbegin());
+        };
+        MetaRegistration::Unregister();
+        delete gYrExtConfig;
+        gYrExtConfig = nullptr;
     }
 }
 
-#include <Windows.h>
-#include "yr/event/windows_event.h"
 __declspec(dllexport) BOOL WINAPI DllMain(HANDLE hInstance, DWORD dwReason, LPVOID v)
 {
-    if (dwReason == DLL_PROCESS_DETACH)
+    switch (dwReason)
     {
-        UnloadAllExtensions();
+    case DLL_PROCESS_ATTACH:
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+        break;
+    case DLL_PROCESS_DETACH:
+        OnAppExit();
+        break;
     }
 
     return true;
 }
 
+#include "yr/event/windows_event.h"
+#include "yr/event/general_event.h"
 void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
+        case WM_QUERYENDSESSION:
+        case WM_ENDSESSION:
         case WM_CLOSE:
         case WM_DESTROY:
-            UnloadAllExtensions();
+        case WM_QUIT:
+            OnAppExit();
             break;
     }
 }
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrMainWndProcEvent) {
     WndProc(E->hWnd, E->uMsg, E->wParam, E->lParam);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTerminateEvent) {
+    OnAppExit();
 }
