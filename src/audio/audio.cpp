@@ -4,6 +4,8 @@
 #include "core/assertion_macro.h"
 #include "physics/yr_tools.h"
 #include "runtime/logger/logger.h"
+#include "yr/extcore_config.h"
+#include "runtime/platform/path.h"
 
 XKEINEXT_API std::shared_ptr<WwiseSettings> AudioSystem::gWwiseSettings;
 static AkGameObjectID                       gNextId;
@@ -12,8 +14,8 @@ static bool                                 gInited = false;
 #include <AK/../../samples/SoundEngine/Common/AkFilePackageLowLevelIODeferred.h>
 // We're using the default Low-Level I/O implementation that's part
 // of the SDK's sample code, with the file package extension
-static CAkFilePackageLowLevelIODeferred gLowLevelIO;
-static AkResourceMonitorDataSummary     gResourceDataSummary;
+static CAkFilePackageLowLevelIODeferred* gLowLevelIO;
+static AkResourceMonitorDataSummary      gResourceDataSummary;
 
 #define DATA_SUMMARY_REFRESH_COOLDOWN 7; // Refresh cooldown affecting the refresh rate of the resource monitor data summary
 
@@ -68,7 +70,8 @@ void InitWwise()
     }
     // CAkFilePackageLowLevelIODeferred::Init() creates a streaming device
     // in the Stream Manager, and registers itself as the File Location Resolver.
-    if (gLowLevelIO.Init(gWwiseSettings->deviceSettings) != AK_Success)
+    gLowLevelIO = new CAkFilePackageLowLevelIODeferred();
+    if (gLowLevelIO->Init(gWwiseSettings->deviceSettings) != AK_Success)
     {
         assert(!"Could not create the streaming device and Low-Level I/O system");
         return;
@@ -98,6 +101,8 @@ void InitWwise()
         assert(!"Could not initialize the Spatial Audio.");
         return;
     }
+
+    gLowLevelIO->SetBasePath(std::filesystem::path(gYrExtConfig->assetsPath / "wwise").c_str());
 
     // Set global language. Low-level I/O devices can use this string to find language-specific assets.
     if (AK::StreamMgr::SetCurrentLanguage(AKTEXT("English(US)")) != AK_Success)
@@ -137,12 +142,13 @@ void AudioSystem::Destroy()
     // Terminate the streaming device and streaming manager
     // CAkFilePackageLowLevelIODeferred::Term() destroys its associated streaming device
     // that lives in the Stream Manager, and unregisters itself as the File Location Resolver.
-    gLowLevelIO.Term();
+    gLowLevelIO->Term();
     if (AK::IAkStreamMgr::Get())
         AK::IAkStreamMgr::Get()->Destroy();
     // Terminate the Memory Manager
     AK::MemoryMgr::Term();
 
+    delete gLowLevelIO;
     gWwiseSettings.reset();
 }
 

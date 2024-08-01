@@ -92,6 +92,7 @@ target("XkeinExt")
     add_files("src/audio/**.cpp", "src/physics/**.cpp", "src/render/**.cpp")
     add_headerfiles("src/xkein/**.h")
     add_files("src/xkein/**.cpp")
+    add_includedirs("content/yr_wwise_template/GeneratedSoundBanks", { public = true })
     add_filegroups("XkeinExt", {rootdir = "src"})
     
 target("XkeinEditor")

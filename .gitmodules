@@ -22,3 +22,6 @@
 [submodule "3rdparty/JoltPhysics"]
 	path = 3rdparty/JoltPhysics
 	url = https://github.com/jrouwe/JoltPhysics.git
+[submodule "content/yr_wwise_template"]
+	path = content/yr_wwise_template
+	url = https://github.com/Xkein/yr_wwise_template.git

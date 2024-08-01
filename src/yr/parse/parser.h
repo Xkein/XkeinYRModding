@@ -58,6 +58,17 @@ struct Parser : private ::detail::Parser<T>
 #include <YRMathVector.h>
 namespace detail
 {
+    struct ini_string_pool
+    {
+        static YREXTCORE_API std::map<std::size_t, std::string> string_dict;
+        static std::string_view get_pool_string_view(std::string_view str_view)
+        {
+            std::size_t strHash = std::hash<std::string_view>{}(str_view);
+            std::string& str = string_dict[strHash];
+            return std::string_view(str.begin(), str.end());
+        }
+    };
+    
     struct ParserHelper
     {
         template<typename T>
@@ -151,6 +162,16 @@ namespace detail
         }
     };
 
+    template<>
+    struct Parser<std::string_view>
+    {
+        static bool Read(std::string_view str, std::string_view& result)
+        {
+            result = ini_string_pool::get_pool_string_view(str);
+            return true;
+        }
+    };
+
     template<size_t Size>
     struct Parser<char[Size]>
     {
@@ -177,8 +198,7 @@ namespace detail
     template<typename T>
     struct Parser<std::optional<T>>
     {
-        using data_type = std::optional<T>;
-        static bool Read(std::string_view str, data_type& result)
+        static bool Read(std::string_view str, std::optional<T>& result)
         {
             T tmp;
             if (::Parser<T>::Read(str, tmp))
@@ -187,6 +207,17 @@ namespace detail
                 return true;
             }
             return false;
+        }
+    };
+    
+    template<typename T>
+    struct Parser<std::vector<T>>
+    {
+        static bool Read(std::string_view str, std::vector<T>& result)
+        {
+            int count = std::count(str.begin(), str.end(), ',') + 1;
+            result.resize(count);
+            return ParserHelper::Read(str, result.data(), count);
         }
     };
 
