@@ -1,11 +1,17 @@
 #include "audio/audio.h"
+#include "Wwise_IDs.h"
 #include "audio/audio_component.h"
 #include "audio/wwise/wwise.h"
 #include "core/assertion_macro.h"
 #include "physics/yr_tools.h"
 #include "runtime/logger/logger.h"
-#include "yr/extcore_config.h"
 #include "runtime/platform/path.h"
+#include "yr/extcore_config.h"
+#include <Surface.h>
+#include <TacticalClass.h>
+#include <HouseClass.h>
+#include <AK/SoundEngine/Common/AkQueryParameters.h>
+#include <chrono>
 
 XKEINEXT_API std::shared_ptr<WwiseSettings> AudioSystem::gWwiseSettings;
 static AkGameObjectID                       gNextId;
@@ -16,6 +22,11 @@ static bool                                 gInited = false;
 // of the SDK's sample code, with the file package extension
 static CAkFilePackageLowLevelIODeferred* gLowLevelIO;
 static AkResourceMonitorDataSummary      gResourceDataSummary;
+
+struct _AudioData {
+    EMusicState musicState {EMusicState::None};
+    std::chrono::steady_clock::time_point lastTimeBattle;
+} gAudioData;
 
 #define DATA_SUMMARY_REFRESH_COOLDOWN 7; // Refresh cooldown affecting the refresh rate of the resource monitor data summary
 
@@ -113,7 +124,17 @@ void InitWwise()
     AK::Monitor::SetLocalOutput(AK::Monitor::ErrorLevel_All, LocalErrorCallback);
 
     AK::SoundEngine::RegisterGameObj(LISTENER_ID, "Listener (Default)");
+    AK::SoundEngine::RegisterGameObj(MUSIC_ID, "Music");
     AK::SoundEngine::SetDefaultListeners(&LISTENER_ID, 1);
+
+    // Load the Init sound bank
+    // NOTE: The Init sound bank must be the first bank loaded by Wwise!
+    AkBankID bankID;
+    if (AK::SoundEngine::LoadBank("Init.bnk", bankID) != AK_Success)
+    {
+        gLogger->error("AudioSystem::Init(): could not load Init.bnk!");
+        return;
+    }
 
     gInited = true;
     atexit(AudioSystem::Destroy);
@@ -130,6 +151,10 @@ void AudioSystem::Destroy()
     if (!gInited)
         return;
     gInited = false;
+
+    // Unload the init soundbank
+    AK::SoundEngine::UnloadBank("Init.bnk", NULL);
+
 #ifndef AK_OPTIMIZED
     // Terminate Communication Services
     AK::Comm::Term();
@@ -155,9 +180,13 @@ void AudioSystem::Destroy()
 void AudioSystem::InitWorld()
 {
     gNextId = 10000;
+    SetMusicState(EMusicState::Normal);
 }
 
-void AudioSystem::DestroyWorld() {}
+void AudioSystem::DestroyWorld()
+{
+    SetMusicState(EMusicState::None);
+}
 
 inline AkVector ToAkVector(JPH::Vec3 vec)
 {
@@ -171,8 +200,8 @@ inline AkVector ToAkVector(CoordStruct coord)
 
 inline void GetAkOrientation(Quaternion rot, AkVector& orientationFront, AkVector& orientationTop)
 {
-    JPH::Quat quat   = ToQuat(rot);
-    orientationFront = ToAkVector(quat.GetEulerAngles());
+    JPH::Quat quat   = ToQuat(rot).Normalized();
+    orientationFront = ToAkVector(quat * JPH::Vec3 {1, 0, 0});
     orientationTop   = ToAkVector(quat * JPH::Vec3 {0, 0, 1});
 }
 
@@ -180,7 +209,8 @@ void AudioSystem::Tick()
 {
     if (!gInited)
         return;
-        
+
+    // update all AudioComponent
     for (auto&& [entity, audioCom] : gEntt->view<AudioComponent>().each())
     {
         AbstractClass* pYrObject = audioCom.owner;
@@ -193,9 +223,44 @@ void AudioSystem::Tick()
         AkSoundPosition soundPos;
         soundPos.Set(position, orientationFront, orientationTop);
         AK::SoundEngine::SetPosition(audioCom.akGameObjId, soundPos);
+
+        audioCom.Tick();
+    }
+
+    bool isInGameScene = ScenarioClass::Instance != nullptr;
+    if (isInGameScene) {
+        // update camera listener
+        RectangleStruct viewBounds      = DSurface::ViewBounds;
+        CoordStruct     screenCenterPos = TacticalClass::Instance->ClientToCoords({viewBounds.X + viewBounds.Width / 2, viewBounds.Y + viewBounds.Height / 2});
+        AkSoundPosition cameraPos;
+        cameraPos.Set(ToAkVector(screenCenterPos), {1, 0, 0}, {0, 0, 1});
+        AK::SoundEngine::SetPosition(LISTENER_ID, cameraPos);
+
+        EMusicState nextState = gAudioData.musicState;
+        if (gAudioData.musicState == EMusicState::Invasion || gAudioData.musicState == EMusicState::UnderAttack) {
+            using namespace std::chrono;
+            duration<float> timeSpan = duration_cast<duration<float>>(steady_clock::now() - gAudioData.lastTimeBattle);
+            if (timeSpan.count() > 10.0f) {
+                nextState = EMusicState::Normal;
+            }
+        }
+
+        if (HouseClass* player = HouseClass::CurrentPlayer) {
+            if (player->IsWinner) {
+                nextState = EMusicState::Winning;
+            } else if (player->IsGameOver) {
+                nextState = EMusicState::GameOver;
+            }
+        }
+
+        SetMusicState(nextState);
     }
 
     AK::SoundEngine::RenderAudio();
+    
+
+    // AkStateID wwiseMusicState;
+    // AK::SoundEngine::Query::GetState(AK::STATES::MUSIC::GROUP, wwiseMusicState);
 }
 
 AkGameObjectID AudioSystem::GetNextGameObjId()
@@ -203,9 +268,122 @@ AkGameObjectID AudioSystem::GetNextGameObjId()
     return gNextId++;
 }
 
-#include "yr/event/general_event.h"
-#include "yr/event/ui_event.h"
+EMusicState AudioSystem::GetMusicState()
+{
+    return gAudioData.musicState;
+}
+
+void AudioSystem::SetMusicState(EMusicState state)
+{
+    if (gAudioData.musicState == state)
+        return;
+    gAudioData.musicState = state;
+    AkUniqueID musicEvent;
+    switch (state)
+    {
+    case EMusicState::Normal:
+        musicEvent = AK::EVENTS::M_NORMAL;
+        break;
+    case EMusicState::GameOver:
+        musicEvent = AK::EVENTS::M_GAMEOVER;
+        break;
+    case EMusicState::Winning:
+        musicEvent = AK::EVENTS::M_WINNING;
+        break;
+    case EMusicState::Invasion:
+        musicEvent = AK::EVENTS::M_INVASION;
+        break;
+    case EMusicState::UnderAttack:
+        musicEvent = AK::EVENTS::M_UNDERATTACK;
+        break;
+    default:
+        musicEvent = AK::EVENTS::M_NONE;
+        break;
+    }
+    AK::SoundEngine::PostEvent(musicEvent, MUSIC_ID);
+}
+
+AkUniqueID AudioSystem::GetSurfaceID(LandType landType)
+{
+    switch (landType)
+    {
+        case LandType::Clear:
+            return AK::SWITCHES::SURFACE::SWITCH::CLEAR;
+        case LandType::Road:
+            return AK::SWITCHES::SURFACE::SWITCH::ROAD;
+        case LandType::Water:
+            return AK::SWITCHES::SURFACE::SWITCH::WATER;
+        case LandType::Rock:
+            return AK::SWITCHES::SURFACE::SWITCH::ROCK;
+        case LandType::Wall:
+            return AK::SWITCHES::SURFACE::SWITCH::WALL;
+        case LandType::Tiberium:
+            return AK::SWITCHES::SURFACE::SWITCH::TIBERIUM;
+        case LandType::Beach:
+            return AK::SWITCHES::SURFACE::SWITCH::BEACH;
+        case LandType::Rough:
+            return AK::SWITCHES::SURFACE::SWITCH::ROUGH;
+        case LandType::Ice:
+            return AK::SWITCHES::SURFACE::SWITCH::ICE;
+        case LandType::Railroad:
+            return AK::SWITCHES::SURFACE::SWITCH::RAILROAD;
+        case LandType::Tunnel:
+            return AK::SWITCHES::SURFACE::SWITCH::TUNNEL;
+        case LandType::Weeds:
+            return AK::SWITCHES::SURFACE::SWITCH::WEEDS;
+    }
+}
+
+static std::map<std::string_view, std::weak_ptr<WwiseSoundBank>> gSoundBanks;
+
+std::shared_ptr<WwiseSoundBank> AudioSystem::GetSoundBank(std::string_view path)
+{
+    std::weak_ptr<WwiseSoundBank> weakPtr = gSoundBanks[path];
+    if (weakPtr.expired())
+    {
+        std::shared_ptr<WwiseSoundBank> soundBank = std::make_shared<WwiseSoundBank>(path);
+        weakPtr                                   = soundBank;
+        return soundBank;
+    }
+    return weakPtr.lock();
+}
+
+WwiseSoundBank::WwiseSoundBank(std::string_view bankName) : bankName(bankName)
+{
+    if (AK::SoundEngine::LoadBank(bankName.data(), bankID) != AK_Success)
+    {
+        gLogger->error("AudioSystem: could not load sound bank {}", bankName);
+        success = false;
+        return;
+    }
+
+    success = true;
+}
+
+WwiseSoundBank::~WwiseSoundBank()
+{
+    if (success)
+    {
+        AK::SoundEngine::UnloadBank(bankID, nullptr);
+    }
+}
+
+#include "yr/yr_all_events.h"
 REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioStartEvent, AudioSystem::InitWorld);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent, AudioSystem::DestroyWorld);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, AudioSystem::Tick);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, AudioSystem::Tick);
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent)
+{
+    HouseClass* player = HouseClass::CurrentPlayer;
+    bool isPlayerAttacked = player == E->pObject->GetOwningHouse();
+    bool isPlayerInvasion = player == E->pAttackingHouse;
+    if (isPlayerInvasion) {
+        AudioSystem::SetMusicState(EMusicState::Invasion);
+        gAudioData.lastTimeBattle = std::chrono::steady_clock::now();
+    } else if (isPlayerAttacked) {
+        AudioSystem::SetMusicState(EMusicState::UnderAttack);
+        gAudioData.lastTimeBattle = std::chrono::steady_clock::now();
+    }
+}

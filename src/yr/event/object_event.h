@@ -21,3 +21,19 @@ public:
     bool              PreventPassengerEscape;
     HouseClass*       pAttackingHouse;
 };
+
+// YrObjectLimboCheckedEvent raised when object is really need Limbo
+CLASS(HookEvent)
+struct YrObjectLimboCheckedEvent
+{
+    ObjectClass* pObject;
+};
+
+// YrObjectUnlimboCheckedEvent raised when object is really need Unlimbo
+CLASS(HookEvent)
+struct YrObjectUnlimboCheckedEvent
+{
+    ObjectClass* pObject;
+    CoordStruct* pCrd;
+    DirType      dFaceDir;
+};

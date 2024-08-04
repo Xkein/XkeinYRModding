@@ -10,7 +10,7 @@ class AbstractTypeClass;
 struct WwiseStringID
 {
     std::string_view str;
-    AkUniqueID id;
+    AkUniqueID id {0};
 
     void ResolveID();
     operator std::string_view() const {
@@ -30,11 +30,17 @@ struct AudioTypeComponent final
     PROPERTY(IniField = "Audio.Enable")
     bool enable {false};
     PROPERTY(IniField = "Audio.SoundBank")
-    std::string_view soundBank;
+    std::string_view soundBankName;
     PROPERTY(IniField = "Audio.DetonateEvent")
     WwiseStringID detonateEvent;
     PROPERTY(IniField = "Audio.DamageEvent")
     WwiseStringID damageEvent;
+    PROPERTY(IniField = "Audio.CreateEvent")
+    WwiseStringID createEvent;
+    PROPERTY(IniField = "Audio.RemoveEvent")
+    WwiseStringID removeEvent;
+    
+    std::shared_ptr<WwiseSoundBank> soundBank;
 };
 
 CLASS(ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass])
@@ -67,9 +73,13 @@ namespace detail
     {
         static bool Read(std::string_view str, WwiseStringID& result)
         {
-            if(::Parser<decltype(result.str)>::Read(str, result.str)) {
-                result.ResolveID();
-                return true;
+            WwiseStringID wwiseId;
+            if(::Parser<decltype(result.str)>::Read(str, wwiseId.str)) {
+                wwiseId.ResolveID();
+                if (wwiseId) {
+                    result = wwiseId;
+                    return true;
+                }
             }
             return false;
         }

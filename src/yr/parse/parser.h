@@ -63,9 +63,13 @@ namespace detail
         static YREXTCORE_API std::map<std::size_t, std::string> string_dict;
         static std::string_view get_pool_string_view(std::string_view str_view)
         {
-            std::size_t strHash = std::hash<std::string_view>{}(str_view);
-            std::string& str = string_dict[strHash];
-            return std::string_view(str.begin(), str.end());
+            std::size_t strHash = std::hash<std::string_view> {}(str_view);
+            auto        iter    = string_dict.find(strHash);
+            if (iter == string_dict.end())
+            {
+                iter = string_dict.try_emplace(strHash, str_view).first;
+            }
+            return std::string_view(iter->second);
         }
     };
     

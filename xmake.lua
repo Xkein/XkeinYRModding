@@ -133,8 +133,11 @@ target("make_artifacts")
                 copy_pairs[path.join(dir, rel)] = path.join(out_dir, rel)
             end
         end
-        
+        -- copy javascript
         get_copy_files("src/scripts/javascript/", "**", output_dir.."/assets/JavaScript/")
+        -- copy wwise sound banks
+        get_copy_files("content/yr_wwise_template/GeneratedSoundBanks/Windows/", "**.bnk", output_dir.."/assets/wwise/")
+        -- copy raw assets
         get_copy_files("assets/", "**", output_dir.."/assets/")
 
         local depend_files = {}
