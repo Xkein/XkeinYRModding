@@ -24,7 +24,7 @@ struct WwiseStringID
     }
 };
 
-CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass])
+CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass, ThemeClass])
 struct AudioTypeComponent final
 {
     PROPERTY(IniField = "Audio.Enable")

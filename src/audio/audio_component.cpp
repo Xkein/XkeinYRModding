@@ -23,7 +23,7 @@ void AudioComponent::CreateAudioComponent(entt::registry& reg, entt::entity enti
         com.owner = pYrObject;
         com.type = pAudioType;
         com.akGameObjId = AudioSystem::GetNextGameObjId();
-        if (!pAudioType->soundBank) {
+        if (!pAudioType->soundBank && !pAudioType->soundBankName.empty()) {
             pAudioType->soundBank = AudioSystem::GetSoundBank(pAudioType->soundBankName);
         }
 
