@@ -113,7 +113,8 @@ func get_yr_game_types()
         "AngerStruct",
         "ScoutStruct",
         "DropshipStruct",
-        "ThemeClass"]
+        "ThemeClass",
+        "ThemeControl"]
 end
 
 func get_yr_types()

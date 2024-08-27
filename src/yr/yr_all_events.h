@@ -23,4 +23,5 @@
 #include "yr/event/weapon_type_event.h"
 #include "yr/event/general_event.h"
 #include "yr/event/ui_event.h"
+#include "yr/event/theme_event.h"
 #include "yr/event/windows_event.h"

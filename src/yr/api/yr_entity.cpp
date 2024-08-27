@@ -23,13 +23,21 @@
 #include <VeinholeMonsterClass.h>
 #include <TriggerTypeClass.h>
 #include <WaypointPathClass.h>
+#include <ThemeClass.h>
 
 #include <unordered_map>
 
 template<typename T>
 using ExtMap = std::unordered_map<T*, entt::entity>;
 
+static ExtMap<void> gAnyExtMap;
 template<typename T>
+inline ExtMap<void>& GetExtMap()
+{
+    return gAnyExtMap;
+}
+
+template<typename T> requires std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>
 inline ExtMap<T>& GetExtMap()
 {
     static ExtMap<T> singleton;
@@ -59,11 +67,13 @@ inline void DestroyEntity(T* pObject)
     }
     extMap.erase(iter);
 
-    auto& cacheExtMap = GetExtMap<AbstractClass>();
-    auto  cacheIter   = cacheExtMap.find(pObject);
-    if (cacheIter != cacheExtMap.end())
-    {
-        cacheExtMap.erase(cacheIter);
+    if constexpr (std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>) {
+        auto& cacheExtMap = GetExtMap<AbstractClass>();
+        auto  cacheIter   = cacheExtMap.find(pObject);
+        if (cacheIter != cacheExtMap.end())
+        {
+            cacheExtMap.erase(cacheIter);
+        }
     }
 }
 
@@ -204,6 +214,11 @@ YREXTCORE_API entt::entity api::GetEntity(AbstractClass* pObject)
     //    gEntt->on_destroy<RemoveCacheComponent>().con;
     //}
     return entity;
+}
+
+YREXTCORE_API entt::entity api::GetEntityAny(void* pObject)
+{
+    return ::GetEntity<void>(pObject);
 }
 
 #define CASE_GET_CLASS_META(CLASS)  \
@@ -350,3 +365,16 @@ DO_ENTITY_ACTION(DESTROY_ENTITY, YrWeaponTypeDtorEvent, WeaponTypeClass, E->pWea
 
 DO_ENTITY_ACTION(CREATE_ENTITY, YrWarheadTypeCtorEvent, WarheadTypeClass, E->pWarheadType)
 DO_ENTITY_ACTION(DESTROY_ENTITY, YrWarheadTypeDtorEvent, WarheadTypeClass, E->pWarheadType)
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeLoadIniEvent)
+{
+    CREATE_ENTITY(ThemeControl, E->themeCtrl);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeClearEvent)
+{
+    ThemeClass* theme = E->theme;
+    for (ThemeControl* themeCtrl : theme->Themes)
+    {
+        DESTROY_ENTITY(ThemeControl, themeCtrl);
+    }
+}

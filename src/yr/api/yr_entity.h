@@ -13,13 +13,19 @@ struct YrEntityComponent
 namespace api
 {
     YREXTCORE_API entt::entity GetEntity(AbstractClass* pObject);
+    YREXTCORE_API entt::entity GetEntityAny(void* pObject);
     YREXTCORE_API entt::meta_type GetYrClassMeta(AbstractClass const* pAbstract);
 }
 
 template<typename T>
 entt::entity GetYrEntity(T* pObject)
 {
-    return api::GetEntity(pObject);
+    if constexpr (std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>) {
+        return api::GetEntity(pObject);
+    }
+    else {
+        return api::GetEntityAny(pObject);
+    }
 }
 
 template<typename TCom, typename T>

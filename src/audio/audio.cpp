@@ -356,6 +356,7 @@ WwiseSoundBank::WwiseSoundBank(std::string_view bankName) : bankName(bankName)
         success = false;
         return;
     }
+    gLogger->info("AudioSystem: loaded sound bank \"{}\"", bankName);
 
     success = true;
 }
@@ -364,6 +365,7 @@ WwiseSoundBank::~WwiseSoundBank()
 {
     if (success)
     {
+        gLogger->info("AudioSystem: unload sound bank \"{}\"", bankName);
         AK::SoundEngine::UnloadBank(bankID, nullptr);
     }
 }
@@ -379,6 +381,10 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent)
     HouseClass* player = HouseClass::CurrentPlayer;
     bool isPlayerAttacked = player == E->pObject->GetOwningHouse();
     bool isPlayerInvasion = player == E->pAttackingHouse;
+    if (isPlayerAttacked && isPlayerInvasion) {
+        // player attack own unit
+        return;
+    }
     if (isPlayerInvasion) {
         AudioSystem::SetMusicState(EMusicState::Invasion);
         gAudioData.lastTimeBattle = std::chrono::steady_clock::now();

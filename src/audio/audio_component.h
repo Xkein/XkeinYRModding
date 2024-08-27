@@ -24,7 +24,7 @@ struct WwiseStringID
     }
 };
 
-CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass, ThemeClass])
+CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass])
 struct AudioTypeComponent final
 {
     PROPERTY(IniField = "Audio.Enable")
@@ -41,6 +41,20 @@ struct AudioTypeComponent final
     WwiseStringID removeEvent;
     
     std::shared_ptr<WwiseSoundBank> soundBank;
+};
+
+CLASS(IniComponent, ComponentTarget = [ThemeControl])
+struct ThemeComponent final
+{
+    PROPERTY(IniField = "Theme.Enable")
+    bool enable {false};
+    PROPERTY(IniField = "Theme.SoundBank")
+    std::string_view soundBankName;
+    PROPERTY(IniField = "Theme.PlayEvent")
+    WwiseStringID playEvent;
+    
+    std::shared_ptr<WwiseSoundBank> soundBank;
+    AkPlayingID playingID;
 };
 
 CLASS(ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass])

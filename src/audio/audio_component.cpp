@@ -46,6 +46,58 @@ void AudioComponent::Tick()
 }
 
 #include "yr/yr_all_events.h"
+#include <ThemeClass.h>
+void on_wwise_theme_end(AkCallbackType in_eType, AkCallbackInfo* in_pCallbackInfo)
+{
+    if (in_eType == AK_EndOfEvent)
+    {
+        ThemeClass* theme = &ThemeClass::Instance;
+        if (theme->QueuedTheme == -2) {
+            theme->QueuedTheme = theme->GetRandomIndex(theme->LastTheme);
+        }
+        ThemeClass::Instance->Play(theme->QueuedTheme);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrThemePlayEvent)
+{
+    ThemeControl* themeCtrl = E->theme->Themes[E->index];
+    ThemeComponent* themeCom = GetYrComponent<ThemeComponent>(themeCtrl);
+    if (themeCom && themeCom->enable && themeCom->playEvent)
+    {
+        if (!themeCom->soundBank && !themeCom->soundBankName.empty()) {
+            themeCom->soundBank = AudioSystem::GetSoundBank(themeCom->soundBankName);
+        }
+		themeCom->playingID = AK::SoundEngine::PostEvent(themeCom->playEvent, MUSIC_ID, 0, on_wwise_theme_end);
+    }
+
+    for (ThemeControl* ctrl : E->theme->Themes)
+    {
+        if (ctrl != themeCtrl) {
+            if (ThemeComponent* com = GetYrComponent<ThemeComponent>(ctrl)) {
+                com->soundBank.reset();
+            }
+        }
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeStopEvent)
+{
+    ThemeControl* themeCtrl = E->theme->Themes[E->theme->CurrentTheme];
+    ThemeComponent* themeCom = GetYrComponent<ThemeComponent>(themeCtrl);
+    if (themeCom && themeCom->enable && themeCom->playEvent)
+    {
+		AK::SoundEngine::StopPlayingID(themeCom->playingID, E->fade ? 500 : 0);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeSuspendEvent)
+{
+    ThemeControl* themeCtrl = E->theme->Themes[E->theme->CurrentTheme];
+    ThemeComponent* themeCom = GetYrComponent<ThemeComponent>(themeCtrl);
+    if (themeCom && themeCom->enable && themeCom->playEvent)
+    {
+		AK::SoundEngine::StopPlayingID(themeCom->playingID);
+    }
+}
+
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletConstructEvent)
 {
     AudioComponent::OnEntityConstruct(*gEntt, GetYrEntity(E->pBullet), E->pBullet);

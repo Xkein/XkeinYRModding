@@ -18,7 +18,7 @@ is_ini_component_house = is_ini_component && array.contains(component_target_lis
 is_ini_component_super = is_ini_component && array.contains(component_target_list, "SuperWeaponTypeClass")
 is_ini_component_weapon = is_ini_component && array.contains(component_target_list, "WeaponTypeClass")
 is_ini_component_warhead = is_ini_component && array.contains(component_target_list, "WarheadTypeClass")
-is_ini_component_theme = is_ini_component && array.contains(component_target_list, "ThemeClass")
+is_ini_component_theme = is_ini_component && array.contains(component_target_list, "ThemeControl")
 func user_gen_meta_class(htClass)
     $result = ""
     for target_type in component_target_list
@@ -93,6 +93,11 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrWeaponTypeLoadIniEvent) {
 {{- if is_ini_component_warhead }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrWarheadTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{type_name}}>(E->pWarheadType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_theme }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{type_name}}>(E->themeCtrl, E->pIni);
 }
 {{- end }}
 {{- end }}
