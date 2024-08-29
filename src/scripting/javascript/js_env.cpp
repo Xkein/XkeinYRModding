@@ -14,7 +14,7 @@
 
 #define CHECK_V8_ARGS(...)
 
-YRSCRIPTING_API JsEnv* gJsEnv = nullptr;
+XKEINEXT_API JsEnv* gJsEnv = nullptr;
 
 using namespace PUERTS_NAMESPACE;
 

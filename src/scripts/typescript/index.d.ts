@@ -4,4 +4,4 @@
 /// <reference path="yr/yr_struct.d.ts" />
 /// <reference path="gen/YrExtCore.d.ts" />
 /// <reference path="gen/YRpp.d.ts" />
-/// <reference path="gen/YrScripting.d.ts" />
+/// <reference path="gen/XkeinExt.d.ts" />

@@ -30,6 +30,10 @@
 #include "{{source_file}}"
 #include "core/raii_invoker.h"
 #include <Binding.hpp>
+#ifdef UNICODE
+#define GetClassNameA GetClassNameW
+#define LoadImageA LoadImageW
+#endif
 void __JsRegister_{{type_name}}() {
 {{ if is_class }}
 {{- func gen_js_class(htClass)

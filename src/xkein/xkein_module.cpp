@@ -2,6 +2,7 @@
 #include "codegen/XkeinExt.gen.h"
 #include "physics/physics.h"
 #include "audio/audio.h"
+#include "scripting/engine.h"
 
 void YrXkeinModule::Startup()
 {
@@ -9,12 +10,19 @@ void YrXkeinModule::Startup()
 
     Physics::Init();
     AudioSystem::Init();
+    gEngine = new Engine();
+    gEngine->Start();
 }
 
 void YrXkeinModule::Shutdown()
 {
-    __Gen_Type_XkeinExt::Unregister();
-    
+    if (gEngine) {
+        delete gEngine;
+        gEngine = nullptr;
+    }
+
     Physics::Destroy();
     AudioSystem::Destroy();
+
+    __Gen_Type_XkeinExt::Unregister();
 }

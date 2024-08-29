@@ -19,7 +19,7 @@ public:
     }
 };
 
-class YRSCRIPTING_API DefaultJSModuleLoader : public IJSModuleLoader
+class XKEINEXT_API DefaultJSModuleLoader : public IJSModuleLoader
 {
 public:
     explicit DefaultJSModuleLoader(const char* InScriptRoot) : ScriptRoot(InScriptRoot)

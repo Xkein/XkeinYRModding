@@ -149,4 +149,4 @@ private:
     bool ExtensionMethodsMapInited;
 };
 
-extern YRSCRIPTING_API JsEnv* gJsEnv;
+extern XKEINEXT_API JsEnv* gJsEnv;
