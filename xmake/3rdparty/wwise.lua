@@ -8,7 +8,7 @@ wwise_includes_dir = wwise_sdk_path.."/include"
 if is_mode("debug") then
     wwise_lib_dir = wwise_sdk_path.."/Win32_vc170/Debug(StaticCRT)/lib"
 else
-    wwise_lib_dir = wwise_sdk_path.."/Win32_vc170/Release/lib"
+    wwise_lib_dir = wwise_sdk_path.."/Win32_vc170/Release(StaticCRT)/lib"
 end
 
 if not os.exists(wwise_includes_dir) or not os.exists(wwise_lib_dir) then
@@ -28,8 +28,12 @@ target("wwise")
     add_defines("UNICODE", {public = true})
     add_linkdirs(wwise_lib_dir, {public = true})
     add_syslinks("DbgHelp", "Winmm", "Dsound", "ws2_32", "Msacm32", {public=true})
-    add_links("CommunicationCentral.lib",
-              "Ak3DAudioBedMixerFX.lib",
+    if is_mode("debug") then
+        add_links("CommunicationCentral.lib")
+    else
+        add_defines("AK_OPTIMIZED", {public = true})
+    end
+    add_links("Ak3DAudioBedMixerFX.lib",
               "AkAudioInputSource.lib",
               "AkCompressorFX.lib",
               "AkDelayFX.lib",
