@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ui/imgui/yr_imgui.h"
-#include "scripting/editor/graph/graph_node.h"
+#include "editor/scripting/graph/graph_node.h"
 #include <imgui_node_editor.h>
 #include <vector>
 #include <map>

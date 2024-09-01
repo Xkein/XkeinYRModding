@@ -2,14 +2,14 @@
 
 #include <imgui_node_editor.h>
 #include <imgui_internal.h>
-#include "scripting/editor/graph/graph_pin.h"
+#include "editor/scripting/graph/graph_pin.h"
 
 #include <string>
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <utility>
-#include "scripting/editor/blueprints/utilities/builders.h"
+#include "editor/scripting/blueprints/utilities/builders.h"
 
 namespace ed   = ax::NodeEditor;
 class GraphEditor;

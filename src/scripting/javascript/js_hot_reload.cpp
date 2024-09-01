@@ -1,7 +1,5 @@
 
-#include "scripting/editor/graph/graph_editor.h"
 #include "imgui_internal.h"
-#include "scripting/editor/editor.h"
 #include "scripting/javascript/js_env.h"
 #include "yr/extcore_config.h"
 #include "runtime/platform/path.h"
@@ -9,8 +7,8 @@
 #include "runtime/logger/logger.h"
 #include "scripting/engine.h"
 #include <efsw/efsw.hpp>
-std::shared_ptr<GraphEditor> editor;
-std::shared_ptr<efsw::FileWatcher> fw;
+
+static std::shared_ptr<efsw::FileWatcher> fw;
 using namespace std::chrono_literals;
  
 class JsHotReloadListener : public efsw::FileWatchListener
@@ -64,51 +62,12 @@ class JsHotReloadListener : public efsw::FileWatchListener
 
 } JsHotReload;
 
-void EngineEditor::Start()
+void CreateJsHotReloadWatcher()
 {
     if (gYrExtConfig->rawData.value("js_watch_files", false))
     {
         fw = std::make_shared<efsw::FileWatcher>();
         fw->addWatch(gYrExtConfig->assetsPath / "JavaScript", &JsHotReload, true);
         fw->watch();
-    }
-}
-
-void EngineEditor::End()
-{
-    fw.reset();
-    editor.reset();
-}
-
-struct DemoWindow: YrImGuiWindow
-{
-    virtual void OnOpen() override
-    {
-        isShow = true;
-    }
-    virtual void OnClose()
-    {
-        isShow = false;
-    }
-
-    virtual void OnFrame() override
-    {
-        ImGui::ShowDemoWindow(&isShow);
-        if (!isShow)
-            this->Close();
-    }
-    bool isShow {false};
-};
-void EngineEditor::Tick()
-{
-    static std::shared_ptr<DemoWindow> demo;
-    if (ImGui::IsKeyReleased(ImGuiKey_KeypadAdd))
-    {
-        YrImGui::SwitchWindow(demo, true);
-    }
-
-    if (ImGui::IsKeyReleased(ImGuiKey_F11))
-    {
-        YrImGui::SwitchWindow(editor);
     }
 }

@@ -29,7 +29,7 @@ public:
     JsEnv();
     ~JsEnv();
 
-    bool Eval(const char* Code, const char* Path, v8::Global<v8::Value>* result = nullptr);
+    XKEINEXT_API bool Eval(const char* Code, const char* Path, v8::Global<v8::Value>* result = nullptr);
 
     void ExecuteModule(const char* ModuleName);
 
@@ -66,7 +66,7 @@ public:
     std::string GetJSStackTrace();
 
     std::string ObjectToString(v8::Local<v8::Value> value);
-    std::string ObjectToString(const v8::PersistentBase<v8::Value>& value);
+    XKEINEXT_API std::string ObjectToString(const v8::PersistentBase<v8::Value>& value);
 
     v8::Local<v8::Value> FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial);
 

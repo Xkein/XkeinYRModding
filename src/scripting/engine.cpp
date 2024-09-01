@@ -1,7 +1,4 @@
 #include "engine.h"
-#ifdef IS_EDITOR
-#include "scripting/editor/editor.h"
-#endif
 #include "runtime/logger/logger.h"
 #include "runtime/ecs/entt.h"
 #include "yr/yr_all_events.h"
@@ -46,17 +43,11 @@ void Engine::Start()
 {
     gLogger->info("Engine::Start()");
     gJsEnv = new JsEnv();
-#ifdef IS_EDITOR
-    EngineEditor::Start();
-#endif
 }
 
 void Engine::Exit()
 {
     gLogger->info("Engine::Exit()");
-#ifdef IS_EDITOR
-    EngineEditor::End();
-#endif
     delete gJsEnv;
     gJsEnv = nullptr;
 }
@@ -71,15 +62,11 @@ void Engine::OnScenarioClear()
     gLogger->info("Engine::OnScenarioClear()");
 }
 
-#include "scripting/editor/editor.h"
 void Engine::OnBeginUpdate()
 {
     //gConsole->info("Engine::OnBeginUpdate()");
     mutex.lock();
     CalDeltaTime();
-#ifdef IS_EDITOR
-    EngineEditor::Tick();
-#endif
     for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
     {
         script.Invoke(script.OnBeginUpdate);
@@ -99,9 +86,7 @@ void Engine::OnEndUpdate()
 
 void Engine::OnUIUpdate()
 {
-#ifdef IS_EDITOR
-    EngineEditor::Tick();
-#endif
+
 }
 
 void Engine::OnBeginRender()

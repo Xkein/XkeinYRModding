@@ -12,5 +12,10 @@
     "js_wait_debugger_timeout": 0,
     "js_watch_files": true,
     "break_on_start": false,
-    "break_on_exit": false
+    "break_on_exit": false,
+
+    "editor_key_config": {
+        "js_terminal": 606,
+        "imgui_demo": 626
+    }
 }

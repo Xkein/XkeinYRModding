@@ -1,5 +1,5 @@
 #pragma once
-#include "scripting/editor/graph/graph_node.h"
+#include "editor/scripting/graph/graph_node.h"
 #include "core/reflection/reflection.h"
 #include <memory>
 #include <functional>

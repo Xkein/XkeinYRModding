@@ -1,3 +1,4 @@
+#include "editor/editor.h"
 #include "scripting/javascript/js_env.h"
 #include <ui/imgui/yr_imgui.h>
 #include <runtime/logger/logger.h>
@@ -334,15 +335,4 @@ public:
     }
 };
 
-std::shared_ptr<TerminalWindow> terminal;
-
-static void Update()
-{
-    if (ImGui::IsKeyReleased(ImGuiKey_GraveAccent))
-    {
-        YrImGui::SwitchWindow(terminal);
-    }
-}
-
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, Update)
-REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, Update)
+IMPL_EDITOR_WINDOW(TerminalWindow, "js_terminal");

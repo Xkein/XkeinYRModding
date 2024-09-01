@@ -15,6 +15,7 @@
 #define CHECK_V8_ARGS(...)
 
 XKEINEXT_API JsEnv* gJsEnv = nullptr;
+void CreateJsHotReloadWatcher();
 
 using namespace PUERTS_NAMESPACE;
 
@@ -168,6 +169,9 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     BackendEnv->StartPolling();
 
     gLogger->info("JsEnv started.");
+#ifdef IS_EDITOR
+    CreateJsHotReloadWatcher();
+#endif
 }
 
 JsEnv::~JsEnv()

@@ -1,6 +1,6 @@
-#include "scripting/editor/graph/graph_node.h"
-#include "scripting/editor/graph/graph.h"
-#include "scripting/editor/graph/graph_editor.h"
+#include "editor/scripting/graph/graph_node.h"
+#include "editor/scripting/graph/graph.h"
+#include "editor/scripting/graph/graph_editor.h"
 
 void EdMetaCodeNode::OnDraw(EdGraphNodeDrawContext const& context)
 {

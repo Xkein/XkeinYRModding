@@ -3,7 +3,7 @@
 #include <imgui_node_editor.h>
 #include "core/reflection/reflection.h"
 #include <string>
-#include "scripting/editor/blueprints/utilities/builders.h"
+#include "editor/scripting/blueprints/utilities/builders.h"
 
 namespace ed = ax::NodeEditor;
 

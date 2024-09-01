@@ -1,8 +1,22 @@
-#include "editor/object_inspector.h"
+#include "editor/editor.h"
 #include "core/reflection/reflection.h"
 #include "yr/api/yr_entity.h"
 #include <FootClass.h>
 #include <ObjectClass.h>
+
+
+class YrObjectInspector : public YrEditorWindow
+{
+    virtual void OnOpen() override;
+    virtual void OnClose() override;
+    virtual void OnFrame() override;
+
+public:
+    YrObjectInspector();
+    virtual ~YrObjectInspector();
+    
+};
+
 
 void YrObjectInspector::OnOpen()
 {

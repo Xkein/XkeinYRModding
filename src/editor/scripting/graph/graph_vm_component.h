@@ -1,6 +1,6 @@
 #pragma once
 #include "core/reflection/macro.h"
-#include "scripting/editor/graph/graph.h"
+#include "editor/scripting/graph/graph.h"
 
 struct EdGraphVmComponent
 {
