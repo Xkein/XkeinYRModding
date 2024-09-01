@@ -8,6 +8,9 @@ public:
     TerrainHeightMap();
     ~TerrainHeightMap();
 
-    JPH::Body* body;
+    void Rebuild();
+    void Clear();
+
+    JPH::Body* heightMapBody;
     std::vector<JPH::Body*> cliffBodies;
 };

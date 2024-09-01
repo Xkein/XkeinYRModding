@@ -320,6 +320,7 @@ void Physics::InitWorld()
     gPhysicsSystem->SetContactListener(gContactListener);
 
     gTerrainHeightMap = new TerrainHeightMap();
+    gTerrainHeightMap->Rebuild();
 
     gPhysicsSystem->OptimizeBroadPhase();
 }
