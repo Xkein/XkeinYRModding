@@ -1,6 +1,7 @@
 {
     "extensions": [
-        "XkeinExt"
+        "XkeinExt",
+        "XkeinEditor"
     ],
     "assets_dir": "assets",
     "plugins_dir": "plugins",
@@ -16,6 +17,7 @@
 
     "editor_key_config": {
         "js_terminal": 606,
-        "imgui_demo": 626
+        "imgui_demo": 626,
+        "object_inspector": 598
     }
 }

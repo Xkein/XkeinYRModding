@@ -88,7 +88,9 @@ void LoadExtensions()
     for (auto ext : gYrExtConfig->extensions)
     {
         std::string extName = ext;
-        ExtensionManager::LoadExtension(extName.c_str());
+        if (!ExtensionManager::LoadExtension(extName.c_str())) {
+            gLogger->error("could not load extension {}", extName);
+        }
     }
 
     gLogger->info("All extension loaded");

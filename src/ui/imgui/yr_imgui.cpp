@@ -66,7 +66,6 @@ LRESULT ImGui_ImplWin32_WndProcHandler_NoCapture(HWND hWnd, UINT msg, WPARAM wPa
         case WM_MBUTTONDBLCLK:
         case WM_XBUTTONDOWN:
         case WM_XBUTTONDBLCLK: {
-        std::lock_guard lock(windowMtx);
             ImGuiMouseSource mouse_source = GetMouseSourceFromMessageExtraInfo();
             int              button       = 0;
             if (msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK)

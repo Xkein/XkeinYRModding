@@ -1,5 +1,6 @@
 #pragma once
 
+#include <entt/meta/pointer.hpp>
 #include <entt/meta/factory.hpp>
 #include "core/tool/function.hpp"
 

@@ -1,6 +1,7 @@
 #include "editor/editor.h"
 #include "editor.h"
 #include "yr/extcore_config.h"
+#include "runtime/logger/logger.h"
 #include <map>
 #include <ranges>
 
@@ -142,8 +143,11 @@ bool YrEditorWindow::IsOpened() const
     return _impl->_opened;
 }
 
-
-static std::map<ImGuiKey, std::vector<YrEditorKeyListener::ListenerFuncType>> gKeyListeners;
+auto& GetKeyListeners()
+{
+    static std::map<ImGuiKey, std::vector<YrEditorKeyListener::ListenerFuncType>> gKeyListeners {};
+    return gKeyListeners;
+}
 
 ImGuiKey GetConfigKey(std::string_view config)
 {
@@ -155,7 +159,8 @@ void YrEditorKeyListener::Register(std::string_view config, ListenerFuncType lis
     ImGuiKey key = GetConfigKey(config);
     if (key == ImGuiKey_None)
         return;
-    gKeyListeners[key].push_back(listener);
+    GetKeyListeners()[key].push_back(listener);
+    gLogger->info("editor: key register {} <- {}", config, (void*)listener);
 }
 
 void YrEditorKeyListener::Unregistere(std::string_view config, ListenerFuncType listener)
@@ -163,20 +168,21 @@ void YrEditorKeyListener::Unregistere(std::string_view config, ListenerFuncType 
     ImGuiKey key = GetConfigKey(config);
     if (key == ImGuiKey_None)
         return;
-    auto& list = gKeyListeners[key];
+    auto& list = GetKeyListeners()[key];
     if (auto iter = std::find(list.begin(), list.end(), listener); iter != list.end()){
         list.erase(iter);
     }
+    gLogger->info("editor: key unregister {} <- {}", config, (void*)listener);
 }
 
 void StepEditorKeyListener()
 {
-    for (auto&& [key, list] : gKeyListeners)
+    for (auto&& [key, list] : GetKeyListeners())
     {
-        if (!ImGui::IsKeyDown(key))
+        if (!ImGui::IsKeyPressed(key))
             continue;
         for (auto const& listener : list | std::views::reverse) {
-            if (listener)
+            if (listener())
                 break;
         }
     }
