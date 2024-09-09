@@ -1,9 +1,13 @@
 #include "editor/editor.h"
 #include "core/reflection/reflection.h"
+#include "runtime/platform/platform.h"
 #include "yr/api/yr_entity.h"
 #include <FootClass.h>
 #include <ObjectClass.h>
-#include "runtime/platform/platform.h"
+#include <TacticalClass.h>
+#include <DisplayClass.h>
+#include <MouseClass.h>
+#include <WWMouseClass.h>
 
 using namespace entt::literals;
 
@@ -18,6 +22,7 @@ public:
     virtual ~YrObjectInspector();
 private:
     bool isShow {false};
+    bool showAimmingCell {false};
 };
 
 YrObjectInspector::YrObjectInspector()
@@ -40,7 +45,7 @@ void YrObjectInspector::OnClose()
     isShow = false;
 }
 
-void InspectType(entt::meta_type type, void* inst);
+void InspectType(entt::meta_type type, void* inst, const char* name = nullptr);
 
 void InspectField(entt::meta_any& inst, entt::meta_data field)
 {
@@ -52,7 +57,7 @@ void InspectField(entt::meta_any& inst, entt::meta_data field)
     }
     const char*     fieldName = field.prop("name"_hs).value().cast<const char*>();
     entt::meta_type fieldType = field.type();
-
+    
     entt::meta_any data = field.get(inst);
     void* ptr = data.data();
 
@@ -61,14 +66,14 @@ void InspectField(entt::meta_any& inst, entt::meta_data field)
         entt::meta_any ref = *data;
         if (ref)
         {
-            InspectType(ref.type(), ref.data());
+            InspectType(ref.type(), ref.data(), fieldName);
         }
         return;
     }
 
     if (fieldType.is_class())
     {
-        InspectType(fieldType, ptr);
+        InspectType(fieldType, ptr, fieldName);
         return;
     }
 
@@ -115,7 +120,7 @@ void InspectField(entt::meta_any& inst, entt::meta_data field)
     ImGui::LabelText(fieldName, "<unsupported type>");
 }
 
-void InspectType(entt::meta_type type, void* inst)
+void InspectType(entt::meta_type type, void* inst, const char* name)
 {
     entt::meta_prop prop = type.prop("name"_hs);
     if (!prop)
@@ -124,13 +129,20 @@ void InspectType(entt::meta_type type, void* inst)
         return;
     }
     const char* typeName = prop.value().cast<const char*>();
-    if (!ImGui::TreeNode(typeName, "%s 0x%08X", typeName, inst)) {
-        return;
+    if (name) {
+        if (!ImGui::TreeNode(typeName, "%s %s 0x%08X", name, typeName, inst)) {
+            return;
+        }
+    }
+    else {
+        if (!ImGui::TreeNode(typeName, "%s 0x%08X", typeName, inst)) {
+            return;
+        }
     }
 
     for (auto&& [id, base] : type.base())
     {
-        InspectType(base, inst);
+        InspectType(base, inst, "base");
     }
     
     entt::meta_any instance = type.from_void(inst);
@@ -165,6 +177,22 @@ void YrObjectInspector::OnFrame()
     }
     if (!isShow)
         this->Close();
+
+    ImGui::Checkbox("Show Aimming Cell", &showAimmingCell);
+    if (showAimmingCell)
+    {
+        Point2D cursorPos;
+        WWMouseClass::Instance->GetCoords(&cursorPos);
+        CoordStruct coord = TacticalClass::Instance->ClientToCoords(cursorPos);
+        //CellStruct cell;
+        //TacticalClass::Instance->CoordsToCell(&cell, &coord);
+        //coord = CellClass::Cell2Coord(cell);
+        //int cellHeight = MapClass::Instance->GetCellFloorHeight(coord);
+        //coord = CellClass::Cell2Coord(cell, cellHeight);
+        if (CellClass* pCell = MapClass::Instance->GetCellAt(coord)) {
+            InspectObject(pCell);
+        }
+    }
 
     for (ObjectClass* pObject : ObjectClass::CurrentObjects.get())
     {
