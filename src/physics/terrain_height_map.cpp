@@ -1,15 +1,20 @@
 #include "physics/terrain_height_map.h"
 #include "physics/layers.h"
 #include "physics/physics.h"
+#include "physics/yr_math.h"
 #include "terrain_height_map.h"
 #include <IsometricTileTypeClass.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
 #include <Jolt/Physics/Collision/Shape/HeightFieldShape.h>
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <runtime/logger/logger.h>
 #include <MapClass.h>
+#include <Fundamentals.h>
 #include <array>
+#include <map>
+#include <queue>
 
 TerrainHeightMap::TerrainHeightMap() {}
 
@@ -23,31 +28,102 @@ inline static int sBlockSizeShift = 2;
 // Bits per sample
 inline static int sBitsPerSample = 8;
 
-std::array<float, 9> get_slope_height_offset(CellClass* pCell)
+std::array<float, 9>& get_slope_height_offset(CellClass* pCell)
 {
-    int slopeIndex = pCell->SlopeIndex;
-    switch (slopeIndex)
-    {
-        case 0:
-            return {0, 0, 0, 0, 0, 0, 0, 0, 0};
-        case 1:
-            return {};
+    static std::array<float, 9> offsets[] {
+        {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, // 0
+
+        {0.0f, 0.5f, 1.0f, 0.0f, 0.5f, 1.0f, 0.0f, 0.5f, 1.0f}, // 1
+        {0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 1.0f}, // 2
+        {1.0f, 0.5f, 0.0f, 1.0f, 0.5f, 0.0f, 1.0f, 0.5f, 0.0f}, // 3
+        {1.0f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f}, // 4
+
+        {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f}, // 5
+        {0.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.5f, 0.0f}, // 6
+        {1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}, // 7
+        {0.0f, 0.5f, 1.0f, 0.0f, 0.0f, 0.5f, 0.0f, 0.0f, 0.0f}, // 8
+
+        {0.0f, 0.5f, 1.0f, 0.5f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f}, // 9
+        {1.0f, 0.5f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f, 1.0f}, // 10
+        {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 0.5f, 0.0f}, // 11
+        {1.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.5f, 1.0f}, // 12
+
+        {0.0f, 0.5f, 1.0f, 0.5f, 1.0f, 1.5f, 1.0f, 1.5f, 2.0f}, // 13
+        {1.0f, 0.5f, 0.0f, 1.5f, 1.0f, 0.5f, 2.0f, 1.5f, 1.0f}, // 14
+        {2.0f, 1.5f, 1.0f, 1.5f, 1.0f, 0.5f, 1.0f, 0.5f, 0.0f}, // 15
+        {1.0f, 1.5f, 2.0f, 0.5f, 1.0f, 1.5f, 0.0f, 0.5f, 1.0f}, // 16
+
+        {0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f}, // 17
+        {1.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 1.0f}, // 18
+        {0.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.5f, 0.0f}, // 19
+        {1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f}, // 20
+    };
+    static bool inited = false;
+    if (!inited) {
+        for (std::array<float, 9>& offset : offsets)
+        {
+            for (float& val : offset)
+            {
+                val *= Unsorted::LevelHeight;
+            }
+        }
+        inited = true;
     }
-    gLogger->error("could not get height offset for slope index '{}'", slopeIndex);
+    return offsets[pCell->SlopeIndex];
 }
 
 std::array<float, 9> get_cell_heights(CellClass* pCell)
 {
-    auto                 offsets      = get_slope_height_offset(pCell);
+    auto&                offsets      = get_slope_height_offset(pCell);
     CoordStruct          coord        = pCell->GetCellCoords();
     float                centerHeight = coord.Z;
     std::array<float, 9> tmp;
     for (size_t idx = 0; idx < 9; idx++)
     {
-        tmp[idx] = centerHeight + offsets[idx];
+        tmp[idx] = (centerHeight + offsets[idx]) * detail::physics_world_scale;
     }
 
     return tmp;
+}
+
+static std::map<CellClass*, JPH::Body*> gCellCliff {};
+static std::queue<CellClass*> gCellQueue;
+
+
+void create_body_from_queue()
+{
+    std::vector<JPH::Vec3> triangles;
+    while(!gCellQueue.empty())
+    {
+        CellClass* pCell = gCellQueue.front();
+
+    }
+}
+
+void TerrainHeightMap::CreateCellBody(CellClass* pCell)
+{
+    if (!pCell->Tile_Is_Cliff() || gCellCliff.contains(pCell)) {
+        return;
+    }
+    if (gCellQueue.size() > 10) {
+        return;
+    }
+    gCellQueue.push(pCell);
+
+    for (size_t idx = (size_t)FacingType::Count - 1; idx >= 0; idx--)
+    {
+        if (gCellQueue.size() > 10) {
+            return;
+        }
+        CellClass* pNeighborCell = pCell->GetNeighbourCell((FacingType)idx);
+        gCellQueue.push(pNeighborCell);
+    }
+    
+    if (gCellCliff.contains(pCell)) {
+        return;
+    }
+
+    create_body_from_queue();
 }
 
 void TerrainHeightMap::Rebuild()
@@ -69,10 +145,15 @@ void TerrainHeightMap::Rebuild()
         CellClass*           pCell       = map->Cells[idx];
         std::array<float, 9> cellHeights = get_cell_heights(pCell);
 
-        IsometricTileTypeClass* pIsoTileType = IsometricTileTypeClass::Array->GetItem(pCell->IsoTileTypeIndex);
-        bool                    isCliff      = pCell->Tile_Is_Cliff();
-        if (isCliff)
+        CreateCellBody(pCell);
+
+        CoordStruct coord = pCell->GetCoords();
+        CellStruct cell = CellClass::Coord2Cell(coord);
+        int x = cell.X * 3;
+        int y = cell.Y * 3;
+        for (size_t idx = 0; idx < 9; idx++)
         {
+            terrain[(x + idx % 3) + (y * height + idx / 3)] = cellHeights[idx];
         }
     }
 
@@ -88,6 +169,8 @@ void TerrainHeightMap::Rebuild()
 
 void TerrainHeightMap::Clear()
 {
+    gCellCliff.clear();
+
     for (JPH::Body* cliffBody : cliffBodies)
     {
         gBodyInterface->RemoveBody(cliffBody->GetID());

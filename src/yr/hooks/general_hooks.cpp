@@ -7,8 +7,7 @@ BROADCAST_HOOK_EVENT(0x55B719, 0x5, YrLogicEndUpdateEvent) {}
 BROADCAST_HOOK_EVENT(0x4F4480, 0x8, YrBeginRenderEvent) {}
 BROADCAST_HOOK_EVENT(0x4F45A3, 0x5, YrEndRenderEvent) {}
 
-// in progress: Initializing Tactical display
-BROADCAST_HOOK_EVENT(0x6875F3, 0x6, YrScenarioStartEvent) {}
+BROADCAST_HOOK_EVENT(0x687917, 0x6, YrScenarioStartEvent) {}
 BROADCAST_HOOK_EVENT(0x685659, 0xA, YrScenarioClearEvent) {}
 
 BROADCAST_HOOK_EVENT(0x67CEF0, 0x6, YrSaveGameBeginEvent)
