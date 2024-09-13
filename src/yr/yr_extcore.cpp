@@ -11,10 +11,12 @@ void LoadExtensions();
 #include "codegen/YRpp.gen.h"
 #include "codegen/YrExtCore.gen.h"
 #include "runtime/ecs/entt.h"
+#include "yr/reflection/yr_reflection.h"
 struct MetaRegistration
 {
     static void Register() {
         gEntt = new entt::registry();
+        YrReflectionRegister();
         __Gen_Type_YRpp::Register();
         __Gen_Type_YrExtCore::Register();
     }
@@ -22,6 +24,7 @@ struct MetaRegistration
     {
         __Gen_Type_YrExtCore::Unregister();
         __Gen_Type_YRpp::Unregister();
+        YrReflectionUnregister();
         delete gEntt;
         gEntt = nullptr;
     }
