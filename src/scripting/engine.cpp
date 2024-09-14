@@ -9,8 +9,8 @@
 
 Engine* gEngine;
 
-DEFINE_YR_HOOK_EVENT_LISTENER(YrScenarioStartEvent) { if(gEngine) gEngine->OnScenarioStart(); }
-DEFINE_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent) { if(gEngine) gEngine->OnScenarioClear(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent) { if(gEngine) gEngine->OnScenarioStart(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent) { if(gEngine) gEngine->OnScenarioClear(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent) { if(gEngine) gEngine->OnBeginUpdate(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent) { if(gEngine) gEngine->OnEndUpdate(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) { if(gEngine) gEngine->OnUIUpdate(); }

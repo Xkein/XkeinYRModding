@@ -405,7 +405,7 @@ void Physics::BeginTick()
 void Physics::EndTick() {}
 
 #include "yr/event/general_event.h"
-REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioStartEvent, Physics::InitWorld);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrScenarioClearEvent, Physics::DestroyWorld);
+REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent, Physics::InitWorld);
+REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent, Physics::DestroyWorld);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, Physics::BeginTick);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, Physics::EndTick);

@@ -1,12 +1,12 @@
-#include "editor/editor.h"
 #include "core/reflection/reflection.h"
+#include "editor/editor.h"
 #include "runtime/platform/platform.h"
 #include "yr/api/yr_entity.h"
+#include <DisplayClass.h>
 #include <FootClass.h>
+#include <MouseClass.h>
 #include <ObjectClass.h>
 #include <TacticalClass.h>
-#include <DisplayClass.h>
-#include <MouseClass.h>
 #include <WWMouseClass.h>
 
 using namespace entt::literals;
@@ -20,20 +20,15 @@ class YrObjectInspector : public YrEditorWindow
 public:
     YrObjectInspector();
     virtual ~YrObjectInspector();
+
 private:
     bool isShow {false};
     bool showAimmingCell {false};
 };
 
-YrObjectInspector::YrObjectInspector()
-{
+YrObjectInspector::YrObjectInspector() {}
 
-}
-
-YrObjectInspector::~YrObjectInspector()
-{
-
-}
+YrObjectInspector::~YrObjectInspector() {}
 
 void YrObjectInspector::OnOpen()
 {
@@ -52,14 +47,17 @@ void InspectField(entt::meta_any& inst, entt::meta_data field)
     entt::meta_prop prop = field.prop("name"_hs);
     if (!prop)
     {
-        ImGui::LabelText("<unknown type>", "0x%08X", inst);
+        ImGui::LabelText("<unknown field name>", "<unknown type> 0x%08X", inst);
         return;
     }
     const char*     fieldName = field.prop("name"_hs).value().cast<const char*>();
     entt::meta_type fieldType = field.type();
-    
+
+    entt::meta_prop fieldTypeProp = fieldType.prop("name"_hs);
+    const char*     fieldTypeName = fieldTypeProp ? fieldTypeProp.value().cast<const char*>() : "<unknown type>";
+
     entt::meta_any data = field.get(inst);
-    void* ptr = data.data();
+    void*          ptr  = data.data();
 
     if (fieldType.is_pointer() || fieldType.is_pointer_like())
     {
@@ -67,6 +65,10 @@ void InspectField(entt::meta_any& inst, entt::meta_data field)
         if (ref)
         {
             InspectType(ref.type(), ref.data(), fieldName);
+        }
+        else
+        {
+            ImGui::LabelText(fieldName, "nullptr", inst);
         }
         return;
     }
@@ -77,47 +79,92 @@ void InspectField(entt::meta_any& inst, entt::meta_data field)
         return;
     }
 
-    if (fieldType.is_arithmetic())
+    if (fieldType.is_enum())
     {
-        if (fieldType == entt::resolve<int8>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_S8, ptr);
+        if (fieldType.size_of() == 4)
+        {
+            uint enumVal = *(uint*)ptr;
+            ImGui::LabelText(fieldName, "enum %s unsupported = %d", fieldTypeName, enumVal);
         }
-        else if (fieldType == entt::resolve<uint8>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_U8, ptr);
-        }
-        else if (fieldType == entt::resolve<int16>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_S16, ptr);
-        }
-        else if (fieldType == entt::resolve<uint16>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_U16, ptr);
-        }
-        else if (fieldType == entt::resolve<int32>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_S32, ptr);
-        }
-        else if (fieldType == entt::resolve<uint32>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_U32, ptr);
-        }
-        else if (fieldType == entt::resolve<int64>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_S64, ptr);
-        }
-        else if (fieldType == entt::resolve<uint64>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_U64, ptr);
-        }
-        else if (fieldType == entt::resolve<float>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_Float, ptr);
-        }
-        else if (fieldType == entt::resolve<double>()) {
-            ImGui::InputScalar(fieldName, ImGuiDataType_Double, ptr);
+        else
+        {
+            ImGui::LabelText(fieldName, "enum %s unsupported", fieldTypeName);
         }
         return;
     }
 
-    if (fieldType.can_convert(entt::resolve<const char*>())){
+    if (fieldType.is_arithmetic())
+    {
+        if (fieldType == entt::resolve<bool>())
+        {
+            ImGui::Checkbox(fieldName, (bool*)ptr);
+        }
+        else if (fieldType == entt::resolve<int8>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_S8, ptr);
+        }
+        else if (fieldType == entt::resolve<uint8>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_U8, ptr);
+        }
+        else if (fieldType == entt::resolve<int16>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_S16, ptr);
+        }
+        else if (fieldType == entt::resolve<uint16>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_U16, ptr);
+        }
+        else if (fieldType == entt::resolve<int32>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_S32, ptr);
+        }
+        else if (fieldType == entt::resolve<uint32>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_U32, ptr);
+        }
+        else if (fieldType == entt::resolve<int64>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_S64, ptr);
+        }
+        else if (fieldType == entt::resolve<uint64>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_U64, ptr);
+        }
+        else if (fieldType == entt::resolve<float>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_Float, ptr);
+        }
+        else if (fieldType == entt::resolve<double>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_Double, ptr);
+        }
+        else if (fieldType == entt::resolve<char>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_S8, ptr);
+        }
+        else if (fieldType == entt::resolve<long>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_S32, ptr);
+        }
+        else if (fieldType == entt::resolve<unsigned long>())
+        {
+            ImGui::InputScalar(fieldName, ImGuiDataType_U32, ptr);
+        }
+        else
+        {
+            ImGui::LabelText(fieldName, "%s unsupported arithmetic", fieldTypeName);
+        }
+        return;
+    }
+
+    if (fieldType.can_convert(entt::resolve<const char*>()))
+    {
         ImGui::LabelText(fieldName, data.cast<const char*>());
         return;
     }
 
-    ImGui::LabelText(fieldName, "<unsupported type>");
+    ImGui::LabelText(fieldName, "%s unsupported", fieldTypeName);
 }
 
 void InspectType(entt::meta_type type, void* inst, const char* name)
@@ -125,17 +172,21 @@ void InspectType(entt::meta_type type, void* inst, const char* name)
     entt::meta_prop prop = type.prop("name"_hs);
     if (!prop)
     {
-        ImGui::LabelText("<unknown type>", "0x%08X", inst);
+        ImGui::LabelText(name ? name : "<unknown type>", "<unknown type> 0x%08X", inst);
         return;
     }
     const char* typeName = prop.value().cast<const char*>();
-    if (name) {
-        if (!ImGui::TreeNode(typeName, "%s %s 0x%08X", name, typeName, inst)) {
+    if (name)
+    {
+        if (!ImGui::TreeNode(typeName, "%s %s 0x%08X", name, typeName, inst))
+        {
             return;
         }
     }
-    else {
-        if (!ImGui::TreeNode(typeName, "%s 0x%08X", typeName, inst)) {
+    else
+    {
+        if (!ImGui::TreeNode(typeName, "%s 0x%08X", typeName, inst))
+        {
             return;
         }
     }
@@ -144,7 +195,7 @@ void InspectType(entt::meta_type type, void* inst, const char* name)
     {
         InspectType(base, inst, "base");
     }
-    
+
     entt::meta_any instance = type.from_void(inst);
     for (auto&& [id, field] : type.data())
     {
@@ -153,7 +204,7 @@ void InspectType(entt::meta_type type, void* inst, const char* name)
         ImGui::PushID(id);
 
         InspectField(instance, field);
-        
+
         ImGui::PopID();
     }
 
@@ -184,12 +235,13 @@ void YrObjectInspector::OnFrame()
         Point2D cursorPos;
         WWMouseClass::Instance->GetCoords(&cursorPos);
         CoordStruct coord = TacticalClass::Instance->ClientToCoords(cursorPos);
-        //CellStruct cell;
-        //TacticalClass::Instance->CoordsToCell(&cell, &coord);
-        //coord = CellClass::Cell2Coord(cell);
-        //int cellHeight = MapClass::Instance->GetCellFloorHeight(coord);
-        //coord = CellClass::Cell2Coord(cell, cellHeight);
-        if (CellClass* pCell = MapClass::Instance->GetCellAt(coord)) {
+        // CellStruct cell;
+        // TacticalClass::Instance->CoordsToCell(&cell, &coord);
+        // coord = CellClass::Cell2Coord(cell);
+        // int cellHeight = MapClass::Instance->GetCellFloorHeight(coord);
+        // coord = CellClass::Cell2Coord(cell, cellHeight);
+        if (CellClass* pCell = MapClass::Instance->GetCellAt(coord))
+        {
             InspectObject(pCell);
         }
     }
@@ -199,7 +251,7 @@ void YrObjectInspector::OnFrame()
         InspectObject(pObject);
         break;
     }
-    
+
     ImGui::End();
 }
 

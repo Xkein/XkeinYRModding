@@ -22,13 +22,11 @@ CLASS(HookEvent)
 class YrEndRenderEvent
 {};
 
-// ======================= scenario =======================
+CLASS(HookEvent)
+class YrSceneEnterEvent { };
 
 CLASS(HookEvent)
-class YrScenarioStartEvent { };
-
-CLASS(HookEvent)
-class YrScenarioClearEvent { };
+class YrSceneExitEvent { };
 
 // ======================= save game =======================
 
