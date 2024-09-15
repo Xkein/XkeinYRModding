@@ -8,8 +8,10 @@
 
 #include <GeneralStructures.h>
 #include <Matrix3D.h>
+#include <Quaternion.h>
 
 using namespace entt::literals;
+#define INIT_META_FACTORY(CLASS) entt::meta<CLASS>().type(#CLASS##_hs).prop("name"_hs, #CLASS)
 
 template <typename T>
 void RegisterVector2D(entt::meta_factory<Vector2D<T>>&& factory)
@@ -43,14 +45,58 @@ void RegisterVector4D(entt::meta_factory<Vector4D<T>>&& factory)
 
 void YrReflectionRegister()
 {
-    RegisterVector3D(entt::meta<CoordStruct>().type("CoordStruct"_hs).prop("name"_hs, "CoordStruct"));
-    RegisterVector2D(entt::meta<Point2D>().type("Point2D"_hs).prop("name"_hs, "Point2D"));
-    RegisterVector2D(entt::meta<CellStruct>().type("CellStruct"_hs).prop("name"_hs, "CellStruct"));
+    RegisterVector2D(INIT_META_FACTORY(Vector2D<int>));
+    RegisterVector2D(INIT_META_FACTORY(Vector2D<short>));
+    RegisterVector3D(INIT_META_FACTORY(Vector3D<int>));
+    RegisterVector3D(INIT_META_FACTORY(Vector3D<double>));
+    RegisterVector3D(INIT_META_FACTORY(Vector3D<float>));
+
+    {
+        auto factory = INIT_META_FACTORY(ColorStruct);
+        factory.ctor<>();
+        factory.ctor<byte, byte, byte>();
+        register_data<&ColorStruct::R>(factory, "R"_hs).prop("name"_hs, "R");
+        register_data<&ColorStruct::G>(factory, "G"_hs).prop("name"_hs, "G");
+        register_data<&ColorStruct::B>(factory, "B"_hs).prop("name"_hs, "B");
+    }
+    {
+        auto factory = INIT_META_FACTORY(Quaternion);
+        factory.ctor<>();
+        factory.ctor<float, float, float, float>();
+        register_data<&Quaternion::X>(factory, "X"_hs).prop("name"_hs, "X");
+        register_data<&Quaternion::Y>(factory, "Y"_hs).prop("name"_hs, "Y");
+        register_data<&Quaternion::Z>(factory, "Z"_hs).prop("name"_hs, "Z");
+        register_data<&Quaternion::W>(factory, "W"_hs).prop("name"_hs, "W");
+    }
+    {
+        auto factory = INIT_META_FACTORY(RectangleStruct);
+        factory.ctor<>();
+        factory.ctor<int, int, int, int>();
+        register_data<&RectangleStruct::X>(factory, "X"_hs).prop("name"_hs, "X");
+        register_data<&RectangleStruct::Y>(factory, "Y"_hs).prop("name"_hs, "Y");
+        register_data<&RectangleStruct::Width>(factory, "Width"_hs).prop("name"_hs, "Width");
+        register_data<&RectangleStruct::Height>(factory, "Height"_hs).prop("name"_hs, "Height");
+    }
+    {
+        auto factory = INIT_META_FACTORY(Matrix3D);
+        factory.ctor<>();
+        factory.ctor<Vector3D<float>, Vector3D<float>, Vector3D<float>, Vector3D<float>>();
+        factory.ctor<float, float, float, float, float, float, float, float, float, float, float, float>();
+        register_data<&Matrix3D::Data>(factory, "Data"_hs).prop("name"_hs, "Data");
+    }
 }
 
 void YrReflectionUnregister()
 {
-   entt::meta_reset<CoordStruct>();
-   entt::meta_reset<Point2D>();
-   entt::meta_reset<CellStruct>();
+   entt::meta_reset<Vector2D<int>>();
+   entt::meta_reset<Vector2D<short>>();
+
+   entt::meta_reset<Vector3D<int>>();
+   entt::meta_reset<Vector3D<double>>();
+   entt::meta_reset<Vector3D<float>>();
+
+   entt::meta_reset<ColorStruct>();
+   entt::meta_reset<Quaternion>();
+   entt::meta_reset<RectangleStruct>();
+   entt::meta_reset<Matrix3D>();
 }

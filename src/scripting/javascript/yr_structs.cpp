@@ -4,11 +4,13 @@
 
 #include <GeneralStructures.h>
 #include <Matrix3D.h>
+#include <Quaternion.h>
 
 template<typename T, typename API, typename RegisterAPI>
 void RegisterVector2D(PUERTS_NAMESPACE::ClassDefineBuilder<Vector2D<T>, API, RegisterAPI>&& builder)
 { 
     builder
+        .Constructor<T, T>()
         .Property("X", MakeProperty(&Vector2D<T>::X))
         .Property("Y", MakeProperty(&Vector2D<T>::Y))
         .Register();
@@ -18,6 +20,7 @@ template<typename T, typename API, typename RegisterAPI>
 void RegisterVector3D(PUERTS_NAMESPACE::ClassDefineBuilder<Vector3D<T>, API, RegisterAPI>&& builder)
 { 
     builder
+        .Constructor<T, T, T>()
         .Property("X", MakeProperty(&Vector3D<T>::X))
         .Property("Y", MakeProperty(&Vector3D<T>::Y))
         .Property("Z", MakeProperty(&Vector3D<T>::Z))
@@ -28,6 +31,7 @@ template<typename T, typename API, typename RegisterAPI>
 void RegisterVector4D(PUERTS_NAMESPACE::ClassDefineBuilder<Vector4D<T>, API, RegisterAPI>&& builder)
 { 
     builder
+        .Constructor<T, T, T, T>()
         .Property("X", MakeProperty(&Vector4D<T>::X))
         .Property("Y", MakeProperty(&Vector4D<T>::Y))
         .Property("Z", MakeProperty(&Vector4D<T>::Z))
@@ -37,9 +41,49 @@ void RegisterVector4D(PUERTS_NAMESPACE::ClassDefineBuilder<Vector4D<T>, API, Reg
 
 void __JsRegister_YrStructs()
 {
-    RegisterVector3D(PUERTS_NAMESPACE::DefineClass<CoordStruct>());
-    RegisterVector2D(PUERTS_NAMESPACE::DefineClass<Point2D>());
-    RegisterVector2D(PUERTS_NAMESPACE::DefineClass<CellStruct>());
+    RegisterVector2D(PUERTS_NAMESPACE::DefineClass<Vector2D<int>>());
+    RegisterVector2D(PUERTS_NAMESPACE::DefineClass<Vector2D<short>>());
+    RegisterVector3D(PUERTS_NAMESPACE::DefineClass<Vector3D<int>>());
+    RegisterVector3D(PUERTS_NAMESPACE::DefineClass<Vector3D<double>>());
+    RegisterVector3D(PUERTS_NAMESPACE::DefineClass<Vector3D<float>>());
+
+    {
+        auto builder = PUERTS_NAMESPACE::DefineClass<ColorStruct>();
+        builder
+            .Constructor<byte, byte, byte>()
+            .Property("R", MakeProperty(&ColorStruct::R))
+            .Property("G", MakeProperty(&ColorStruct::G))
+            .Property("B", MakeProperty(&ColorStruct::B))
+            .Register();
+    }
+    {
+        auto builder = PUERTS_NAMESPACE::DefineClass<Quaternion>();
+        builder
+            .Constructor<float, float, float, float>()
+            .Property("X", MakeProperty(&Quaternion::X))
+            .Property("Y", MakeProperty(&Quaternion::Y))
+            .Property("Z", MakeProperty(&Quaternion::Z))
+            .Property("W", MakeProperty(&Quaternion::W))
+            .Register();
+    }
+    {
+        auto builder = PUERTS_NAMESPACE::DefineClass<RectangleStruct>();
+        builder
+            .Constructor<int, int, int, int>()
+            .Property("X", MakeProperty(&RectangleStruct::X))
+            .Property("Y", MakeProperty(&RectangleStruct::Y))
+            .Property("Width", MakeProperty(&RectangleStruct::Width))
+            .Property("Height", MakeProperty(&RectangleStruct::Height))
+            .Register();
+    }
+    {
+        auto builder = PUERTS_NAMESPACE::DefineClass<Matrix3D>();
+        builder
+            .Constructor<Vector3D<float>, Vector3D<float>, Vector3D<float>, Vector3D<float>>()
+            .Constructor<float, float, float, float, float, float, float, float, float, float, float, float>();
+        MakePropertyCheck<&Matrix3D::Data>(builder, "Data");
+        builder.Register();
+    }
 }
 
 GLOBAL_INVOKE_ON_CTOR(__JsRegister_YrStructs);
