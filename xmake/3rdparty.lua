@@ -3,6 +3,7 @@ add_requires("utfcpp")
 add_requires("efsw")
 add_requires("spdlog")
 add_requires("stb")
+add_requires("cereal")
 
 includes("3rdparty/YRpp.lua")
 includes("3rdparty/entt.lua")

@@ -3,18 +3,18 @@
 #include "physics/physics.h"
 #include "physics/yr_math.h"
 #include "terrain_height_map.h"
+#include <Fundamentals.h>
 #include <IsometricTileTypeClass.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
 #include <Jolt/Physics/Collision/Shape/HeightFieldShape.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/PhysicsSystem.h>
-#include <runtime/logger/logger.h>
 #include <MapClass.h>
-#include <Fundamentals.h>
 #include <array>
 #include <map>
 #include <queue>
+#include <runtime/logger/logger.h>
 
 TerrainHeightMap::TerrainHeightMap() {}
 
@@ -59,7 +59,8 @@ std::array<float, 9>& get_slope_height_offset(CellClass* pCell)
         {1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f}, // 20
     };
     static bool inited = false;
-    if (!inited) {
+    if (!inited)
+    {
         for (std::array<float, 9>& offset : offsets)
         {
             for (float& val : offset)
@@ -87,39 +88,41 @@ std::array<float, 9> get_cell_heights(CellClass* pCell)
 }
 
 static std::map<CellClass*, JPH::Body*> gCellCliff {};
-static std::queue<CellClass*> gCellQueue;
-
+static std::queue<CellClass*>           gCellQueue;
 
 void create_body_from_queue()
 {
     std::vector<JPH::Vec3> triangles;
-    while(!gCellQueue.empty())
+    while (!gCellQueue.empty())
     {
         CellClass* pCell = gCellQueue.front();
-
     }
 }
 
 void TerrainHeightMap::CreateCellBody(CellClass* pCell)
 {
-    if (!pCell->Tile_Is_Cliff() || gCellCliff.contains(pCell)) {
+    if (!pCell->Tile_Is_Cliff() || gCellCliff.contains(pCell))
+    {
         return;
     }
-    if (gCellQueue.size() > 10) {
+    if (gCellQueue.size() > 10)
+    {
         return;
     }
     gCellQueue.push(pCell);
 
     for (size_t idx = (size_t)FacingType::Count - 1; idx >= 0; idx--)
     {
-        if (gCellQueue.size() > 10) {
+        if (gCellQueue.size() > 10)
+        {
             return;
         }
         CellClass* pNeighborCell = pCell->GetNeighbourCell((FacingType)idx);
         gCellQueue.push(pNeighborCell);
     }
-    
-    if (gCellCliff.contains(pCell)) {
+
+    if (gCellCliff.contains(pCell))
+    {
         return;
     }
 
@@ -142,15 +145,20 @@ void TerrainHeightMap::Rebuild()
     int                maxCellCount = map->MaxNumCells;
     for (size_t idx = 0; idx < maxCellCount; idx++)
     {
-        CellClass*           pCell       = map->Cells[idx];
+        CellClass* pCell = map->Cells[idx];
+        if (!pCell)
+        {
+            gLogger->error("TerrainHeightMap::Rebuild: cell({}/{}) is empty", idx, maxCellCount);
+            continue;
+        }
         std::array<float, 9> cellHeights = get_cell_heights(pCell);
 
-        CreateCellBody(pCell);
+        // CreateCellBody(pCell);
 
         CoordStruct coord = pCell->GetCoords();
-        CellStruct cell = CellClass::Coord2Cell(coord);
-        int x = cell.X * 3;
-        int y = cell.Y * 3;
+        CellStruct  cell  = CellClass::Coord2Cell(coord);
+        int         x     = cell.X * 3;
+        int         y     = cell.Y * 3;
         for (size_t idx = 0; idx < 9; idx++)
         {
             terrain[(x + idx % 3) + (y * height + idx / 3)] = cellHeights[idx];
