@@ -43,6 +43,7 @@ function get_default_templates()
         js_module = {
             ["ts_module_index.scriban"] = root_dir.."/src/scripts/typescript/gen/{0}.d.ts",
             ["js_module_setup.scriban"] = root_dir.."/src/scripts/javascript/gen/{0}.js",
+            ["js_module_cpp.scriban"] =  codegen_dir.."/XkeinExt/codegen/{1}/{0}.js_module.cpp",
         },
         depends = {
             ["include/common.scriban"] = "not use to generate!",

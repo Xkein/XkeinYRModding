@@ -105,42 +105,6 @@ func get_function_ptr_type(htFunction, htClass)
     ret $func_type
 end
 
-func get_function_lambda_wrap(htFunction, htClass)
-    $cpp_function = htFunction.cpp_function
-    $return_type = $cpp_function.return_type.full_name
-    $lambda = $"[]("
-    if $cpp_function.is_cxx_class_method && !$cpp_function.is_static
-        if $cpp_function.is_const
-            $lambda += "const " 
-        end
-        $lambda += $"{htClass.cpp_class.name}* _this"
-        if array.size(htFunction.cpp_function.parameters) > 0
-            $lambda += ", "
-        end
-    end
-    $lambda += (htFunction.cpp_function.parameters | array.each do; ret $0; end) | array.join ", "
-    $lambda += ")"
-    $lambda += $" -> {$return_type} "
-    $lambda += "{ "
-    if $return_type != "void"
-        $lambda += "return "
-    end
-    
-    $function_name = htFunction.cpp_function.name
-    if $cpp_function.is_cxx_class_method
-        $class_name = htClass.cpp_class.name
-        if $cpp_function.is_static
-            $lambda += $"{$class_name}::{$function_name}"
-        else
-            $lambda += $"_this->{$function_name}"
-        end
-    end
-    $lambda += "("
-    $lambda += (htFunction.cpp_function.parameters | array.each do; ret $0.name; end) | array.join ", "
-    $lambda += "); }"
-    ret $lambda
-end
-
 func get_cpp_primitives()
     ret [
         "signed char",

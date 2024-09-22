@@ -23,7 +23,7 @@
     type_map["long double"] = "number"
     type_map["bool"] = "boolean"
     type_map["char *"] = "string"
-    type_map["char const*"] = "string"
+    type_map["char const *"] = "string"
     any_types = []
     if is_yrpp 
         any_types = array.concat(any_types, ["IndexClass"])
@@ -72,6 +72,19 @@
     func gen_property(property)
         ret (property.is_static ? 's' : 'm') + $'{property.name} : {get_ts_type(property.cpp_field.type)};'
     end
+    func gen_method(function, cppFunction)
+        $result = ""
+        if function.is_static
+            $result += "static "
+        end
+        $result += function.name
+        $result += "("
+        $result += array.each(cppFunction.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)}'); end) | array.join ", "
+        $result += ") : "
+        $result += get_ts_type(cppFunction.return_type)
+        $result += ";"
+        ret $result
+    end
 -}}
 /// <reference path = "../index.d.ts"/>
 declare module "{{module_name}}" {
@@ -95,7 +108,7 @@ $base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
         end
         param_idx = 0
         }}
-    {{function.name}}({{($cpp_function.parameters | array.each do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)}'); end) | array.join ", "}}) : {{get_ts_type($cpp_function.return_type)}};
+    {{gen_method(function, $cpp_function)}}
 {{- end }}
 {{- for property in klass.properties ; $cpp_field = property.cpp_field }}
     {{- if should_skip_visibility_ex(klass, property)

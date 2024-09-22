@@ -47,17 +47,14 @@ void __JsRegister_{{type_name}}() {
         if should_skip_visibility(htClass, function) || function.is_deleted || function.is_destructor || function.is_constructor
             continue
         end
-        $use_lambda = meta_should_use_lambda(function)
-        if $use_lambda ; $lambda = $use_lambda ? get_function_lambda_wrap(function, htClass) : null
-            $klass = append_line($klass, $'//.Function("{function.name}", MakeFunction({$lambda}))')
-        else if function.is_static
+        if function.is_static
             if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
-                $klass = append_line($klass, $'builder.Function("{function.name}", MakeFunction(static_cast<{$func_type}>(&{htClass.type_name}::{function.name})));')
+                $klass = append_line($klass, $'MakeFunctionCheck<static_cast<{$func_type}>(&{htClass.type_name}::{function.name})>(builder, "{function.name}");')
             else
-                $klass = append_line($klass, $'builder.Function("{function.name}", MakeFunction(&{htClass.type_name}::{function.name}));')
+                $klass = append_line($klass, $'MakeFunctionCheck<&{htClass.type_name}::{function.name}>(builder, "{function.name}");')
             end
         else if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
-            $klass = append_line($klass, $'builder.Method("{function.name}", MakeFunction(static_cast<{$func_type}>(&{htClass.type_name}::{function.name})));')
+            $klass = append_line($klass, $'MakeMethodCheck<static_cast<{$func_type}>(&{htClass.type_name}::{function.name})>(builder, "{function.name}");')
         else
             $klass = append_line($klass, $'MakeMethodCheck<&{htClass.type_name}::{function.name}>(builder, "{function.name}");')
         end
@@ -101,4 +98,3 @@ end -}}
 
 {{ end }}
 }
-GLOBAL_INVOKE_ON_CTOR(__JsRegister_{{type_name}});

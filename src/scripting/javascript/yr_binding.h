@@ -270,7 +270,7 @@ namespace PUERTS_NAMESPACE
             static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, T* value)
             {
                 using TypeWithoutConst = typename std::remove_const<T>::type;
-                return FindOrAddYrObject(context->GetIsolate(), context, (TypeWithoutConst*)(value), true);
+                return FindOrAddYrObject(context->GetIsolate(), context, (TypeWithoutConst*)(value), false);
             }
 
             static T* toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)

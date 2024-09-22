@@ -70,6 +70,8 @@ public:
 
     v8::Local<v8::Value> FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial);
 
+    void Unbind(AbstractClass* YrObject);
+
     static std::string TryCatchToString(v8::Isolate* Isolate, v8::TryCatch* TryCatch);
 
     static v8::Local<v8::String> ToV8String(v8::Isolate* Isolate, const char* String);

@@ -7,16 +7,10 @@
     end
 -}}
 
+void __JsRegister_{{module_name}}() {
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-exports.{{klass.name}} = puerts.loadCPPType("{{klass.name}}")
+    extern void __JsRegister_{{klass.name}}();
+    __JsRegister_{{klass.name}}();
 {{- end; end }}
-
-{{- for enum in module_enums }}
-{{- if need_codegen(enum) || is_yrpp }}
-exports.{{enum.name}} = {
-    {{- for enum_item in enum.constants }}
-    {{enum_item.name}} : {{enum_item.value}},
-    {{- end}}
 }
-{{- end; end }}

@@ -21,26 +21,17 @@ func gen_meta_class_function(htClass, htFunction)
     if htFunction.is_destructor
         ret null # dtor not supported yet
     end
-    if htFunction.is_static 
-        ret null # static not supported yet
-    end
     $function_name = htFunction.name
     if $function_name | string.contains "operator"
         ret null # operator not supported yet
     end
 
-    $use_lambda = meta_should_use_lambda(htFunction)
-    $lambda = $use_lambda ? get_function_lambda_wrap(htFunction, htClass) : null
     if htFunction.is_constructor
         if htClass.is_abstract
             ret null
         end
         $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
-        if $use_lambda
-            ret $'factory.ctor<{$lambda}>();'
-        else
-            ret $'factory.ctor<{$arg_types}>();'
-        end
+        ret $'factory.ctor<{$arg_types}>();'
     end
     $class_name = htClass.cpp_class.name
     $func_type = get_function_ptr_type(htFunction, htClass)
@@ -50,10 +41,8 @@ func gen_meta_class_function(htClass, htFunction)
         $meta_args += $'.prop("arg{for.index}"_hs, "{arg.name}")'
     end
 
-    if $use_lambda
-        ret $'factory.func<{$lambda}>("{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
-    else if htFunction.is_overload
-        ret $'factory.func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>("{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
+    if htFunction.is_overload
+        ret $'register_func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
     else
         ret $'register_func<&{$class_name}::{$function_name}>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
     end

@@ -1133,12 +1133,27 @@ v8::Local<v8::Value> JsEnv::FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Contex
             auto JsRegistration  = FindCppTypeClassByName(TypeName);
             gYrJsTypeID[WhatAmI] = TypeId = JsRegistration->TypeId;
         }
-        
         v8::Local<v8::Value> Result = DataTransfer::FindOrAddCData(Isolate, Context, TypeId, YrObject, true);
+        ObjectMap.emplace(YrObject, v8::Global<v8::Value>(Isolate, Result));
         return Result;
     }
     else
     {
         return v8::Local<v8::Value>::New(Isolate, PersistentValuePtr->second);
+    }
+}
+
+void JsEnv::Unbind(AbstractClass* YrObject)
+{
+    if (!YrObject)
+        return;
+
+    auto PersistentValuePtr = ObjectMap.find(YrObject);
+    if (PersistentValuePtr != ObjectMap.end()) // create and link
+    {
+        size_t WhatAmI = static_cast<size_t>(YrObject->WhatAmI());
+        auto JsRegistration = const_cast<JSClassDefinition*>(FindClassByID(gYrJsTypeID[WhatAmI]));
+        CppObjectMapper.UnBindCppObject(JsRegistration, YrObject);
+        ObjectMap.erase(PersistentValuePtr);
     }
 }

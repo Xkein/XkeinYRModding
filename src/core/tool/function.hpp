@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 // https://stackoverflow.com/a/55701361
 template<typename T, bool noexcept_state = true>
 struct make_noexcept { using type = T; };
@@ -209,3 +211,27 @@ using make_noexcept_t = typename make_noexcept<T, noexcept_state>::type;
 
 template<typename T>
 using remove_noexcept_t = make_noexcept_t<T, false>;
+
+// check fastcall
+template <typename T>
+struct is_fastcall : std::false_type {};
+template<typename Ret, typename... Args>
+struct is_fastcall<Ret(__fastcall*)(Args...)> : std::true_type {};
+template<typename Class, typename Ret, typename... Args>
+struct is_fastcall<Ret(__fastcall Class::*)(Args...)> : std::true_type {};
+template<typename Class, typename Ret, typename... Args>
+struct is_fastcall<Ret(__fastcall Class::*)(Args...) const> : std::true_type {};
+template <auto Func>
+constexpr bool is_fastcall_v = is_fastcall<decltype(Func)>::value;
+
+// check stdcall
+template <typename T>
+struct is_stdcall : std::false_type {};
+template<typename Ret, typename... Args>
+struct is_stdcall<Ret(__stdcall*)(Args...)> : std::true_type {};
+template<typename Class, typename Ret, typename... Args>
+struct is_stdcall<Ret(__stdcall Class::*)(Args...)> : std::true_type {};
+template<typename Class, typename Ret, typename... Args>
+struct is_stdcall<Ret(__stdcall Class::*)(Args...) const> : std::true_type {};
+template <auto Func>
+constexpr bool is_stdcall_v = is_stdcall<decltype(Func)>::value;

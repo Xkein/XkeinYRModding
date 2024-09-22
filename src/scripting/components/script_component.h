@@ -32,9 +32,7 @@ struct ScriptComponent final
 
     ScriptComponent() = default;
     ScriptComponent(ScriptComponent&&) = default;
-    ~ScriptComponent() {
-        Invoke(OnDtor);
-    }
+    ~ScriptComponent();
     template<typename TRet, typename... TFuncArgs, typename... TArgs>
     inline TRet Invoke(ScriptBehaviour<TRet(TFuncArgs...)>& behavior, TArgs&&... args) {
         constexpr bool is_void = std::is_void_v<TRet>;
@@ -67,5 +65,7 @@ struct ScriptComponent final
     ScriptBehaviour<void(const CellStruct&, bool)> OnLaunch;
 private:
     static void CreateScriptComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);
+
+    AbstractClass* pYrObject;
 };
 UsingCppType(ScriptComponent);

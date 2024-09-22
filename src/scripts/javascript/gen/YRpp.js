@@ -1,5 +1,116 @@
-let YRpp = {}
-const DirType = {
+
+exports.TintStruct = puerts.loadCPPType("TintStruct")
+exports.RandomStruct = puerts.loadCPPType("RandomStruct")
+exports.LTRBStruct = puerts.loadCPPType("LTRBStruct")
+exports.RateTimer = puerts.loadCPPType("RateTimer")
+exports.FacingClass = puerts.loadCPPType("FacingClass")
+exports.TechnoClass = puerts.loadCPPType("TechnoClass")
+exports.HouseClass = puerts.loadCPPType("HouseClass")
+exports.StorageClass = puerts.loadCPPType("StorageClass")
+exports.AbstractClass = puerts.loadCPPType("AbstractClass")
+exports.ObjectClass = puerts.loadCPPType("ObjectClass")
+exports.AnimClass = puerts.loadCPPType("AnimClass")
+exports.AnimTypeClass = puerts.loadCPPType("AnimTypeClass")
+exports.ObjectTypeClass = puerts.loadCPPType("ObjectTypeClass")
+exports.AbstractTypeClass = puerts.loadCPPType("AbstractTypeClass")
+exports.TechnoTypeClass = puerts.loadCPPType("TechnoTypeClass")
+exports.WeaponStruct = puerts.loadCPPType("WeaponStruct")
+exports.WeaponTypeClass = puerts.loadCPPType("WeaponTypeClass")
+exports.BulletTypeClass = puerts.loadCPPType("BulletTypeClass")
+exports.BulletClass = puerts.loadCPPType("BulletClass")
+exports.RadioClass = puerts.loadCPPType("RadioClass")
+exports.MissionClass = puerts.loadCPPType("MissionClass")
+exports.InfantryTypeClass = puerts.loadCPPType("InfantryTypeClass")
+exports.CellClass = puerts.loadCPPType("CellClass")
+exports.BuildingClass = puerts.loadCPPType("BuildingClass")
+exports.BuildingTypeClass = puerts.loadCPPType("BuildingTypeClass")
+exports.BuildingAnimStruct = puerts.loadCPPType("BuildingAnimStruct")
+exports.OverlayTypeClass = puerts.loadCPPType("OverlayTypeClass")
+exports.UnitTypeClass = puerts.loadCPPType("UnitTypeClass")
+exports.BuildingAnimFrameStruct = puerts.loadCPPType("BuildingAnimFrameStruct")
+exports.FactoryClass = puerts.loadCPPType("FactoryClass")
+exports.StageClass = puerts.loadCPPType("StageClass")
+exports.InfantryClass = puerts.loadCPPType("InfantryClass")
+exports.FootClass = puerts.loadCPPType("FootClass")
+exports.TeamClass = puerts.loadCPPType("TeamClass")
+exports.TeamTypeClass = puerts.loadCPPType("TeamTypeClass")
+exports.TagClass = puerts.loadCPPType("TagClass")
+exports.TagTypeClass = puerts.loadCPPType("TagTypeClass")
+exports.TriggerTypeClass = puerts.loadCPPType("TriggerTypeClass")
+exports.TriggerClass = puerts.loadCPPType("TriggerClass")
+exports.ScriptTypeClass = puerts.loadCPPType("ScriptTypeClass")
+exports.ScriptActionNode = puerts.loadCPPType("ScriptActionNode")
+exports.TaskForceClass = puerts.loadCPPType("TaskForceClass")
+exports.TaskForceEntryStruct = puerts.loadCPPType("TaskForceEntryStruct")
+exports.ScriptClass = puerts.loadCPPType("ScriptClass")
+exports.ParasiteClass = puerts.loadCPPType("ParasiteClass")
+exports.BuildingLightClass = puerts.loadCPPType("BuildingLightClass")
+exports.LightSourceClass = puerts.loadCPPType("LightSourceClass")
+exports.UnitClass = puerts.loadCPPType("UnitClass")
+exports.EBolt = puerts.loadCPPType("EBolt")
+exports.AircraftClass = puerts.loadCPPType("AircraftClass")
+exports.AircraftTypeClass = puerts.loadCPPType("AircraftTypeClass")
+exports.TerrainClass = puerts.loadCPPType("TerrainClass")
+exports.TerrainTypeClass = puerts.loadCPPType("TerrainTypeClass")
+exports.TiberiumClass = puerts.loadCPPType("TiberiumClass")
+exports.TiberiumLogic = puerts.loadCPPType("TiberiumLogic")
+exports.RadSiteClass = puerts.loadCPPType("RadSiteClass")
+exports.RGBClass = puerts.loadCPPType("RGBClass")
+exports.LaserDrawClass = puerts.loadCPPType("LaserDrawClass")
+exports.FlashData = puerts.loadCPPType("FlashData")
+exports.PassengersClass = puerts.loadCPPType("PassengersClass")
+exports.VeterancyStruct = puerts.loadCPPType("VeterancyStruct")
+exports.TemporalClass = puerts.loadCPPType("TemporalClass")
+exports.SuperClass = puerts.loadCPPType("SuperClass")
+exports.SuperWeaponTypeClass = puerts.loadCPPType("SuperWeaponTypeClass")
+exports.AirstrikeClass = puerts.loadCPPType("AirstrikeClass")
+exports.CaptureManagerClass = puerts.loadCPPType("CaptureManagerClass")
+exports.ControlNode = puerts.loadCPPType("ControlNode")
+exports.SpawnManagerClass = puerts.loadCPPType("SpawnManagerClass")
+exports.SpawnControl = puerts.loadCPPType("SpawnControl")
+exports.SlaveManagerClass = puerts.loadCPPType("SlaveManagerClass")
+exports.ParticleSystemClass = puerts.loadCPPType("ParticleSystemClass")
+exports.ParticleSystemTypeClass = puerts.loadCPPType("ParticleSystemTypeClass")
+exports.ParticleClass = puerts.loadCPPType("ParticleClass")
+exports.ParticleTypeClass = puerts.loadCPPType("ParticleTypeClass")
+exports.WarheadTypeClass = puerts.loadCPPType("WarheadTypeClass")
+exports.VoxelAnimTypeClass = puerts.loadCPPType("VoxelAnimTypeClass")
+exports.WaveClass = puerts.loadCPPType("WaveClass")
+exports.TransitionTimer = puerts.loadCPPType("TransitionTimer")
+exports.RecoilData = puerts.loadCPPType("RecoilData")
+exports.TurretControl = puerts.loadCPPType("TurretControl")
+exports.RadBeam = puerts.loadCPPType("RadBeam")
+exports.PlanningTokenClass = puerts.loadCPPType("PlanningTokenClass")
+exports.PlanningNodeClass = puerts.loadCPPType("PlanningNodeClass")
+exports.PlanningMemberClass = puerts.loadCPPType("PlanningMemberClass")
+exports.PlanningBranchClass = puerts.loadCPPType("PlanningBranchClass")
+exports.BulletData = puerts.loadCPPType("BulletData")
+exports.AbilitiesStruct = puerts.loadCPPType("AbilitiesStruct")
+exports.BounceClass = puerts.loadCPPType("BounceClass")
+exports.BombClass = puerts.loadCPPType("BombClass")
+exports.LineTrail = puerts.loadCPPType("LineTrail")
+exports.LineTrailNode = puerts.loadCPPType("LineTrailNode")
+exports.WaypointClass = puerts.loadCPPType("WaypointClass")
+exports.HouseTypeClass = puerts.loadCPPType("HouseTypeClass")
+exports.StartingTechnoStruct = puerts.loadCPPType("StartingTechnoStruct")
+exports.WaypointPathClass = puerts.loadCPPType("WaypointPathClass")
+exports.UnitTrackerClass = puerts.loadCPPType("UnitTrackerClass")
+exports.ZoneInfoStruct = puerts.loadCPPType("ZoneInfoStruct")
+exports.AngerStruct = puerts.loadCPPType("AngerStruct")
+exports.ScoutStruct = puerts.loadCPPType("ScoutStruct")
+exports.DropshipStruct = puerts.loadCPPType("DropshipStruct")
+exports.BaseClass = puerts.loadCPPType("BaseClass")
+exports.BaseNodeClass = puerts.loadCPPType("BaseNodeClass")
+exports.LinkClass = puerts.loadCPPType("LinkClass")
+exports.GadgetClass = puerts.loadCPPType("GadgetClass")
+exports.OverlayClass = puerts.loadCPPType("OverlayClass")
+exports.GScreenClass = puerts.loadCPPType("GScreenClass")
+exports.Crate = puerts.loadCPPType("Crate")
+exports.LayerClass = puerts.loadCPPType("LayerClass")
+exports.LogicClass = puerts.loadCPPType("LogicClass")
+exports.MapClass = puerts.loadCPPType("MapClass")
+exports.DisplayClass = puerts.loadCPPType("DisplayClass")
+exports.DirType = {
     North : 0,
     NorthEast : 32,
     East : 64,
@@ -10,15 +121,13 @@ const DirType = {
     NorthWest : -32,
     Max : -1,
 }
-YRpp.DirType = DirType
-const AbstractFlags = {
+exports.AbstractFlags = {
     None : 0,
     Techno : 1,
     Object : 2,
     Foot : 4,
 }
-YRpp.AbstractFlags = AbstractFlags
-const AbstractType = {
+exports.AbstractType = {
     None : 0,
     Unit : 1,
     Aircraft : 2,
@@ -94,14 +203,12 @@ const AbstractType = {
     SlaveManager : 72,
     DiskLaser : 73,
 }
-YRpp.AbstractType = AbstractType
-const RecordFlag = {
+exports.RecordFlag = {
     Write : 1,
     Read : 2,
     Attract : 4,
 }
-YRpp.RecordFlag = RecordFlag
-const Action = {
+exports.Action = {
     None : 0,
     Move : 1,
     NoMove : 2,
@@ -176,8 +283,7 @@ const Action = {
     Airstrike : 71,
     PsychicReveal : 72,
 }
-YRpp.Action = Action
-const Ability = {
+exports.Ability = {
     Faster : 0,
     Stronger : 1,
     Firepower : 2,
@@ -197,14 +303,12 @@ const Ability = {
     GuardArea : 16,
     Crusher : 17,
 }
-YRpp.Ability = Ability
-const AIDifficulty = {
+exports.AIDifficulty = {
     Hard : 0,
     Normal : 1,
     Easy : 2,
 }
-YRpp.AIDifficulty = AIDifficulty
-const TextPrintType = {
+exports.TextPrintType = {
     LASTPOINT : 0,
     LASTSHADOW : 0,
     Point6 : 1,
@@ -232,14 +336,12 @@ const TextPrintType = {
     UnknownColor : 32768,
     GradAll : 61440,
 }
-YRpp.TextPrintType = TextPrintType
-const TriggerPersistence = {
+exports.TriggerPersistence = {
     Volatile : 0,
     SemiPersistant : 1,
     Persistent : 2,
 }
-YRpp.TriggerPersistence = TriggerPersistence
-const TriggerEvent = {
+exports.TriggerEvent = {
     None : 0,
     EnteredBy : 1,
     SpiedBy : 2,
@@ -303,8 +405,7 @@ const TriggerEvent = {
     TechTypeExists : 60,
     TechTypeDoesntExist : 61,
 }
-YRpp.TriggerEvent = TriggerEvent
-const TriggerAction = {
+exports.TriggerAction = {
     None : 0,
     Win : 1,
     Lose : 2,
@@ -452,16 +553,14 @@ const TriggerAction = {
     RetintBlue : 144,
     JumpCameraHome : 145,
 }
-YRpp.TriggerAction = TriggerAction
-const TriggerAttachType = {
+exports.TriggerAttachType = {
     Global : 1,
     Object : 2,
     Map : 4,
     House : 8,
     Logic : 16,
 }
-YRpp.TriggerAttachType = TriggerAttachType
-const LogicNeedType = {
+exports.LogicNeedType = {
     None : 0,
     Theme : 1,
     Movie : 2,
@@ -511,15 +610,13 @@ const LogicNeedType = {
     NumberNSuper : 46,
     BuildingNNumber : 47,
 }
-YRpp.LogicNeedType = LogicNeedType
-const AIMode = {
+exports.AIMode = {
     General : 0,
     LowOnCash : 1,
     BuildBase : 3,
     SellAll : 4,
 }
-YRpp.AIMode = AIMode
-const AITriggerCondition = {
+exports.AITriggerCondition = {
     Pool : -1,
     AIOwns : 0,
     EnemyOwns : 1,
@@ -530,14 +627,12 @@ const AITriggerCondition = {
     ChronoCharged : 6,
     NeutralOwns : 7,
 }
-YRpp.AITriggerCondition = AITriggerCondition
-const AITriggerHouseType = {
+exports.AITriggerHouseType = {
     None : 0,
     Single : 1,
     Any : 2,
 }
-YRpp.AITriggerHouseType = AITriggerHouseType
-const Armor = {
+exports.Armor = {
     None : 0,
     Flak : 1,
     Plate : 2,
@@ -550,39 +645,34 @@ const Armor = {
     Special_1 : 9,
     Special_2 : 10,
 }
-YRpp.Armor = Armor
-const SpotlightBehaviour = {
+exports.SpotlightBehaviour = {
     None : 0,
     Sweep : 1,
     Circle : 2,
     Follow : 3,
 }
-YRpp.SpotlightBehaviour = SpotlightBehaviour
-const SpotlightFlags = {
+exports.SpotlightFlags = {
     None : 0,
     NoColor : 1,
     NoRed : 2,
     NoGreen : 4,
     NoBlue : 8,
 }
-YRpp.SpotlightFlags = SpotlightFlags
-const BehavesLike = {
+exports.BehavesLike = {
     Smoke : 0,
     Gas : 1,
     Fire : 2,
     Spark : 3,
     Railgun : 4,
 }
-YRpp.BehavesLike = BehavesLike
-const ParticleSystemHoldsWhat = {
+exports.ParticleSystemHoldsWhat = {
     Gas : 0,
     Smoke : 1,
     Fire : 2,
     Spark : 3,
     Railgun : 4,
 }
-YRpp.ParticleSystemHoldsWhat = ParticleSystemHoldsWhat
-const BuildCat = {
+exports.BuildCat = {
     DontCare : 0,
     Tech : 1,
     Resoure : 2,
@@ -590,8 +680,7 @@ const BuildCat = {
     Infrastructure : 4,
     Combat : 5,
 }
-YRpp.BuildCat = BuildCat
-const BuildingAnimSlot = {
+exports.BuildingAnimSlot = {
     All : -2,
     None : -1,
     Upgrade1 : 0,
@@ -616,8 +705,7 @@ const BuildingAnimSlot = {
     LowPower : 19,
     SuperLowPower : 20,
 }
-YRpp.BuildingAnimSlot = BuildingAnimSlot
-const Category = {
+exports.Category = {
     Invalid : -1,
     Soldier : 0,
     Civilian : 1,
@@ -631,8 +719,7 @@ const Category = {
     AirPower : 9,
     AirLift : 10,
 }
-YRpp.Category = Category
-const CellFlags = {
+exports.CellFlags = {
     Empty : 0,
     CenterRevealed : 1,
     EdgeRevealed : 2,
@@ -660,8 +747,7 @@ const CellFlags = {
     Revealed : 3,
     Bridge : 1280,
 }
-YRpp.CellFlags = CellFlags
-const AltCellFlags = {
+exports.AltCellFlags = {
     Unknown_1 : 1,
     ContainsBuilding : 2,
     Unknown_4 : 4,
@@ -673,8 +759,7 @@ const AltCellFlags = {
     Unknown_100 : 256,
     Clear : 24,
 }
-YRpp.AltCellFlags = AltCellFlags
-const PassabilityType = {
+exports.PassabilityType = {
     Passable : 0,
     Crushable : 1,
     Destroyable : 2,
@@ -684,8 +769,7 @@ const PassabilityType = {
     Impassable : 6,
     OutsideMap : 7,
 }
-YRpp.PassabilityType = PassabilityType
-const FacingType = {
+exports.FacingType = {
     North : 0,
     NorthEast : 1,
     East : 2,
@@ -697,15 +781,13 @@ const FacingType = {
     Count : 8,
     None : -1,
 }
-YRpp.FacingType = FacingType
-const CloakState = {
+exports.CloakState = {
     Uncloaked : 0,
     Cloaking : 1,
     Cloaked : 2,
     Uncloaking : 3,
 }
-YRpp.CloakState = CloakState
-const DamageState = {
+exports.DamageState = {
     Unaffected : 0,
     Unchanged : 1,
     NowYellow : 2,
@@ -713,26 +795,22 @@ const DamageState = {
     NowDead : 4,
     PostMortem : 5,
 }
-YRpp.DamageState = DamageState
-const DamageAreaResult = {
+exports.DamageAreaResult = {
     Hit : 0,
     Missed : 1,
     Nullified : 2,
 }
-YRpp.DamageAreaResult = DamageAreaResult
-const KickOutResult = {
+exports.KickOutResult = {
     Failed : 0,
     Busy : 1,
     Succeeded : 2,
 }
-YRpp.KickOutResult = KickOutResult
-const CanBuildResult = {
+exports.CanBuildResult = {
     TemporarilyUnbuildable : -1,
     Unbuildable : 0,
     Buildable : 1,
 }
-YRpp.CanBuildResult = CanBuildResult
-const FireError = {
+exports.FireError = {
     NONE : -1,
     OK : 0,
     AMMO : 1,
@@ -747,14 +825,12 @@ const FireError = {
     BUSY : 10,
     MUST_DEPLOY : 11,
 }
-YRpp.FireError = FireError
-const HealthState = {
+exports.HealthState = {
     Red : 0,
     Yellow : 1,
     Green : 2,
 }
-YRpp.HealthState = HealthState
-const Foundation = {
+exports.Foundation = {
     _1x1 : 0,
     _2x1 : 1,
     _1x2 : 2,
@@ -778,15 +854,13 @@ const Foundation = {
     _6x4 : 20,
     _0x0 : 21,
 }
-YRpp.Foundation = Foundation
-const GameMode = {
+exports.GameMode = {
     Campaign : 0,
     LAN : 3,
     Internet : 4,
     Skirmish : 5,
 }
-YRpp.GameMode = GameMode
-const InfDeath = {
+exports.InfDeath = {
     None : 0,
     Die1 : 1,
     Die2 : 2,
@@ -799,8 +873,7 @@ const InfDeath = {
     Mutate : 9,
     Brute : 10,
 }
-YRpp.InfDeath = InfDeath
-const LandType = {
+exports.LandType = {
     Clear : 0,
     Road : 1,
     Water : 2,
@@ -814,8 +887,7 @@ const LandType = {
     Tunnel : 10,
     Weeds : 11,
 }
-YRpp.LandType = LandType
-const Layer = {
+exports.Layer = {
     None : -1,
     Underground : 0,
     Surface : 1,
@@ -823,8 +895,7 @@ const Layer = {
     Air : 3,
     Top : 4,
 }
-YRpp.Layer = Layer
-const MarkType = {
+exports.MarkType = {
     Up : 0,
     Down : 1,
     Change : 2,
@@ -832,20 +903,17 @@ const MarkType = {
     OverlapDown : 4,
     OverlapUp : 5,
 }
-YRpp.MarkType = MarkType
-const MouseHotSpotX = {
+exports.MouseHotSpotX = {
     Left : 0,
     Center : 12345,
     Right : 54321,
 }
-YRpp.MouseHotSpotX = MouseHotSpotX
-const MouseHotSpotY = {
+exports.MouseHotSpotY = {
     Top : 0,
     Middle : 12345,
     Bottom : 54321,
 }
-YRpp.MouseHotSpotY = MouseHotSpotY
-const Mission = {
+exports.Mission = {
     None : -1,
     Sleep : 0,
     Attack : 1,
@@ -880,8 +948,7 @@ const Mission = {
     SpyplaneApproach : 30,
     SpyplaneOverfly : 31,
 }
-YRpp.Mission = Mission
-const MovementZone = {
+exports.MovementZone = {
     None : -1,
     Normal : 0,
     Crusher : 1,
@@ -897,8 +964,7 @@ const MovementZone = {
     WaterBeach : 11,
     CrusherAll : 12,
 }
-YRpp.MovementZone = MovementZone
-const PipIndex = {
+exports.PipIndex = {
     Empty : 0,
     Green : 1,
     Yellow : 2,
@@ -913,8 +979,7 @@ const PipIndex = {
     PersonBlue : 11,
     PersonPurple : 12,
 }
-YRpp.PipIndex = PipIndex
-const PipScale = {
+exports.PipScale = {
     None : 0,
     Ammo : 1,
     Tiberium : 2,
@@ -922,8 +987,7 @@ const PipScale = {
     Power : 4,
     MindControl : 5,
 }
-YRpp.PipScale = PipScale
-const Powerup = {
+exports.Powerup = {
     Money : 0,
     Unit : 1,
     HealBase : 2,
@@ -944,8 +1008,7 @@ const Powerup = {
     Tiberium : 17,
     Pod : 18,
 }
-YRpp.Powerup = Powerup
-const Prerequisite = {
+exports.Prerequisite = {
     Proc : -6,
     Tech : -5,
     Radar : -4,
@@ -953,14 +1016,12 @@ const Prerequisite = {
     Factory : -2,
     Power : -1,
 }
-YRpp.Prerequisite = Prerequisite
-const PrismChargeState = {
+exports.PrismChargeState = {
     Idle : 0,
     Master : 1,
     Slave : 2,
 }
-YRpp.PrismChargeState = PrismChargeState
-const RadarEventType = {
+exports.RadarEventType = {
     Combat : 0,
     Noncombat : 1,
     DropZone : 2,
@@ -979,8 +1040,7 @@ const RadarEventType = {
     GarrisonAbandoned : 15,
     AllyBaseAttacked : 16,
 }
-YRpp.RadarEventType = RadarEventType
-const PsychicDominatorStatus = {
+exports.PsychicDominatorStatus = {
     Inactive : 0,
     FirstAnim : 1,
     Fire : 2,
@@ -988,21 +1048,18 @@ const PsychicDominatorStatus = {
     Reset : 4,
     Over : 5,
 }
-YRpp.PsychicDominatorStatus = PsychicDominatorStatus
-const NukeFlashStatus = {
+exports.NukeFlashStatus = {
     Inactive : 0,
     FadeIn : 1,
     FadeOut : 2,
 }
-YRpp.NukeFlashStatus = NukeFlashStatus
-const ChargeDrainState = {
+exports.ChargeDrainState = {
     None : -1,
     Charging : 0,
     Ready : 1,
     Draining : 2,
 }
-YRpp.ChargeDrainState = ChargeDrainState
-const SuperWeaponType = {
+exports.SuperWeaponType = {
     Invalid : -1,
     Nuke : 0,
     IronCurtain : 1,
@@ -1017,8 +1074,7 @@ const SuperWeaponType = {
     ForceShield : 10,
     PsychicReveal : 11,
 }
-YRpp.SuperWeaponType = SuperWeaponType
-const MouseCursorType = {
+exports.MouseCursorType = {
     Default : 0,
     Move_N : 1,
     Move_NE : 2,
@@ -1106,21 +1162,18 @@ const MouseCursorType = {
     PsychicReveal : 84,
     SpyPlane : 85,
 }
-YRpp.MouseCursorType = MouseCursorType
-const RadBeamType = {
+exports.RadBeamType = {
     Temporal : 0,
     RadBeam : 1,
     Eruption : 2,
 }
-YRpp.RadBeamType = RadBeamType
-const Rank = {
+exports.Rank = {
     Invalid : -1,
     Elite : 0,
     Veteran : 1,
     Rookie : 2,
 }
-YRpp.Rank = Rank
-const Sequence = {
+exports.Sequence = {
     Ready : 0,
     Guard : 1,
     Prone : 2,
@@ -1165,8 +1218,7 @@ const Sequence = {
     SecondaryProne : 41,
     Nothing : -1,
 }
-YRpp.Sequence = Sequence
-const SequenceFacing = {
+exports.SequenceFacing = {
     N : 0,
     NE : 1,
     E : 2,
@@ -1176,8 +1228,7 @@ const SequenceFacing = {
     W : 6,
     NW : 7,
 }
-YRpp.SequenceFacing = SequenceFacing
-const SpeedType = {
+exports.SpeedType = {
     None : -1,
     Foot : 0,
     Track : 1,
@@ -1188,8 +1239,7 @@ const SpeedType = {
     Amphibious : 6,
     FloatBeach : 7,
 }
-YRpp.SpeedType = SpeedType
-const TheaterType = {
+exports.TheaterType = {
     None : -1,
     Temperate : 0,
     Snow : 1,
@@ -1198,8 +1248,7 @@ const TheaterType = {
     NewUrban : 4,
     Lunar : 5,
 }
-YRpp.TheaterType = TheaterType
-const VisualType = {
+exports.VisualType = {
     Normal : 0,
     Indistinct : 1,
     Darken : 2,
@@ -1207,8 +1256,7 @@ const VisualType = {
     Ripple : 4,
     Hidden : 5,
 }
-YRpp.VisualType = VisualType
-const RadioCommand = {
+exports.RadioCommand = {
     AnswerInvalid : 0,
     AnswerPositive : 1,
     RequestLink : 2,
@@ -1250,8 +1298,7 @@ const RadioCommand = {
     QueryOnBuilding : 35,
     QueryCanTote : 36,
 }
-YRpp.RadioCommand = RadioCommand
-const EventType = {
+exports.EventType = {
     Empty : 0,
     PowerOn : 1,
     PowerOff : 2,
@@ -1301,16 +1348,14 @@ const EventType = {
     AbandonAll : 46,
     LAST_EVENT : 47,
 }
-YRpp.EventType = EventType
-const SoundPriority = {
+exports.SoundPriority = {
     Lowest : 0,
     Low : 1,
     Normal : 2,
     High : 3,
     Critical : 4,
 }
-YRpp.SoundPriority = SoundPriority
-const SoundType = {
+exports.SoundType = {
     Normal : 0,
     Violent : 1,
     Movement : 2,
@@ -1326,8 +1371,7 @@ const SoundType = {
     Shroud : 2048,
     Ambient : 4096,
 }
-YRpp.SoundType = SoundType
-const SoundControl = {
+exports.SoundControl = {
     None : 0,
     Loop : 1,
     Random : 2,
@@ -1338,29 +1382,25 @@ const SoundControl = {
     Decay : 64,
     Ambient : 128,
 }
-YRpp.SoundControl = SoundControl
-const VoxType = {
+exports.VoxType = {
     Standard : 0,
     Queue : 1,
     Interrupt : 2,
     QueuedInterrupt : 3,
 }
-YRpp.VoxType = VoxType
-const VoxPriority = {
+exports.VoxPriority = {
     Low : 0,
     Normal : 1,
     Important : 2,
     Critical : 3,
 }
-YRpp.VoxPriority = VoxPriority
-const WaveType = {
+exports.WaveType = {
     Sonic : 0,
     BigLaser : 1,
     Laser : 2,
     Magnetron : 3,
 }
-YRpp.WaveType = WaveType
-const TargetType = {
+exports.TargetType = {
     None : 0,
     Anything : 1,
     Buildings : 2,
@@ -1373,8 +1413,7 @@ const TargetType = {
     Occupiable : 10,
     TechBuildings : 11,
 }
-YRpp.TargetType = TargetType
-const TargetFlags = {
+exports.TargetFlags = {
     None : 0,
     unknown_1 : 1,
     unknown_2 : 2,
@@ -1394,8 +1433,7 @@ const TargetFlags = {
     Occupiable : 32768,
     TechCapture : 65536,
 }
-YRpp.TargetFlags = TargetFlags
-const BlitterFlags = {
+exports.BlitterFlags = {
     None : 0,
     Darken : 1,
     TransLucent25 : 2,
@@ -1418,8 +1456,7 @@ const BlitterFlags = {
     Zero : 65536,
     Nonzero : 131072,
 }
-YRpp.BlitterFlags = BlitterFlags
-const MouseEvent = {
+exports.MouseEvent = {
     None : 0,
     LeftDown : 1,
     LeftHeld : 2,
@@ -1429,8 +1466,7 @@ const MouseEvent = {
     RightHeld : 32,
     RightUp : 64,
 }
-YRpp.MouseEvent = MouseEvent
-const Edge = {
+exports.Edge = {
     None : -1,
     North : 0,
     East : 1,
@@ -1438,8 +1474,7 @@ const Edge = {
     West : 3,
     Air : 4,
 }
-YRpp.Edge = Edge
-const Move = {
+exports.Move = {
     OK : 0,
     Cloak : 1,
     MovingBlock : 2,
@@ -1449,24 +1484,21 @@ const Move = {
     Temp : 6,
     No : 7,
 }
-YRpp.Move = Move
-const ZGradient = {
+exports.ZGradient = {
     None : -1,
     Ground : 0,
     Deg45 : 1,
     Deg90 : 2,
     Deg135 : 3,
 }
-YRpp.ZGradient = ZGradient
-const ParasiteState = {
+exports.ParasiteState = {
     Start : 0,
     Grab : 1,
     PushLeft : 2,
     PushRight : 3,
     Damage : 4,
 }
-YRpp.ParasiteState = ParasiteState
-const WWKey = {
+exports.WWKey = {
     Shift : 256,
     Ctrl : 512,
     Alt : 1024,
@@ -1475,8 +1507,7 @@ const WWKey = {
     DoubleClick : 8192,
     Button : 32768,
 }
-YRpp.WWKey = WWKey
-const AirAttackStatus = {
+exports.AirAttackStatus = {
     ValidateAZ : 0,
     PickAttackLocation : 1,
     TakeOff : 2,
@@ -1489,14 +1520,12 @@ const AirAttackStatus = {
     FireAtTarget5_Strafe : 9,
     ReturnToBase : 10,
 }
-YRpp.AirAttackStatus = AirAttackStatus
-const LandTargetingType = {
+exports.LandTargetingType = {
     Land_OK : 0,
     Land_Not_OK : 1,
     Land_Secondary : 2,
 }
-YRpp.LandTargetingType = LandTargetingType
-const NavalTargetingType = {
+exports.NavalTargetingType = {
     Underwater_Never : 0,
     Underwater_Secondary : 1,
     Underwater_Only : 2,
@@ -1506,16 +1535,14 @@ const NavalTargetingType = {
     Naval_None : 6,
     Naval_Primary : 7,
 }
-YRpp.NavalTargetingType = NavalTargetingType
-const RGBMode = {
+exports.RGBMode = {
     RGB555 : 0,
     RGB556 : 1,
     RGB565 : 2,
     RGB655 : 3,
     Invalid : -1,
 }
-YRpp.RGBMode = RGBMode
-const ZoneType = {
+exports.ZoneType = {
     None : -1,
     Core : 0,
     North : 1,
@@ -1523,8 +1550,7 @@ const ZoneType = {
     South : 3,
     West : 4,
 }
-YRpp.ZoneType = ZoneType
-const BStateType = {
+exports.BStateType = {
     Construction : 0,
     Idle : 1,
     Active : 2,
@@ -1534,21 +1560,18 @@ const BStateType = {
     Count : 6,
     None : -1,
 }
-YRpp.BStateType = BStateType
-const FileAccessMode = {
+exports.FileAccessMode = {
     None : 0,
     Read : 1,
     Write : 2,
     ReadWrite : 3,
 }
-YRpp.FileAccessMode = FileAccessMode
-const FileSeekMode = {
+exports.FileSeekMode = {
     Set : 0,
     Current : 1,
     End : 2,
 }
-YRpp.FileSeekMode = FileSeekMode
-const SpawnNodeStatus = {
+exports.SpawnNodeStatus = {
     Idle : 0,
     TakeOff : 1,
     Preparing : 2,
@@ -1557,14 +1580,12 @@ const SpawnNodeStatus = {
     Reloading : 6,
     Dead : 7,
 }
-YRpp.SpawnNodeStatus = SpawnNodeStatus
-const SpawnManagerStatus = {
+exports.SpawnManagerStatus = {
     Idle : 0,
     Launching : 1,
     CoolDown : 2,
 }
-YRpp.SpawnManagerStatus = SpawnManagerStatus
-const SlaveControlStatus = {
+exports.SlaveControlStatus = {
     Unknown : 0,
     ScanningForTiberium : 1,
     MovingToTiberium : 2,
@@ -1573,8 +1594,7 @@ const SlaveControlStatus = {
     Respawning : 5,
     Dead : 6,
 }
-YRpp.SlaveControlStatus = SlaveControlStatus
-const SlaveManagerStatus = {
+exports.SlaveManagerStatus = {
     Ready : 0,
     Scanning : 1,
     Travelling : 2,
@@ -1583,8 +1603,7 @@ const SlaveManagerStatus = {
     ScanningAgain : 5,
     PackingUp : 6,
 }
-YRpp.SlaveManagerStatus = SlaveManagerStatus
-const CSFLanguages = {
+exports.CSFLanguages = {
     US : 0,
     UK : 1,
     German : 2,
@@ -1597,15 +1616,13 @@ const CSFLanguages = {
     Chinese : 9,
     Unknown : 10,
 }
-YRpp.CSFLanguages = CSFLanguages
-const KeyModifier = {
+exports.KeyModifier = {
     None : 0,
     Shift : 1,
     Ctrl : 2,
     Alt : 4,
 }
-YRpp.KeyModifier = KeyModifier
-const GadgetFlag = {
+exports.GadgetFlag = {
     LeftPress : 1,
     LeftHeld : 2,
     LeftRelease : 4,
@@ -1616,5 +1633,3 @@ const GadgetFlag = {
     RightUp : 128,
     Keyboard : 256,
 }
-YRpp.GadgetFlag = GadgetFlag
-let YRpp_1 = YRpp

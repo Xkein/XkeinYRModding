@@ -187,10 +187,98 @@ void MakePropertyCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>
 }
 
 #include "core/tool/function.hpp"
+
+namespace _scripting_detail_
+{
+    template<auto func, typename Ret, typename... Args>
+    constexpr auto get_lambda_wrapper(Ret(__fastcall*)(Args...))
+    {
+        return +[](Args... args) -> Ret {
+            return func(args...);
+        };
+    }
+
+    template<auto func, typename Ret, typename... Args>
+    constexpr auto get_lambda_wrapper(Ret(__stdcall*)(Args...))
+    {
+        return +[](Args... args) -> Ret {
+            return func(args...);
+        };
+    }
+
+    template<auto func, typename Class, typename Ret, typename... Args>
+    constexpr auto get_lambda_wrapper(Ret (__fastcall Class::*)(Args...))
+    {
+        struct wrapper_class : public Class
+        {
+            Ret wrapper(Args... args)
+            {
+                return (this->*func)(args...);
+            }
+        };
+        return static_cast<Ret (Class::*)(Args...)>(&wrapper_class::wrapper);
+    }
+
+    template<auto func, typename Class, typename Ret, typename... Args>
+    constexpr auto get_lambda_wrapper(Ret (__stdcall Class::*)(Args...))
+    {
+        struct wrapper_class : public Class
+        {
+            Ret wrapper(Args... args)
+            {
+                return (this->*func)(args...);
+            }
+        };
+        return static_cast<Ret (Class::*)(Args...)>(&wrapper_class::wrapper);
+    }
+
+    template<auto func, typename Class, typename Ret, typename... Args>
+    constexpr auto get_lambda_wrapper(Ret (__fastcall Class::*)(Args...) const)
+    {
+        struct wrapper_class : public Class
+        {
+            Ret wrapper(Args... args) const
+            {
+                return (this->*func)(args...);
+            }
+        };
+        return static_cast<Ret (Class::*)(Args...) const>(&wrapper_class::wrapper);
+    }
+
+    template<auto func, typename Class, typename Ret, typename... Args>
+    constexpr auto get_lambda_wrapper(Ret (__stdcall Class::*)(Args...) const)
+    {
+        struct wrapper_class : public Class
+        {
+            Ret wrapper(Args... args) const
+            {
+                return (this->*func)(args...);
+            }
+        };
+        return static_cast<Ret (Class::*)(Args...) const>(&wrapper_class::wrapper);
+    }
+} // namespace _scripting_detail_
+
 template<auto Candidate, typename T, typename API, typename RegisterAPI>
 void MakeMethodCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
 {
-    builder.Method(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
+    if constexpr (is_fastcall_v<Candidate> || is_stdcall_v<Candidate>) {
+        MakeMethodCheck<_scripting_detail_::get_lambda_wrapper<Candidate>(Candidate)>(builder, name);
+    }
+    else {
+        builder.Method(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
+    }
+}
+
+template<auto Candidate, typename T, typename API, typename RegisterAPI>
+void MakeFunctionCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
+{
+    if constexpr (is_fastcall_v<Candidate> || is_stdcall_v<Candidate>) {
+        MakeFunctionCheck<_scripting_detail_::get_lambda_wrapper<Candidate>(Candidate)>(builder, name);
+    }
+    else {
+        builder.Function(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
+    }
 }
 
 template<typename T, typename API, typename RegisterAPI>

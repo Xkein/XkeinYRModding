@@ -1,6 +1,6 @@
 #include "js_module_loader.h"
-#include "runtime/platform/file_manager.h"
 #include "runtime/platform/file_helper.h"
+#include "runtime/platform/file_manager.h"
 #include "runtime/platform/path.h"
 #include "yr/extcore_config.h"
 
@@ -11,8 +11,21 @@ bool DefaultJSModuleLoader::Search(const std::string& RequiredDir, const std::st
         return true;
     }
 
-    return SearchModuleInDir(Paths::GetLaunchDir() / ScriptRoot, RequiredModule, Path, AbsolutePath) ||
-           (ScriptRoot != "JavaScript" && SearchModuleInDir(gYrExtConfig->assetsPath / "JavaScript", RequiredModule, Path, AbsolutePath));
+    if (SearchModuleInDir(Paths::GetLaunchDir() / ScriptRoot, RequiredModule, Path, AbsolutePath))
+    {
+        return true;
+    }
+
+    if (ScriptRoot != "JavaScript")
+    {
+        if (SearchModuleInDir(gYrExtConfig->assetsPath / "JavaScript", RequiredModule, Path, AbsolutePath) ||
+            SearchModuleInDir(gYrExtConfig->assetsPath / "JavaScript/gen", RequiredModule, Path, AbsolutePath))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool DefaultJSModuleLoader::Load(const char* Path, std::vector<uint8>& Content)
@@ -51,7 +64,5 @@ bool DefaultJSModuleLoader::SearchModuleInDir(const std::string& Dir, const std:
 
 bool DefaultJSModuleLoader::SearchModuleWithExtInDir(const std::string& Dir, const std::string& RequiredModule, std::string& Path, std::string& AbsolutePath)
 {
-    return CheckExists(Dir / RequiredModule, Path, AbsolutePath) ||
-           (!Dir.ends_with("node_modules") && CheckExists(Dir / "node_modules" / RequiredModule, Path, AbsolutePath));
-
+    return CheckExists(Dir / RequiredModule, Path, AbsolutePath) || (!Dir.ends_with("node_modules") && CheckExists(Dir / "node_modules" / RequiredModule, Path, AbsolutePath));
 }

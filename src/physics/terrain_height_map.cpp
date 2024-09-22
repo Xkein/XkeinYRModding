@@ -143,13 +143,19 @@ void TerrainHeightMap::Rebuild()
     int                terrainSize = width * height * 9;
     std::vector<float> terrain(terrainSize);
     int                maxCellCount = map->MaxNumCells;
+    int                errorCount   = 0;
     for (size_t idx = 0; idx < maxCellCount; idx++)
     {
         CellClass* pCell = map->Cells[idx];
         if (!pCell)
         {
             gLogger->error("TerrainHeightMap::Rebuild: cell({}/{}) is empty", idx, maxCellCount);
-            continue;
+            if (errorCount++ > 100) {
+            gLogger->error("TerrainHeightMap::Rebuild: too many error, exiting...");
+                return;
+            } else {
+                continue;
+            }
         }
         std::array<float, 9> cellHeights = get_cell_heights(pCell);
 

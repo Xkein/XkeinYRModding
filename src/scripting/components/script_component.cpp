@@ -80,7 +80,7 @@ struct JsScriptTemplate
             return;
 
         V8ObjectWrapper wrapper = std::move(ScriptCtor(scriptCom, pYrObject));
-        // scriptCom->JsObject = std::move(wrapper.v8Object);
+        // scriptCom->jsObject = std::move(wrapper.v8Object);
     }
 
 private:
@@ -107,7 +107,14 @@ void ScriptComponent::CreateScriptComponent(entt::registry& reg, entt::entity en
 
         ScriptComponent& script = reg.emplace<ScriptComponent>(entity);
         iter->second.Instantiate(&script, pYrObject);
+        script.pYrObject = pYrObject;
     }
+}
+
+ScriptComponent::~ScriptComponent()
+{
+    Invoke(OnDtor);
+    gJsEnv->Unbind(pYrObject);
 }
 
 #include "yr/yr_all_events.h"

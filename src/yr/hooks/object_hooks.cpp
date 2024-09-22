@@ -2,7 +2,7 @@
 #include "yr/yr_hook.h"
 
 // TechnoClass
-IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x701900, 0)
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x701900, 0x702D1F)
 BROADCAST_HOOK_EVENT(0x701900, 0x6, YrObjectReceiveDamageEvent)
 {
     E->pObject                = R->ECX<ObjectClass*>();

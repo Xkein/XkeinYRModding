@@ -5,9 +5,9 @@
 
 #include <functional>
 #include <vector>
+#include <Syringe.h>
 
 struct YrHookContext;
-class REGISTERS;
 typedef unsigned long DWORD;
 
 using HookEventListenerFuncType = void(YrHookContext* const C, void* const E);
@@ -135,7 +135,12 @@ public:
         hookEvent->InitHookInfo<T, HookAddress>(R, &e);
         if constexpr(detail::hook_event_override_return<T>) {
             auto retAddr = hookEvent->Broadcast(R, &e);
-            return e.hasSet ? detail::get_hook_override_return_address<T, HookAddress>() : retAddr;
+            if (e.hasSet) {
+                R->EAX(e.returnValue);
+                return detail::get_hook_override_return_address<T, HookAddress>();
+            } else {
+                return retAddr;
+            }
         }
         else {
             return hookEvent->Broadcast(R, &e);

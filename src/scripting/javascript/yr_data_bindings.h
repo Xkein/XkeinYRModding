@@ -155,12 +155,17 @@ UsingYrStruct(GUID);
 // not implement, declare only
 UsingCppType(IAIHouse);
 UsingCppType(IConnectionPoint);
+UsingPointer(IConnectionPoint**);
 UsingCppType(ILocomotion);
 UsingCppType(IPiggyback);
 UsingCppType(IStream);
+UsingCppType(IApplication);
+UsingCppType(IEnumConnectionPoints);
+UsingPointer(IEnumConnectionPoints**);
 UsingCppType(TubeClass);
 UsingCppType(LightConvertClass);
 UsingCppType(Surface);
+UsingCppType(DSurface);
 UsingCppType(FoggedObjectClass);
 UsingCppType(CRCEngine);
 UsingCppType(CCINIClass);
@@ -184,6 +189,9 @@ UsingCppType(CellLevelPassabilityStruct);
 UsingCppType(LevelAndPassabilityStruct2);
 UsingCppType(SubzoneConnectionStruct);
 UsingCppType(SubzoneTrackingStruct);
+UsingCppType(EventClass);
+UsingCppType(ULARGE_INTEGER);
+UsingPointer(void**);
 
 UsingArray(RadioCommand);
 UsingArray(Crate);
