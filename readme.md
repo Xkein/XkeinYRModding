@@ -38,16 +38,29 @@ English Version click [here](#project-structure) or drag page down
 
 基本UI框架，集成了方便调试开发的ImGui
 
-### **YrScripting**
+### XkeinExt
 
-脚本模块，主要负责：
+功能模块，可细分为：
 
-- 读取，执行，热重载JavaScript
-- 自动生成游戏对象的js wrap代码
+- 脚本模块：
+    - 读取，执行，热重载JavaScript
+    - 自动生成游戏对象的js wrap代码
+- 音频模块：接入Wwise
+    - 交互性bgm
+    - 音频播放：子弹爆炸，受击，创建销毁
+- 物理模块：接入JoltPhysics
+    - 正在探索用途
 
 js代码热重载：
 
 ![https://github.com/Xkein/Images/blob/master/XkeinYRModding/yr_js_reload.gif?raw=true](https://github.com/Xkein/Images/blob/master/XkeinYRModding/yr_js_reload.gif?raw=true)
+
+### XkeinEditor
+
+编辑器模块
+
+- JavaScript终端
+- Inspector
 
 ### 构建环境
 
@@ -68,6 +81,8 @@ js代码热重载：
 - [nlohmann json](https://github.com/nlohmann/json) — json库
 - stb — 图像读取库
 - spdlog — 日志库
+- Wwise — 音频引擎
+- [JoltPhysics](https://github.com/jrouwe/JoltPhysics) — 物理引擎
 
 ## 编译
 
@@ -75,11 +90,9 @@ js代码热重载：
 
 在编译前，你需要安装[xmake](https://xmake.io/), dotnet, VS2022
 
-注：由于msvc编译器在C++20下存在[bug](https://stackoverflow.com/questions/76796033/ambiguous-call-to-operator-new-when-upgrading-to-c-20)，需要使用msvc 14.39编译避免编译错误
-
-1. 准备第三方库
+2. 准备第三方库
 - [v8-backend](https://github.com/puerts/backend-v8/releases): 下载好之后，设置环境变量V8_PATH路径为v8 backend的路径
-1. 配置
+3. 配置
 
 命令行输入
 
@@ -89,7 +102,7 @@ xmake f -a x86 -m debug --skip_codegen=n --make_artifacts=y
 
 第一次运行时可能会出现第三方库的安装请求, 输入y安装即可
 
-1. 编译
+4. 编译
 
 命令行输入
 
@@ -97,13 +110,13 @@ xmake f -a x86 -m debug --skip_codegen=n --make_artifacts=y
 xmake build -v
 ```
 
-1. 复制成品
+5. 复制成品
 
 前往`build\artifacts\debug` 复制成品到游戏目录
 
 ## 待办许愿池
 
-- [ ]  适用于游戏的cegui
+- [ ]  UI框架（如cegui）
 - [ ]  C#支持，考虑兼容dp，并且提供更高性能的语言交互（类似mono embed）
 - [ ]  扩展模块管理工具
 - [ ]  Profiler工具
@@ -155,16 +168,29 @@ Also some convenient tools are provided:
 
 Basic UI framework, integrating Imgui that convenient for debug developing
 
-### **YrScripting**
+### XkeinExt
 
-Script module, mainly do：
+Feature module, can be divided in：
 
-- load, execute, hot reload the JavaScript code
-- Auto generating Js wrap code for game classes
+- Script module：
+    - load, execute, hot reload the JavaScript code
+    - Auto generating Js wrap code for game classes
+- Audio module: Wwise integration
+    - interactive bgm
+    - audio play: bullet detonate, receive damage, create and destroy
+- Physics module: JoltPhysics integration
+    - exploring usage
 
 js code hot reload：
 
 ![https://github.com/Xkein/Images/blob/master/XkeinYRModding/yr_js_reload.gif?raw=true](https://github.com/Xkein/Images/blob/master/XkeinYRModding/yr_js_reload.gif?raw=true)
+
+### XkeinEditor
+
+Editor module
+
+- JavaScript Terminal
+- Inspector
 
 ### Build Environment
 
@@ -185,6 +211,8 @@ js code hot reload：
 - [nlohmann json](https://github.com/nlohmann/json) — json library
 - stb — image library
 - spdlog — logger library
+- Wwise — Audio engine
+- [JoltPhysics](https://github.com/jrouwe/JoltPhysics) — Physics engine
 
 ## Compile
 
@@ -192,11 +220,9 @@ js code hot reload：
 
 Before compiling, you must install [xmake](https://xmake.io/), dotnet, VS2022
 
-Note: Due to [bug](https://stackoverflow.com/questions/76796033/ambiguous-call-to-operator-new-when-upgrading-to-c-20) in the MSVC compiler under C++20, it is necessary to use MSVC 14.39 to avoid compilation errors
-
-1. Preparing third party
+2. Preparing third party
 - [v8-backend](https://github.com/puerts/backend-v8/releases): After download, set the environment variable `V8_PATH` to v8 backend path
-1. Configure
+3. Configure
 
 ```powershell
 xmake f -a x86 -m debug --skip_codegen=n --make_artifacts=y
@@ -204,19 +230,19 @@ xmake f -a x86 -m debug --skip_codegen=n --make_artifacts=y
 
 There may be some third party installation requests during the first configure. Please enter `y` to accept.
 
-1. Compile
+4. Compile
 
 ```powershell
 xmake build -v
 ```
 
-1. Copy artifacts
+5. Copy artifacts
 
 Goto`build\artifacts\debug` and copy files to  game directory
 
 ## Todo List Wishing Pool
 
-- [ ]  cegui ready for YR
+- [ ]  UI framework(cegui)
 - [ ]  C# support, dp compatible, providing faster performance (like mono embed)
 - [ ]  Extension module manager tool
 - [ ]  Profiler tool
