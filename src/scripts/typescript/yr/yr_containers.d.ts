@@ -1,5 +1,5 @@
 
-declare module "yr" {
+declare module "YRpp" {
     class VectorClass<T> {
         Clear(): void;
         GetItem(Index: number): T;

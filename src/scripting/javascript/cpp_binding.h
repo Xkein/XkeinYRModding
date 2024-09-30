@@ -187,98 +187,442 @@ void MakePropertyCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>
 }
 
 #include "core/tool/function.hpp"
-
-namespace _scripting_detail_
+namespace PUERTS_NAMESPACE
 {
-    template<auto func, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret(__fastcall*)(Args...))
+    namespace internal
     {
-        return +[](Args... args) -> Ret {
-            return func(args...);
-        };
-    }
-
-    template<auto func, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret(__stdcall*)(Args...))
-    {
-        return +[](Args... args) -> Ret {
-            return func(args...);
-        };
-    }
-
-    template<auto func, typename Class, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret (__fastcall Class::*)(Args...))
-    {
-        struct wrapper_class : public Class
+        namespace traits
         {
-            Ret wrapper(Args... args)
+            template <typename Ret, typename... Args>
+            struct FunctionTrait<Ret (__fastcall *)(Args...)> : FunctionTrait<Ret (*)(Args...)>
             {
-                return (this->*func)(args...);
-            }
-        };
-        return static_cast<Ret (Class::*)(Args...)>(&wrapper_class::wrapper);
+            };
+            template <typename Ret, typename... Args>
+            struct FunctionTrait<Ret (__stdcall *)(Args...)> : FunctionTrait<Ret (*)(Args...)>
+            {
+            };
+
+            template <typename C, typename Ret, typename... Args>
+            struct FunctionTrait<Ret (__fastcall C::*)(Args...)> : FunctionTrait<Ret (*)(Args...)>
+            {
+            };
+
+            template <typename C, typename Ret, typename... Args>
+            struct FunctionTrait<Ret (__fastcall C::*)(Args...) const> : FunctionTrait<Ret (*)(Args...)>
+            {
+            };
+            
+            template <typename C, typename Ret, typename... Args>
+            struct FunctionTrait<Ret (__stdcall C::*)(Args...)> : FunctionTrait<Ret (*)(Args...)>
+            {
+            };
+
+            template <typename C, typename Ret, typename... Args>
+            struct FunctionTrait<Ret (__stdcall C::*)(Args...) const> : FunctionTrait<Ret (*)(Args...)>
+            {
+            };
+        }
     }
 
-    template<auto func, typename Class, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret (__stdcall Class::*)(Args...))
+    
+    template<typename Ret, typename... Args, Ret (__fastcall* func)(Args...), bool ScriptTypePtrAsRef, std::size_t StartParameter>
+    class CFunctionInfoByPtrImpl<Ret (__fastcall*)(Args...), func, ScriptTypePtrAsRef, StartParameter> : public CFunctionInfoImpl<Ret, ScriptTypePtrAsRef, StartParameter, Args...>
     {
-        struct wrapper_class : public Class
+    public:
+        virtual ~CFunctionInfoByPtrImpl() {}
+#ifdef WITH_V8_FAST_CALL
+        virtual const class v8::CFunction* FastCallInfo() const override
         {
-            Ret wrapper(Args... args)
-            {
-                return (this->*func)(args...);
-            }
+            return V8FastCall<Ret (__fastcall*)(Args...), func>::info();
         };
-        return static_cast<Ret (Class::*)(Args...)>(&wrapper_class::wrapper);
-    }
+#endif
 
-    template<auto func, typename Class, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret (__fastcall Class::*)(Args...) const)
-    {
-        struct wrapper_class : public Class
+        static const CFunctionInfo* get(unsigned int defaultCount)
         {
-            Ret wrapper(Args... args) const
-            {
-                return (this->*func)(args...);
-            }
+            static CFunctionInfoByPtrImpl instance {};
+            instance.defaultCount_ = defaultCount;
+            return &instance;
+        }
+    };
+    
+    template<typename Ret, typename... Args, Ret (__stdcall* func)(Args...), bool ScriptTypePtrAsRef, std::size_t StartParameter>
+    class CFunctionInfoByPtrImpl<Ret (__stdcall*)(Args...), func, ScriptTypePtrAsRef, StartParameter> : public CFunctionInfoImpl<Ret, ScriptTypePtrAsRef, StartParameter, Args...>
+    {
+    public:
+        virtual ~CFunctionInfoByPtrImpl() {}
+#ifdef WITH_V8_FAST_CALL
+        virtual const class v8::CFunction* FastCallInfo() const override
+        {
+            return V8FastCall<Ret (__stdcall*)(Args...), func>::info();
         };
-        return static_cast<Ret (Class::*)(Args...) const>(&wrapper_class::wrapper);
-    }
+#endif
 
-    template<auto func, typename Class, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret (__stdcall Class::*)(Args...) const)
-    {
-        struct wrapper_class : public Class
+        static const CFunctionInfo* get(unsigned int defaultCount)
         {
-            Ret wrapper(Args... args) const
-            {
-                return (this->*func)(args...);
-            }
+            static CFunctionInfoByPtrImpl instance {};
+            instance.defaultCount_ = defaultCount;
+            return &instance;
+        }
+    };
+
+    template<typename Inc, typename Ret, typename... Args, Ret (__fastcall Inc::*func)(Args...), bool ScriptTypePtrAsRef>
+    class CFunctionInfoByPtrImpl<Ret (__fastcall Inc::*)(Args...), func, ScriptTypePtrAsRef> : public CFunctionInfoImpl<Ret, ScriptTypePtrAsRef, 0, Args...>
+    {
+    public:
+        virtual ~CFunctionInfoByPtrImpl() {}
+#ifdef WITH_V8_FAST_CALL
+        virtual const class v8::CFunction* FastCallInfo() const override
+        {
+            return V8FastCall<Ret (__fastcall Inc::*)(Args...), func>::info();
         };
-        return static_cast<Ret (Class::*)(Args...) const>(&wrapper_class::wrapper);
-    }
-} // namespace _scripting_detail_
+#endif
+
+        static const CFunctionInfo* get(unsigned int defaultCount)
+        {
+            static CFunctionInfoByPtrImpl instance {};
+            instance.defaultCount_ = defaultCount;
+            return &instance;
+        }
+    };
+
+    template<typename Inc, typename Ret, typename... Args, Ret (__fastcall Inc::*func)(Args...) const, bool ScriptTypePtrAsRef>
+    class CFunctionInfoByPtrImpl<Ret (__fastcall Inc::*)(Args...) const, func, ScriptTypePtrAsRef> : public CFunctionInfoImpl<Ret, ScriptTypePtrAsRef, 0, Args...>
+    {
+    public:
+        virtual ~CFunctionInfoByPtrImpl() {}
+#ifdef WITH_V8_FAST_CALL
+        virtual const class v8::CFunction* FastCallInfo() const override
+        {
+            return V8FastCall<Ret (__fastcall Inc::*)(Args...) const, func>::info();
+        };
+#endif
+
+        static const CFunctionInfo* get(unsigned int defaultCount)
+        {
+            static CFunctionInfoByPtrImpl instance {};
+            instance.defaultCount_ = defaultCount;
+            return &instance;
+        }
+    };
+    
+    template<typename Inc, typename Ret, typename... Args, Ret (__stdcall Inc::*func)(Args...), bool ScriptTypePtrAsRef>
+    class CFunctionInfoByPtrImpl<Ret (__stdcall Inc::*)(Args...), func, ScriptTypePtrAsRef> : public CFunctionInfoImpl<Ret, ScriptTypePtrAsRef, 0, Args...>
+    {
+    public:
+        virtual ~CFunctionInfoByPtrImpl() {}
+#ifdef WITH_V8_FAST_CALL
+        virtual const class v8::CFunction* FastCallInfo() const override
+        {
+            return V8FastCall<Ret (__stdcall Inc::*)(Args...), func>::info();
+        };
+#endif
+
+        static const CFunctionInfo* get(unsigned int defaultCount)
+        {
+            static CFunctionInfoByPtrImpl instance {};
+            instance.defaultCount_ = defaultCount;
+            return &instance;
+        }
+    };
+
+    template<typename Inc, typename Ret, typename... Args, Ret (__stdcall Inc::*func)(Args...) const, bool ScriptTypePtrAsRef>
+    class CFunctionInfoByPtrImpl<Ret (__stdcall Inc::*)(Args...) const, func, ScriptTypePtrAsRef> : public CFunctionInfoImpl<Ret, ScriptTypePtrAsRef, 0, Args...>
+    {
+    public:
+        virtual ~CFunctionInfoByPtrImpl() {}
+#ifdef WITH_V8_FAST_CALL
+        virtual const class v8::CFunction* FastCallInfo() const override
+        {
+            return V8FastCall<Ret (__stdcall Inc::*)(Args...) const, func>::info();
+        };
+#endif
+
+        static const CFunctionInfo* get(unsigned int defaultCount)
+        {
+            static CFunctionInfoByPtrImpl instance {};
+            instance.defaultCount_ = defaultCount;
+            return &instance;
+        }
+    };
+
+    
+    template<typename API, typename Ret, typename... Args, Ret (__fastcall*func)(Args...), bool ReturnByPointer, bool ScriptTypePtrAsRef, bool GetSelfFromData>
+    struct FuncCallWrapper<API, Ret (__fastcall*)(Args...), func, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>
+    {
+        static void call(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::call(func, info);
+        }
+
+        static bool overloadCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            return Helper::call(func, info);
+        }
+        static void checkedCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            if (!Helper::call(func, info))
+            {
+                API::ThrowException(info, "invalid parameter!");
+            }
+        }
+        template<class... DefaultArguments>
+        static void callWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::call(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        template<class... DefaultArguments>
+        static bool overloadCallWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            return Helper::call(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        static const CFunctionInfo* info(unsigned int defaultCount = 0)
+        {
+            return CFunctionInfoByPtrImpl<Ret (__fastcall*)(Args...), func, ScriptTypePtrAsRef>::get(defaultCount);
+        }
+    };
+
+    template<typename API, typename Ret, typename... Args, Ret (__stdcall*func)(Args...), bool ReturnByPointer, bool ScriptTypePtrAsRef, bool GetSelfFromData>
+    struct FuncCallWrapper<API, Ret (__stdcall*)(Args...), func, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>
+    {
+        static void call(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::call(func, info);
+        }
+
+        static bool overloadCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            return Helper::call(func, info);
+        }
+        static void checkedCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            if (!Helper::call(func, info))
+            {
+                API::ThrowException(info, "invalid parameter!");
+            }
+        }
+        template<class... DefaultArguments>
+        static void callWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::call(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        template<class... DefaultArguments>
+        static bool overloadCallWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>;
+            return Helper::call(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        static const CFunctionInfo* info(unsigned int defaultCount = 0)
+        {
+            return CFunctionInfoByPtrImpl<Ret (__stdcall*)(Args...), func, ScriptTypePtrAsRef>::get(defaultCount);
+        }
+    };
+
+    template <typename API, typename Inc, typename Ret, typename... Args, Ret (__fastcall Inc::*func)(Args...), bool ReturnByPointer,
+        bool ScriptTypePtrAsRef, bool GetSelfFromData>
+    struct FuncCallWrapper<API, Ret (__fastcall Inc::*)(Args...), func, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>
+    {
+        static void call(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer,
+                ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::template callMethod<Inc>(func, info);
+        }
+
+        static bool overloadCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            return Helper::template callMethod<Inc, decltype(func)>(func, info);
+        }
+        static void checkedCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            if (!Helper::template callMethod<Inc, decltype(func)>(func, info))
+            {
+                API::ThrowException(info, "invalid parameter!");
+            }
+        }
+        template <class... DefaultArguments>
+        static void callWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer,
+                ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::template callMethod<Inc>(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        template <class... DefaultArguments>
+        static bool overloadCallWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            return Helper::template callMethod<Inc>(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        static const CFunctionInfo* info(unsigned int defaultCount = 0)
+        {
+            return CFunctionInfoByPtrImpl<Ret (__fastcall Inc::*)(Args...), func, ScriptTypePtrAsRef>::get(defaultCount);
+        }
+    };
+
+    // TODO: Similar logic...
+    template <typename API, typename Inc, typename Ret, typename... Args, Ret (__fastcall Inc::*func)(Args...) const, bool ReturnByPointer,
+        bool ScriptTypePtrAsRef, bool GetSelfFromData>
+    struct FuncCallWrapper<API, Ret (__fastcall Inc::*)(Args...) const, func, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>
+    {
+        static void call(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer,
+                ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::template callMethod<Inc>(func, info);
+        }
+
+        static bool overloadCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            return Helper::template callMethod<Inc, decltype(func)>(func, info);
+        }
+        static void checkedCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            if (!Helper::template callMethod<Inc, decltype(func)>(func, info))
+            {
+                API::ThrowException(info, "invalid parameter!");
+            }
+        }
+        template <class... DefaultArguments>
+        static void callWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer,
+                ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::template callMethod<Inc>(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        template <class... DefaultArguments>
+        static bool overloadCallWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            return Helper::template callMethod<Inc>(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        static const CFunctionInfo* info(unsigned int defaultCount = 0)
+        {
+            return CFunctionInfoByPtrImpl<Ret (__fastcall Inc::*)(Args...) const, func, ScriptTypePtrAsRef>::get(defaultCount);
+        }
+    };
+    
+    template <typename API, typename Inc, typename Ret, typename... Args, Ret (__stdcall Inc::*func)(Args...), bool ReturnByPointer,
+        bool ScriptTypePtrAsRef, bool GetSelfFromData>
+    struct FuncCallWrapper<API, Ret (__stdcall Inc::*)(Args...), func, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>
+    {
+        static void call(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer,
+                ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::template callMethod<Inc>(func, info);
+        }
+
+        static bool overloadCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            return Helper::template callMethod<Inc, decltype(func)>(func, info);
+        }
+        static void checkedCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            if (!Helper::template callMethod<Inc, decltype(func)>(func, info))
+            {
+                API::ThrowException(info, "invalid parameter!");
+            }
+        }
+        template <class... DefaultArguments>
+        static void callWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer,
+                ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::template callMethod<Inc>(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        template <class... DefaultArguments>
+        static bool overloadCallWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            return Helper::template callMethod<Inc>(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        static const CFunctionInfo* info(unsigned int defaultCount = 0)
+        {
+            return CFunctionInfoByPtrImpl<Ret (__stdcall Inc::*)(Args...), func, ScriptTypePtrAsRef>::get(defaultCount);
+        }
+    };
+
+    // TODO: Similar logic...
+    template <typename API, typename Inc, typename Ret, typename... Args, Ret (__stdcall Inc::*func)(Args...) const, bool ReturnByPointer,
+        bool ScriptTypePtrAsRef, bool GetSelfFromData>
+    struct FuncCallWrapper<API, Ret (__stdcall Inc::*)(Args...) const, func, ReturnByPointer, ScriptTypePtrAsRef, GetSelfFromData>
+    {
+        static void call(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer,
+                ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::template callMethod<Inc>(func, info);
+        }
+
+        static bool overloadCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            return Helper::template callMethod<Inc, decltype(func)>(func, info);
+        }
+        static void checkedCall(typename API::CallbackInfoType info)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            if (!Helper::template callMethod<Inc, decltype(func)>(func, info))
+            {
+                API::ThrowException(info, "invalid parameter!");
+            }
+        }
+        template <class... DefaultArguments>
+        static void callWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, false, ReturnByPointer,
+                ScriptTypePtrAsRef, GetSelfFromData>;
+            Helper::template callMethod<Inc>(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        template <class... DefaultArguments>
+        static bool overloadCallWithDefaultValues(typename API::CallbackInfoType info, DefaultArguments&&... defaultValues)
+        {
+            using Helper = internal::FuncCallHelper<API, std::pair<Ret, std::tuple<Args...>>, true, ReturnByPointer, ScriptTypePtrAsRef,
+                GetSelfFromData>;
+            return Helper::template callMethod<Inc>(func, info, std::forward<DefaultArguments>(defaultValues)...);
+        }
+        static const CFunctionInfo* info(unsigned int defaultCount = 0)
+        {
+            return CFunctionInfoByPtrImpl<Ret (__stdcall Inc::*)(Args...) const, func, ScriptTypePtrAsRef>::get(defaultCount);
+        }
+    };
+}
 
 template<auto Candidate, typename T, typename API, typename RegisterAPI>
 void MakeMethodCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
 {
-    if constexpr (is_fastcall_v<Candidate> || is_stdcall_v<Candidate>) {
-        MakeMethodCheck<_scripting_detail_::get_lambda_wrapper<Candidate>(Candidate)>(builder, name);
-    }
-    else {
-        builder.Method(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
-    }
+    builder.Method(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
 }
 
 template<auto Candidate, typename T, typename API, typename RegisterAPI>
 void MakeFunctionCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
 {
-    if constexpr (is_fastcall_v<Candidate> || is_stdcall_v<Candidate>) {
-        MakeFunctionCheck<_scripting_detail_::get_lambda_wrapper<Candidate>(Candidate)>(builder, name);
-    }
-    else {
-        builder.Function(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
-    }
+    builder.Function(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
 }
 
 template<typename T, typename API, typename RegisterAPI>

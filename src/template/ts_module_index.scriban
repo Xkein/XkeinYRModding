@@ -88,7 +88,7 @@
 -}}
 /// <reference path = "../index.d.ts"/>
 declare module "{{module_name}}" {
-import { CDTimerClass } from "yr";
+import { CDTimerClass } from "YRpp";
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
 {{ klass.is_interface ? "interface" : "class" }} {{klass.name}}

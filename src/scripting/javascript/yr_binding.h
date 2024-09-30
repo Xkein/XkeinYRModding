@@ -264,6 +264,7 @@ namespace PUERTS_NAMESPACE
         };
 
         inline v8::Local<v8::Value> FindOrAddYrObject(v8::Isolate* InIsolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial);
+        inline const void* GetYrJsTypeID(AbstractType type);
         template<typename T>
         struct Converter<T*, typename std::enable_if<std::is_convertible<T*, const AbstractClass*>::value>::type>
         {
@@ -283,7 +284,7 @@ namespace PUERTS_NAMESPACE
             {
                 if (value.As<v8::Object>()->IsNullOrUndefined())
                     return true;
-                return DataTransfer::IsInstanceOf(context->GetIsolate(), T::StaticClass(), value.As<v8::Object>());
+                return DataTransfer::IsInstanceOf(context->GetIsolate(), GetYrJsTypeID(T::AbsID), value.As<v8::Object>());
             }
         };
     } // namespace v8_impl

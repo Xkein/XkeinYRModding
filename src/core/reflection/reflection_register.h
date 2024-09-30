@@ -6,53 +6,77 @@
 
 namespace _core_detail_
 {
-    template<auto func, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret(__fastcall*)(Args...))
+    template <typename TFunc, TFunc>
+    struct lambda_wrapper;
+
+    template<typename Ret, typename... Args, Ret(__fastcall*func)(Args...)>
+    struct lambda_wrapper<Ret(__fastcall*)(Args...), func>
     {
-        return +[](Args... args) -> Ret {
+        static Ret wrapper_func(Args... args)
+        {
             return func(args...);
-        };
-    }
+        }
 
-    template<auto func, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret(__stdcall*)(Args...))
+        constexpr static auto wrapper = &wrapper_func;
+    };
+
+    template<typename Ret, typename... Args, Ret(__stdcall*func)(Args...)>
+    struct lambda_wrapper<Ret(__stdcall*)(Args...), func>
     {
-        return +[](Args... args) -> Ret {
+        static Ret wrapper_func(Args... args)
+        {
             return func(args...);
-        };
-    }
+        }
 
-    template<auto func, typename Class, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret (__fastcall Class::*)(Args...))
-    {
-        return +[](Class* klass, Args... args) -> Ret {
-            return (klass->*func)(args...);
-        };
-    }
+        constexpr static auto wrapper = &wrapper_func;
+    };
 
-    template<auto func, typename Class, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret (__stdcall Class::*)(Args...))
+    template<typename Class, typename Ret, typename... Args, Ret(__fastcall Class::*func)(Args...)>
+    struct lambda_wrapper<Ret(__fastcall Class::*)(Args...), func> : public Class
     {
-        return +[](Class* klass, Args... args) -> Ret {
+        static Ret wrapper_func(Class* klass, Args... args)
+        {
             return (klass->*func)(args...);
-        };
-    }
+        }
+        
+        constexpr static auto wrapper = &wrapper_func;
+    };
 
-    template<auto func, typename Class, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret (__fastcall Class::*)(Args...) const)
+    template<typename Class, typename Ret, typename... Args, Ret(__stdcall Class::*func)(Args...)>
+    struct lambda_wrapper<Ret(__stdcall Class::*)(Args...), func> : public Class
     {
-        return +[](Class const* klass, Args... args) -> Ret {
+        static Ret wrapper_func(Class* klass, Args... args)
+        {
             return (klass->*func)(args...);
-        };
-    }
+        }
 
-    template<auto func, typename Class, typename Ret, typename... Args>
-    constexpr auto get_lambda_wrapper(Ret (__stdcall Class::*)(Args...) const)
+        constexpr static auto wrapper = &wrapper_func;
+    };
+
+    template<typename Class, typename Ret, typename... Args, Ret(__fastcall Class::*func)(Args...) const>
+    struct lambda_wrapper<Ret(__fastcall Class::*)(Args...) const, func> : public Class
     {
-        return +[](Class const* klass, Args... args) -> Ret {
+        static Ret wrapper_func(Class const* klass, Args... args)
+        {
             return (klass->*func)(args...);
-        };
-    }
+        }
+
+        constexpr static auto wrapper = &wrapper_func;
+    };
+
+    template<typename Class, typename Ret, typename... Args, Ret(__stdcall Class::*func)(Args...) const>
+    struct lambda_wrapper<Ret(__stdcall Class::*)(Args...) const, func> : public Class
+    {
+        static Ret wrapper_func(Class const* klass, Args... args)
+        {
+            return (klass->*func)(args...);
+        }
+
+        constexpr static auto wrapper = &wrapper_func;
+    };
+
+    template<auto func>
+    constexpr auto lambda_wrapper_v = lambda_wrapper<decltype(func), func>::wrapper;
 } // namespace _core_detail_
 
 template<auto Candidate, typename Type>
@@ -60,7 +84,7 @@ auto register_func(entt::meta_factory<Type>& factory, const entt::id_type id)
 {
     if constexpr (is_fastcall_v<Candidate> || is_stdcall_v<Candidate>)
     {
-        return register_func<_core_detail_::get_lambda_wrapper<Candidate>(Candidate)>(factory, id);
+        return register_func<_core_detail_::lambda_wrapper_v<Candidate>>(factory, id);
     }
     else
     {

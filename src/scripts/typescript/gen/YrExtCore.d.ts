@@ -1,4 +1,4 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YrExtCore" {
-import { CDTimerClass } from "yr";
+import { CDTimerClass } from "YRpp";
 }

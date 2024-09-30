@@ -44,10 +44,18 @@ void __JsRegister_{{type_name}}() {
         end
     end
     for function in class_functions ; $cpp_function = function.cpp_function
-        if should_skip_visibility(htClass, function) || function.is_deleted || function.is_destructor || function.is_constructor
+        if should_skip_visibility(htClass, function) || function.is_deleted || function.is_destructor
             continue
         end
-        if function.is_static
+        if function.is_overload
+            continue
+        end
+        if function.is_constructor
+            if !htClass.is_abstract
+                $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+                $klass = append_line($klass, $'// builder.Constructor<{$arg_types}>();')
+            end
+        else if function.is_static
             if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
                 $klass = append_line($klass, $'MakeFunctionCheck<static_cast<{$func_type}>(&{htClass.type_name}::{function.name})>(builder, "{function.name}");')
             else
@@ -57,6 +65,74 @@ void __JsRegister_{{type_name}}() {
             $klass = append_line($klass, $'MakeMethodCheck<static_cast<{$func_type}>(&{htClass.type_name}::{function.name})>(builder, "{function.name}");')
         else
             $klass = append_line($klass, $'MakeMethodCheck<&{htClass.type_name}::{function.name}>(builder, "{function.name}");')
+        end
+    end
+
+    for pair in htClass.overload_functions
+        $overload_name = pair.key
+        $static_list = ""
+        $member_list = ""
+        $ctor_list = ""
+        $static_count = 0
+        $member_count = 0
+        $ctor_count = 0
+        for function in pair.value
+            $func_type = get_function_ptr_type(function, htClass)
+            if !should_skip_visibility(htClass, function)
+                if function.is_constructor
+                    $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+                    if string.empty($arg_types)
+                        $ctor_list = append_line($ctor_list, $'MakeConstructor({htClass.type_name}),')
+                    else
+                        $ctor_list = append_line($ctor_list, $'MakeConstructor({htClass.type_name}, {$arg_types}),')
+                    end
+                    $ctor_count = $ctor_count + 1
+                else if function.is_static
+                    $static_list = append_line($static_list, $'MakeOverload({$func_type}, &{htClass.type_name}::{function.name}),')
+                    $static_count = $static_count + 1
+                else
+                    $member_list = append_line($member_list, $'MakeOverload({$func_type}, &{htClass.type_name}::{function.name}),')
+                    $member_count = $member_count + 1
+                end
+            end
+            if for.last
+                $ctor_list = string.remove_last($ctor_list, ",")
+                $static_list = string.remove_last($static_list, ",")
+                $member_list = string.remove_last($member_list, ",")
+            end
+        end
+        
+        if !string.empty($ctor_list) && !htClass.is_abstract
+            if $ctor_count > 1
+                $klass = append_line($klass, $'/*builder.Constructor(CombineConstructors(')
+                $klass = append_line($klass, $ctor_list)
+                $klass = append_line($klass, $'));*/')
+            else
+                if !string.contains($ctor_list, "char const *")
+                    $decay = $ctor_list | string.remove_first $'MakeConstructor({htClass.type_name}' | string.remove_first ',' | string.remove_first ')'
+                    $klass = append_line($klass, $'/*builder.Constructor<{$decay}>();*/')
+                end
+            end
+        end
+        if !string.empty($static_list)
+            if $static_count > 1
+                $klass = append_line($klass, $'builder.Function("{$overload_name}", CombineOverloads(')
+                $klass = append_line($klass, $static_list)
+                $klass = append_line($klass, $'));')
+            else
+                $decay = $static_list | string.remove_first 'MakeOverload(' | string.remove_first $', &{htClass.type_name}::{$overload_name})'
+                $klass = append_line($klass, $'MakeFunctionCheck<static_cast<{$decay}>(&{htClass.type_name}::{$overload_name})>(builder, "{$overload_name}");')
+            end
+        end
+        if !string.empty($member_list)
+            if $member_count > 1
+                $klass = append_line($klass, $'builder.Method("{$overload_name}", CombineOverloads(')
+                $klass = append_line($klass, $member_list)
+                $klass = append_line($klass, $'));')
+            else
+                $decay = $member_list | string.remove_first 'MakeOverload(' | string.remove_first $', &{htClass.type_name}::{$overload_name})'
+                $klass = append_line($klass, $'MakeMethodCheck<static_cast<{$decay}>(&{htClass.type_name}::{$overload_name})>(builder, "{$overload_name}");')
+            end
         end
     end
     for property in class_properties ; $cpp_field = property.cpp_field

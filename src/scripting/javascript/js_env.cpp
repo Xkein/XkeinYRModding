@@ -1094,6 +1094,11 @@ v8::MaybeLocal<v8::Module> JsEnv::ResolveModuleCallback(v8::Local<v8::Context> C
     return (ItRefModule->second).Get(Context->GetIsolate());
 }
 
+#include <AbstractClass.h>
+#include "yr/api/yr_entity.h"
+using namespace entt::literals;
+
+static const void* gYrJsTypeID[static_cast<size_t>(AbstractType::DiskLaser) + 1] {};
 
 namespace PUERTS_NAMESPACE
 {
@@ -1103,14 +1108,14 @@ namespace PUERTS_NAMESPACE
         {
             return gJsEnv->FindOrAdd(InIsolate, Context, YrObject, SkipTypeScriptInitial);
         }
+
+        const void* GetYrJsTypeID(AbstractType type)
+        {
+            return gYrJsTypeID[static_cast<size_t>(type)];
+        }
     } // namespace v8_impl
 } // namespace PUERTS_NAMESPACE
 
-#include <AbstractClass.h>
-#include "yr/api/yr_entity.h"
-using namespace entt::literals;
-
-static const void* gYrJsTypeID[static_cast<size_t>(AbstractType::DiskLaser) + 1] {};
 
 v8::Local<v8::Value> JsEnv::FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial)
 {

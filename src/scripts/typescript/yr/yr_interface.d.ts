@@ -1,5 +1,5 @@
 
-declare module "yr" {
+declare module "YRpp" {
     interface IStream {
     }
 }

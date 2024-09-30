@@ -1,5 +1,5 @@
 
-declare module "yr" {
+declare module "YRpp" {
     class _GUID { }
     class _ULARGE_INTEGER { }
 

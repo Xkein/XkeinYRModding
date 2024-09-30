@@ -1,6 +1,6 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YRpp" {
-import { CDTimerClass } from "yr";
+import { CDTimerClass } from "YRpp";
 class TintStruct
 {
     mRed : number;

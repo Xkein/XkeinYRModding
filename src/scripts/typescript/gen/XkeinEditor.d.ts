@@ -1,4 +1,4 @@
 /// <reference path = "../index.d.ts"/>
 declare module "XkeinEditor" {
-import { CDTimerClass } from "yr";
+import { CDTimerClass } from "YRpp";
 }
