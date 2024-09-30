@@ -84,6 +84,22 @@ void YrReflectionRegister()
         factory.ctor<float, float, float, float, float, float, float, float, float, float, float, float>();
         register_data<&Matrix3D::Data>(factory, "Data"_hs).prop("name"_hs, "Data");
     }
+    {
+        auto factory = INIT_META_FACTORY(CDTimerClass);
+        register_func<&CDTimerClass::Start>(factory, "Start"_hs).prop("name"_hs, "Start").prop("arg0"_hs, "duration");
+        register_func<&CDTimerClass::Stop>(factory, "Stop"_hs).prop("name"_hs, "Stop");
+        register_func<&CDTimerClass::Pause>(factory, "Pause"_hs).prop("name"_hs, "Pause");
+        register_func<&CDTimerClass::Resume>(factory, "Resume"_hs).prop("name"_hs, "Resume");
+        register_func<&CDTimerClass::GetTimeLeft>(factory, "GetTimeLeft"_hs).prop("name"_hs, "GetTimeLeft");
+        register_func<&CDTimerClass::Completed>(factory, "Completed"_hs).prop("name"_hs, "Completed");
+        register_func<&CDTimerClass::InProgress>(factory, "InProgress"_hs).prop("name"_hs, "InProgress");
+        register_func<&CDTimerClass::Expired>(factory, "Expired"_hs).prop("name"_hs, "Expired");
+        register_func<&CDTimerClass::HasStarted>(factory, "HasStarted"_hs).prop("name"_hs, "HasStarted");
+        register_func<&CDTimerClass::IsTicking>(factory, "IsTicking"_hs).prop("name"_hs, "IsTicking");
+        register_func<&CDTimerClass::HasTimeLeft>(factory, "HasTimeLeft"_hs).prop("name"_hs, "HasTimeLeft");
+        register_data<&CDTimerClass::StartTime>(factory, "StartTime"_hs).prop("name"_hs, "StartTime");
+        register_data<&CDTimerClass::TimeLeft>(factory, "TimeLeft"_hs).prop("name"_hs, "TimeLeft");
+    }
 }
 
 void YrReflectionUnregister()
@@ -99,4 +115,6 @@ void YrReflectionUnregister()
    entt::meta_reset<Quaternion>();
    entt::meta_reset<RectangleStruct>();
    entt::meta_reset<Matrix3D>();
+
+   entt::meta_reset<CDTimerClass>();
 }

@@ -84,6 +84,24 @@ void __JsRegister_YrStructs()
         MakePropertyCheck<&Matrix3D::Data>(builder, "Data");
         builder.Register();
     }
+    
+    {
+        auto builder = PUERTS_NAMESPACE::DefineClass<CDTimerClass>();
+        MakeMethodCheck<&CDTimerClass::Start>(builder, "Start");
+        MakeMethodCheck<&CDTimerClass::Stop>(builder, "Stop");
+        MakeMethodCheck<&CDTimerClass::Pause>(builder, "Pause");
+        MakeMethodCheck<&CDTimerClass::Resume>(builder, "Resume");
+        MakeMethodCheck<&CDTimerClass::GetTimeLeft>(builder, "GetTimeLeft");
+        MakeMethodCheck<&CDTimerClass::Completed>(builder, "Completed");
+        MakeMethodCheck<&CDTimerClass::InProgress>(builder, "InProgress");
+        MakeMethodCheck<&CDTimerClass::Expired>(builder, "Expired");
+        MakeMethodCheck<&CDTimerClass::HasStarted>(builder, "HasStarted");
+        MakeMethodCheck<&CDTimerClass::IsTicking>(builder, "IsTicking");
+        MakeMethodCheck<&CDTimerClass::HasTimeLeft>(builder, "HasTimeLeft");
+        MakePropertyCheck<&CDTimerClass::StartTime>(builder, "mStartTime");
+        MakePropertyCheck<&CDTimerClass::TimeLeft>(builder, "mTimeLeft");
+        builder.Register();
+    }
 }
 
 GLOBAL_INVOKE_ON_CTOR(__JsRegister_YrStructs);
