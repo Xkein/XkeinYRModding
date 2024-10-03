@@ -30,6 +30,8 @@ struct ScriptComponent final
         CreateScriptComponent(reg, entity, pYrObject, pYrObject->Type);
     }
 
+    static void OnJsEnvDestroy();
+
     ScriptComponent() = default;
     ScriptComponent(ScriptComponent&&) = default;
     ~ScriptComponent();

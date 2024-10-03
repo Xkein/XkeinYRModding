@@ -289,6 +289,8 @@ void Physics::Init()
     gBroadPhaseLayerInterface      = new BPLayerInterfaceImpl();
     gObjectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterImpl();
     gObjectLayerPairFilter         = new ObjectLayerPairFilterImpl();
+
+    gLogger->info("physics module inited.");
 }
 
 void Physics::Destroy()
@@ -305,6 +307,8 @@ void Physics::Destroy()
 
     delete JPH::Factory::sInstance;
     JPH::Factory::sInstance = nullptr;
+    
+    gLogger->info("physics module destroyed.");
 }
 
 void Physics::InitWorld()

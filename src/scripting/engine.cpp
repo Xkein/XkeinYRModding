@@ -48,6 +48,7 @@ void Engine::Start()
 void Engine::Exit()
 {
     gLogger->info("Engine::Exit()");
+    ScriptComponent::OnJsEnvDestroy();
     delete gJsEnv;
     gJsEnv = nullptr;
 }

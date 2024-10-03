@@ -94,6 +94,8 @@ void UIMainThread()
 }
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) {
+    if (!ImGui::GetCurrentContext())
+        return;
     ImGui::GetIO().MouseDrawCursor = false;
     UIMainThread();
 }
@@ -102,6 +104,8 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent) {
 }
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent) {
+    if (!ImGui::GetCurrentContext())
+        return;
     ImGui::GetIO().MouseDrawCursor = true;
     UIMainThread();
 }

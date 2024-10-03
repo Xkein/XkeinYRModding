@@ -138,6 +138,8 @@ void InitWwise()
 
     gInited = true;
     atexit(AudioSystem::Destroy);
+
+    gLogger->info("audio module inited.");
 }
 
 void AudioSystem::Init()
@@ -175,6 +177,8 @@ void AudioSystem::Destroy()
 
     delete gLowLevelIO;
     gWwiseSettings.reset();
+
+    gLogger->info("audio module destroyed.");
 }
 
 void AudioSystem::InitWorld()

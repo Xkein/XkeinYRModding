@@ -111,10 +111,18 @@ void ScriptComponent::CreateScriptComponent(entt::registry& reg, entt::entity en
     }
 }
 
+void ScriptComponent::OnJsEnvDestroy()
+{
+    gJsScripts.clear();
+}
+
 ScriptComponent::~ScriptComponent()
 {
     Invoke(OnDtor);
-    gJsEnv->Unbind(pYrObject);
+    if (gJsEnv)
+    {
+        gJsEnv->Unbind(pYrObject);
+    }
 }
 
 #include "yr/yr_all_events.h"

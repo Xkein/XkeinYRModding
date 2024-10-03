@@ -151,6 +151,8 @@ auto& GetKeyListeners()
 
 ImGuiKey GetConfigKey(std::string_view config)
 {
+    if (!gYrExtConfig)
+        return ImGuiKey_None;
     return gYrExtConfig->rawData["editor_key_config"].value(config, ImGuiKey_None);
 }
 
@@ -177,6 +179,8 @@ void YrEditorKeyListener::Unregistere(std::string_view config, ListenerFuncType 
 
 void StepEditorKeyListener()
 {
+    if (!ImGui::GetCurrentContext())
+        return;
     for (auto&& [key, list] : GetKeyListeners())
     {
         if (!ImGui::IsKeyPressed(key))
