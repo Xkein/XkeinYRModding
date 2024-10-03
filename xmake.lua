@@ -3,6 +3,8 @@ add_rules("mode.debug", "mode.release")
 set_allowedplats("windows")
 set_allowedarchs("x86")
 
+add_cxxflags("/bigobj")
+
 add_moduledirs("xmake/modules")
 includes("xmake/modules/common_tool.lua")
 
@@ -84,7 +86,6 @@ target("XkeinExt")
     add_files("src/xkein/**.cpp")
     add_includedirs("content/yr_wwise_template/GeneratedSoundBanks", { public = true })
     add_filegroups("XkeinExt", {rootdir = "src"})
-    add_cxxflags("/bigobj")
     
 target("XkeinEditor")
     set_kind("shared")

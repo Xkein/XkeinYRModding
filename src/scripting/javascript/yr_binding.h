@@ -37,51 +37,6 @@ UsingContainer(TYPEDEF)
 #define UsingDynamicVectorClass(CLS) UsingVectorClass(CLS) UsingContainer(DynamicVectorClass<CLS>)
 #define UsingTypeList(CLS) UsingDynamicVectorClass(CLS) UsingContainer(TypeList<CLS>)
 
-#define RegisterVectorClass(CLS) \
-    PUERTS_NAMESPACE::DefineClass<VectorClass<CLS>>() \
-        /*.Method("SetCapacity", MakeFunction(&VectorClass<CLS>::SetCapacity))*/ \
-        .Method("Clear", MakeFunction(&VectorClass<CLS>::Clear)) \
-        /*.Method("FindItemIndex", MakeFunction(&VectorClass<CLS>::FindItemIndex))*/ \
-        /*.Method("GetItemIndex", MakeFunction(&VectorClass<CLS>::GetItemIndex))*/ \
-        .Method("GetItem", MakeFunction(&VectorClass<CLS>::GetItem)) \
-        .Method("Reserve", MakeFunction(&VectorClass<CLS>::Reserve)) \
-        .Property("Capacity", MakeProperty(&VectorClass<CLS>::Capacity)) \
-        .Register()
-
-#define RegisterDynamicVectorClass(CLS) \
-    RegisterVectorClass(CLS); \
-    PUERTS_NAMESPACE::DefineClass<DynamicVectorClass<CLS>>() \
-        .Extends<VectorClass<CLS>>() \
-        /*.Method("SetCapacity", MakeFunction(&DynamicVectorClass<CLS>::SetCapacity))*/ \
-        .Method("ValidIndex", MakeFunction(&DynamicVectorClass<CLS>::ValidIndex)) \
-        .Method("GetItemOrDefault", SelectFunction(CLS (DynamicVectorClass<CLS>::*)(int) const, &DynamicVectorClass<CLS>::GetItemOrDefault)) \
-        .Method("GetItemOrDefault", SelectFunction(CLS (DynamicVectorClass<CLS>::*)(int, CLS) const, &DynamicVectorClass<CLS>::GetItemOrDefault)) \
-        .Method("AddItem", MakeFunction(&DynamicVectorClass<CLS>::AddItem)) \
-        .Method("AddUnique", MakeFunction(&DynamicVectorClass<CLS>::AddUnique)) \
-        .Method("RemoveItem", MakeFunction(&DynamicVectorClass<CLS>::RemoveItem)) \
-        .Method("Remove", MakeFunction(&DynamicVectorClass<CLS>::Remove)) \
-        .Property("Count", MakeProperty(&DynamicVectorClass<CLS>::Count)) \
-        .Register()
-
-#define RegisterTypeList(CLS) \
-    RegisterDynamicVectorClass(CLS); \
-    PUERTS_NAMESPACE::DefineClass<TypeList<CLS>>() \
-        .Extends<DynamicVectorClass<CLS>>() \
-        .Register()
-
-#define RegisterIndexClass(TKEY, TVALUE) {\
-    typedef IndexClass<TKEY, TVALUE> __IndexClass; \
-    PUERTS_NAMESPACE::DefineClass<__IndexClass>() \
-        .Method("AddIndex", SelectFunction(bool (__IndexClass::*)(TKEY, TVALUE&&), &__IndexClass::AddIndex)) \
-        .Method("RemoveIndex", MakeFunction(&__IndexClass::RemoveIndex)) \
-        .Method("IsPresent", MakeFunction(&__IndexClass::IsPresent)) \
-        .Method("Count", MakeFunction(&__IndexClass::Count)) \
-        .Method("FetchIndex", SelectFunction(TVALUE& (__IndexClass::*)(TKEY), &__IndexClass::FetchIndex)) \
-        .Method("Clear", MakeFunction(&__IndexClass::Clear)) \
-        .Method("Reverse", MakeFunction(&__IndexClass::Reverse)) \
-        .Method("Sort", MakeFunction(&__IndexClass::Sort)) \
-        .Register(); }
-
 namespace PUERTS_NAMESPACE
 {
     template<typename API, typename Ret, unsigned int Address, const constant_ptr<Ret, Address>* Variable>

@@ -11,7 +11,9 @@
 #include <TubeClass.h>
 #include <PixelFXClass.h>
 #include <TriggerTypeClass.h>
+#include <FoggedObjectClass.h>
 #define wchar wchar_t
 
 {{get_meta_gen_header()}}
+#include "yr/reflection/yr_container.h"
 {{gen_meta_register_snippet(this)}}
