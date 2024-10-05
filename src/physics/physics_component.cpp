@@ -13,6 +13,7 @@
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
+#include <Jolt/Physics/Collision/Shape/StaticCompoundShape.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <ObjectClass.h>
 
@@ -74,7 +75,7 @@ bool InitShapeSetting(PhysicsTypeComponent* pPhysicsType, AbstractTypeClass* pYr
             break;
         }
 
-    pPhysicsType->shapeSettings = std::shared_ptr<JPH::ShapeSettings>(settings);
+    pPhysicsType->shapeSettings = settings;
     return true;
 }
 
@@ -131,13 +132,12 @@ JPH::BodyCreationSettings GetBodySettings(PhysicsTypeComponent const* pPhysicsTy
     AbstractType     whatAmI     = pYrObject->WhatAmI();
     JPH::EMotionType motionType  = GetMotionType(pPhysicsType, whatAmI);
     JPH::ObjectLayer objectLayer = GetObjectLayer(pPhysicsType, whatAmI);
-    JPH::Shape*      shape       = pPhysicsType->shapeSettings->Create().Get();
     if (quat.IsNaN())
     {
         quat = JPH::Quat::sIdentity();
         gLogger->error("{} rotation is NaN!", (void*)pYrObject);
     }
-    JPH::BodyCreationSettings settings {shape, position, quat, motionType, objectLayer};
+    JPH::BodyCreationSettings settings {pPhysicsType->shapeSettings, position, quat, motionType, objectLayer};
     return settings;
 }
 

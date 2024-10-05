@@ -1,7 +1,7 @@
 #pragma once
 
 #include "physics/jolt/jolt.h"
-class TerrainHeightMap;
+class TerrainBody;
 
 class Physics
 {
@@ -11,10 +11,11 @@ public:
     static void BeginTick();
     static void EndTick();
 
-    static void InitWorld();
-    static void DestroyWorld();
+    static void LoadWorld();
+    static void EnterWorld();
+    static void ExitWorld();
 
-    static XKEINEXT_API TerrainHeightMap* gTerrainHeightMap;
+    static XKEINEXT_API TerrainBody* gTerrainBody;
 };
 
 extern XKEINEXT_API JPH::JobSystem*		                gJobSystem;

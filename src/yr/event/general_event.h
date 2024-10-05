@@ -23,6 +23,9 @@ class YrEndRenderEvent
 {};
 
 CLASS(HookEvent)
+class YrSceneLoadEvent { };
+
+CLASS(HookEvent)
 class YrSceneEnterEvent { };
 
 CLASS(HookEvent)

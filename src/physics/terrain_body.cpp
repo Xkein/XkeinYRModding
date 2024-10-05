@@ -1,24 +1,26 @@
-#include "physics/terrain_height_map.h"
+#include "physics/terrain_body.h"
 #include "physics/layers.h"
 #include "physics/physics.h"
 #include "physics/yr_math.h"
-#include "terrain_height_map.h"
+#include "runtime/logger/logger.h"
 #include <Fundamentals.h>
 #include <IsometricTileTypeClass.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyInterface.h>
 #include <Jolt/Physics/Collision/Shape/HeightFieldShape.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
+#include <Jolt/Physics/Collision/Shape/RotatedTranslatedShape.h>
+#include <Jolt/Physics/Collision/Shape/ScaledShape.h>
+#include <Jolt/Physics/Collision/Shape/StaticCompoundShape.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <MapClass.h>
 #include <array>
 #include <map>
 #include <queue>
-#include <runtime/logger/logger.h>
 
-TerrainHeightMap::TerrainHeightMap() {}
+TerrainBody::TerrainBody() {}
 
-TerrainHeightMap::~TerrainHeightMap()
+TerrainBody::~TerrainBody()
 {
     Clear();
 }
@@ -99,7 +101,7 @@ void create_body_from_queue()
     }
 }
 
-void TerrainHeightMap::CreateCellBody(CellClass* pCell)
+void TerrainBody::CreateCellBody(CellClass* pCell)
 {
     if (!pCell->Tile_Is_Cliff() || gCellCliff.contains(pCell))
     {
@@ -129,7 +131,7 @@ void TerrainHeightMap::CreateCellBody(CellClass* pCell)
     create_body_from_queue();
 }
 
-void TerrainHeightMap::Rebuild()
+void TerrainBody::Rebuild()
 {
     Clear();
 
@@ -137,25 +139,19 @@ void TerrainHeightMap::Rebuild()
     if (!map)
         return;
 
-    int width  = map->MaxHeight;
-    int height = map->MaxHeight;
+    int width  = map->MaxWidth * 3;
+    int height = map->MaxHeight * 3;
 
-    int                terrainSize = width * height * 9;
+    // TODO: reduce useless memory
+    int                terrainSize = width * height;
     std::vector<float> terrain(terrainSize);
     int                maxCellCount = map->MaxNumCells;
-    int                errorCount   = 0;
     for (size_t idx = 0; idx < maxCellCount; idx++)
     {
         CellClass* pCell = map->Cells[idx];
         if (!pCell)
         {
-            gLogger->error("TerrainHeightMap::Rebuild: cell({}/{}) is empty", idx, maxCellCount);
-            if (errorCount++ > 100) {
-            gLogger->error("TerrainHeightMap::Rebuild: too many error, exiting...");
-                return;
-            } else {
-                continue;
-            }
+            continue;
         }
         std::array<float, 9> cellHeights = get_cell_heights(pCell);
 
@@ -163,36 +159,71 @@ void TerrainHeightMap::Rebuild()
 
         CoordStruct coord = pCell->GetCoords();
         CellStruct  cell  = CellClass::Coord2Cell(coord);
-        int         x     = cell.X * 3;
-        int         y     = cell.Y * 3;
+        int         x     = cell.X;
+        int         y     = cell.Y;
         for (size_t idx = 0; idx < 9; idx++)
         {
-            terrain[(x + idx % 3) + (y * height + idx / 3)] = cellHeights[idx];
+            terrain[(x + idx % 3) + (y + idx / 3) * width] = cellHeights[idx];
         }
     }
 
-    // Create height field
-    JPH::HeightFieldShapeSettings settings(terrain.data(), JPH::Vec3::sZero(), JPH::Vec3(1, 1, 1), terrainSize);
-    settings.mBlockSize     = 1 << sBlockSizeShift;
-    settings.mBitsPerSample = sBitsPerSample;
+    // Create multi height field because height field has limit sample count -- 1 << JPH::HeightFieldShapeConstants::cNumBitsXY
+    constexpr size_t                           maxSampleCount  = 1 << JPH::HeightFieldShapeConstants::cNumBitsXY;
+    JPH::Ref<JPH::StaticCompoundShapeSettings> terrainCompound = new JPH::StaticCompoundShapeSettings;
 
-    JPH::RefConst<JPH::HeightFieldShape> mHeightField = StaticCast<JPH::HeightFieldShape>(settings.Create().Get());
-    heightMapBody = gBodyInterface->CreateBody(JPH::BodyCreationSettings(mHeightField, JPH::RVec3::sZero(), JPH::Quat::sIdentity(), JPH::EMotionType::Static, PhysicsLayers::NON_MOVING));
-    gBodyInterface->AddBody(heightMapBody->GetID(), JPH::EActivation::DontActivate);
+    size_t xSquareNum  = std::ceil(width / (float)maxSampleCount);
+    size_t ySquareNum  = std::ceil(height / (float)maxSampleCount);
+    size_t sampleCount = std::min(maxSampleCount, (size_t)std::max(width, height));
+    for (size_t ySquare = 0; ySquare < ySquareNum; ySquare++)
+    {
+        for (size_t xSquare = 0; xSquare < xSquareNum; xSquare++)
+        {
+            std::vector<float> heightField(sampleCount * sampleCount);
+            size_t             xStart = xSquare * sampleCount;
+            size_t             yStart = ySquare * sampleCount;
+            for (size_t y = 0; y < sampleCount; y++)
+            {
+                for (size_t x = 0; x < sampleCount; x++)
+                {
+                    size_t index = (xStart + x) + (yStart + y) * width;
+                    if (index < terrain.size())
+                    {
+                        heightField[x + y * sampleCount] = terrain[index];
+                    }
+                }
+            }
+
+            JPH::Ref<JPH::HeightFieldShapeSettings> settings =
+                new JPH::HeightFieldShapeSettings(heightField.data(), JPH::Vec3(-sampleCount / 2.0, 0, -sampleCount / 2.0), JPH::Vec3(1 / 3.0, 1, 1 / 3.0), sampleCount);
+            settings->mBlockSize     = 1 << sBlockSizeShift;
+            settings->mBitsPerSample = sBitsPerSample;
+            terrainCompound->AddShape(JPH::Vec3::sZero(), JPH::Quat::sIdentity(), settings);
+        }
+    }
+
+    // convert to left hand coordinate system with Z-up
+    JPH::Quat                                     rotation      = JPH::Quat::sEulerAngles(JPH::Vec3Arg(JPH::DegreesToRadians(90), JPH::DegreesToRadians(180), 0));
+    JPH::Ref<JPH::RotatedTranslatedShapeSettings> rotTransShape = new JPH::RotatedTranslatedShapeSettings(JPH::Vec3::sZero(), rotation, terrainCompound);
+    JPH::Ref<JPH::ScaledShapeSettings>            scaleShape    = new JPH::ScaledShapeSettings(rotTransShape, JPH::Vec3(-1, 1, 1));
+
+    JPH::Body* body = gBodyInterface->CreateBody(JPH::BodyCreationSettings(scaleShape, JPH::RVec3::sZero(), JPH::Quat::sIdentity(), JPH::EMotionType::Static, PhysicsLayers::NON_MOVING));
+    gBodyInterface->AddBody(body->GetID(), JPH::EActivation::DontActivate);
+    heightBodies.push_back(body);
 }
 
-void TerrainHeightMap::Clear()
+void TerrainBody::Clear()
 {
     gCellCliff.clear();
 
-    for (JPH::Body* cliffBody : cliffBodies)
+    for (JPH::Body* body : cliffBodies)
     {
-        gBodyInterface->RemoveBody(cliffBody->GetID());
+        gBodyInterface->RemoveBody(body->GetID());
     }
     cliffBodies.clear();
-    if (heightMapBody)
+
+    for (JPH::Body* body : heightBodies)
     {
-        gBodyInterface->RemoveBody(heightMapBody->GetID());
-        heightMapBody = nullptr;
+        gBodyInterface->RemoveBody(body->GetID());
     }
+    heightBodies.clear();
 }

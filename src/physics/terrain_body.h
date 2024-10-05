@@ -4,16 +4,16 @@
 
 class CellClass;
 
-class TerrainHeightMap
+class TerrainBody
 {
 public:
-    TerrainHeightMap();
-    ~TerrainHeightMap();
+    TerrainBody();
+    ~TerrainBody();
 
     void Rebuild();
     void Clear();
 
-    JPH::Body* heightMapBody;
+    std::vector<JPH::Body*> heightBodies;
     std::vector<JPH::Body*> cliffBodies;
 private:
     void CreateCellBody(CellClass* pCell);

@@ -2,7 +2,7 @@
 #include "physics/jolt/debug_renderer.h"
 #include "physics/layers.h"
 #include "physics/physics_component.h"
-#include "physics/terrain_height_map.h"
+#include "physics/terrain_body.h"
 #include "physics/yr_tools.h"
 #include "runtime/logger/logger.h"
 #include <Jolt/Core/JobSystemThreadPool.h>
@@ -249,7 +249,7 @@ XKEINEXT_API JPH::BroadPhaseLayerInterface* gBroadPhaseLayerInterface;
 XKEINEXT_API JPH::ObjectVsBroadPhaseLayerFilter* gObjectVsBroadPhaseLayerFilter;
 XKEINEXT_API JPH::ObjectLayerPairFilter* gObjectLayerPairFilter;
 
-XKEINEXT_API TerrainHeightMap* Physics::gTerrainHeightMap;
+XKEINEXT_API TerrainBody* Physics::gTerrainBody;
 
 static constexpr uint cNumBodies             = 10240;
 static constexpr uint cNumBodyMutexes        = 0; // Autodetect
@@ -311,7 +311,7 @@ void Physics::Destroy()
     gLogger->info("physics module destroyed.");
 }
 
-void Physics::InitWorld()
+void Physics::LoadWorld()
 {
     gPhysicsSystem = new JPH::PhysicsSystem();
     gPhysicsSystem->Init(cNumBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, *gBroadPhaseLayerInterface, *gObjectVsBroadPhaseLayerFilter, *gObjectLayerPairFilter);
@@ -322,16 +322,19 @@ void Physics::InitWorld()
 
     gContactListener = new ContactListenerImpl();
     gPhysicsSystem->SetContactListener(gContactListener);
+}
 
-    gTerrainHeightMap = new TerrainHeightMap();
-    gTerrainHeightMap->Rebuild();
+void Physics::EnterWorld()
+{
+    gTerrainBody = new TerrainBody();
+    gTerrainBody->Rebuild();
 
     gPhysicsSystem->OptimizeBroadPhase();
 }
 
-void Physics::DestroyWorld()
+void Physics::ExitWorld()
 {
-    delete gTerrainHeightMap;
+    delete gTerrainBody;
     delete gContactListener;
 
     gBodyInterface = nullptr;
@@ -409,7 +412,8 @@ void Physics::BeginTick()
 void Physics::EndTick() {}
 
 #include "yr/event/general_event.h"
-REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent, Physics::InitWorld);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent, Physics::DestroyWorld);
+REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneLoadEvent, Physics::LoadWorld);
+REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent, Physics::EnterWorld);
+REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent, Physics::ExitWorld);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, Physics::BeginTick);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, Physics::EndTick);

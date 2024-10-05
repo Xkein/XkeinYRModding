@@ -37,7 +37,7 @@ struct PhysicsTypeComponent final
     PROPERTY(IniField = "Physics.HalfExtent")
     Vector3D<float> halfExtent {0.5f, 0.5f, 0.5f};
 
-    std::shared_ptr<JPH::ShapeSettings> shapeSettings;
+    JPH::Ref<JPH::ShapeSettings> shapeSettings;
 };
 
 CLASS(ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass])

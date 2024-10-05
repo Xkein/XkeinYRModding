@@ -26,6 +26,7 @@
 #include <ThemeClass.h>
 
 #include <unordered_map>
+#include "runtime/logger/logger.h"
 
 template<typename T>
 using ExtMap = std::unordered_map<T*, entt::entity>;
@@ -51,6 +52,10 @@ inline void CreateEntity(T* pObject)
     entt::entity entity = gEntt->create();
     extMap[pObject]     = entity;
     gEntt->emplace<YrEntityComponent<T>>(entity, pObject);
+    //if constexpr (std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>)
+    //{
+    //    gLogger->info("api::CreateEntity: create entity ({} - {})", (void*)pObject, (int)pObject->WhatAmI());
+    //}
 }
 
 template<typename T>
@@ -74,6 +79,7 @@ inline void DestroyEntity(T* pObject)
         {
             cacheExtMap.erase(cacheIter);
         }
+        //gLogger->info("api::DestroyEntity: destroy entity ({} - {})", (void*)pObject, (int)pObject->WhatAmI());
     }
 }
 
@@ -198,7 +204,16 @@ YREXTCORE_API entt::entity api::GetEntity(AbstractClass* pObject)
     auto& extMap = GetExtMap<AbstractClass>();
     auto  iter   = extMap.find(pObject);
     if (iter != extMap.end())
-        return iter->second;
+    {
+        if (gEntt->valid(iter->second))
+        {
+            return iter->second;
+        }
+        else
+        {
+            //gLogger->error("api::GetEntity: invalid cache to ({} - {})! what happen???", (void*)pObject, (int)pObject->WhatAmI());
+        }
+    }
 
     entt::entity entity = get_entity_by_switch(pObject);
     extMap[pObject]     = entity; // maybe null
