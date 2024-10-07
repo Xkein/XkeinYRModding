@@ -17,7 +17,7 @@ enum class EPhysicShapeType : unsigned int {
     Cylinder,
 };
 
-CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass])
+CLASS(BindJs, IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass])
 struct PhysicsTypeComponent final
 {
     PROPERTY(IniField = "Physics.Enable")
@@ -40,7 +40,7 @@ struct PhysicsTypeComponent final
     JPH::Ref<JPH::ShapeSettings> shapeSettings;
 };
 
-CLASS(ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass])
+CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass])
 class PhysicsComponent final
 {
 public:
@@ -53,8 +53,10 @@ public:
     PhysicsComponent(PhysicsComponent&&) = default;
     ~PhysicsComponent();
 
-    AbstractClass* owner;
     JPH::Body* body;
+    PROPERTY()
+    AbstractClass* owner;
+    PROPERTY()
     PhysicsTypeComponent* type;
 private:
     static void CreatePhysicsComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);

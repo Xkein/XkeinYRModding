@@ -1,5 +1,5 @@
 #include "scripting/components/script_component.h"
-#include "scripting/javascript/yr_binding.h"
+#include "scripting/javascript/all_data_binding.h"
 #include "scripting/javascript/js_env.h"
 
 struct V8ObjectWrapper {

@@ -4,6 +4,8 @@
 #include <string>
 #include <functional>
 #include <GeneralStructures.h>
+#include <GeneralDefinitions.h>
+#include <FootClass.h>
 
 class AbstractTypeClass;
 class WarheadTypeClass;
@@ -20,8 +22,9 @@ struct ScriptTypeComponent final
     std::string jsScript;
 };
 
-#include "scripting/javascript/yr_data_bindings.h"
-#include <GeneralDefinitions.h>
+class PhysicsCollisionAddAndPersistResult;
+class PhysicsCollisionRemoveResult;
+
 CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, SuperClass, AnimClass, HouseClass])
 struct ScriptComponent final
 {
@@ -65,9 +68,14 @@ struct ScriptComponent final
     ScriptBehaviour<void(const CoordStruct&)> OnDetonate;
     PROPERTY()
     ScriptBehaviour<void(const CellStruct&, bool)> OnLaunch;
+    PROPERTY()
+    ScriptBehaviour<void(const PhysicsCollisionAddAndPersistResult&)> OnCollisionEnter;
+    PROPERTY()
+    ScriptBehaviour<void(const PhysicsCollisionAddAndPersistResult&)> OnCollisionPersist;
+    PROPERTY()
+    ScriptBehaviour<void(const PhysicsCollisionRemoveResult&)> OnCollisionExit;
 private:
     static void CreateScriptComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);
 
     AbstractClass* pYrObject;
 };
-UsingCppType(ScriptComponent);

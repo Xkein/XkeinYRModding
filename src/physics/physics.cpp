@@ -4,6 +4,7 @@
 #include "physics/physics_component.h"
 #include "physics/terrain_body.h"
 #include "physics/yr_tools.h"
+#include "physics/physics_collision.h"
 #include "runtime/logger/logger.h"
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -12,6 +13,8 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/RegisterTypes.h>
 #include <stdarg.h>
+
+// #define TRACE_COLLISION
 
 /// Class that determines if two object layers can collide
 class ObjectLayerPairFilterImpl : public JPH::ObjectLayerPairFilter
@@ -157,9 +160,9 @@ JPH::ValidateResult ContactListenerImpl::OnContactValidate(const JPH::Body& inBo
 
     JPH::RVec3 contact_point = inBaseOffset + inCollisionResult.mContactPointOn1;
     JPH::DebugRenderer::sInstance->DrawArrow(contact_point, contact_point - inCollisionResult.mPenetrationAxis.NormalizedOr(JPH::Vec3::sZero()), JPH::Color::sBlue, 0.05f);
-
+#ifdef TRACE_COLLISION
     JPH::Trace("Validate %u and %u result %d", inBody1.GetID().GetIndex(), inBody2.GetID().GetIndex(), (int)result);
-
+#endif
     return result;
 }
 
@@ -169,8 +172,9 @@ void ContactListenerImpl::OnContactAdded(const JPH::Body& inBody1, const JPH::Bo
     if (!(inBody1.GetID() < inBody2.GetID()))
         JPH_BREAKPOINT;
 
+#ifdef TRACE_COLLISION
     JPH::Trace("Contact added %u (%08x) and %u (%08x)", inBody1.GetID().GetIndex(), inManifold.mSubShapeID1.GetValue(), inBody2.GetID().GetIndex(), inManifold.mSubShapeID2.GetValue());
-
+#endif
     JPH::DebugRenderer::sInstance->DrawWirePolygon(JPH::RMat44::sTranslation(inManifold.mBaseOffset), inManifold.mRelativeContactPointsOn1, JPH::Color::sGreen, 0.05f);
     JPH::DebugRenderer::sInstance->DrawWirePolygon(JPH::RMat44::sTranslation(inManifold.mBaseOffset), inManifold.mRelativeContactPointsOn2, JPH::Color::sGreen, 0.05f);
     JPH::DebugRenderer::sInstance->DrawArrow(inManifold.GetWorldSpaceContactPointOn1(0), inManifold.GetWorldSpaceContactPointOn1(0) + inManifold.mWorldSpaceNormal, JPH::Color::sGreen, 0.05f);
@@ -182,6 +186,8 @@ void ContactListenerImpl::OnContactAdded(const JPH::Body& inBody1, const JPH::Bo
         if (mState.find(key) != mState.end())
             JPH_BREAKPOINT; // Added contact that already existed
         mState[key] = StatePair(inManifold.mBaseOffset, inManifold.mRelativeContactPointsOn1);
+
+        PhysicsCollision::OnContactAdded(inBody1, inBody2, inManifold, ioSettings);
     }
 
     if (mNext != nullptr)
@@ -194,8 +200,9 @@ void ContactListenerImpl::OnContactPersisted(const JPH::Body& inBody1, const JPH
     if (!(inBody1.GetID() < inBody2.GetID()))
         JPH_BREAKPOINT;
 
+#ifdef TRACE_COLLISION
     JPH::Trace("Contact persisted %u (%08x) and %u (%08x)", inBody1.GetID().GetIndex(), inManifold.mSubShapeID1.GetValue(), inBody2.GetID().GetIndex(), inManifold.mSubShapeID2.GetValue());
-
+#endif
     JPH::DebugRenderer::sInstance->DrawWirePolygon(JPH::RMat44::sTranslation(inManifold.mBaseOffset), inManifold.mRelativeContactPointsOn1, JPH::Color::sYellow, 0.05f);
     JPH::DebugRenderer::sInstance->DrawWirePolygon(JPH::RMat44::sTranslation(inManifold.mBaseOffset), inManifold.mRelativeContactPointsOn2, JPH::Color::sYellow, 0.05f);
     JPH::DebugRenderer::sInstance->DrawArrow(inManifold.GetWorldSpaceContactPointOn1(0), inManifold.GetWorldSpaceContactPointOn1(0) + inManifold.mWorldSpaceNormal, JPH::Color::sYellow, 0.05f);
@@ -209,6 +216,8 @@ void ContactListenerImpl::OnContactPersisted(const JPH::Body& inBody1, const JPH
             i->second = StatePair(inManifold.mBaseOffset, inManifold.mRelativeContactPointsOn1);
         else
             JPH_BREAKPOINT; // Persisted contact that didn't exist
+            
+        PhysicsCollision::OnContactPersisted(inBody1, inBody2, inManifold, ioSettings);
     }
 
     if (mNext != nullptr)
@@ -221,12 +230,13 @@ void ContactListenerImpl::OnContactRemoved(const JPH::SubShapeIDPair& inSubShape
     if (!(inSubShapePair.GetBody1ID() < inSubShapePair.GetBody2ID()))
         JPH_BREAKPOINT;
 
+#ifdef TRACE_COLLISION
     JPH::Trace("Contact removed %u (%08x) and %u (%08x)",
                inSubShapePair.GetBody1ID().GetIndex(),
                inSubShapePair.GetSubShapeID1().GetValue(),
                inSubShapePair.GetBody2ID().GetIndex(),
                inSubShapePair.GetSubShapeID2().GetValue());
-
+#endif
     // Update existing manifold in state map
     {
         std::lock_guard    lock(mStateMutex);
@@ -235,6 +245,8 @@ void ContactListenerImpl::OnContactRemoved(const JPH::SubShapeIDPair& inSubShape
             mState.erase(i);
         else
             JPH_BREAKPOINT; // Removed contact that didn't exist
+            
+        PhysicsCollision::OnContactRemoved(inSubShapePair);
     }
 
     if (mNext != nullptr)
@@ -244,6 +256,7 @@ void ContactListenerImpl::OnContactRemoved(const JPH::SubShapeIDPair& inSubShape
 XKEINEXT_API JPH::JobSystem* gJobSystem;
 XKEINEXT_API JPH::PhysicsSystem* gPhysicsSystem;
 XKEINEXT_API JPH::BodyInterface* gBodyInterface;
+XKEINEXT_API JPH::BodyInterface* mBodyInterfaceNoLock;
 XKEINEXT_API JPH::TempAllocator* gTempAllocator;
 XKEINEXT_API JPH::BroadPhaseLayerInterface* gBroadPhaseLayerInterface;
 XKEINEXT_API JPH::ObjectVsBroadPhaseLayerFilter* gObjectVsBroadPhaseLayerFilter;
@@ -319,6 +332,7 @@ void Physics::LoadWorld()
     gPhysicsSystem->SetGravity(JPH::Vec3(0, 0, -9.81f));
 
     gBodyInterface = &gPhysicsSystem->GetBodyInterface();
+    mBodyInterfaceNoLock = &gPhysicsSystem->GetBodyInterfaceNoLock();
 
     gContactListener = new ContactListenerImpl();
     gPhysicsSystem->SetContactListener(gContactListener);
@@ -338,6 +352,7 @@ void Physics::ExitWorld()
     delete gContactListener;
 
     gBodyInterface = nullptr;
+    mBodyInterfaceNoLock = nullptr;
     delete gPhysicsSystem;
 }
 

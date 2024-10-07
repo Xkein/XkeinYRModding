@@ -10,6 +10,7 @@ yr.createScriptTemplate = function (scriptName) {
     let scriptTemplate = scriptExports.ScriptClass
     scriptTemplate.__constructor__ = function (ScriptComponent, YrObject) {
         let inst = new scriptTemplate(YrObject)
+        YrObject.scriptInst = inst
         bindScriptComponent(ScriptComponent, inst, "OnDtor")
         bindScriptComponent(ScriptComponent, inst, "OnBeginUpdate")
         bindScriptComponent(ScriptComponent, inst, "OnEndUpdate")
@@ -17,6 +18,9 @@ yr.createScriptTemplate = function (scriptName) {
         bindScriptComponent(ScriptComponent, inst, "OnFire")
         bindScriptComponent(ScriptComponent, inst, "OnDetonate")
         bindScriptComponent(ScriptComponent, inst, "OnLaunch")
+        bindScriptComponent(ScriptComponent, inst, "OnCollisionEnter")
+        bindScriptComponent(ScriptComponent, inst, "OnCollisionPersist")
+        bindScriptComponent(ScriptComponent, inst, "OnCollisionExit")
     }
     return scriptTemplate
 }
