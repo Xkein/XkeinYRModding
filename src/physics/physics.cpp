@@ -256,7 +256,7 @@ void ContactListenerImpl::OnContactRemoved(const JPH::SubShapeIDPair& inSubShape
 XKEINEXT_API JPH::JobSystem* gJobSystem;
 XKEINEXT_API JPH::PhysicsSystem* gPhysicsSystem;
 XKEINEXT_API JPH::BodyInterface* gBodyInterface;
-XKEINEXT_API JPH::BodyInterface* mBodyInterfaceNoLock;
+XKEINEXT_API JPH::BodyInterface* gBodyInterfaceNoLock;
 XKEINEXT_API JPH::TempAllocator* gTempAllocator;
 XKEINEXT_API JPH::BroadPhaseLayerInterface* gBroadPhaseLayerInterface;
 XKEINEXT_API JPH::ObjectVsBroadPhaseLayerFilter* gObjectVsBroadPhaseLayerFilter;
@@ -332,7 +332,7 @@ void Physics::LoadWorld()
     gPhysicsSystem->SetGravity(JPH::Vec3(0, 0, -9.81f));
 
     gBodyInterface = &gPhysicsSystem->GetBodyInterface();
-    mBodyInterfaceNoLock = &gPhysicsSystem->GetBodyInterfaceNoLock();
+    gBodyInterfaceNoLock = &gPhysicsSystem->GetBodyInterfaceNoLock();
 
     gContactListener = new ContactListenerImpl();
     gPhysicsSystem->SetContactListener(gContactListener);
@@ -352,7 +352,7 @@ void Physics::ExitWorld()
     delete gContactListener;
 
     gBodyInterface = nullptr;
-    mBodyInterfaceNoLock = nullptr;
+    gBodyInterfaceNoLock = nullptr;
     delete gPhysicsSystem;
 }
 

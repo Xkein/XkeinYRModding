@@ -57,8 +57,8 @@ void PhysicsCollision::OnContactPersisted(const JPH::Body& inBody1, const JPH::B
 
 void PhysicsCollision::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
 {
-    PhysicsComponent* com1 = reinterpret_cast<PhysicsComponent*>(mBodyInterfaceNoLock->GetUserData(inSubShapePair.GetBody1ID()));
-    PhysicsComponent* com2 = reinterpret_cast<PhysicsComponent*>(mBodyInterfaceNoLock->GetUserData(inSubShapePair.GetBody2ID()));
+    PhysicsComponent* com1 = reinterpret_cast<PhysicsComponent*>(gBodyInterfaceNoLock->GetUserData(inSubShapePair.GetBody1ID()));
+    PhysicsComponent* com2 = reinterpret_cast<PhysicsComponent*>(gBodyInterfaceNoLock->GetUserData(inSubShapePair.GetBody2ID()));
 
     if (!com1 || !com2)
         return;

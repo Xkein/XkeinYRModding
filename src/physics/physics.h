@@ -21,7 +21,7 @@ public:
 extern XKEINEXT_API JPH::JobSystem*		                gJobSystem;
 extern XKEINEXT_API JPH::PhysicsSystem*	                gPhysicsSystem;
 extern XKEINEXT_API JPH::BodyInterface*	                gBodyInterface;
-extern XKEINEXT_API JPH::BodyInterface*	                mBodyInterfaceNoLock;
+extern XKEINEXT_API JPH::BodyInterface*	                gBodyInterfaceNoLock;
 extern XKEINEXT_API JPH::TempAllocator*                 gTempAllocator;
 extern XKEINEXT_API JPH::BroadPhaseLayerInterface*      gBroadPhaseLayerInterface;
 extern XKEINEXT_API JPH::ObjectVsBroadPhaseLayerFilter* gObjectVsBroadPhaseLayerFilter;
