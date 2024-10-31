@@ -4,6 +4,7 @@ add_requires("efsw")
 add_requires("spdlog")
 add_requires("stb")
 add_requires("cereal")
+add_requires("cppzmq")
 
 includes("3rdparty/YRpp.lua")
 includes("3rdparty/entt.lua")

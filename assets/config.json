@@ -6,6 +6,8 @@
     "assets_dir": "assets",
     "plugins_dir": "plugins",
     "log_level": 0,
+
+    "render_server_port": 9900,
     
     "enable_graphic_debug_layer": true,
     "debug_console": true,

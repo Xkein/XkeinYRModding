@@ -17,7 +17,7 @@ namespace detail
 struct IniComponentLoader
 {
     template<typename T>
-    static bool Load(IniReader& parser, const char* pSection, const char* pKey, T& value, bool allocate = false)
+    static bool Load(IniReader& parser, const char* pSection, const char* pKey, T& value)
     {
         bool hasLoader = false;
         bool success = false;
@@ -66,6 +66,43 @@ struct IniComponentLoader
         }
         IniReader reader {pIni};
         IniComponentLoader::Load(reader, pID, nullptr, *pCom);
+    }
+
+    static void Clear()
+    {
+
+    }
+
+    template<typename T>
+    static bool FindOrAlloc(IniReader& parser, const char* pSection, T& value)
+    {
+        bool hasLoader = false;
+        bool success = false;
+        if constexpr (IsParserImplemented<T>)
+        {
+            hasLoader = true;
+            success = parser.Read(pSection, pKey, value);
+        }
+        entt::meta_type type = entt::resolve<T>();
+        if (type)
+        {
+            entt::meta_func func = type.func("LoadIniComponent"_hs);
+            if (func)
+            {
+                hasLoader = true;
+                success = func.invoke(value, parser, pSection).cast<bool>();
+            }
+        }
+        if (success) {
+            if constexpr (detail::ini_component_has_after<T>) {
+                value.AfterLoadIni(parser, pSection, pKey);
+            }
+            return true;
+        }
+        if (!hasLoader) {
+            gLogger->error("could not load {} for [{}]->{}", typeid(T).name(), pSection, pKey);
+        }
+        return false;
     }
 };
 #endif

@@ -67,25 +67,8 @@ void PhysicsCollision::OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePai
     result.com1 = com1;
     result.com2 = com2;
 
-    ScriptComponent* script1 = nullptr;
-    ScriptComponent* script2 = nullptr;
-    if (com1->owner)
-    {
-        script1 = GetYrComponent<ScriptComponent>(com1->owner);
-    }
-    else
-    {
-        gLogger->error("com1 has no owner!");
-    }
-    if (com2->owner)
-    {
-        script2 = GetYrComponent<ScriptComponent>(com2->owner);
-    }
-    else
-    {
-        gLogger->error("com2 has no owner!");
-    }
-
+    ScriptComponent* script1 = GetYrComponent<ScriptComponent>(com1->owner);
+    ScriptComponent* script2 = GetYrComponent<ScriptComponent>(com2->owner);
     if (script1) {
         script1->Invoke(script1->OnCollisionExit, result);
     }
