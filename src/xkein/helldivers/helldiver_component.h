@@ -2,13 +2,33 @@
 
 #include "core/reflection/reflection.h"
 #include "yr/component/component.h"
+#include "yr/parse/ini_container.h"
 
 class AbstractTypeClass;
+
+CLASS(IniComponent)
+struct HelldiverStratagem
+{
+    static DefaultIniContainer<HelldiverStratagem>& GetIniContainer();
+
+    PROPERTY(IniField = "Sequence")
+    std::string_view sequence;
+    PROPERTY(IniField = "Shared")
+    bool shared {false};
+    
+};
 
 CLASS(IniComponent, ComponentTarget = [TechnoTypeClass])
 struct HelldiverTypeComponent final
 {
-    
+    PROPERTY(IniField = "Helldiver.Stratagems")
+    std::vector<HelldiverStratagem*> stratagems;
+
+};
+
+class HelldiverStratagemInst
+{
+
 };
 
 CLASS(ComponentTarget = [TechnoClass])
@@ -28,6 +48,7 @@ public:
 
     HelldiverTypeComponent* type;
     AbstractClass* owner;
+    std::vector<HelldiverStratagemInst*> stratagemInsts;
 private:
     static void CreateHelldiverComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);
 };

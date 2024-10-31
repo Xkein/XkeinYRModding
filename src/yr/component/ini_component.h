@@ -12,6 +12,11 @@ namespace detail
     concept ini_component_has_after = requires(Type& com, IniReader& parser, const char* pSection, const char* pKey) {
         com.AfterLoadIni(parser, pSection, pKey);
     };
+
+    template<typename Type>
+    concept ini_component_has_container = requires() {
+        Type::GetIniContainer();
+    };
 }
 
 struct IniComponentLoader
@@ -67,42 +72,39 @@ struct IniComponentLoader
         IniReader reader {pIni};
         IniComponentLoader::Load(reader, pID, nullptr, *pCom);
     }
-
-    static void Clear()
+    
+    template<typename T>
+    static bool Load(IniReader& parser, const char* pSection, const char* pKey, const T*& value)
     {
-
+        return Load(parser, pSection, const_cast<T*&>(value));
     }
 
-    template<typename T>
-    static bool FindOrAlloc(IniReader& parser, const char* pSection, T& value)
+    template<typename T, typename Enable = typename std::enable_if_t<detail::ini_component_has_container<T>>>
+    static bool Load(IniReader& parser, const char* pSection, const char* pKey, T*& value)
     {
-        bool hasLoader = false;
-        bool success = false;
-        if constexpr (IsParserImplemented<T>)
+        auto& container = T::GetIniContainer();
+
+        std::string_view name;
+        if(!Load(parser, pSection, pKey, name))
+            return false;
+
+        if (!name.empty())
         {
-            hasLoader = true;
-            success = parser.Read(pSection, pKey, value);
-        }
-        entt::meta_type type = entt::resolve<T>();
-        if (type)
-        {
-            entt::meta_func func = type.func("LoadIniComponent"_hs);
-            if (func)
+            bool allocated = false;
+            value = container.FindOrAllocate(name.data(), allocated);
+            if (allocated)
             {
-                hasLoader = true;
-                success = func.invoke(value, parser, pSection).cast<bool>();
+                Load(parser, name.data(), nullptr, *value);
             }
         }
-        if (success) {
-            if constexpr (detail::ini_component_has_after<T>) {
-                value.AfterLoadIni(parser, pSection, pKey);
-            }
-            return true;
-        }
-        if (!hasLoader) {
-            gLogger->error("could not load {} for [{}]->{}", typeid(T).name(), pSection, pKey);
-        }
-        return false;
+        return true;
+    }
+
+    template<typename T, typename Enable = typename std::enable_if_t<std::is_convertible<T*, const AbstractTypeClass*>::value>>
+    static bool Load(IniReader& parser, const char* pSection, const char* pKey, T*& value)
+    {
+
+        return true;
     }
 };
 #endif
