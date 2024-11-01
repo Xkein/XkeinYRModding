@@ -12,8 +12,9 @@ public:
     void Start();
     void Exit();
 
-    void OnScenarioStart();
-    void OnScenarioClear();
+    void OnSceneStart();
+    void OnSceneClear();
+    void OnSceneLoad();
 
     void OnBeginUpdate();
     void OnEndUpdate();

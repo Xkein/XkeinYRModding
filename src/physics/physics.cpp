@@ -425,10 +425,3 @@ void Physics::BeginTick()
 }
 
 void Physics::EndTick() {}
-
-#include "yr/event/general_event.h"
-REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneLoadEvent, Physics::LoadWorld);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent, Physics::EnterWorld);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent, Physics::ExitWorld);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, Physics::BeginTick);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, Physics::EndTick);

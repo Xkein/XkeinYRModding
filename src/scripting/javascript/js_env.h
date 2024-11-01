@@ -5,6 +5,7 @@
 #include <CppObjectMapper.h>
 #include <DataTransfer.h>
 #include <memory>
+#include <mutex>
 
 namespace PUERTS_NAMESPACE
 {
@@ -87,6 +88,7 @@ public:
 
     v8::Isolate* MainIsolate;
 
+    std::mutex mutex;
 private:
     bool LoadFile(const char* RequiringDir, const char* ModuleName, std::string& OutPath, std::string& OutDebugPath, std::vector<uint8>& Data, std::string& ErrInfo);
 

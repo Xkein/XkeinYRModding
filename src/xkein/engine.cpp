@@ -5,12 +5,15 @@
 #include "yr/extcore_config.h"
 #include "scripting/components/script_component.h"
 #include "scripting/javascript/js_env.h"
+#include "audio/audio.h"
+#include "physics/physics.h"
 #include <GameClasses.h>
 
 Engine* gEngine;
 
-DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent) { if(gEngine) gEngine->OnScenarioStart(); }
-DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent) { if(gEngine) gEngine->OnScenarioClear(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent) { if(gEngine) gEngine->OnSceneStart(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent) { if(gEngine) gEngine->OnSceneClear(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneLoadEvent) { if(gEngine) gEngine->OnSceneLoad(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent) { if(gEngine) gEngine->OnBeginUpdate(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent) { if(gEngine) gEngine->OnEndUpdate(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) { if(gEngine) gEngine->OnUIUpdate(); }
@@ -42,6 +45,10 @@ Engine::~Engine()
 void Engine::Start()
 {
     gLogger->info("Engine::Start()");
+
+    Physics::Init();
+    AudioSystem::Init();
+
     gJsEnv = new JsEnv();
 }
 
@@ -51,27 +58,42 @@ void Engine::Exit()
     ScriptComponent::OnJsEnvDestroy();
     delete gJsEnv;
     gJsEnv = nullptr;
+
+    Physics::Destroy();
+    AudioSystem::Destroy();
 }
 
-void Engine::OnScenarioStart()
+void Engine::OnSceneLoad()
 {
-    gLogger->info("Engine::OnScenarioStart()");
+    gLogger->info("Engine::OnSceneLoad()");
+    Physics::LoadWorld();
 }
 
-void Engine::OnScenarioClear()
+void Engine::OnSceneStart()
 {
-    gLogger->info("Engine::OnScenarioClear()");
+    gLogger->info("Engine::OnSceneStart()");
+    Physics::EnterWorld();
+    AudioSystem::InitWorld();
+}
+
+void Engine::OnSceneClear()
+{
+    gLogger->info("Engine::OnSceneClear()");
+    Physics::ExitWorld();
+    AudioSystem::DestroyWorld();
 }
 
 void Engine::OnBeginUpdate()
 {
     //gConsole->info("Engine::OnBeginUpdate()");
-    mutex.lock();
     CalDeltaTime();
+    gJsEnv->mutex.lock();
     for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
     {
         script.Invoke(script.OnBeginUpdate);
     }
+
+    Physics::BeginTick();
 }
 
 void Engine::OnEndUpdate()
@@ -82,12 +104,15 @@ void Engine::OnEndUpdate()
     {
         script.Invoke(script.OnEndUpdate);
     }
-    mutex.unlock();
+    gJsEnv->mutex.unlock();
+
+    Physics::EndTick();
+    AudioSystem::Tick();
 }
 
 void Engine::OnUIUpdate()
 {
-
+    AudioSystem::Tick();
 }
 
 void Engine::OnBeginRender()

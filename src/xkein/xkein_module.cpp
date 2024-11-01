@@ -2,7 +2,7 @@
 #include "codegen/XkeinExt.gen.h"
 #include "physics/physics.h"
 #include "audio/audio.h"
-#include "scripting/engine.h"
+#include "xkein/engine.h"
 
 #define REGISTER_JS_MODULE(Module) \
     extern void __JsRegister_##Module(); \
@@ -17,8 +17,6 @@ void YrXkeinModule::Startup()
     REGISTER_JS_MODULE(YrExtUI);
     REGISTER_JS_MODULE(XkeinExt);
 
-    Physics::Init();
-    AudioSystem::Init();
     gEngine = new Engine();
     gEngine->Start();
 }
@@ -29,9 +27,6 @@ void YrXkeinModule::Shutdown()
         delete gEngine;
         gEngine = nullptr;
     }
-
-    Physics::Destroy();
-    AudioSystem::Destroy();
 
     __Gen_Type_XkeinExt::Unregister();
 }

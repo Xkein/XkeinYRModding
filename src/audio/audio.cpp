@@ -375,10 +375,6 @@ WwiseSoundBank::~WwiseSoundBank()
 }
 
 #include "yr/yr_all_events.h"
-REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent, AudioSystem::InitWorld);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent, AudioSystem::DestroyWorld);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent, AudioSystem::Tick);
-REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, AudioSystem::Tick);
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent)
 {

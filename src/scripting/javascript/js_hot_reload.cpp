@@ -5,7 +5,6 @@
 #include "runtime/platform/path.h"
 #include "runtime/platform/file_helper.h"
 #include "runtime/logger/logger.h"
-#include "scripting/engine.h"
 #include <efsw/efsw.hpp>
 
 static std::shared_ptr<efsw::FileWatcher> fw;
@@ -51,7 +50,7 @@ class JsHotReloadListener : public efsw::FileWatchListener
         std::string     source;
         if (FileHelper::LoadFileToString(path.c_str(), source))
         {
-            std::lock_guard guard(gEngine->mutex);
+            std::lock_guard guard(gJsEnv->mutex);
             gJsEnv->ReloadModule(moduleName.c_str(), source.c_str());
         }
         else
