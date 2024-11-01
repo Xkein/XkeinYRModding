@@ -5,6 +5,8 @@
 #include "yr/parse/ini_container.h"
 
 class AbstractTypeClass;
+class SuperClass;
+class SuperWeaponTypeClass;
 
 CLASS(IniComponent)
 struct HelldiverStratagem
@@ -15,7 +17,8 @@ struct HelldiverStratagem
     std::string_view sequence;
     PROPERTY(IniField = "Shared")
     bool shared {false};
-    
+    PROPERTY(IniField = "SuperWeapon")
+    SuperWeaponTypeClass* swType;
 };
 
 CLASS(IniComponent, ComponentTarget = [TechnoTypeClass])
@@ -28,7 +31,7 @@ struct HelldiverTypeComponent final
 
 class HelldiverStratagemInst
 {
-
+    SuperClass* super;
 };
 
 CLASS(ComponentTarget = [TechnoClass])

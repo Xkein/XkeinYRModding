@@ -6,3 +6,12 @@ DefaultIniContainer<HelldiverStratagem>& HelldiverStratagem::GetIniContainer()
     return container;
 }
 
+HelldiverComponent::~HelldiverComponent()
+{
+
+}
+
+void HelldiverComponent::CreateHelldiverComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType)
+{
+
+}

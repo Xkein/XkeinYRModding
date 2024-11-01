@@ -17,6 +17,11 @@ namespace detail
     concept ini_component_has_container = requires() {
         Type::GetIniContainer();
     };
+    
+    template<typename Type>
+    concept ini_has_yr_find = requires() {
+        { Type::Find("") } -> std::convertible_to<Type*>;
+    };
 }
 
 struct IniComponentLoader
@@ -79,32 +84,46 @@ struct IniComponentLoader
         return Load(parser, pSection, const_cast<T*&>(value));
     }
 
-    template<typename T, typename Enable = typename std::enable_if_t<detail::ini_component_has_container<T>>>
+    template<typename T>
     static bool Load(IniReader& parser, const char* pSection, const char* pKey, T*& value)
     {
-        auto& container = T::GetIniContainer();
-
         std::string_view name;
         if(!Load(parser, pSection, pKey, name))
             return false;
 
-        if (!name.empty())
+        if (name.empty())
+            return true;
+
+        if constexpr (detail::ini_component_has_container<T>)
         {
+            auto& container = T::GetIniContainer();
+
             bool allocated = false;
-            value = container.FindOrAllocate(name.data(), allocated);
+            T* ptr = container.FindOrAllocate(name.data(), allocated);
+            if (!ptr)
+                return false;
+
+            value = ptr;
+
             if (allocated)
             {
                 Load(parser, name.data(), nullptr, *value);
             }
+
+            return true;
         }
-        return true;
-    }
-
-    template<typename T, typename Enable = typename std::enable_if_t<std::is_convertible<T*, const AbstractTypeClass*>::value>>
-    static bool Load(IniReader& parser, const char* pSection, const char* pKey, T*& value)
-    {
-
-        return true;
+        else if constexpr(detail::ini_has_yr_find<T>)
+        {
+            T* ptr = T::Find(name.data());
+            if (!ptr)
+                return false;
+            value = ptr;
+            
+            return true;
+        }
+        else {
+            static_assert(false, "could not load this pointer!");
+        }
     }
 };
 #endif

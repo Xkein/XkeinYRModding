@@ -24,6 +24,6 @@ public:
 
     void Clear()
     {
-        _list.clear();
+        _items.clear();
     }
 };
