@@ -44,16 +44,37 @@ target("YrExtCore")
     add_filegroups("YrExtCore", {rootdir = "src"})
     add_syslinks("DbgHelp")
 
-target("YrExtUI")
+target("XkeinExt")
     set_kind("shared")
     set_languages("cxxlatest")
     add_rules("codegen-cpp")
-    add_deps("YrExtCore", "imgui")
-    add_packages("stb")
-    add_syslinks("d3d11", "user32", "Comctl32")
+
+    add_deps("YrExtCore", "JoltPhysics", "wwise", "puerts")
+    add_packages("cppzmq", "stb")
+
+    add_headerfiles("src/audio/**.h", "src/physics/**.h", "src/render/**.h", "src/scripting/**.h")
+    add_files("src/audio/**.cpp", "src/physics/**.cpp", "src/render/**.cpp", "src/scripting/**.cpp")
+
+    add_headerfiles("src/xkein/**.h")
+    add_files("src/xkein/**.cpp")
+    -- editor
+    add_deps("imgui", "ImguiNodeEditor")
     add_headerfiles("src/ui/**.h")
     add_files("src/ui/**.cpp")
-    add_filegroups("YrExtUI", {rootdir = "src"})
+    add_syslinks("d3d11", "user32", "Comctl32")
+    -- wwise generated content
+    add_includedirs("content/yr_wwise_template/GeneratedSoundBanks", { public = true })
+
+    add_filegroups("XkeinExt", {rootdir = "src"})
+    
+target("XkeinEditor")
+    set_kind("shared")
+    set_languages("cxxlatest")
+    add_rules("codegen-cpp")
+    add_deps("YrExtCore", "XkeinExt")
+    add_headerfiles("src/editor/**.h")
+    add_files("src/editor/**.cpp")
+    add_filegroups("XkeinEditor", {rootdir = "src"})
 
 target("Scripts")
     set_kind("phony")
@@ -75,28 +96,6 @@ target("Scripts")
     end)
 target_end()
 
-target("XkeinExt")
-    set_kind("shared")
-    set_languages("cxxlatest")
-    add_rules("codegen-cpp")
-    add_deps("YrExtCore", "YrExtUI", "JoltPhysics", "wwise", "ImguiNodeEditor", "puerts")
-    add_packages("cppzmq")
-    add_headerfiles("src/audio/**.h", "src/physics/**.h", "src/render/**.h", "src/scripting/**.h")
-    add_files("src/audio/**.cpp", "src/physics/**.cpp", "src/render/**.cpp", "src/scripting/**.cpp")
-    add_headerfiles("src/xkein/**.h")
-    add_files("src/xkein/**.cpp")
-    add_includedirs("content/yr_wwise_template/GeneratedSoundBanks", { public = true })
-    add_filegroups("XkeinExt", {rootdir = "src"})
-    
-target("XkeinEditor")
-    set_kind("shared")
-    set_languages("cxxlatest")
-    add_rules("codegen-cpp")
-    add_deps("YrExtCore", "YrExtUI", "XkeinExt")
-    add_headerfiles("src/editor/**.h")
-    add_files("src/editor/**.cpp")
-    add_filegroups("XkeinEditor", {rootdir = "src"})
-
 target("make_artifacts")
     set_kind("phony")
     add_deps("Scripts", "XkeinExt", "XkeinEditor")
@@ -112,7 +111,6 @@ target("make_artifacts")
             [build_dir.."/YrExtCore.dll"] = output_dir.."/YrExtCore.dll",
             [build_dir.."/imgui.dll"] = output_dir.."/plugins/imgui.dll",
             [build_dir.."/ImguiNodeEditor.dll"] = output_dir.."/plugins/ImguiNodeEditor.dll",
-            [build_dir.."/YrExtUI.dll"] = output_dir.."/plugins/YrExtUI.dll",
             [build_dir.."/JoltPhysics.dll"] = output_dir.."/plugins/JoltPhysics.dll",
             [build_dir.."/XkeinEditor.dll"] = output_dir.."/plugins/XkeinEditor.dll",
             [build_dir.."/XkeinExt.dll"] = output_dir.."/plugins/XkeinExt.dll",

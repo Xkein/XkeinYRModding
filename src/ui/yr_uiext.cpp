@@ -77,10 +77,13 @@ struct ImGuiThread
 
 std::unique_ptr<ImGuiThread> imguiThread;
 
-void UIMainThread()
+void YrExtUIModule::UIMainThread()
 {
     if (!imguiThread)
         return;
+    if (!ImGui::GetCurrentContext())
+        return;
+    ImGui::GetIO().MouseDrawCursor = true;
     if (YrImGui::gWindows.size() > 0)
     {
         isMainThread = true;
@@ -91,29 +94,6 @@ void UIMainThread()
         YrImGui::Render();
         isMainThread = false;
     }
-}
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) {
-    if (!ImGui::GetCurrentContext())
-        return;
-    ImGui::GetIO().MouseDrawCursor = false;
-    UIMainThread();
-}
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent) {
-}
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent) {
-    if (!ImGui::GetCurrentContext())
-        return;
-    ImGui::GetIO().MouseDrawCursor = true;
-    UIMainThread();
-}
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent) {
-}
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent) {
 }
 
 void YrExtUIModule::Startup()

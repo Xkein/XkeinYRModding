@@ -315,7 +315,7 @@ int YrImGui::GetTextureHeight(ImTextureID texture)
     return m_Renderer->GetTextureHeight(texture);
 }
 
-YREXTUI_API std::vector<YrImGuiWindow*> YrImGui::gWindows;
+XKEINEXT_API std::vector<YrImGuiWindow*> YrImGui::gWindows;
 int                                     gOpenedWindowCount = 0;
 
 class YrImGuiWindow_Impl

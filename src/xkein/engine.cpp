@@ -7,6 +7,7 @@
 #include "scripting/javascript/js_env.h"
 #include "audio/audio.h"
 #include "physics/physics.h"
+#include "ui/yr_uiext.h"
 #include <GameClasses.h>
 
 Engine* gEngine;
@@ -29,8 +30,6 @@ static void JsUpdate()
         gJsEnv->LogicTick();
     }
 }
-
-REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, JsUpdate)
 
 Engine::Engine()
 {
@@ -108,11 +107,16 @@ void Engine::OnEndUpdate()
 
     Physics::EndTick();
     AudioSystem::Tick();
+
+    YrExtUIModule::UIMainThread();
 }
 
 void Engine::OnUIUpdate()
 {
+    JsUpdate();
     AudioSystem::Tick();
+    
+    YrExtUIModule::UIMainThread();
 }
 
 void Engine::OnBeginRender()

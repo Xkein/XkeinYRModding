@@ -14,7 +14,6 @@ void YrXkeinModule::Startup()
 
     REGISTER_JS_MODULE(YRpp);
     REGISTER_JS_MODULE(YrExtCore);
-    REGISTER_JS_MODULE(YrExtUI);
     REGISTER_JS_MODULE(XkeinExt);
 
     gEngine = new Engine();
