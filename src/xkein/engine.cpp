@@ -22,15 +22,6 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) { if(gEngine) gEngine->OnUIUpdate
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent) { if(gEngine) gEngine->OnBeginRender(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent) { if(gEngine) gEngine->OnEndRender(); }
 
-static void JsUpdate()
-{
-    if (gJsEnv)
-    {
-        gJsEnv->InspectorTick();
-        gJsEnv->LogicTick();
-    }
-}
-
 Engine::Engine()
 {
 
@@ -82,14 +73,27 @@ void Engine::OnSceneClear()
     AudioSystem::DestroyWorld();
 }
 
+static void JsUpdate()
+{
+    if (gJsEnv)
+    {
+        gJsEnv->InspectorTick();
+        gJsEnv->LogicTick();
+    }
+}
+
 void Engine::OnBeginUpdate()
 {
     //gConsole->info("Engine::OnBeginUpdate()");
     CalDeltaTime();
-    gJsEnv->mutex.lock();
-    for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
+    
+    if (gJsEnv)
     {
-        script.Invoke(script.OnBeginUpdate);
+        gJsEnv->mutex.lock();
+        for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
+        {
+            script.Invoke(script.OnBeginUpdate);
+        }
     }
 
     Physics::BeginTick();
@@ -99,11 +103,14 @@ void Engine::OnEndUpdate()
 {
     JsUpdate();
 
-    for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
+    if (gJsEnv)
     {
-        script.Invoke(script.OnEndUpdate);
+        for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
+        {
+            script.Invoke(script.OnEndUpdate);
+        }
+        gJsEnv->mutex.unlock();
     }
-    gJsEnv->mutex.unlock();
 
     Physics::EndTick();
     AudioSystem::Tick();

@@ -3,6 +3,8 @@
 #include "yr/yr_event.h"
 
 struct IStream;
+class CCINIClass;
+class RulesClass;
 
 // ======================= logic =======================
 
@@ -30,6 +32,29 @@ class YrSceneEnterEvent { };
 
 CLASS(HookEvent)
 class YrSceneExitEvent { };
+
+// ======================= load ini =======================
+
+CLASS(HookEvent)
+class YrRulesLoadBeforeGeneralData {
+public:
+    RulesClass* pRules;
+    CCINIClass* pIni;
+};
+
+CLASS(HookEvent)
+class YrRulesLoadBeforeTypeData {
+public:
+    RulesClass* pRules;
+    CCINIClass* pIni;
+};
+
+CLASS(HookEvent)
+class YrRulesLoadAfterTypeData {
+public:
+    RulesClass* pRules;
+    CCINIClass* pIni;
+};
 
 // ======================= save game =======================
 

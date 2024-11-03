@@ -10,6 +10,7 @@
 component_target_list = get_derived_classes_by_list(get_meta_list(meta, "ComponentTarget"))
 has_component_target = array.size(component_target_list) > 0
 is_ini_component = get_meta_tag(meta, "IniComponent")
+is_ini_auto_load = get_meta_tag(meta, "IniAutoLoad")
 is_ini_component_techno = is_ini_component && array_contains_any_of(component_target_list, ["AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"])
 is_ini_component_terrain = is_ini_component && array.contains(component_target_list, "TerrainTypeClass")
 is_ini_component_bullet = is_ini_component && array.contains(component_target_list, "BulletTypeClass")
@@ -25,7 +26,10 @@ func user_gen_meta_class(htClass)
         $result = append_line($result, $'ComponentInstantiation::RegisterComponentInstantiation<{type_name}, {target_type}>();')
     end
     if is_ini_component
-        $result = append_line($result, $'IniComponentLoader::Register<{type_name}, &LoadIni_{type_name}>(factory);')
+        $result = append_line($result, $'IniComponentLoader::RegisterLoader<{type_name}, &LoadIni_{type_name}>(factory);')
+    end
+    if is_ini_auto_load
+        $result = append_line($result, $'IniComponentLoader::RegisterAutoLoad<{type_name}>(factory);')
     end
     ret $result
 end }}

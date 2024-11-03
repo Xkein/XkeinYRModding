@@ -2,24 +2,10 @@
 
 #include "core/reflection/reflection.h"
 #include "yr/component/component.h"
-#include "yr/parse/ini_container.h"
+#include "xkein/helldivers/helldiver_stratagem.h"
 
+class TechnoClass;
 class AbstractTypeClass;
-class SuperClass;
-class SuperWeaponTypeClass;
-
-CLASS(IniComponent)
-struct HelldiverStratagem
-{
-    static DefaultIniContainer<HelldiverStratagem>& GetIniContainer();
-
-    PROPERTY(IniField = "Sequence")
-    std::string_view sequence;
-    PROPERTY(IniField = "Shared")
-    bool shared {false};
-    PROPERTY(IniField = "SuperWeapon")
-    SuperWeaponTypeClass* swType;
-};
 
 CLASS(IniComponent, ComponentTarget = [TechnoTypeClass])
 struct HelldiverTypeComponent final
@@ -27,11 +13,6 @@ struct HelldiverTypeComponent final
     PROPERTY(IniField = "Helldiver.Stratagems")
     std::vector<HelldiverStratagem*> stratagems;
 
-};
-
-class HelldiverStratagemInst
-{
-    SuperClass* super;
 };
 
 CLASS(ComponentTarget = [TechnoClass])
@@ -47,10 +28,8 @@ public:
     HelldiverComponent(HelldiverComponent&&) = default;
     ~HelldiverComponent();
 
-    void Tick();
-
     HelldiverTypeComponent* type;
-    AbstractClass* owner;
+    TechnoClass* owner;
     std::vector<HelldiverStratagemInst*> stratagemInsts;
 private:
     static void CreateHelldiverComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);

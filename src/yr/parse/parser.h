@@ -25,6 +25,15 @@ namespace detail
             std::declval<Parser<T>>().Read("", a)
         } -> std::same_as<bool>;
     };
+    
+    template<typename Type>
+    concept parser_has_find = requires() {
+        { Type::Find("") } -> std::convertible_to<Type*>;
+    };
+    template<typename Type>
+    concept parser_has_find_or_allocate = requires() {
+        { Type::FindOrAllocate("") } -> std::convertible_to<Type*>;
+    };
 
 } // namespace detail
 
@@ -47,7 +56,7 @@ struct Parser : private ::detail::Parser<T>
         }
         else
         {
-            gLogger->error("parser not implement");
+            gLogger->error("Parser<{}> not implement", typeid(T).name());
             return false;
         }
     }
@@ -76,7 +85,7 @@ namespace detail
     struct ParserHelper
     {
         template<typename T>
-        static bool Read(std::string_view str, T* result, size_t size)
+        static bool ReadArray(std::string_view str, T* result, size_t size)
         {
             auto view = std::ranges::split_view(str, ',');
             int  idx  = 0;
@@ -117,7 +126,7 @@ namespace detail
             entt::meta_type type = entt::resolve<T>();
             if (!type)
             {
-                gLogger->error("could not parse enum {} because no meta", typeid(T).name());
+                gLogger->error("could not parse enum {}: no meta!", typeid(T).name());
                 return false;
             }
             for (auto&& [id, data] : type.data())
@@ -195,7 +204,7 @@ namespace detail
         using data_type = T[Size];
         static bool Read(std::string_view str, data_type& result)
         {
-            return ParserHelper::Read(str, result, Size);
+            return ParserHelper::ReadArray(str, result, Size);
         }
     };
 
@@ -221,9 +230,61 @@ namespace detail
         {
             int count = std::count(str.begin(), str.end(), ',') + 1;
             result.resize(count);
-            return ParserHelper::Read(str, result.data(), count);
+            return ParserHelper::ReadArray(str, result.data(), count);
         }
     };
+
+    // yr parsers
+    template<typename T>
+    struct Parser<T*>
+    {
+        static bool Read(std::string_view str, T*& result)
+        {
+            T* ptr = nullptr;
+            if constexpr(detail::parser_has_find_or_allocate<T>)
+            {
+                ptr = T::FindOrAllocate(str.data());
+            }
+            else if constexpr(detail::parser_has_find<T>)
+            {
+                ptr = T::Find(str.data());
+            }
+            else
+            {
+                entt::meta_type type = entt::resolve<T>();
+                if (type) {
+                    entt::meta_func func = type.func("__FindOrAllocate"_hs);
+                    if (func)
+                    {
+                        ptr = func.invoke({}, str.data()).cast<T*>();
+                    }
+                    else {
+                        gLogger->error("could not parse {}: it is not auto load!", typeid(T).name());
+                        return false;
+                    }
+                }
+                else {
+                    gLogger->error("could not parse {}: no meta!", typeid(T).name());
+                    return false;
+                }
+            }
+            
+            if (!ptr)
+                return false;
+            result = ptr;
+            return true;
+        }
+    };
+    
+    template<typename T>
+    struct Parser<const T*>
+    {
+        static bool Read(std::string_view str, const T*& result)
+        {
+            return detail::Parser<T*>::Read(str, const_cast<T*&>(result));
+        }
+    };
+
 
     template<typename T>
     struct Parser<Vector2D<T>>
@@ -231,7 +292,7 @@ namespace detail
         using data_type = Vector2D<T>;
         static bool Read(std::string_view str, data_type& result)
         {
-            return ParserHelper::Read(str, reinterpret_cast<T*>(&result.X), 2);
+            return ParserHelper::ReadArray(str, reinterpret_cast<T*>(&result.X), 2);
         }
     };
 
@@ -241,7 +302,7 @@ namespace detail
         using data_type = Vector3D<T>;
         static bool Read(std::string_view str, data_type& result)
         {
-            return ParserHelper::Read(str, reinterpret_cast<T*>(&result.X), 3);
+            return ParserHelper::ReadArray(str, reinterpret_cast<T*>(&result.X), 3);
         }
     };
 
@@ -251,7 +312,7 @@ namespace detail
         using data_type = Vector3D<T>;
         static bool Read(std::string_view str, data_type& result)
         {
-            return ParserHelper::Read(str, reinterpret_cast<T*>(&result.X), 4);
+            return ParserHelper::ReadArray(str, reinterpret_cast<T*>(&result.X), 4);
         }
     };
 
@@ -271,7 +332,7 @@ namespace detail
         using data_type = ColorStruct;
         static bool Read(std::string_view str, data_type& result)
         {
-            return ParserHelper::Read(str, reinterpret_cast<BYTE*>(&result.R), 3);
+            return ParserHelper::ReadArray(str, reinterpret_cast<BYTE*>(&result.R), 3);
         }
     };
 
@@ -281,7 +342,7 @@ namespace detail
         using data_type = RectangleStruct;
         static bool Read(std::string_view str, data_type& result)
         {
-            return ParserHelper::Read(str, reinterpret_cast<int*>(&result.X), 4);
+            return ParserHelper::ReadArray(str, reinterpret_cast<int*>(&result.X), 4);
         }
     };
 
@@ -291,7 +352,7 @@ namespace detail
         using data_type = RandomStruct;
         static bool Read(std::string_view str, data_type& result)
         {
-            return ParserHelper::Read(str, reinterpret_cast<int*>(&result.Min), 2);
+            return ParserHelper::ReadArray(str, reinterpret_cast<int*>(&result.Min), 2);
         }
     };
 } // namespace detail

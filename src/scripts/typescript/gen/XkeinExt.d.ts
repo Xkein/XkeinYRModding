@@ -34,6 +34,8 @@ class ScriptComponent
     m_OnDtor : any;
     m_OnBeginUpdate : any;
     m_OnEndUpdate : any;
+    m_OnSave : any;
+    m_OnLoad : any;
     m_OnReceiveDamage : any;
     m_OnFire : any;
     m_OnDetonate : any;

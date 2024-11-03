@@ -61,13 +61,27 @@ struct ScriptComponent final
     PROPERTY()
     ScriptBehaviour<void()> OnEndUpdate;
     PROPERTY()
+    ScriptBehaviour<void()> OnSave;
+    PROPERTY()
+    ScriptBehaviour<void()> OnLoad;
+
+    // object bindings
+    PROPERTY()
     ScriptBehaviour<std::optional<DamageState>(int*, int, WarheadTypeClass* pWH, ObjectClass*, bool, bool, HouseClass*)> OnReceiveDamage;
+
+    // techno bindings
     PROPERTY()
     ScriptBehaviour<std::optional<BulletClass*>(AbstractClass*, int)> OnFire;
+
+    // bullet bindings
     PROPERTY()
     ScriptBehaviour<void(const CoordStruct&)> OnDetonate;
+
+    // super weapon bindings
     PROPERTY()
     ScriptBehaviour<void(const CellStruct&, bool)> OnLaunch;
+
+    // physics bindings
     PROPERTY()
     ScriptBehaviour<void(const PhysicsCollisionAddAndPersistResult&)> OnCollisionEnter;
     PROPERTY()

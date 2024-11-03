@@ -12,16 +12,6 @@ namespace detail
     concept ini_component_has_after = requires(Type& com, IniReader& parser, const char* pSection, const char* pKey) {
         com.AfterLoadIni(parser, pSection, pKey);
     };
-
-    template<typename Type>
-    concept ini_component_has_container = requires() {
-        Type::GetIniContainer();
-    };
-    
-    template<typename Type>
-    concept ini_has_yr_find = requires() {
-        { Type::Find("") } -> std::convertible_to<Type*>;
-    };
 }
 
 struct IniComponentLoader
@@ -39,7 +29,7 @@ struct IniComponentLoader
         entt::meta_type type = entt::resolve<T>();
         if (type)
         {
-            entt::meta_func func = type.func("LoadIniComponent"_hs);
+            entt::meta_func func = type.func("__LoadIniComponent"_hs);
             if (func)
             {
                 hasLoader = true;
@@ -59,9 +49,40 @@ struct IniComponentLoader
     }
 
     template<typename Type, bool (*Func)(Type&, IniReader&, const char*)>
-    static void Register(entt::meta_factory<Type>& factory)
+    static void RegisterLoader(entt::meta_factory<Type>& factory)
     {
-        factory.func<Func>("LoadIniComponent"_hs).prop("name"_hs, "LoadIniComponent");
+        factory.func<Func>("__LoadIniComponent"_hs).prop("name"_hs, "__LoadIniComponent");
+    }
+
+    template<typename Type>
+    static void RegisterAutoLoad(entt::meta_factory<Type>& factory)
+    {
+        static std::map<std::string, std::unique_ptr<Type>> items;
+        struct AutoLoad {
+            static void LoadAll(IniReader& reader) {
+                for (auto&& [name, ptr] : items)
+                {
+                    IniComponentLoader::Load(reader, name.c_str(), nullptr, *ptr);
+                }
+            }
+            static void Clear() {
+                items.clear();
+            }
+            static Type* FindOrAllocate(const char* name) {
+                auto iter = items.find(name);
+                if (iter != items.end()) {
+                    return iter->second.get();
+                }
+
+                IniComponentLoader::RegisterLoadAllCallback(&items, &LoadAll, &Clear);
+
+                auto& ptr = items[name];
+                ptr = std::make_unique<Type>();
+                return ptr.get();
+            }
+        };
+
+        factory.func<&AutoLoad::FindOrAllocate>("__FindOrAllocate"_hs).prop("name"_hs, "__FindOrAllocate");
     }
 
     template<typename Type, typename TargetType>
@@ -77,53 +98,7 @@ struct IniComponentLoader
         IniReader reader {pIni};
         IniComponentLoader::Load(reader, pID, nullptr, *pCom);
     }
-    
-    template<typename T>
-    static bool Load(IniReader& parser, const char* pSection, const char* pKey, const T*& value)
-    {
-        return Load(parser, pSection, const_cast<T*&>(value));
-    }
-
-    template<typename T>
-    static bool Load(IniReader& parser, const char* pSection, const char* pKey, T*& value)
-    {
-        std::string_view name;
-        if(!Load(parser, pSection, pKey, name))
-            return false;
-
-        if (name.empty())
-            return true;
-
-        if constexpr (detail::ini_component_has_container<T>)
-        {
-            auto& container = T::GetIniContainer();
-
-            bool allocated = false;
-            T* ptr = container.FindOrAllocate(name.data(), allocated);
-            if (!ptr)
-                return false;
-
-            value = ptr;
-
-            if (allocated)
-            {
-                Load(parser, name.data(), nullptr, *value);
-            }
-
-            return true;
-        }
-        else if constexpr(detail::ini_has_yr_find<T>)
-        {
-            T* ptr = T::Find(name.data());
-            if (!ptr)
-                return false;
-            value = ptr;
-            
-            return true;
-        }
-        else {
-            static_assert(false, "could not load this pointer!");
-        }
-    }
+private:
+    YREXTCORE_API static void RegisterLoadAllCallback(void* id, std::function<void(IniReader&)> load, std::function<void()> clear);
 };
 #endif
