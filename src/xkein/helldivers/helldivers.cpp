@@ -69,10 +69,10 @@ void Helldivers::Tick()
         {
             HelldiverStratagem* stratagem = inst->type;
             std::wstring str = stratagem->swType->UIName;
-            Point2D endPos { 0,0 };
+
             int color = inst->super->IsReady ? Drawing::RGB_To_Int(0, 0, 255) : Drawing::RGB_To_Int(255, 0, 0);
-            Fancy_Text_Print_Wide(endPos, stratagem->swType->UIName, surface, rect, pos, color, 0, TextPrintType::NoShadow);
-            pos.Y = endPos.Y;
+            surface->DrawText(str.c_str(), &pos, color);
+            pos.Y += Drawing::GetTextDimensions(str.c_str(), { 0,0 }, 0).Height;
 
             int idx = 0;
             str.clear();
@@ -81,8 +81,8 @@ void Helldivers::Tick()
                 idx++;
             }
             color = Drawing::RGB_To_Int(255, 0, 0);
-            Fancy_Text_Print_Wide(endPos, str.c_str(), surface, rect, pos, color, 0, TextPrintType::NoShadow);
-            pos.X = endPos.X;
+            surface->DrawText(str.c_str(), &pos, color);
+            pos.X += Drawing::GetTextDimensions(str.c_str(), { 0,0 }, 0).Width;
 
             str.clear();
             while(idx < stratagem->sequence.size()) {
@@ -90,8 +90,8 @@ void Helldivers::Tick()
                 idx++;
             }
             color = Drawing::RGB_To_Int(0, 255, 0);
-            Fancy_Text_Print_Wide(endPos, str.c_str(), surface, rect, pos, color, 0, TextPrintType::NoShadow);
-            pos.Y = endPos.Y;
+            surface->DrawText(str.c_str(), &pos, color);
+            pos.Y += Drawing::GetTextDimensions(str.c_str(), { 0,0 }, 0).Height;
         }
     }
 }
