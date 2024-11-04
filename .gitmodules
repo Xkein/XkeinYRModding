@@ -25,3 +25,6 @@
 [submodule "content/yr_wwise_template"]
 	path = content/yr_wwise_template
 	url = https://github.com/Xkein/yr_wwise_template.git
+[submodule "3rdparty/gainput"]
+	path = 3rdparty/gainput
+	url = https://github.com/jkuhlmann/gainput.git

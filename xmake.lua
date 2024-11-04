@@ -49,11 +49,11 @@ target("XkeinExt")
     set_languages("cxxlatest")
     add_rules("codegen-cpp")
 
-    add_deps("YrExtCore", "JoltPhysics", "wwise", "puerts")
+    add_deps("YrExtCore", "JoltPhysics", "wwise", "puerts", "gainput")
     add_packages("cppzmq", "stb")
 
-    add_headerfiles("src/audio/**.h", "src/physics/**.h", "src/render/**.h", "src/scripting/**.h")
-    add_files("src/audio/**.cpp", "src/physics/**.cpp", "src/render/**.cpp", "src/scripting/**.cpp")
+    add_headerfiles("src/audio/**.h", "src/physics/**.h", "src/render/**.h", "src/scripting/**.h", "src/input/**.h")
+    add_files("src/audio/**.cpp", "src/physics/**.cpp", "src/render/**.cpp", "src/scripting/**.cpp", "src/input/**.cpp")
 
     add_headerfiles("src/xkein/**.h")
     add_files("src/xkein/**.cpp")
@@ -112,6 +112,7 @@ target("make_artifacts")
             [build_dir.."/imgui.dll"] = output_dir.."/plugins/imgui.dll",
             [build_dir.."/ImguiNodeEditor.dll"] = output_dir.."/plugins/ImguiNodeEditor.dll",
             [build_dir.."/JoltPhysics.dll"] = output_dir.."/plugins/JoltPhysics.dll",
+            [build_dir.."/gainput.dll"] = output_dir.."/plugins/gainput.dll",
             [build_dir.."/XkeinEditor.dll"] = output_dir.."/plugins/XkeinEditor.dll",
             [build_dir.."/XkeinExt.dll"] = output_dir.."/plugins/XkeinExt.dll",
         }

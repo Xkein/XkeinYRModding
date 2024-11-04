@@ -8,6 +8,7 @@
 #include "audio/audio.h"
 #include "physics/physics.h"
 #include "ui/yr_uiext.h"
+#include "input/input.h"
 #include <GameClasses.h>
 
 Engine* gEngine;
@@ -21,6 +22,13 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) { if(gEngine) gEngine->OnUIUpdate
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent) { if(gEngine) gEngine->OnBeginRender(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent) { if(gEngine) gEngine->OnEndRender(); }
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrMainWndProcEvent) {
+    if (Input::gManager) {
+        MSG msg { E->hWnd, E->uMsg, E->wParam, E->lParam };
+        Input::gManager->HandleMessage(msg);
+    }
+}
 
 Engine::Engine()
 {
@@ -38,6 +46,7 @@ void Engine::Start()
 
     Physics::Init();
     AudioSystem::Init();
+    Input::Init();
 
     gJsEnv = new JsEnv();
 }
@@ -51,6 +60,7 @@ void Engine::Exit()
 
     Physics::Destroy();
     AudioSystem::Destroy();
+    Input::Destroy();
 }
 
 void Engine::OnSceneLoad()
@@ -86,6 +96,8 @@ void Engine::OnBeginUpdate()
 {
     //gConsole->info("Engine::OnBeginUpdate()");
     CalDeltaTime();
+
+    Input::Tick();
     
     if (gJsEnv)
     {
@@ -120,6 +132,8 @@ void Engine::OnEndUpdate()
 
 void Engine::OnUIUpdate()
 {
+    Input::Tick();
+
     JsUpdate();
     AudioSystem::Tick();
     

@@ -1,6 +1,7 @@
 #include "xkein/helldivers/helldivers.h"
 #include "xkein/helldivers/helldiver_component.h"
 #include "xkein/helldivers/helldiver_stratagem.h"
+#include "input/input.h"
 
 #include <FootClass.h>
 #include <SuperClass.h>
@@ -10,6 +11,12 @@
 
 std::string gInputSequence;
 std::vector<std::unique_ptr<HelldiverStratagemInst>> gInsts;
+
+enum HelldiverButtons
+{
+    Activate = 1111,
+    Up, Down, Left, Right
+};
 
 void Helldivers::Tick()
 {
@@ -28,18 +35,18 @@ void Helldivers::Tick()
         }
     }
 
-    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+    if (Input::gMap->GetBool(HelldiverButtons::Activate))
     {
-        if (ImGui::IsKeyReleased(ImGuiKey::ImGuiKey_W)) {
+        if (Input::gMap->GetBoolIsNew(HelldiverButtons::Up)) {
             gInputSequence.push_back('W');
         }
-        else if (ImGui::IsKeyReleased(ImGuiKey::ImGuiKey_S)) {
+        else if (Input::gMap->GetBoolIsNew(HelldiverButtons::Down)) {
             gInputSequence.push_back('S');
         }
-        else if (ImGui::IsKeyReleased(ImGuiKey::ImGuiKey_A)) {
+        else if (Input::gMap->GetBoolIsNew(HelldiverButtons::Left)) {
             gInputSequence.push_back('A');
         }
-        else if (ImGui::IsKeyReleased(ImGuiKey::ImGuiKey_D)) {
+        else if (Input::gMap->GetBoolIsNew(HelldiverButtons::Right)) {
             gInputSequence.push_back('D');
         }
     }
@@ -58,7 +65,7 @@ void Helldivers::Tick()
     }
     
     // render ui
-    if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl))
+    if (Input::gMap->GetBool(HelldiverButtons::Activate))
     {
         DSurface* surface = DSurface::Primary;
         RectangleStruct rect = { 0, 0, 0, 0 };
@@ -112,10 +119,16 @@ void Helldivers::ReturnStratagem(HelldiverStratagemInst* inst)
     std::erase_if(gInsts, [=](auto& ptr) { return ptr.get() == inst; });
 }
 
-
+static bool inited = false;
 void Helldivers::Init()
 {
-
+    if (!inited) {
+        Input::gMap->MapBool(HelldiverButtons::Activate, Input::gKeyboardId, gainput::KeyCtrlL);
+        Input::gMap->MapBool(HelldiverButtons::Up, Input::gKeyboardId, gainput::KeyW);
+        Input::gMap->MapBool(HelldiverButtons::Down, Input::gKeyboardId, gainput::KeyS);
+        Input::gMap->MapBool(HelldiverButtons::Left, Input::gKeyboardId, gainput::KeyA);
+        Input::gMap->MapBool(HelldiverButtons::Right, Input::gKeyboardId, gainput::KeyD);
+    }
 }
 
 void Helldivers::Clear()
