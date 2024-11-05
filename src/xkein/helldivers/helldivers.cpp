@@ -12,6 +12,8 @@
 std::string gInputSequence;
 std::vector<std::unique_ptr<HelldiverStratagemInst>> gInsts;
 
+struct SelectingTag { ObjectClass* pObject; };
+
 enum HelldiverButtons
 {
     Activate = 1111,
@@ -60,7 +62,24 @@ void Helldivers::Tick()
         if (inst->type->sequence == gInputSequence && inst->super->IsReady)
         {
             Unsorted::CurrentSWType = inst->type->swType->ArrayIndex;
+            for (ObjectClass* pObject : ObjectClass::CurrentObjects.get())
+            {
+                entt::entity entity = GetYrEntity(pObject);
+                gEntt->emplace_or_replace<SelectingTag>(entity, pObject);
+                pObject->Deselect();
+            }
+            
             break;
+        }
+    }
+
+    if (Unsorted::CurrentSWType == -1)
+    {
+        for (auto&& [entity, tag] : gEntt->view<SelectingTag>().each())
+        {
+            ObjectClass* pObject = tag.pObject;
+            gEntt->remove<SelectingTag>(entity);
+            pObject->Select();
         }
     }
     
