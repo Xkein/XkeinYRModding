@@ -3,6 +3,7 @@
 #include "physics/physics.h"
 #include "audio/audio.h"
 #include "xkein/engine.h"
+#include <Unsorted.h>
 
 #define REGISTER_JS_MODULE(Module) \
     extern void __JsRegister_##Module(); \
@@ -17,7 +18,10 @@ void YrXkeinModule::Startup()
     REGISTER_JS_MODULE(XkeinExt);
 
     gEngine = new Engine();
-    gEngine->Start();
+    if (Game::hWnd)
+    {
+        gEngine->Start();
+    }
 }
 
 void YrXkeinModule::Shutdown()
@@ -29,3 +33,19 @@ void YrXkeinModule::Shutdown()
 
     __Gen_Type_XkeinExt::Unregister();
 }
+
+#include "yr/event/windows_event.h"
+#include "yr/event/general_event.h"
+#include "yr/event/ui_event.h"
+
+void EnsureStart()
+{
+    if (gEngine && !gEngine->started)
+    {
+        gEngine->Start();
+    }
+}
+
+REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, EnsureStart);
+REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, EnsureStart);
+REGISTER_YR_HOOK_EVENT_LISTENER(YrAfterCreateWindoweEvent, EnsureStart);

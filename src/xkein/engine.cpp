@@ -42,18 +42,26 @@ Engine::~Engine()
 
 void Engine::Start()
 {
+    if (started)
+        return;
+    started = true;
     gLogger->info("Engine::Start()");
 
     Physics::Init();
     AudioSystem::Init();
     Input::Init();
+    YrExtUIModule::InitUIModule();
 
     gJsEnv = new JsEnv();
 }
 
 void Engine::Exit()
 {
+    if (!started)
+        return;
+    started = false;
     gLogger->info("Engine::Exit()");
+
     ScriptComponent::OnJsEnvDestroy();
     delete gJsEnv;
     gJsEnv = nullptr;

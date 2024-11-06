@@ -240,14 +240,15 @@ namespace detail
     {
         static bool Read(std::string_view str, T*& result)
         {
+            std::string_view copied_str = ini_string_pool::get_pool_string_view(str);
             T* ptr = nullptr;
             if constexpr(detail::parser_has_find_or_allocate<T>)
             {
-                ptr = T::FindOrAllocate(str.data());
+                ptr = T::FindOrAllocate(copied_str.data());
             }
             else if constexpr(detail::parser_has_find<T>)
             {
-                ptr = T::Find(str.data());
+                ptr = T::Find(copied_str.data());
             }
             else
             {
@@ -256,7 +257,7 @@ namespace detail
                     entt::meta_func func = type.func("__FindOrAllocate"_hs);
                     if (func)
                     {
-                        ptr = func.invoke({}, str.data()).cast<T*>();
+                        ptr = func.invoke({}, copied_str.data()).cast<T*>();
                     }
                     else {
                         gLogger->error("could not parse {}: it is not auto load!", typeid(T).name());

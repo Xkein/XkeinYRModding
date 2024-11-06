@@ -77,6 +77,16 @@ struct ImGuiThread
 
 std::unique_ptr<ImGuiThread> imguiThread;
 
+void YrExtUIModule::InitUIModule()
+{
+    imguiThread = std::make_unique<ImGuiThread>();
+}
+
+void YrExtUIModule::DestroyUIModule()
+{
+    imguiThread.reset();
+}
+
 void YrExtUIModule::UIMainThread()
 {
     if (!imguiThread)
@@ -99,11 +109,10 @@ void YrExtUIModule::UIMainThread()
 void YrExtUIModule::Startup()
 {
     gLogger->info("Yr Extension UI module load.");
-    imguiThread = std::make_unique<ImGuiThread>();
 }
 
 void YrExtUIModule::Shutdown()
 {
     gLogger->info("Yr Extension UI module unload.");
-    imguiThread.reset();
+    DestroyUIModule();
 }

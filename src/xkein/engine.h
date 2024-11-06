@@ -27,10 +27,10 @@ public:
     float                                 deltaTime;
     std::chrono::steady_clock::time_point lastTickTimePoint {std::chrono::steady_clock::now()};
     std::mutex                            mutex;
+    bool                                  started;
 
 private:
     void CalDeltaTime();
-
 };
 
 extern Engine* gEngine;

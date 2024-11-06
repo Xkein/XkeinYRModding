@@ -6,6 +6,8 @@ class YrExtUIModule final : public IYrExtension
 {
 public:
     static void UIMainThread();
+    static void InitUIModule();
+    static void DestroyUIModule();
     
 private:
     virtual void Startup() override;

@@ -137,7 +137,6 @@ void InitWwise()
     }
 
     gInited = true;
-    atexit(AudioSystem::Destroy);
 
     gLogger->info("audio module inited.");
 }
@@ -145,7 +144,7 @@ void InitWwise()
 void AudioSystem::Init()
 {
     gWwiseSettings = std::make_shared<WwiseSettings>();
-    std::thread(InitWwise).detach();
+    InitWwise();
 }
 
 void AudioSystem::Destroy()

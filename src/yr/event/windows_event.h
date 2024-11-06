@@ -22,3 +22,6 @@ class YrBootEvent { };
 
 CLASS(HookEvent)
 class YrTerminateEvent { };
+
+CLASS(HookEvent)
+class YrAfterCreateWindoweEvent { };
