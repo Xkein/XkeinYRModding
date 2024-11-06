@@ -33,7 +33,13 @@ void Helldivers::Tick()
     {
         if (com.owner->IsSelected)
         {
-            candidateInsts.append_range(com.stratagemInsts);
+            for (HelldiverStratagemInst* inst : com.stratagemInsts)
+            {
+                auto iter = std::find_if(candidateInsts.begin(), candidateInsts.end(), [=](auto cur) { return inst->type == cur->type; });
+                if (iter == candidateInsts.end()) {
+                    candidateInsts.push_back(inst);
+                }
+            }
         }
     }
 
@@ -54,23 +60,22 @@ void Helldivers::Tick()
     }
     else if (!gInputSequence.empty())
     {
-        gInputSequence.clear();
-    }
-
-    for (HelldiverStratagemInst* inst : candidateInsts)
-    {
-        if (inst->type->sequence == gInputSequence && inst->super->IsReady)
+        for (HelldiverStratagemInst* inst : candidateInsts)
         {
-            Unsorted::CurrentSWType = inst->type->swType->ArrayIndex;
-            for (ObjectClass* pObject : ObjectClass::CurrentObjects.get())
+            if (inst->type->sequence == gInputSequence && inst->super->IsReady)
             {
-                entt::entity entity = GetYrEntity(pObject);
-                gEntt->emplace_or_replace<SelectingTag>(entity, pObject);
-                pObject->Deselect();
+                Unsorted::CurrentSWType = inst->type->swType->ArrayIndex;
+                for (ObjectClass* pObject : ObjectClass::CurrentObjects.get() | std::views::reverse)
+                {
+                    entt::entity entity = GetYrEntity(pObject);
+                    gEntt->emplace_or_replace<SelectingTag>(entity, pObject);
+                    pObject->Deselect();
+                }
+                break;
             }
-            
-            break;
         }
+
+        gInputSequence.clear();
     }
 
     if (Unsorted::CurrentSWType == -1)
@@ -87,17 +92,35 @@ void Helldivers::Tick()
     if (Input::gMap->GetBool(HelldiverButtons::Activate))
     {
         DSurface* surface = DSurface::Primary;
+        if (!surface->Lock(0, 0)) {
+            return;
+        }
         RectangleStruct rect = { 0, 0, 0, 0 };
         surface->GetRect(&rect);
-
         Point2D pos {10,100};
         for (HelldiverStratagemInst* inst : candidateInsts)
         {
+            pos.X = 10;
+            pos.Y += 10;
+
             HelldiverStratagem* stratagem = inst->type;
             std::wstring str = stratagem->swType->UIName;
 
-            int color = inst->super->IsReady ? Drawing::RGB_To_Int(0, 0, 255) : Drawing::RGB_To_Int(255, 0, 0);
-            surface->DrawText(str.c_str(), &pos, color);
+            int color;
+            if (inst->super->IsReady) {
+                color = Drawing::RGB_To_Int(0, 255, 0);
+            }
+            else {
+                color = Drawing::RGB_To_Int(255, 0, 0);
+                if (inst->super->IsPresent) {
+                    float chargeTime = inst->super->CustomChargeTime != -1 ? inst->super->CustomChargeTime : stratagem->swType->RechargeTime;
+                    str += std::format(L" ({:.2f}%)", inst->super->RechargeTimer.GetTimeLeft() / chargeTime * 0.01);
+                }
+                else {
+                    str += L" (invalid)";
+                }
+            }
+            surface->DrawText(str.c_str(), &rect, &pos, color, 0, TextPrintType::Background);
             pos.Y += Drawing::GetTextDimensions(str.c_str(), { 0,0 }, 0).Height;
 
             int idx = 0;
@@ -107,7 +130,7 @@ void Helldivers::Tick()
                 idx++;
             }
             color = Drawing::RGB_To_Int(255, 0, 0);
-            surface->DrawText(str.c_str(), &pos, color);
+            surface->DrawText(str.c_str(), &rect, &pos, color, 0, TextPrintType::Background);
             pos.X += Drawing::GetTextDimensions(str.c_str(), { 0,0 }, 0).Width;
 
             str.clear();
@@ -116,9 +139,10 @@ void Helldivers::Tick()
                 idx++;
             }
             color = Drawing::RGB_To_Int(0, 255, 0);
-            surface->DrawText(str.c_str(), &pos, color);
+            surface->DrawText(str.c_str(), &rect, &pos, color, 0, TextPrintType::Background);
             pos.Y += Drawing::GetTextDimensions(str.c_str(), { 0,0 }, 0).Height;
         }
+        surface->Unlock();
     }
 }
 void Helldivers::QueryStratagem(HelldiverComponent* com)
