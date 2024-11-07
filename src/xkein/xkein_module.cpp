@@ -9,6 +9,15 @@
     extern void __JsRegister_##Module(); \
     __JsRegister_##Module();
 
+void EnsureStart()
+{
+    if (Game::hWnd && !gEngine)
+    {
+        gEngine = new Engine();
+        gEngine->Start();
+    }
+}
+
 void YrXkeinModule::Startup()
 {
     __Gen_Type_XkeinExt::Register();
@@ -17,11 +26,7 @@ void YrXkeinModule::Startup()
     REGISTER_JS_MODULE(YrExtCore);
     REGISTER_JS_MODULE(XkeinExt);
 
-    gEngine = new Engine();
-    if (Game::hWnd)
-    {
-        gEngine->Start();
-    }
+    EnsureStart();
 }
 
 void YrXkeinModule::Shutdown()
@@ -37,14 +42,6 @@ void YrXkeinModule::Shutdown()
 #include "yr/event/windows_event.h"
 #include "yr/event/general_event.h"
 #include "yr/event/ui_event.h"
-
-void EnsureStart()
-{
-    if (gEngine && !gEngine->started)
-    {
-        gEngine->Start();
-    }
-}
 
 REGISTER_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent, EnsureStart);
 REGISTER_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent, EnsureStart);
