@@ -114,7 +114,7 @@ void Helldivers::Tick()
                 color = Drawing::RGB_To_Int(255, 0, 0);
                 if (inst->super->IsPresent) {
                     float chargeTime = inst->super->CustomChargeTime != -1 ? inst->super->CustomChargeTime : stratagem->swType->RechargeTime;
-                    str += std::format(L" ({:.2f}%)", inst->super->RechargeTimer.GetTimeLeft() / chargeTime * 0.01);
+                    str += std::format(L" {:.2f} %%", (1.0f - inst->super->RechargeTimer.GetTimeLeft() / chargeTime) * 100);
                 }
                 else {
                     str += L" (invalid)";
