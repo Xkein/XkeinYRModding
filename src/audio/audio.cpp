@@ -135,6 +135,11 @@ void InitWwise()
         gLogger->error("AudioSystem::Init(): could not load Init.bnk!");
         return;
     }
+    if (AK::SoundEngine::LoadBank("EngineUsed.bnk", bankID) != AK_Success)
+    {
+        gLogger->error("AudioSystem::Init(): could not load EngineUsed.bnk!");
+        return;
+    }
 
     gInited = true;
 
