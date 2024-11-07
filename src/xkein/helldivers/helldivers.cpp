@@ -2,6 +2,8 @@
 #include "xkein/helldivers/helldiver_component.h"
 #include "xkein/helldivers/helldiver_stratagem.h"
 #include "input/input.h"
+#include "audio/wwise/wwise.h"
+#include "audio/audio.h"
 
 #include <FootClass.h>
 #include <SuperClass.h>
@@ -43,8 +45,9 @@ void Helldivers::Tick()
         }
     }
 
-    if (Input::gMap->GetBool(HelldiverButtons::Activate))
+    if (Input::gMap->GetBool(HelldiverButtons::Activate) && !candidateInsts.empty())
     {
+        bool isDown = true;
         if (Input::gMap->GetBoolIsNew(HelldiverButtons::Up)) {
             gInputSequence.push_back('W');
         }
@@ -56,6 +59,13 @@ void Helldivers::Tick()
         }
         else if (Input::gMap->GetBoolIsNew(HelldiverButtons::Right)) {
             gInputSequence.push_back('D');
+        }
+        else {
+            isDown = false;
+        }
+
+        if (isDown) {
+            AK::SoundEngine::PostEvent("HelldiverStratagemPress", LISTENER_ID);
         }
     }
     else if (!gInputSequence.empty())
@@ -73,6 +83,7 @@ void Helldivers::Tick()
                 }
                 break;
             }
+            AK::SoundEngine::PostEvent("HelldiverStratagemActivate", LISTENER_ID);
         }
 
         gInputSequence.clear();
