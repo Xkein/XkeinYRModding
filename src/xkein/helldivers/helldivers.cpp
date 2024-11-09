@@ -81,9 +81,9 @@ void Helldivers::Tick()
                     gEntt->emplace_or_replace<SelectingTag>(entity, pObject);
                     pObject->Deselect();
                 }
+                AK::SoundEngine::PostEvent("HelldiverStratagemActivate", LISTENER_ID);
                 break;
             }
-            AK::SoundEngine::PostEvent("HelldiverStratagemActivate", LISTENER_ID);
         }
 
         gInputSequence.clear();

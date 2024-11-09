@@ -1,9 +1,10 @@
 #pragma once
 #include "core/reflection/reflection.h"
 #include "yr/component/component.h"
-#include <AK/SoundEngine/Common/AkSoundEngine.h>
 #include "yr/parse/parser.h"
+#include <AbstractClass.h>
 #include "audio/audio.h"
+#include <AK/SoundEngine/Common/AkSoundEngine.h>
 
 class AbstractTypeClass;
 

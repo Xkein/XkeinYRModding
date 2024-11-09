@@ -1,8 +1,8 @@
 #pragma once
-#include <AK/SoundEngine/Common/AkTypes.h>
 #include <memory>
 #include <string_view>
 #include <GeneralDefinitions.h>
+#include <AK/SoundEngine/Common/AkTypes.h>
 
 class WwiseSettings;
 

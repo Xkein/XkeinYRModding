@@ -165,6 +165,7 @@ PhysicsComponent::~PhysicsComponent()
 {
     if (body)
     {
+        body->SetUserData(0);
         gBodyInterface->RemoveBody(body->GetID());
         body = nullptr;
     }

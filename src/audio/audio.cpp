@@ -159,6 +159,7 @@ void AudioSystem::Destroy()
     gInited = false;
 
     // Unload the init soundbank
+    AK::SoundEngine::UnloadBank("EngineUsed.bnk", NULL);
     AK::SoundEngine::UnloadBank("Init.bnk", NULL);
 
 #ifndef AK_OPTIMIZED

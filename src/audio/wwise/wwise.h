@@ -3,7 +3,7 @@
 #include <AK/SoundEngine/Common/AkTypes.h>
 
 #include <AK/SoundEngine/Common/AkMemoryMgr.h>		// Memory Manager
-#include <AK/SoundEngine/Common/AkModule.h>			// Default memory and stream managers
+#include <AK/SoundEngine/Common/AkMemoryMgrModule.h>    // Default memory and stream managers
 #include <AK/SoundEngine/Common/IAkStreamMgr.h>		// Streaming Manager
 #include <AK/SoundEngine/Common/AkSoundEngine.h>    // Sound engine
 #include <AK/MusicEngine/Common/AkMusicEngine.h>	// Music Engine
