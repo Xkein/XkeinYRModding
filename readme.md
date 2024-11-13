@@ -86,33 +86,7 @@ js代码热重载：
 
 ## 编译
 
-1. 准备构建环境
-
-在编译前，你需要安装[xmake](https://xmake.io/), dotnet, VS2022
-
-2. 准备第三方库
-- [v8-backend](https://github.com/puerts/backend-v8/releases): 下载好之后，设置环境变量V8_PATH路径为v8 backend的路径
-3. 配置
-
-命令行输入
-
-```powershell
-xmake f -a x86 -m debug --skip_codegen=n --make_artifacts=y
-```
-
-第一次运行时可能会出现第三方库的安装请求, 输入y安装即可
-
-4. 编译
-
-命令行输入
-
-```powershell
-xmake build -v
-```
-
-5. 复制成品
-
-前往`build\artifacts\debug` 复制成品到游戏目录
+查看[构建文档](./doc/build.md)
 
 ## 待办许愿池
 
@@ -216,29 +190,7 @@ Editor module
 
 ## Compile
 
-1. Preparing build environment
-
-Before compiling, you must install [xmake](https://xmake.io/), dotnet, VS2022
-
-2. Preparing third party
-- [v8-backend](https://github.com/puerts/backend-v8/releases): After download, set the environment variable `V8_PATH` to v8 backend path
-3. Configure
-
-```powershell
-xmake f -a x86 -m debug --skip_codegen=n --make_artifacts=y
-```
-
-There may be some third party installation requests during the first configure. Please enter `y` to accept.
-
-4. Compile
-
-```powershell
-xmake build -v
-```
-
-5. Copy artifacts
-
-Goto`build\artifacts\debug` and copy files to  game directory
+See [build document](./doc/build.md)
 
 ## Todo List Wishing Pool
 
