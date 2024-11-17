@@ -1,10 +1,11 @@
-add_requires("boost", {configs = {context = true, coroutine = true}})
+add_requires("xmake::boost", {alias = "boost", configs = {nowide = true, container = true}})
 add_requires("utfcpp")
 add_requires("efsw")
 add_requires("spdlog")
 add_requires("stb")
 add_requires("cereal")
 add_requires("cppzmq")
+add_requires("msgpack-cxx", {configs = {boost = false}})
 
 includes("3rdparty/YRpp.lua")
 includes("3rdparty/entt.lua")

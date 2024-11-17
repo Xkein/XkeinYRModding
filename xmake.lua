@@ -3,8 +3,6 @@ add_rules("mode.debug", "mode.release")
 set_allowedplats("windows")
 set_allowedarchs("x86")
 
-add_cxxflags("/bigobj")
-
 add_moduledirs("xmake/modules")
 includes("xmake/modules/common_tool.lua")
 
@@ -24,6 +22,7 @@ target("Core")
     add_files("src/runtime/**.cpp")
     add_includedirs("src", { public = true })
     add_filegroups("Core", {rootdir = "src"})
+    add_cxxflags("/bigobj", "/utf-8", {public = true})
 
 target("YrExtCore")
     set_kind("shared")
@@ -50,7 +49,7 @@ target("XkeinExt")
     add_rules("codegen-cpp")
 
     add_deps("YrExtCore", "JoltPhysics", "wwise", "puerts", "gainput")
-    add_packages("cppzmq", "stb")
+    add_packages("cppzmq", "stb", "msgpack-cxx")
 
     add_headerfiles("src/audio/**.h", "src/physics/**.h", "src/render/**.h", "src/scripting/**.h", "src/input/**.h")
     add_files("src/audio/**.cpp", "src/physics/**.cpp", "src/render/**.cpp", "src/scripting/**.cpp", "src/input/**.cpp")
