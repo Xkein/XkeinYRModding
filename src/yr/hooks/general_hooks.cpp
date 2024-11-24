@@ -24,7 +24,7 @@ BROADCAST_HOOK_EVENT(0x679A15, 0x6, YrRulesLoadBeforeTypeData)
     E->pIni   = R->Stack<CCINIClass*>(0x4);
 }
 
-BROADCAST_HOOK_EVENT(0x679CAF, 0x6, YrRulesLoadAfterTypeData)
+BROADCAST_HOOK_EVENT(0x679CAF, 0x5, YrRulesLoadAfterTypeData)
 {
     E->pRules = RulesClass::Instance;
     E->pIni   = R->ESI<CCINIClass*>();

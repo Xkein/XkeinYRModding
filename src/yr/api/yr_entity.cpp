@@ -393,3 +393,13 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeClearEvent)
         DESTROY_ENTITY(ThemeControl, themeCtrl);
     }
 }
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent)
+{
+    CREATE_ENTITY(MouseClass, (MouseClass*)MouseClass::Instance);
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent)
+{
+    DESTROY_ENTITY(MouseClass, (MouseClass*)MouseClass::Instance);
+}
