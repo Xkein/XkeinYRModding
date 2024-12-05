@@ -1,17 +1,22 @@
 /// <reference path = "../index.d.ts"/>
 declare module "XkeinExt" {
 import { CDTimerClass } from "YRpp";
-class PhysicsComponent
-{
-    m_owner : AbstractClass;
-    m_type : PhysicsTypeComponent;
-}
 class PhysicsCollisionAddAndPersistResult
 {
     m_com1 : PhysicsComponent;
     m_com2 : PhysicsComponent;
     m_point : any;
     m_normal : any;
+}
+class PhysicsCollisionRemoveResult
+{
+    m_com1 : PhysicsComponent;
+    m_com2 : PhysicsComponent;
+}
+class PhysicsComponent
+{
+    m_owner : AbstractClass;
+    m_type : PhysicsTypeComponent;
 }
 class PhysicsTypeComponent
 {
@@ -23,11 +28,6 @@ class PhysicsTypeComponent
     m_radius : number;
     m_halfHeight : number;
     m_halfExtent : any;
-}
-class PhysicsCollisionRemoveResult
-{
-    m_com1 : PhysicsComponent;
-    m_com2 : PhysicsComponent;
 }
 class ScriptComponent
 {

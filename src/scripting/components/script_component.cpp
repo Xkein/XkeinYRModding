@@ -1,6 +1,7 @@
 #include "scripting/components/script_component.h"
 #include "scripting/javascript/all_data_binding.h"
 #include "scripting/javascript/js_env.h"
+#include "physics/physics.h"
 
 struct V8ObjectWrapper {
     V8ObjectWrapper() = default;
@@ -114,6 +115,56 @@ void ScriptComponent::CreateScriptComponent(entt::registry& reg, entt::entity en
 void ScriptComponent::OnJsEnvDestroy()
 {
     gJsScripts.clear();
+}
+
+void ScriptComponentOnCollisionEnter(const PhysicsCollisionAddAndPersistResult& result)
+{
+    ScriptComponent* script1 = GetYrComponent<ScriptComponent>(result.com1->owner);
+    ScriptComponent* script2 = GetYrComponent<ScriptComponent>(result.com2->owner);
+
+    if (script1) {
+        script1->Invoke(script1->OnCollisionEnter, result);
+    }
+    if (script2) {
+        script2->Invoke(script2->OnCollisionEnter, result);
+    }
+}
+void ScriptComponentOnCollisionPersist(const PhysicsCollisionAddAndPersistResult& result)
+{
+    ScriptComponent* script1 = GetYrComponent<ScriptComponent>(result.com1->owner);
+    ScriptComponent* script2 = GetYrComponent<ScriptComponent>(result.com2->owner);
+
+    if (script1) {
+        script1->Invoke(script1->OnCollisionPersist, result);
+    }
+    if (script2) {
+        script2->Invoke(script2->OnCollisionPersist, result);
+    }
+}
+void ScriptComponentOnCollisionExit(const PhysicsCollisionRemoveResult& result)
+{
+    ScriptComponent* script1 = GetYrComponent<ScriptComponent>(result.com1->owner);
+    ScriptComponent* script2 = GetYrComponent<ScriptComponent>(result.com2->owner);
+    if (script1) {
+        script1->Invoke(script1->OnCollisionExit, result);
+    }
+    if (script2) {
+        script2->Invoke(script2->OnCollisionExit, result);
+    }
+}
+
+void ScriptComponent::Init()
+{
+    Physics::gOnCollisionEnter->connect<&ScriptComponentOnCollisionEnter>();
+    Physics::gOnCollisionPersist->connect<&ScriptComponentOnCollisionPersist>();
+    Physics::gOnCollisionExit->connect<&ScriptComponentOnCollisionExit>();
+}
+
+void ScriptComponent::Shutdown()
+{
+    Physics::gOnCollisionEnter->disconnect<&ScriptComponentOnCollisionEnter>();
+    Physics::gOnCollisionPersist->disconnect<&ScriptComponentOnCollisionPersist>();
+    Physics::gOnCollisionExit->disconnect<&ScriptComponentOnCollisionExit>();
 }
 
 ScriptComponent::~ScriptComponent()

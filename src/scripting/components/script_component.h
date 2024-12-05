@@ -34,6 +34,8 @@ struct ScriptComponent final
     }
 
     static void OnJsEnvDestroy();
+    static void Init();
+    static void Shutdown();
 
     ScriptComponent() = default;
     ScriptComponent(ScriptComponent&&) = default;

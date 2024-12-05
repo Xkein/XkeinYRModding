@@ -1,6 +1,6 @@
 
-exports.PhysicsComponent = puerts.loadCPPType("PhysicsComponent")
 exports.PhysicsCollisionAddAndPersistResult = puerts.loadCPPType("PhysicsCollisionAddAndPersistResult")
-exports.PhysicsTypeComponent = puerts.loadCPPType("PhysicsTypeComponent")
 exports.PhysicsCollisionRemoveResult = puerts.loadCPPType("PhysicsCollisionRemoveResult")
+exports.PhysicsComponent = puerts.loadCPPType("PhysicsComponent")
+exports.PhysicsTypeComponent = puerts.loadCPPType("PhysicsTypeComponent")
 exports.ScriptComponent = puerts.loadCPPType("ScriptComponent")

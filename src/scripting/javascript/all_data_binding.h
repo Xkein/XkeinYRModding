@@ -6,7 +6,7 @@ UsingCppType(ScriptComponent);
 #include "physics/physics_component.h"
 UsingCppType(PhysicsComponent)
 UsingCppType(PhysicsTypeComponent)
-#include "physics/physics_collision.h"
+#include "physics/physics.h"
 UsingCppType(PhysicsCollisionAddAndPersistResult);
 UsingCppType(PhysicsCollisionRemoveResult);
 

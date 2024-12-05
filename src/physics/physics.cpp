@@ -4,7 +4,6 @@
 #include "physics/physics_component.h"
 #include "physics/terrain_body.h"
 #include "physics/yr_tools.h"
-#include "physics/physics_collision.h"
 #include "runtime/logger/logger.h"
 #include <Jolt/Core/JobSystemThreadPool.h>
 #include <Jolt/Core/TempAllocator.h>
@@ -166,6 +165,59 @@ JPH::ValidateResult ContactListenerImpl::OnContactValidate(const JPH::Body& inBo
     return result;
 }
 
+entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)> gSignalOnCollisionEnter;
+entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)> gSignalOnCollisionPersist;
+entt::sigh<void(const PhysicsCollisionRemoveResult&)> gSignalOnCollisionExit;
+
+void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
+{
+    PhysicsComponent* com1 = reinterpret_cast<PhysicsComponent*>(inBody1.GetUserData());
+    PhysicsComponent* com2 = reinterpret_cast<PhysicsComponent*>(inBody2.GetUserData());
+
+    if (!com1 || !com2)
+        return;
+
+    PhysicsCollisionAddAndPersistResult result;
+    result.com1 = com1;
+    result.com2 = com2;
+    result.point = ToCoord(inManifold.GetWorldSpaceContactPointOn1(0));
+    result.normal = ToVector3f(inManifold.mWorldSpaceNormal);
+
+    gSignalOnCollisionEnter.publish(result);
+}
+
+void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
+{
+    PhysicsComponent* com1 = reinterpret_cast<PhysicsComponent*>(inBody1.GetUserData());
+    PhysicsComponent* com2 = reinterpret_cast<PhysicsComponent*>(inBody2.GetUserData());
+
+    if (!com1 || !com2)
+        return;
+
+    PhysicsCollisionAddAndPersistResult result;
+    result.com1 = com1;
+    result.com2 = com2;
+    result.point = ToCoord(inManifold.GetWorldSpaceContactPointOn1(0));
+    result.normal = ToVector3f(inManifold.mWorldSpaceNormal);
+    
+    gSignalOnCollisionPersist.publish(result);
+}
+
+void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
+{
+    PhysicsComponent* com1 = reinterpret_cast<PhysicsComponent*>(gBodyInterfaceNoLock->GetUserData(inSubShapePair.GetBody1ID()));
+    PhysicsComponent* com2 = reinterpret_cast<PhysicsComponent*>(gBodyInterfaceNoLock->GetUserData(inSubShapePair.GetBody2ID()));
+
+    if (!com1 || !com2)
+        return;
+
+    PhysicsCollisionRemoveResult result;
+    result.com1 = com1;
+    result.com2 = com2;
+
+    gSignalOnCollisionExit.publish(result);
+}
+
 void ContactListenerImpl::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 {
     // Expect bodies to be sorted
@@ -187,7 +239,7 @@ void ContactListenerImpl::OnContactAdded(const JPH::Body& inBody1, const JPH::Bo
             JPH_BREAKPOINT; // Added contact that already existed
         mState[key] = StatePair(inManifold.mBaseOffset, inManifold.mRelativeContactPointsOn1);
 
-        PhysicsCollision::OnContactAdded(inBody1, inBody2, inManifold, ioSettings);
+        ::OnContactAdded(inBody1, inBody2, inManifold, ioSettings);
     }
 
     if (mNext != nullptr)
@@ -217,7 +269,7 @@ void ContactListenerImpl::OnContactPersisted(const JPH::Body& inBody1, const JPH
         else
             JPH_BREAKPOINT; // Persisted contact that didn't exist
             
-        PhysicsCollision::OnContactPersisted(inBody1, inBody2, inManifold, ioSettings);
+        ::OnContactPersisted(inBody1, inBody2, inManifold, ioSettings);
     }
 
     if (mNext != nullptr)
@@ -246,7 +298,7 @@ void ContactListenerImpl::OnContactRemoved(const JPH::SubShapeIDPair& inSubShape
         else
             JPH_BREAKPOINT; // Removed contact that didn't exist
             
-        PhysicsCollision::OnContactRemoved(inSubShapePair);
+        ::OnContactRemoved(inSubShapePair);
     }
 
     if (mNext != nullptr)
@@ -263,6 +315,10 @@ XKEINEXT_API JPH::ObjectVsBroadPhaseLayerFilter* gObjectVsBroadPhaseLayerFilter;
 XKEINEXT_API JPH::ObjectLayerPairFilter* gObjectLayerPairFilter;
 
 XKEINEXT_API TerrainBody* Physics::gTerrainBody;
+
+XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)>>* Physics::gOnCollisionEnter;
+XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)>>* Physics::gOnCollisionPersist;
+XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionRemoveResult&)>>* Physics::gOnCollisionExit;
 
 static constexpr uint cNumBodies             = 10240;
 static constexpr uint cNumBodyMutexes        = 0; // Autodetect
@@ -303,11 +359,22 @@ void Physics::Init()
     gObjectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterImpl();
     gObjectLayerPairFilter         = new ObjectLayerPairFilterImpl();
 
+    gOnCollisionEnter = new entt::sink{gSignalOnCollisionEnter};
+    gOnCollisionPersist = new entt::sink{gSignalOnCollisionPersist};
+    gOnCollisionExit = new entt::sink{gSignalOnCollisionExit};
+
     gLogger->info("physics module inited.");
 }
 
 void Physics::Destroy()
 {
+    gOnCollisionEnter->disconnect();
+    delete gOnCollisionEnter;
+    gOnCollisionPersist->disconnect();
+    delete gOnCollisionPersist;
+    gOnCollisionExit->disconnect();
+    delete gOnCollisionExit;
+
     delete gBroadPhaseLayerInterface;
     delete gObjectVsBroadPhaseLayerFilter;
     delete gObjectLayerPairFilter;
