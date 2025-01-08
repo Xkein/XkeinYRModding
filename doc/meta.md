@@ -42,7 +42,7 @@ struct PhysicsTypeComponent final
 ```
 
 ### YrExtension
-It is recommended to use YrExtension to manager your initialization and cleaning for below reasons:
+It is recommended to use YrExtension to manager your module initialization and cleaning for below reasons:
 - Clear execution order: all initialization and cleaning job are begin at one place
 - Easy to reload: if your module is dynamic reloading supported, it is easy to do this.
 
@@ -69,8 +69,11 @@ target("XkeinEditor")
 
 
 ### HookEvent
-This keyword can **only be used in YrExtCore module**!
+When the game reaching the hook address,  HookEvent is used to store the transient data.
 
+> This keyword can **only be used in YrExtCore module**!
+
+See the code below:
 ```cpp
 // in header files
 // declare a normal event
@@ -112,6 +115,7 @@ BROADCAST_HOOK_EVENT(0x6FDD50, 0x6, YrTechnoFireEvent)
 ```
 
 ### ComponentTarget
+Component can be automatically attach to game entitys if the type is match the list of ComponentTarget.
 
 ```cpp
 CLASS(ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass])
@@ -133,20 +137,58 @@ private:
 ```
 
 ### IniComponent
-
+When we want loading configs from ini, the tag `IniComponent` will generate the ini loding code and do loading job after loading of `ComponentTarget`.
 ```cpp
-CLASS(IniComponent, ComponentTarget = [TechnoTypeClass])
-struct HelldiverTypeComponent final
+CLASS(IniComponent, ComponentTarget = [ThemeControl])
+struct ThemeComponent final
 {
-    PROPERTY(IniField = "Helldiver.Stratagems")
-    std::vector<HelldiverStratagem*> stratagems;
-
+    PROPERTY(IniField = "Theme.Enable")
+    bool enable {false};
+    PROPERTY(IniField = "Theme.SoundBank")
+    std::string_view soundBankName;
+    PROPERTY(IniField = "Theme.PlayEvent")
+    WwiseStringID playEvent;
+    
+    std::shared_ptr<WwiseSoundBank> soundBank;
+    AkPlayingID playingID;
 };
 ```
 
 ### IniAutoLoad
+Sometime we want to load a global section in ini and the tag `IniAutoLoad` combined with `IniComponent` can do this work.
+```cpp
+CLASS(IniComponent, IniAutoLoad)
+struct Stratagem
+{
+    PROPERTY(IniField = "Sequence")
+    std::string_view sequence;
+    PROPERTY(IniField = "Shared")
+    bool shared {false};
+    PROPERTY(IniField = "SuperWeapon")
+    SuperWeaponTypeClass* swType;
+};
+```
+
 
 ### BindJs
+Tag `BindJs` indicated that this class or struct should be wrapped to javascript side.
+> Only the fields tagged by `PROPERTY` and function tagged by `FUNCTION` will be wrapped.
+```cpp
+CLASS(BindJs)
+class PhysicsCollisionAddAndPersistResult
+{
+public:
+    PROPERTY()
+    PhysicsComponent* com1;
+    PROPERTY()
+    PhysicsComponent* com2;
+    PROPERTY()
+    CoordStruct point;
+    PROPERTY()
+    Vector3D<float> normal;
+};
+```
+
 
 ## Enum Meta Keywords
 The keyword `ENUM` writing before an enum is used to specify enum meta:
@@ -161,27 +203,49 @@ enum class EPhysicShapeType : unsigned int {
 };
 ```
 
+## Function Meta Keywords
+The keyword `FUNCTION` writing before an function is used to specify function meta:
+```cpp
+CLASS(/*...*/)
+class AClass
+{
+public:
+    FUNCTION()
+    void func() {}
+};
+```
+
 
 ## Member Meta Keywords
 The keyword `PROPERTY` writing before a class member is used to specify class member meta:
 ```cpp
-CLASS(BindJs, IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass])
+CLASS(/*...*/)
 struct PhysicsTypeComponent final
 {
-    PROPERTY(IniField = "Physics.Sensor")
-    bool isSensor {false};
-    PROPERTY(IniField = "Physics.Shape")
-    EPhysicShapeType shapeType {EPhysicShapeType::Auto};
-    PROPERTY(IniField = "Physics.Mass")
-    float mass {0.0f};
+    // ...
     PROPERTY(IniField = "Physics.HalfExtent")
     Vector3D<float> halfExtent {0.5f, 0.5f, 0.5f};
 
     JPH::Ref<JPH::ShapeSettings> shapeSettings;
 };
 ```
-This keyword always combine with keyword `CLASS` or `ENUM`
+This keyword always combine with keyword `CLASS`
 
 ### IniField
+By default, the member will be loaded by its member name.
+
+To custom the ini key of the member, use tag `IniField`.
+```cpp
+CLASS(BindJs, IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass])
+struct PhysicsTypeComponent final
+{
+    // ...
+    PROPERTY(IniField = "Physics.HalfExtent")
+    Vector3D<float> halfExtent {0.5f, 0.5f, 0.5f};
+
+    JPH::Ref<JPH::ShapeSettings> shapeSettings;
+};
+```
+
 
 ## Reflection
