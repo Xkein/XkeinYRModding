@@ -11,6 +11,7 @@
 #include "core/string/string_tool.h"
 #include "runtime/platform/path.h"
 #include "core/assertion_macro.h"
+#include "scripting/javascript/js_events.h"
 
 #define CHECK_V8_ARGS(...)
 
@@ -145,6 +146,8 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     this->WaitDebugger(gYrExtConfig->rawData.value("js_wait_debugger_timeout", 0));
 #endif // IS_EDITOR
 
+    JsEvents::Init();
+
     ExecuteModule("puerts/first_run.js");
 #if !defined(WITH_NODEJS)
     ExecuteModule("puerts/polyfill.js");
@@ -158,7 +161,6 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     ExecuteModule("puerts/hot_reload.js");
     ExecuteModule("puerts/pesaddon.js");
 
-    ExecuteModule("yrlazyload.js");
     ExecuteModule("main.js");
 
     Require.Reset(Isolate, PuertsObj->Get(Context, FV8Utils::V8String(Isolate, "__require")).ToLocalChecked().As<v8::Function>());
@@ -177,6 +179,7 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
 JsEnv::~JsEnv()
 {
     LogicTick();
+    JsEvents::Shutdown();
     BackendEnv->StopPolling();
     DestroyInspector();
 

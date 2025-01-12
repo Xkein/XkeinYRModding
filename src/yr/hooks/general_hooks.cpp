@@ -5,6 +5,12 @@
 BROADCAST_HOOK_EVENT(0x55AFB3, 0x6, YrLogicBeginUpdateEvent) {}
 BROADCAST_HOOK_EVENT(0x55B719, 0x5, YrLogicEndUpdateEvent) {}
 
+BROADCAST_HOOK_EVENT(0x7258D0, 0x6, YrPointerExpireEvent)
+{
+    E->pAbstract = R->ECX<AbstractClass*>();
+    E->removed   = R->DL();
+}
+
 BROADCAST_HOOK_EVENT(0x4F4480, 0x8, YrBeginRenderEvent) {}
 BROADCAST_HOOK_EVENT(0x4F45A3, 0x5, YrEndRenderEvent) {}
 
@@ -12,19 +18,19 @@ BROADCAST_HOOK_EVENT(0x6875F3, 0x6, YrSceneLoadEvent) {}
 BROADCAST_HOOK_EVENT(0x687CC7, 0x6, YrSceneEnterEvent) {}
 BROADCAST_HOOK_EVENT(0x685659, 0xA, YrSceneExitEvent) {}
 
-BROADCAST_HOOK_EVENT(0x66D530, 0x6, YrRulesLoadBeforeGeneralData)
+BROADCAST_HOOK_EVENT(0x66D530, 0x6, YrRulesLoadBeforeGeneralDataEvent)
 {
     E->pRules = R->ECX<RulesClass*>();
     E->pIni   = R->Stack<CCINIClass*>(0x4);
 }
 
-BROADCAST_HOOK_EVENT(0x679A15, 0x6, YrRulesLoadBeforeTypeData)
+BROADCAST_HOOK_EVENT(0x679A15, 0x6, YrRulesLoadBeforeTypeDataEvent)
 {
     E->pRules = R->ECX<RulesClass*>();
     E->pIni   = R->Stack<CCINIClass*>(0x4);
 }
 
-BROADCAST_HOOK_EVENT(0x679CAF, 0x5, YrRulesLoadAfterTypeData)
+BROADCAST_HOOK_EVENT(0x679CAF, 0x5, YrRulesLoadAfterTypeDataEvent)
 {
     E->pRules = RulesClass::Instance;
     E->pIni   = R->ESI<CCINIClass*>();

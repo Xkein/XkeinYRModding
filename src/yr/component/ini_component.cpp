@@ -12,7 +12,7 @@ void IniComponentLoader::RegisterLoadAllCallback(void* id, std::function<void(In
 }
 
 #include "yr/event/general_event.h"
-DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeData)
+DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeDataEvent)
 {
     IniReader reader {E->pIni};
     for (auto&& [id, callback] : gLoadAllCallbacks)

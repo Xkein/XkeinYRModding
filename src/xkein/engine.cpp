@@ -1,9 +1,9 @@
 #include "engine.h"
+#include "scripting/javascript/js_events.h"
 #include "runtime/logger/logger.h"
 #include "runtime/ecs/entt.h"
 #include "yr/yr_all_events.h"
 #include "yr/extcore_config.h"
-#include "scripting/components/script_component.h"
 #include "scripting/javascript/js_env.h"
 #include "audio/audio.h"
 #include "physics/physics.h"
@@ -62,7 +62,6 @@ void Engine::Exit()
     started = false;
     gLogger->info("Engine::Exit()");
 
-    ScriptComponent::OnJsEnvDestroy();
     delete gJsEnv;
     gJsEnv = nullptr;
 
@@ -110,10 +109,7 @@ void Engine::OnBeginUpdate()
     if (gJsEnv)
     {
         gJsEnv->mutex.lock();
-        for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
-        {
-            script.Invoke(script.OnBeginUpdate);
-        }
+        JsEvents::Invoke(JsEvents::game.onBeginUpdate);
     }
 
     Physics::BeginTick();
@@ -125,10 +121,7 @@ void Engine::OnEndUpdate()
 
     if (gJsEnv)
     {
-        for (auto&& [entity, script] : gEntt->view<ScriptComponent>().each())
-        {
-            script.Invoke(script.OnEndUpdate);
-        }
+        JsEvents::Invoke(JsEvents::game.onEndUpdate);
         gJsEnv->mutex.unlock();
     }
 

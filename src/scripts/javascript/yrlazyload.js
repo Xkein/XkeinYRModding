@@ -1,6 +1,5 @@
 
-let YRpp =  require("YRpp.js")
-require("XkeinExt.js")
+const YRpp =  require("YRpp.js")
 
 // load yr structs
 YRpp.ColorStruct = puerts.loadCPPType("ColorStruct");

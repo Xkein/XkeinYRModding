@@ -23,6 +23,7 @@
 #include <BounceClass.h>
 #include <DisplayClass.h>
 #include <GadgetClass.h>
+#include <SuperClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);

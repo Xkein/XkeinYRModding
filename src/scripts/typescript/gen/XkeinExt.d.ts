@@ -29,19 +29,73 @@ class PhysicsTypeComponent
     m_halfHeight : number;
     m_halfExtent : any;
 }
-class ScriptComponent
+class JsAbstractEvents
 {
-    m_OnDtor : any;
-    m_OnBeginUpdate : any;
-    m_OnEndUpdate : any;
-    m_OnSave : any;
-    m_OnLoad : any;
-    m_OnReceiveDamage : any;
-    m_OnFire : any;
-    m_OnDetonate : any;
-    m_OnLaunch : any;
-    m_OnCollisionEnter : any;
-    m_OnCollisionPersist : any;
-    m_OnCollisionExit : any;
+    m_onCtor : any;
+    m_onDtor : any;
+    m_onSave : any;
+    m_onLoad : any;
+}
+class JsObjectEvents
+    extends JsAbstractEvents
+{
+    m_onReceiveDamage : any;
+}
+class JsAbstractTypeEvents
+    extends JsAbstractEvents
+{
+    m_onLoadIni : any;
+}
+class JsGameEvents
+{
+    m_onRulesLoadAfterTypeData : any;
+    m_onBeginUpdate : any;
+    m_onEndUpdate : any;
+    m_onApplicationQuit : any;
+}
+class JsPhysicsEvents
+{
+    m_onCollisionEnter : any;
+    m_onCollisionPersist : any;
+    m_onCollisionExit : any;
+}
+class JsTechnoEvents
+    extends JsObjectEvents
+{
+    m_onFire : any;
+}
+class JsBulletEvents
+    extends JsObjectEvents
+{
+    m_onDetonate : any;
+    m_onConstruct : any;
+}
+class JsSuperWeaponEvents
+    extends JsAbstractEvents
+{
+    m_onLaunch : any;
+}
+class JsHouseEvents
+    extends JsAbstractEvents
+{
+}
+class JsEvents
+{
+    s_game : JsGameEvents;
+    s_physics : JsPhysicsEvents;
+    s_unit : JsTechnoEvents;
+    s_unitType : JsAbstractTypeEvents;
+    s_infantry : JsTechnoEvents;
+    s_infantryType : JsAbstractTypeEvents;
+    s_building : JsTechnoEvents;
+    s_buildingType : JsAbstractTypeEvents;
+    s_aircraft : JsTechnoEvents;
+    s_aircraftType : JsAbstractTypeEvents;
+    s_bullet : JsBulletEvents;
+    s_bulletType : JsAbstractTypeEvents;
+    s_superWeapon : JsSuperWeaponEvents;
+    s_superWeaponType : JsAbstractTypeEvents;
+    s_house : JsHouseEvents;
+    s_houseType : JsAbstractTypeEvents;
 }
 }

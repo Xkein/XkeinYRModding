@@ -5,6 +5,7 @@
 struct IStream;
 class CCINIClass;
 class RulesClass;
+class AbstractClass;
 
 // ======================= logic =======================
 
@@ -13,6 +14,13 @@ class YrLogicBeginUpdateEvent { };
 
 CLASS(HookEvent)
 class YrLogicEndUpdateEvent { };
+
+CLASS(HookEvent)
+class YrPointerExpireEvent {
+public:
+    AbstractClass* pAbstract;
+    bool removed;
+};
 
 // ======================= render =======================
 
@@ -23,6 +31,8 @@ class YrBeginRenderEvent
 CLASS(HookEvent)
 class YrEndRenderEvent
 {};
+
+// ======================= scene =======================
 
 CLASS(HookEvent)
 class YrSceneLoadEvent { };
@@ -36,21 +46,21 @@ class YrSceneExitEvent { };
 // ======================= load ini =======================
 
 CLASS(HookEvent)
-class YrRulesLoadBeforeGeneralData {
+class YrRulesLoadBeforeGeneralDataEvent {
 public:
     RulesClass* pRules;
     CCINIClass* pIni;
 };
 
 CLASS(HookEvent)
-class YrRulesLoadBeforeTypeData {
+class YrRulesLoadBeforeTypeDataEvent {
 public:
     RulesClass* pRules;
     CCINIClass* pIni;
 };
 
 CLASS(HookEvent)
-class YrRulesLoadAfterTypeData {
+class YrRulesLoadAfterTypeDataEvent {
 public:
     RulesClass* pRules;
     CCINIClass* pIni;
