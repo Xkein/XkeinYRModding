@@ -114,6 +114,7 @@ target("make_artifacts")
             [build_dir.."/gainput.dll"] = output_dir.."/plugins/gainput.dll",
             [build_dir.."/XkeinEditor.dll"] = output_dir.."/plugins/XkeinEditor.dll",
             [build_dir.."/XkeinExt.dll"] = output_dir.."/plugins/XkeinExt.dll",
+            -- [os.getenv("NODEJS_PATH").."/lib/Win32/libnode.dll"] = output_dir.."/plugins/libnode.dll",
         }
 
         local function get_copy_files(dir, pattern, out_dir)

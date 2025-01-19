@@ -10,6 +10,7 @@ target("puerts")
     set_kind("static")
     set_languages("cxx17")
     add_deps("v8")
+    -- add_deps("nodejs")
     add_includedirs(
         puerts_native_dir.."/Inc",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private",
@@ -39,5 +40,6 @@ target("puerts")
     add_defines("puerts_API=__declspec(dllexport)", "BUILDING_V8_SHARED", {public = true}) -- static lib
     -- add_defines("puerts_API=__declspec(dllexport)", "BUILDING_V8_SHARED", {private=true})
     -- add_defines("puerts_API=__declspec(dllimport)", "USING_V8_SHARED", {interface=true})
+    -- add_defines("MAPPER_ISOLATE_DATA_POS=2", "PLATFORM_WINDOWS", "WITH_NODEJS", "USING_V8_SHARED", {public = true})
     add_filegroups("puerts", {rootdir = puerts_dir})
 target_end()
