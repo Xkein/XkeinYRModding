@@ -1103,6 +1103,21 @@ using namespace entt::literals;
 
 static const void* gYrJsTypeID[static_cast<size_t>(AbstractType::DiskLaser) + 1] {};
 
+const void* GetYrJsTypeID(AbstractType type)
+{
+    size_t      WhatAmI = static_cast<size_t>(type);
+    const void* TypeId  = gYrJsTypeID[WhatAmI];
+    if (!TypeId)
+    {
+        auto        meta     = GetYrClassMeta(static_cast<size_t>(type));
+        const char* TypeName = meta.prop("name"_hs).value().cast<const char*>();
+
+        auto JsRegistration  = FindCppTypeClassByName(TypeName);
+        gYrJsTypeID[WhatAmI] = TypeId = JsRegistration->TypeId;
+    }
+    return TypeId;
+}
+
 namespace PUERTS_NAMESPACE
 {
     namespace v8_impl
@@ -1114,7 +1129,7 @@ namespace PUERTS_NAMESPACE
 
         const void* GetYrJsTypeID(AbstractType type)
         {
-            return gYrJsTypeID[static_cast<size_t>(type)];
+            return ::GetYrJsTypeID(type);
         }
     } // namespace v8_impl
 } // namespace PUERTS_NAMESPACE
@@ -1131,16 +1146,7 @@ v8::Local<v8::Value> JsEnv::FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Contex
     auto PersistentValuePtr = ObjectMap.find(YrObject);
     if (PersistentValuePtr == ObjectMap.end()) // create and link
     {
-        size_t WhatAmI = static_cast<size_t>(YrObject->WhatAmI());
-        const void* TypeId  = gYrJsTypeID[WhatAmI];
-        if (!TypeId)
-        {
-            auto        meta     = GetYrClassMeta(YrObject);
-            const char* TypeName = meta.prop("name"_hs).value().cast<const char*>();
-
-            auto JsRegistration  = FindCppTypeClassByName(TypeName);
-            gYrJsTypeID[WhatAmI] = TypeId = JsRegistration->TypeId;
-        }
+        const void*          TypeId = GetYrJsTypeID(YrObject->WhatAmI());
         v8::Local<v8::Value> Result = DataTransfer::FindOrAddCData(Isolate, Context, TypeId, YrObject, true);
         ObjectMap.emplace(YrObject, v8::Global<v8::Value>(Isolate, Result));
         return Result;
@@ -1159,8 +1165,7 @@ void JsEnv::Unbind(AbstractClass* YrObject)
     auto PersistentValuePtr = ObjectMap.find(YrObject);
     if (PersistentValuePtr != ObjectMap.end()) // create and link
     {
-        size_t WhatAmI = static_cast<size_t>(YrObject->WhatAmI());
-        auto JsRegistration = const_cast<JSClassDefinition*>(FindClassByID(gYrJsTypeID[WhatAmI]));
+        auto JsRegistration = const_cast<JSClassDefinition*>(FindClassByID(GetYrJsTypeID(YrObject->WhatAmI())));
         CppObjectMapper.UnBindCppObject(JsRegistration, YrObject);
         ObjectMap.erase(PersistentValuePtr);
     }

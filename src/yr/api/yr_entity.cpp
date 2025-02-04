@@ -240,9 +240,9 @@ YREXTCORE_API entt::entity api::GetEntityAny(void* pObject)
     case CLASS::AbsID: \
         return entt::resolve<CLASS>();
 #define NULL_CLASS_META entt::resolve(entt::type_id<void>())
-YREXTCORE_API entt::meta_type api::GetYrClassMeta(AbstractClass const* pAbstract)
+YREXTCORE_API entt::meta_type api::GetYrClassMeta(size_t whatAmI)
 {
-    switch (pAbstract->WhatAmI())
+    switch (static_cast<AbstractType>(whatAmI))
     {
         CASE_GET_CLASS_META(UnitClass);
         CASE_GET_CLASS_META(AircraftClass);
@@ -326,6 +326,10 @@ YREXTCORE_API entt::meta_type api::GetYrClassMeta(AbstractClass const* pAbstract
             break;
     }
     return NULL_CLASS_META;
+}
+
+YREXTCORE_API entt::meta_type api::GetYrClassMeta(AbstractClass const* pAbstract) {
+    return api::GetYrClassMeta(static_cast<size_t>(pAbstract->WhatAmI()));
 }
 
 #define DO_ENTITY_ACTION(EntityAction, HookEvent, Class, Member) DEFINE_YR_HOOK_EVENT_LISTENER(HookEvent) { EntityAction(Class, Member); }

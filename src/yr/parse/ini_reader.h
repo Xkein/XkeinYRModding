@@ -17,6 +17,9 @@ public:
     explicit IniReader(CCINIClass* pIni) : IniFile(pIni) {}
 
     FUNCTION()
+    CCINIClass* GetIni() const { return IniFile; }    
+
+    FUNCTION()
     char* value() const
     {
         return _readBuffer;

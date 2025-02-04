@@ -535,7 +535,7 @@ class HouseClass
     static FindBySideIndex(index_0 : number) : HouseClass;
     static FindBySideName(name_0 : string) : HouseClass;
     static FindCivilianSide() : HouseClass;
-    static LoadFromINIList(pINI_0 : any) : void;
+    static LoadFromINIList(pINI_0 : CCINIClass) : void;
     GetSpawnPosition() : number;
     GetPlanningWaypointAt(coords_0 : any) : WaypointClass;
     GetPlanningWaypointProperties(wpt_0 : WaypointClass, idxPath_1 : number, idxWP_2 : number) : boolean;
@@ -1349,8 +1349,8 @@ class AbstractTypeClass
     extends AbstractClass
 {
     LoadTheaterSpecificArt(th_type_0 : any) : void;
-    LoadFromINI(pINI_0 : any) : boolean;
-    SaveToINI(pINI_0 : any) : boolean;
+    LoadFromINI(pINI_0 : CCINIClass) : boolean;
+    SaveToINI(pINI_0 : CCINIClass) : boolean;
     get_ID() : string;
     s_AbsID : any;
     s_Array : any;
@@ -1358,6 +1358,109 @@ class AbstractTypeClass
     m_UINameLabel : number;
     m_UIName : number;
     m_Name : number;
+}
+class CCINIClass
+    extends INIClass
+{
+    static LoadINIFile(pFileName_0 : string) : CCINIClass;
+    static UnloadINIFile(pINI_0 : CCINIClass) : void;
+    ReadCCFile(pCCFile_0 : any, bDigest_1 : boolean, bLoadComments_2 : boolean) : CCINIClass;
+    WriteCCFile(pCCFile_0 : any, bDigest_1 : boolean) : void;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number, szBufferSize_3 : any) : number;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
+    GetCRC() : number;
+    s_RulesHash : any;
+    s_ArtHash : any;
+    s_AIHash : any;
+    s_INI_Rules : any;
+    s_INI_AI : any;
+    s_INI_Art : any;
+    s_INI_UIMD : any;
+    s_INI_RA2MD : any;
+    m_Digested : boolean;
+    m_Digest : number;
+}
+class INIClass
+{
+    Reset() : void;
+    Clear(s1_0 : string, s2_1 : string) : void;
+    GetSection(pSection_0 : string) : any;
+    GetKeyCount(pSection_0 : string) : number;
+    GetKeyName(pSection_0 : string, nKeyIndex_1 : number) : string;
+    ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : string, szBufferSize_4 : any) : number;
+    GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : string, szBufferSize_3 : any) : number;
+    WriteString(pSection_0 : string, pKey_1 : string, pString_2 : string) : boolean;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number, szBufferSize_4 : any) : number;
+    WriteUnicodeString(pSection_0 : string, pKey_1 : string, pString_2 : number) : boolean;
+    ReadBool(pSection_0 : string, pKey_1 : string, bDefault_2 : boolean) : boolean;
+    GetBool(pSection_0 : string, pKey_1 : string, bValue_2 : boolean) : void;
+    WriteBool(pSection_0 : string, pKey_1 : string, bValue_2 : boolean) : boolean;
+    ReadInteger(pSection_0 : string, pKey_1 : string, nDefault_2 : number) : number;
+    GetInteger(pSection_0 : string, pKey_1 : string, nValue_2 : number) : void;
+    WriteInteger(pSection_0 : string, pKey_1 : string, nValue_2 : number, bHex_3 : boolean) : boolean;
+    ReadDouble(pSection_0 : string, pKey_1 : string, dDefault_2 : number) : number;
+    GetDouble(pSection_0 : string, pKey_1 : string, nValue_2 : number) : void;
+    WriteDouble(pSection_0 : string, pKey_1 : string, dValue_2 : number) : boolean;
+    ReadRate(pSection_0 : string, pKey_1 : string, nDefault_2 : number) : number;
+    GetRate(pSection_0 : string, pKey_1 : string, nValue_2 : number) : void;
+    WriteRate(pSection_0 : string, pKey_1 : string, nValue_2 : number) : boolean;
+    Read2Integers(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
+    ReadPoint2D(ret_0 : any, pSection_1 : string, pKey_2 : string, defValue_3 : any) : any;
+    GetPoint2D(pSection_0 : string, pKey_1 : string, value_2 : any) : void;
+    Write2Integers(pSection_0 : string, pKey_1 : string, pValues_2 : number) : boolean;
+    Read3Integers(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
+    ReadPoint3D(ret_0 : any, pSection_1 : string, pKey_2 : string, defValue_3 : any) : any;
+    GetPoint3D(pSection_0 : string, pKey_1 : string, value_2 : any) : void;
+    Read3Bytes(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
+    Write3Bytes(pSection_0 : string, pKey_1 : string, pValues_2 : number) : boolean;
+    Exists(pSection_0 : string, pKey_1 : string) : boolean;
+    ReadTime(pSection_0 : string, pKey_1 : string, nDefault_2 : number) : number;
+    WriteTime(pSection_0 : string, pKey_1 : string, nValue_2 : number) : boolean;
+    ReadPip(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadPipScale(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadCategory(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadColorString(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadFoundation(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadMovementZone(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadSpeedType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadSWAction(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadSWType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadVoxName(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadFactory(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadBuildCat(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadHouseTypesList(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadHousesList(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadArmorType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadLandType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadHouseType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadSide(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadMovie(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadTheater(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadTheme(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadEdge(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadPowerup(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadLayer(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadVHPScan(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadColor(pBuffer_0 : any, pSection_1 : string, pKey_2 : string, defValue_3 : any) : any;
+    ReadColor(pSection_0 : number, pKey_1 : number, defValue_2 : any) : any;
+    GetColor(pSection_0 : number, pKey_1 : number, value_2 : any) : void;
+    WriteColor(pSection_0 : number, pKey_1 : number, color_2 : any) : boolean;
+    ReadUUBlock(pSection_0 : number, pBuffer_1 : void, length_2 : any) : any;
+    WriteUUBlock(pSection_0 : number, pBuffer_1 : void, length_2 : any) : boolean;
+    ReadAbilities(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
+    GetTechnoType(pSection_0 : string, pKey_1 : string) : TechnoTypeClass;
+    ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : number) : number;
+    GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number) : number;
+    static GetPrerequisites(pBuffer_0 : any, pINI_1 : INIClass, pSection_2 : string, pKey_3 : string, Defaults_4 : any) : any;
+    static IsBlank(pValue_0 : string) : boolean;
+    m_CurrentSectionName : string;
+    m_CurrentSection : any;
+    m_Sections : any;
+    m___Sections : number;
+    m_SectionIndex : any;
+    m___SectionIndex : number;
+    m_LineComments : any;
 }
 class TechnoTypeClass
     extends ObjectTypeClass
@@ -2947,7 +3050,7 @@ class TeamTypeClass
     Save(pStm_0 : any, fClearDirty_1 : number) : number;
     WhatAmI() : any;
     Size() : number;
-    static LoadFromINIList(pINI_0 : any, IsGlobal_1 : boolean) : boolean;
+    static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
     CreateTeam(pHouse_0 : HouseClass) : TeamClass;
     DestroyAllInstances() : void;
     GetGroup() : number;
@@ -3055,10 +3158,10 @@ class TagTypeClass
     Size() : number;
     ComputeCRC(crc_0 : any) : void;
     GetArrayIndex() : number;
-    LoadFromINI(pINI_0 : any) : boolean;
-    SaveToINI(pINI_0 : any) : boolean;
-    static LoadFromINIList(pINI_0 : any) : void;
-    static SaveToINIList(pINI_0 : any) : void;
+    LoadFromINI(pINI_0 : CCINIClass) : boolean;
+    SaveToINI(pINI_0 : CCINIClass) : boolean;
+    static LoadFromINIList(pINI_0 : CCINIClass) : void;
+    static SaveToINIList(pINI_0 : CCINIClass) : void;
     static FindByNameOrID(pName_0 : string) : TagTypeClass;
     GetFlags() : any;
     HasAllowWinAction() : boolean;
@@ -3128,7 +3231,7 @@ class ScriptTypeClass
     Save(pStm_0 : any, fClearDirty_1 : number) : number;
     WhatAmI() : any;
     Size() : number;
-    static LoadFromINIList(pINI_0 : any, IsGlobal_1 : boolean) : boolean;
+    static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
     s_AbsID : any;
     s_Array : any;
     m_ArrayIndex : number;
@@ -3280,8 +3383,8 @@ class UnitClass
     FlagRemove() : boolean;
     APCCloseDoor() : void;
     APCOpenDoor() : void;
-    static ReadINI(pINI_0 : any) : void;
-    static WriteINI(pINI_0 : any) : void;
+    static ReadINI(pINI_0 : CCINIClass) : void;
+    static WriteINI(pINI_0 : CCINIClass) : void;
     ShouldCrashIt(pTarget_0 : TechnoClass) : boolean;
     AssignDestination_7447B0(pTarget_0 : AbstractClass) : AbstractClass;
     AStarAttempt(cell1_0 : any, cell2_1 : any) : boolean;
@@ -4773,7 +4876,7 @@ class DisplayClass
     SetActiveFoundation(Coords_0 : any) : void;
     Load(pStm_0 : any) : number;
     Save(pStm_0 : any) : number;
-    LoadFromINI(pINI_0 : any) : void;
+    LoadFromINI(pINI_0 : CCINIClass) : void;
     GetToolTip(nDlgID_0 : number) : number;
     CloseWindow() : void;
     vt_entry_8C() : void;

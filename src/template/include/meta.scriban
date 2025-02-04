@@ -25,6 +25,10 @@ func gen_meta_class_function(htClass, htFunction)
     if $function_name | string.contains "operator"
         ret null # operator not supported yet
     end
+    
+    if htFunction.cpp_function.is_function_template
+        ret $'// skip template function: {htClass.cpp_class.name}::{$function_name}'
+    end
 
     if htFunction.is_constructor
         if htClass.is_abstract
@@ -52,11 +56,14 @@ func gen_meta_class_property(htClass, htProperty)
     if should_skip_visibility(htClass, htProperty) || htProperty.is_static
         ret null
     end
-    $field_name = property.name
+    $field_name = htProperty.name
     if string.empty($field_name)
         ret null
     end
     $class_name = htClass.name
+    if htProperty.is_bit_field
+        ret $'// skip bit field: {$class_name}::{$field_name}'
+    end
     ret $'register_data<&{$class_name}::{$field_name}>(factory, "{$field_name}"_hs).prop("name"_hs, "{$field_name}");'
 end
 

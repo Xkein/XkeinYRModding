@@ -62,7 +62,7 @@ void Engine::Exit()
     started = false;
     gLogger->info("Engine::Exit()");
 
-    JsEvents::Invoke(JsEvents::game.onApplicationQuit);
+    INVOKE_JS_EVENT(JsEvents::game.onApplicationQuit);
 
     delete gJsEnv;
     gJsEnv = nullptr;
@@ -111,7 +111,7 @@ void Engine::OnBeginUpdate()
     if (gJsEnv)
     {
         gJsEnv->mutex.lock();
-        JsEvents::Invoke(JsEvents::game.onBeginUpdate);
+        INVOKE_JS_EVENT(JsEvents::game.onBeginUpdate);
     }
 
     Physics::BeginTick();
@@ -123,7 +123,7 @@ void Engine::OnEndUpdate()
 
     if (gJsEnv)
     {
-        JsEvents::Invoke(JsEvents::game.onEndUpdate);
+        INVOKE_JS_EVENT(JsEvents::game.onEndUpdate);
         gJsEnv->mutex.unlock();
     }
 

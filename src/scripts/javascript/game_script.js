@@ -1,6 +1,6 @@
 
 (function (global) {
-    gameEvents.game.onRulesLoadAfterTypeData.add(() => {
+    gameEvents.game.onRulesLoadAfterTypeData.add((yrRules, yrIni) => {
         
     })
 

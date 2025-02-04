@@ -3,6 +3,7 @@ declare module "YrExtCore" {
 import { CDTimerClass } from "YRpp";
 class IniReader
 {
+    GetIni() : CCINIClass;
     value() : string;
     max_size() : number;
     empty() : boolean;

@@ -18,9 +18,12 @@ class Delegate
     }
 
     invoke(...args) {
-        this.handlers.forEach(handler => {
-            handler(args)
-        })
+        for (const handler of this.handlers) {
+            const ret = handler(args)
+            if (ret) {
+                return ret
+            }
+        }
     }
 }
 

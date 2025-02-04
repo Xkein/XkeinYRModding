@@ -24,6 +24,7 @@
 #include <DisplayClass.h>
 #include <GadgetClass.h>
 #include <SuperClass.h>
+#include <CCINIClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -140,6 +141,18 @@ UsingCppType(AngerStruct);
 UsingCppType(ScoutStruct);
 UsingYrStruct(DropshipStruct);
 
+UsingCppType(INIClass);
+UsingCppType(CCINIClass);
+// not implement
+UsingCppType(RulesClass);
+UsingCppType(INIClass::INISection);
+UsingCppType(INIClass::INIComment);
+UsingCppType(FileClass);
+UsingCppType(CCFileClass);
+using INISectionList = List<INIClass::INISection>;
+UsingCppType(INISectionList);
+UsingIndexClass(int, INIClass::INISection*);
+
 // hand write registration
 UsingYrStruct(CoordStruct);
 UsingYrStruct(Point2D);
@@ -169,7 +182,6 @@ UsingCppType(Surface);
 UsingCppType(DSurface);
 UsingCppType(FoggedObjectClass);
 UsingCppType(CRCEngine);
-UsingCppType(CCINIClass);
 UsingCppType(ColorScheme);
 UsingCppType(SHPStruct);
 UsingYrStruct(VoxelStruct);

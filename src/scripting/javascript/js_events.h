@@ -7,6 +7,8 @@
 
 class AbstractTypeClass;
 class CCINIClass;
+class RulesClass;
+class IniReader;
 class WarheadTypeClass;
 class ObjectClass;
 class HouseClass;
@@ -53,14 +55,14 @@ CLASS(BindJs)
 struct JsAbstractTypeEvents : public JsAbstractEvents
 {
     PROPERTY()
-    ScriptBehaviour<void(AbstractTypeClass*, CCINIClass*)> onLoadIni;
+    ScriptBehaviour<void(AbstractTypeClass*, IniReader*)> onLoadIni;
 };
 
 CLASS(BindJs)
 struct JsGameEvents
 {
     PROPERTY()
-    ScriptBehaviour<void()> onRulesLoadAfterTypeData;
+    ScriptBehaviour<void(RulesClass*, IniReader*)> onRulesLoadAfterTypeData;
     PROPERTY()
     ScriptBehaviour<void()> onBeginUpdate;
     PROPERTY()
@@ -92,7 +94,7 @@ CLASS(BindJs)
 struct JsBulletEvents : public JsObjectEvents
 {
     PROPERTY()
-    ScriptBehaviour<void(BulletClass*, const CoordStruct&)> onDetonate;
+    ScriptBehaviour<void(BulletClass*, const CoordStruct*)> onDetonate;
     PROPERTY()
     ScriptBehaviour<void(BulletClass*)> onConstruct;
 };
@@ -101,7 +103,7 @@ CLASS(BindJs)
 struct JsSuperWeaponEvents : public JsAbstractEvents
 {
     PROPERTY()
-    ScriptBehaviour<void(SuperClass*, const CellStruct&, bool)> onLaunch;
+    ScriptBehaviour<void(SuperClass*, const CellStruct*, bool)> onLaunch;
 };
 
 CLASS(BindJs)
@@ -116,24 +118,24 @@ struct JsEvents final
     static void Init();
     static void Shutdown();
 
-    template<typename TRet, typename... TFuncArgs, typename... TArgs>
-    static inline TRet Invoke(ScriptBehaviour<TRet(TFuncArgs...)>& behavior, TArgs&&... args)
+
+    template<typename T>
+    struct _Invoker;
+
+    template<typename TRet, typename... TArgs>
+    struct _Invoker<ScriptBehaviour<TRet(TArgs...)>>
     {
-        constexpr bool is_void = std::is_void_v<TRet>;
-        if (behavior)
+        static TRet Invoke(ScriptBehaviour<TRet(TArgs...)>* behavior, TArgs... args)
         {
-            if constexpr (is_void)
-                std::invoke(behavior, std::forward<TArgs>(args)...);
-            else
-                return std::invoke(behavior, std::forward<TArgs>(args)...);
+            if (behavior && *behavior)
+            {
+                return std::invoke(*behavior, std::forward<TArgs>(args)...);
+            }
+
+            return TRet{};
         }
-
-        if constexpr (is_void)
-            return;
-        else
-            return {};
-    }
-
+    };
+    
     PROPERTY()
     static JsGameEvents game;
     
@@ -175,3 +177,5 @@ struct JsEvents final
     PROPERTY()
     static JsAbstractTypeEvents houseType;
 };
+
+#define INVOKE_JS_EVENT(behavior, ...) JsEvents::_Invoker<std::remove_reference_t<decltype(behavior)>>::Invoke(&behavior, __VA_ARGS__)

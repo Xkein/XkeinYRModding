@@ -26,6 +26,7 @@
 #include <HouseClass.h>
 #include <ColorScheme.h>
 #include <TriggerTypeClass.h>
+#define wchar wchar_t
 {{- end }}
 #include "{{source_file}}"
 #include "core/raii_invoker.h"
@@ -47,7 +48,7 @@ void __JsRegister_{{type_name}}() {
         if should_skip_visibility(htClass, function) || function.is_deleted || function.is_destructor
             continue
         end
-        if function.is_overload
+        if function.is_overload || function.cpp_function.is_function_template
             continue
         end
         if function.is_constructor
@@ -78,7 +79,7 @@ void __JsRegister_{{type_name}}() {
         $ctor_count = 0
         for function in pair.value
             $func_type = get_function_ptr_type(function, htClass)
-            if !should_skip_visibility(htClass, function)
+            if !should_skip_visibility(htClass, function) && !function.cpp_function.is_function_template
                 if function.is_constructor
                     $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
                     if string.empty($arg_types)
@@ -136,7 +137,7 @@ void __JsRegister_{{type_name}}() {
         end
     end
     for property in class_properties ; $cpp_field = property.cpp_field
-        if should_skip_visibility(htClass, property)
+        if should_skip_visibility(htClass, property) || property.is_bit_field
             continue
         end
         if string.empty(property.name)
