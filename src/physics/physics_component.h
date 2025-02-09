@@ -8,7 +8,7 @@
 
 class AbstractTypeClass;
 
-ENUM()
+ENUM(BindJs)
 enum class EPhysicShapeType : unsigned int {
     Auto,
     Sphere,

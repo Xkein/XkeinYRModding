@@ -1,6 +1,6 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YrExtCore" {
-import { CDTimerClass } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass } from "YRpp";
 class IniReader
 {
     GetIni() : CCINIClass;

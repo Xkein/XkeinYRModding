@@ -1,6 +1,6 @@
 /// <reference path = "../index.d.ts"/>
 declare module "XkeinExt" {
-import { CDTimerClass } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass } from "YRpp";
 class PhysicsCollisionAddAndPersistResult
 {
     m_com1 : PhysicsComponent;
@@ -97,5 +97,12 @@ class JsEvents
     s_superWeaponType : JsAbstractTypeEvents;
     s_house : JsHouseEvents;
     s_houseType : JsAbstractTypeEvents;
+}
+enum EPhysicShapeType {
+    Auto = 0,
+    Sphere = 1,
+    Box = 2,
+    Capsule = 3,
+    Cylinder = 4,
 }
 }

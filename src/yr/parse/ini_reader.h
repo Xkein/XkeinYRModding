@@ -20,7 +20,7 @@ public:
     CCINIClass* GetIni() const { return IniFile; }    
 
     FUNCTION()
-    char* value() const
+    const char* value() const
     {
         return _readBuffer;
     }
@@ -41,7 +41,7 @@ public:
     FUNCTION()
     size_t ReadString(const char* pSection, const char* pKey)
     {
-        auto const res = IniFile->ReadString(pSection, pKey, "", this->value(), this->max_size());
+        auto const res = IniFile->ReadString(pSection, pKey, "", _readBuffer, this->max_size());
         return static_cast<size_t>(res);
     }
 

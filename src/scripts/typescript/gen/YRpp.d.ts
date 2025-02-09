@@ -1,6 +1,5 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YRpp" {
-import { CDTimerClass } from "YRpp";
 class TintStruct
 {
     m_Red : number;
@@ -457,7 +456,7 @@ class HouseClass
     Apparent_Base_Center() : any;
     Is_Powered() : boolean;
     ID_Number() : number;
-    Name() : number;
+    Name() : any;
     Get_Application() : any;
     Available_Money() : number;
     Available_Storage() : number;
@@ -895,7 +894,7 @@ class HouseClass
     m_ThreatPosedEstimates : number;
     m_PlainName : number;
     m_UINameString : number;
-    m_UIName : number;
+    m_UIName : any;
     m_ColorSchemeIndex : number;
     m_StartingPoint : number;
     m_StartingCell : any;
@@ -996,7 +995,7 @@ class ObjectClass
     GetTechnoType() : TechnoTypeClass;
     GetType() : ObjectTypeClass;
     GetTypeOwners() : number;
-    GetUIName() : number;
+    GetUIName() : any;
     CanBeRepaired() : boolean;
     CanBeSold() : boolean;
     IsActive() : boolean;
@@ -1356,7 +1355,7 @@ class AbstractTypeClass
     s_Array : any;
     m_ID : number;
     m_UINameLabel : number;
-    m_UIName : number;
+    m_UIName : any;
     m_Name : number;
 }
 class CCINIClass
@@ -1366,8 +1365,8 @@ class CCINIClass
     static UnloadINIFile(pINI_0 : CCINIClass) : void;
     ReadCCFile(pCCFile_0 : any, bDigest_1 : boolean, bLoadComments_2 : boolean) : CCINIClass;
     WriteCCFile(pCCFile_0 : any, bDigest_1 : boolean) : void;
-    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number, szBufferSize_3 : any) : number;
-    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : any, szBufferSize_3 : any) : number;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : any) : number;
     GetCRC() : number;
     s_RulesHash : any;
     s_ArtHash : any;
@@ -1390,8 +1389,8 @@ class INIClass
     ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : string, szBufferSize_4 : any) : number;
     GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : string, szBufferSize_3 : any) : number;
     WriteString(pSection_0 : string, pKey_1 : string, pString_2 : string) : boolean;
-    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number, szBufferSize_4 : any) : number;
-    WriteUnicodeString(pSection_0 : string, pKey_1 : string, pString_2 : number) : boolean;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : any, pBuffer_3 : any, szBufferSize_4 : any) : number;
+    WriteUnicodeString(pSection_0 : string, pKey_1 : string, pString_2 : any) : boolean;
     ReadBool(pSection_0 : string, pKey_1 : string, bDefault_2 : boolean) : boolean;
     GetBool(pSection_0 : string, pKey_1 : string, bValue_2 : boolean) : void;
     WriteBool(pSection_0 : string, pKey_1 : string, bValue_2 : boolean) : boolean;
@@ -1451,7 +1450,7 @@ class INIClass
     GetTechnoType(pSection_0 : string, pKey_1 : string) : TechnoTypeClass;
     ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : number) : number;
     GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
-    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number) : number;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : any, pBuffer_3 : any) : number;
     static GetPrerequisites(pBuffer_0 : any, pINI_1 : INIClass, pSection_2 : string, pKey_3 : string, Defaults_4 : any) : any;
     static IsBlank(pValue_0 : string) : boolean;
     m_CurrentSectionName : string;
@@ -2176,7 +2175,7 @@ class CellClass
     ProcessColourComponents(arg0_0 : number, pIntensity_1 : number, pAmbient_2 : number, a5_3 : number, a6_4 : number, tintR_5 : number, tintG_6 : number, tintB_7 : number) : void;
     GetTunnel() : any;
     GetContainingRect(dest_0 : any) : any;
-    GetUIName() : number;
+    GetUIName() : any;
     ConnectsToOverlay(idxOverlay_0 : number, direction_1 : number) : boolean;
     GetContainedTiberiumIndex() : number;
     GetContainedTiberiumValue() : number;
@@ -3406,7 +3405,7 @@ class UnitClass
     m_Deploying : boolean;
     m_Undeploying : boolean;
     m_NonPassengerCount : number;
-    m_ToolTipText : number;
+    m_ToolTipText : any;
 }
 class EBolt
 {
@@ -3734,7 +3733,7 @@ class SuperClass
     GetRechargeTime() : number;
     SetRechargeTime(time_0 : number) : void;
     ResetRechargeTime() : void;
-    NameReadiness() : number;
+    NameReadiness() : any;
     ShouldDrawProgress() : boolean;
     ShouldFlashTab() : boolean;
     s_AbsID : any;
@@ -4877,7 +4876,7 @@ class DisplayClass
     Load(pStm_0 : any) : number;
     Save(pStm_0 : any) : number;
     LoadFromINI(pINI_0 : CCINIClass) : void;
-    GetToolTip(nDlgID_0 : number) : number;
+    GetToolTip(nDlgID_0 : number) : any;
     CloseWindow() : void;
     vt_entry_8C() : void;
     MapCell(pMapCoord_0 : any, pHouse_1 : HouseClass) : boolean;

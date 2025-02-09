@@ -1,49 +1,122 @@
 
+class GameScripts
+{
+    constructor() {
+        this.scriptables = new Map()
+
+    }
+
+    add(scriptable) {
+        this.scriptables.set(scriptable.name, scriptable)
+    }
+
+    remove(scriptable) {
+        this.scriptables.delete(scriptable.name)
+    }
+
+    get(name) {
+        return this.scriptables.get(name)
+    }
+
+    getOrCreate(name) {
+        var scriptable = this.get(name)
+        if (scriptable)
+            return scriptable
+
+        try {
+            var scriptModule = require(name)
+            scriptable = new GameScriptable(name, scriptModule.script)
+        } catch (error) {
+            console.error(error)
+        }
+        if (!scriptable) {
+            console.error("could not load script: " + name)
+            return
+        }
+        this.add(scriptable)
+        return scriptable
+    }
+}
+
+const gameScripts = new GameScripts()
+
+class GameScriptable
+{
+    constructor(name, script) {
+        this.insts = new Set()
+        this.name = name
+        this.script = script
+        script.scriptable = this
+    }
+
+    addInst(inst) {
+        this.insts.add(inst)
+    }
+
+    removeInst(inst) {
+        this.insts.delete(inst)
+    }
+}
+
 (function (global) {
-    gameEvents.game.onRulesLoadAfterTypeData.add((yrRules, yrIni) => {
+    global.gameScripts = gameScripts
+
+    gameEvents.game.onRulesLoadAfterTypeData.add((yrRules, iniReader) => {
         
     })
 
-    let onLoadType = (yrObjectType, yrIni) => { 
-
-
+    let onLoadType = (yrObjectType, iniReader) => {
+        if (iniReader.ReadString(yrObjectType.m_ID, "JsScript") > 0) {
+            var scriptName = iniReader.value()
+            yrObjectType.__scriptable = gameScripts.getOrCreate(scriptName)
+        }
     }
 
     function get_scriptable(yrObject) {
         if (yrObject.m_Type)
-            return  yrObject.m_Type.__scriptable
+            return yrObject.m_Type.__scriptable
         return null
     }
 
-    let addScriptable = (yrObject) => {
+    let scriptable_add = (yrObject) => {
+        let scriptable = get_scriptable(yrObject)
+        if (!scriptable)
+            return
+        
+        if (scriptable.script.onAddInst) {
+            scriptable.script.onAddInst(yrObject)
+        }
+
+        scriptable.addInst(yrObject)
+    }
+
+    let scriptable_remove = (yrObject) => {
         let scriptable = get_scriptable(yrObject)
         if (!scriptable)
             return
 
+        if (scriptable.script.onRemoveInst) {
+            scriptable.script.onRemoveInst(yrObject)
+        }
+
+        scriptable.removeInst(yrObject)
     }
 
-    let removeScriptable = (yrObject) => {
-        let scriptable = get_scriptable(yrObject)
-        if (!scriptable)
-            return
+    gameEvents.unit.onCtor.add(scriptable_add)
+    gameEvents.infantry.onCtor.add(scriptable_add)
+    gameEvents.building.onCtor.add(scriptable_add)
+    gameEvents.aircraft.onCtor.add(scriptable_add)
+    gameEvents.bullet.onConstruct.add(scriptable_add)
+    gameEvents.superWeapon.onCtor.add(scriptable_add)
+    gameEvents.house.onCtor.add(scriptable_add)
 
-    }
-
-    gameEvents.unit.onCtor.add(addScriptable)
-    gameEvents.infantry.onCtor.add(addScriptable)
-    gameEvents.building.onCtor.add(addScriptable)
-    gameEvents.aircraft.onCtor.add(addScriptable)
-    gameEvents.bullet.onConstruct.add(addScriptable)
-    gameEvents.superWeapon.onCtor.add(addScriptable)
-    gameEvents.house.onCtor.add(addScriptable)
-
-    gameEvents.unit.onDtor.add(removeScriptable)
-    gameEvents.infantry.onDtor.add(removeScriptable)
-    gameEvents.building.onDtor.add(removeScriptable)
-    gameEvents.aircraft.onDtor.add(removeScriptable)
-    gameEvents.bullet.onDtor.add(removeScriptable)
-    gameEvents.superWeapon.onDtor.add(removeScriptable)
-    gameEvents.house.onDtor.add(removeScriptable)
+    gameEvents.unit.onDtor.add(scriptable_remove)
+    gameEvents.infantry.onDtor.add(scriptable_remove)
+    gameEvents.building.onDtor.add(scriptable_remove)
+    gameEvents.aircraft.onDtor.add(scriptable_remove)
+    gameEvents.bullet.onDtor.add(scriptable_remove)
+    gameEvents.superWeapon.onDtor.add(scriptable_remove)
+    gameEvents.house.onDtor.add(scriptable_remove)
 
     gameEvents.unitType.onLoadIni.add(onLoadType)
     gameEvents.infantryType.onLoadIni.add(onLoadType)

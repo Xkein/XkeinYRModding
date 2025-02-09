@@ -21,6 +21,10 @@ func user_init_extra_vars(htType)
 end
 
 func init_extra_vars(htType)
+    htType.is_class = false
+    htType.is_enum = false
+    htType.is_module = false
+    
     if htType.cpp_class
         htType.is_class = true
         htType.class_name = htType.name

@@ -5,3 +5,4 @@
 /// <reference path="gen/YrExtCore.d.ts" />
 /// <reference path="gen/YRpp.d.ts" />
 /// <reference path="gen/XkeinExt.d.ts" />
+/// <reference path="scriptable.d.ts" />
