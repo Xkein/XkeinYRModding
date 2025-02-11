@@ -77,7 +77,7 @@ js代码热重载：
 - [puerts](https://github.com/Tencent/puerts) — 游戏Typescript编程解决方案
 - [imgui](https://github.com/thedmd/imgui) — 立即UI框架
 - [imgui-node-editor](https://github.com/thedmd/imgui-node-editor) — 可视化节点编辑器UI
-- v8 — javascript引擎
+- [nodejs](https://github.com/nodejs/node) — javascript引擎
 - [nlohmann json](https://github.com/nlohmann/json) — json库
 - stb — 图像读取库
 - spdlog — 日志库
@@ -181,7 +181,7 @@ Editor module
 - [puerts](https://github.com/Tencent/puerts) — Game Typescript programming resolution
 - [imgui](https://github.com/thedmd/imgui) — Immediate UI framework
 - [imgui-node-editor](https://github.com/thedmd/imgui-node-editor) — Visual node editor UI
-- v8 — javascript engine
+- [nodejs](https://github.com/nodejs/node) — javascript engine
 - [nlohmann json](https://github.com/nlohmann/json) — json library
 - stb — image library
 - spdlog — logger library
