@@ -62,12 +62,19 @@ class GameScriptable
     global.gameScripts = gameScripts
 
     gameEvents.game.onRulesLoadAfterTypeData.add((yrRules, iniReader) => {
+        if (iniReader.ReadString("Basic", "JsMapScript") > 0) {
+            var scriptName = iniReader.value().trim()
+            yrObjectType.__scriptable = gameScripts.getOrCreate(scriptName)
+        }
+    })
+
+    gameEvents.game.onSceneEnter.add(() => {
         
     })
 
     let onLoadType = (yrObjectType, iniReader) => {
         if (iniReader.ReadString(yrObjectType.m_ID, "JsScript") > 0) {
-            var scriptName = iniReader.value()
+            var scriptName = iniReader.value().trim()
             yrObjectType.__scriptable = gameScripts.getOrCreate(scriptName)
         }
     }

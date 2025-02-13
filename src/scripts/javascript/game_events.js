@@ -54,6 +54,9 @@ class GameEvents
     constructor() {
         this.onRulesLoadAfterTypeData = new Delegate()
         this.onBeginUpdate = new Delegate()
+        this.onSceneEnter = new Delegate()
+        this.onSceneExit = new Delegate()
+        this.onSceneLoad = new Delegate()
         this.onEndUpdate = new Delegate()
         this.onApplicationQuit = new Delegate()
     }

@@ -64,6 +64,12 @@ struct JsGameEvents
     PROPERTY()
     ScriptBehaviour<void(RulesClass*, IniReader*)> onRulesLoadAfterTypeData;
     PROPERTY()
+    ScriptBehaviour<void()> onSceneEnter;
+    PROPERTY()
+    ScriptBehaviour<void()> onSceneExit;
+    PROPERTY()
+    ScriptBehaviour<void()> onSceneLoad;
+    PROPERTY()
     ScriptBehaviour<void()> onBeginUpdate;
     PROPERTY()
     ScriptBehaviour<void()> onEndUpdate;

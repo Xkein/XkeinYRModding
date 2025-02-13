@@ -28,6 +28,9 @@ interface AbstractTypeEvents extends AbstractEvents
 interface GameEvents
 {
     onRulesLoadAfterTypeData: Delegate;
+    onSceneEnter: Delegate;
+    onSceneExit: Delegate;
+    onSceneLoad: Delegate;
     onBeginUpdate: Delegate;
     onEndUpdate: Delegate;
     onApplicationQuit: Delegate;

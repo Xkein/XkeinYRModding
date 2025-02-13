@@ -49,6 +49,9 @@ class JsAbstractTypeEvents
 class JsGameEvents
 {
     m_onRulesLoadAfterTypeData : any;
+    m_onSceneEnter : any;
+    m_onSceneExit : any;
+    m_onSceneLoad : any;
     m_onBeginUpdate : any;
     m_onEndUpdate : any;
     m_onApplicationQuit : any;

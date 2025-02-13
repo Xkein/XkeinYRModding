@@ -64,6 +64,7 @@ UsingPointer(WarheadTypeClass**);
 UsingPointer(WeaponTypeClass**);
 UsingPointer(ParticleClass**);
 UsingPointer(ParticleTypeClass**);
+UsingPointer(SmudgeTypeClass**);
 UsingPointer(CellClass**);
 UsingPointer(EBolt**);
 UsingPointer(ScriptTypeClass**);
@@ -133,6 +134,7 @@ UsingPointer(WarheadTypeClass*const*);
 UsingPointer(WeaponTypeClass*const*);
 UsingPointer(ParticleClass*const*);
 UsingPointer(ParticleTypeClass*const*);
+UsingPointer(SmudgeTypeClass*const*);
 UsingPointer(CellClass*const*);
 UsingPointer(EBolt*const*);
 UsingPointer(ScriptTypeClass*const*);
@@ -230,7 +232,6 @@ void __JsRegister_YrContainers()
     REGISTER_DYNAMIC_VECTOR_CLASS(AbstractTypeClass*);
     REGISTER_DYNAMIC_VECTOR_CLASS(ObjectClass*);
     REGISTER_DYNAMIC_VECTOR_CLASS(TechnoClass*);
-    REGISTER_DYNAMIC_VECTOR_CLASS(TechnoTypeClass*);
     REGISTER_DYNAMIC_VECTOR_CLASS(InfantryClass*);
     REGISTER_DYNAMIC_VECTOR_CLASS(AircraftClass*);
     REGISTER_DYNAMIC_VECTOR_CLASS(UnitClass*);
@@ -302,6 +303,9 @@ void __JsRegister_YrContainers()
     REGISTER_TYPE_LIST(VoxelAnimTypeClass*);
     REGISTER_TYPE_LIST(RGBClass*);
     REGISTER_TYPE_LIST(int);
+    REGISTER_TYPE_LIST(TechnoTypeClass*);
+    REGISTER_TYPE_LIST(TerrainTypeClass*);
+    REGISTER_TYPE_LIST(SmudgeTypeClass*);
 
     RegisterIndexClass<int, int>();
     RegisterIndexClass<MainVoxelIndexKey, VoxelCacheStruct*>();

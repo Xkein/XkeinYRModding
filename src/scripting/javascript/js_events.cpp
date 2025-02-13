@@ -165,6 +165,19 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeDataEvent)
     IniReader reader {E->pIni};
     INVOKE_JS_EVENT(JsEvents::game.onRulesLoadAfterTypeData, E->pRules, &reader);
 }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::game.onSceneEnter);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::game.onSceneExit);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneLoadEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::game.onSceneLoad);
+}
+
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
     auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTechnoType, onLoadIni);
     if (behavior)

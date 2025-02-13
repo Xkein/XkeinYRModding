@@ -202,7 +202,7 @@ void MakePropertyCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>
     if constexpr (std::is_member_object_pointer_v<decltype(Data)>)
     {
         using data_type = std::invoke_result_t<decltype(Data), T&>;
-        if constexpr (std::is_move_assignable_v<data_type>)
+        if constexpr (std::is_move_assignable_v<data_type> && !std::is_same_v<data_type, const char*&>)
         {
             builder.Property(name, MakeProperty(Data));
         }

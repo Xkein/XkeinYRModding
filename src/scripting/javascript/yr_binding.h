@@ -75,7 +75,7 @@ namespace PUERTS_NAMESPACE
             {
                 API::SetReturn(info, typename API::template Converter<Ret[Count]>::toScript(context, Variable->get()));
             }
-            else if constexpr (std::is_pointer_v<Ret>)
+            else if constexpr (std::is_pointer_v<Ret> || std::is_enum_v<Ret>)
             {
                 API::SetReturn(info, DecayTypeConverter<Ret>::toScript(context, Variable->get()));
             }

@@ -25,6 +25,7 @@
 #include <GadgetClass.h>
 #include <SuperClass.h>
 #include <CCINIClass.h>
+#include <SmudgeTypeClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -86,6 +87,7 @@ UsingYrClass(ScriptTypeClass);
 UsingYrClass(TaskForceClass);
 UsingYrClass(ParticleClass);
 UsingYrClass(ParticleTypeClass);
+UsingYrClass(SmudgeTypeClass);
 
 UsingCppType(RadBeam);
 UsingCppType(EBolt);
@@ -140,11 +142,16 @@ UsingCppType(StartingTechnoStruct);
 UsingCppType(AngerStruct);
 UsingCppType(ScoutStruct);
 UsingYrStruct(DropshipStruct);
+UsingCppType(LightingStruct);
+UsingCppType(DifficultyStruct);
+UsingCppType(Randomizer);
+UsingCppType(ScenarioFlags);
+UsingCppType(ScenarioClass)
 
 UsingCppType(INIClass);
 UsingCppType(CCINIClass);
-// not implement
 UsingCppType(RulesClass);
+// not implement
 UsingCppType(INIClass::INISection);
 UsingCppType(INIClass::INIComment);
 UsingCppType(FileClass);
@@ -205,6 +212,7 @@ UsingCppType(SubzoneTrackingStruct);
 UsingCppType(EventClass);
 UsingCppType(ULARGE_INTEGER);
 UsingPointer(void**);
+UsingCppType(Variable)
 
 UsingArray(RadioCommand);
 UsingArray(Crate);
@@ -217,6 +225,7 @@ UsingArray(int);
 UsingArray2D(int);
 UsingArray2D(unsigned int);
 UsingArray(void*);
+UsingArray(Variable);
 
 UsingContainer(IndexBitfield<HouseClass*>);
 UsingContainer(CounterClass);
@@ -225,7 +234,6 @@ UsingDynamicVectorClass(AbstractClass*);
 UsingDynamicVectorClass(AbstractTypeClass*);
 UsingDynamicVectorClass(ObjectClass*);
 UsingDynamicVectorClass(TechnoClass*);
-UsingDynamicVectorClass(TechnoTypeClass*);
 UsingDynamicVectorClass(InfantryClass*);
 UsingDynamicVectorClass(AircraftClass*);
 UsingDynamicVectorClass(UnitClass*);
@@ -267,7 +275,6 @@ UsingDynamicVectorClass(TriggerTypeClass*);
 UsingDynamicVectorClass(TeamClass*);
 UsingDynamicVectorClass(TeamTypeClass*);
 UsingDynamicVectorClass(TerrainClass*);
-UsingDynamicVectorClass(TerrainTypeClass*);
 UsingDynamicVectorClass(TemporalClass*);
 UsingDynamicVectorClass(TiberiumClass*);
 UsingDynamicVectorClass(WaveClass*);
@@ -299,6 +306,9 @@ UsingTypeList(BuildingTypeClass*);
 UsingTypeList(VoxelAnimTypeClass*);
 UsingTypeList(RGBClass*);
 UsingTypeList(int);
+UsingTypeList(TechnoTypeClass*);
+UsingTypeList(TerrainTypeClass*);
+UsingTypeList(SmudgeTypeClass*);
 
 UsingIndexClass(int, int);
 UsingIndexClass(MainVoxelIndexKey, VoxelCacheStruct*);
