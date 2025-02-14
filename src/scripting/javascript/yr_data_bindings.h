@@ -144,9 +144,12 @@ UsingCppType(ScoutStruct);
 UsingYrStruct(DropshipStruct);
 UsingCppType(LightingStruct);
 UsingCppType(DifficultyStruct);
+UsingCppType(RocketStruct);
 UsingCppType(Randomizer);
 UsingCppType(ScenarioFlags);
 UsingCppType(ScenarioClass)
+UsingCppType(EventClass);
+UsingCppType(Variable)
 
 UsingCppType(INIClass);
 UsingCppType(CCINIClass);
@@ -209,10 +212,8 @@ UsingCppType(CellLevelPassabilityStruct);
 UsingCppType(LevelAndPassabilityStruct2);
 UsingCppType(SubzoneConnectionStruct);
 UsingCppType(SubzoneTrackingStruct);
-UsingCppType(EventClass);
 UsingCppType(ULARGE_INTEGER);
 UsingPointer(void**);
-UsingCppType(Variable)
 
 UsingArray(RadioCommand);
 UsingArray(Crate);

@@ -213,7 +213,7 @@ class TechnoClass
     DrawVoxelShadow(vxl_0 : any, shadow_index_1 : number, vxl_index_key_2 : any, shadow_cache_3 : any, bound_4 : any, a3_5 : any, matrix_6 : any, again_7 : boolean, surface_8 : any, shadow_point_9 : any) : void;
     DrawObject(pSHP_0 : any, nFrame_1 : number, pLocation_2 : any, pBounds_3 : any, _4 : number, _5 : number, nZAdjust_6 : number, eZGradientDescIdx_7 : any, _8 : number, nBrightness_9 : number, TintColor_10 : number, pZShape_11 : any, nZFrame_12 : number, nZOffsetX_13 : number, nZOffsetY_14 : number, _15 : number) : void;
     sub_70DE00(State_0 : number) : number;
-    ClearPlanningTokens(pEvent_0 : any) : number;
+    ClearPlanningTokens(pEvent_0 : EventClass) : number;
     SetTargetForPassengers(pTarget_0 : AbstractClass) : void;
     KillPassengers(pSource_0 : TechnoClass) : void;
     GetOriginalOwner() : HouseClass;
@@ -3650,6 +3650,9 @@ class LaserDrawClass
     m_StartIntensity : number;
     m_EndIntensity : number;
 }
+class EventClass
+{
+}
 class FlashData
 {
     Update() : boolean;
@@ -4714,6 +4717,22 @@ class DifficultyStruct
     m_DestroyWalls : boolean;
     m_ContentScan : boolean;
 }
+class RocketStruct
+{
+    m_PauseFrames : number;
+    m_TiltFrames : number;
+    m_PitchInitial : number;
+    m_PitchFinal : number;
+    m_TurnRate : number;
+    m_RaiseRate : number;
+    m_Acceleration : number;
+    m_Altitude : number;
+    m_Damage : number;
+    m_EliteDamage : number;
+    m_BodyLength : number;
+    m_LazyCurve : boolean;
+    m_Type : AircraftTypeClass;
+}
 class RulesClass
 {
     Init(pINI_0 : CCINIClass) : void;
@@ -4944,9 +4963,9 @@ class RulesClass
     m_PrismSupportDelay : number;
     m_PrismSupportDuration : number;
     m_PrismSupportHeight : number;
-    m_V3Rocket : any;
-    m_DMisl : any;
-    m_CMisl : any;
+    m_V3Rocket : RocketStruct;
+    m_DMisl : RocketStruct;
+    m_CMisl : RocketStruct;
     m_ParadropRadius : number;
     m_ZoomInFactor : number;
     m_ConditionRedSparkingProbability : number;
@@ -5482,6 +5501,11 @@ class RulesClass
     m_DirectRockingCoefficient : number;
     m_FallBackCoefficient : number;
 }
+class Variable
+{
+    m_Name : number;
+    m_Value : number;
+}
 class LightingStruct
 {
     m_Tint : TintStruct;
@@ -5593,8 +5617,8 @@ class ScenarioClass
     m_CarryOverMoney : number;
     m_CarryOverCap : number;
     m_Percent : number;
-    m_GlobalVariables : any;
-    m_LocalVariables : any;
+    m_GlobalVariables : Variable;
+    m_LocalVariables : Variable;
     m_View1 : any;
     m_View2 : any;
     m_View3 : any;
