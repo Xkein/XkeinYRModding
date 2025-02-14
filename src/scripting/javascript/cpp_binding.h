@@ -154,6 +154,37 @@ namespace PUERTS_NAMESPACE                                                      
     }                                                                                                                            \
     }
 
+#define UsingReferenceConverter(CLS)                                                                       \
+namespace PUERTS_NAMESPACE                                                                                 \
+{                                                                                                          \
+    namespace internal                                                                                     \
+    {                                                                                                      \
+        template <>                                                                                        \
+        struct ConverterDecay<CLS&>                                                                \
+        {                                                                                                  \
+            using type = CLS&;                                                                     \
+        };                                                                                                 \
+    }                                                                                                      \
+    namespace v8_impl                                                                                      \
+    {                                                                                                      \
+        template<>                                                                                         \
+        struct Converter<CLS&>                                                                     \
+        {                                                                                                  \
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, CLS& value)       \
+            {                                                                                              \
+                return Converter<CLS*>::toScript(context, &value);                                 \
+            }                                                                                              \
+            static CLS& toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)   \
+            {                                                                                              \
+                return *Converter<CLS*>::toCpp(context, value);                                    \
+            }                                                                                              \
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)          \
+            {                                                                                              \
+                return Converter<CLS*>::accept(context, value);                                    \
+            }                                                                                              \
+        };                                                                                                 \
+    }                                                                                                      \
+}
 
 namespace PUERTS_NAMESPACE
 {

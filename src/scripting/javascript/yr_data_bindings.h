@@ -214,6 +214,7 @@ UsingCppType(SubzoneConnectionStruct);
 UsingCppType(SubzoneTrackingStruct);
 UsingCppType(ULARGE_INTEGER);
 UsingPointer(void**);
+UsingCppType(noinit_t);
 
 UsingArray(RadioCommand);
 UsingArray(Crate);
@@ -316,6 +317,9 @@ UsingIndexClass(MainVoxelIndexKey, VoxelCacheStruct*);
 UsingIndexClass(TurretWeaponVoxelIndexKey, VoxelCacheStruct*);
 UsingIndexClass(TurretBarrelVoxelIndexKey, VoxelCacheStruct*);
 UsingIndexClass(ShadowVoxelIndexKey, VoxelCacheStruct*);
+
+UsingReferenceConverter(LinkClass);
+UsingReferenceConverter(GadgetClass);
 
 namespace PUERTS_NAMESPACE
 {

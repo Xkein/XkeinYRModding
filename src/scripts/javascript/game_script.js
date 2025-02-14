@@ -60,6 +60,14 @@ class GameScriptable
 
 (function (global) {
     global.gameScripts = gameScripts
+    
+    var iniXkein = YRpp.CCINIClass.LoadINIFile("XkeinExt.ini")
+    var iniReaderXkein = new YrExtCore.IniReader(iniXkein)
+    if (iniReaderXkein.ReadString("Scripting", "InitScript") > 0) {
+        var scriptName = iniReaderXkein.value().trim()
+        require(scriptName)
+    }
+    YRpp.CCINIClass.UnloadINIFile(iniXkein)
 
     gameEvents.game.onRulesLoadAfterTypeData.add((yrRules, iniReader) => {
         if (iniReader.ReadString("Basic", "JsMapScript") > 0) {

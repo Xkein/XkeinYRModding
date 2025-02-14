@@ -54,7 +54,7 @@ void __JsRegister_{{type_name}}() {
         if function.is_constructor
             if !htClass.is_abstract
                 $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
-                $klass = append_line($klass, $'// builder.Constructor<{$arg_types}>();')
+                $klass = append_line($klass, $'builder.Constructor<{$arg_types}>();')
             end
         else if function.is_static
             if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
@@ -105,13 +105,13 @@ void __JsRegister_{{type_name}}() {
         
         if !string.empty($ctor_list) && !htClass.is_abstract
             if $ctor_count > 1
-                $klass = append_line($klass, $'/*builder.Constructor(CombineConstructors(')
+                $klass = append_line($klass, $'builder.Constructor(CombineConstructors(')
                 $klass = append_line($klass, $ctor_list)
-                $klass = append_line($klass, $'));*/')
+                $klass = append_line($klass, $'));')
             else
                 if !string.contains($ctor_list, "char const *")
                     $decay = $ctor_list | string.remove_first $'MakeConstructor({htClass.type_name}' | string.remove_first ',' | string.remove_first ')'
-                    $klass = append_line($klass, $'/*builder.Constructor<{$decay}>();*/')
+                    $klass = append_line($klass, $'builder.Constructor<{$decay}>();')
                 end
             end
         end
