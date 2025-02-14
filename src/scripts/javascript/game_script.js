@@ -72,12 +72,8 @@ class GameScriptable
     gameEvents.game.onRulesLoadAfterTypeData.add((yrRules, iniReader) => {
         if (iniReader.ReadString("Basic", "JsMapScript") > 0) {
             var scriptName = iniReader.value().trim()
-            yrObjectType.__scriptable = gameScripts.getOrCreate(scriptName)
+            var mapScriptable = gameScripts.getOrCreate(scriptName)
         }
-    })
-
-    gameEvents.game.onSceneEnter.add(() => {
-        
     })
 
     let onLoadType = (yrObjectType, iniReader) => {
