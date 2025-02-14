@@ -77,6 +77,7 @@ void InitLogger()
 
     gLogger = std::make_shared<spdlog::async_logger>("main", sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
     gLogger->set_level(logLevel);
+    gLogger->flush_on(spdlog::level::err);
 
     spdlog::register_logger(gLogger);
     spdlog::set_default_logger(gLogger);
@@ -172,6 +173,7 @@ void OnAppExit()
     if (appInited) {
         appInited = false;
         gLogger->info("OnAppExit!");
+        gLogger->flush();
         if (breakOnExit) {
             assert(false);
         }
