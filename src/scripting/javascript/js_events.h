@@ -73,8 +73,8 @@ struct JsGameEvents
     ScriptBehaviour<void()> onBeginUpdate;
     PROPERTY()
     ScriptBehaviour<void()> onEndUpdate;
-    PROPERTY()
-    ScriptBehaviour<void()> onApplicationQuit;
+    // PROPERTY()
+    // ScriptBehaviour<void()> onApplicationQuit;
 };
 
 CLASS(BindJs)

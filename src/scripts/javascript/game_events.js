@@ -58,7 +58,7 @@ class GameEvents
         this.onSceneExit = new Delegate()
         this.onSceneLoad = new Delegate()
         this.onEndUpdate = new Delegate()
-        this.onApplicationQuit = new Delegate()
+        // this.onApplicationQuit = new Delegate()
     }
 }
 
@@ -142,7 +142,7 @@ let __JsEvents = XkeinExt.JsEvents
 __JsEvents.s_game.m_onRulesLoadAfterTypeData = (...args) => { gameEvents.game.onRulesLoadAfterTypeData.invoke(...args) }
 __JsEvents.s_game.m_onBeginUpdate = (...args) => { gameEvents.game.onBeginUpdate.invoke(...args) }
 __JsEvents.s_game.m_onEndUpdate = (...args) => { gameEvents.game.onEndUpdate.invoke(...args) }
-__JsEvents.s_game.m_onApplicationQuit = (...args) => { gameEvents.game.onApplicationQuit.invoke(...args) }
+// __JsEvents.s_game.m_onApplicationQuit = (...args) => { gameEvents.game.onApplicationQuit.invoke(...args) }
 
 __JsEvents.s_physics.m_onCollisionEnter = (...args) => { gameEvents.physics.onCollisionEnter.invoke(...args) }
 __JsEvents.s_physics.m_onCollisionPersist = (...args) => { gameEvents.physics.onCollisionPersist.invoke(...args) }

@@ -54,7 +54,6 @@ class JsGameEvents
     m_onSceneLoad : any;
     m_onBeginUpdate : any;
     m_onEndUpdate : any;
-    m_onApplicationQuit : any;
 }
 class JsPhysicsEvents
 {

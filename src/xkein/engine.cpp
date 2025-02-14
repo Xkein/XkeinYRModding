@@ -62,7 +62,7 @@ void Engine::Exit()
     started = false;
     gLogger->info("Engine::Exit()");
 
-    INVOKE_JS_EVENT(JsEvents::game.onApplicationQuit);
+    // INVOKE_JS_EVENT(JsEvents::game.onApplicationQuit);
 
     delete gJsEnv;
     gJsEnv = nullptr;
