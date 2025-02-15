@@ -6,6 +6,7 @@
 #include <runtime/logger/logger.h>
 #include <core/macro.h>
 #include <optional>
+#include <comdef.h>
 
 #define UsingContainer(CLS) __DefObjectType(CLS) __DefCDataPointerConverter(CLS)
 
@@ -160,30 +161,63 @@ namespace PUERTS_NAMESPACE                                                      
     namespace internal                                                                                     \
     {                                                                                                      \
         template <>                                                                                        \
-        struct ConverterDecay<CLS&>                                                                \
+        struct ConverterDecay<CLS&>                                                                        \
         {                                                                                                  \
-            using type = CLS&;                                                                     \
+            using type = CLS&;                                                                             \
         };                                                                                                 \
     }                                                                                                      \
     namespace v8_impl                                                                                      \
     {                                                                                                      \
         template<>                                                                                         \
-        struct Converter<CLS&>                                                                     \
+        struct Converter<CLS&>                                                                             \
         {                                                                                                  \
-            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, CLS& value)       \
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, CLS& value)               \
             {                                                                                              \
-                return Converter<CLS*>::toScript(context, &value);                                 \
+                return Converter<CLS*>::toScript(context, &value);                                         \
             }                                                                                              \
-            static CLS& toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)   \
+            static CLS& toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)           \
             {                                                                                              \
-                return *Converter<CLS*>::toCpp(context, value);                                    \
+                return *Converter<CLS*>::toCpp(context, value);                                            \
             }                                                                                              \
             static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)          \
             {                                                                                              \
-                return Converter<CLS*>::accept(context, value);                                    \
+                return Converter<CLS*>::accept(context, value);                                            \
             }                                                                                              \
         };                                                                                                 \
     }                                                                                                      \
+}
+
+// to pass compile but not use function pointer
+#define MuteFunctionPtr(CLS)                                                                       \
+namespace PUERTS_NAMESPACE                                                                         \
+{                                                                                                  \
+    template<>                                                                                     \
+    struct ScriptTypeName<CLS>                                                                     \
+    {                                                                                              \
+        static constexpr auto value()                                                              \
+        {                                                                                          \
+            return internal::Literal(#CLS);                                                        \
+        }                                                                                          \
+    };                                                                                             \
+    namespace v8_impl                                                                              \
+    {                                                                                              \
+        template<>                                                                                 \
+        struct Converter<CLS*>                                                                     \
+        {                                                                                          \
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, CLS* value)       \
+            {                                                                                      \
+                return API::GetUndefined(context);                                                 \
+            }                                                                                      \
+            static CLS* toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)   \
+            {                                                                                      \
+                return nullptr;                                                                    \
+            }                                                                                      \
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)  \
+            {                                                                                      \
+                return false;                                                                      \
+            }                                                                                      \
+        };                                                                                         \
+    }                                                                                              \
 }
 
 namespace PUERTS_NAMESPACE
@@ -215,6 +249,62 @@ namespace PUERTS_NAMESPACE
                 return Converter<T>::accept(context, value);
             }
         };
+        
+        template<size_t Capacity>
+        struct Converter<char[Capacity]>
+        {
+            using data_type = char[Capacity];
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const data_type& value)
+            {
+                return Converter<const char*>::toScript(context, value);
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return value->IsString();
+            }
+        };
+
+        template<>
+        struct Converter<LARGE_INTEGER>
+        {
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, LARGE_INTEGER value)
+            {
+                return Converter<decltype(LARGE_INTEGER::QuadPart)>::toScript(context, value.QuadPart);
+            }
+
+            static LARGE_INTEGER toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                LARGE_INTEGER ret;
+                ret.QuadPart = Converter<decltype(LARGE_INTEGER::QuadPart)>::toCpp(context, value);
+                return ret;
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return Converter<decltype(LARGE_INTEGER::QuadPart)>::accept(context, value);
+            }
+        };
+
+        template<typename _Interface, const IID* _IID /*= &__uuidof(_Interface)*/>
+        struct Converter<_COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>>
+        {
+            using com_ptr = _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>;
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const com_ptr& value)
+            {
+                return Converter<_Interface*>::toScript(context, value.GetInterfacePtr());
+            }
+
+            static com_ptr toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return Converter<_Interface*>::toCpp(context, value);
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return Converter<_Interface*>::accept(context, value);
+            }
+        };
     } // namespace v8_impl
     
     template<typename T>
@@ -223,6 +313,24 @@ namespace PUERTS_NAMESPACE
         static constexpr auto value()
         {
             return internal::Literal("std::optional<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+    
+    template<>
+    struct ScriptTypeName<LARGE_INTEGER>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("LARGE_INTEGER");
+        }
+    };
+    
+    template<typename _Interface, const IID* _IID /*= &__uuidof(_Interface)*/>
+    struct ScriptTypeName<_COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("com_ptr<") + ScriptTypeNameWithNamespace<_Interface>::value() + internal::Literal(">");
         }
     };
 } // namespace PUERTS_NAMESPACE

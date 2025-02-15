@@ -162,62 +162,6 @@ namespace PUERTS_NAMESPACE
             }
         };
 
-        template<size_t Capacity>
-        struct Converter<char[Capacity]>
-        {
-            using data_type = char[Capacity];
-            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const data_type& value)
-            {
-                return Converter<const char*>::toScript(context, value);
-            }
-
-            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
-            {
-                return value->IsString();
-            }
-        };
-
-        template<>
-        struct Converter<LARGE_INTEGER>
-        {
-            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, LARGE_INTEGER value)
-            {
-                return Converter<decltype(LARGE_INTEGER::QuadPart)>::toScript(context, value.QuadPart);
-            }
-
-            static LARGE_INTEGER toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
-            {
-                LARGE_INTEGER ret;
-                ret.QuadPart = Converter<decltype(LARGE_INTEGER::QuadPart)>::toCpp(context, value);
-                return ret;
-            }
-
-            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
-            {
-                return Converter<decltype(LARGE_INTEGER::QuadPart)>::accept(context, value);
-            }
-        };
-
-        template<typename _Interface, const IID* _IID /*= &__uuidof(_Interface)*/>
-        struct Converter<_COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>>
-        {
-            using com_ptr = _COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>;
-            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const com_ptr& value)
-            {
-                return Converter<_Interface*>::toScript(context, value.GetInterfacePtr());
-            }
-
-            static com_ptr toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
-            {
-                return Converter<_Interface*>::toCpp(context, value);
-            }
-
-            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
-            {
-                return Converter<_Interface*>::accept(context, value);
-            }
-        };
-
         inline v8::Local<v8::Value> FindOrAddYrObject(v8::Isolate* InIsolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial);
         inline const void* GetYrJsTypeID(AbstractType type);
         template<typename T>
@@ -300,29 +244,11 @@ namespace PUERTS_NAMESPACE
     };
 
     template<>
-    struct ScriptTypeName<LARGE_INTEGER>
-    {
-        static constexpr auto value()
-        {
-            return internal::Literal("LARGE_INTEGER");
-        }
-    };
-
-    template<>
     struct ScriptTypeName<CounterClass>
     {
         static constexpr auto value()
         {
             return internal::Literal("CounterClass");
-        }
-    };
-
-    template<typename _Interface, const IID* _IID /*= &__uuidof(_Interface)*/>
-    struct ScriptTypeName<_COM_SMARTPTR<_COM_SMARTPTR_LEVEL2<_Interface, _IID>>>
-    {
-        static constexpr auto value()
-        {
-            return internal::Literal("com_ptr<") + ScriptTypeNameWithNamespace<_Interface>::value() + internal::Literal(">");
         }
     };
 } // namespace PUERTS_NAMESPACE

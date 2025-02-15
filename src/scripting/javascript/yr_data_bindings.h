@@ -22,10 +22,12 @@
 #include <ParticleClass.h>
 #include <BounceClass.h>
 #include <DisplayClass.h>
+#include <MouseClass.h>
 #include <GadgetClass.h>
 #include <SuperClass.h>
 #include <CCINIClass.h>
 #include <SmudgeTypeClass.h>
+#include <Blitters/Blitter.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -102,6 +104,22 @@ UsingCppType(LogicClass);
 UsingCppType(DisplayClass);
 UsingCppType(GScreenClass);
 UsingCppType(MapClass);
+UsingCppType(RadarClass);
+UsingCppType(PowerClass);
+UsingCppType(BuildType);
+UsingCppType(StripClass);
+UsingCppType(SidebarClass);
+UsingCppType(TabDataClass);
+UsingCppType(TabClass);
+UsingCppType(ScrollClass);
+UsingCppType(MouseClass);
+UsingCppType(ColorScheme);
+UsingCppType(ConvertClass);
+UsingCppType(LightConvertClass);
+UsingCppType(Surface);
+UsingCppType(XSurface);
+UsingCppType(DSurface);
+UsingCppType(BytePalette);
 UsingCppType(Crate);
 UsingCppType(GadgetClass);
 UsingCppType(LinkClass);
@@ -186,13 +204,11 @@ UsingCppType(IStream);
 UsingCppType(IApplication);
 UsingCppType(IEnumConnectionPoints);
 UsingPointer(IEnumConnectionPoints**);
+UsingCppType(IDirectDrawSurface);
+UsingCppType(DDSURFACEDESC2);
 UsingCppType(TubeClass);
-UsingCppType(LightConvertClass);
-UsingCppType(Surface);
-UsingCppType(DSurface);
 UsingCppType(FoggedObjectClass);
 UsingCppType(CRCEngine);
-UsingCppType(ColorScheme);
 UsingCppType(SHPStruct);
 UsingYrStruct(VoxelStruct);
 UsingCppType(SequenceStruct);
@@ -215,6 +231,9 @@ UsingCppType(SubzoneTrackingStruct);
 UsingCppType(ULARGE_INTEGER);
 UsingPointer(void**);
 UsingCppType(noinit_t);
+UsingCppType(HashIterator);
+UsingCppType(Blitter)
+UsingCppType(RLEBlitter)
 
 UsingArray(RadioCommand);
 UsingArray(Crate);
@@ -228,6 +247,14 @@ UsingArray2D(int);
 UsingArray2D(unsigned int);
 UsingArray(void*);
 UsingArray(Variable);
+UsingArray(Blitter*);
+UsingArray(RLEBlitter*);
+UsingArray(BuildType);
+UsingArray(StripClass);
+UsingArray(HouseClass*);
+UsingArray(ColorScheme*);
+using DynamicVectorClass_Point2D = DynamicVectorClass<Point2D>;
+UsingArray(DynamicVectorClass_Point2D);
 
 UsingContainer(IndexBitfield<HouseClass*>);
 UsingContainer(CounterClass);
@@ -253,9 +280,9 @@ UsingDynamicVectorClass(CaptureManagerClass*);
 UsingDynamicVectorClass(OverlayClass*);
 UsingDynamicVectorClass(OverlayTypeClass*);
 UsingDynamicVectorClass(FoggedObjectClass*);
-UsingDynamicVectorClass(CoordStruct);
 UsingDynamicVectorClass(FactoryClass*);
 UsingDynamicVectorClass(ParasiteClass*);
+UsingDynamicVectorClass(ConvertClass*);
 UsingDynamicVectorClass(LightConvertClass*);
 UsingDynamicVectorClass(BuildingLightClass*);
 UsingDynamicVectorClass(PlanningTokenClass*);
@@ -295,6 +322,8 @@ UsingDynamicVectorClass(StartingTechnoStruct*);
 UsingDynamicVectorClass(AngerStruct);
 UsingDynamicVectorClass(ScoutStruct);
 UsingDynamicVectorClass(CellStruct);
+UsingDynamicVectorClass(CoordStruct);
+UsingDynamicVectorClass(Point2D);
 UsingDynamicVectorClass(IConnectionPoint*);
 UsingDynamicVectorClass(ZoneConnectionClass);
 UsingDynamicVectorClass(SubzoneTrackingStruct);
@@ -320,6 +349,9 @@ UsingIndexClass(ShadowVoxelIndexKey, VoxelCacheStruct*);
 
 UsingReferenceConverter(LinkClass);
 UsingReferenceConverter(GadgetClass);
+
+using __func__fastcall__bool__int_ptr = bool __fastcall (int *);
+MuteFunctionPtr(__func__fastcall__bool__int_ptr);
 
 namespace PUERTS_NAMESPACE
 {

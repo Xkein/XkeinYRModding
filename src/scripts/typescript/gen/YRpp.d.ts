@@ -1,5 +1,9 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YRpp" {
+class BytePalette
+{
+    m_Entries : any;
+}
 class TintStruct
 {
     m_Red : number;
@@ -210,7 +214,7 @@ class TechnoClass
     MarkPassengersAsExited() : void;
     SetCurrentWeaponStage(idx_0 : number) : void;
     SetFocus(pFocus_0 : AbstractClass) : void;
-    DrawVoxelShadow(vxl_0 : any, shadow_index_1 : number, vxl_index_key_2 : any, shadow_cache_3 : any, bound_4 : any, a3_5 : any, matrix_6 : any, again_7 : boolean, surface_8 : any, shadow_point_9 : any) : void;
+    DrawVoxelShadow(vxl_0 : any, shadow_index_1 : number, vxl_index_key_2 : any, shadow_cache_3 : any, bound_4 : any, a3_5 : any, matrix_6 : any, again_7 : boolean, surface_8 : Surface, shadow_point_9 : any) : void;
     DrawObject(pSHP_0 : any, nFrame_1 : number, pLocation_2 : any, pBounds_3 : any, _4 : number, _5 : number, nZAdjust_6 : number, eZGradientDescIdx_7 : any, _8 : number, nBrightness_9 : number, TintColor_10 : number, pZShape_11 : any, nZFrame_12 : number, nZOffsetX_13 : number, nZOffsetY_14 : number, _15 : number) : void;
     sub_70DE00(State_0 : number) : number;
     ClearPlanningTokens(pEvent_0 : EventClass) : number;
@@ -220,7 +224,7 @@ class TechnoClass
     FireDeathWeapon(additionalDamage_0 : number) : void;
     HasAbility(ability_0 : any) : boolean;
     ClearSidebarTabObject() : void;
-    GetDrawer() : any;
+    GetDrawer() : LightConvertClass;
     GetEffectTintIntensity(currentIntensity_0 : number) : number;
     GetInvulnerabilityTintIntensity(currentIntensity_0 : number) : number;
     GetAirstrikeTintIntensity(currentIntensity_0 : number) : number;
@@ -1080,7 +1084,7 @@ class ObjectClass
     IsWarpingIn() : boolean;
     IsWarpingSomethingOut() : boolean;
     IsNotWarping() : boolean;
-    GetRemapColour() : any;
+    GetRemapColour() : LightConvertClass;
     static DrawALinkTo(src_X_0 : number, src_Y_1 : number, src_Z_2 : number, dst_X_3 : number, dst_Y_4 : number, dst_Z_5 : number, color_6 : any) : void;
     DistanceFrom(that_0 : AbstractClass) : number;
     GetHealthPercentage() : number;
@@ -1154,7 +1158,7 @@ class AnimClass
     m_Type : AnimTypeClass;
     m_OwnerObject : ObjectClass;
     m_unknown_D0 : number;
-    m_LightConvert : any;
+    m_LightConvert : LightConvertClass;
     m_LightConvertIndex : number;
     m_PaletteName : number;
     m_TintColor : number;
@@ -1949,7 +1953,7 @@ class BulletTypeClass
     m_Vertical : boolean;
     m_Elasticity : number;
     m_Acceleration : number;
-    m_Color : any;
+    m_Color : ColorScheme;
     m_Trailer : AnimTypeClass;
     m_ROT : number;
     m_CourseLockDuration : number;
@@ -2242,7 +2246,7 @@ class CellClass
     ReplaceTag(pTag_0 : TagClass) : void;
     UpdateCellLighting() : void;
     CalculateLightSourceLighting(nIntensity_0 : number, nAmbient_1 : number, Red1_2 : number, Green1_3 : number, Blue1_4 : number, Red2_5 : number, Green2_6 : number, Blue2_7 : number) : void;
-    InitLightConvert(pDrawer_0 : any, nIntensity_1 : number, nAmbient_2 : number, Red1_3 : number, Green1_4 : number, Blue1_5 : number) : void;
+    InitLightConvert(pDrawer_0 : LightConvertClass, nIntensity_1 : number, nAmbient_2 : number, Red1_3 : number, Green1_4 : number, Blue1_5 : number) : void;
     DrawOverlay(Location_0 : any, Bound_1 : any) : void;
     DrawOverlayShadow(Location_0 : any, Bound_1 : any) : void;
     IsClearToMove(speedType_0 : any, ignoreInfantry_1 : boolean, ignoreVehicles_2 : boolean, zone_3 : number, movementZone_4 : any, level_5 : number, isBridge_6 : boolean) : boolean;
@@ -2253,7 +2257,7 @@ class CellClass
     m_FoggedObjects : any;
     m_BridgeOwnerCell : CellClass;
     m_unknown_30 : number;
-    m_LightConvert : any;
+    m_LightConvert : LightConvertClass;
     m_IsoTileTypeIndex : number;
     m_AttachedTag : TagClass;
     m_Rubble : BuildingTypeClass;
@@ -3364,7 +3368,7 @@ class UnitClass
     UnmarkAllOccupationBits(coords_0 : any) : void;
     DrawAsVXL(Coords_0 : any, BoundingRect_1 : any, Brightness_2 : number, Tint_3 : number) : void;
     DrawAsSHP(Coords_0 : any, BoundingRect_1 : any, Brightness_2 : number, Tint_3 : number) : void;
-    DrawObject(pSurface_0 : any, Coords_1 : any, CacheRect_2 : any, Brightness_3 : number, Tint_4 : number) : void;
+    DrawObject(pSurface_0 : Surface, Coords_1 : any, CacheRect_2 : any, Brightness_3 : number, Tint_4 : number) : void;
     IsDeactivated() : boolean;
     UpdateTube() : void;
     UpdateRotation() : void;
@@ -3406,6 +3410,45 @@ class UnitClass
     m_Undeploying : boolean;
     m_NonPassengerCount : number;
     m_ToolTipText : any;
+}
+class Surface
+{
+    CopyFromWhole(pSrc_0 : Surface, bUnk1_1 : boolean, bUnk2_2 : boolean) : boolean;
+    CopyFromPart(pClipRect_0 : any, pSrc_1 : Surface, pSrcRect_2 : any, bUnk1_3 : boolean, bUnk2_4 : boolean) : boolean;
+    CopyFrom(pClipRect_0 : any, pClipRect2_1 : any, pSrc_2 : Surface, pDestRect_3 : any, pSrcRect_4 : any, bUnk1_5 : boolean, bUnk2_6 : boolean) : boolean;
+    FillRectEx(pClipRect_0 : any, pFillRect_1 : any, nColor_2 : number) : boolean;
+    FillRect(pFillRect_0 : any, nColor_1 : number) : boolean;
+    Fill(nColor_0 : number) : boolean;
+    FillRectTrans(pClipRect_0 : any, pColor_1 : any, nOpacity_2 : number) : boolean;
+    DrawEllipse(XOff_0 : number, YOff_1 : number, CenterX_2 : number, CenterY_3 : number, Rect_4 : any, nColor_5 : number) : boolean;
+    SetPixel(pPoint_0 : any, nColor_1 : number) : boolean;
+    GetPixel(pPoint_0 : any) : number;
+    DrawLineEx(pClipRect_0 : any, pStart_1 : any, pEnd_2 : any, nColor_3 : number) : boolean;
+    DrawLine(pStart_0 : any, pEnd_1 : any, nColor_2 : number) : boolean;
+    DrawLineColor_AZ(pRect_0 : any, pStart_1 : any, pEnd_2 : any, nColor_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
+    DrawMultiplyingLine_AZ(pRect_0 : any, pStart_1 : any, pEnd_2 : any, dwMultiplier_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
+    DrawSubtractiveLine_AZ(pRect_0 : any, pStart_1 : any, pEnd_2 : any, pColor_3 : any, dwUnk1_4 : number, dwUnk2_5 : number, bUnk1_6 : boolean, bUnk2_7 : boolean, bUkn3_8 : boolean, bUkn4_9 : boolean, fUkn_10 : number) : boolean;
+    DrawRGBMultiplyingLine_AZ(pRect_0 : any, pStart_1 : any, pEnd_2 : any, pColor_3 : any, Intensity_4 : number, dwUnk1_5 : number, dwUnk2_6 : number) : boolean;
+    PlotLine(pRect_0 : any, pStart_1 : any, pEnd_2 : any, fpDrawCallback_3 : any) : boolean;
+    DrawDashedLine(pStart_0 : any, pEnd_1 : any, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number) : boolean;
+    DrawDashedLine_(pStart_0 : any, pEnd_1 : any, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number, bUkn_5 : boolean) : boolean;
+    DrawLine_(pStart_0 : any, pEnd_1 : any, nColor_2 : number, bUnk_3 : boolean) : boolean;
+    DrawRectEx(pClipRect_0 : any, pDrawRect_1 : any, nColor_2 : number) : boolean;
+    DrawRect(pDrawRect_0 : any, dwColor_1 : number) : boolean;
+    Lock(X_0 : number, Y_1 : number) : void;
+    Unlock() : boolean;
+    CanLock(dwUkn1_0 : number, dwUkn2_1 : number) : boolean;
+    vt_entry_68(dwUnk1_0 : number, dwUnk2_1 : number) : boolean;
+    IsLocked() : boolean;
+    GetBytesPerPixel() : number;
+    GetPitch() : number;
+    GetRect(pRect_0 : any) : any;
+    GetWidth() : number;
+    GetHeight() : number;
+    IsDSurface() : boolean;
+    GetRect() : any;
+    m_Width : number;
+    m_Height : number;
 }
 class EBolt
 {
@@ -3612,6 +3655,70 @@ class RadSiteClass
     m_IntensityDecrement : number;
     m_RadDuration : number;
     m_RadTimeLeft : number;
+}
+class LightConvertClass
+    extends ConvertClass
+{
+    UpdateColors(red_0 : number, green_1 : number, blue_2 : number, tinted_3 : boolean) : void;
+    static InitLightConvert(red_0 : number, green_1 : number, blue_2 : number) : LightConvertClass;
+    s_Array : any;
+    m_UsedPalette1 : RGBClass;
+    m_UsedPalette2 : RGBClass;
+    m_IndexesToIgnore : number;
+    m_RefCount : number;
+    m_Color1 : TintStruct;
+    m_Color2 : TintStruct;
+    m_Tinted : boolean;
+}
+class ConvertClass
+{
+    static CreateFromFile(pFilename_0 : string, pPalette_1 : BytePalette, pDestination_2 : ConvertClass) : void;
+    SelectPlainBlitter(flags_0 : any) : any;
+    SelectRLEBlitter(flags_0 : any) : any;
+    s_Array : any;
+    m_BytesPerPixel : number;
+    m_Blitters : any;
+    m_RLEBlitters : any;
+    m_ShadeCount : number;
+    m_FullColorData : void;
+    m_PaletteData : void;
+    m_ByteColorData : void;
+    m_CurrentZRemap : number;
+    m_HalfTranslucencyMask : number;
+    m_QuatTranslucencyMask : number;
+}
+class DSurface
+    extends XSurface
+{
+    DrawGradientLine(pRect_0 : any, pStart_1 : any, pEnd_2 : any, pStartColor_3 : any, pEndColor_4 : any, fStep_5 : number, nColor_6 : number) : boolean;
+    CanBlit() : boolean;
+    DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : number, Position_3 : any, Bounds_4 : any, Flags_5 : any, Remap_6 : number, ZAdjust_7 : number, ZGradientDescIndex_8 : any, Brightness_9 : number, TintColor_10 : number, ZShape_11 : any, ZShapeFrame_12 : number, XOffset_13 : number, YOffset_14 : number) : void;
+    DrawTextA(pText_0 : any, pBounds_1 : any, pLocation_2 : any, ForeColor_3 : number, BackColor_4 : number, Flag_5 : any) : void;
+    DrawTextA(pText_0 : any, pLoction_1 : any, Color_2 : number) : void;
+    DrawTextA(pText_0 : any, X_1 : number, Y_2 : number, Color_3 : number) : void;
+    s_Tile : any;
+    s_Sidebar : any;
+    s_Primary : any;
+    s_Hidden : any;
+    s_Alternate : any;
+    s_Temp : any;
+    s_Composite : any;
+    s_SidebarBounds : any;
+    s_ViewBounds : any;
+    s_WindowBounds : any;
+    m_Buffer : void;
+    m_IsAllocated : boolean;
+    m_IsInVideoRam : boolean;
+    m_VideoSurfacePtr : any;
+    m_VideoSurfaceDescription : any;
+}
+class XSurface
+    extends Surface
+{
+    PutPixelClip(pPoint_0 : any, nUkn_1 : number, pRect_2 : any) : boolean;
+    GetPixelClip(pPoint_0 : any, pRect_1 : any) : number;
+    m_LockLevel : number;
+    m_BytesPerPixel : number;
 }
 class RGBClass
 {
@@ -4413,6 +4520,23 @@ class BulletData
     m_ArmTimer : CDTimerClass;
     m_Location : any;
     m_Distance : number;
+}
+class ColorScheme
+{
+    static Find(pID_0 : string, ShadeCount_1 : number) : ColorScheme;
+    static FindIndex(pID_0 : string, ShadeCount_1 : number) : number;
+    static FindByName(pID_0 : string, BaseColor_1 : any, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number) : ColorScheme;
+    static GetNumberOfSchemes() : number;
+    static GeneratePalette(name_0 : string) : any;
+    static GetPaletteSchemesFromIterator(it_0 : any) : any;
+    s_Array : any;
+    m_ArrayIndex : number;
+    m_Colors : BytePalette;
+    m_ID : string;
+    m_BaseColor : any;
+    m_LightConvert : LightConvertClass;
+    m_ShadeCount : number;
+    m_MainShadeIndex : number;
 }
 class AbilitiesStruct
 {
@@ -5703,7 +5827,7 @@ class OverlayClass
 }
 class GScreenClass
 {
-    static DoBlit(mouseCaptured_0 : boolean, surface_1 : any, rect_2 : any) : void;
+    static DoBlit(mouseCaptured_0 : boolean, surface_1 : DSurface, rect_2 : any) : void;
     QueryInterface(iid_0 : any, ppvObject_1 : void) : number;
     AddRef() : number;
     Release() : number;
@@ -5936,6 +6060,199 @@ class DisplayClass
     m_unknown_11D8 : number;
     m_unknown_11DC : number;
     m_unknown_11E0 : number;
+}
+class RadarClass
+    extends DisplayClass
+{
+    CreateEmptyMap(pMapRect_0 : any, reuse_1 : boolean, nLevel_2 : number, bUnk2_3 : boolean) : void;
+    SetVisibleRect(mapRect_0 : any) : void;
+    DisposeOfArt() : void;
+    vt_entry_CC(out_pUnk_0 : void, pPoint_1 : any) : void;
+    vt_entry_D0(dwUnk_0 : number) : void;
+    Init_For_House() : void;
+    s_Instance : any;
+    m_unknown_11E8 : number;
+    m_unknown_11EC : number;
+    m_unknown_11F0 : number;
+    m_unknown_11F4 : number;
+    m_unknown_11F8 : number;
+    m_unknown_11FC : number;
+    m_unknown_1200 : number;
+    m_unknown_1204 : number;
+    m_unknown_1208 : number;
+    m_unknown_rect_120C : any;
+    m_unknown_121C : number;
+    m_unknown_1220 : number;
+    m_unknown_cells_1124 : any;
+    m_unknown_123C : number;
+    m_unknown_1240 : number;
+    m_unknown_1244 : number;
+    m_unknown_1248 : number;
+    m_unknown_124C : number;
+    m_unknown_1250 : number;
+    m_unknown_1254 : number;
+    m_unknown_1258 : number;
+    m_unknown_points_125C : any;
+    m_unknown_1274 : number;
+    m_FoundationTypePixels : any;
+    m_RadarSizeFactor : number;
+    m_unknown_int_148C : number;
+    m_unknown_1490 : number;
+    m_unknown_1494 : number;
+    m_unknown_1498 : number;
+    m_unknown_rect_149C : any;
+    m_unknown_14AC : number;
+    m_unknown_14B0 : number;
+    m_unknown_14B4 : number;
+    m_unknown_14B8 : number;
+    m_unknown_bool_14BC : boolean;
+    m_unknown_bool_14BD : boolean;
+    m_unknown_14C0 : number;
+    m_unknown_14C4 : number;
+    m_unknown_14C8 : number;
+    m_unknown_14CC : number;
+    m_unknown_14D0 : number;
+    m_unknown_int_14D4 : number;
+    m_IsAvailableNow : boolean;
+    m_unknown_bool_14D9 : boolean;
+    m_unknown_bool_14DA : boolean;
+    m_unknown_rect_14DC : any;
+    m_unknown_14EC : number;
+    m_unknown_14F0 : number;
+    m_unknown_14F4 : number;
+    m_unknown_14F8 : number;
+    m_unknown_14FC : number;
+    m_unknown_timer_1500 : CDTimerClass;
+}
+class PowerClass
+    extends RadarClass
+{
+    s_Instance : any;
+    m_unknown_bool_150C : boolean;
+    m_unknown_timer_1510 : CDTimerClass;
+    m_unknown_151C : number;
+    m_unknown_timer_1520 : CDTimerClass;
+    m_unknown_152C : number;
+    m_unknown_1530 : number;
+    m_unknown_1534 : number;
+    m_unknown_bool_1538 : boolean;
+    m_PowerOutput : number;
+    m_PowerDrain : number;
+}
+class BuildType
+{
+    static SortsBefore(leftType_0 : any, leftIndex_1 : number, rightType_2 : any, rightIndex_3 : number) : boolean;
+    m_ItemIndex : number;
+    m_ItemType : any;
+    m_IsAlt : boolean;
+    m_CurrentFactory : FactoryClass;
+    m_unknown_10 : number;
+    m_Progress : StageClass;
+    m_FlashEndFrame : number;
+}
+class StripClass
+{
+    m_Progress : StageClass;
+    m_AllowedToDraw : boolean;
+    m_Location : any;
+    m_Bounds : any;
+    m_Index : number;
+    m_NeedsRedraw : boolean;
+    m_unknown_3D : number;
+    m_unknown_3E : number;
+    m_unknown_3F : number;
+    m_unknown_40 : number;
+    m_TopRowIndex : number;
+    m_unknown_48 : number;
+    m_unknown_4C : number;
+    m_unknown_50 : number;
+    m_CameoCount : number;
+    m_Cameos : BuildType;
+}
+class SidebarClass
+    extends PowerClass
+{
+    SidebarNeedsRepaint(mode_0 : number) : void;
+    RepaintSidebar(tab_0 : number) : void;
+    AddCameo(absType_0 : any, idxType_1 : number) : boolean;
+    Draw(dwUnk_0 : number) : void;
+    vt_entry_D8(nUnknown_0 : number) : boolean;
+    static GetObjectTabIdx(abs_0 : any, idxType_1 : number, unused_2 : number) : number;
+    static GetObjectTabIdx(abs_0 : any, buildCat_1 : any, isNaval_2 : boolean) : number;
+    s_Instance : any;
+    s_TooltipBuffer : any;
+    m_Tabs : StripClass;
+    m_unknown_5394 : number;
+    m_unknown_5398 : number;
+    m_ActiveTabIndex : number;
+    m_unknown_53A0 : number;
+    m_HideObjectNameInTooltip : boolean;
+    m_IsSidebarActive : boolean;
+    m_SidebarNeedsRedraw : boolean;
+    m_SidebarBackgroundNeedsRedraw : boolean;
+    m_unknown_bool_53A8 : boolean;
+    m_DiplomacyHouses : HouseClass;
+    m_DiplomacyKills : number;
+    m_DiplomacyOwned : number;
+    m_DiplomacyPowerDrain : number;
+    m_DiplomacyColors : ColorScheme;
+    m_unknown_544C : number;
+    m_unknown_546C : number;
+    m_unknown_548C : number;
+    m_unknown_54AC : number;
+    m_unknown_54CC : number;
+    m_unknown_54EC : number;
+    m_unknown_550C : number;
+    m_DiplomacyNumHouses : number;
+    m_unknown_bool_5514 : boolean;
+    m_unknown_bool_5515 : boolean;
+}
+class TabDataClass
+{
+    m_TargetValue : number;
+    m_LastValue : number;
+    m_NeedsRedraw : boolean;
+    m_ValueIncreased : boolean;
+    m_ValueChanged : boolean;
+    m_ValueDelta : number;
+}
+class TabClass
+    extends SidebarClass
+{
+    Activate(control_0 : number) : void;
+    s_Instance : any;
+    m_TabData : TabDataClass;
+    m_unknown_timer_552C : CDTimerClass;
+    m_InsufficientFundsBlinkTimer : CDTimerClass;
+    m_unknown_byte_5544 : number;
+    m_MissionTimerPinged : boolean;
+    m_unknown_byte_5546 : number;
+}
+class ScrollClass
+    extends TabClass
+{
+    s_Instance : any;
+    m_unknown_int_5548 : number;
+    m_unknown_byte_554C : number;
+    m_unknown_int_5550 : number;
+    m_unknown_int_5554 : number;
+    m_unknown_byte_5548 : number;
+    m_unknown_byte_5549 : number;
+    m_unknown_byte_554A : number;
+}
+class MouseClass
+    extends ScrollClass
+{
+    SetCursor(idxCursor_0 : any, miniMap_1 : boolean) : boolean;
+    UpdateCursor(idxCursor_0 : any, miniMap_1 : boolean) : boolean;
+    RestoreCursor() : boolean;
+    UpdateCursorMinimapState(miniMap_0 : boolean) : void;
+    GetLastMouseCursor() : any;
+    s_Instance : any;
+    m_MouseCursorIsMini : boolean;
+    m_MouseCursorIndex : any;
+    m_MouseCursorLastIndex : any;
+    m_MouseCursorCurrentFrame : number;
 }
 enum DirType {
     North = 0,

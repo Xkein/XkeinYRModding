@@ -12,6 +12,8 @@
 #include <PixelFXClass.h>
 #include <TriggerTypeClass.h>
 #include <FoggedObjectClass.h>
+#include <Blitters/Blitter.h>
+#include <YRDDraw.h>
 #define wchar wchar_t
 
 {{get_meta_gen_header()}}

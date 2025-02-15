@@ -34,6 +34,7 @@
 #ifdef UNICODE
 #define GetClassNameA GetClassNameW
 #define LoadImageA LoadImageW
+#define DrawTextA DrawTextW
 #endif
 void __JsRegister_{{type_name}}() {
 {{ if is_class }}
@@ -54,7 +55,9 @@ void __JsRegister_{{type_name}}() {
         if function.is_constructor
             if !htClass.is_abstract
                 $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
-                $klass = append_line($klass, $'builder.Constructor<{$arg_types}>();')
+                if !string.contains($arg_types, "char const *")
+                    $klass = append_line($klass, $'builder.Constructor<{$arg_types}>();')
+                end
             end
         else if function.is_static
             if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
