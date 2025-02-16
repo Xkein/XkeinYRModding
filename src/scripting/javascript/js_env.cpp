@@ -183,6 +183,7 @@ JsEnv::~JsEnv()
     BackendEnv->StopPolling();
     DestroyInspector();
 
+    ObjectMap.clear();
     BackendEnv->JsPromiseRejectCallback.Reset();
     LastException.Reset();
     Require.Reset();
