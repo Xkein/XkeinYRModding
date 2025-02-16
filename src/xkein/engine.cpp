@@ -11,7 +11,7 @@
 #include "input/input.h"
 #include <GameClasses.h>
 
-Engine* gEngine;
+Engine* gEngine = nullptr;
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent) { if(gEngine) gEngine->OnSceneStart(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent) { if(gEngine) gEngine->OnSceneClear(); }

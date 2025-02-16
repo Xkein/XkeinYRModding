@@ -1,6 +1,6 @@
 #include "input/input.h"
 
-gainput::InputManager* Input::gManager;
+gainput::InputManager* Input::gManager = nullptr;
 gainput::InputMap*     Input::gMap;
 gainput::DeviceId      Input::gMouseId;
 gainput::DeviceId      Input::gKeyboardId;
@@ -28,5 +28,7 @@ void Input::Destroy()
 
 void Input::Tick()
 {
+    if (!gManager)
+        return;
     gManager->Update();
 }
