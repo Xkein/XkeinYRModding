@@ -82,12 +82,28 @@ public:
         hasSet = true;
     }
 };
+
+class YrHookOverride
+{
+    friend class YrHookEvent;
+    friend class YrHookEventSystem;
+
+    bool handled {false};
+public:
+    void Override() {
+        handled = true;
+    }
+};
+
 namespace detail
 {
     template<typename THookEvent>
     concept hook_event_override_return = requires(THookEvent e) {
         e.OverrideReturn({});
     };
+    
+    template<typename THookEvent>
+    concept hook_event_override = std::is_base_of_v<YrHookOverride, THookEvent>;
 
     template<typename THookEvent, DWORD hookAddress>
     DWORD get_hook_override_return_address();
@@ -130,8 +146,8 @@ public:
     template<class TEvent, DWORD HookAddress>
     inline static DWORD Broadcast(REGISTERS* R)
     {
-        YrHookEvent* hookEvent = GetEvent<TEvent>();
-        TEvent       e;
+        static YrHookEvent* hookEvent = GetEvent<TEvent>();
+        TEvent              e;
         hookEvent->InitHookInfo<TEvent, HookAddress>(R, &e);
         return Broadcast_Impl<TEvent, HookAddress>(hookEvent, R, &e);
     }
@@ -144,18 +160,19 @@ private:
     template<class TEvent, DWORD HookAddress>
     inline static DWORD Broadcast_Impl(YrHookEvent* hookEvent, REGISTERS* R, TEvent* E)
     {
-        if constexpr(detail::hook_event_override_return<TEvent>) {
-            auto retAddr = hookEvent->Broadcast(R, E);
+        auto retAddr = hookEvent->Broadcast(R, E);
+        if constexpr (detail::hook_event_override_return<TEvent>) {
             if (E->hasSet) {
                 R->EAX(E->returnValue);
                 return detail::get_hook_override_return_address<TEvent, HookAddress>();
-            } else {
-                return retAddr;
             }
         }
-        else {
-            return hookEvent->Broadcast(R, E);
+        if constexpr (detail::hook_event_override<TEvent>) {
+            if (E->handled) {
+                return detail::get_hook_override_return_address<TEvent, HookAddress>();
+            }
         }
+        return retAddr;
     }
 };
 

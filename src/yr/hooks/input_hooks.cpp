@@ -1,9 +1,20 @@
 #include "yr/event/input_event.h"
 #include "yr/yr_hook.h"
 
-bool YrInputBlocker::blockGadgetInput = false;
+bool YrInputBlocker::blockGadgetInput        = false;
 bool YrInputBlocker::blockUserInterfaceInput = false;
-bool YrInputBlocker::blockKeyboardInput = false;
+bool YrInputBlocker::blockKeyboardInput      = false;
+bool YrInputBlocker::blockMouseLeftInput     = false;
+bool YrInputBlocker::blockMouseRightInput    = false;
+
+void YrInputBlocker::BlockAllInput()
+{
+    blockGadgetInput = true;
+    blockUserInterfaceInput = true;
+    blockKeyboardInput = true;
+    blockMouseLeftInput = true;
+    blockMouseRightInput = true;
+}
 
 BROADCAST_HOOK_EVENT(0x4E18BC, 0x7, YrGadgetInputEvent)
 {
@@ -17,9 +28,11 @@ BROADCAST_HOOK_EVENT(0x4E18BC, 0x7, YrGadgetInputEvent)
 }
 IMPL_HOOK_BROADCAST(YrGadgetInputEvent, 0x4E18BC)
 {
-    YrInputBlocker::blockGadgetInput = false;
+    YrInputBlocker::blockGadgetInput        = false;
     YrInputBlocker::blockUserInterfaceInput = false;
-    YrInputBlocker::blockKeyboardInput = false;
+    YrInputBlocker::blockKeyboardInput      = false;
+    YrInputBlocker::blockMouseLeftInput     = false;
+    YrInputBlocker::blockMouseRightInput    = false;
 
     auto retAddr = hookEvent->Broadcast(R, E);
     if (!YrInputBlocker::blockGadgetInput)
@@ -56,7 +69,8 @@ BROADCAST_HOOK_EVENT(0x5BDDC0, 0x5, YrUserInterfaceInputEvent)
 }
 IMPL_HOOK_BROADCAST(YrUserInterfaceInputEvent, 0x5BDDC0)
 {
-    if (YrInputBlocker::blockUserInterfaceInput) {
+    if (YrInputBlocker::blockUserInterfaceInput)
+    {
         return 0x5BDF2A;
     }
     return hookEvent->Broadcast(R, E);
@@ -68,8 +82,66 @@ BROADCAST_HOOK_EVENT(0x55DEF8, 0x6, YrKeyboardInputEvent)
 }
 IMPL_HOOK_BROADCAST(YrKeyboardInputEvent, 0x55DEF8)
 {
-    if (YrInputBlocker::blockKeyboardInput) {
+    if (YrInputBlocker::blockKeyboardInput)
+    {
         *E->pKey = 0;
+    }
+    return hookEvent->Broadcast(R, E);
+}
+
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrDecideActionEvent, 0x692610, 0x69264A)
+BROADCAST_HOOK_EVENT(0x692610, 0x8, YrDecideActionEvent)
+{
+    E->cell     = *R->Stack<CellStruct*>(STACK_OFFSET(0x0, 0x4));
+    E->pObject  = R->Stack<ObjectClass*>(STACK_OFFSET(0x0, 0x8));
+}
+
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrConvertActionEvent, 0x4AAE90, 0x4AB397)
+BROADCAST_HOOK_EVENT(0x4AAE90, 0x8, YrConvertActionEvent)
+{
+    E->cell     = *R->Stack<CellStruct*>(STACK_OFFSET(0x0, 0x4));
+    E->shrouded = R->Stack<bool>(STACK_OFFSET(0x0, 0x8));
+    E->pObject  = R->Stack<ObjectClass*>(STACK_OFFSET(0x0, 0xC));
+    E->action   = R->Stack<Action>(STACK_OFFSET(0x0, 0x10));
+}
+
+BROADCAST_HOOK_EVENT(0x4AC380, 0x6, YrLeftMouseButtonDownEvent)
+{
+    E->point = *R->Stack<Point2D*>(STACK_OFFSET(0x0, 0x4));
+}
+IMPL_HOOK_BROADCAST(YrLeftMouseButtonDownEvent, 0x4AC380)
+{
+    if (YrInputBlocker::blockMouseLeftInput)
+    {
+        return 0x4AC433;
+    }
+    return hookEvent->Broadcast(R, E);
+}
+
+BROADCAST_HOOK_EVENT(0x4AB9B0, 0x5, YrLeftMouseButtonUpEvent)
+{
+    E->coords = *R->Stack<CoordStruct*>(STACK_OFFSET(0x0, 0x4));
+    E->cell   = *R->Stack<CellStruct*>(STACK_OFFSET(0x0, 0x8));
+    E->pObject = R->Stack<ObjectClass*>(STACK_OFFSET(0x0, 0xC));
+    E->action = R->Stack<Action>(STACK_OFFSET(0x0, 0x10));
+}
+IMPL_HOOK_BROADCAST(YrLeftMouseButtonUpEvent, 0x4AB9B0)
+{
+    if (YrInputBlocker::blockMouseLeftInput)
+    {
+        return 0x4AC433;
+    }
+    return hookEvent->Broadcast(R, E);
+}
+
+BROADCAST_HOOK_EVENT(0x693840, 0x9, YrRightMouseButtonUpEvent)
+{
+}
+IMPL_HOOK_BROADCAST(YrRightMouseButtonUpEvent, 0x693840)
+{
+    if (YrInputBlocker::blockMouseRightInput)
+    {
+        return 0x693865;
     }
     return hookEvent->Broadcast(R, E);
 }

@@ -7,6 +7,8 @@ class YrInputBlocker
     s_blockGadgetInput : boolean;
     s_blockUserInterfaceInput : boolean;
     s_blockKeyboardInput : boolean;
+    s_blockMouseLeftInput : boolean;
+    s_blockMouseRightInput : boolean;
 }
 class IniReader
 {

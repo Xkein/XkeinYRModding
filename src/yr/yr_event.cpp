@@ -132,7 +132,7 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
                 YrHookInfo& info = impl->_infos[idx];
                 YrHookMeta& meta = info.meta;
                 ++info.errors;
-                gLogger->error("hook encounter error! ({} times)!", info.errors);
+                gLogger->error("hook {} encounter error! ({} times)!", (void*)context.GetHookAddress() ,info.errors);
                 gLogger->error("stack trace : {}", *stackTrace);
             }
             else
