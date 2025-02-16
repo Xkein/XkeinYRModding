@@ -24,6 +24,9 @@ namespace detail { \
     } \
 }
 
+#define IMPL_HOOK_BROADCAST(HookEvent, HookAddress) \
+    template<> DWORD YrHookEventSystem::Broadcast_Impl<HookEvent, HookAddress>(YrHookEvent* hookEvent, REGISTERS* R, HookEvent* E)
+
 struct YrHookContext final
 {
     REGISTERS* const   R;

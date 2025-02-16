@@ -127,30 +127,36 @@ public:
     }
 
 #ifdef YREXTCORE_IMPL
-    template<class T, DWORD HookAddress>
+    template<class TEvent, DWORD HookAddress>
     inline static DWORD Broadcast(REGISTERS* R)
     {
-        YrHookEvent* hookEvent = GetEvent<T>();
-        T            e;
-        hookEvent->InitHookInfo<T, HookAddress>(R, &e);
-        if constexpr(detail::hook_event_override_return<T>) {
-            auto retAddr = hookEvent->Broadcast(R, &e);
-            if (e.hasSet) {
-                R->EAX(e.returnValue);
-                return detail::get_hook_override_return_address<T, HookAddress>();
-            } else {
-                return retAddr;
-            }
-        }
-        else {
-            return hookEvent->Broadcast(R, &e);
-        }
+        YrHookEvent* hookEvent = GetEvent<TEvent>();
+        TEvent       e;
+        hookEvent->InitHookInfo<TEvent, HookAddress>(R, &e);
+        return Broadcast_Impl<TEvent, HookAddress>(hookEvent, R, &e);
     }
 #endif // YREXTCORE_IMPL
 
 private:
     template<class T>
     static YrHookEvent* GetEvent_Impl();
+
+    template<class TEvent, DWORD HookAddress>
+    inline static DWORD Broadcast_Impl(YrHookEvent* hookEvent, REGISTERS* R, TEvent* E)
+    {
+        if constexpr(detail::hook_event_override_return<TEvent>) {
+            auto retAddr = hookEvent->Broadcast(R, E);
+            if (E->hasSet) {
+                R->EAX(E->returnValue);
+                return detail::get_hook_override_return_address<TEvent, HookAddress>();
+            } else {
+                return retAddr;
+            }
+        }
+        else {
+            return hookEvent->Broadcast(R, E);
+        }
+    }
 };
 
 #define REGISTER_YR_HOOK_EVENT_LISTENER(EventType, Listener) \

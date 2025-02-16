@@ -1,6 +1,13 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YrExtCore" {
 import { CDTimerClass, AbstractClass, CCINIClass } from "YRpp";
+class YrInputBlocker
+{
+    static BlockAllInput() : void;
+    s_blockGadgetInput : boolean;
+    s_blockUserInterfaceInput : boolean;
+    s_blockKeyboardInput : boolean;
+}
 class IniReader
 {
     GetIni() : CCINIClass;

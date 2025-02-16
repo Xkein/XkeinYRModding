@@ -23,4 +23,7 @@ UsingCppType(PhysicsCollisionRemoveResult);
 #include "yr/parse/ini_reader.h"
 UsingCppType(IniReader);
 
+#include "yr/event/input_event.h"
+UsingCppType(YrInputBlocker);
+
 #endif
