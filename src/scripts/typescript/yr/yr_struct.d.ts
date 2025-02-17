@@ -18,7 +18,7 @@ declare module "YRpp" {
         HasStarted() : void;
         IsTicking() : void;
         HasTimeLeft() : void;
-        mStartTime : number;
-        mTimeLeft : number;
+        m_StartTime : number;
+        m_TimeLeft : number;
     }
 }

@@ -9,6 +9,7 @@
     type_map["void"] = "void"
     type_map["char"] = "number"
     type_map["wchar"] = "number"
+    type_map["wchar_t"] = "number"
     type_map["unsigned char"] = "number"
     type_map["short"] = "number"
     type_map["unsigned short"] = "number"
@@ -42,6 +43,9 @@
         end
         $unwrap = httype.unwrap_type(type)
         $unwrap_name = $unwrap.full_name
+        if $unwrap_name == "char" && is_array_type(type)
+            ret "string"
+        end
         $mapped_type = type_map[$unwrap_name]
         if $mapped_type
             ret $mapped_type
@@ -79,7 +83,11 @@
         end
         $result += function.name
         $result += "("
-        $result += array.each(cppFunction.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)}'); end) | array.join ", "
+        if function.is_override
+            $result += array.each(cppFunction.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)} | any'); end) | array.join ", "
+        else
+            $result += array.each(cppFunction.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)}'); end) | array.join ", "
+        end
         $result += ") : "
         $result += get_ts_type(cppFunction.return_type)
         $result += ";"

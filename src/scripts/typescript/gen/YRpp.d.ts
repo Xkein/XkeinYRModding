@@ -29,25 +29,25 @@ class RateTimer
 }
 class FacingClass
 {
-    SetDesired(facing_0 : any) : boolean;
-    SetCurrent(facing_0 : any) : boolean;
-    Desired() : any;
-    Current() : any;
+    SetDesired(facing_0 : DirStruct) : boolean;
+    SetCurrent(facing_0 : DirStruct) : boolean;
+    Desired() : DirStruct;
+    Current() : DirStruct;
     IsRotating() : boolean;
     IsRotatingCCW() : boolean;
     IsRotatingCW() : boolean;
-    Difference() : any;
+    Difference() : DirStruct;
     SetROT(rate_0 : number) : void;
-    m_DesiredFacing : any;
-    m_StartFacing : any;
+    m_DesiredFacing : DirStruct;
+    m_StartFacing : DirStruct;
     m_RotationTimer : CDTimerClass;
-    m_ROT : any;
+    m_ROT : DirStruct;
 }
 class TechnoClass
     extends RadioClass
 {
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     Limbo() : boolean;
     IsUnitFactory() : boolean;
     IsCloakable() : boolean;
@@ -58,7 +58,7 @@ class TechnoClass
     vt_entry_29C() : boolean;
     IsReadyToCloak() : boolean;
     ShouldNotBeCloaked() : boolean;
-    TurretFacing(pBuffer_0 : any) : any;
+    TurretFacing(pBuffer_0 : DirStruct) : DirStruct;
     IsArmed() : boolean;
     vt_entry_2B0() : boolean;
     GetStoragePercentage() : number;
@@ -67,7 +67,7 @@ class TechnoClass
     GetThreatValue() : number;
     IsInSameZoneAs(pTarget_0 : AbstractClass) : boolean;
     vt_entry_2C8(dwUnk_0 : number, dwUnk2_1 : number) : number;
-    IsInSameZoneAsCoords(coord_0 : any) : boolean;
+    IsInSameZoneAsCoords(coord_0 : CoordStruct) : boolean;
     GetCrewCount() : number;
     GetAntiAirValue() : number;
     GetAntiArmorValue() : number;
@@ -77,12 +77,12 @@ class TechnoClass
     SelectNavalTargeting(pTarget_0 : AbstractClass) : number;
     GetZAdjustment() : number;
     GetZGradient() : any;
-    GetLastFlightMapCoords() : any;
-    SetLastFlightMapCoords(coord_0 : any) : void;
-    vt_entry_2FC(Buffer_0 : any, dwUnk2_1 : number, dwUnk3_2 : number) : any;
-    vt_entry_300(Buffer_0 : any, dwUnk2_1 : number) : any;
+    GetLastFlightMapCoords() : CellStruct;
+    SetLastFlightMapCoords(coord_0 : CellStruct) : void;
+    vt_entry_2FC(Buffer_0 : CellStruct, dwUnk2_1 : number, dwUnk3_2 : number) : CellStruct;
+    vt_entry_300(Buffer_0 : CoordStruct, dwUnk2_1 : number) : CoordStruct;
     vt_entry_304(dwUnk_0 : number, dwUnk2_1 : number) : number;
-    GetRealFacing(pBuffer_0 : any) : any;
+    GetRealFacing(pBuffer_0 : DirStruct) : DirStruct;
     GetCrew() : InfantryTypeClass;
     vt_entry_310() : boolean;
     CanDeploySlashUnload() : boolean;
@@ -124,7 +124,7 @@ class TechnoClass
     TriggersCellInset(pTarget_0 : AbstractClass) : boolean;
     IsCloseEnough(pTarget_0 : AbstractClass, idxWeapon_1 : number) : boolean;
     IsCloseEnoughToAttack(pTarget_0 : AbstractClass) : boolean;
-    IsCloseEnoughToAttackCoords(Coords_0 : any) : boolean;
+    IsCloseEnoughToAttackCoords(Coords_0 : CoordStruct) : boolean;
     vt_entry_3B4(dwUnk_0 : number) : number;
     Destroyed(Killer_0 : ObjectClass) : void;
     GetFireErrorWithoutRange(pTarget_0 : AbstractClass, nWeaponIndex_1 : number) : any;
@@ -155,18 +155,18 @@ class TechnoClass
     Sensed() : void;
     Reload() : void;
     vt_entry_428() : void;
-    GetAttackCoordinates(pCrd_0 : any) : any;
+    GetAttackCoordinates(pCrd_0 : CoordStruct) : CoordStruct;
     IsNotWarpingIn() : boolean;
     vt_entry_434(dwUnk_0 : number) : boolean;
     DrawActionLines(Force_0 : boolean, dwUnk2_1 : number) : void;
     GetDisguiseFlags(existingFlags_0 : number) : number;
     IsClearlyVisibleTo(House_0 : HouseClass) : boolean;
-    DrawVoxel(Voxel_0 : any, dwUnk2_1 : number, Facing_2 : number, VoxelIndex_3 : any, Rect_4 : any, Location_5 : any, Matrix_6 : any, Intensity_7 : number, dwUnk9_8 : number, dwUnk10_9 : number) : void;
+    DrawVoxel(Voxel_0 : any, dwUnk2_1 : number, Facing_2 : number, VoxelIndex_3 : any, Rect_4 : RectangleStruct, Location_5 : Point2D, Matrix_6 : Matrix3D, Intensity_7 : number, dwUnk9_8 : number, dwUnk10_9 : number) : void;
     vt_entry_448(dwUnk_0 : number, dwUnk2_1 : number) : void;
-    DrawHealthBar(pLocation_0 : any, pBounds_1 : any, bUnk3_2 : boolean) : void;
-    DrawPipScalePips(pLocation_0 : any, pOriginalLocation_1 : any, pBounds_2 : any) : void;
-    DrawVeterancyPips(pLocation_0 : any, pBounds_1 : any) : void;
-    DrawExtraInfo(location_0 : any, originalLocation_1 : any, bounds_2 : any) : void;
+    DrawHealthBar(pLocation_0 : Point2D, pBounds_1 : RectangleStruct, bUnk3_2 : boolean) : void;
+    DrawPipScalePips(pLocation_0 : Point2D, pOriginalLocation_1 : Point2D, pBounds_2 : RectangleStruct) : void;
+    DrawVeterancyPips(pLocation_0 : Point2D, pBounds_1 : RectangleStruct) : void;
+    DrawExtraInfo(location_0 : Point2D, originalLocation_1 : Point2D, bounds_2 : RectangleStruct) : void;
     Uncloak(bPlaySound_0 : boolean) : void;
     Cloak(bPlaySound_0 : boolean) : void;
     vt_entry_464(dwUnk_0 : number) : number;
@@ -180,7 +180,7 @@ class TechnoClass
     EnterIdleMode(initial_0 : boolean, unused_1 : boolean) : boolean;
     UpdateSight(dwUnk_0 : number, dwUnk2_1 : number, dwUnk3_2 : number, dwUnk4_3 : number, dwUnk5_4 : number) : void;
     vt_entry_48C(dwUnk_0 : number, dwUnk2_1 : number, dwUnk3_2 : number, dwUnk4_3 : number) : void;
-    ForceCreate(coord_0 : any, dwUnk_1 : number) : boolean;
+    ForceCreate(coord_0 : CoordStruct, dwUnk_1 : number) : boolean;
     RadarTrackingStart() : void;
     RadarTrackingStop() : void;
     RadarTrackingFlash() : void;
@@ -190,7 +190,7 @@ class TechnoClass
     vt_entry_4AC() : boolean;
     vt_entry_4B0() : boolean;
     vt_entry_4B4() : number;
-    vt_entry_4B8(pCrd_0 : any) : any;
+    vt_entry_4B8(pCrd_0 : CoordStruct) : CoordStruct;
     CanUseWaypoint() : boolean;
     CanAttackOnTheMove() : boolean;
     vt_entry_4C4() : boolean;
@@ -198,15 +198,15 @@ class TechnoClass
     vt_entry_4CC() : void;
     vt_entry_4D0() : boolean;
     StartReloading() : void;
-    ShouldSuppress(coords_0 : any) : boolean;
+    ShouldSuppress(coords_0 : CellStruct) : boolean;
     get_ID() : string;
     TimeToBuild() : number;
     IsMindControlled() : boolean;
     CanBePermaMindControlled() : boolean;
-    CreateLaser(pTarget_0 : ObjectClass, idxWeapon_1 : number, pWeapon_2 : WeaponTypeClass, Coords_3 : any) : LaserDrawClass;
+    CreateLaser(pTarget_0 : ObjectClass, idxWeapon_1 : number, pWeapon_2 : WeaponTypeClass, Coords_3 : CoordStruct) : LaserDrawClass;
     UpdateThreatInCell(Cell_0 : CellClass) : void;
-    CanAutoTargetObject(targetFlags_0 : any, canTargetWhatAmI_1 : number, wantedDistance_2 : number, pTarget_3 : TechnoClass, pThreatPosed_4 : number, dwUnk_5 : number, pSourceCoords_6 : any) : boolean;
-    TryAutoTargetObject(targetFlags_0 : any, canTargetWhatAmI_1 : number, pCoords_2 : any, dwUnk1_3 : number, dwUnk2_4 : number, pThreatPosed_5 : number, dwUnk3_6 : number) : boolean;
+    CanAutoTargetObject(targetFlags_0 : any, canTargetWhatAmI_1 : number, wantedDistance_2 : number, pTarget_3 : TechnoClass, pThreatPosed_4 : number, dwUnk_5 : number, pSourceCoords_6 : CoordStruct) : boolean;
+    TryAutoTargetObject(targetFlags_0 : any, canTargetWhatAmI_1 : number, pCoords_2 : CellStruct, dwUnk1_3 : number, dwUnk2_4 : number, pThreatPosed_5 : number, dwUnk3_6 : number) : boolean;
     Reactivate() : void;
     Deactivate() : void;
     EnteredOpenTopped(pWho_0 : TechnoClass) : void;
@@ -214,8 +214,8 @@ class TechnoClass
     MarkPassengersAsExited() : void;
     SetCurrentWeaponStage(idx_0 : number) : void;
     SetFocus(pFocus_0 : AbstractClass) : void;
-    DrawVoxelShadow(vxl_0 : any, shadow_index_1 : number, vxl_index_key_2 : any, shadow_cache_3 : any, bound_4 : any, a3_5 : any, matrix_6 : any, again_7 : boolean, surface_8 : Surface, shadow_point_9 : any) : void;
-    DrawObject(pSHP_0 : any, nFrame_1 : number, pLocation_2 : any, pBounds_3 : any, _4 : number, _5 : number, nZAdjust_6 : number, eZGradientDescIdx_7 : any, _8 : number, nBrightness_9 : number, TintColor_10 : number, pZShape_11 : any, nZFrame_12 : number, nZOffsetX_13 : number, nZOffsetY_14 : number, _15 : number) : void;
+    DrawVoxelShadow(vxl_0 : any, shadow_index_1 : number, vxl_index_key_2 : any, shadow_cache_3 : any, bound_4 : RectangleStruct, a3_5 : Point2D, matrix_6 : Matrix3D, again_7 : boolean, surface_8 : Surface, shadow_point_9 : Point2D) : void;
+    DrawObject(pSHP_0 : any, nFrame_1 : number, pLocation_2 : Point2D, pBounds_3 : RectangleStruct, _4 : number, _5 : number, nZAdjust_6 : number, eZGradientDescIdx_7 : any, _8 : number, nBrightness_9 : number, TintColor_10 : number, pZShape_11 : any, nZFrame_12 : number, nZOffsetX_13 : number, nZOffsetY_14 : number, _15 : number) : void;
     sub_70DE00(State_0 : number) : number;
     ClearPlanningTokens(pEvent_0 : EventClass) : number;
     SetTargetForPassengers(pTarget_0 : AbstractClass) : void;
@@ -232,17 +232,17 @@ class TechnoClass
     GetPrimaryWeapon() : WeaponStruct;
     GetIonCannonValue(difficulty_0 : any) : number;
     GetIonCannonValue(difficulty_0 : any, maxHealth_1 : number) : number;
-    TurretFacing() : any;
-    GetRealFacing() : any;
+    TurretFacing() : DirStruct;
+    GetRealFacing() : DirStruct;
     BaseIsAttacked(pEnemy_0 : TechnoClass) : void;
     s_AbsDerivateID : any;
     s_Array : any;
     m_Flashing : FlashData;
-    m___Flashing : number;
+    m___Flashing : string;
     m_Animation : StageClass;
-    m___Animation : number;
+    m___Animation : string;
     m_Passengers : PassengersClass;
-    m___Passengers : number;
+    m___Passengers : string;
     m_Transporter : TechnoClass;
     m_unknown_int_120 : number;
     m_CurrentTurretNumber : number;
@@ -257,24 +257,24 @@ class TechnoClass
     m_TurretAnimFrame : number;
     m_InitialOwner : HouseClass;
     m_Veterancy : VeterancyStruct;
-    m___Veterancy : number;
+    m___Veterancy : string;
     m_ArmorMultiplier : number;
     m_FirepowerMultiplier : number;
     m_IdleActionTimer : CDTimerClass;
-    m___IdleActionTimer : number;
+    m___IdleActionTimer : string;
     m_RadarFlashTimer : CDTimerClass;
-    m___RadarFlashTimer : number;
+    m___RadarFlashTimer : string;
     m_TargetingTimer : CDTimerClass;
-    m___TargetingTimer : number;
+    m___TargetingTimer : string;
     m_IronCurtainTimer : CDTimerClass;
-    m___IronCurtainTimer : number;
+    m___IronCurtainTimer : string;
     m_IronTintTimer : CDTimerClass;
-    m___IronTintTimer : number;
+    m___IronTintTimer : string;
     m_IronTintStage : number;
     m_AirstrikeTimer : CDTimerClass;
-    m___AirstrikeTimer : number;
+    m___AirstrikeTimer : string;
     m_AirstrikeTintTimer : CDTimerClass;
-    m___AirstrikeTintTimer : number;
+    m___AirstrikeTintTimer : string;
     m_AirstrikeTintStage : number;
     m_ForceShielded : number;
     m_Deactivated : boolean;
@@ -284,27 +284,27 @@ class TechnoClass
     m_Disguised : boolean;
     m_DisguiseCreationFrame : number;
     m_InfantryBlinkTimer : CDTimerClass;
-    m___InfantryBlinkTimer : number;
+    m___InfantryBlinkTimer : string;
     m_DisguiseBlinkTimer : CDTimerClass;
-    m___DisguiseBlinkTimer : number;
+    m___DisguiseBlinkTimer : string;
     m_UnlimboingInfantry : boolean;
     m_ReloadTimer : CDTimerClass;
-    m___ReloadTimer : number;
+    m___ReloadTimer : string;
     m_unknown_208 : number;
     m_unknown_20C : number;
     m_DisplayProductionTo : any;
-    m___DisplayProductionTo : number;
+    m___DisplayProductionTo : string;
     m_Group : number;
     m_Focus : AbstractClass;
     m_Owner : HouseClass;
     m_CloakState : any;
     m_CloakProgress : StageClass;
-    m___CloakProgress : number;
+    m___CloakProgress : string;
     m_CloakDelayTimer : CDTimerClass;
-    m___CloakDelayTimer : number;
+    m___CloakDelayTimer : string;
     m_WarpFactor : number;
     m_unknown_bool_250 : boolean;
-    m_LastSightCoords : any;
+    m_LastSightCoords : CoordStruct;
     m_LastSightRange : number;
     m_LastSightHeight : number;
     m_GapSuperCharged : boolean;
@@ -319,7 +319,7 @@ class TechnoClass
     m_IsImmobilized : boolean;
     m_unknown_280 : number;
     m_ChronoLockRemaining : number;
-    m_ChronoDestCoords : any;
+    m_ChronoDestCoords : CoordStruct;
     m_Airstrike : AirstrikeClass;
     m_Berzerk : boolean;
     m_BerzerkDurationLeft : number;
@@ -343,7 +343,7 @@ class TechnoClass
     m_BunkerLinkedItem : TechnoClass;
     m_PitchAngle : number;
     m_DiskLaserTimer : CDTimerClass;
-    m___DiskLaserTimer : number;
+    m___DiskLaserTimer : string;
     m_ROF : number;
     m_Ammo : number;
     m_Value : number;
@@ -362,19 +362,19 @@ class TechnoClass
     m_RockingForwardsPerFrame : number;
     m_HijackerInfantryType : number;
     m_Tiberium : StorageClass;
-    m___Tiberium : number;
+    m___Tiberium : string;
     m_unknown_34C : number;
     m_UnloadTimer : TransitionTimer;
-    m___UnloadTimer : number;
+    m___UnloadTimer : string;
     m_BarrelFacing : FacingClass;
-    m___BarrelFacing : number;
+    m___BarrelFacing : string;
     m_PrimaryFacing : FacingClass;
-    m___PrimaryFacing : number;
+    m___PrimaryFacing : string;
     m_SecondaryFacing : FacingClass;
-    m___SecondaryFacing : number;
+    m___SecondaryFacing : string;
     m_CurrentBurstIndex : number;
     m_TargetLaserTimer : CDTimerClass;
-    m___TargetLaserTimer : number;
+    m___TargetLaserTimer : string;
     m_unknown_short_3C8 : number;
     m_unknown_3CA : number;
     m_CountedAsOwned : boolean;
@@ -388,9 +388,9 @@ class TechnoClass
     m_Spawned : boolean;
     m_IsInPlayfield : boolean;
     m_TurretRecoil : RecoilData;
-    m___TurretRecoil : number;
+    m___TurretRecoil : string;
     m_BarrelRecoil : RecoilData;
-    m___BarrelRecoil : number;
+    m___BarrelRecoil : string;
     m_unknown_bool_418 : boolean;
     m_unknown_bool_419 : boolean;
     m_IsOwnedByCurrentPlayer : boolean;
@@ -418,25 +418,25 @@ class TechnoClass
     m_unknown_bool_43A : boolean;
     m_unknown_43C : number;
     m_CurrentTargetThreatValues : any;
-    m___CurrentTargetThreatValues : number;
+    m___CurrentTargetThreatValues : string;
     m_CurrentTargets : any;
-    m___CurrentTargets : number;
+    m___CurrentTargets : string;
     m_AttackedTargets : any;
-    m___AttackedTargets : number;
+    m___AttackedTargets : string;
     m_Audio3 : any;
-    m___Audio3 : number;
+    m___Audio3 : string;
     m_unknown_BOOL_49C : number;
     m_TurretIsRotating : number;
     m_Audio4 : any;
-    m___Audio4 : number;
+    m___Audio4 : string;
     m_unknown_bool_4B8 : boolean;
     m_unknown_4BC : number;
     m_Audio5 : any;
-    m___Audio5 : number;
+    m___Audio5 : string;
     m_unknown_bool_4D4 : boolean;
     m_unknown_4D8 : number;
     m_Audio6 : any;
-    m___Audio6 : number;
+    m___Audio6 : string;
     m_QueuedVoiceIndex : number;
     m_unknown_4F4 : number;
     m_unknown_bool_4F8 : boolean;
@@ -453,30 +453,30 @@ class TechnoClass
 class HouseClass
     extends AbstractClass
 {
-    EnumConnectionPoints(ppEnum_0 : any) : number;
-    FindConnectionPoint(riid_0 : any, ppCP_1 : any) : number;
-    Apparent_Category_Quantity(category_0 : any) : number;
-    Apparent_Category_Power(category_0 : any) : number;
-    Apparent_Base_Center() : any;
+    EnumConnectionPoints(ppEnum_0 : any | any) : number;
+    FindConnectionPoint(riid_0 : any | any, ppCP_1 : any | any) : number;
+    Apparent_Category_Quantity(category_0 : any | any) : number;
+    Apparent_Category_Power(category_0 : any | any) : number;
+    Apparent_Base_Center() : CellStruct;
     Is_Powered() : boolean;
     ID_Number() : number;
-    Name() : any;
+    Name() : number;
     Get_Application() : any;
     Available_Money() : number;
     Available_Storage() : number;
     Power_Output() : number;
     Power_Drain() : number;
-    Category_Quantity(category_0 : any) : number;
-    Category_Power(category_0 : any) : number;
-    Base_Center() : any;
+    Category_Quantity(category_0 : any | any) : number;
+    Category_Power(category_0 : any | any) : number;
+    Base_Center() : CellStruct;
     Fire_Sale() : number;
     All_To_Hunt() : number;
-    QueryInterface(iid_0 : any, ppvObject_1 : void) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     IsAlliedWith(idxHouse_0 : number) : boolean;
@@ -540,7 +540,7 @@ class HouseClass
     static FindCivilianSide() : HouseClass;
     static LoadFromINIList(pINI_0 : CCINIClass) : void;
     GetSpawnPosition() : number;
-    GetPlanningWaypointAt(coords_0 : any) : WaypointClass;
+    GetPlanningWaypointAt(coords_0 : CellStruct) : WaypointClass;
     GetPlanningWaypointProperties(wpt_0 : WaypointClass, idxPath_1 : number, idxWP_2 : number) : boolean;
     EnsurePlanningPathExists(idx_0 : number) : void;
     Update_FactoriesQueues(factoryOf_0 : any, isNaval_1 : boolean, buildCat_2 : any) : void;
@@ -589,18 +589,18 @@ class HouseClass
     AI_BaseConstructionUpdate() : number;
     AI_VehicleConstructionUpdate() : number;
     AI_TryFireSW() : void;
-    Fire_SW(idx_0 : number, coords_1 : any) : boolean;
-    PickTargetByType(outBuffer_0 : any, targetType_1 : any) : any;
-    PickTargetByType(targetType_0 : any) : any;
-    PickIonCannonTarget(outBuffer_0 : any) : any;
-    PickIonCannonTarget() : any;
+    Fire_SW(idx_0 : number, coords_1 : CellStruct) : boolean;
+    PickTargetByType(outBuffer_0 : CellStruct, targetType_1 : any) : CellStruct;
+    PickTargetByType(targetType_0 : any) : CellStruct;
+    PickIonCannonTarget(outBuffer_0 : CellStruct) : CellStruct;
+    PickIonCannonTarget() : CellStruct;
     IsIonCannonEligibleTarget(pTechno_0 : TechnoClass) : boolean;
     UpdateFlagCoords(NewCarrier_0 : UnitClass, dwUnk_1 : number) : void;
-    DroppedFlag(Where_0 : any, Who_1 : UnitClass) : void;
+    DroppedFlag(Where_0 : CellStruct, Who_1 : UnitClass) : void;
     PickedUpFlag(Who_0 : UnitClass, dwUnk_1 : number) : number;
     GetPrimaryFactory(absID_0 : any, naval_1 : boolean, buildCat_2 : any) : FactoryClass;
     SetPrimaryFactory(pFactory_0 : FactoryClass, absID_1 : any, naval_2 : boolean, buildCat_3 : any) : void;
-    GetBaseCenter() : any;
+    GetBaseCenter() : CellStruct;
     GetAIDifficultyIndex() : number;
     IsNeutral() : boolean;
     IsCurrentPlayer() : boolean;
@@ -618,36 +618,36 @@ class HouseClass
     m_ArrayIndex : number;
     m_Type : HouseTypeClass;
     m_RelatedTags : any;
-    m___RelatedTags : number;
+    m___RelatedTags : string;
     m_ConYards : any;
-    m___ConYards : number;
+    m___ConYards : string;
     m_Buildings : any;
-    m___Buildings : number;
+    m___Buildings : string;
     m_UnitRepairStations : any;
-    m___UnitRepairStations : number;
+    m___UnitRepairStations : string;
     m_Grinders : any;
-    m___Grinders : number;
+    m___Grinders : string;
     m_Absorbers : any;
-    m___Absorbers : number;
+    m___Absorbers : string;
     m_Bunkers : any;
-    m___Bunkers : number;
+    m___Bunkers : string;
     m_Occupiables : any;
-    m___Occupiables : number;
+    m___Occupiables : string;
     m_CloningVats : any;
-    m___CloningVats : number;
+    m___CloningVats : string;
     m_SecretLabs : any;
-    m___SecretLabs : number;
+    m___SecretLabs : string;
     m_PsychicDetectionBuildings : any;
-    m___PsychicDetectionBuildings : number;
+    m___PsychicDetectionBuildings : string;
     m_FactoryPlants : any;
-    m___FactoryPlants : number;
+    m___FactoryPlants : string;
     m_CountResourceGatherers : number;
     m_CountResourceDestinations : number;
     m_CountWarfactories : number;
     m_InfantrySelfHeal : number;
     m_UnitsSelfHeal : number;
     m_StartingUnits : any;
-    m___StartingUnits : number;
+    m___StartingUnits : string;
     m_AIDifficulty : any;
     m_FirepowerMultiplier : number;
     m_GroundspeedMultiplier : number;
@@ -702,22 +702,22 @@ class HouseClass
     m_IQLevel2 : number;
     m_AIMode : any;
     m_Supers : any;
-    m___Supers : number;
+    m___Supers : string;
     m_LastBuiltBuildingType : number;
     m_LastBuiltInfantryType : number;
     m_LastBuiltAircraftType : number;
     m_LastBuiltVehicleType : number;
     m_AllowWinBlocks : number;
     m_RepairTimer : CDTimerClass;
-    m___RepairTimer : number;
+    m___RepairTimer : string;
     m_AlertTimer : CDTimerClass;
-    m___AlertTimer : number;
+    m___AlertTimer : string;
     m_BorrowedTime : CDTimerClass;
-    m___BorrowedTime : number;
+    m___BorrowedTime : string;
     m_PowerBlackoutTimer : CDTimerClass;
-    m___PowerBlackoutTimer : number;
+    m___PowerBlackoutTimer : string;
     m_RadarBlackoutTimer : CDTimerClass;
-    m___RadarBlackoutTimer : number;
+    m___RadarBlackoutTimer : string;
     m_Side2TechInfiltrated : boolean;
     m_Side1TechInfiltrated : boolean;
     m_Side0TechInfiltrated : boolean;
@@ -738,32 +738,32 @@ class HouseClass
     m_OwnedInfantry : number;
     m_OwnedAircraft : number;
     m_OwnedTiberium : StorageClass;
-    m___OwnedTiberium : number;
+    m___OwnedTiberium : string;
     m_Balance : number;
     m_TotalStorage : number;
     m_OwnedWeed : StorageClass;
-    m___OwnedWeed : number;
+    m___OwnedWeed : string;
     m_unknown_324 : number;
     m_BuiltAircraftTypes : UnitTrackerClass;
-    m___BuiltAircraftTypes : number;
+    m___BuiltAircraftTypes : string;
     m_BuiltInfantryTypes : UnitTrackerClass;
-    m___BuiltInfantryTypes : number;
+    m___BuiltInfantryTypes : string;
     m_BuiltUnitTypes : UnitTrackerClass;
-    m___BuiltUnitTypes : number;
+    m___BuiltUnitTypes : string;
     m_BuiltBuildingTypes : UnitTrackerClass;
-    m___BuiltBuildingTypes : number;
+    m___BuiltBuildingTypes : string;
     m_KilledAircraftTypes : UnitTrackerClass;
-    m___KilledAircraftTypes : number;
+    m___KilledAircraftTypes : string;
     m_KilledInfantryTypes : UnitTrackerClass;
-    m___KilledInfantryTypes : number;
+    m___KilledInfantryTypes : string;
     m_KilledUnitTypes : UnitTrackerClass;
-    m___KilledUnitTypes : number;
+    m___KilledUnitTypes : string;
     m_KilledBuildingTypes : UnitTrackerClass;
-    m___KilledBuildingTypes : number;
+    m___KilledBuildingTypes : string;
     m_CapturedBuildings : UnitTrackerClass;
-    m___CapturedBuildings : number;
+    m___CapturedBuildings : string;
     m_CollectedCrates : UnitTrackerClass;
-    m___CollectedCrates : number;
+    m___CollectedCrates : string;
     m_NumAirpads : number;
     m_NumBarracks : number;
     m_NumWarFactories : number;
@@ -799,63 +799,63 @@ class HouseClass
     m_unknown_53DA : number;
     m_unknown_53DB : number;
     m_OurFlagCarrier : UnitClass;
-    m_OurFlagCoords : any;
+    m_OurFlagCoords : CellStruct;
     m_KilledUnitsOfHouses : number;
     m_TotalKilledUnits : number;
     m_KilledBuildingsOfHouses : number;
     m_TotalKilledBuildings : number;
     m_WhoLastHurtMe : number;
-    m_BaseSpawnCell : any;
-    m_BaseCenter : any;
+    m_BaseSpawnCell : CellStruct;
+    m_BaseCenter : CellStruct;
     m_Radius : number;
     m_ZoneInfos : ZoneInfoStruct;
-    m___ZoneInfos : number;
+    m___ZoneInfos : string;
     m_LATime : number;
     m_LAEnemy : number;
     m_ToCapture : number;
     m_RadarVisibleTo : any;
     m_SiloMoney : number;
     m_PreferredTargetType : any;
-    m_PreferredTargetCell : any;
-    m_PreferredDefensiveCell : any;
-    m_PreferredDefensiveCell2 : any;
+    m_PreferredTargetCell : CellStruct;
+    m_PreferredDefensiveCell : CellStruct;
+    m_PreferredDefensiveCell2 : CellStruct;
     m_PreferredDefensiveCellStartTime : number;
     m_OwnedBuildingTypes : any;
-    m___OwnedBuildingTypes : number;
+    m___OwnedBuildingTypes : string;
     m_OwnedUnitTypes : any;
-    m___OwnedUnitTypes : number;
+    m___OwnedUnitTypes : string;
     m_OwnedInfantryTypes : any;
-    m___OwnedInfantryTypes : number;
+    m___OwnedInfantryTypes : string;
     m_OwnedAircraftTypes : any;
-    m___OwnedAircraftTypes : number;
+    m___OwnedAircraftTypes : string;
     m_ActiveBuildingTypes : any;
-    m___ActiveBuildingTypes : number;
+    m___ActiveBuildingTypes : string;
     m_ActiveUnitTypes : any;
-    m___ActiveUnitTypes : number;
+    m___ActiveUnitTypes : string;
     m_ActiveInfantryTypes : any;
-    m___ActiveInfantryTypes : number;
+    m___ActiveInfantryTypes : string;
     m_ActiveAircraftTypes : any;
-    m___ActiveAircraftTypes : number;
+    m___ActiveAircraftTypes : string;
     m_FactoryProducedBuildingTypes : any;
-    m___FactoryProducedBuildingTypes : number;
+    m___FactoryProducedBuildingTypes : string;
     m_FactoryProducedUnitTypes : any;
-    m___FactoryProducedUnitTypes : number;
+    m___FactoryProducedUnitTypes : string;
     m_FactoryProducedInfantryTypes : any;
-    m___FactoryProducedInfantryTypes : number;
+    m___FactoryProducedInfantryTypes : string;
     m_FactoryProducedAircraftTypes : any;
-    m___FactoryProducedAircraftTypes : number;
+    m___FactoryProducedAircraftTypes : string;
     m_AttackTimer : CDTimerClass;
-    m___AttackTimer : number;
+    m___AttackTimer : string;
     m_InitialAttackDelay : number;
     m_EnemyHouseIndex : number;
     m_AngerNodes : any;
-    m___AngerNodes : number;
+    m___AngerNodes : string;
     m_ScoutNodes : any;
-    m___ScoutNodes : number;
+    m___ScoutNodes : string;
     m_AITimer : CDTimerClass;
-    m___AITimer : number;
+    m___AITimer : string;
     m_Unknown_Timer_5640 : CDTimerClass;
-    m___Unknown_Timer_5640 : number;
+    m___Unknown_Timer_5640 : string;
     m_ProducingBuildingTypeIndex : number;
     m_ProducingUnitTypeIndex : number;
     m_ProducingInfantryTypeIndex : number;
@@ -866,7 +866,7 @@ class HouseClass
     m_RatioTeamBuildings : number;
     m_BaseDefenseTeamCount : number;
     m_DropshipData : DropshipStruct;
-    m___DropshipData : number;
+    m___DropshipData : string;
     m_CurrentDropshipIndex : number;
     m_HasCloakingRanges : number;
     m_Color : any;
@@ -877,35 +877,35 @@ class HouseClass
     m_SpySatActive : boolean;
     m_IsBeingDrained : boolean;
     m_Edge : any;
-    m_EMPTarget : any;
-    m_NukeTarget : any;
+    m_EMPTarget : CellStruct;
+    m_NukeTarget : CellStruct;
     m_Allies : any;
     m_DamageDelayTimer : CDTimerClass;
-    m___DamageDelayTimer : number;
+    m___DamageDelayTimer : string;
     m_TeamDelayTimer : CDTimerClass;
-    m___TeamDelayTimer : number;
+    m___TeamDelayTimer : string;
     m_TriggerDelayTimer : CDTimerClass;
-    m___TriggerDelayTimer : number;
+    m___TriggerDelayTimer : string;
     m_SpeakAttackDelayTimer : CDTimerClass;
-    m___SpeakAttackDelayTimer : number;
+    m___SpeakAttackDelayTimer : string;
     m_SpeakPowerDelayTimer : CDTimerClass;
-    m___SpeakPowerDelayTimer : number;
+    m___SpeakPowerDelayTimer : string;
     m_SpeakMoneyDelayTimer : CDTimerClass;
-    m___SpeakMoneyDelayTimer : number;
+    m___SpeakMoneyDelayTimer : string;
     m_SpeakMaxedDelayTimer : CDTimerClass;
-    m___SpeakMaxedDelayTimer : number;
+    m___SpeakMaxedDelayTimer : string;
     m_AIGeneral : any;
     m_ThreatPosedEstimates : number;
-    m_PlainName : number;
-    m_UINameString : number;
-    m_UIName : any;
+    m_PlainName : string;
+    m_UINameString : string;
+    m_UIName : number;
     m_ColorSchemeIndex : number;
     m_StartingPoint : number;
-    m_StartingCell : any;
+    m_StartingCell : CellStruct;
     m_StartingAllies : any;
     m_unknown_16060 : number;
     m_WaypointPath : any;
-    m___WaypointPath : number;
+    m___WaypointPath : string;
     m_unknown_1607C : number;
     m_unknown_16080 : number;
     m_unknown_16084 : number;
@@ -936,18 +936,18 @@ class AbstractClass
 {
     GetClassNameA() : string;
     static GetClassNameA(abs_0 : any) : string;
-    QueryInterface(iid_0 : any, ppvObject_1 : void) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
-    GetClassID(pClassID_0 : any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     IsDirty() : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    GetSizeMax(pcbSize_0 : any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : number;
     What_Am_I() : any;
     Fetch_ID() : number;
     Create_ID() : void;
-    INoticeSink_Unknown(dwUnknown_0 : number) : boolean;
+    INoticeSink_Unknown(dwUnknown_0 : number | any) : boolean;
     INoticeSource_Unknown() : void;
     Init() : void;
     PointerExpired(pAbstract_0 : AbstractClass, removed_1 : boolean) : void;
@@ -958,20 +958,20 @@ class AbstractClass
     GetOwningHouse() : HouseClass;
     GetArrayIndex() : number;
     IsDead() : boolean;
-    GetCoords(pCrd_0 : any) : any;
-    GetDestination(pCrd_0 : any, pDocker_1 : TechnoClass) : any;
+    GetCoords(pCrd_0 : CoordStruct) : CoordStruct;
+    GetDestination(pCrd_0 : CoordStruct, pDocker_1 : TechnoClass) : CoordStruct;
     IsOnFloor() : boolean;
     IsInAir() : boolean;
-    GetCenterCoords(pCrd_0 : any) : any;
+    GetCenterCoords(pCrd_0 : CoordStruct) : CoordStruct;
     Update() : void;
     static AnnounceExpiredPointer(pAbstract_0 : AbstractClass, removed_1 : boolean) : void;
     static RemoveAllInactive() : void;
     AnnounceExpiredPointer(removed_0 : boolean) : void;
-    GetCoords() : any;
-    GetDestination(pDocker_0 : TechnoClass) : any;
-    GetCenterCoords() : any;
-    GetTargetDirection(pDir_0 : any, pTarget_1 : AbstractClass) : any;
-    GetTargetDirection(pTarget_0 : AbstractClass) : any;
+    GetCoords() : CoordStruct;
+    GetDestination(pDocker_0 : TechnoClass) : CoordStruct;
+    GetCenterCoords() : CoordStruct;
+    GetTargetDirection(pDir_0 : DirStruct, pTarget_1 : AbstractClass) : DirStruct;
+    GetTargetDirection(pTarget_0 : AbstractClass) : DirStruct;
     s_AbsID : any;
     s_Array : any;
     s_TargetIndex : any;
@@ -984,14 +984,14 @@ class AbstractClass
 class ObjectClass
     extends AbstractClass
 {
-    Load(pStm_0 : any) : number;
+    Load(pStm_0 : any | any) : number;
     IsOnFloor() : boolean;
     IsInAir() : boolean;
     AnimPointerExpired(pAnim_0 : AnimClass) : void;
     IsSelectable() : boolean;
     VisualCharacter(SpecificOwner_0 : number, WhoIsAsking_1 : HouseClass) : any;
     GetImage() : any;
-    MouseOverCell(pCell_0 : any, checkFog_1 : boolean, ignoreForce_2 : boolean) : any;
+    MouseOverCell(pCell_0 : CellStruct, checkFog_1 : boolean, ignoreForce_2 : boolean) : any;
     MouseOverObject(pObject_0 : ObjectClass, ignoreForce_1 : boolean) : any;
     InWhichLayer() : any;
     IsSurfaced() : boolean;
@@ -999,16 +999,16 @@ class ObjectClass
     GetTechnoType() : TechnoTypeClass;
     GetType() : ObjectTypeClass;
     GetTypeOwners() : number;
-    GetUIName() : any;
+    GetUIName() : number;
     CanBeRepaired() : boolean;
     CanBeSold() : boolean;
     IsActive() : boolean;
     IsControllable() : boolean;
-    GetTargetCoords(pCrd_0 : any) : any;
-    GetDockCoords(pCrd_0 : any, docker_1 : TechnoClass) : any;
-    GetRenderCoords(pCrd_0 : any) : any;
-    GetFLH(pDest_0 : any, idxWeapon_1 : number, BaseCoords_2 : any) : any;
-    GetExitCoords(pCrd_0 : any, dwUnk_1 : number) : any;
+    GetTargetCoords(pCrd_0 : CoordStruct) : CoordStruct;
+    GetDockCoords(pCrd_0 : CoordStruct, docker_1 : TechnoClass) : CoordStruct;
+    GetRenderCoords(pCrd_0 : CoordStruct) : CoordStruct;
+    GetFLH(pDest_0 : CoordStruct, idxWeapon_1 : number, BaseCoords_2 : CoordStruct) : CoordStruct;
+    GetExitCoords(pCrd_0 : CoordStruct, dwUnk_1 : number) : CoordStruct;
     GetYSort() : number;
     IsOnBridge(pDocker_0 : TechnoClass) : boolean;
     IsStandingStill() : boolean;
@@ -1017,33 +1017,33 @@ class ObjectClass
     GetDisguise(DisguisedAgainstAllies_0 : boolean) : ObjectTypeClass;
     GetDisguiseHouse(DisguisedAgainstAllies_0 : boolean) : HouseClass;
     Limbo() : boolean;
-    Unlimbo(Crd_0 : any, dFaceDir_1 : any) : boolean;
+    Unlimbo(Crd_0 : CoordStruct, dFaceDir_1 : any) : boolean;
     Disappear(permanently_0 : boolean) : void;
     RegisterDestruction(Destroyer_0 : TechnoClass) : void;
     RegisterKill(Destroyer_0 : HouseClass) : void;
-    SpawnParachuted(coords_0 : any) : boolean;
+    SpawnParachuted(coords_0 : CoordStruct) : boolean;
     DropAsBomb() : void;
-    MarkAllOccupationBits(coords_0 : any) : void;
-    UnmarkAllOccupationBits(coords_0 : any) : void;
+    MarkAllOccupationBits(coords_0 : CoordStruct) : void;
+    UnmarkAllOccupationBits(coords_0 : CoordStruct) : void;
     UnInit() : void;
     Reveal() : void;
-    KickOutUnit(pTechno_0 : TechnoClass, Cell_1 : any) : any;
-    DrawIfVisible(pBounds_0 : any, EvenIfCloaked_1 : boolean, dwUnk3_2 : number) : boolean;
-    GetFoundationData(includeBib_0 : boolean) : any;
-    DrawBehind(pLocation_0 : any, pBounds_1 : any) : void;
-    DrawExtras(pLocation_0 : any, pBounds_1 : any) : void;
-    DrawIt(pLocation_0 : any, pBounds_1 : any) : void;
-    DrawAgain(location_0 : any, bounds_1 : any) : void;
+    KickOutUnit(pTechno_0 : TechnoClass, Cell_1 : CellStruct) : any;
+    DrawIfVisible(pBounds_0 : RectangleStruct, EvenIfCloaked_1 : boolean, dwUnk3_2 : number) : boolean;
+    GetFoundationData(includeBib_0 : boolean) : CellStruct;
+    DrawBehind(pLocation_0 : Point2D, pBounds_1 : RectangleStruct) : void;
+    DrawExtras(pLocation_0 : Point2D, pBounds_1 : RectangleStruct) : void;
+    DrawIt(pLocation_0 : Point2D, pBounds_1 : RectangleStruct) : void;
+    DrawAgain(location_0 : Point2D, bounds_1 : RectangleStruct) : void;
     Undiscover() : void;
     See(dwUnk_0 : number, dwUnk2_1 : number) : void;
     Mark(value_0 : any) : boolean;
-    GetDimensions(pRect_0 : any) : any;
-    GetRenderDimensions(pRect_0 : any) : any;
+    GetDimensions(pRect_0 : RectangleStruct) : RectangleStruct;
+    GetRenderDimensions(pRect_0 : RectangleStruct) : RectangleStruct;
     DrawRadialIndicator(dwUnk_0 : number) : void;
     MarkForRedraw() : void;
     CanBeSelected() : boolean;
     CanBeSelectedNow() : boolean;
-    CellClickedAction(action_0 : any, pCell_1 : any, pCell1_2 : any, bUnk_3 : boolean) : boolean;
+    CellClickedAction(action_0 : any, pCell_1 : CellStruct, pCell1_2 : CellStruct, bUnk_3 : boolean) : boolean;
     ObjectClickedAction(action_0 : any, pTarget_1 : ObjectClass, bUnk_2 : boolean) : boolean;
     Flash(Duration_0 : number) : void;
     Select() : boolean;
@@ -1056,7 +1056,7 @@ class ObjectClass
     GetWeaponRange(idxWeapon_0 : number) : number;
     ReceiveDamage(pDamage_0 : number, DistanceFromEpicenter_1 : number, pWH_2 : WarheadTypeClass, Attacker_3 : ObjectClass, IgnoreDefenses_4 : boolean, PreventPassengerEscape_5 : boolean, pAttackingHouse_6 : HouseClass) : any;
     Destroy() : void;
-    Scatter(crd_0 : any, ignoreMission_1 : boolean, ignoreDestination_2 : boolean) : void;
+    Scatter(crd_0 : CoordStruct, ignoreMission_1 : boolean, ignoreDestination_2 : boolean) : void;
     Ignite() : boolean;
     Extinguish() : void;
     GetPointsValue() : number;
@@ -1072,10 +1072,10 @@ class ObjectClass
     MoveToDirection(facing_0 : any) : void;
     IsCellOccupied(pDestCell_0 : CellClass, facing_1 : any, level_2 : number, pSourceCell_3 : CellClass, alt_4 : boolean) : any;
     vt_entry_1B0(dwUnk_0 : number, dwUnk2_1 : number, dwUnk3_2 : number, dwUnk4_3 : number, dwUnk5_4 : number) : number;
-    SetLocation(crd_0 : any) : void;
-    GetMapCoords(pUCell_0 : any) : any;
+    SetLocation(crd_0 : CoordStruct) : void;
+    GetMapCoords(pUCell_0 : CellStruct) : CellStruct;
     GetCell() : CellClass;
-    GetMapCoordsAgain(pUCell_0 : any) : any;
+    GetMapCoordsAgain(pUCell_0 : CellStruct) : CellStruct;
     GetCellAgain() : CellClass;
     GetHeight() : number;
     SetHeight(dwUnk_0 : number) : void;
@@ -1097,11 +1097,11 @@ class ObjectClass
     BecomeUntargetable() : void;
     ReplaceTag(pTag_0 : TagClass) : void;
     GetCellLevel() : number;
-    GetMapCoords() : any;
-    GetMapCoordsAgain() : any;
-    GetTargetCoords() : any;
-    GetRenderCoords() : any;
-    GetFLH(idxWeapon_0 : number, base_1 : any) : any;
+    GetMapCoords() : CellStruct;
+    GetMapCoordsAgain() : CellStruct;
+    GetTargetCoords() : CoordStruct;
+    GetRenderCoords() : CoordStruct;
+    GetFLH(idxWeapon_0 : number, base_1 : CoordStruct) : CoordStruct;
     s_AbsDerivateID : any;
     s_CurrentObjects : any;
     m_unknown_24 : number;
@@ -1111,9 +1111,9 @@ class ObjectClass
     m_AttachedTag : TagClass;
     m_AttachedBomb : BombClass;
     m_AmbientSoundController : any;
-    m___AmbientSoundController : number;
+    m___AmbientSoundController : string;
     m_CustomSoundController : any;
-    m___CustomSoundController : number;
+    m___CustomSoundController : string;
     m_CustomSound : number;
     m_BombVisible : boolean;
     m_Health : number;
@@ -1135,15 +1135,15 @@ class ObjectClass
     m_LastLayer : any;
     m_IsInLogic : boolean;
     m_IsVisible : boolean;
-    m_Location : any;
+    m_Location : CoordStruct;
     m_LineTrailer : LineTrail;
 }
 class AnimClass
     extends ObjectClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    PointerExpired(pAbstract_0 : AbstractClass, detachFromAll_1 : boolean) : void;
+    GetClassID(pClassID_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    PointerExpired(pAbstract_0 : AbstractClass | any, detachFromAll_1 : boolean | any) : void;
     WhatAmI() : any;
     Size() : number;
     AnimExtras() : number;
@@ -1154,17 +1154,17 @@ class AnimClass
     s_AbsID : any;
     s_Array : any;
     m_Animation : StageClass;
-    m___Animation : number;
+    m___Animation : string;
     m_Type : AnimTypeClass;
     m_OwnerObject : ObjectClass;
     m_unknown_D0 : number;
     m_LightConvert : LightConvertClass;
     m_LightConvertIndex : number;
-    m_PaletteName : number;
+    m_PaletteName : string;
     m_TintColor : number;
     m_ZAdjust : number;
     m_YSortAdjust : number;
-    m_FlamingGuyCoords : any;
+    m_FlamingGuyCoords : CoordStruct;
     m_FlamingGuyRetries : number;
     m_IsBuildingAnim : boolean;
     m_UnderTemporal : boolean;
@@ -1174,7 +1174,7 @@ class AnimClass
     m_Reverse : boolean;
     m_unknown_124 : number;
     m_Bounce : BounceClass;
-    m___Bounce : number;
+    m___Bounce : string;
     m_TranslucencyLevel : number;
     m_TimeToDie : boolean;
     m_AttachedBullet : BulletClass;
@@ -1194,9 +1194,9 @@ class AnimClass
     m_Invisible : boolean;
     m_PowerOff : boolean;
     m_Audio3 : any;
-    m___Audio3 : number;
+    m___Audio3 : string;
     m_Audio4 : any;
-    m___Audio4 : number;
+    m___Audio4 : string;
 }
 class AnimTypeClass
     extends ObjectTypeClass
@@ -1204,11 +1204,11 @@ class AnimTypeClass
     static Find(pID_0 : string) : AnimTypeClass;
     static FindOrAllocate(pID_0 : string) : AnimTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(owner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     LoadImageA() : any;
     Load2DArt() : void;
     s_AbsID : any;
@@ -1287,19 +1287,19 @@ class AnimTypeClass
 class ObjectTypeClass
     extends AbstractTypeClass
 {
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    GetSizeMax(pcbSize_0 : any) : number;
-    vt_entry_6C(pDest_0 : any, pSrc_1 : any) : any;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : number;
+    vt_entry_6C(pDest_0 : CoordStruct, pSrc_1 : CoordStruct) : CoordStruct;
     GetOwners() : number;
     GetPipMax() : number;
     vt_entry_78(dwUnk_0 : number) : void;
-    Dimension2(pDest_0 : any) : void;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
+    Dimension2(pDest_0 : CoordStruct) : void;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct, pOwner_1 : HouseClass) : boolean;
     GetActualCost(pHouse_0 : HouseClass) : number;
     GetBuildSpeed() : number;
     CreateObject(pOwner_0 : HouseClass) : ObjectClass;
-    GetFoundationData(IncludeBib_0 : boolean) : any;
+    GetFoundationData(IncludeBib_0 : boolean) : CellStruct;
     FindFactory(allowOccupied_0 : boolean, requirePower_1 : boolean, requireCanBuild_2 : boolean, pHouse_3 : HouseClass) : BuildingClass;
     GetCameo() : any;
     GetImage() : any;
@@ -1322,10 +1322,10 @@ class ObjectTypeClass
     m_MaxDimension : number;
     m_CrushSound : number;
     m_AmbientSound : number;
-    m_ImageFile : number;
+    m_ImageFile : string;
     m_AlternateArcticArt : boolean;
     m_ArcticArtInUse : boolean;
-    m_AlphaImageFile : number;
+    m_AlphaImageFile : string;
     m_Theater : boolean;
     m_Crushable : boolean;
     m_Bombable : boolean;
@@ -1357,10 +1357,10 @@ class AbstractTypeClass
     get_ID() : string;
     s_AbsID : any;
     s_Array : any;
-    m_ID : number;
-    m_UINameLabel : number;
-    m_UIName : any;
-    m_Name : number;
+    m_ID : string;
+    m_UINameLabel : string;
+    m_UIName : number;
+    m_Name : string;
 }
 class CCINIClass
     extends INIClass
@@ -1369,8 +1369,8 @@ class CCINIClass
     static UnloadINIFile(pINI_0 : CCINIClass) : void;
     ReadCCFile(pCCFile_0 : any, bDigest_1 : boolean, bLoadComments_2 : boolean) : CCINIClass;
     WriteCCFile(pCCFile_0 : any, bDigest_1 : boolean) : void;
-    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : any, szBufferSize_3 : any) : number;
-    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : any) : number;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number, szBufferSize_3 : any) : number;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
     GetCRC() : number;
     s_RulesHash : any;
     s_ArtHash : any;
@@ -1393,8 +1393,8 @@ class INIClass
     ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : string, szBufferSize_4 : any) : number;
     GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : string, szBufferSize_3 : any) : number;
     WriteString(pSection_0 : string, pKey_1 : string, pString_2 : string) : boolean;
-    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : any, pBuffer_3 : any, szBufferSize_4 : any) : number;
-    WriteUnicodeString(pSection_0 : string, pKey_1 : string, pString_2 : any) : boolean;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number, szBufferSize_4 : any) : number;
+    WriteUnicodeString(pSection_0 : string, pKey_1 : string, pString_2 : number) : boolean;
     ReadBool(pSection_0 : string, pKey_1 : string, bDefault_2 : boolean) : boolean;
     GetBool(pSection_0 : string, pKey_1 : string, bValue_2 : boolean) : void;
     WriteBool(pSection_0 : string, pKey_1 : string, bValue_2 : boolean) : boolean;
@@ -1408,12 +1408,12 @@ class INIClass
     GetRate(pSection_0 : string, pKey_1 : string, nValue_2 : number) : void;
     WriteRate(pSection_0 : string, pKey_1 : string, nValue_2 : number) : boolean;
     Read2Integers(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
-    ReadPoint2D(ret_0 : any, pSection_1 : string, pKey_2 : string, defValue_3 : any) : any;
-    GetPoint2D(pSection_0 : string, pKey_1 : string, value_2 : any) : void;
+    ReadPoint2D(ret_0 : Point2D, pSection_1 : string, pKey_2 : string, defValue_3 : Point2D) : Point2D;
+    GetPoint2D(pSection_0 : string, pKey_1 : string, value_2 : Point2D) : void;
     Write2Integers(pSection_0 : string, pKey_1 : string, pValues_2 : number) : boolean;
     Read3Integers(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
-    ReadPoint3D(ret_0 : any, pSection_1 : string, pKey_2 : string, defValue_3 : any) : any;
-    GetPoint3D(pSection_0 : string, pKey_1 : string, value_2 : any) : void;
+    ReadPoint3D(ret_0 : CoordStruct, pSection_1 : string, pKey_2 : string, defValue_3 : CoordStruct) : CoordStruct;
+    GetPoint3D(pSection_0 : string, pKey_1 : string, value_2 : CoordStruct) : void;
     Read3Bytes(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
     Write3Bytes(pSection_0 : string, pKey_1 : string, pValues_2 : number) : boolean;
     Exists(pSection_0 : string, pKey_1 : string) : boolean;
@@ -1454,15 +1454,15 @@ class INIClass
     GetTechnoType(pSection_0 : string, pKey_1 : string) : TechnoTypeClass;
     ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : number) : number;
     GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
-    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : any, pBuffer_3 : any) : number;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number) : number;
     static GetPrerequisites(pBuffer_0 : any, pINI_1 : INIClass, pSection_2 : string, pKey_3 : string, Defaults_4 : any) : any;
     static IsBlank(pValue_0 : string) : boolean;
     m_CurrentSectionName : string;
     m_CurrentSection : any;
     m_Sections : any;
-    m___Sections : number;
+    m___Sections : string;
     m_SectionIndex : any;
-    m___SectionIndex : number;
+    m___SectionIndex : string;
     m_LineComments : any;
 }
 class TechnoTypeClass
@@ -1470,12 +1470,12 @@ class TechnoTypeClass
 {
     static Find(pID_0 : string) : TechnoTypeClass;
     static FindIndex(pID_0 : string) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    GetSizeMax(pcbSize_0 : any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : number;
     CanUseWaypoint() : boolean;
     CanAttackMove() : boolean;
-    CanCreateHere(mapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
+    CanCreateHere(mapCoords_0 : CellStruct, pOwner_1 : HouseClass) : boolean;
     GetCost() : number;
     GetRepairStepCost() : number;
     GetRepairStep() : number;
@@ -1483,8 +1483,8 @@ class TechnoTypeClass
     GetFlightLevel() : number;
     static GetByTypeAndIndex(abs_0 : any, index_1 : number) : TechnoTypeClass;
     HasMultipleTurrets() : boolean;
-    GetParticleSysOffset(pBuffer_0 : any) : any;
-    GetParticleSysOffset() : any;
+    GetParticleSysOffset(pBuffer_0 : CoordStruct) : CoordStruct;
+    GetParticleSysOffset() : CoordStruct;
     InOwners(bitHouseType_0 : number) : boolean;
     InRequiredHouses(bitHouseType_0 : number) : boolean;
     InForbiddenHouses(bitHouseType_0 : number) : boolean;
@@ -1653,10 +1653,10 @@ class TechnoTypeClass
     m_AIBasePlanningSide : number;
     m_StupidHunt : boolean;
     m_AllowedToStartInMultiplayer : boolean;
-    m_CameoFile : number;
+    m_CameoFile : string;
     m_Cameo : any;
     m_CameoAllocated : boolean;
-    m_AltCameoFile : number;
+    m_AltCameoFile : string;
     m_AltCameo : any;
     m_AltCameoAllocated : boolean;
     m_RotCount : number;
@@ -1667,17 +1667,17 @@ class TechnoTypeClass
     m_Explosion : any;
     m_DestroyAnim : any;
     m_NaturalParticleSystem : ParticleSystemTypeClass;
-    m_NaturalParticleSystemLocation : any;
+    m_NaturalParticleSystemLocation : CoordStruct;
     m_RefinerySmokeParticleSystem : ParticleSystemTypeClass;
     m_DamageParticleSystems : any;
     m_DestroyParticleSystems : any;
-    m_DamageSmokeOffset : any;
+    m_DamageSmokeOffset : CoordStruct;
     m_DamSmkOffScrnRel : boolean;
-    m_DestroySmokeOffset : any;
-    m_RefinerySmokeOffsetOne : any;
-    m_RefinerySmokeOffsetTwo : any;
-    m_RefinerySmokeOffsetThree : any;
-    m_RefinerySmokeOffsetFour : any;
+    m_DestroySmokeOffset : CoordStruct;
+    m_RefinerySmokeOffsetOne : CoordStruct;
+    m_RefinerySmokeOffsetTwo : CoordStruct;
+    m_RefinerySmokeOffsetThree : CoordStruct;
+    m_RefinerySmokeOffsetFour : CoordStruct;
     m_ShadowIndex : number;
     m_Storage : number;
     m_TurretNotExportedOnGround : boolean;
@@ -1687,7 +1687,7 @@ class TechnoTypeClass
     m_WeaponCount : number;
     m_IsChargeTurret : boolean;
     m_TurretWeapon : number;
-    m_AlternativeFLH : any;
+    m_AlternativeFLH : CoordStruct;
     m_Weapon : WeaponStruct;
     m_ClearAllWeapons : boolean;
     m_EliteWeapon : WeaponStruct;
@@ -1805,7 +1805,7 @@ class TechnoTypeClass
     m_ForbiddenHouses : number;
     m_SecretHouses : number;
     m_UseBuffer : boolean;
-    m_SecondSpawnOffset : any;
+    m_SecondSpawnOffset : CoordStruct;
     m_IsSelectableCombatant : boolean;
     m_Accelerates : boolean;
     m_DisableVoxelCache : boolean;
@@ -1814,14 +1814,14 @@ class TechnoTypeClass
     m_ZFudgeColumn : number;
     m_ZFudgeTunnel : number;
     m_ZFudgeBridge : number;
-    m_PaletteFile : number;
+    m_PaletteFile : string;
     m_Palette : any;
     m_align_DF4 : number;
 }
 class WeaponStruct
 {
     m_WeaponType : WeaponTypeClass;
-    m_FLH : any;
+    m_FLH : CoordStruct;
     m_BarrelLength : number;
     m_BarrelThickness : number;
     m_TurretLocked : boolean;
@@ -1832,9 +1832,9 @@ class WeaponTypeClass
     static Find(pID_0 : string) : WeaponTypeClass;
     static FindOrAllocate(pID_0 : string) : WeaponTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     CalculateSpeed() : void;
@@ -1850,11 +1850,11 @@ class WeaponTypeClass
     m_Range : number;
     m_MinimumRange : number;
     m_Report : any;
-    m___Report : number;
+    m___Report : string;
     m_DownReport : any;
-    m___DownReport : number;
+    m___DownReport : string;
     m_Anim : any;
-    m___Anim : number;
+    m___Anim : string;
     m_OccupantAnim : AnimTypeClass;
     m_AssaultAnim : AnimTypeClass;
     m_OpenToppedAnim : AnimTypeClass;
@@ -1913,11 +1913,11 @@ class BulletTypeClass
     static Find(pID_0 : string) : BulletTypeClass;
     static FindOrAllocate(pID_0 : string) : BulletTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(owner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     Rotates() : boolean;
     SetScaledSpawnDelay(delay_0 : number) : void;
     CreateBullet(Target_0 : AbstractClass, Owner_1 : TechnoClass, Damage_2 : number, WH_3 : WarheadTypeClass, Speed_4 : number, Bright_5 : boolean) : BulletClass;
@@ -1969,25 +1969,25 @@ class BulletTypeClass
 class BulletClass
     extends ObjectClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     GetAnimFrame() : number;
     SetTarget(pTarget_0 : AbstractClass) : void;
-    MoveTo(where_0 : any, velocity_1 : any) : boolean;
+    MoveTo(where_0 : CoordStruct, velocity_1 : any) : boolean;
     Construct(pType_0 : BulletTypeClass, pTarget_1 : AbstractClass, pOwner_2 : TechnoClass, damage_3 : number, pWarhead_4 : WarheadTypeClass, speed_5 : number, bright_6 : boolean) : void;
     Explode(destroy_0 : boolean) : void;
-    Detonate(coords_0 : any) : void;
+    Detonate(coords_0 : CoordStruct) : void;
     Shrapnel() : void;
-    static ApplyRadiationToCell(cell_0 : any, radius_1 : number, amount_2 : number) : void;
+    static ApplyRadiationToCell(cell_0 : CellStruct, radius_1 : number, amount_2 : number) : void;
     LoseTarget() : void;
     IsHoming() : boolean;
     SetWeaponType(weapon_0 : WeaponTypeClass) : void;
     GetWeaponType() : WeaponTypeClass;
     InitScalable() : void;
     NukeMaker() : void;
-    GetTargetCoords() : any;
+    GetTargetCoords() : CoordStruct;
     s_AbsID : any;
     s_Array : any;
     s_ScalableBullets : any;
@@ -2011,9 +2011,9 @@ class BulletClass
     m_AnimFrame : number;
     m_AnimRateCounter : number;
     m_WeaponType : WeaponTypeClass;
-    m_SourceCoords : any;
-    m_TargetCoords : any;
-    m_LastMapCoords : any;
+    m_SourceCoords : CoordStruct;
+    m_TargetCoords : CoordStruct;
+    m_LastMapCoords : CellStruct;
     m_DamageMultiplier : number;
     m_NextAnim : AnimClass;
     m_SpawnNextAnim : boolean;
@@ -2022,8 +2022,8 @@ class BulletClass
 class RadioClass
     extends MissionClass
 {
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     SendToFirstLink(command_0 : any) : any;
     SendCommand(command_0 : any, pRecipient_1 : TechnoClass) : any;
     SendCommandWithData(command_0 : any, pInOut_1 : AbstractClass, pRecipient_2 : TechnoClass) : any;
@@ -2037,7 +2037,7 @@ class RadioClass
     SetLinkCount(count_0 : number) : void;
     m_LastCommands : any;
     m_RadioLinks : any;
-    m___RadioLinks : number;
+    m___RadioLinks : string;
 }
 class MissionClass
     extends ObjectClass
@@ -2085,21 +2085,21 @@ class MissionClass
     m_CurrentMissionStartTime : number;
     m_unknown_C4 : number;
     m_UpdateTimer : CDTimerClass;
-    m___UpdateTimer : number;
+    m___UpdateTimer : string;
 }
 class InfantryTypeClass
     extends TechnoTypeClass
 {
-    static Find(pID_0 : string) : InfantryTypeClass;
+    static Find(pID_0 : string | any) : InfantryTypeClass;
     static FindOrAllocate(pID_0 : string) : InfantryTypeClass;
-    static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    static FindIndex(pID_0 : string | any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(pOwner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     s_AbsID : any;
     s_AbsVTable : number;
     s_Array : any;
@@ -2145,25 +2145,25 @@ class InfantryTypeClass
 class CellClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    FindTechnoNearestTo(offsetPixel_0 : any, alt_1 : boolean, pExcludeThis_2 : TechnoClass) : TechnoClass;
+    FindTechnoNearestTo(offsetPixel_0 : Point2D, alt_1 : boolean, pExcludeThis_2 : TechnoClass) : TechnoClass;
     FindObjectOfType(abs_0 : any, alt_1 : boolean) : ObjectClass;
     GetBuilding() : BuildingClass;
     GetUnit(alt_0 : boolean) : UnitClass;
     GetInfantry(alt_0 : boolean) : InfantryClass;
     GetAircraft(alt_0 : boolean) : AircraftClass;
     GetTerrain(alt_0 : boolean) : TerrainClass;
-    GetSomeObject(coords_0 : any, alt_1 : boolean) : ObjectClass;
+    GetSomeObject(coords_0 : CoordStruct, alt_1 : boolean) : ObjectClass;
     SetWallOwner() : void;
     IncreaseShroudCounter() : void;
     ReduceShroudCounter() : void;
     IsShrouded() : boolean;
     Unshroud() : void;
-    ShapeRect(pRet_0 : any) : any;
+    ShapeRect(pRet_0 : RectangleStruct) : RectangleStruct;
     IsFogged() : boolean;
     FogCell() : void;
     CleanFog() : void;
@@ -2172,14 +2172,14 @@ class CellClass
     RecalcAttributes(cellLevel_0 : number) : void;
     BlowUpBridge() : void;
     CanThisExistHere(SpeedType_0 : any, pObject_1 : BuildingTypeClass, pOwner_2 : HouseClass) : boolean;
-    ScatterContent(crd_0 : any, ignoreMission_1 : boolean, ignoreDestination_2 : boolean, alt_3 : boolean) : void;
+    ScatterContent(crd_0 : CoordStruct, ignoreMission_1 : boolean, ignoreDestination_2 : boolean, alt_3 : boolean) : void;
     GetNeighbourCell(facing_0 : any) : CellClass;
     UpdateThreat(SourceHouse_0 : number, ThreatLevel_1 : number) : void;
     CollectCrate(pCollector_0 : FootClass) : void;
     ProcessColourComponents(arg0_0 : number, pIntensity_1 : number, pAmbient_2 : number, a5_3 : number, a6_4 : number, tintR_5 : number, tintG_6 : number, tintB_7 : number) : void;
     GetTunnel() : any;
-    GetContainingRect(dest_0 : any) : any;
-    GetUIName() : any;
+    GetContainingRect(dest_0 : RectangleStruct) : RectangleStruct;
+    GetUIName() : number;
     ConnectsToOverlay(idxOverlay_0 : number, direction_1 : number) : boolean;
     GetContainedTiberiumIndex() : number;
     GetContainedTiberiumValue() : number;
@@ -2187,10 +2187,10 @@ class CellClass
     IncreaseTiberium(idxTiberium_0 : number, amount_1 : number) : boolean;
     ReduceTiberium(amount_0 : number) : void;
     CanTiberiumGerminate(tib_0 : TiberiumClass) : boolean;
-    SetMapCoords(coords_0 : any) : void;
-    GetFloorHeight(subcoords_0 : any) : number;
-    GetCellCoords(pOutBuffer_0 : any) : any;
-    GetCellCoords() : any;
+    SetMapCoords(coords_0 : CoordStruct) : void;
+    GetFloorHeight(subcoords_0 : Point2D) : number;
+    GetCellCoords(pOutBuffer_0 : CoordStruct) : CoordStruct;
+    GetCellCoords() : CoordStruct;
     ActivateVeins() : void;
     CloakGen_InclHouse(idx_0 : number) : boolean;
     CloakGen_AddHouse(idx_0 : number) : void;
@@ -2232,14 +2232,14 @@ class CellClass
     Tile_Is_Green() : boolean;
     Tile_Is_NotWater() : boolean;
     Tile_Is_DestroyableCliff() : boolean;
-    static Cell2Coord(cell_0 : any, z_1 : number) : any;
-    static Coord2Cell(crd_0 : any) : any;
-    FixHeight(crd_0 : any) : any;
-    GetCoordsWithBridge() : any;
+    static Cell2Coord(cell_0 : CellStruct, z_1 : number) : CoordStruct;
+    static Coord2Cell(crd_0 : CoordStruct) : CellStruct;
+    FixHeight(crd_0 : CoordStruct) : CoordStruct;
+    GetCoordsWithBridge() : CoordStruct;
     MarkForRedraw() : void;
     ChainReaction() : void;
-    FindInfantrySubposition(pOutBuffer_0 : any, coords_1 : any, ignoreContents_2 : boolean, alt_3 : boolean, useCellCoords_4 : boolean) : any;
-    FindInfantrySubposition(coords_0 : any, ignoreContents_1 : boolean, alt_2 : boolean, useCellCoords_3 : boolean) : any;
+    FindInfantrySubposition(pOutBuffer_0 : CoordStruct, coords_1 : CoordStruct, ignoreContents_2 : boolean, alt_3 : boolean, useCellCoords_4 : boolean) : CoordStruct;
+    FindInfantrySubposition(coords_0 : CoordStruct, ignoreContents_1 : boolean, alt_2 : boolean, useCellCoords_3 : boolean) : CoordStruct;
     TryAssignJumpjet(pObject_0 : FootClass) : boolean;
     AddContent(Content_0 : ObjectClass, onBridge_1 : boolean) : void;
     RemoveContent(pContent_0 : ObjectClass, onBridge_1 : boolean) : void;
@@ -2247,13 +2247,13 @@ class CellClass
     UpdateCellLighting() : void;
     CalculateLightSourceLighting(nIntensity_0 : number, nAmbient_1 : number, Red1_2 : number, Green1_3 : number, Blue1_4 : number, Red2_5 : number, Green2_6 : number, Blue2_7 : number) : void;
     InitLightConvert(pDrawer_0 : LightConvertClass, nIntensity_1 : number, nAmbient_2 : number, Red1_3 : number, Green1_4 : number, Blue1_5 : number) : void;
-    DrawOverlay(Location_0 : any, Bound_1 : any) : void;
-    DrawOverlayShadow(Location_0 : any, Bound_1 : any) : void;
+    DrawOverlay(Location_0 : Point2D, Bound_1 : RectangleStruct) : void;
+    DrawOverlayShadow(Location_0 : Point2D, Bound_1 : RectangleStruct) : void;
     IsClearToMove(speedType_0 : any, ignoreInfantry_1 : boolean, ignoreVehicles_2 : boolean, zone_3 : number, movementZone_4 : any, level_5 : number, isBridge_6 : boolean) : boolean;
     s_AbsID : any;
     s_BridgeLevels : number;
     s_BridgeHeight : number;
-    m_MapCoords : any;
+    m_MapCoords : CellStruct;
     m_FoggedObjects : any;
     m_BridgeOwnerCell : CellClass;
     m_unknown_30 : number;
@@ -2270,7 +2270,7 @@ class CellClass
     m_unknown_5C : number;
     m_unknown_60 : number;
     m_RedrawFrame : number;
-    m_InViewportRect : any;
+    m_InViewportRect : RectangleStruct;
     m_CloakedByHouses : number;
     m_BaseSpacerOfHouses : number;
     m_Jumpjet : FootClass;
@@ -2313,28 +2313,28 @@ class CellClass
 class BuildingClass
     extends TechnoClass
 {
-    GetClassID(pClassID_0 : any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
-    Destroyed(Killer_0 : ObjectClass) : void;
-    ForceCreate(coord_0 : any, dwUnk_1 : number) : boolean;
-    FindExitCell(dwUnk_0 : number, dwUnk2_1 : number) : any;
+    Destroyed(Killer_0 : ObjectClass | any) : void;
+    ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : number | any) : boolean;
+    FindExitCell(dwUnk_0 : number, dwUnk2_1 : number) : CellStruct;
     DistanceToDockingCoord(pObj_0 : ObjectClass) : number;
     Place(captured_0 : boolean) : void;
     UpdateConstructionOptions() : void;
-    Draw(point_0 : any, rect_1 : any) : void;
-    FireAngleTo(pObject_0 : ObjectClass) : any;
-    Destory(dwUnused_0 : number, pTechno_1 : TechnoClass, NoSurvivor_2 : boolean, cell_3 : any) : void;
+    Draw(point_0 : Point2D, rect_1 : RectangleStruct) : void;
+    FireAngleTo(pObject_0 : ObjectClass) : DirStruct;
+    Destory(dwUnused_0 : number, pTechno_1 : TechnoClass, NoSurvivor_2 : boolean, cell_3 : CellStruct) : void;
     TogglePrimaryFactory() : boolean;
-    SensorArrayActivate(cell_0 : any) : void;
-    SensorArrayDeactivate(cell_0 : any) : void;
-    DisguiseDetectorActivate(cell_0 : any) : void;
-    DisguiseDetectorDeactivate(cell_0 : any) : void;
+    SensorArrayActivate(cell_0 : CellStruct) : void;
+    SensorArrayDeactivate(cell_0 : CellStruct) : void;
+    DisguiseDetectorActivate(cell_0 : CellStruct) : void;
+    DisguiseDetectorDeactivate(cell_0 : CellStruct) : void;
     AlwaysZero() : number;
     UpdateAnimations() : void;
     GetCurrentFrame() : number;
     IsAllFogged() : boolean;
-    SetRallypoint(pTarget_0 : any, bPlayEVA_1 : boolean) : void;
+    SetRallypoint(pTarget_0 : CellStruct, bPlayEVA_1 : boolean) : void;
     FreezeInFog(pFoggedArray_0 : any, pCell_1 : CellClass, Visible_2 : boolean) : void;
     GoOnline() : void;
     GoOffline() : void;
@@ -2358,15 +2358,15 @@ class BuildingClass
     GetShapeNumber() : number;
     BeginMode(bType_0 : any) : void;
     SecondActiveSWIdx() : number;
-    FireLaser(Coords_0 : any) : void;
+    FireLaser(Coords_0 : CoordStruct) : void;
     IsBeingDrained() : boolean;
     UpdateBunker() : boolean;
     KillOccupants(pAssaulter_0 : TechnoClass) : void;
     MakeTraversable() : boolean;
     CheckFog() : boolean;
-    GetVoxelBarrelOffsetMatrix(ret_0 : any) : any;
+    GetVoxelBarrelOffsetMatrix(ret_0 : Matrix3D) : Matrix3D;
     IsTraversable() : boolean;
-    DrawInfoTipAndSpiedSelection(pLocation_0 : any, pRect_1 : any) : number;
+    DrawInfoTipAndSpiedSelection(pLocation_0 : Point2D, pRect_1 : RectangleStruct) : number;
     HasSuperWeapon(index_0 : number) : boolean;
     GetSecretProduction() : TechnoTypeClass;
     GetAnim(slot_0 : any) : AnimClass;
@@ -2400,8 +2400,8 @@ class BuildingClass
     m_LaserFenceFrame : number;
     m_FirestormWallFrame : number;
     m_RepairProgress : StageClass;
-    m_unknown_rect_63C : any;
-    m_unknown_coord_64C : any;
+    m_unknown_rect_63C : RectangleStruct;
+    m_unknown_coord_64C : CoordStruct;
     m_unknown_int_658 : number;
     m_unknown_65C : number;
     m_HasPower : boolean;
@@ -2447,27 +2447,27 @@ class BuildingClass
     m_UpgradeLevel : number;
     m_GateStage : number;
     m_PrismStage : any;
-    m_PrismTargetCoords : any;
+    m_PrismTargetCoords : CoordStruct;
     m_DelayBeforeFiring : number;
     m_BunkerState : number;
 }
 class BuildingTypeClass
     extends TechnoTypeClass
 {
-    static Find(pID_0 : string) : BuildingTypeClass;
+    static Find(pID_0 : string | any) : BuildingTypeClass;
     static FindOrAllocate(pID_0 : string) : BuildingTypeClass;
-    static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
+    static FindIndex(pID_0 : string | any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(pOwner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     LoadBuildup() : any;
     ClearBuildUp() : void;
     IsVehicle() : boolean;
     GetFoundationWidth() : number;
     GetFoundationHeight(bIncludeBib_0 : boolean) : number;
-    CanPlaceHere(cell_0 : any, owner_1 : HouseClass) : boolean;
+    CanPlaceHere(cell_0 : CellStruct, owner_1 : HouseClass) : boolean;
     HasSuperWeapon(index_0 : number) : boolean;
     HasSuperWeapon() : boolean;
     CanTogglePower() : boolean;
@@ -2477,12 +2477,12 @@ class BuildingTypeClass
     s_AbsVTable : number;
     s_Array : any;
     m_ArrayIndex : number;
-    m_FoundationData : any;
+    m_FoundationData : CellStruct;
     m_Buildup : any;
     m_BuildupLoaded : boolean;
     m_BuildCat : any;
-    m_HalfDamageSmokeLocation1 : any;
-    m_HalfDamageSmokeLocation2 : any;
+    m_HalfDamageSmokeLocation1 : CoordStruct;
+    m_HalfDamageSmokeLocation2 : CoordStruct;
     m_align_E24 : number;
     m_GateCloseDelay : number;
     m_LightVisibility : number;
@@ -2490,11 +2490,11 @@ class BuildingTypeClass
     m_LightRedTint : number;
     m_LightGreenTint : number;
     m_LightBlueTint : number;
-    m_PrimaryFirePixelOffset : any;
-    m_SecondaryFirePixelOffset : any;
+    m_PrimaryFirePixelOffset : Point2D;
+    m_SecondaryFirePixelOffset : Point2D;
     m_ToOverlay : OverlayTypeClass;
     m_ToTile : number;
-    m_BuildupFile : number;
+    m_BuildupFile : string;
     m_BuildupSound : number;
     m_PackupSound : number;
     m_CreateUnitSound : number;
@@ -2502,7 +2502,7 @@ class BuildingTypeClass
     m_UnitExitSound : number;
     m_WorkingSound : number;
     m_NotWorkingSound : number;
-    m_PowersUpBuilding : number;
+    m_PowersUpBuilding : string;
     m_FreeUnit : UnitTypeClass;
     m_SecretInfantry : InfantryTypeClass;
     m_SecretUnit : UnitTypeClass;
@@ -2510,9 +2510,9 @@ class BuildingTypeClass
     m_field_EB0 : number;
     m_Adjacent : number;
     m_Factory : any;
-    m_TargetCoordOffset : any;
-    m_ExitCoord : any;
-    m_FoundationOutside : any;
+    m_TargetCoordOffset : CoordStruct;
+    m_ExitCoord : CoordStruct;
+    m_FoundationOutside : CellStruct;
     m_field_ED8 : number;
     m_DeployFacing : number;
     m_PowerBonus : number;
@@ -2546,7 +2546,7 @@ class BuildingTypeClass
     m_AntiAirValue : number;
     m_AntiArmorValue : number;
     m_AntiInfantryValue : number;
-    m_ZShapePointMove : any;
+    m_ZShapePointMove : Point2D;
     m_unknown_1538 : number;
     m_unknown_153C : number;
     m_unknown_1540 : number;
@@ -2583,12 +2583,12 @@ class BuildingTypeClass
     m_CanOccupyFire : boolean;
     m_MaxNumberOccupants : number;
     m_ShowOccupantPips : boolean;
-    m_MuzzleFlash : any;
-    m_DamageFireOffset : any;
-    m_QueueingCell : any;
+    m_MuzzleFlash : Point2D;
+    m_DamageFireOffset : Point2D;
+    m_QueueingCell : Point2D;
     m_NumberImpassableRows : number;
-    m_RemoveOccupy : any;
-    m_AddOccupy : any;
+    m_RemoveOccupy : Point2D;
+    m_AddOccupy : Point2D;
     m_Radar : boolean;
     m_SpySat : boolean;
     m_ChargeAnim : boolean;
@@ -2656,11 +2656,11 @@ class BuildingTypeClass
     m_ConcentricRadialIndicator : boolean;
     m_PsychicDetectionRadius : number;
     m_BarrelStartPitch : number;
-    m_VoxelBarrelFile : number;
-    m_VoxelBarrelOffsetToPitchPivotPoint : any;
-    m_VoxelBarrelOffsetToRotatePivotPoint : any;
-    m_VoxelBarrelOffsetToBuildingPivotPoint : any;
-    m_VoxelBarrelOffsetToBarrelEnd : any;
+    m_VoxelBarrelFile : string;
+    m_VoxelBarrelOffsetToPitchPivotPoint : CoordStruct;
+    m_VoxelBarrelOffsetToRotatePivotPoint : CoordStruct;
+    m_VoxelBarrelOffsetToBuildingPivotPoint : CoordStruct;
+    m_VoxelBarrelOffsetToBarrelEnd : CoordStruct;
     m_DemandLoad : boolean;
     m_DemandLoadBuildup : boolean;
     m_FreeBuildup : boolean;
@@ -2671,16 +2671,16 @@ class BuildingTypeClass
     m_CrateBeneath : boolean;
     m_LeaveRubble : boolean;
     m_CrateBeneathIsMoney : boolean;
-    m_TheaterSpecificID : number;
+    m_TheaterSpecificID : string;
     m_NumberOfDocks : number;
     m_DockingOffsets : any;
 }
 class BuildingAnimStruct
 {
-    m_Anim : number;
-    m_Damaged : number;
-    m_Garrisoned : number;
-    m_Position : any;
+    m_Anim : string;
+    m_Damaged : string;
+    m_Garrisoned : string;
+    m_Position : Point2D;
     m_ZAdjust : number;
     m_YSort : number;
     m_Powered : boolean;
@@ -2694,15 +2694,15 @@ class OverlayTypeClass
     static Find(pID_0 : string) : OverlayTypeClass;
     static FindOrAllocate(pID_0 : string) : OverlayTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    vt_entry_6C(pDest_0 : any, pSrc_1 : any) : any;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(pOwner_0 : HouseClass) : ObjectClass;
-    Draw(pClientCoords_0 : any, pClipRect_1 : any, nFrame_2 : number) : void;
+    vt_entry_6C(pDest_0 : CoordStruct | any, pSrc_1 : CoordStruct | any) : CoordStruct;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
+    Draw(pClientCoords_0 : Point2D, pClipRect_1 : RectangleStruct, nFrame_2 : number) : void;
     s_AbsID : any;
     s_Array : any;
     m_ArrayIndex : number;
@@ -2729,22 +2729,22 @@ class OverlayTypeClass
 class UnitTypeClass
     extends TechnoTypeClass
 {
-    static Find(pID_0 : string) : UnitTypeClass;
+    static Find(pID_0 : string | any) : UnitTypeClass;
     static FindOrAllocate(pID_0 : string) : UnitTypeClass;
-    static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    static FindIndex(pID_0 : string | any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(pOwner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     s_AbsID : any;
     s_AbsVTable : number;
     s_Array : any;
     m_ArrayIndex : number;
     m_MovementRestrictedTo : any;
-    m_HalfDamageSmokeLocation : any;
+    m_HalfDamageSmokeLocation : CoordStruct;
     m_Passive : boolean;
     m_CrateGoodie : boolean;
     m_Harvester : boolean;
@@ -2779,7 +2779,7 @@ class UnitTypeClass
     m_AltImage : any;
     m_WalkFrames : number;
     m_FiringFrames : number;
-    m_AltImageFile : number;
+    m_AltImageFile : string;
 }
 class BuildingAnimFrameStruct
 {
@@ -2790,9 +2790,9 @@ class BuildingAnimFrameStruct
 class FactoryClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     HasProgressChanged() : boolean;
@@ -2839,7 +2839,7 @@ class StageClass
 class InfantryClass
     extends FootClass
 {
-    GetClassID(pClassID_0 : any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
     IsDeployed() : boolean;
@@ -2864,24 +2864,24 @@ class InfantryClass
 class FootClass
     extends TechnoClass
 {
-    Destroyed(Killer_0 : ObjectClass) : void;
-    ForceCreate(coord_0 : any, dwUnk_1 : number) : boolean;
+    Destroyed(Killer_0 : ObjectClass | any) : void;
+    ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : number | any) : boolean;
     ReceiveGunner(Gunner_0 : FootClass) : void;
     RemoveGunner(Gunner_0 : FootClass) : void;
     IsLeavingMap() : boolean;
     vt_entry_4E0() : boolean;
     CanDeployNow() : boolean;
-    AddSensorsAt(cell_0 : any) : void;
-    RemoveSensorsAt(cell_0 : any) : void;
-    vt_entry_4F0(pCrd_0 : any) : any;
+    AddSensorsAt(cell_0 : CellStruct) : void;
+    RemoveSensorsAt(cell_0 : CellStruct) : void;
+    vt_entry_4F0(pCrd_0 : CoordStruct) : CoordStruct;
     vt_entry_4F4() : void;
     vt_entry_4F8() : boolean;
-    MoveTo(pCrd_0 : any) : boolean;
+    MoveTo(pCrd_0 : CoordStruct) : boolean;
     StopMoving() : boolean;
     vt_entry_504() : boolean;
-    ChronoWarpTo(pDest_0 : any) : boolean;
-    Draw_A_SHP(SHP_0 : any, idxFacing_1 : number, Coords_2 : any, Rectangle_3 : any, dwUnk5_4 : number, dwUnk6_5 : number, dwUnk7_6 : number, ZGradient_7 : any, dwUnk9_8 : number, extraLight_9 : number, dwUnk11_10 : number, dwUnk12_11 : number, dwUnk13_12 : number, dwUnk14_13 : number, dwUnk15_14 : number, dwUnk16_15 : number) : void;
-    Draw_A_VXL(VXL_0 : any, HVAFrameIndex_1 : number, Flags_2 : number, Cache_3 : any, Rectangle_4 : any, CenterPoint_5 : any, Matrix_6 : any, dwUnk8_7 : number, DrawFlags_8 : number, dwUnk10_9 : number) : void;
+    ChronoWarpTo(pDest_0 : CoordStruct) : boolean;
+    Draw_A_SHP(SHP_0 : any, idxFacing_1 : number, Coords_2 : Point2D, Rectangle_3 : RectangleStruct, dwUnk5_4 : number, dwUnk6_5 : number, dwUnk7_6 : number, ZGradient_7 : any, dwUnk9_8 : number, extraLight_9 : number, dwUnk11_10 : number, dwUnk12_11 : number, dwUnk13_12 : number, dwUnk14_13 : number, dwUnk15_14 : number, dwUnk16_15 : number) : void;
+    Draw_A_VXL(VXL_0 : any, HVAFrameIndex_1 : number, Flags_2 : number, Cache_3 : any, Rectangle_4 : RectangleStruct, CenterPoint_5 : Point2D, Matrix_6 : Matrix3D, dwUnk8_7 : number, DrawFlags_8 : number, dwUnk10_9 : number) : void;
     GoBerzerk() : void;
     Panic() : void;
     UnPanic() : void;
@@ -2899,13 +2899,13 @@ class FootClass
     vt_entry_54C() : void;
     vt_entry_550(dwUnk_0 : number) : boolean;
     CanBeRecruited(ByWhom_0 : HouseClass) : boolean;
-    CreateWakes(coords_0 : any) : void;
+    CreateWakes(coords_0 : CoordStruct) : void;
     Jumpjet_LocationClear() : boolean;
-    Jumpjet_OccupyCell(Cell_0 : any) : void;
+    Jumpjet_OccupyCell(Cell_0 : CellStruct) : void;
     FootClass_ImbueLocomotor(target_0 : FootClass, clsid_1 : any) : void;
     UpdatePassengerCoords() : void;
     AbortMotion() : void;
-    UpdatePathfinding(unkCell_0 : any, unkCell2_1 : any, unk3_2 : number) : boolean;
+    UpdatePathfinding(unkCell_0 : CellStruct, unkCell2_1 : CellStruct, unk3_2 : number) : boolean;
     RemoveFirstPassenger() : FootClass;
     RemovePassenger(pPassenger_0 : FootClass) : FootClass;
     EnterAsPassenger(pPassenger_0 : FootClass) : void;
@@ -2915,8 +2915,8 @@ class FootClass
     s_AbsDerivateID : any;
     s_Array : any;
     m_PlanningPathIdx : number;
-    m_WaypointNearbyAccessibleCellDelta : any;
-    m_WaypointCell : any;
+    m_WaypointNearbyAccessibleCellDelta : CellStruct;
+    m_WaypointCell : CellStruct;
     m_unknown_52C : number;
     m_unknown_530 : number;
     m_unknown_534 : number;
@@ -2924,21 +2924,21 @@ class FootClass
     m_unknown_bool_53C : boolean;
     m_unknown_540 : number;
     m_Audio7 : any;
-    m___Audio7 : number;
-    m_CurrentMapCoords : any;
-    m_LastMapCoords : any;
-    m_LastFlightMapCoords : any;
-    m_CurrentJumpjetMapCoords : any;
-    m_unknown_coords_568 : any;
+    m___Audio7 : string;
+    m_CurrentMapCoords : CellStruct;
+    m_LastMapCoords : CellStruct;
+    m_LastFlightMapCoords : CellStruct;
+    m_CurrentJumpjetMapCoords : CellStruct;
+    m_unknown_coords_568 : CoordStruct;
     m_SpeedPercentage : number;
     m_SpeedMultiplier : number;
     m_unknown_abstract_array_588 : any;
-    m___unknown_abstract_array_588 : number;
+    m___unknown_abstract_array_588 : string;
     m_unknown_5A0 : AbstractClass;
     m_Destination : AbstractClass;
     m_LastDestination : AbstractClass;
     m_NavQueue : any;
-    m___NavQueue : number;
+    m___NavQueue : string;
     m_unknown_int_5C4 : number;
     m_unknown_5C8 : number;
     m_unknown_5CC : number;
@@ -2949,17 +2949,17 @@ class FootClass
     m_unknown_5DC : number;
     m_PathDirections : number;
     m_PathDelayTimer : CDTimerClass;
-    m___PathDelayTimer : number;
+    m___PathDelayTimer : string;
     m_unknown_int_64C : number;
     m_unknown_timer_650 : CDTimerClass;
-    m___unknown_timer_650 : number;
+    m___unknown_timer_650 : string;
     m_SightTimer : CDTimerClass;
-    m___SightTimer : number;
+    m___SightTimer : string;
     m_BlockagePathTimer : CDTimerClass;
-    m___BlockagePathTimer : number;
+    m___BlockagePathTimer : string;
     m_Locomotor : any;
-    m___Locomotor : number;
-    m_unknown_point3d_678 : any;
+    m___Locomotor : string;
+    m_unknown_point3d_678 : CoordStruct;
     m_TubeIndex : number;
     m_unknown_bool_685 : boolean;
     m_WaypointIndex : number;
@@ -2978,7 +2978,7 @@ class FootClass
     m_unknown_698 : number;
     m_ParasiteImUsing : ParasiteClass;
     m_ParalysisTimer : CDTimerClass;
-    m___ParalysisTimer : number;
+    m___ParalysisTimer : string;
     m_unknown_bool_6AC : boolean;
     m_IsAttackedByLocomotor : boolean;
     m_IsLetGoByLocomotor : boolean;
@@ -2996,9 +2996,9 @@ class FootClass
 class TeamClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     GetTaskForceMissingMemberTypes(dest_0 : any) : void;
     LiberateMember(pFoot_0 : FootClass, idx_1 : number, count_2 : number) : void;
     AddMember(pFoot_0 : FootClass, bForce_1 : boolean) : boolean;
@@ -3048,17 +3048,17 @@ class TeamTypeClass
     static Find(pID_0 : string) : TeamTypeClass;
     static FindOrAllocate(pID_0 : string) : TeamTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
     CreateTeam(pHouse_0 : HouseClass) : TeamClass;
     DestroyAllInstances() : void;
     GetGroup() : number;
-    GetWaypoint(buffer_0 : any) : any;
-    GetTransportWaypoint(buffer_0 : any) : any;
+    GetWaypoint(buffer_0 : CellStruct) : CellStruct;
+    GetTransportWaypoint(buffer_0 : CellStruct) : CellStruct;
     CanRecruitUnit(pUnit_0 : FootClass, pOwner_1 : HouseClass) : boolean;
     FlashAllInstances(Duration_0 : number) : void;
     FindFirstInstance() : TeamClass;
@@ -3117,13 +3117,13 @@ class TagClass
     static DeleteAll() : void;
     static NotifyGlobalChanged(idxGlobal_0 : number) : void;
     static NotifyLocalChanged(idxLocal_0 : number) : void;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    PointerExpired(pAbstract_0 : AbstractClass, removed_1 : boolean) : void;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
     WhatAmI() : any;
     Size() : number;
-    ComputeCRC(crc_0 : any) : void;
+    ComputeCRC(crc_0 : any | any) : void;
     HasCrossesHorizontalLineEvent() : boolean;
     HasCrossesVerticalLineEvent() : boolean;
     HasZoneEntryByEvent() : boolean;
@@ -3131,7 +3131,7 @@ class TagClass
     GlobalChanged(idxGlobal_0 : number) : void;
     LocalChanged(idxLocal_0 : number) : void;
     IsOnlyInstanceOfType() : boolean;
-    RaiseEvent(event_0 : any, pTagOwner_1 : ObjectClass, location_2 : any, forceAllOccured_3 : boolean, pSource_4 : TechnoClass) : boolean;
+    RaiseEvent(event_0 : any, pTagOwner_1 : ObjectClass, location_2 : CellStruct, forceAllOccured_3 : boolean, pSource_4 : TechnoClass) : boolean;
     ShouldReplace() : boolean;
     Destroy() : void;
     HasBeenDestroyed() : boolean;
@@ -3143,7 +3143,7 @@ class TagClass
     m_Type : TagTypeClass;
     m_FirstTrigger : TriggerClass;
     m_InstanceCount : number;
-    m_DefaultCoords : any;
+    m_DefaultCoords : CellStruct;
     m_Destroyed : boolean;
     m_IsExecuting : boolean;
 }
@@ -3153,16 +3153,16 @@ class TagTypeClass
     static Find(pID_0 : string) : TagTypeClass;
     static FindOrAllocate(pID_0 : string) : TagTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    PointerExpired(pAbstract_0 : AbstractClass, removed_1 : boolean) : void;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
     WhatAmI() : any;
     Size() : number;
-    ComputeCRC(crc_0 : any) : void;
+    ComputeCRC(crc_0 : any | any) : void;
     GetArrayIndex() : number;
-    LoadFromINI(pINI_0 : CCINIClass) : boolean;
-    SaveToINI(pINI_0 : CCINIClass) : boolean;
+    LoadFromINI(pINI_0 : CCINIClass | any) : boolean;
+    SaveToINI(pINI_0 : CCINIClass | any) : boolean;
     static LoadFromINIList(pINI_0 : CCINIClass) : void;
     static SaveToINIList(pINI_0 : CCINIClass) : void;
     static FindByNameOrID(pName_0 : string) : TagTypeClass;
@@ -3187,13 +3187,13 @@ class TriggerClass
     extends AbstractClass
 {
     static GetInstance(pType_0 : TriggerTypeClass) : TriggerClass;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    PointerExpired(pAbstract_0 : AbstractClass, removed_1 : boolean) : void;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
     WhatAmI() : any;
     Size() : number;
-    ComputeCRC(crc_0 : any) : void;
+    ComputeCRC(crc_0 : any | any) : void;
     HasCrossesHorizontalLineEvent() : boolean;
     HasCrossesVerticalLineEvent() : boolean;
     HasZoneEntryByEvent() : boolean;
@@ -3212,7 +3212,7 @@ class TriggerClass
     Enable() : void;
     Disable() : void;
     RegisterEvent(event_0 : any, pObject_1 : ObjectClass, forceFire_2 : boolean, persistent_3 : boolean, pSource_4 : TechnoClass) : boolean;
-    FireActions(pObj_0 : ObjectClass, location_1 : any) : boolean;
+    FireActions(pObj_0 : ObjectClass, location_1 : CellStruct) : boolean;
     s_AbsID : any;
     s_Array : any;
     m_Type : TriggerTypeClass;
@@ -3229,9 +3229,9 @@ class ScriptTypeClass
     static Find(pID_0 : string) : ScriptTypeClass;
     static FindOrAllocate(pID_0 : string) : ScriptTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
@@ -3253,9 +3253,9 @@ class TaskForceClass
     static Find(pID_0 : string) : TaskForceClass;
     static FindOrAllocate(pID_0 : string) : TaskForceClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     s_AbsID : any;
@@ -3273,9 +3273,9 @@ class TaskForceEntryStruct
 class ScriptClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     GetCurrentAction(buffer_0 : ScriptActionNode) : ScriptActionNode;
@@ -3292,9 +3292,9 @@ class ScriptClass
 class ParasiteClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     UpdateSquid() : void;
@@ -3318,16 +3318,16 @@ class ParasiteClass
 class BuildingLightClass
     extends ObjectClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     SetBehaviour(mode_0 : any) : void;
     s_AbsID : any;
     s_Array : any;
     m_Speed : number;
-    m_field_B8 : any;
-    m_field_C4 : any;
+    m_field_B8 : CoordStruct;
+    m_field_C4 : CoordStruct;
     m_Acceleration : number;
     m_Direction : boolean;
     m_BehaviourMode : any;
@@ -3337,9 +3337,9 @@ class BuildingLightClass
 class LightSourceClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     Activate(dwZero_0 : number) : void;
@@ -3350,25 +3350,25 @@ class LightSourceClass
     m_LightIntensity : number;
     m_LightTint : TintStruct;
     m_DetailLevel : number;
-    m_Location : any;
+    m_Location : CoordStruct;
     m_LightVisibility : number;
     m_Activated : boolean;
 }
 class UnitClass
     extends FootClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    MouseOverCell(pCell_0 : any, checkFog_1 : boolean, ignoreForce_2 : boolean) : any;
-    MouseOverObject(pObject_0 : ObjectClass, ignoreForce_1 : boolean) : any;
-    MarkAllOccupationBits(coords_0 : any) : void;
-    UnmarkAllOccupationBits(coords_0 : any) : void;
-    DrawAsVXL(Coords_0 : any, BoundingRect_1 : any, Brightness_2 : number, Tint_3 : number) : void;
-    DrawAsSHP(Coords_0 : any, BoundingRect_1 : any, Brightness_2 : number, Tint_3 : number) : void;
-    DrawObject(pSurface_0 : Surface, Coords_1 : any, CacheRect_2 : any, Brightness_3 : number, Tint_4 : number) : void;
+    MouseOverCell(pCell_0 : CellStruct | any, checkFog_1 : boolean | any, ignoreForce_2 : boolean | any) : any;
+    MouseOverObject(pObject_0 : ObjectClass | any, ignoreForce_1 : boolean | any) : any;
+    MarkAllOccupationBits(coords_0 : CoordStruct | any) : void;
+    UnmarkAllOccupationBits(coords_0 : CoordStruct | any) : void;
+    DrawAsVXL(Coords_0 : Point2D, BoundingRect_1 : RectangleStruct, Brightness_2 : number, Tint_3 : number) : void;
+    DrawAsSHP(Coords_0 : Point2D, BoundingRect_1 : RectangleStruct, Brightness_2 : number, Tint_3 : number) : void;
+    DrawObject(pSurface_0 : Surface | any, Coords_1 : Point2D | any, CacheRect_2 : RectangleStruct | any, Brightness_3 : number | any, Tint_4 : number | any) : void;
     IsDeactivated() : boolean;
     UpdateTube() : void;
     UpdateRotation() : void;
@@ -3390,7 +3390,7 @@ class UnitClass
     static WriteINI(pINI_0 : CCINIClass) : void;
     ShouldCrashIt(pTarget_0 : TechnoClass) : boolean;
     AssignDestination_7447B0(pTarget_0 : AbstractClass) : AbstractClass;
-    AStarAttempt(cell1_0 : any, cell2_1 : any) : boolean;
+    AStarAttempt(cell1_0 : CellStruct, cell2_1 : CellStruct) : boolean;
     s_AbsID : any;
     s_AbsVTable : number;
     s_Array : any;
@@ -3409,32 +3409,32 @@ class UnitClass
     m_Deploying : boolean;
     m_Undeploying : boolean;
     m_NonPassengerCount : number;
-    m_ToolTipText : any;
+    m_ToolTipText : number;
 }
 class Surface
 {
     CopyFromWhole(pSrc_0 : Surface, bUnk1_1 : boolean, bUnk2_2 : boolean) : boolean;
-    CopyFromPart(pClipRect_0 : any, pSrc_1 : Surface, pSrcRect_2 : any, bUnk1_3 : boolean, bUnk2_4 : boolean) : boolean;
-    CopyFrom(pClipRect_0 : any, pClipRect2_1 : any, pSrc_2 : Surface, pDestRect_3 : any, pSrcRect_4 : any, bUnk1_5 : boolean, bUnk2_6 : boolean) : boolean;
-    FillRectEx(pClipRect_0 : any, pFillRect_1 : any, nColor_2 : number) : boolean;
-    FillRect(pFillRect_0 : any, nColor_1 : number) : boolean;
+    CopyFromPart(pClipRect_0 : RectangleStruct, pSrc_1 : Surface, pSrcRect_2 : RectangleStruct, bUnk1_3 : boolean, bUnk2_4 : boolean) : boolean;
+    CopyFrom(pClipRect_0 : RectangleStruct, pClipRect2_1 : RectangleStruct, pSrc_2 : Surface, pDestRect_3 : RectangleStruct, pSrcRect_4 : RectangleStruct, bUnk1_5 : boolean, bUnk2_6 : boolean) : boolean;
+    FillRectEx(pClipRect_0 : RectangleStruct, pFillRect_1 : RectangleStruct, nColor_2 : number) : boolean;
+    FillRect(pFillRect_0 : RectangleStruct, nColor_1 : number) : boolean;
     Fill(nColor_0 : number) : boolean;
-    FillRectTrans(pClipRect_0 : any, pColor_1 : any, nOpacity_2 : number) : boolean;
-    DrawEllipse(XOff_0 : number, YOff_1 : number, CenterX_2 : number, CenterY_3 : number, Rect_4 : any, nColor_5 : number) : boolean;
-    SetPixel(pPoint_0 : any, nColor_1 : number) : boolean;
-    GetPixel(pPoint_0 : any) : number;
-    DrawLineEx(pClipRect_0 : any, pStart_1 : any, pEnd_2 : any, nColor_3 : number) : boolean;
-    DrawLine(pStart_0 : any, pEnd_1 : any, nColor_2 : number) : boolean;
-    DrawLineColor_AZ(pRect_0 : any, pStart_1 : any, pEnd_2 : any, nColor_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
-    DrawMultiplyingLine_AZ(pRect_0 : any, pStart_1 : any, pEnd_2 : any, dwMultiplier_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
-    DrawSubtractiveLine_AZ(pRect_0 : any, pStart_1 : any, pEnd_2 : any, pColor_3 : any, dwUnk1_4 : number, dwUnk2_5 : number, bUnk1_6 : boolean, bUnk2_7 : boolean, bUkn3_8 : boolean, bUkn4_9 : boolean, fUkn_10 : number) : boolean;
-    DrawRGBMultiplyingLine_AZ(pRect_0 : any, pStart_1 : any, pEnd_2 : any, pColor_3 : any, Intensity_4 : number, dwUnk1_5 : number, dwUnk2_6 : number) : boolean;
-    PlotLine(pRect_0 : any, pStart_1 : any, pEnd_2 : any, fpDrawCallback_3 : any) : boolean;
-    DrawDashedLine(pStart_0 : any, pEnd_1 : any, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number) : boolean;
-    DrawDashedLine_(pStart_0 : any, pEnd_1 : any, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number, bUkn_5 : boolean) : boolean;
-    DrawLine_(pStart_0 : any, pEnd_1 : any, nColor_2 : number, bUnk_3 : boolean) : boolean;
-    DrawRectEx(pClipRect_0 : any, pDrawRect_1 : any, nColor_2 : number) : boolean;
-    DrawRect(pDrawRect_0 : any, dwColor_1 : number) : boolean;
+    FillRectTrans(pClipRect_0 : RectangleStruct, pColor_1 : any, nOpacity_2 : number) : boolean;
+    DrawEllipse(XOff_0 : number, YOff_1 : number, CenterX_2 : number, CenterY_3 : number, Rect_4 : RectangleStruct, nColor_5 : number) : boolean;
+    SetPixel(pPoint_0 : Point2D, nColor_1 : number) : boolean;
+    GetPixel(pPoint_0 : Point2D) : number;
+    DrawLineEx(pClipRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, nColor_3 : number) : boolean;
+    DrawLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number) : boolean;
+    DrawLineColor_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, nColor_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
+    DrawMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, dwMultiplier_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
+    DrawSubtractiveLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : any, dwUnk1_4 : number, dwUnk2_5 : number, bUnk1_6 : boolean, bUnk2_7 : boolean, bUkn3_8 : boolean, bUkn4_9 : boolean, fUkn_10 : number) : boolean;
+    DrawRGBMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : any, Intensity_4 : number, dwUnk1_5 : number, dwUnk2_6 : number) : boolean;
+    PlotLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, fpDrawCallback_3 : any) : boolean;
+    DrawDashedLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number) : boolean;
+    DrawDashedLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number, bUkn_5 : boolean) : boolean;
+    DrawLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, bUnk_3 : boolean) : boolean;
+    DrawRectEx(pClipRect_0 : RectangleStruct, pDrawRect_1 : RectangleStruct, nColor_2 : number) : boolean;
+    DrawRect(pDrawRect_0 : RectangleStruct, dwColor_1 : number) : boolean;
     Lock(X_0 : number, Y_1 : number) : void;
     Unlock() : boolean;
     CanLock(dwUkn1_0 : number, dwUkn2_1 : number) : boolean;
@@ -3442,11 +3442,11 @@ class Surface
     IsLocked() : boolean;
     GetBytesPerPixel() : number;
     GetPitch() : number;
-    GetRect(pRect_0 : any) : any;
+    GetRect(pRect_0 : RectangleStruct) : RectangleStruct;
     GetWidth() : number;
     GetHeight() : number;
     IsDSurface() : boolean;
-    GetRect() : any;
+    GetRect() : RectangleStruct;
     m_Width : number;
     m_Height : number;
 }
@@ -3454,12 +3454,12 @@ class EBolt
 {
     SetOwner(pOwner_0 : UnitClass, idxWeapon_1 : number) : void;
     ClearOwner() : void;
-    GetSourceCoords(outBuffer_0 : any) : any;
-    GetSourceCoords() : any;
-    Fire(P1_0 : any, P2_1 : any, arg18_2 : number) : void;
+    GetSourceCoords(outBuffer_0 : CoordStruct) : CoordStruct;
+    GetSourceCoords() : CoordStruct;
+    Fire(P1_0 : CoordStruct, P2_1 : CoordStruct, arg18_2 : number) : void;
     s_Array : any;
-    m_Point1 : any;
-    m_Point2 : any;
+    m_Point1 : CoordStruct;
+    m_Point2 : CoordStruct;
     m_unknown_18 : number;
     m_Random : number;
     m_Owner : TechnoClass;
@@ -3476,12 +3476,12 @@ class AircraftClass
     Is_Strafe() : number;
     Is_Fighter() : number;
     Is_Locked() : number;
-    QueryInterface(iid_0 : any, ppvObject_1 : void) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     s_AbsID : any;
@@ -3502,14 +3502,14 @@ class AircraftClass
 class AircraftTypeClass
     extends TechnoTypeClass
 {
-    static Find(pID_0 : string) : AircraftTypeClass;
+    static Find(pID_0 : string | any) : AircraftTypeClass;
     static FindOrAllocate(pID_0 : string) : AircraftTypeClass;
-    static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
+    static FindIndex(pID_0 : string | any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(pOwner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     s_AbsID : any;
     s_AbsVTable : number;
     s_Array : any;
@@ -3528,9 +3528,9 @@ class AircraftTypeClass
 class TerrainClass
     extends ObjectClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     s_AbsID : any;
@@ -3539,7 +3539,7 @@ class TerrainClass
     m_Type : TerrainTypeClass;
     m_IsBurning : boolean;
     m_IsCrumbling : boolean;
-    m_unknown_rect_D0 : any;
+    m_unknown_rect_D0 : RectangleStruct;
 }
 class TerrainTypeClass
     extends ObjectTypeClass
@@ -3547,13 +3547,13 @@ class TerrainTypeClass
     static Find(pID_0 : string) : TerrainTypeClass;
     static FindOrAllocate(pID_0 : string) : TerrainTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(owner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     s_AbsID : any;
     s_Array : any;
     m_ArrayIndex : number;
@@ -3568,7 +3568,7 @@ class TerrainTypeClass
     m_IsFlammable : boolean;
     m_IsAnimated : boolean;
     m_IsVeinhole : boolean;
-    m_FoundationData : any;
+    m_FoundationData : CellStruct;
 }
 class TiberiumClass
     extends AbstractTypeClass
@@ -3576,13 +3576,13 @@ class TiberiumClass
     static Find(pID_0 : string) : TiberiumClass;
     static FindOrAllocate(pID_0 : string) : TiberiumClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    GetSizeMax(pcbSize_0 : any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
-    RegisterForGrowth(cell_0 : any) : void;
+    RegisterForGrowth(cell_0 : CellStruct) : void;
     static FindIndex(idxOverlayType_0 : number) : number;
     static Find(idxOverlayType_0 : number) : TiberiumClass;
     s_AbsID : any;
@@ -3596,15 +3596,15 @@ class TiberiumClass
     m_Power : number;
     m_Color : number;
     m_Debris : any;
-    m___Debris : number;
+    m___Debris : string;
     m_Image : OverlayTypeClass;
     m_NumFrames : number;
     m_NumImages : number;
     m_field_EC : number;
     m_SpreadLogic : TiberiumLogic;
-    m___SpreadLogic : number;
+    m___SpreadLogic : string;
     m_GrowthLogic : TiberiumLogic;
-    m___GrowthLogic : number;
+    m___GrowthLogic : string;
 }
 class TiberiumLogic
 {
@@ -3619,9 +3619,9 @@ class TiberiumLogic
 class RadSiteClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     Activate() : void;
@@ -3631,9 +3631,9 @@ class RadSiteClass
     DecreaseLight() : void;
     Add(nRadLevel_0 : number) : void;
     GetRadLevel() : number;
-    GetRadLevelAt(pCell_0 : any) : number;
+    GetRadLevelAt(pCell_0 : CellStruct) : number;
     SetRadLevel(nRadLevel_0 : number) : void;
-    SetBaseCell(pCell_0 : any) : void;
+    SetBaseCell(pCell_0 : CellStruct) : void;
     GetSpread() : void;
     SetSpread(nCells_0 : number) : void;
     GetEffectPercentage() : number;
@@ -3641,10 +3641,10 @@ class RadSiteClass
     s_Array : any;
     m_LightSource : LightSourceClass;
     m_RadLevelTimer : CDTimerClass;
-    m___RadLevelTimer : number;
+    m___RadLevelTimer : string;
     m_RadLightTimer : CDTimerClass;
-    m___RadLightTimer : number;
-    m_BaseCell : any;
+    m___RadLightTimer : string;
+    m_BaseCell : CellStruct;
     m_Spread : number;
     m_SpreadInLeptons : number;
     m_RadLevel : number;
@@ -3690,12 +3690,12 @@ class ConvertClass
 class DSurface
     extends XSurface
 {
-    DrawGradientLine(pRect_0 : any, pStart_1 : any, pEnd_2 : any, pStartColor_3 : any, pEndColor_4 : any, fStep_5 : number, nColor_6 : number) : boolean;
+    DrawGradientLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pStartColor_3 : any, pEndColor_4 : any, fStep_5 : number, nColor_6 : number) : boolean;
     CanBlit() : boolean;
-    DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : number, Position_3 : any, Bounds_4 : any, Flags_5 : any, Remap_6 : number, ZAdjust_7 : number, ZGradientDescIndex_8 : any, Brightness_9 : number, TintColor_10 : number, ZShape_11 : any, ZShapeFrame_12 : number, XOffset_13 : number, YOffset_14 : number) : void;
-    DrawTextA(pText_0 : any, pBounds_1 : any, pLocation_2 : any, ForeColor_3 : number, BackColor_4 : number, Flag_5 : any) : void;
-    DrawTextA(pText_0 : any, pLoction_1 : any, Color_2 : number) : void;
-    DrawTextA(pText_0 : any, X_1 : number, Y_2 : number, Color_3 : number) : void;
+    DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : number, Position_3 : Point2D, Bounds_4 : RectangleStruct, Flags_5 : any, Remap_6 : number, ZAdjust_7 : number, ZGradientDescIndex_8 : any, Brightness_9 : number, TintColor_10 : number, ZShape_11 : any, ZShapeFrame_12 : number, XOffset_13 : number, YOffset_14 : number) : void;
+    DrawTextA(pText_0 : number, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : any) : void;
+    DrawTextA(pText_0 : number, pLoction_1 : Point2D, Color_2 : number) : void;
+    DrawTextA(pText_0 : number, X_1 : number, Y_2 : number, Color_3 : number) : void;
     s_Tile : any;
     s_Sidebar : any;
     s_Primary : any;
@@ -3715,8 +3715,8 @@ class DSurface
 class XSurface
     extends Surface
 {
-    PutPixelClip(pPoint_0 : any, nUkn_1 : number, pRect_2 : any) : boolean;
-    GetPixelClip(pPoint_0 : any, pRect_1 : any) : number;
+    PutPixelClip(pPoint_0 : Point2D, nUkn_1 : number, pRect_2 : RectangleStruct) : boolean;
+    GetPixelClip(pPoint_0 : Point2D, pRect_1 : RectangleStruct) : number;
     m_LockLevel : number;
     m_BytesPerPixel : number;
 }
@@ -3739,12 +3739,12 @@ class RGBClass
 class LaserDrawClass
 {
     m_Progress : StageClass;
-    m___Progress : number;
+    m___Progress : string;
     m_Thickness : number;
     m_IsHouseColor : boolean;
     m_IsSupported : boolean;
-    m_Source : any;
-    m_Target : any;
+    m_Source : CoordStruct;
+    m_Target : CoordStruct;
     m_ZAdjust : number;
     m_field_40 : number;
     m_InnerColor : any;
@@ -3794,9 +3794,9 @@ class VeterancyStruct
 class TemporalClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     Fire(pTarget_0 : TechnoClass) : void;
@@ -3821,29 +3821,29 @@ class TemporalClass
 class SuperClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    CreateChronoAnim(coords_0 : any) : void;
+    CreateChronoAnim(coords_0 : CoordStruct) : void;
     Reset() : void;
     SetOnHold(onHold_0 : boolean) : boolean;
     Grant(oneTime_0 : boolean, announce_1 : boolean, onHold_2 : boolean) : boolean;
     Lose() : boolean;
     IsPowered() : boolean;
-    Launch(cell_0 : any, isPlayer_1 : boolean) : void;
+    Launch(cell_0 : CellStruct, isPlayer_1 : boolean) : void;
     CanFire() : number;
     SetReadiness(ready_0 : boolean) : void;
     StopPreclickAnim(isPlayer_0 : boolean) : number;
-    ClickFire(isPlayer_0 : boolean, cell_1 : any) : number;
+    ClickFire(isPlayer_0 : boolean, cell_1 : CellStruct) : number;
     HasChargeProgressed(isPlayer_0 : boolean) : boolean;
     AnimStage() : number;
     SetCharge(percentage_0 : number) : void;
     GetRechargeTime() : number;
     SetRechargeTime(time_0 : number) : void;
     ResetRechargeTime() : void;
-    NameReadiness() : any;
+    NameReadiness() : number;
     ShouldDrawProgress() : boolean;
     ShouldFlashTab() : boolean;
     s_AbsID : any;
@@ -3857,9 +3857,9 @@ class SuperClass
     m_BlinkState : boolean;
     m_BlinkTimer : any;
     m_SpecialSoundDuration : number;
-    m_SpecialSoundLocation : any;
+    m_SpecialSoundLocation : CoordStruct;
     m_CanHold : boolean;
-    m_ChronoMapCoords : any;
+    m_ChronoMapCoords : CellStruct;
     m_Animation : AnimClass;
     m_AnimationGotInvalid : boolean;
     m_IsPresent : boolean;
@@ -3876,12 +3876,12 @@ class SuperWeaponTypeClass
     static Find(pID_0 : string) : SuperWeaponTypeClass;
     static FindOrAllocate(pID_0 : string) : SuperWeaponTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    MouseOverObject(cell_0 : any, pObjBelowMouse_1 : ObjectClass) : any;
+    MouseOverObject(cell_0 : CellStruct, pObjBelowMouse_1 : ObjectClass) : any;
     static FindFirstOfAction(Action_0 : any) : SuperWeaponTypeClass;
     s_AbsID : any;
     s_Array : any;
@@ -3898,7 +3898,7 @@ class SuperWeaponTypeClass
     m_SpecialSound : number;
     m_StartSound : number;
     m_AuxBuilding : BuildingTypeClass;
-    m_SidebarImageFile : number;
+    m_SidebarImageFile : string;
     m_UseChargeDrain : boolean;
     m_IsPowered : boolean;
     m_DisableableFromShell : boolean;
@@ -3915,9 +3915,9 @@ class SuperWeaponTypeClass
 class AirstrikeClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     StartMission(pTarget_0 : ObjectClass) : void;
@@ -3942,9 +3942,9 @@ class AirstrikeClass
 class CaptureManagerClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     CaptureUnit(pUnit_0 : TechnoClass) : boolean;
@@ -3975,14 +3975,14 @@ class ControlNode
     m_Unit : TechnoClass;
     m_OriginalOwner : HouseClass;
     m_LinkDrawTimer : CDTimerClass;
-    m___LinkDrawTimer : number;
+    m___LinkDrawTimer : string;
 }
 class SpawnManagerClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     KillNodes() : void;
@@ -4017,9 +4017,9 @@ class SpawnControl
 class SlaveManagerClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     SetOwner(NewOwner_0 : TechnoClass) : void;
@@ -4046,18 +4046,18 @@ class SlaveManagerClass
 class ParticleSystemClass
     extends ObjectClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     s_AbsID : any;
     s_Array : any;
     m_Type : ParticleSystemTypeClass;
-    m_SpawnDistanceToOwner : any;
+    m_SpawnDistanceToOwner : CoordStruct;
     m_Particles : any;
-    m___Particles : number;
-    m_TargetCoords : any;
+    m___Particles : string;
+    m_TargetCoords : CoordStruct;
     m_Owner : ObjectClass;
     m_Target : AbstractClass;
     m_SpawnFrames : number;
@@ -4074,13 +4074,13 @@ class ParticleSystemTypeClass
     static Find(pID_0 : string) : ParticleSystemTypeClass;
     static FindOrAllocate(pID_0 : string) : ParticleSystemTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(mcoords_0 : any, owner_1 : HouseClass) : boolean;
-    CreateObject(owner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
+    CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     s_AbsID : any;
     s_Array : any;
     m_HoldsWhat : number;
@@ -4110,9 +4110,9 @@ class ParticleSystemTypeClass
 class ParticleClass
     extends ObjectClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     vt_entry_1E8() : number;
@@ -4125,16 +4125,16 @@ class ParticleClass
     m_unknown_B4 : number;
     m_unknown_B8 : number;
     m_unknown_BC : number;
-    m_Velocity : any;
+    m_Velocity : CoordStruct;
     m_unknown_CC : number;
     m_unknown_double_D0 : number;
     m_unknown_D8 : number;
     m_unknown_DC : number;
     m_unknown_E0 : number;
     m_Speed : number;
-    m_unknown_coords_E8 : any;
-    m_unknown_coords_F4 : any;
-    m_unknown_coords_100 : any;
+    m_unknown_coords_E8 : CoordStruct;
+    m_unknown_coords_F4 : CoordStruct;
+    m_unknown_coords_100 : CoordStruct;
     m_unknown_vector3d_10C : any;
     m_unknown_vector3d_118 : any;
     m_ParticleSystem : ParticleSystemClass;
@@ -4153,16 +4153,16 @@ class ParticleTypeClass
     static Find(pID_0 : string) : ParticleTypeClass;
     static FindOrAllocate(pID_0 : string) : ParticleTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(mcoords_0 : any, owner_1 : HouseClass) : boolean;
-    CreateObject(owner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
+    CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     s_AbsID : any;
     s_Array : any;
-    m_NextParticleOffset : any;
+    m_NextParticleOffset : CoordStruct;
     m_XVelocity : number;
     m_YVelocity : number;
     m_MinZVelocity : number;
@@ -4199,9 +4199,9 @@ class WarheadTypeClass
     static Find(pID_0 : string) : WarheadTypeClass;
     static FindOrAllocate(pID_0 : string) : WarheadTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     s_AbsID : any;
@@ -4272,11 +4272,11 @@ class VoxelAnimTypeClass
     static Find(pID_0 : string) : VoxelAnimTypeClass;
     static FindOrAllocate(pID_0 : string) : VoxelAnimTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : any, pOwner_1 : HouseClass) : boolean;
-    CreateObject(owner_0 : HouseClass) : ObjectClass;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     s_AbsID : any;
     s_Array : any;
     m_Normalized : boolean;
@@ -4307,20 +4307,20 @@ class VoxelAnimTypeClass
 class WaveClass
     extends ObjectClass
 {
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
-    GetClassID(pClassID_0 : any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
-    Draw_Magnetic(xyzFrom_0 : any, xyzTo_1 : any) : void;
-    Draw_NonMagnetic(xyzFrom_0 : any, xyzTo_1 : any) : void;
+    Draw_Magnetic(xyzFrom_0 : CoordStruct, xyzTo_1 : CoordStruct) : void;
+    Draw_NonMagnetic(xyzFrom_0 : CoordStruct, xyzTo_1 : CoordStruct) : void;
     Update_Wave() : void;
-    DamageArea(location_0 : any) : void;
+    DamageArea(location_0 : CoordStruct) : void;
     s_AbsID : any;
     s_Array : any;
     m_Target : TechnoClass;
     m_Type : any;
-    m_someCoords : any;
+    m_someCoords : Point2D;
     m_field_BC : number;
     m_field_C0 : number;
     m_field_C4 : number;
@@ -4438,8 +4438,8 @@ class RadBeam
 {
     static Allocate(mode_0 : any) : RadBeam;
     SetColor(color_0 : any) : void;
-    SetCoordsSource(loc_0 : any) : void;
-    SetCoordsTarget(loc_0 : any) : void;
+    SetCoordsSource(loc_0 : CoordStruct) : void;
+    SetCoordsTarget(loc_0 : CoordStruct) : void;
     s_Array : any;
     m_unknown_0 : number;
     m_Owner : TechnoClass;
@@ -4449,8 +4449,8 @@ class RadBeam
     m_unknown_14 : number;
     m_unknown_18 : number;
     m_Color : any;
-    m_SourceLocation : any;
-    m_TargetLocation : any;
+    m_SourceLocation : CoordStruct;
+    m_TargetLocation : CoordStruct;
     m_Period : number;
     m_Amplitude : number;
     m_unknown_48 : number;
@@ -4461,12 +4461,12 @@ class RadBeam
     m_unknown_60 : number;
     m_unknown_64 : number;
     m_unknown_68 : number;
-    m_AnotherLocation : any;
+    m_AnotherLocation : CoordStruct;
     m_unknown_7C : number;
     m_unknown_80 : number;
     m_unknown_88 : number;
     m_unknown_8C : number;
-    m_AndAnotherLocation : any;
+    m_AndAnotherLocation : CoordStruct;
     m_unknown_9C : number;
     m_unknown_A0 : number;
     m_unknown_A4 : number;
@@ -4486,7 +4486,7 @@ class PlanningTokenClass
     m_field_1C : boolean;
     m_field_1D : boolean;
     m_unknown_20_88 : number;
-    m___unknown_20_88 : number;
+    m___unknown_20_88 : string;
     m_field_8C : number;
     m_ClosedLoopNodeCount : number;
     m_StepsToClosedLoop : number;
@@ -4518,7 +4518,7 @@ class BulletData
 {
     m_UnknownTimer : CDTimerClass;
     m_ArmTimer : CDTimerClass;
-    m_Location : any;
+    m_Location : CoordStruct;
     m_Distance : number;
 }
 class ColorScheme
@@ -4561,26 +4561,26 @@ class AbilitiesStruct
 }
 class BounceClass
 {
-    Initialize(coords_0 : any, elasticity_1 : number, gravity_2 : number, maxVelocity_3 : number, velocity_4 : any, angularVelocity_5 : number) : void;
-    GetCoords(pBuffer_0 : any) : any;
-    GetCoords() : any;
-    GetDrawingMatrix(pBuffer_0 : any) : any;
-    GetDrawingMatrix() : any;
+    Initialize(coords_0 : CoordStruct, elasticity_1 : number, gravity_2 : number, maxVelocity_3 : number, velocity_4 : any, angularVelocity_5 : number) : void;
+    GetCoords(pBuffer_0 : CoordStruct) : CoordStruct;
+    GetCoords() : CoordStruct;
+    GetDrawingMatrix(pBuffer_0 : Matrix3D) : Matrix3D;
+    GetDrawingMatrix() : Matrix3D;
     Update() : any;
     m_Elasticity : number;
     m_Gravity : number;
     m_MaxVelocity : number;
     m_Coords : any;
     m_Velocity : any;
-    m_CurrentAngle : any;
-    m_AngularVelocity : any;
+    m_CurrentAngle : Quaternion;
+    m_AngularVelocity : Quaternion;
 }
 class BombClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     Detonate() : void;
@@ -4613,12 +4613,12 @@ class LineTrail
 }
 class LineTrailNode
 {
-    m_Position : any;
+    m_Position : CoordStruct;
     m_Value : number;
 }
 class WaypointClass
 {
-    m_Coords : any;
+    m_Coords : CellStruct;
     m_unknown : number;
 }
 class HouseTypeClass
@@ -4627,9 +4627,9 @@ class HouseTypeClass
     static Find(pID_0 : string) : HouseTypeClass;
     static FindOrAllocate(pID_0 : string) : HouseTypeClass;
     static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     FindParentCountry() : HouseTypeClass;
@@ -4671,7 +4671,7 @@ class HouseTypeClass
     m_VeteranInfantry : any;
     m_VeteranUnits : any;
     m_VeteranAircraft : any;
-    m_Suffix : number;
+    m_Suffix : string;
     m_Prefix : number;
     m_Multiplay : boolean;
     m_MultiplayPassive : boolean;
@@ -4681,14 +4681,14 @@ class HouseTypeClass
 class StartingTechnoStruct
 {
     m_Unit : TechnoTypeClass;
-    m_Cell : any;
+    m_Cell : CellStruct;
 }
 class WaypointPathClass
     extends AbstractClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     GetWaypoint(idx_0 : number) : WaypointClass;
@@ -4731,7 +4731,7 @@ class ScoutStruct
 class DropshipStruct
 {
     m_Timer : CDTimerClass;
-    m___Timer : number;
+    m___Timer : string;
     m_unknown_C : number;
     m_Count : number;
     m_Types : TechnoTypeClass;
@@ -4744,19 +4744,19 @@ class BaseClass
     ComputeCRC(crc_0 : any) : void;
     FailedToPlaceNode(Node_0 : BaseNodeClass) : number;
     m_BaseNodes : any;
-    m___BaseNodes : number;
+    m___BaseNodes : string;
     m_PercentBuilt : number;
     m_Cells_24 : any;
-    m___Cells_24 : number;
+    m___Cells_24 : string;
     m_Cells_38 : any;
-    m___Cells_38 : number;
-    m_Center : any;
+    m___Cells_38 : string;
+    m_Center : CellStruct;
     m_Owner : HouseClass;
 }
 class BaseNodeClass
 {
     m_BuildingTypeIndex : number;
-    m_MapCoords : any;
+    m_MapCoords : CellStruct;
     m_Placed : boolean;
     m_Attempts : number;
 }
@@ -5627,7 +5627,7 @@ class RulesClass
 }
 class Variable
 {
-    m_Name : number;
+    m_Name : string;
     m_Value : number;
 }
 class LightingStruct
@@ -5678,20 +5678,20 @@ class ScenarioClass
     static UpdateHashPalLighting(R_0 : number, G_1 : number, B_2 : number, tint_3 : boolean) : void;
     static ScenarioLighting(r_0 : number, g_1 : number, b_2 : number) : void;
     static RecalcLighting(R_0 : number, G_1 : number, B_2 : number, tint_3 : boolean) : void;
-    static SaveGame(FileName_0 : string, Description_1 : any, BarGraph_2 : boolean) : boolean;
+    static SaveGame(FileName_0 : string, Description_1 : number, BarGraph_2 : boolean) : boolean;
     static LoadGame(FileName_0 : string) : boolean;
     static StartScenario(FileName_0 : string, Briefing_1 : boolean, CampaignIndex_2 : number) : boolean;
     static AssignHouses() : void;
     ReadStartPoints(ini_0 : INIClass) : void;
     IsDefinedWaypoint(idx_0 : number) : boolean;
-    GetWaypointCoords(dest_0 : any, idx_1 : number) : any;
-    GetWaypointCoords(idx_0 : number) : any;
+    GetWaypointCoords(dest_0 : CellStruct, idx_1 : number) : CellStruct;
+    GetWaypointCoords(idx_0 : number) : CellStruct;
     s_Instance : any;
     s_NewINIFormat : any;
     s_LastTheater : any;
     m_SpecialFlags : ScenarioFlags;
-    m_NextScenario : number;
-    m_AltNextScenario : number;
+    m_NextScenario : string;
+    m_AltNextScenario : string;
     m_HomeCell : number;
     m_AltHomeCell : number;
     m_UniqueID : number;
@@ -5702,20 +5702,20 @@ class ScenarioClass
     m_PauseTimer : CDTimerClass;
     m_unknown_62C : number;
     m_IsGamePaused : boolean;
-    m_Waypoints : any;
+    m_Waypoints : CellStruct;
     m_StartX : number;
     m_StartY : number;
     m_Width : number;
     m_Height : number;
     m_NumberStartingPoints : number;
-    m_StartingPoints : any;
+    m_StartingPoints : Point2D;
     m_HouseIndices : number;
-    m_HouseHomeCells : any;
+    m_HouseHomeCells : CellStruct;
     m_TeamsPresent : boolean;
     m_NumCoopHumanStartSpots : number;
     m_MissionTimer : CDTimerClass;
-    m_MissionTimerTextCSF : any;
-    m_MissionTimerText : number;
+    m_MissionTimerTextCSF : number;
+    m_MissionTimerText : string;
     m_ShroudRegrowTimer : CDTimerClass;
     m_FogTimer : CDTimerClass;
     m_IceTimer : CDTimerClass;
@@ -5723,10 +5723,10 @@ class ScenarioClass
     m_AmbientTimer : CDTimerClass;
     m_TechLevel : number;
     m_Theater : any;
-    m_FileName : number;
-    m_Name : any;
-    m_UIName : number;
-    m_UINameLoaded : any;
+    m_FileName : string;
+    m_Name : number;
+    m_UIName : string;
+    m_UINameLoaded : number;
     m_Intro : string;
     m_Brief : string;
     m_Win : string;
@@ -5734,8 +5734,8 @@ class ScenarioClass
     m_Action : string;
     m_PostScore : string;
     m_PreMapSelect : string;
-    m_Briefing : any;
-    m_BriefingCSF : number;
+    m_Briefing : number;
+    m_BriefingCSF : string;
     m_ThemeIndex : number;
     m_HumanPlayerHouseTypeIndex : number;
     m_CarryOverMoney : number;
@@ -5743,10 +5743,10 @@ class ScenarioClass
     m_Percent : number;
     m_GlobalVariables : Variable;
     m_LocalVariables : Variable;
-    m_View1 : any;
-    m_View2 : any;
-    m_View3 : any;
-    m_View4 : any;
+    m_View1 : CellStruct;
+    m_View2 : CellStruct;
+    m_View3 : CellStruct;
+    m_View4 : CellStruct;
     m_unknown_34A0 : number;
     m_FreeRadar : boolean;
     m_TrainCrate : boolean;
@@ -5798,26 +5798,26 @@ class ScenarioClass
     m_ParTimeEasy : number;
     m_ParTimeMedium : number;
     m_ParTimeDifficult : number;
-    m_UnderParTitle : number;
-    m_UnderParMessage : number;
-    m_OverParTitle : number;
-    m_OverParMessage : number;
-    m_LSLoadMessage : number;
-    m_LSBrief : number;
+    m_UnderParTitle : string;
+    m_UnderParMessage : string;
+    m_OverParTitle : string;
+    m_OverParMessage : string;
+    m_LSLoadMessage : string;
+    m_LSBrief : string;
     m_LS640BriefLocX : number;
     m_LS640BriefLocY : number;
     m_LS800BriefLocX : number;
     m_LS800BriefLocY : number;
-    m_LS640BkgdName : number;
-    m_LS800BkgdName : number;
-    m_LS800BkgdPal : number;
+    m_LS640BkgdName : string;
+    m_LS800BkgdName : string;
+    m_LS800BkgdPal : string;
 }
 class OverlayClass
     extends ObjectClass
 {
-    GetClassID(pClassID_0 : any) : number;
-    Load(pStm_0 : any) : number;
-    Save(pStm_0 : any, fClearDirty_1 : number) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
     static GetTiberiumType(overlayTypeIndex_0 : number) : number;
@@ -5827,8 +5827,8 @@ class OverlayClass
 }
 class GScreenClass
 {
-    static DoBlit(mouseCaptured_0 : boolean, surface_1 : DSurface, rect_2 : any) : void;
-    QueryInterface(iid_0 : any, ppvObject_1 : void) : number;
+    static DoBlit(mouseCaptured_0 : boolean, surface_1 : DSurface, rect_2 : RectangleStruct) : void;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
     One_Time() : void;
@@ -5836,7 +5836,7 @@ class GScreenClass
     Init_Clear() : void;
     Init_IO() : void;
     GetInputAndUpdate(outKeyCode_0 : number, outMouseX_1 : number, outMouseY_2 : number) : void;
-    Update(keyCode_0 : number, mouseCoords_1 : any) : void;
+    Update(keyCode_0 : number, mouseCoords_1 : Point2D) : void;
     SetButtons(pGadget_0 : GadgetClass) : boolean;
     AddButton(pGadget_0 : GadgetClass) : boolean;
     RemoveButton(pGadget_0 : GadgetClass) : boolean;
@@ -5857,7 +5857,7 @@ class GScreenClass
 class Crate
 {
     m_CrateTimer : CDTimerClass;
-    m_Location : any;
+    m_Location : CellStruct;
 }
 class LayerClass
 {
@@ -5871,7 +5871,7 @@ class LayerClass
 class LogicClass
     extends LayerClass
 {
-    AddObject(pObject_0 : ObjectClass, sorted_1 : boolean) : boolean;
+    AddObject(pObject_0 : ObjectClass | any, sorted_1 : boolean | any) : boolean;
     PointerGotInvalid(pInvalid_0 : AbstractClass, removed_1 : boolean) : void;
     RemoveObject(pObject_0 : ObjectClass) : void;
     Update() : void;
@@ -5880,60 +5880,60 @@ class MapClass
     extends GScreenClass
 {
     static GetLayer(lyr_0 : any) : LayerClass;
-    Is_Visible(cell_0 : any) : number;
+    Is_Visible(cell_0 : CellStruct | any) : number;
     AllocateCells() : void;
     DestructCells() : void;
     ConstructCells() : void;
     PointerGotInvalid(ptr_0 : AbstractClass, bUnk_1 : boolean) : void;
     DraggingInProgress() : boolean;
     UpdateCrates() : void;
-    CreateEmptyMap(mapRect_0 : any, reuse_1 : boolean, nLevel_2 : number, bUnk2_3 : boolean) : void;
-    SetVisibleRect(mapRect_0 : any) : void;
-    TryGetCellAt(MapCoords_0 : any) : CellClass;
-    TryGetCellAt(Crd_0 : any) : CellClass;
-    GetCellAt(MapCoords_0 : any) : CellClass;
-    GetCellAt(Crd_0 : any) : CellClass;
-    GetTargetCell(location_0 : any) : CellClass;
-    CellExists(MapCoords_0 : any) : boolean;
-    GetThreatPosed(cell_0 : any, pHouse_1 : HouseClass) : number;
-    IsLocationShrouded(crd_0 : any) : boolean;
-    static GetCellIndex(MapCoords_0 : any) : number;
-    static GetRandomCoordsNear(outBuffer_0 : any, coords_1 : any, distance_2 : number, center_3 : boolean) : any;
-    static GetRandomCoordsNear(coords_0 : any, distance_1 : number, center_2 : boolean) : any;
-    static PickInfantrySublocation(outBuffer_0 : any, coords_1 : any, ignoreContents_2 : boolean) : any;
-    static PickInfantrySublocation(coords_0 : any, ignoreContents_1 : boolean) : any;
+    CreateEmptyMap(mapRect_0 : RectangleStruct, reuse_1 : boolean, nLevel_2 : number, bUnk2_3 : boolean) : void;
+    SetVisibleRect(mapRect_0 : RectangleStruct) : void;
+    TryGetCellAt(MapCoords_0 : CellStruct) : CellClass;
+    TryGetCellAt(Crd_0 : CoordStruct) : CellClass;
+    GetCellAt(MapCoords_0 : CellStruct) : CellClass;
+    GetCellAt(Crd_0 : CoordStruct) : CellClass;
+    GetTargetCell(location_0 : Point2D) : CellClass;
+    CellExists(MapCoords_0 : CellStruct) : boolean;
+    GetThreatPosed(cell_0 : CellStruct, pHouse_1 : HouseClass) : number;
+    IsLocationShrouded(crd_0 : CoordStruct) : boolean;
+    static GetCellIndex(MapCoords_0 : CellStruct) : number;
+    static GetRandomCoordsNear(outBuffer_0 : CoordStruct, coords_1 : CoordStruct, distance_2 : number, center_3 : boolean) : CoordStruct;
+    static GetRandomCoordsNear(coords_0 : CoordStruct, distance_1 : number, center_2 : boolean) : CoordStruct;
+    static PickInfantrySublocation(outBuffer_0 : CoordStruct, coords_1 : CoordStruct, ignoreContents_2 : boolean) : CoordStruct;
+    static PickInfantrySublocation(coords_0 : CoordStruct, ignoreContents_1 : boolean) : CoordStruct;
     static UnselectAll() : void;
     CenterMap() : void;
     CellIteratorReset() : void;
     CellIteratorNext() : CellClass;
-    GetMovementZoneType(MapCoords_0 : any, movementZone_1 : any, isBridge_2 : boolean) : number;
-    static DamageArea(Coords_0 : any, Damage_1 : number, SourceObject_2 : TechnoClass, WH_3 : WarheadTypeClass, AffectsTiberium_4 : boolean, SourceHouse_5 : HouseClass) : any;
-    static SelectDamageAnimation(Damage_0 : number, WH_1 : WarheadTypeClass, LandType_2 : any, coords_3 : any) : AnimTypeClass;
-    static FlashbangWarheadAt(Damage_0 : number, WH_1 : WarheadTypeClass, coords_2 : any, Force_3 : boolean, CLDisableFlags_4 : any) : void;
+    GetMovementZoneType(MapCoords_0 : CellStruct, movementZone_1 : any, isBridge_2 : boolean) : number;
+    static DamageArea(Coords_0 : CoordStruct, Damage_1 : number, SourceObject_2 : TechnoClass, WH_3 : WarheadTypeClass, AffectsTiberium_4 : boolean, SourceHouse_5 : HouseClass) : any;
+    static SelectDamageAnimation(Damage_0 : number, WH_1 : WarheadTypeClass, LandType_2 : any, coords_3 : CoordStruct) : AnimTypeClass;
+    static FlashbangWarheadAt(Damage_0 : number, WH_1 : WarheadTypeClass, coords_2 : CoordStruct, Force_3 : boolean, CLDisableFlags_4 : any) : void;
     static GetTotalDamage(damage_0 : number, pWarhead_1 : WarheadTypeClass, armor_2 : any, distance_3 : number) : number;
-    GetCellFloorHeight(crd_0 : any) : number;
-    PickCellOnEdge(buffer_0 : any, Edge_1 : any, CurrentLocation_2 : any, Fallback_3 : any, SpeedType_4 : any, ValidateReachability_5 : boolean, MovZone_6 : any) : any;
-    PickCellOnEdge(Edge_0 : any, CurrentLocation_1 : any, Fallback_2 : any, SpeedType_3 : any, ValidateReachability_4 : boolean, MovZone_5 : any) : any;
+    GetCellFloorHeight(crd_0 : CoordStruct) : number;
+    PickCellOnEdge(buffer_0 : CellStruct, Edge_1 : any, CurrentLocation_2 : CellStruct, Fallback_3 : CellStruct, SpeedType_4 : any, ValidateReachability_5 : boolean, MovZone_6 : any) : CellStruct;
+    PickCellOnEdge(Edge_0 : any, CurrentLocation_1 : CellStruct, Fallback_2 : CellStruct, SpeedType_3 : any, ValidateReachability_4 : boolean, MovZone_5 : any) : CellStruct;
     Update_Pathfinding_1() : void;
     Update_Pathfinding_2(where_0 : any) : void;
-    NearByLocation(outBuffer_0 : any, position_1 : any, SpeedType_2 : any, a5_3 : number, MovementZone_4 : any, alt_5 : boolean, SpaceSizeX_6 : number, SpaceSizeY_7 : number, disallowOverlay_8 : boolean, a11_9 : boolean, requireBurrowable_10 : boolean, allowBridge_11 : boolean, closeTo_12 : any, a15_13 : boolean, buildable_14 : boolean) : any;
-    NearByLocation(position_0 : any, SpeedType_1 : any, a5_2 : number, MovementZone_3 : any, alt_4 : boolean, SpaceSizeX_5 : number, SpaceSizeY_6 : number, disallowOverlay_7 : boolean, a11_8 : boolean, requireBurrowable_9 : boolean, allowBridge_10 : boolean, closeTo_11 : any, a15_12 : boolean, buildable_13 : boolean) : any;
-    AddContentAt(coords_0 : any, Content_1 : TechnoClass) : void;
-    RemoveContentAt(coords_0 : any, Content_1 : TechnoClass) : void;
-    IsWithinUsableArea(cell_0 : any, checkLevel_1 : boolean) : boolean;
+    NearByLocation(outBuffer_0 : CellStruct, position_1 : CellStruct, SpeedType_2 : any, a5_3 : number, MovementZone_4 : any, alt_5 : boolean, SpaceSizeX_6 : number, SpaceSizeY_7 : number, disallowOverlay_8 : boolean, a11_9 : boolean, requireBurrowable_10 : boolean, allowBridge_11 : boolean, closeTo_12 : CellStruct, a15_13 : boolean, buildable_14 : boolean) : CellStruct;
+    NearByLocation(position_0 : CellStruct, SpeedType_1 : any, a5_2 : number, MovementZone_3 : any, alt_4 : boolean, SpaceSizeX_5 : number, SpaceSizeY_6 : number, disallowOverlay_7 : boolean, a11_8 : boolean, requireBurrowable_9 : boolean, allowBridge_10 : boolean, closeTo_11 : CellStruct, a15_12 : boolean, buildable_13 : boolean) : CellStruct;
+    AddContentAt(coords_0 : CellStruct, Content_1 : TechnoClass) : void;
+    RemoveContentAt(coords_0 : CellStruct, Content_1 : TechnoClass) : void;
+    IsWithinUsableArea(cell_0 : CellStruct, checkLevel_1 : boolean) : boolean;
     IsWithinUsableArea(pCell_0 : CellClass, checkLevel_1 : boolean) : boolean;
-    IsWithinUsableArea(coords_0 : any) : boolean;
-    CoordinatesLegal(cell_0 : any) : boolean;
-    IsLinkedBridgeDestroyed(cell_0 : any) : boolean;
-    PlacePowerupCrate(cell_0 : any, type_1 : any) : boolean;
-    FindFirstFirestorm(pOutBuffer_0 : any, start_1 : any, end_2 : any, pHouse_3 : HouseClass) : any;
-    FindFirstFirestorm(start_0 : any, end_1 : any, pHouse_2 : HouseClass) : any;
-    RevealArea1(Coords_0 : any, Radius_1 : number, OwnerHouse_2 : HouseClass, arg4_3 : any, RevealByHeight_4 : number, arg6_5 : number, arg7_6 : number, arg8_7 : number) : void;
-    RevealArea2(Coords_0 : any, Radius_1 : number, OwnerHouse_2 : HouseClass, arg4_3 : number, RevealByHeight_4 : number, arg6_5 : number, arg7_6 : number, arg8_7 : number) : void;
-    RevealArea3(Coords_0 : any, Height_1 : number, Radius_2 : number, SkipReveal_3 : boolean) : void;
+    IsWithinUsableArea(coords_0 : CoordStruct) : boolean;
+    CoordinatesLegal(cell_0 : CellStruct) : boolean;
+    IsLinkedBridgeDestroyed(cell_0 : CellStruct) : boolean;
+    PlacePowerupCrate(cell_0 : CellStruct, type_1 : any) : boolean;
+    FindFirstFirestorm(pOutBuffer_0 : CoordStruct, start_1 : CoordStruct, end_2 : CoordStruct, pHouse_3 : HouseClass) : CoordStruct;
+    FindFirstFirestorm(start_0 : CoordStruct, end_1 : CoordStruct, pHouse_2 : HouseClass) : CoordStruct;
+    RevealArea1(Coords_0 : CoordStruct, Radius_1 : number, OwnerHouse_2 : HouseClass, arg4_3 : CellStruct, RevealByHeight_4 : number, arg6_5 : number, arg7_6 : number, arg8_7 : number) : void;
+    RevealArea2(Coords_0 : CoordStruct, Radius_1 : number, OwnerHouse_2 : HouseClass, arg4_3 : number, RevealByHeight_4 : number, arg6_5 : number, arg7_6 : number, arg8_7 : number) : void;
+    RevealArea3(Coords_0 : CoordStruct, Height_1 : number, Radius_2 : number, SkipReveal_3 : boolean) : void;
     Reveal(pHouse_0 : HouseClass) : void;
     Reshroud(pHouse_0 : HouseClass) : void;
-    GetZPos(Coords_0 : any) : number;
+    GetZPos(Coords_0 : CoordStruct) : number;
     sub_657CE0() : void;
     RedrawSidebar(mode_0 : number) : void;
     NextObject(pCurrentObject_0 : ObjectClass) : ObjectClass;
@@ -5943,14 +5943,14 @@ class MapClass
     SetWaypointMode(mode_0 : number, somebool_1 : boolean) : void;
     SetRepairMode(mode_0 : number) : void;
     DestroyCliff(Cell_0 : CellClass) : void;
-    IsLocationFogged(coord_0 : any) : boolean;
+    IsLocationFogged(coord_0 : CoordStruct) : boolean;
     RevealCheck(pCell_0 : CellClass, pHouse_1 : HouseClass, bUnk_2 : boolean) : void;
-    MakeTraversable(pVisitor_0 : ObjectClass, cell_1 : any) : boolean;
-    BuildingToFirestormWall(cell_0 : any, pHouse_1 : HouseClass, pBldType_2 : BuildingTypeClass) : void;
-    BuildingToWall(cell_0 : any, pHouse_1 : HouseClass, pBldType_2 : BuildingTypeClass) : void;
-    RecalculateZones(cell_0 : any) : void;
-    ResetZones(cell_0 : any) : void;
-    RecalculateSubZones(cell_0 : any) : void;
+    MakeTraversable(pVisitor_0 : ObjectClass, cell_1 : CellStruct) : boolean;
+    BuildingToFirestormWall(cell_0 : CellStruct, pHouse_1 : HouseClass, pBldType_2 : BuildingTypeClass) : void;
+    BuildingToWall(cell_0 : CellStruct, pHouse_1 : HouseClass, pBldType_2 : BuildingTypeClass) : void;
+    RecalculateZones(cell_0 : CellStruct) : void;
+    ResetZones(cell_0 : CellStruct) : void;
+    RecalculateSubZones(cell_0 : CellStruct) : void;
     s_Instance : any;
     s_InvalidCell : any;
     s_MaxCells : number;
@@ -5973,8 +5973,8 @@ class MapClass
     m_SubzoneTracking2 : any;
     m_SubzoneTracking3 : any;
     m_CellStructs1 : any;
-    m_MapRect : any;
-    m_VisibleRect : any;
+    m_MapRect : RectangleStruct;
+    m_VisibleRect : RectangleStruct;
     m_CellIterator_NextX : number;
     m_CellIterator_NextY : number;
     m_CellIterator_CurrentY : number;
@@ -5995,43 +5995,43 @@ class MapClass
 class DisplayClass
     extends MapClass
 {
-    ProcessClickCoords(src_0 : any, XYdst_1 : any, XYZdst_2 : any, Target_3 : ObjectClass, a5_4 : number, a6_5 : number) : boolean;
-    SetActiveFoundation(Coords_0 : any) : void;
+    ProcessClickCoords(src_0 : Point2D, XYdst_1 : CellStruct, XYZdst_2 : CoordStruct, Target_3 : ObjectClass, a5_4 : number, a6_5 : number) : boolean;
+    SetActiveFoundation(Coords_0 : CellStruct) : void;
     Load(pStm_0 : any) : number;
     Save(pStm_0 : any) : number;
     LoadFromINI(pINI_0 : CCINIClass) : void;
-    GetToolTip(nDlgID_0 : number) : any;
+    GetToolTip(nDlgID_0 : number) : number;
     CloseWindow() : void;
     vt_entry_8C() : void;
-    MapCell(pMapCoord_0 : any, pHouse_1 : HouseClass) : boolean;
-    RevealFogShroud(pMapCoord_0 : any, pHouse_1 : HouseClass, bIncreaseShroudCounter_2 : boolean) : boolean;
-    MapCellFoggedness(pMapCoord_0 : any, pHouse_1 : HouseClass) : boolean;
-    MapCellVisibility(pMapCoord_0 : any, pHouse_1 : HouseClass) : boolean;
+    MapCell(pMapCoord_0 : CellStruct, pHouse_1 : HouseClass) : boolean;
+    RevealFogShroud(pMapCoord_0 : CellStruct, pHouse_1 : HouseClass, bIncreaseShroudCounter_2 : boolean) : boolean;
+    MapCellFoggedness(pMapCoord_0 : CellStruct, pHouse_1 : HouseClass) : boolean;
+    MapCellVisibility(pMapCoord_0 : CellStruct, pHouse_1 : HouseClass) : boolean;
     GetLastMouseCursor() : any;
     ScrollMap(dwUnk1_0 : number, dwUnk2_1 : number, dwUnk3_2 : number) : boolean;
-    Set_View_Dimensions(rect_0 : any) : void;
+    Set_View_Dimensions(rect_0 : RectangleStruct) : void;
     vt_entry_AC(dwUnk_0 : number) : void;
     vt_entry_B0(dwUnk_0 : number) : void;
-    vt_entry_B4(pPoint_0 : any) : void;
-    ConvertAction(cell_0 : any, bShrouded_1 : boolean, pObject_2 : ObjectClass, action_3 : any, dwUnk_4 : boolean) : boolean;
-    LeftMouseButtonDown(point_0 : any) : void;
-    LeftMouseButtonUp(coords_0 : any, cell_1 : any, pObject_2 : ObjectClass, action_3 : any, dwUnk2_4 : number) : void;
+    vt_entry_B4(pPoint_0 : Point2D) : void;
+    ConvertAction(cell_0 : CellStruct, bShrouded_1 : boolean, pObject_2 : ObjectClass, action_3 : any, dwUnk_4 : boolean) : boolean;
+    LeftMouseButtonDown(point_0 : Point2D) : void;
+    LeftMouseButtonUp(coords_0 : CoordStruct, cell_1 : CellStruct, pObject_2 : ObjectClass, action_3 : any, dwUnk2_4 : number) : void;
     RightMouseButtonUp(dwUnk_0 : number) : void;
-    DecideAction(cell_0 : any, pObject_1 : ObjectClass, dwUnk_2 : number) : any;
-    FoundationBoundsSize(outBuffer_0 : any, pFoundationData_1 : any) : any;
-    FoundationBoundsSize(pFoundationData_0 : any) : any;
-    MarkFoundation(BaseCell_0 : any, Mark_1 : boolean) : void;
+    DecideAction(cell_0 : CellStruct, pObject_1 : ObjectClass, dwUnk_2 : number) : any;
+    FoundationBoundsSize(outBuffer_0 : CellStruct, pFoundationData_1 : CellStruct) : CellStruct;
+    FoundationBoundsSize(pFoundationData_0 : CellStruct) : CellStruct;
+    MarkFoundation(BaseCell_0 : CellStruct, Mark_1 : boolean) : void;
     Submit(pObject_0 : ObjectClass) : void;
     Remove(pObject_0 : ObjectClass) : void;
     s_Instance : any;
-    m_CurrentFoundation_CenterCell : any;
-    m_CurrentFoundation_TopLeftOffset : any;
-    m_CurrentFoundation_Data : any;
+    m_CurrentFoundation_CenterCell : CellStruct;
+    m_CurrentFoundation_TopLeftOffset : CellStruct;
+    m_CurrentFoundation_Data : CellStruct;
     m_unknown_1180 : boolean;
     m_unknown_1181 : boolean;
-    m_CurrentFoundationCopy_CenterCell : any;
-    m_CurrentFoundationCopy_TopLeftOffset : any;
-    m_CurrentFoundationCopy_Data : any;
+    m_CurrentFoundationCopy_CenterCell : CellStruct;
+    m_CurrentFoundationCopy_TopLeftOffset : CellStruct;
+    m_CurrentFoundationCopy_Data : CellStruct;
     m_unknown_1190 : number;
     m_unknown_1194 : number;
     m_unknown_1198 : number;
@@ -6064,10 +6064,10 @@ class DisplayClass
 class RadarClass
     extends DisplayClass
 {
-    CreateEmptyMap(pMapRect_0 : any, reuse_1 : boolean, nLevel_2 : number, bUnk2_3 : boolean) : void;
-    SetVisibleRect(mapRect_0 : any) : void;
+    CreateEmptyMap(pMapRect_0 : RectangleStruct | any, reuse_1 : boolean | any, nLevel_2 : number | any, bUnk2_3 : boolean | any) : void;
+    SetVisibleRect(mapRect_0 : RectangleStruct | any) : void;
     DisposeOfArt() : void;
-    vt_entry_CC(out_pUnk_0 : void, pPoint_1 : any) : void;
+    vt_entry_CC(out_pUnk_0 : void, pPoint_1 : Point2D) : void;
     vt_entry_D0(dwUnk_0 : number) : void;
     Init_For_House() : void;
     s_Instance : any;
@@ -6080,7 +6080,7 @@ class RadarClass
     m_unknown_1200 : number;
     m_unknown_1204 : number;
     m_unknown_1208 : number;
-    m_unknown_rect_120C : any;
+    m_unknown_rect_120C : RectangleStruct;
     m_unknown_121C : number;
     m_unknown_1220 : number;
     m_unknown_cells_1124 : any;
@@ -6100,7 +6100,7 @@ class RadarClass
     m_unknown_1490 : number;
     m_unknown_1494 : number;
     m_unknown_1498 : number;
-    m_unknown_rect_149C : any;
+    m_unknown_rect_149C : RectangleStruct;
     m_unknown_14AC : number;
     m_unknown_14B0 : number;
     m_unknown_14B4 : number;
@@ -6116,7 +6116,7 @@ class RadarClass
     m_IsAvailableNow : boolean;
     m_unknown_bool_14D9 : boolean;
     m_unknown_bool_14DA : boolean;
-    m_unknown_rect_14DC : any;
+    m_unknown_rect_14DC : RectangleStruct;
     m_unknown_14EC : number;
     m_unknown_14F0 : number;
     m_unknown_14F4 : number;
@@ -6154,8 +6154,8 @@ class StripClass
 {
     m_Progress : StageClass;
     m_AllowedToDraw : boolean;
-    m_Location : any;
-    m_Bounds : any;
+    m_Location : Point2D;
+    m_Bounds : RectangleStruct;
     m_Index : number;
     m_NeedsRedraw : boolean;
     m_unknown_3D : number;
@@ -6175,7 +6175,7 @@ class SidebarClass
     SidebarNeedsRepaint(mode_0 : number) : void;
     RepaintSidebar(tab_0 : number) : void;
     AddCameo(absType_0 : any, idxType_1 : number) : boolean;
-    Draw(dwUnk_0 : number) : void;
+    Draw(dwUnk_0 : number | any) : void;
     vt_entry_D8(nUnknown_0 : number) : boolean;
     static GetObjectTabIdx(abs_0 : any, idxType_1 : number, unused_2 : number) : number;
     static GetObjectTabIdx(abs_0 : any, buildCat_1 : any, isNaval_2 : boolean) : number;
@@ -6243,10 +6243,10 @@ class ScrollClass
 class MouseClass
     extends ScrollClass
 {
-    SetCursor(idxCursor_0 : any, miniMap_1 : boolean) : boolean;
-    UpdateCursor(idxCursor_0 : any, miniMap_1 : boolean) : boolean;
+    SetCursor(idxCursor_0 : any | any, miniMap_1 : boolean | any) : boolean;
+    UpdateCursor(idxCursor_0 : any | any, miniMap_1 : boolean | any) : boolean;
     RestoreCursor() : boolean;
-    UpdateCursorMinimapState(miniMap_0 : boolean) : void;
+    UpdateCursorMinimapState(miniMap_0 : boolean | any) : void;
     GetLastMouseCursor() : any;
     s_Instance : any;
     m_MouseCursorIsMini : boolean;

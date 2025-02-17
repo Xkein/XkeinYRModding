@@ -8,28 +8,59 @@
 
 template<typename T, typename API, typename RegisterAPI>
 void RegisterVector2D(PUERTS_NAMESPACE::ClassDefineBuilder<Vector2D<T>, API, RegisterAPI>&& builder)
-{ 
+{
     builder
         .Constructor<T, T>()
         .Property("X", MakeProperty(&Vector2D<T>::X))
         .Property("Y", MakeProperty(&Vector2D<T>::Y))
+        .Method("Magnitude", MakeFunction(&Vector2D<T>::Magnitude))
+        .Method("MagnitudeSquared", MakeFunction(&Vector2D<T>::MagnitudeSquared))
+        .Method("DistanceFrom", MakeFunction(&Vector2D<T>::DistanceFrom))
+        .Method("DistanceFromSquared", MakeFunction(&Vector2D<T>::DistanceFromSquared))
+        .Method("IsCollinearTo", MakeFunction(&Vector2D<T>::IsCollinearTo))
+        .Method("FindScalar", MakeFunction(&Vector2D<T>::FindScalar))
+        .Method("op_Addition", MakeFunction(&Vector2D<T>::operator+))
+        .Method("op_Subtraction", SelectFunction(Vector2D<T>(Vector2D<T>::*)(const Vector2D<T>&) const, (&Vector2D<T>::operator-)))
+        .Method("op_Equality", MakeFunction(&Vector2D<T>::operator==))
+        .Method("op_Inequality", MakeFunction(&Vector2D<T>::operator!=))
+        .Method("op_Multiply", CombineOverloads(
+            MakeOverload(Vector2D<T>(Vector2D<T>::*)(double) const, &Vector2D<T>::operator*),
+            MakeOverload(double(Vector2D<T>::*)(const Vector2D<T>&) const, &Vector2D<T>::operator*)
+        ))
+        .Method("op_UnaryNegation", SelectFunction(Vector2D<T>(Vector2D<T>::*)() const, (&Vector2D<T>::operator-)))
         .Register();
 }
 
 template<typename T, typename API, typename RegisterAPI>
 void RegisterVector3D(PUERTS_NAMESPACE::ClassDefineBuilder<Vector3D<T>, API, RegisterAPI>&& builder)
-{ 
+{
     builder
         .Constructor<T, T, T>()
         .Property("X", MakeProperty(&Vector3D<T>::X))
         .Property("Y", MakeProperty(&Vector3D<T>::Y))
         .Property("Z", MakeProperty(&Vector3D<T>::Z))
+        .Method("Magnitude", MakeFunction(&Vector3D<T>::Magnitude))
+        .Method("MagnitudeSquared", MakeFunction(&Vector3D<T>::MagnitudeSquared))
+        .Method("DistanceFrom", MakeFunction(&Vector3D<T>::DistanceFrom))
+        .Method("DistanceFromSquared", MakeFunction(&Vector3D<T>::DistanceFromSquared))
+        .Method("IsCollinearTo", MakeFunction(&Vector3D<T>::IsCollinearTo))
+        .Method("FindScalar", MakeFunction(&Vector3D<T>::FindScalar))
+        .Method("CrossProduct", MakeFunction(&Vector3D<T>::CrossProduct))
+        .Method("op_Addition", MakeFunction(&Vector3D<T>::operator+))
+        .Method("op_Subtraction", SelectFunction(Vector3D<T>(Vector3D<T>::*)(const Vector3D<T>&) const, (&Vector3D<T>::operator-)))
+        .Method("op_Equality", MakeFunction(&Vector3D<T>::operator==))
+        .Method("op_Inequality", MakeFunction(&Vector3D<T>::operator!=))
+        .Method("op_Multiply", CombineOverloads(
+            MakeOverload(Vector3D<T>(Vector3D<T>::*)(double) const, &Vector3D<T>::operator*),
+            MakeOverload(double(Vector3D<T>::*)(const Vector3D<T>&) const, &Vector3D<T>::operator*)
+        ))
+        .Method("op_UnaryNegation", SelectFunction(Vector3D<T>(Vector3D<T>::*)() const, (&Vector3D<T>::operator-)))
         .Register();
 }
 
 template<typename T, typename API, typename RegisterAPI>
 void RegisterVector4D(PUERTS_NAMESPACE::ClassDefineBuilder<Vector4D<T>, API, RegisterAPI>&& builder)
-{ 
+{
     builder
         .Constructor<T, T, T, T>()
         .Property("X", MakeProperty(&Vector4D<T>::X))
@@ -98,8 +129,8 @@ void __JsRegister_YrStructs()
         MakeMethodCheck<&CDTimerClass::HasStarted>(builder, "HasStarted");
         MakeMethodCheck<&CDTimerClass::IsTicking>(builder, "IsTicking");
         MakeMethodCheck<&CDTimerClass::HasTimeLeft>(builder, "HasTimeLeft");
-        MakePropertyCheck<&CDTimerClass::StartTime>(builder, "mStartTime");
-        MakePropertyCheck<&CDTimerClass::TimeLeft>(builder, "mTimeLeft");
+        MakePropertyCheck<&CDTimerClass::StartTime>(builder, "m_StartTime");
+        MakePropertyCheck<&CDTimerClass::TimeLeft>(builder, "m_TimeLeft");
         builder.Register();
     }
 }

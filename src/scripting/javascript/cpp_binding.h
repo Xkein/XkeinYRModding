@@ -824,22 +824,27 @@ static void RegisterCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterA
     ClassDef.SuperTypeId = Cdb.superTypeId_;
 
     ClassDef.Initialize = Cdb.constructor_;
+    // ClassDef.SetInitialize(Cdb.constructor_);
     ClassDef.Finalize   = PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>::template FinalizeBuilder<T>::Build();
 
     s_functions_ = std::move(Cdb.functions_);
     s_functions_.push_back({nullptr, nullptr, nullptr});
+    // s_functions_.push_back(JSFunctionInfo());
     ClassDef.Functions = s_functions_.data();
 
     s_methods_ = std::move(Cdb.methods_);
     s_methods_.push_back({nullptr, nullptr, nullptr});
+    // s_methods_.push_back(JSFunctionInfo());
     ClassDef.Methods = s_methods_.data();
 
     s_properties_ = std::move(Cdb.properties_);
     s_properties_.push_back(JSPropertyInfo {nullptr, nullptr, nullptr, nullptr});
+    // s_properties_.push_back(JSPropertyInfo());
     ClassDef.Properties = s_properties_.data();
 
     s_variables_ = std::move(Cdb.variables_);
     s_variables_.push_back(JSPropertyInfo {nullptr, nullptr, nullptr, nullptr});
+    // s_variables_.push_back(JSPropertyInfo());
     ClassDef.Variables = s_variables_.data();
 
     s_constructorInfos_ = std::move(Cdb.constructorInfos_);

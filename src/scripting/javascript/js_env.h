@@ -6,6 +6,7 @@
 #include <DataTransfer.h>
 #include <memory>
 #include <mutex>
+#include <map>
 
 namespace PUERTS_NAMESPACE
 {

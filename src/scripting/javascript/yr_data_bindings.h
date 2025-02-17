@@ -244,6 +244,7 @@ UsingArray(AnimClass*);
 UsingArray(WaypointPathClass*);
 UsingArray(int);
 UsingArray2D(int);
+UsingArray2D(float);
 UsingArray2D(unsigned int);
 UsingArray(void*);
 UsingArray(Variable);

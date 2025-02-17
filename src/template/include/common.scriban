@@ -146,4 +146,8 @@ func array_contains_any_of(list, anyList)
     end
     ret false
 end
+
+func is_array_type(cppType)
+    ret cppType.type_kind == 3
+end
 }}

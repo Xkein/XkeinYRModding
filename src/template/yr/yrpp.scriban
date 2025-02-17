@@ -146,12 +146,14 @@ end
 
 func get_yr_types()
     $types = get_yr_game_types()
-    ret $types
+    $handwrite_types = ["CoordStruct", "Point2D", "CellStruct", "Quaternion", "BulletVelocity", "Quaternion", "Matrix3D", "DirStruct", "RectangleStruct"]
+    $result = array.concat($types, $handwrite_types)
+    ret $result
 end
 
 func yr_need_codegen(htType)
     $element = htType.element
-    ret get_yr_types() | array.contains $element.name
+    ret get_yr_game_types() | array.contains $element.name
 end
 
 func yr_inject_meta(htType)

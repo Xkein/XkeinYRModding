@@ -1168,6 +1168,7 @@ void JsEnv::Unbind(AbstractClass* YrObject)
     {
         auto JsRegistration = const_cast<JSClassDefinition*>(FindClassByID(GetYrJsTypeID(YrObject->WhatAmI())));
         CppObjectMapper.UnBindCppObject(JsRegistration, YrObject);
+        // CppObjectMapper.UnBindCppObject(MainIsolate, JsRegistration, YrObject);
         ObjectMap.erase(PersistentValuePtr);
     }
 }
