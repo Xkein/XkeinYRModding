@@ -37,3 +37,41 @@ struct YrObjectUnlimboCheckedEvent
     CoordStruct* pCrd;
     DirType      dFaceDir;
 };
+
+CLASS(HookEvent)
+class YrObjectMouseOverCellEvent : public YrHookOverrideReturn<Action>
+{
+public:
+    ObjectClass* pObject;
+    CellStruct   cell;
+    bool         checkFog;
+    bool         ignoreForce;
+};
+
+CLASS(HookEvent)
+class YrObjectMouseOverObjectEvent : public YrHookOverrideReturn<Action>
+{
+public:
+    ObjectClass*       pObject;
+    ObjectClass const* pTarget;
+    bool               ignoreForce;
+};
+
+CLASS(HookEvent)
+class YrObjectCellClickedActionEvent : public YrHookOverrideReturn<bool>
+{
+public:
+    ObjectClass* pObject;
+    Action       action;
+    CellStruct   cell;
+    // CellStruct*  pCell1; i dont know what it really means...
+};
+
+CLASS(HookEvent)
+class YrObjectObjectClickedActionEvent : public YrHookOverrideReturn<bool>
+{
+public:
+    ObjectClass* pObject;
+    Action       action;
+    ObjectClass* pTarget;
+};

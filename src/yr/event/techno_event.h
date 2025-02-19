@@ -2,6 +2,7 @@
 
 #include "yr/yr_event.h"
 #include <optional>
+#include <GeneralDefinitions.h>
 
 class TechnoClass;
 struct IStream;
@@ -61,4 +62,22 @@ public:
     TechnoClass* pTechno;
     AbstractClass* pTarget;
     int nWeaponIndex;
+};
+
+CLASS(HookEvent)
+class YrTechnoSelectWeaponEvent : public YrHookOverrideReturn<int>
+{
+public:
+    TechnoClass* pTechno;
+    AbstractClass* pTarget;
+};
+
+CLASS(HookEvent)
+class YrTechnoGetFireErrorEvent : public YrHookOverrideReturn<FireError>
+{
+public:
+    TechnoClass* pTechno;
+    AbstractClass* pTarget;
+    int weaponIndex;
+    bool ignoreRange;
 };

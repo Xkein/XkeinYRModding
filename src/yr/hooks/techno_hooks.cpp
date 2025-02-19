@@ -85,6 +85,8 @@ BROADCAST_HOOK_EVENT(0x716DAC, 0xA, YrTechnoTypeLoadGameEndEvent)
     E->stream      = gSavingStream;
 }
 
+// BEGIN hooks for TechnoClass::Fire ===================================
+// TechnoClass::Fire
 IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoFireEvent, 0x6FDD50, 0x6FDE0B)
 BROADCAST_HOOK_EVENT(0x6FDD50, 0x6, YrTechnoFireEvent)
 {
@@ -92,3 +94,112 @@ BROADCAST_HOOK_EVENT(0x6FDD50, 0x6, YrTechnoFireEvent)
     E->pTarget      = R->Stack<AbstractClass*>(0x4);
     E->nWeaponIndex = R->Stack<int>(0x8);
 }
+IMPL_HOOK_BROADCAST(YrTechnoFireEvent, 0x6FDD50)
+{
+    switch (E->pTechno->WhatAmI())
+    {
+        case AbstractType::Aircraft:
+        case AbstractType::Infantry:
+        case AbstractType::Unit:
+            return 0;
+    }
+    return Broadcast_Impl_Default<YrTechnoFireEvent, 0x6FDD50>(hookEvent, R, E);
+}
+// AircraftClass::Fire
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoFireEvent, 0x415EE0, 0x415F05)
+BROADCAST_HOOK_EVENT(0x415EE0, 0x6, YrTechnoFireEvent)
+{
+    E->pTechno      = R->ECX<TechnoClass*>();
+    E->pTarget      = R->Stack<AbstractClass*>(0x4);
+    E->nWeaponIndex = R->Stack<int>(0x8);
+}
+// InfantryClass::Fire
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoFireEvent, 0x51DF60, 0x51DFE0)
+BROADCAST_HOOK_EVENT(0x51DF60, 0x5, YrTechnoFireEvent)
+{
+    E->pTechno      = R->ECX<TechnoClass*>();
+    E->pTarget      = R->Stack<AbstractClass*>(0x4);
+    E->nWeaponIndex = R->Stack<int>(0x8);
+}
+// UnitClass::Fire
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoFireEvent, 0x741340, 0x74136D)
+BROADCAST_HOOK_EVENT(0x741340, 0x6, YrTechnoFireEvent)
+{
+    E->pTechno      = R->ECX<TechnoClass*>();
+    E->pTarget      = R->Stack<AbstractClass*>(0x4);
+    E->nWeaponIndex = R->Stack<int>(0x8);
+}
+// END hooks for TechnoClass::Fire ===================================
+
+// BEGIN hooks for TechnoClass::SelectWeapon ===================================
+// TechnoClass::SelectWeapon
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoSelectWeaponEvent, 0x6F3330, 0x6F3376)
+BROADCAST_HOOK_EVENT(0x6F3330, 0x5, YrTechnoSelectWeaponEvent)
+{
+    E->pTechno = R->ECX<TechnoClass*>();
+    E->pTarget = R->Stack<AbstractClass*>(0x4);
+}
+IMPL_HOOK_BROADCAST(YrTechnoSelectWeaponEvent, 0x6F3330)
+{
+    switch (E->pTechno->WhatAmI())
+    {
+        case AbstractType::Infantry:
+        case AbstractType::Unit:
+            return 0;
+    }
+    return Broadcast_Impl_Default<YrTechnoSelectWeaponEvent, 0x6F3330>(hookEvent, R, E);
+}
+// InfantryClass::SelectWeapon
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoSelectWeaponEvent, 0x5218E0, 0x521914)
+BROADCAST_HOOK_EVENT(0x5218E0, 0x9, YrTechnoSelectWeaponEvent)
+{
+    E->pTechno = R->ECX<TechnoClass*>();
+    E->pTarget = R->Stack<AbstractClass*>(0x4);
+}
+// UnitClass::SelectWeapon
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoSelectWeaponEvent, 0x746CD0, 0x746CF0)
+BROADCAST_HOOK_EVENT(0x746CD0, 0x6, YrTechnoSelectWeaponEvent)
+{
+    E->pTechno = R->ECX<TechnoClass*>();
+    E->pTarget = R->Stack<AbstractClass*>(0x4);
+}
+// END hooks for TechnoClass::SelectWeapon ===================================
+
+// BEGIN hooks for TechnoClass::GetFireError ===================================
+// AircraftClass::GetFireError
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoGetFireErrorEvent, 0x41A9E0, 0x41AA1B)
+BROADCAST_HOOK_EVENT(0x41A9E0, 0x5, YrTechnoGetFireErrorEvent)
+{
+    E->pTechno     = R->ECX<TechnoClass*>();
+    E->pTarget     = R->Stack<AbstractClass*>(0x4);
+    E->weaponIndex = R->Stack<int>(0x8);
+    E->ignoreRange = R->Stack<bool>(0xC);
+}
+// BuildingClass::GetFireError
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoGetFireErrorEvent, 0x447F10, 0x447F6C)
+BROADCAST_HOOK_EVENT(0x447F10, 0x5, YrTechnoGetFireErrorEvent)
+{
+    E->pTechno     = R->ECX<TechnoClass*>();
+    E->pTarget     = R->Stack<AbstractClass*>(0x4);
+    E->weaponIndex = R->Stack<int>(0x8);
+    E->ignoreRange = R->Stack<bool>(0xC);
+}
+// InfantryClass::GetFireError
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoGetFireErrorEvent, 0x51C8B0, 0x51C8FB)
+BROADCAST_HOOK_EVENT(0x51C8B0, 0x6, YrTechnoGetFireErrorEvent)
+{
+    E->pTechno     = R->ECX<TechnoClass*>();
+    E->pTarget     = R->Stack<AbstractClass*>(0x4);
+    E->weaponIndex = R->Stack<int>(0x8);
+    E->ignoreRange = R->Stack<bool>(0xC);
+}
+// UnitClass::GetFireError
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoGetFireErrorEvent, 0x740FD0, 0x740FEF)
+BROADCAST_HOOK_EVENT(0x740FD0, 0x5, YrTechnoGetFireErrorEvent)
+{
+    E->pTechno     = R->ECX<TechnoClass*>();
+    E->pTarget     = R->Stack<AbstractClass*>(0x4);
+    E->weaponIndex = R->Stack<int>(0x8);
+    E->ignoreRange = R->Stack<bool>(0xC);
+}
+// END hooks for TechnoClass::GetFireError ===================================

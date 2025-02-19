@@ -30,7 +30,7 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrMainWndProcEvent) {
     }
 }
 
-Engine::Engine()
+Engine::Engine() : started(false)
 {
 
 }

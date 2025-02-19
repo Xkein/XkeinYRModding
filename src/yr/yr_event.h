@@ -160,6 +160,12 @@ private:
     template<class TEvent, DWORD HookAddress>
     inline static DWORD Broadcast_Impl(YrHookEvent* hookEvent, REGISTERS* R, TEvent* E)
     {
+        return Broadcast_Impl_Default<TEvent, HookAddress>(hookEvent, R, E);
+    }
+    
+    template<class TEvent, DWORD HookAddress>
+    inline static DWORD Broadcast_Impl_Default(YrHookEvent* hookEvent, REGISTERS* R, TEvent* E)
+    {
         auto retAddr = hookEvent->Broadcast(R, E);
         if constexpr (detail::hook_event_override_return<TEvent>) {
             if (E->hasSet) {

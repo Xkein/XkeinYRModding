@@ -108,7 +108,7 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
     impl->_callTimes++;
 // #define _LOG_HOOK
 #ifdef _LOG_HOOK
-    gConsole->info("broadcast hook at {}", R->Origin());
+    gConsole->info("broadcast hook at {}", (void*)R->Origin());
 #endif
 
     YrHookContext context {
@@ -149,3 +149,14 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
 
     return context.returnAddress;
 }
+
+// DEFINE_HOOK(0x6BB990, Exception_Handler, 6)
+// {
+//     gLogger->error("Fatal Error!");
+// 	GET(LPEXCEPTION_POINTERS*, ppExs, ECX);
+//     std::string* stackTrace = nullptr;
+//     ExceptionFilterGetInfo(*ppExs, stackTrace);
+//     gLogger->error("stack trace : {}", *stackTrace);
+//     delete stackTrace;
+//     return 0;
+// }

@@ -305,16 +305,16 @@ void ContactListenerImpl::OnContactRemoved(const JPH::SubShapeIDPair& inSubShape
         mNext->OnContactRemoved(inSubShapePair);
 }
 
-XKEINEXT_API JPH::JobSystem* gJobSystem;
-XKEINEXT_API JPH::PhysicsSystem* gPhysicsSystem;
-XKEINEXT_API JPH::BodyInterface* gBodyInterface;
-XKEINEXT_API JPH::BodyInterface* gBodyInterfaceNoLock;
-XKEINEXT_API JPH::TempAllocator* gTempAllocator;
-XKEINEXT_API JPH::BroadPhaseLayerInterface* gBroadPhaseLayerInterface;
-XKEINEXT_API JPH::ObjectVsBroadPhaseLayerFilter* gObjectVsBroadPhaseLayerFilter;
-XKEINEXT_API JPH::ObjectLayerPairFilter* gObjectLayerPairFilter;
+XKEINEXT_API JPH::JobSystem* gJobSystem = nullptr;
+XKEINEXT_API JPH::PhysicsSystem* gPhysicsSystem = nullptr;
+XKEINEXT_API JPH::BodyInterface* gBodyInterface = nullptr;
+XKEINEXT_API JPH::BodyInterface* gBodyInterfaceNoLock = nullptr;
+XKEINEXT_API JPH::TempAllocator* gTempAllocator = nullptr;
+XKEINEXT_API JPH::BroadPhaseLayerInterface* gBroadPhaseLayerInterface = nullptr;
+XKEINEXT_API JPH::ObjectVsBroadPhaseLayerFilter* gObjectVsBroadPhaseLayerFilter = nullptr;
+XKEINEXT_API JPH::ObjectLayerPairFilter* gObjectLayerPairFilter = nullptr;
 
-XKEINEXT_API TerrainBody* Physics::gTerrainBody;
+XKEINEXT_API TerrainBody* Physics::gTerrainBody = nullptr;
 
 XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)>>* Physics::gOnCollisionEnter;
 XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)>>* Physics::gOnCollisionPersist;
@@ -428,6 +428,8 @@ const int   COLLISION_STEPS = 1;
 
 void Physics::BeginTick()
 {
+    if (!gPhysicsSystem)
+        return;
     auto view = gEntt->view<PhysicsComponent>();
     // PrePhysicsUpdate
     // set yr transform to physics world
