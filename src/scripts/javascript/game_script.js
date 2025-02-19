@@ -79,7 +79,11 @@ class GameScriptable
     let onLoadType = (yrObjectType, iniReader) => {
         if (iniReader.ReadString(yrObjectType.m_ID, "JsScript") > 0) {
             var scriptName = iniReader.value().trim()
-            yrObjectType.__scriptable = gameScripts.getOrCreate(scriptName)
+            let scriptable = gameScripts.getOrCreate(scriptName)
+            yrObjectType.__scriptable = scriptable
+            if (scriptable && scriptable.script.onLoadType) {
+                scriptable.script.onLoadType(yrObjectType)
+            }
         }
     }
 
