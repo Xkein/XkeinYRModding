@@ -9,6 +9,7 @@
 #include <boost/function_types/function_arity.hpp>
 
 JsGameEvents         JsEvents::game;
+JsInputEvents        JsEvents::input;
 JsPhysicsEvents      JsEvents::physics;
 JsBulletEvents       JsEvents::bullet;
 JsAbstractTypeEvents JsEvents::bulletType;
@@ -178,6 +179,47 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneLoadEvent)
     INVOKE_JS_EVENT(JsEvents::game.onSceneLoad);
 }
 
+DEFINE_YR_HOOK_EVENT_LISTENER(YrGadgetInputEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::input.onGadgetInput, E->pGadget, E->pKey, E->mouseX, E->mouseY, E->forceRedraw, E->flags, E->modifier);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrUserInterfaceInputEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::input.onUserInterfaceInput, E->pKey, E->pMouseCoords);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrKeyboardInputEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::input.onKeyboardInput, E->pKey);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrDecideActionEvent)
+{
+    std::optional<Action> action = INVOKE_JS_EVENT(JsEvents::input.onDecideAction, E->cell, E->pObject);
+    if (action)
+    {
+        E->OverrideReturn(action.value());
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrConvertActionEvent)
+{
+    std::optional<bool> ret = INVOKE_JS_EVENT(JsEvents::input.onConvertAction, E->cell, E->shrouded, E->pObject, E->action);
+    if (ret)
+    {
+        E->OverrideReturn(ret.value());
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLeftMouseButtonUpEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::input.onLeftMouseButtonUp, E->coords, E->cell, E->pObject, E->action);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLeftMouseButtonDownEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::input.onLeftMouseButtonDown, E->point);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrRightMouseButtonUpEvent)
+{
+    INVOKE_JS_EVENT(JsEvents::input.onRightMouseButtonUp);
+}
+
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
     auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTechnoType, onLoadIni);
     if (behavior)
@@ -262,6 +304,58 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent)
     }
 }
 
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectMouseOverCellEvent)
+{
+    auto behavior = GET_OBJECT_BEHAVIOR(E->pObject, onMouseOverCell);
+    if (behavior)
+    {
+        std::optional<Action> action = INVOKE_JS_EVENT(*behavior, E->pObject, E->cell, E->checkFog, E->ignoreForce);
+        if (action)
+        {
+            E->OverrideReturn(action.value());
+        }
+    }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectMouseOverObjectEvent)
+{
+    auto behavior = GET_OBJECT_BEHAVIOR(E->pObject, onMouseOverObject);
+    if (behavior)
+    {
+        std::optional<Action> action = INVOKE_JS_EVENT(*behavior, E->pObject, E->pTarget, E->ignoreForce);
+        if (action)
+        {
+            E->OverrideReturn(action.value());
+        }
+    }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectCellClickedActionEvent)
+{
+    auto behavior = GET_OBJECT_BEHAVIOR(E->pObject, onCellClickedAction);
+    if (behavior)
+    {
+        std::optional<bool> ret = INVOKE_JS_EVENT(*behavior, E->pObject, E->action, E->cell);
+        if (ret)
+        {
+            E->OverrideReturn(ret.value());
+        }
+    }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectObjectClickedActionEvent)
+{
+    auto behavior = GET_OBJECT_BEHAVIOR(E->pObject, onObjectClickedAction);
+    if (behavior)
+    {
+        std::optional<bool> ret = INVOKE_JS_EVENT(*behavior, E->pObject, E->action, E->pTarget);
+        if (ret)
+        {
+            E->OverrideReturn(ret.value());
+        }
+    }
+}
+
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoFireEvent)
 {
     auto behavior = GET_TECHNO_BEHAVIOR(E->pTechno, onFire);
@@ -271,6 +365,32 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoFireEvent)
         if (pBullet)
         {
             E->OverrideReturn(pBullet.value());
+        }
+    }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoSelectWeaponEvent)
+{
+    auto behavior = GET_TECHNO_BEHAVIOR(E->pTechno, onSelectWeapon);
+    if (behavior)
+    {
+        std::optional<int> weaponIndex = INVOKE_JS_EVENT(*behavior, E->pTechno, E->pTarget);
+        if (weaponIndex)
+        {
+            E->OverrideReturn(weaponIndex.value());
+        }
+    }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoGetFireErrorEvent)
+{
+    auto behavior = GET_TECHNO_BEHAVIOR(E->pTechno, onGetFireError);
+    if (behavior)
+    {
+        std::optional<FireError> fireError = INVOKE_JS_EVENT(*behavior, E->pTechno, E->pTarget, E->weaponIndex, E->ignoreRange);
+        if (fireError)
+        {
+            E->OverrideReturn(fireError.value());
         }
     }
 }

@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include <GeneralDefinitions.h>
+#include <GadgetClass.h>
 
 class AbstractTypeClass;
 class CCINIClass;
@@ -49,6 +50,14 @@ struct JsObjectEvents : public JsAbstractEvents
 {
     PROPERTY()
     ScriptBehaviour<std::optional<DamageState>(ObjectClass*, int*, int, WarheadTypeClass* pWH, ObjectClass*, bool, bool, HouseClass*)> onReceiveDamage;
+    PROPERTY()
+    ScriptBehaviour<std::optional<Action>(ObjectClass*, CellStruct, bool, bool)> onMouseOverCell;
+    PROPERTY()
+    ScriptBehaviour<std::optional<Action>(ObjectClass*, ObjectClass const*, bool)> onMouseOverObject;
+    PROPERTY()
+    ScriptBehaviour<std::optional<bool>(ObjectClass*, Action, CellStruct)> onCellClickedAction;
+    PROPERTY()
+    ScriptBehaviour<std::optional<bool>(ObjectClass*, Action, ObjectClass*)> onObjectClickedAction;
 };
 
 CLASS(BindJs)
@@ -78,6 +87,27 @@ struct JsGameEvents
 };
 
 CLASS(BindJs)
+struct JsInputEvents
+{
+    PROPERTY()
+    ScriptBehaviour<void(GadgetClass*, DWORD*, int, int, bool, GadgetFlag, KeyModifier)> onGadgetInput;
+    PROPERTY()
+    ScriptBehaviour<void(DWORD*, Point2D*)> onUserInterfaceInput;
+    PROPERTY()
+    ScriptBehaviour<void(DWORD*)> onKeyboardInput;
+    PROPERTY()
+    ScriptBehaviour<std::optional<Action>(CellStruct, ObjectClass*)> onDecideAction;
+    PROPERTY()
+    ScriptBehaviour<std::optional<bool>(CellStruct, bool, ObjectClass*, Action)> onConvertAction;
+    PROPERTY()
+    ScriptBehaviour<void(Point2D)> onLeftMouseButtonDown;
+    PROPERTY()
+    ScriptBehaviour<void(CoordStruct, CellStruct, ObjectClass*, Action)> onLeftMouseButtonUp;
+    PROPERTY()
+    ScriptBehaviour<void()> onRightMouseButtonUp;
+};
+
+CLASS(BindJs)
 struct JsPhysicsEvents
 {
     // physics bindings
@@ -94,6 +124,10 @@ struct JsTechnoEvents : public JsObjectEvents
 {
     PROPERTY()
     ScriptBehaviour<std::optional<BulletClass*>(TechnoClass*, AbstractClass*, int)> onFire;
+    PROPERTY()
+    ScriptBehaviour<std::optional<int>(TechnoClass*, AbstractClass*)> onSelectWeapon;
+    PROPERTY()
+    ScriptBehaviour<std::optional<FireError>(TechnoClass*, AbstractClass*, int, bool)> onGetFireError;
 };
 
 CLASS(BindJs)
@@ -144,6 +178,9 @@ struct JsEvents final
     
     PROPERTY()
     static JsGameEvents game;
+    
+    PROPERTY()
+    static JsInputEvents input;
     
     PROPERTY()
     static JsPhysicsEvents physics;

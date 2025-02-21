@@ -40,6 +40,10 @@ class JsObjectEvents
     extends JsAbstractEvents
 {
     m_onReceiveDamage : any;
+    m_onMouseOverCell : any;
+    m_onMouseOverObject : any;
+    m_onCellClickedAction : any;
+    m_onObjectClickedAction : any;
 }
 class JsAbstractTypeEvents
     extends JsAbstractEvents
@@ -55,6 +59,17 @@ class JsGameEvents
     m_onBeginUpdate : any;
     m_onEndUpdate : any;
 }
+class JsInputEvents
+{
+    m_onGadgetInput : any;
+    m_onUserInterfaceInput : any;
+    m_onKeyboardInput : any;
+    m_onDecideAction : any;
+    m_onConvertAction : any;
+    m_onLeftMouseButtonDown : any;
+    m_onLeftMouseButtonUp : any;
+    m_onRightMouseButtonUp : any;
+}
 class JsPhysicsEvents
 {
     m_onCollisionEnter : any;
@@ -65,6 +80,8 @@ class JsTechnoEvents
     extends JsObjectEvents
 {
     m_onFire : any;
+    m_onSelectWeapon : any;
+    m_onGetFireError : any;
 }
 class JsBulletEvents
     extends JsObjectEvents
@@ -84,6 +101,7 @@ class JsHouseEvents
 class JsEvents
 {
     s_game : JsGameEvents;
+    s_input : JsInputEvents;
     s_physics : JsPhysicsEvents;
     s_unit : JsTechnoEvents;
     s_unitType : JsAbstractTypeEvents;

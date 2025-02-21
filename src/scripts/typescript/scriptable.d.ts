@@ -18,6 +18,10 @@ interface AbstractEvents
 interface ObjectEvents extends AbstractEvents
 {
     onReceiveDamage: Delegate;
+    onMouseOverCell: Delegate;
+    onMouseOverObject: Delegate;
+    onCellClickedAction: Delegate;
+    onObjectClickedAction: Delegate;
 }
 
 interface AbstractTypeEvents extends AbstractEvents
@@ -36,6 +40,18 @@ interface GameEvents
     onApplicationQuit: Delegate;
 }
 
+interface InputEvents
+{
+    onGadgetInput: Delegate;
+    onUserInterfaceInput: Delegate;
+    onKeyboardInput: Delegate;
+    onDecideAction: Delegate;
+    onConvertAction: Delegate;
+    onLeftMouseButtonDown: Delegate;
+    onLeftMouseButtonUp: Delegate;
+    onRightMouseButtonUp: Delegate;
+}
+
 interface PhysicsEvents
 {
     onCollisionEnter: Delegate;
@@ -46,6 +62,8 @@ interface PhysicsEvents
 interface TechnoEvents extends ObjectEvents
 {
     onFire: Delegate;
+    onSelectWeapon: Delegate;
+    onGetFireError: Delegate;
 }
 
 interface BulletEvents extends ObjectEvents
@@ -65,6 +83,7 @@ interface HouseEvents extends AbstractEvents
 
 interface AllGameEvents {
     game: GameEvents;
+    input: InputEvents;
     PhysicsEvents: PhysicsEvents;
     unit: TechnoEvents;
     unitType: AbstractTypeEvents;
