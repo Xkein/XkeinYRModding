@@ -39,3 +39,11 @@ BROADCAST_HOOK_EVENT(0x6CEE43, 0xA, YrSuperWeaponTypeLoadIniEvent)
     E->pSuperWeaponType = R->EBP<SuperWeaponTypeClass*>();
     E->pIni             = R->Stack<CCINIClass*>(0x3FC);
 }
+
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrSuperWeaponTypeMouseOverObjectEvent, 0x6CEF84, 0x6CEFD9)
+BROADCAST_HOOK_EVENT(0x6CEF84, 0x7, YrSuperWeaponTypeMouseOverObjectEvent)
+{
+    E->pSuperWeaponType = R->ECX<SuperWeaponTypeClass*>();
+    E->cell             = R->Stack<CellStruct>(STACK_OFFSET(0x8, 0x4));
+    E->pObjBelowMouse   = R->Stack<ObjectClass*>(STACK_OFFSET(0x8, 0x8));
+}

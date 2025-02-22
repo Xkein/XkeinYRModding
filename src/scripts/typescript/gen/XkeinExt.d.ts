@@ -116,7 +116,7 @@ class JsEvents
     s_bullet : JsBulletEvents;
     s_bulletType : JsAbstractTypeEvents;
     s_superWeapon : JsSuperWeaponEvents;
-    s_superWeaponType : JsAbstractTypeEvents;
+    s_superWeaponType : JsSuperWeaponTypeEvents;
     s_house : JsHouseEvents;
     s_houseType : JsAbstractTypeEvents;
 }

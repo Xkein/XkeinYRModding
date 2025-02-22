@@ -79,6 +79,11 @@ interface SuperWeaponEvents extends AbstractEvents
     onLaunch: Delegate;
 }
 
+interface SuperWeaponTypeEvents extends AbstractTypeEvents
+{
+    onMouseOverObject: Delegate;
+}
+
 interface HouseEvents extends AbstractEvents
 {
 }
@@ -98,7 +103,7 @@ interface AllGameEvents {
     bullet: BulletEvents;
     bulletType: AbstractTypeEvents;
     superWeapon: SuperWeaponEvents;
-    superWeaponType: AbstractTypeEvents;
+    superWeaponType: SuperWeaponTypeEvents;
     house: HouseEvents;
     houseType: AbstractTypeEvents;
 }

@@ -118,6 +118,14 @@ class SuperWeaponEvents extends AbstractEvents
     }
 }
 
+class SuperWeaponTypeEvents extends AbstractTypeEvents
+{
+    constructor() {
+        super()
+        this.onMouseOverObject = new Delegate()
+    }
+}
+
 class HouseEvents extends AbstractEvents
 {
     constructor() {
@@ -140,7 +148,7 @@ gameEvents.aircraftType = new AbstractTypeEvents()
 gameEvents.bullet = new BulletEvents()
 gameEvents.bulletType = new AbstractTypeEvents()
 gameEvents.superWeapon = new SuperWeaponEvents()
-gameEvents.superWeaponType = new AbstractTypeEvents()
+gameEvents.superWeaponType = new SuperWeaponTypeEvents()
 gameEvents.house = new HouseEvents()
 gameEvents.houseType = new AbstractTypeEvents()
 
@@ -273,6 +281,7 @@ __JsEvents.s_bulletType.m_onLoadIni = (...args) => { gameEvents.bulletType.onLoa
 __JsEvents.s_superWeaponType.m_onCtor = (...args) => { gameEvents.superWeaponType.onCtor.invoke(...args) }
 __JsEvents.s_superWeaponType.m_onDtor = (...args) => { gameEvents.superWeaponType.onDtor.invoke(...args) }
 __JsEvents.s_superWeaponType.m_onLoadIni = (...args) => { gameEvents.superWeaponType.onLoadIni.invoke(...args) }
+__JsEvents.s_superWeaponType.m_onMouseOverObject = (...args) => { gameEvents.superWeaponType.onMouseOverObject.invoke(...args) }
 
 __JsEvents.s_houseType.m_onCtor = (...args) => { gameEvents.houseType.onCtor.invoke(...args) }
 __JsEvents.s_houseType.m_onDtor = (...args) => { gameEvents.houseType.onDtor.invoke(...args) }

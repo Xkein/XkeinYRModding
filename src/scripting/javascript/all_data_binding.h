@@ -11,6 +11,7 @@ UsingCppTypeWithRefCache(JsPhysicsEvents)
 UsingCppTypeWithRefCache(JsTechnoEvents)
 UsingCppTypeWithRefCache(JsBulletEvents)
 UsingCppTypeWithRefCache(JsSuperWeaponEvents)
+UsingCppTypeWithRefCache(JsSuperWeaponTypeEvents)
 UsingCppTypeWithRefCache(JsHouseEvents)
 UsingCppTypeWithRefCache(JsEvents)
 

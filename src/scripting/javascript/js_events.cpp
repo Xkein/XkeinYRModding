@@ -8,23 +8,23 @@
 #include <boost/function_types/result_type.hpp>
 #include <boost/function_types/function_arity.hpp>
 
-JsGameEvents         JsEvents::game;
-JsInputEvents        JsEvents::input;
-JsPhysicsEvents      JsEvents::physics;
-JsBulletEvents       JsEvents::bullet;
-JsAbstractTypeEvents JsEvents::bulletType;
-JsSuperWeaponEvents  JsEvents::superWeapon;
-JsAbstractTypeEvents JsEvents::superWeaponType;
-JsHouseEvents        JsEvents::house;
-JsAbstractTypeEvents JsEvents::houseType;
-JsTechnoEvents       JsEvents::unit;
-JsAbstractTypeEvents JsEvents::unitType;
-JsTechnoEvents       JsEvents::infantry;
-JsAbstractTypeEvents JsEvents::infantryType;
-JsTechnoEvents       JsEvents::building;
-JsAbstractTypeEvents JsEvents::buildingType;
-JsTechnoEvents       JsEvents::aircraft;
-JsAbstractTypeEvents JsEvents::aircraftType;
+JsGameEvents            JsEvents::game;
+JsInputEvents           JsEvents::input;
+JsPhysicsEvents         JsEvents::physics;
+JsBulletEvents          JsEvents::bullet;
+JsAbstractTypeEvents    JsEvents::bulletType;
+JsSuperWeaponEvents     JsEvents::superWeapon;
+JsSuperWeaponTypeEvents JsEvents::superWeaponType;
+JsHouseEvents           JsEvents::house;
+JsAbstractTypeEvents    JsEvents::houseType;
+JsTechnoEvents          JsEvents::unit;
+JsAbstractTypeEvents    JsEvents::unitType;
+JsTechnoEvents          JsEvents::infantry;
+JsAbstractTypeEvents    JsEvents::infantryType;
+JsTechnoEvents          JsEvents::building;
+JsAbstractTypeEvents    JsEvents::buildingType;
+JsTechnoEvents          JsEvents::aircraft;
+JsAbstractTypeEvents    JsEvents::aircraftType;
 
 template<typename TTarget, typename TFunc>
 struct EnttInvoker
@@ -420,4 +420,11 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletDetonateEvent)
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperLaunchEvent)
 {
     INVOKE_JS_EVENT(JsEvents::superWeapon.onLaunch, E->pSuper, E->pCell, E->isPlayer);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeMouseOverObjectEvent) {
+    std::optional<Action> action = INVOKE_JS_EVENT(JsEvents::superWeaponType.onMouseOverObject, E->pSuperWeaponType, E->cell, E->pObjBelowMouse);
+    if (action)
+    {
+        E->OverrideReturn(action.value());
+    }
 }

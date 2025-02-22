@@ -1,10 +1,12 @@
 #pragma once
 
 #include "yr/yr_event.h"
+#include <GeneralDefinitions.h>
 
 class SuperWeaponTypeClass;
 class CCINIClass;
 struct IStream;
+class ObjectClass;
 
 CLASS(HookEvent)
 class YrSuperWeaponTypeCtorEvent
@@ -26,4 +28,13 @@ class YrSuperWeaponTypeLoadIniEvent
 public:
     SuperWeaponTypeClass* pSuperWeaponType;
     CCINIClass*           pIni;
+};
+
+CLASS(HookEvent)
+class YrSuperWeaponTypeMouseOverObjectEvent : public YrHookOverrideReturn<Action>
+{
+public:
+    SuperWeaponTypeClass* pSuperWeaponType;
+    CellStruct            cell;
+    ObjectClass*          pObjBelowMouse;
 };

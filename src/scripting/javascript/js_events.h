@@ -24,6 +24,7 @@ class InfantryTypeClass;
 class AircraftTypeClass;
 class UnitTypeClass;
 class BuildingTypeClass;
+class SuperWeaponTypeClass;
 
 class PhysicsCollisionAddAndPersistResult;
 class PhysicsCollisionRemoveResult;
@@ -150,6 +151,13 @@ struct JsSuperWeaponEvents : public JsAbstractEvents
     ScriptBehaviour<void(SuperClass*, const CellStruct*, bool)> onLaunch;
 };
 
+CLASS(BindJS)
+struct JsSuperWeaponTypeEvents : public JsAbstractTypeEvents
+{
+    PROPERTY()
+    ScriptBehaviour<std::optional<Action>(SuperWeaponTypeClass*, CellStruct, ObjectClass*)> onMouseOverObject;
+};
+
 CLASS(BindJs)
 struct JsHouseEvents : public JsAbstractEvents
 {
@@ -217,7 +225,7 @@ struct JsEvents final
     PROPERTY()
     static JsSuperWeaponEvents superWeapon;
     PROPERTY()
-    static JsAbstractTypeEvents superWeaponType;
+    static JsSuperWeaponTypeEvents superWeaponType;
 
     PROPERTY()
     static JsHouseEvents house;
