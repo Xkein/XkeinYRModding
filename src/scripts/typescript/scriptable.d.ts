@@ -17,6 +17,8 @@ interface AbstractEvents
 
 interface ObjectEvents extends AbstractEvents
 {
+    onLimboChecked: Delegate;
+    onUnlimboChecked: Delegate;
     onReceiveDamage: Delegate;
     onMouseOverCell: Delegate;
     onMouseOverObject: Delegate;

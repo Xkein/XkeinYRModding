@@ -304,6 +304,23 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent)
     }
 }
 
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectLimboCheckedEvent)
+{
+    auto behavior = GET_OBJECT_BEHAVIOR(E->pObject, onLimboChecked);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pObject);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectUnlimboCheckedEvent)
+{
+    auto behavior = GET_OBJECT_BEHAVIOR(E->pObject, onUnlimboChecked);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pObject, E->pCrd, E->dFaceDir);
+    }
+}
+
 DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectMouseOverCellEvent)
 {
     auto behavior = GET_OBJECT_BEHAVIOR(E->pObject, onMouseOverCell);

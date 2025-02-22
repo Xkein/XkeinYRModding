@@ -49,6 +49,10 @@ CLASS(BindJs)
 struct JsObjectEvents : public JsAbstractEvents
 {
     PROPERTY()
+    ScriptBehaviour<void(ObjectClass*)> onLimboChecked;
+    PROPERTY()
+    ScriptBehaviour<void(ObjectClass*, CoordStruct*, DirType)> onUnlimboChecked;
+    PROPERTY()
     ScriptBehaviour<std::optional<DamageState>(ObjectClass*, int*, int, WarheadTypeClass* pWH, ObjectClass*, bool, bool, HouseClass*)> onReceiveDamage;
     PROPERTY()
     ScriptBehaviour<std::optional<Action>(ObjectClass*, CellStruct, bool, bool)> onMouseOverCell;

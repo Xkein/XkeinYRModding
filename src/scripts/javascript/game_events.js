@@ -37,6 +37,8 @@ class ObjectEvents extends AbstractEvents
 {
     constructor() {
         super()
+        this.onLimboChecked = new Delegate()
+        this.onUnlimboChecked = new Delegate()
         this.onReceiveDamage = new Delegate()
         this.onMouseOverCell = new Delegate()
         this.onMouseOverObject = new Delegate()
@@ -180,6 +182,8 @@ __JsEvents.s_physics.m_onCollisionExit = (...args) => { gameEvents.physics.onCol
 
 __JsEvents.s_unit.m_onCtor = (...args) => { gameEvents.unit.onCtor.invoke(...args) }
 __JsEvents.s_unit.m_onDtor = (...args) => { gameEvents.unit.onDtor.invoke(...args) }
+__JsEvents.s_unit.m_onLimboChecked = (...args) => { gameEvents.unit.onLimboChecked.invoke(...args) }
+__JsEvents.s_unit.m_onUnlimboChecked = (...args) => { gameEvents.unit.onUnlimboChecked.invoke(...args) }
 __JsEvents.s_unit.m_onReceiveDamage = (...args) => { gameEvents.unit.onReceiveDamage.invoke(...args) }
 __JsEvents.s_unit.m_onMouseOverCell = (...args) => { gameEvents.unit.onMouseOverCell.invoke(...args) }
 __JsEvents.s_unit.m_onMouseOverObject = (...args) => { gameEvents.unit.onMouseOverObject.invoke(...args) }
@@ -191,6 +195,8 @@ __JsEvents.s_unit.m_onGetFireError = (...args) => { gameEvents.unit.onGetFireErr
 
 __JsEvents.s_infantry.m_onCtor = (...args) => { gameEvents.infantry.onCtor.invoke(...args) }
 __JsEvents.s_infantry.m_onDtor = (...args) => { gameEvents.infantry.onDtor.invoke(...args) }
+__JsEvents.s_infantry.m_onLimboChecked = (...args) => { gameEvents.infantry.onLimboChecked.invoke(...args) }
+__JsEvents.s_infantry.m_onUnlimboChecked = (...args) => { gameEvents.infantry.onUnlimboChecked.invoke(...args) }
 __JsEvents.s_infantry.m_onReceiveDamage = (...args) => { gameEvents.infantry.onReceiveDamage.invoke(...args) }
 __JsEvents.s_infantry.m_onMouseOverCell = (...args) => { gameEvents.infantry.onMouseOverCell.invoke(...args) }
 __JsEvents.s_infantry.m_onMouseOverObject = (...args) => { gameEvents.infantry.onMouseOverObject.invoke(...args) }
@@ -203,6 +209,8 @@ __JsEvents.s_infantry.m_onGetFireError = (...args) => { gameEvents.infantry.onGe
 
 __JsEvents.s_building.m_onCtor = (...args) => { gameEvents.building.onCtor.invoke(...args) }
 __JsEvents.s_building.m_onDtor = (...args) => { gameEvents.building.onDtor.invoke(...args) }
+__JsEvents.s_building.m_onLimboChecked = (...args) => { gameEvents.building.onLimboChecked.invoke(...args) }
+__JsEvents.s_building.m_onUnlimboChecked = (...args) => { gameEvents.building.onUnlimboChecked.invoke(...args) }
 __JsEvents.s_building.m_onReceiveDamage = (...args) => { gameEvents.building.onReceiveDamage.invoke(...args) }
 __JsEvents.s_building.m_onMouseOverCell = (...args) => { gameEvents.building.onMouseOverCell.invoke(...args) }
 __JsEvents.s_building.m_onMouseOverObject = (...args) => { gameEvents.building.onMouseOverObject.invoke(...args) }
@@ -215,6 +223,8 @@ __JsEvents.s_building.m_onGetFireError = (...args) => { gameEvents.building.onGe
 
 __JsEvents.s_aircraft.m_onCtor = (...args) => { gameEvents.aircraft.onCtor.invoke(...args) }
 __JsEvents.s_aircraft.m_onDtor = (...args) => { gameEvents.aircraft.onDtor.invoke(...args) }
+__JsEvents.s_aircraft.m_onLimboChecked = (...args) => { gameEvents.aircraft.onLimboChecked.invoke(...args) }
+__JsEvents.s_aircraft.m_onUnlimboChecked = (...args) => { gameEvents.aircraft.onUnlimboChecked.invoke(...args) }
 __JsEvents.s_aircraft.m_onReceiveDamage = (...args) => { gameEvents.aircraft.onReceiveDamage.invoke(...args) }
 __JsEvents.s_aircraft.m_onMouseOverCell = (...args) => { gameEvents.aircraft.onMouseOverCell.invoke(...args) }
 __JsEvents.s_aircraft.m_onMouseOverObject = (...args) => { gameEvents.aircraft.onMouseOverObject.invoke(...args) }
@@ -227,6 +237,8 @@ __JsEvents.s_aircraft.m_onGetFireError = (...args) => { gameEvents.aircraft.onGe
 
 __JsEvents.s_bullet.m_onCtor = (...args) => { gameEvents.bullet.onCtor.invoke(...args) }
 __JsEvents.s_bullet.m_onDtor = (...args) => { gameEvents.bullet.onDtor.invoke(...args) }
+__JsEvents.s_bullet.m_onLimboChecked = (...args) => { gameEvents.bullet.onLimboChecked.invoke(...args) }
+__JsEvents.s_bullet.m_onUnlimboChecked = (...args) => { gameEvents.bullet.onUnlimboChecked.invoke(...args) }
 __JsEvents.s_bullet.m_onReceiveDamage = (...args) => { gameEvents.bullet.onReceiveDamage.invoke(...args) }
 __JsEvents.s_bullet.m_onConstruct = (...args) => { gameEvents.bullet.onConstruct.invoke(...args) }
 __JsEvents.s_bullet.m_onDetonate = (...args) => { gameEvents.bullet.onDetonate.invoke(...args) }

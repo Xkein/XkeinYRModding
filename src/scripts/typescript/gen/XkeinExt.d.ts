@@ -39,6 +39,8 @@ class JsAbstractEvents
 class JsObjectEvents
     extends JsAbstractEvents
 {
+    m_onLimboChecked : any;
+    m_onUnlimboChecked : any;
     m_onReceiveDamage : any;
     m_onMouseOverCell : any;
     m_onMouseOverObject : any;

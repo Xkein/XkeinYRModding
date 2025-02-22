@@ -82,7 +82,7 @@ class GameScriptable
             let scriptable = gameScripts.getOrCreate(scriptName)
             yrObjectType.__scriptable = scriptable
             if (scriptable && scriptable.script.onLoadType) {
-                scriptable.script.onLoadType(yrObjectType)
+                scriptable.script.onLoadType(yrObjectType, iniReader)
             }
         }
     }

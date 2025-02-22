@@ -18,8 +18,8 @@
         yr_inject_meta(this)
     end
 -}}
-#include "scripting/javascript/all_data_binding.h"
 {{- if is_yrpp }}
+#include "scripting/javascript/yr_data_bindings.h"
 #include <EventClass.h>
 #include <YRPP.h>
 #include <CRC.h>
@@ -27,6 +27,8 @@
 #include <ColorScheme.h>
 #include <TriggerTypeClass.h>
 #define wchar wchar_t
+{{- else}}
+#include "scripting/javascript/all_data_binding.h"
 {{- end }}
 #include "{{source_file}}"
 #include "core/raii_invoker.h"
