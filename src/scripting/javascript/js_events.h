@@ -151,7 +151,7 @@ struct JsSuperWeaponEvents : public JsAbstractEvents
     ScriptBehaviour<void(SuperClass*, const CellStruct*, bool)> onLaunch;
 };
 
-CLASS(BindJS)
+CLASS(BindJs)
 struct JsSuperWeaponTypeEvents : public JsAbstractTypeEvents
 {
     PROPERTY()

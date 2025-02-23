@@ -96,6 +96,11 @@ class JsSuperWeaponEvents
 {
     m_onLaunch : any;
 }
+class JsSuperWeaponTypeEvents
+    extends JsAbstractTypeEvents
+{
+    m_onMouseOverObject : any;
+}
 class JsHouseEvents
     extends JsAbstractEvents
 {
