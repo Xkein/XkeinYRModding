@@ -237,7 +237,7 @@ namespace PUERTS_NAMESPACE
 
             static std::optional<T> toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
-                if (value.As<v8::Object>()->IsNullOrUndefined())
+                if (value.As<v8::Object>()->IsUndefined() || !Converter<T>::accept(context, value))
                     return {};
                 return std::optional<T>{ Converter<T>::toCpp(context, value) };
             }

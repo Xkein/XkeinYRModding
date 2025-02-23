@@ -11,13 +11,13 @@ declare module "YRpp" {
         Stop() : void;
         Pause() : void;
         Resume() : void;
-        GetTimeLeft() : void;
-        Completed() : void;
-        InProgress() : void;
-        Expired() : void;
-        HasStarted() : void;
-        IsTicking() : void;
-        HasTimeLeft() : void;
+        GetTimeLeft() : number;
+        Completed() : boolean;
+        InProgress() : boolean;
+        Expired() : boolean;
+        HasStarted() : boolean;
+        IsTicking() : boolean;
+        HasTimeLeft() : boolean;
         m_StartTime : number;
         m_TimeLeft : number;
     }
