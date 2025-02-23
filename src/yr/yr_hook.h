@@ -1,18 +1,17 @@
 #pragma once
 
 #include "yr_event.h"
-#include <YRPP.h>
-#include <Helpers/Macro.h>
+#include "yr/patch/syringe_hook.h"
 
 #define BROADCAST_HOOK_EVENT(HookAddress, Size, HookEvent) \
-    DEFINE_HOOK(HookAddress, HOOK_##HookAddress##_##Size, Size) { \
+    SYRINGE_PATCH(HookAddress, HOOK_##HookAddress##_##Size, Size) { \
         return YrHookEventSystem::Broadcast<HookEvent, HookAddress>(R); \
     } \
     template<> \
     inline void YrHookEvent::InitHookInfo_Impl<HookEvent, HookAddress>(REGISTERS* const R, HookEvent* const E)
 
 #define BROADCAST_HOOK_EVENT_AGAIN(HookAddress, Size, HookEvent, BroadAddress) \
-    DEFINE_HOOK(HookAddress, HOOK_##HookAddress##_##Size, Size) { \
+    SYRINGE_PATCH(HookAddress, HOOK_##HookAddress##_##Size, Size) { \
         return YrHookEventSystem::Broadcast<HookEvent, BroadAddress>(R); \
     }
 

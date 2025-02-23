@@ -6,6 +6,8 @@ add_requires("stb")
 add_requires("cereal")
 add_requires("cppzmq")
 add_requires("msgpack-cxx", {configs = {boost = false}})
+add_requires("asmjit")
+add_requires("zydis")
 
 includes("3rdparty/YRpp.lua")
 includes("3rdparty/entt.lua")

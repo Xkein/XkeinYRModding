@@ -5,7 +5,7 @@
     ],
     "assets_dir": "assets",
     "plugins_dir": "plugins",
-    "log_level": 0,
+    "log_level": 2,
 
     "render_server_port": 9900,
     

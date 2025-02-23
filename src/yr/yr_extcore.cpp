@@ -113,8 +113,6 @@ SYRINGE_HANDSHAKE(pInfo)
     return E_POINTER;
 }
 
-#include <Windows.h>
-#include <csignal>
 struct YrExtCore
 {
     YrExtCore();
@@ -134,17 +132,25 @@ YrExtCore::~YrExtCore()
 }
 
 std::unique_ptr<YrExtCore> gYrExtCore;
+DEFINE_HOOK(0x7CD810, OnEntryPoint, 0x9)
+{
+    gYrExtCore = std::make_unique<YrExtCore>();
+    return 0;
+}
 
-GLOBAL_INVOKE_ON_CTOR([]() {
-    wchar_t system_buffer[MAX_PATH];
-    GetModuleFileNameW(NULL, system_buffer, MAX_PATH);
-    system_buffer[MAX_PATH - 1]   = L'\0';
-    std::filesystem::path exePath = system_buffer;
-    if (exePath.filename() == "gamemd.exe")
-    {
-        gYrExtCore = std::make_unique<YrExtCore>();
-    }
-})
+#include <Windows.h>
+#include <csignal>
+
+// GLOBAL_INVOKE_ON_CTOR([]() {
+//     wchar_t system_buffer[MAX_PATH];
+//     GetModuleFileNameW(NULL, system_buffer, MAX_PATH);
+//     system_buffer[MAX_PATH - 1]   = L'\0';
+//     std::filesystem::path exePath = system_buffer;
+//     if (exePath.filename() == "gamemd.exe")
+//     {
+//         gYrExtCore = std::make_unique<YrExtCore>();
+//     }
+// })
 
 BOOL WINAPI CtrlHandler(DWORD fdwCtrlType) {
     OnAppExit();
@@ -152,6 +158,7 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType) {
 }
 static bool appInited = false;
 static bool breakOnExit = false;
+#include "yr/patch/patch.h"
 void OnAppOpen()
 {
     MetaRegistration::Register();
@@ -162,8 +169,9 @@ void OnAppOpen()
     }
     breakOnExit = gYrExtConfig->rawData.value("break_on_exit", false);
     InitLogger();
+    InitPatch();
     LoadExtensions();
-
+    
     SetConsoleCtrlHandler(CtrlHandler, true);
     appInited = true;
 }
@@ -182,6 +190,7 @@ void OnAppExit()
         {
             ExtensionManager::RemoveExtension(*extensions.rbegin());
         };
+        UninitPatch();
         MetaRegistration::Unregister();
         delete gYrExtConfig;
         gYrExtConfig = nullptr;

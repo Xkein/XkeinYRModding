@@ -1,5 +1,6 @@
 #include "yr/event/object_event.h"
 #include "yr/yr_hook.h"
+#include <FootClass.h>
 
 // BEGIN hooks for ObjectClass::ReceiveDamage ===================================
 // ObjectClass::ReceiveDamage
