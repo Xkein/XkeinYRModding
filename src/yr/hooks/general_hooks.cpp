@@ -17,6 +17,10 @@ BROADCAST_HOOK_EVENT(0x4F45A3, 0x5, YrEndRenderEvent) {}
 BROADCAST_HOOK_EVENT(0x6875F3, 0x6, YrSceneLoadEvent) {}
 BROADCAST_HOOK_EVENT(0x687CC7, 0x6, YrSceneEnterEvent) {}
 BROADCAST_HOOK_EVENT(0x685659, 0xA, YrSceneExitEvent) {}
+// when loading a game, the scene will exit but not load or enter.
+// so simulate the scene loading and entering when loading a game.
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameBeginStreamEvent) { YrHookEventSystem::Broadcast<YrSceneLoadEvent, 0x6875F3>(C->R); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameEndEvent) { YrHookEventSystem::Broadcast<YrSceneEnterEvent, 0x687CC7>(C->R); }
 
 BROADCAST_HOOK_EVENT(0x66D530, 0x6, YrRulesLoadBeforeGeneralDataEvent)
 {
@@ -61,9 +65,9 @@ BROADCAST_HOOK_EVENT(0x67E440, 0x6, YrLoadGameBeginEvent)
     E->fileName = R->ECX<const char*>();
 }
 
-BROADCAST_HOOK_EVENT(0x67E730, 0x5, YrLoadGameBeginStreamEvent)
+BROADCAST_HOOK_EVENT(0x67E73E, 0x6, YrLoadGameBeginStreamEvent)
 {
-    E->stream = R->ECX<IStream*>();
+    E->stream = R->ESI<IStream*>();
 }
 
 BROADCAST_HOOK_EVENT(0x67F7C8, 0x5, YrLoadGameEndStreamEvent)

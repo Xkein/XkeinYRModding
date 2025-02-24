@@ -1,4 +1,5 @@
 #include "input/input.h"
+#include "runtime/logger/logger.h"
 
 gainput::InputManager* Input::gManager = nullptr;
 gainput::InputMap*     Input::gMap;
@@ -16,6 +17,8 @@ void Input::Init()
     gTouchId    = gManager->CreateDevice<gainput::InputDeviceTouch>();
 
     gMap = new gainput::InputMap(*gManager);
+
+    gLogger->info("input module inited.");
 }
 
 void Input::Destroy()
