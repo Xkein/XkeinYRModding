@@ -18,3 +18,35 @@ class YrAnimDtorEvent
 public:
     AnimClass* pAnim;
 };
+
+CLASS(HookEvent)
+class YrAnimSaveGameBeginEvent
+{
+public:
+    AnimClass* pAnim;
+    IStream*   stream;
+};
+
+CLASS(HookEvent)
+class YrAnimSaveGameEndEvent
+{
+public:
+    AnimClass* pAnim;
+    IStream*   stream;
+};
+
+CLASS(HookEvent)
+class YrAnimLoadGameBeginEvent
+{
+public:
+    AnimClass* pAnim;
+    IStream*   stream;
+};
+
+CLASS(HookEvent)
+class YrAnimLoadGameEndEvent
+{
+public:
+    AnimClass* pAnim;
+    IStream*   stream;
+};

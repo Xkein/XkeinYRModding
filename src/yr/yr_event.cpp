@@ -108,7 +108,7 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
     impl->_callTimes++;
 // #define _LOG_HOOK
 #ifdef _LOG_HOOK
-    gConsole->info("broadcast hook at {}", (void*)R->Origin());
+    gLogger->info("broadcast hook at {}", (void*)R->Origin());
 #endif
 
     YrHookContext context {

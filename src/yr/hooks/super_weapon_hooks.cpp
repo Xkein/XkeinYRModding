@@ -17,6 +17,32 @@ BROADCAST_HOOK_EVENT(0x6CB120, 0x7, YrSuperDtorEvent)
 {
     E->pSuper = R->ECX<SuperClass*>();
 }
+BROADCAST_HOOK_EVENT(0x6CDFD0, 0x8, YrSuperSaveGameBeginEvent)
+{
+    E->pSuper = R->Stack<SuperClass*>(0x4);
+    E->stream = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pSuper;
+    gSavingStream = E->stream;
+}
+BROADCAST_HOOK_EVENT(0x6CDFEA, 0x5, YrSuperSaveGameEndEvent)
+{
+    E->pSuper = reinterpret_cast<SuperClass*>(gSavingObject);
+    E->stream = gSavingStream;
+}
+BROADCAST_HOOK_EVENT(0x6CDEF0, 0x5, YrSuperLoadGameBeginEvent)
+{
+    E->pSuper = R->Stack<SuperClass*>(0x4);
+    E->stream = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pSuper;
+    gSavingStream = E->stream;
+}
+BROADCAST_HOOK_EVENT(0x6CDFC7, 0x5, YrSuperLoadGameEndEvent)
+{
+    E->pSuper = reinterpret_cast<SuperClass*>(gSavingObject);
+    E->stream = gSavingStream;
+}
 BROADCAST_HOOK_EVENT(0x6CC390, 0x6, YrSuperLaunchEvent)
 {
     E->pSuper   = R->ECX<SuperClass*>();
@@ -31,6 +57,32 @@ BROADCAST_HOOK_EVENT(0x6CE6F6, 0x5, YrSuperWeaponTypeCtorEvent)
 BROADCAST_HOOK_EVENT(0x6CEFE0, 0x8, YrSuperWeaponTypeDtorEvent)
 {
     E->pSuperWeaponType = R->ECX<SuperWeaponTypeClass*>();
+}
+BROADCAST_HOOK_EVENT(0x6CE8D0, 0x8, YrSuperWeaponTypeSaveGameBeginEvent)
+{
+    E->pSuperWeaponType = R->Stack<SuperWeaponTypeClass*>(0x4);
+    E->stream           = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pSuperWeaponType;
+    gSavingStream = E->stream;
+}
+BROADCAST_HOOK_EVENT(0x6CE8EA, 0x5, YrSuperWeaponTypeSaveGameEndEvent)
+{
+    E->pSuperWeaponType = reinterpret_cast<SuperWeaponTypeClass*>(gSavingObject);
+    E->stream           = gSavingStream;
+}
+BROADCAST_HOOK_EVENT(0x6CE800, 0xA, YrSuperWeaponTypeLoadGameBeginEvent)
+{
+    E->pSuperWeaponType = R->Stack<SuperWeaponTypeClass*>(0x4);
+    E->stream           = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pSuperWeaponType;
+    gSavingStream = E->stream;
+}
+BROADCAST_HOOK_EVENT(0x6CE8C5, 0x5, YrSuperWeaponTypeLoadGameEndEvent)
+{
+    E->pSuperWeaponType = reinterpret_cast<SuperWeaponTypeClass*>(gSavingObject);
+    E->stream           = gSavingStream;
 }
 
 BROADCAST_HOOK_EVENT_AGAIN(0x6CEE50, 0xA, YrSuperWeaponTypeLoadIniEvent, 0x6CEE43)

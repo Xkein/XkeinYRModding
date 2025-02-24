@@ -21,6 +21,38 @@ public:
 };
 
 CLASS(HookEvent)
+class YrTerrainTypeSaveGameBeginEvent
+{
+public:
+    TerrainTypeClass* pTerrainType;
+    IStream*          stream;
+};
+
+CLASS(HookEvent)
+class YrTerrainTypeSaveGameEndEvent
+{
+public:
+    TerrainTypeClass* pTerrainType;
+    IStream*          stream;
+};
+
+CLASS(HookEvent)
+class YrTerrainTypeLoadGameBeginEvent
+{
+public:
+    TerrainTypeClass* pTerrainType;
+    IStream*          stream;
+};
+
+CLASS(HookEvent)
+class YrTerrainTypeLoadGameEndEvent
+{
+public:
+    TerrainTypeClass* pTerrainType;
+    IStream*          stream;
+};
+
+CLASS(HookEvent)
 class YrTerrainTypeLoadIniEvent
 {
 public:

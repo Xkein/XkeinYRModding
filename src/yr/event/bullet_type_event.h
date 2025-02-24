@@ -21,6 +21,38 @@ public:
 };
 
 CLASS(HookEvent)
+class YrBulletTypeSaveGameBeginEvent
+{
+public:
+    BulletTypeClass* pBulletType;
+    IStream*         stream;
+};
+
+CLASS(HookEvent)
+class YrBulletTypeSaveGameEndEvent
+{
+public:
+    BulletTypeClass* pBulletType;
+    IStream*         stream;
+};
+
+CLASS(HookEvent)
+class YrBulletTypeLoadGameBeginEvent
+{
+public:
+    BulletTypeClass* pBulletType;
+    IStream*         stream;
+};
+
+CLASS(HookEvent)
+class YrBulletTypeLoadGameEndEvent
+{
+public:
+    BulletTypeClass* pBulletType;
+    IStream*         stream;
+};
+
+CLASS(HookEvent)
 class YrBulletTypeLoadIniEvent
 {
 public:

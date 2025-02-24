@@ -21,6 +21,38 @@ public:
 };
 
 CLASS(HookEvent)
+class YrSuperSaveGameBeginEvent
+{
+public:
+    SuperClass* pSuper;
+    IStream*    stream;
+};
+
+CLASS(HookEvent)
+class YrSuperSaveGameEndEvent
+{
+public:
+    SuperClass* pSuper;
+    IStream*    stream;
+};
+
+CLASS(HookEvent)
+class YrSuperLoadGameBeginEvent
+{
+public:
+    SuperClass* pSuper;
+    IStream*    stream;
+};
+
+CLASS(HookEvent)
+class YrSuperLoadGameEndEvent
+{
+public:
+    SuperClass* pSuper;
+    IStream*    stream;
+};
+
+CLASS(HookEvent)
 class YrSuperLaunchEvent
 {
 public:

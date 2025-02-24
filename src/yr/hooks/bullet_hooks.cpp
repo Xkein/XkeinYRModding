@@ -17,6 +17,33 @@ BROADCAST_HOOK_EVENT(0x4665E9, 0xA, YrBulletDtorEvent)
 {
     E->pBullet = R->ESI<BulletClass*>();
 }
+BROADCAST_HOOK_EVENT(0x46AFB0, 0x8, YrBulletSaveGameBeginEvent)
+{
+    E->pBullet = R->Stack<BulletClass*>(0x4);
+    E->stream  = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pBullet;
+    gSavingStream = E->stream;
+}
+BROADCAST_HOOK_EVENT(0x46AFC4, 0x5, YrBulletSaveGameEndEvent)
+{
+    E->pBullet = reinterpret_cast<BulletClass*>(gSavingObject);
+    E->stream  = gSavingStream;
+}
+BROADCAST_HOOK_EVENT(0x46AE70, 0x5, YrBulletLoadGameBeginEvent)
+{
+    E->pBullet = R->Stack<BulletClass*>(0x4);
+    E->stream  = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pBullet;
+    gSavingStream = E->stream;
+}
+BROADCAST_HOOK_EVENT_AGAIN(0x46AF97, 0x7, YrBulletLoadGameEndEvent, 0x46AF9E)
+BROADCAST_HOOK_EVENT(0x46AF9E, 0x7, YrBulletLoadGameEndEvent)
+{
+    E->pBullet = reinterpret_cast<BulletClass*>(gSavingObject);
+    E->stream  = gSavingStream;
+}
 BROADCAST_HOOK_EVENT(0x466556, 0x6, YrBulletConstructEvent)
 {
     E->pBullet     = R->ESI<BulletClass*>();
@@ -41,6 +68,32 @@ BROADCAST_HOOK_EVENT(0x46BDD9, 0x5, YrBulletTypeCtorEvent)
 BROADCAST_HOOK_EVENT(0x46C8B6, 0x6, YrBulletTypeDtorEvent)
 {
     E->pBulletType = R->ESI<BulletTypeClass*>();
+}
+BROADCAST_HOOK_EVENT(0x46C730, 0x8, YrBulletTypeSaveGameBeginEvent)
+{
+    E->pBulletType = R->Stack<BulletTypeClass*>(0x4);
+    E->stream      = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pBulletType;
+    gSavingStream = E->stream;
+}
+BROADCAST_HOOK_EVENT(0x46C74A, 0x5, YrBulletTypeSaveGameEndEvent)
+{
+    E->pBulletType = reinterpret_cast<BulletTypeClass*>(gSavingObject);
+    E->stream      = gSavingStream;
+}
+BROADCAST_HOOK_EVENT(0x46C6A0, 0x5, YrBulletTypeLoadGameBeginEvent)
+{
+    E->pBulletType = R->Stack<BulletTypeClass*>(0x4);
+    E->stream      = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pBulletType;
+    gSavingStream = E->stream;
+}
+BROADCAST_HOOK_EVENT(0x46C722, 0x5, YrBulletTypeLoadGameEndEvent)
+{
+    E->pBulletType = reinterpret_cast<BulletTypeClass*>(gSavingObject);
+    E->stream      = gSavingStream;
 }
 
 BROADCAST_HOOK_EVENT_AGAIN(0x46C429, 0xA, YrBulletTypeLoadIniEvent, 0x46C41C)

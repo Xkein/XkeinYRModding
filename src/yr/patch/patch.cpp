@@ -50,8 +50,8 @@ void InitCodeHolder(asmjit::CodeHolder& code)
 
 void ApplySyringePatch(syringe_patch_data* data)
 {
-	if (data->hookFunc == nullptr || data->hookAddr == 0)
-		return;
+    if (data->hookFunc == nullptr || data->hookAddr == 0)
+        return;
     using namespace asmjit;
     CodeHolder code;
     InitCodeHolder(code);
@@ -78,34 +78,35 @@ void ApplySyringePatch(syringe_patch_data* data)
     assembly.bind(l_origin);
 
     void*             hookAddress = (void*)data->hookAddr;
-    std::vector<byte> originalCode(data->hookSize);
-    memcpy(originalCode.data(), hookAddress, data->hookSize);
+    DWORD             hookSize    = std::max(data->hookSize, 5u);
+    std::vector<byte> originalCode(hookSize);
+    memcpy(originalCode.data(), hookAddress, hookSize);
     // fix relative jump or call
     if (originalCode[0] == 0xE9 || originalCode[0] == 0xE8)
     {
         DWORD dest = data->hookAddr + 5 + *(DWORD*)(originalCode.data() + 1);
-		switch (originalCode[0])
-		{
-		case 0xE9: // jmp
-			assembly.jmp(dest);
-			originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
-			break;
-		case 0xE8: // call
-			assembly.call(dest);
-			originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
-			break;
-		}
+        switch (originalCode[0])
+        {
+            case 0xE9: // jmp
+                assembly.jmp(dest);
+                originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
+                break;
+            case 0xE8: // call
+                assembly.call(dest);
+                originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
+                break;
+        }
     }
     assembly.embed(originalCode.data(), originalCode.size());
     // jump back
-    assembly.jmp(data->hookAddr + data->hookSize);
+    assembly.jmp(data->hookAddr + hookSize);
     // generate code
     const void* fn;
     gJitRuntime->add(&fn, &code);
     // reset generate data
     code.reset();
     InitCodeHolder(code);
-	code.attach(&assembly);
+    code.attach(&assembly);
     // jump to hook function from hook address
     assembly.jmp(fn);
     code.flatten();
@@ -113,22 +114,21 @@ void ApplySyringePatch(syringe_patch_data* data)
     code.relocateToBase(data->hookAddr);
     // override hook address
     DWORD protect_flag;
-    VirtualProtect(hookAddress, data->hookSize, PAGE_EXECUTE_READWRITE, &protect_flag);
-    code.copyFlattenedData(hookAddress, data->hookSize);
-    VirtualProtect(hookAddress, data->hookSize, protect_flag, NULL);
-    FlushInstructionCache(GetCurrentProcess(), hookAddress, data->hookSize);
-	// check hook race
-	for (byte originalByte : originalCode)
-	{
-		switch (originalByte)
-		{
-		case 0xE9:
-		case 0xE8:
-			gLogger->warn("Hook {} seems to be conflicted with other hooks!", hookAddress);
-			break;
-		}
-	}
-	
+    VirtualProtect(hookAddress, hookSize, PAGE_EXECUTE_READWRITE, &protect_flag);
+    code.copyFlattenedData(hookAddress, hookSize);
+    VirtualProtect(hookAddress, hookSize, protect_flag, NULL);
+    FlushInstructionCache(GetCurrentProcess(), hookAddress, hookSize);
+    // check hook race
+    for (byte originalByte : originalCode)
+    {
+        switch (originalByte)
+        {
+            case 0xE9:
+            case 0xE8:
+                gLogger->warn("Hook {} seems to be conflicted with other hooks!", hookAddress);
+                break;
+        }
+    }
 }
 
 void ApplyModulePatch(HANDLE hInstance)

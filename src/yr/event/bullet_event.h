@@ -25,6 +25,38 @@ public:
 };
 
 CLASS(HookEvent)
+class YrBulletSaveGameBeginEvent
+{
+public:
+    BulletClass* pBullet;
+    IStream*     stream;
+};
+
+CLASS(HookEvent)
+class YrBulletSaveGameEndEvent
+{
+public:
+    BulletClass* pBullet;
+    IStream*     stream;
+};
+
+CLASS(HookEvent)
+class YrBulletLoadGameBeginEvent
+{
+public:
+    BulletClass* pBullet;
+    IStream*     stream;
+};
+
+CLASS(HookEvent)
+class YrBulletLoadGameEndEvent
+{
+public:
+    BulletClass* pBullet;
+    IStream*     stream;
+};
+
+CLASS(HookEvent)
 class YrBulletConstructEvent
 {
 public:

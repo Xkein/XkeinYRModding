@@ -22,6 +22,38 @@ public:
 };
 
 CLASS(HookEvent)
+class YrWeaponTypeSaveGameBeginEvent
+{
+public:
+    WeaponTypeClass* pWeaponType;
+    IStream*         stream;
+};
+
+CLASS(HookEvent)
+class YrWeaponTypeSaveGameEndEvent
+{
+public:
+    WeaponTypeClass* pWeaponType;
+    IStream*         stream;
+};
+
+CLASS(HookEvent)
+class YrWeaponTypeLoadGameBeginEvent
+{
+public:
+    WeaponTypeClass* pWeaponType;
+    IStream*         stream;
+};
+
+CLASS(HookEvent)
+class YrWeaponTypeLoadGameEndEvent
+{
+public:
+    WeaponTypeClass* pWeaponType;
+    IStream*         stream;
+};
+
+CLASS(HookEvent)
 class YrWeaponTypeLoadIniEvent
 {
 public:
@@ -41,6 +73,38 @@ class YrWarheadTypeDtorEvent
 {
 public:
     WarheadTypeClass* pWarheadType;
+};
+
+CLASS(HookEvent)
+class YrWarheadTypeSaveGameBeginEvent
+{
+public:
+    WarheadTypeClass* pWarheadType;
+    IStream*          stream;
+};
+
+CLASS(HookEvent)
+class YrWarheadTypeSaveGameEndEvent
+{
+public:
+    WarheadTypeClass* pWarheadType;
+    IStream*          stream;
+};
+
+CLASS(HookEvent)
+class YrWarheadTypeLoadGameBeginEvent
+{
+public:
+    WarheadTypeClass* pWarheadType;
+    IStream*          stream;
+};
+
+CLASS(HookEvent)
+class YrWarheadTypeLoadGameEndEvent
+{
+public:
+    WarheadTypeClass* pWarheadType;
+    IStream*          stream;
 };
 
 CLASS(HookEvent)

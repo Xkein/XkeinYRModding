@@ -21,6 +21,38 @@ public:
 };
 
 CLASS(HookEvent)
+class YrHouseTypeSaveGameBeginEvent
+{
+public:
+    HouseTypeClass* pHouseType;
+    IStream*        stream;
+};
+
+CLASS(HookEvent)
+class YrHouseTypeSaveGameEndEvent
+{
+public:
+    HouseTypeClass* pHouseType;
+    IStream*        stream;
+};
+
+CLASS(HookEvent)
+class YrHouseTypeLoadGameBeginEvent
+{
+public:
+    HouseTypeClass* pHouseType;
+    IStream*        stream;
+};
+
+CLASS(HookEvent)
+class YrHouseTypeLoadGameEndEvent
+{
+public:
+    HouseTypeClass* pHouseType;
+    IStream*        stream;
+};
+
+CLASS(HookEvent)
 class YrHouseTypeLoadIniEvent
 {
 public:

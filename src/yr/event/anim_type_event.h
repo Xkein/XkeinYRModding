@@ -21,6 +21,38 @@ public:
 };
 
 CLASS(HookEvent)
+class YrAnimTypeSaveGameBeginEvent
+{
+public:
+    AnimTypeClass* pAnimType;
+    IStream*       stream;
+};
+
+CLASS(HookEvent)
+class YrAnimTypeSaveGameEndEvent
+{
+public:
+    AnimTypeClass* pAnimType;
+    IStream*       stream;
+};
+
+CLASS(HookEvent)
+class YrAnimTypeLoadGameBeginEvent
+{
+public:
+    AnimTypeClass* pAnimType;
+    IStream*       stream;
+};
+
+CLASS(HookEvent)
+class YrAnimTypeLoadGameEndEvent
+{
+public:
+    AnimTypeClass* pAnimType;
+    IStream*       stream;
+};
+
+CLASS(HookEvent)
 class YrAnimTypeLoadIniEvent
 {
 public:

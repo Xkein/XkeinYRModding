@@ -18,3 +18,35 @@ class YrTerrainDtorEvent
 public:
     TerrainClass* pTerrain;
 };
+
+CLASS(HookEvent)
+class YrTerrainSaveGameBeginEvent
+{
+public:
+    TerrainClass* pTerrain;
+    IStream*      stream;
+};
+
+CLASS(HookEvent)
+class YrTerrainSaveGameEndEvent
+{
+public:
+    TerrainClass* pTerrain;
+    IStream*      stream;
+};
+
+CLASS(HookEvent)
+class YrTerrainLoadGameBeginEvent
+{
+public:
+    TerrainClass* pTerrain;
+    IStream*      stream;
+};
+
+CLASS(HookEvent)
+class YrTerrainLoadGameEndEvent
+{
+public:
+    TerrainClass* pTerrain;
+    IStream*      stream;
+};

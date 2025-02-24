@@ -37,6 +37,9 @@ BROADCAST_HOOK_EVENT(0x70BF50, 0x5, YrTechnoLoadGameBeginEvent)
 {
     E->pTechno = R->Stack<TechnoClass*>(0x4);
     E->stream  = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pTechno;
+    gSavingStream = E->stream;
 }
 BROADCAST_HOOK_EVENT(0x70C249, 0x5, YrTechnoLoadGameEndEvent)
 {
@@ -78,6 +81,9 @@ BROADCAST_HOOK_EVENT(0x7162F0, 0x6, YrTechnoTypeLoadGameBeginEvent)
 {
     E->pTechnoType = R->Stack<TechnoTypeClass*>(0x4);
     E->stream      = R->Stack<IStream*>(0x8);
+
+    gSavingObject = E->pTechnoType;
+    gSavingStream = E->stream;
 }
 BROADCAST_HOOK_EVENT(0x716DAC, 0xA, YrTechnoTypeLoadGameEndEvent)
 {

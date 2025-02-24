@@ -23,6 +23,38 @@ public:
 };
 
 CLASS(HookEvent)
+class YrSuperWeaponTypeSaveGameBeginEvent
+{
+public:
+    SuperWeaponTypeClass* pSuperWeaponType;
+    IStream*              stream;
+};
+
+CLASS(HookEvent)
+class YrSuperWeaponTypeSaveGameEndEvent
+{
+public:
+    SuperWeaponTypeClass* pSuperWeaponType;
+    IStream*              stream;
+};
+
+CLASS(HookEvent)
+class YrSuperWeaponTypeLoadGameBeginEvent
+{
+public:
+    SuperWeaponTypeClass* pSuperWeaponType;
+    IStream*              stream;
+};
+
+CLASS(HookEvent)
+class YrSuperWeaponTypeLoadGameEndEvent
+{
+public:
+    SuperWeaponTypeClass* pSuperWeaponType;
+    IStream*              stream;
+};
+
+CLASS(HookEvent)
 class YrSuperWeaponTypeLoadIniEvent
 {
 public:
