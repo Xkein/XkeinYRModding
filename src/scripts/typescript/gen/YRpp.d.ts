@@ -43,6 +43,64 @@ class FacingClass
     m_RotationTimer : CDTimerClass;
     m_ROT : DirStruct;
 }
+interface ILocomotion
+{
+    Link_To_Object(pointer_0 : void) : number;
+    Is_Moving() : boolean;
+    Destination() : CoordStruct;
+    Head_To_Coord() : CoordStruct;
+    Can_Enter_Cell(cell_0 : CellStruct) : any;
+    Is_To_Have_Shadow() : boolean;
+    Draw_Matrix(pIndex_0 : any) : Matrix3D;
+    Shadow_Matrix(pIndex_0 : any) : Matrix3D;
+    Draw_Point() : Point2D;
+    Shadow_Point() : Point2D;
+    Visual_Character(raw_0 : boolean) : any;
+    Z_Adjust() : number;
+    Z_Gradient() : any;
+    Process() : boolean;
+    Move_To(to_0 : CoordStruct) : void;
+    Stop_Moving() : void;
+    Do_Turn(coord_0 : DirStruct) : void;
+    Unlimbo() : void;
+    Tilt_Pitch_AI() : void;
+    Power_On() : boolean;
+    Power_Off() : boolean;
+    Is_Powered() : boolean;
+    Is_Ion_Sensitive() : boolean;
+    Push(dir_0 : DirStruct) : boolean;
+    Shove(dir_0 : DirStruct) : boolean;
+    Force_Track(track_0 : number, coord_1 : CoordStruct) : void;
+    In_Which_Layer() : any;
+    Force_Immediate_Destination(coord_0 : CoordStruct) : void;
+    Force_New_Slope(ramp_0 : number) : void;
+    Is_Moving_Now() : boolean;
+    Apparent_Speed() : number;
+    Drawing_Code() : number;
+    Can_Fire() : any;
+    Get_Status() : number;
+    Acquire_Hunter_Seeker_Target() : void;
+    Is_Surfacing() : boolean;
+    Mark_All_Occupation_Bits(mark_0 : any) : void;
+    Is_Moving_Here(to_0 : CoordStruct) : boolean;
+    Will_Jump_Tracks() : boolean;
+    Is_Really_Moving_Now() : boolean;
+    Stop_Movement_Animation() : void;
+    Limbo() : void;
+    Lock() : void;
+    Unlock() : void;
+    Get_Track_Number() : number;
+    Get_Track_Index() : number;
+    Get_Speed_Accum() : number;
+}
+interface IPiggyback
+{
+    Begin_Piggyback(pointer_0 : ILocomotion) : number;
+    End_Piggyback(pointer_0 : ILocomotion) : number;
+    Is_Ok_To_End() : boolean;
+    Piggyback_CLSID(classid_0 : any) : number;
+    Is_Piggybacking() : boolean;
+}
 class TechnoClass
     extends RadioClass
 {
@@ -5625,6 +5683,77 @@ class RulesClass
     m_DirectRockingCoefficient : number;
     m_FallBackCoefficient : number;
 }
+class LocomotionClass
+{
+    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    AddRef() : number;
+    Release() : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    IsDirty() : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : number;
+    Size() : number;
+    Link_To_Object(pointer_0 : void | any) : number;
+    Is_Moving() : boolean;
+    Destination() : CoordStruct;
+    Head_To_Coord() : CoordStruct;
+    Can_Enter_Cell(cell_0 : CellStruct | any) : any;
+    Is_To_Have_Shadow() : boolean;
+    Draw_Matrix(pIndex_0 : any | any) : Matrix3D;
+    Shadow_Matrix(pIndex_0 : any | any) : Matrix3D;
+    Draw_Point() : Point2D;
+    Shadow_Point() : Point2D;
+    Visual_Character(raw_0 : boolean | any) : any;
+    Z_Adjust() : number;
+    Z_Gradient() : any;
+    Process() : boolean;
+    Move_To(to_0 : CoordStruct | any) : void;
+    Stop_Moving() : void;
+    Do_Turn(coord_0 : DirStruct | any) : void;
+    Unlimbo() : void;
+    Tilt_Pitch_AI() : void;
+    Power_On() : boolean;
+    Power_Off() : boolean;
+    Is_Powered() : boolean;
+    Is_Ion_Sensitive() : boolean;
+    Push(dir_0 : DirStruct | any) : boolean;
+    Shove(dir_0 : DirStruct | any) : boolean;
+    Force_Track(track_0 : number | any, coord_1 : CoordStruct | any) : void;
+    In_Which_Layer() : any;
+    Force_Immediate_Destination(coord_0 : CoordStruct | any) : void;
+    Force_New_Slope(ramp_0 : number | any) : void;
+    Is_Moving_Now() : boolean;
+    Apparent_Speed() : number;
+    Drawing_Code() : number;
+    Can_Fire() : any;
+    Get_Status() : number;
+    Acquire_Hunter_Seeker_Target() : void;
+    Is_Surfacing() : boolean;
+    Mark_All_Occupation_Bits(mark_0 : any | any) : void;
+    Is_Moving_Here(to_0 : CoordStruct | any) : boolean;
+    Will_Jump_Tracks() : boolean;
+    Is_Really_Moving_Now() : boolean;
+    Stop_Movement_Animation() : void;
+    Limbo() : void;
+    Lock() : void;
+    Unlock() : void;
+    Get_Track_Number() : number;
+    Get_Track_Index() : number;
+    Get_Speed_Accum() : number;
+    static TryPiggyback(Piggy_0 : IPiggyback, Loco_1 : ILocomotion) : number;
+    static CreateInstance(ppv_0 : ILocomotion, rclsid_1 : any, pUnkOuter_2 : any, dwClsContext_3 : number) : number;
+    static AddRef1(Loco_0 : LocomotionClass) : void;
+    static AddRef2(Loco_0 : LocomotionClass) : void;
+    static ChangeLocomotorTo(Object_0 : FootClass, clsid_1 : any) : void;
+    static CreateInstance(rclsid_0 : any) : any;
+    static End_Piggyback(pLoco_0 : any) : boolean;
+    m_Owner : FootClass;
+    m_LinkedTo : FootClass;
+    m_Powered : boolean;
+    m_Dirty : boolean;
+    m_RefCount : number;
+}
 class Variable
 {
     m_Name : string;
@@ -5824,6 +5953,112 @@ class OverlayClass
     s_AbsID : any;
     s_Array : any;
     m_Type : OverlayTypeClass;
+}
+class FlyLocomotionClass
+    extends LocomotionClass
+{
+    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    AddRef() : number;
+    Release() : number;
+    Is_Moving() : boolean;
+    Destination() : CoordStruct;
+    Process() : boolean;
+    Move_To(to_0 : CoordStruct | any) : void;
+    Stop_Moving() : void;
+    Do_Turn(coord_0 : DirStruct | any) : void;
+    In_Which_Layer() : any;
+    Mark_All_Occupation_Bits(mark_0 : any | any) : void;
+    Limbo() : void;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Size() : number;
+    s_ILocoVTable : number;
+    m_AirportBound : boolean;
+    m_MovingDestination : CoordStruct;
+    m_XYZ2 : CoordStruct;
+    m_HasMoveOrder : boolean;
+    m_FlightLevel : number;
+    m_TargetSpeed : number;
+    m_CurrentSpeed : number;
+    m_IsTakingOff : number;
+    m_IsLanding : boolean;
+    m_WasLanding : boolean;
+    m_unknown_bool_53 : boolean;
+    m_unknown_54 : number;
+    m_unknown_58 : number;
+    m_IsElevating : boolean;
+    m_unknown_bool_5D : boolean;
+    m_unknown_bool_5E : boolean;
+    m_unknown_bool_5F : boolean;
+}
+class RocketLocomotionClass
+    extends LocomotionClass
+{
+    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    AddRef() : number;
+    Release() : number;
+    Is_Moving() : boolean;
+    Destination() : CoordStruct;
+    Process() : boolean;
+    Move_To(to_0 : CoordStruct | any) : void;
+    Stop_Moving() : void;
+    Do_Turn(coord_0 : DirStruct | any) : void;
+    In_Which_Layer() : any;
+    Mark_All_Occupation_Bits(mark_0 : any | any) : void;
+    Limbo() : void;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Size() : number;
+    m_MovingDestination : CoordStruct;
+    m_MissionTimer : RateTimer;
+    m_TrailerTimer : CDTimerClass;
+    m_MissionState : number;
+    m_unknown_44 : number;
+    m_CurrentSpeed : number;
+    m_unknown_bool_4C : boolean;
+    m_SpawnerIsElite : boolean;
+    m_CurrentPitch : number;
+    m_unknown_58 : number;
+    m_unknown_5C : number;
+}
+class TeleportLocomotionClass
+    extends LocomotionClass
+{
+    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    AddRef() : number;
+    Release() : number;
+    Begin_Piggyback(pointer_0 : ILocomotion | any) : number;
+    End_Piggyback(pointer_0 : ILocomotion | any) : number;
+    Is_Ok_To_End() : boolean;
+    Piggyback_CLSID(classid_0 : any | any) : number;
+    Is_Piggybacking() : boolean;
+    Is_Moving() : boolean;
+    Destination() : CoordStruct;
+    Process() : boolean;
+    Move_To(to_0 : CoordStruct | any) : void;
+    Stop_Moving() : void;
+    Do_Turn(coord_0 : DirStruct | any) : void;
+    In_Which_Layer() : any;
+    Mark_All_Occupation_Bits(mark_0 : any | any) : void;
+    Limbo() : void;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Size() : number;
+    vt_entry_28(dwUnk_0 : number) : void;
+    IsStill() : boolean;
+    s_ILocoVTable : number;
+    s_ClassGUID : any;
+    m_MovingDestination : CoordStruct;
+    m_LastCoords : CoordStruct;
+    m_Moving : boolean;
+    m_unknown_bool_35 : boolean;
+    m_unknown_bool_36 : boolean;
+    m_State : number;
+    m_Timer : CDTimerClass;
+    m_Piggybackee : ILocomotion;
 }
 class GScreenClass
 {

@@ -28,6 +28,14 @@
 #include <CCINIClass.h>
 #include <SmudgeTypeClass.h>
 #include <Blitters/Blitter.h>
+#include <DriveLocomotionClass.h>
+#include <DropPodLocomotionClass.h>
+#include <FlyLocomotionClass.h>
+#include <JumpjetLocomotionClass.h>
+#include <RocketLocomotionClass.h>
+#include <ShipLocomotionClass.h>
+#include <TeleportLocomotionClass.h>
+#include <TunnelLocomotionClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -168,6 +176,17 @@ UsingCppType(ScenarioFlags);
 UsingCppType(ScenarioClass)
 UsingCppType(EventClass);
 UsingCppType(Variable)
+UsingCppType(ILocomotion);
+UsingCppType(IPiggyback);
+UsingCppType(LocomotionClass);
+UsingCppType(DriveLocomotionClass);
+UsingCppType(DropPodLocomotionClass);
+UsingCppType(FlyLocomotionClass);
+UsingCppType(JumpjetLocomotionClass);
+UsingCppType(RocketLocomotionClass);
+UsingCppType(ShipLocomotionClass);
+UsingCppType(TeleportLocomotionClass);
+UsingCppType(TunnelLocomotionClass);
 
 UsingCppType(INIClass);
 UsingCppType(CCINIClass);
@@ -193,13 +212,13 @@ UsingYrStruct(RectangleStruct);
 UsingYrStruct(Matrix3D);
 UsingYrStruct(DirStruct);
 UsingYrStruct(GUID);
+UsingYrStruct(const GUID);
 
 // not implement, declare only
+UsingCppType(IUnknown);
 UsingCppType(IAIHouse);
 UsingCppType(IConnectionPoint);
 UsingPointer(IConnectionPoint**);
-UsingCppType(ILocomotion);
-UsingCppType(IPiggyback);
 UsingCppType(IStream);
 UsingCppType(IApplication);
 UsingCppType(IEnumConnectionPoints);
@@ -234,6 +253,9 @@ UsingCppType(noinit_t);
 UsingCppType(HashIterator);
 UsingCppType(Blitter)
 UsingCppType(RLEBlitter)
+UsingPointer(ILocomotion**);
+UsingPointer(IPiggyback**);
+UsingPointer(LocomotionClass**);
 
 UsingArray(RadioCommand);
 UsingArray(Crate);
