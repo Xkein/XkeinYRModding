@@ -161,6 +161,16 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrPointerExpireEvent)
     }
 }
 
+DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadBeforeGeneralDataEvent)
+{
+    IniReader reader {E->pIni};
+    INVOKE_JS_EVENT(JsEvents::game.onRulesLoadBeforeGeneralData, E->pRules, &reader);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadBeforeTypeDataEvent)
+{
+    IniReader reader {E->pIni};
+    INVOKE_JS_EVENT(JsEvents::game.onRulesLoadBeforeTypeData, E->pRules, &reader);
+}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeDataEvent)
 {
     IniReader reader {E->pIni};
@@ -220,6 +230,145 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrRightMouseButtonUpEvent)
     INVOKE_JS_EVENT(JsEvents::input.onRightMouseButtonUp);
 }
 
+// ======================= save/load game =======================
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoSaveGameBeginEvent) {
+    auto behavior = GET_TECHNO_BEHAVIOR(E->pTechno, onSaveGameBegin);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pTechno, E->stream);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoSaveGameEndEvent) {
+    auto behavior = GET_TECHNO_BEHAVIOR(E->pTechno, onSaveGameEnd);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pTechno, E->stream);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoLoadGameBeginEvent) {
+    auto behavior = GET_TECHNO_BEHAVIOR(E->pTechno, onLoadGameBegin);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pTechno, E->stream);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoLoadGameEndEvent) {
+    auto behavior = GET_TECHNO_BEHAVIOR(E->pTechno, onLoadGameEnd);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pTechno, E->stream);
+    }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeSaveGameBeginEvent) {
+    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTechnoType, onSaveGameBegin);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pTechnoType, E->stream);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeSaveGameEndEvent) {
+    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTechnoType, onSaveGameEnd);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pTechnoType, E->stream);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadGameBeginEvent) {
+    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTechnoType, onLoadGameBegin);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pTechnoType, E->stream);
+    }
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadGameEndEvent) {
+    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTechnoType, onLoadGameEnd);
+    if (behavior)
+    {
+        INVOKE_JS_EVENT(*behavior, E->pTechnoType, E->stream);
+    }
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletSaveGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::bullet.onSaveGameBegin, E->pBullet, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletSaveGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::bullet.onSaveGameEnd, E->pBullet, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletLoadGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::bullet.onLoadGameBegin, E->pBullet, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletLoadGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::bullet.onLoadGameEnd, E->pBullet, E->stream);
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeSaveGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::bulletType.onSaveGameBegin, E->pBulletType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeSaveGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::bulletType.onSaveGameEnd, E->pBulletType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::bulletType.onLoadGameBegin, E->pBulletType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::bulletType.onLoadGameEnd, E->pBulletType, E->stream);
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseSaveGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::house.onSaveGameBegin, E->pHouse, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseSaveGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::house.onSaveGameEnd, E->pHouse, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseLoadGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::house.onLoadGameBegin, E->pHouse, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseLoadGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::house.onLoadGameEnd, E->pHouse, E->stream);
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeSaveGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::houseType.onSaveGameBegin, E->pHouseType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeSaveGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::houseType.onSaveGameEnd, E->pHouseType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeLoadGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::houseType.onLoadGameBegin, E->pHouseType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeLoadGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::houseType.onLoadGameEnd, E->pHouseType, E->stream);
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperSaveGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::superWeapon.onSaveGameBegin, E->pSuper, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperSaveGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::superWeapon.onSaveGameEnd, E->pSuper, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperLoadGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::superWeapon.onLoadGameBegin, E->pSuper, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperLoadGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::superWeapon.onLoadGameEnd, E->pSuper, E->stream);
+}
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeSaveGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::superWeaponType.onSaveGameBegin, E->pSuperWeaponType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeSaveGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::superWeaponType.onSaveGameEnd, E->pSuperWeaponType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadGameBeginEvent) {
+    INVOKE_JS_EVENT(JsEvents::superWeaponType.onLoadGameBegin, E->pSuperWeaponType, E->stream);
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadGameEndEvent) {
+    INVOKE_JS_EVENT(JsEvents::superWeaponType.onLoadGameEnd, E->pSuperWeaponType, E->stream);
+}
+// ======================= save/load game =======================
+
+// ======================= load ini =======================
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
     auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTechnoType, onLoadIni);
     if (behavior)
@@ -284,6 +433,7 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrWarheadTypeLoadIniEvent) {
         INVOKE_JS_EVENT(*behavior, E->pWarheadType, &reader);
     }
 }
+// ======================= load ini =======================
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletConstructEvent)
 {

@@ -33,8 +33,10 @@ class JsAbstractEvents
 {
     m_onCtor : any;
     m_onDtor : any;
-    m_onSave : any;
-    m_onLoad : any;
+    m_onSaveGameBegin : any;
+    m_onSaveGameEnd : any;
+    m_onLoadGameBegin : any;
+    m_onLoadGameEnd : any;
 }
 class JsObjectEvents
     extends JsAbstractEvents
@@ -54,10 +56,20 @@ class JsAbstractTypeEvents
 }
 class JsGameEvents
 {
+    m_onRulesLoadBeforeGeneralData : any;
+    m_onRulesLoadBeforeTypeData : any;
     m_onRulesLoadAfterTypeData : any;
     m_onSceneEnter : any;
     m_onSceneExit : any;
     m_onSceneLoad : any;
+    m_onSaveGameBegin : any;
+    m_onSaveGameEnd : any;
+    m_onSaveGameBeginStream : any;
+    m_onSaveGameEndStream : any;
+    m_onLoadGameBegin : any;
+    m_onLoadGameEnd : any;
+    m_onLoadGameBeginStream : any;
+    m_onLoadGameEndStream : any;
     m_onBeginUpdate : any;
     m_onEndUpdate : any;
 }

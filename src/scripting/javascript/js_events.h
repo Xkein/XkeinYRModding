@@ -25,6 +25,7 @@ class AircraftTypeClass;
 class UnitTypeClass;
 class BuildingTypeClass;
 class SuperWeaponTypeClass;
+struct IStream;
 
 class PhysicsCollisionAddAndPersistResult;
 class PhysicsCollisionRemoveResult;
@@ -41,9 +42,13 @@ struct JsAbstractEvents
     ScriptBehaviour<void(AbstractClass*)> onDtor;
 
     PROPERTY()
-    ScriptBehaviour<void(AbstractClass*)> onSave;
+    ScriptBehaviour<void(AbstractClass*, IStream*)> onSaveGameBegin;
     PROPERTY()
-    ScriptBehaviour<void(AbstractClass*)> onLoad;
+    ScriptBehaviour<void(AbstractClass*, IStream*)> onSaveGameEnd;
+    PROPERTY()
+    ScriptBehaviour<void(AbstractClass*, IStream*)> onLoadGameBegin;
+    PROPERTY()
+    ScriptBehaviour<void(AbstractClass*, IStream*)> onLoadGameEnd;
 };
 
 CLASS(BindJs)
@@ -76,6 +81,10 @@ CLASS(BindJs)
 struct JsGameEvents
 {
     PROPERTY()
+    ScriptBehaviour<void(RulesClass*, IniReader*)> onRulesLoadBeforeGeneralData;
+    PROPERTY()
+    ScriptBehaviour<void(RulesClass*, IniReader*)> onRulesLoadBeforeTypeData;
+    PROPERTY()
     ScriptBehaviour<void(RulesClass*, IniReader*)> onRulesLoadAfterTypeData;
     PROPERTY()
     ScriptBehaviour<void()> onSceneEnter;
@@ -83,6 +92,22 @@ struct JsGameEvents
     ScriptBehaviour<void()> onSceneExit;
     PROPERTY()
     ScriptBehaviour<void()> onSceneLoad;
+    PROPERTY()
+    ScriptBehaviour<void(const char*)> onSaveGameBegin;
+    PROPERTY()
+    ScriptBehaviour<void(const char*)> onSaveGameEnd;
+    PROPERTY()
+    ScriptBehaviour<void(IStream*)> onSaveGameBeginStream;
+    PROPERTY()
+    ScriptBehaviour<void(IStream*)> onSaveGameEndStream;
+    PROPERTY()
+    ScriptBehaviour<void(const char*)> onLoadGameBegin;
+    PROPERTY()
+    ScriptBehaviour<void(const char*)> onLoadGameEnd;
+    PROPERTY()
+    ScriptBehaviour<void(IStream*)> onLoadGameBeginStream;
+    PROPERTY()
+    ScriptBehaviour<void(IStream*)> onLoadGameEndStream;
     PROPERTY()
     ScriptBehaviour<void()> onBeginUpdate;
     PROPERTY()
