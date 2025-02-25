@@ -86,6 +86,8 @@ func get_yr_game_types()
         "ColorScheme",
         "ConvertClass",
         "LightConvertClass",
+        "IsometricTileClass",
+        "IsometricTileTypeClass",
         "Surface",
         "XSurface",
         "DSurface",

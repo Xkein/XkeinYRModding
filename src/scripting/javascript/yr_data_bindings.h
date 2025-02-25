@@ -36,6 +36,8 @@
 #include <ShipLocomotionClass.h>
 #include <TeleportLocomotionClass.h>
 #include <TunnelLocomotionClass.h>
+#include <IsometricTileClass.h>
+#include <IsometricTileTypeClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -124,6 +126,8 @@ UsingCppType(MouseClass);
 UsingCppType(ColorScheme);
 UsingCppType(ConvertClass);
 UsingCppType(LightConvertClass);
+UsingCppType(IsometricTileClass);
+UsingCppType(IsometricTileTypeClass);
 UsingCppType(Surface);
 UsingCppType(XSurface);
 UsingCppType(DSurface);
@@ -256,6 +260,7 @@ UsingCppType(RLEBlitter)
 UsingPointer(ILocomotion**);
 UsingPointer(IPiggyback**);
 UsingPointer(LocomotionClass**);
+UsingCppType(RadarTrackingStruct);
 
 UsingArray(RadioCommand);
 UsingArray(Crate);
@@ -276,8 +281,8 @@ UsingArray(BuildType);
 UsingArray(StripClass);
 UsingArray(HouseClass*);
 UsingArray(ColorScheme*);
-using DynamicVectorClass_Point2D = DynamicVectorClass<Point2D>;
-UsingArray(DynamicVectorClass_Point2D);
+UsingArray(DynamicVectorClass<Point2D>);
+UsingArray(DynamicVectorClass<SubzoneTrackingStruct>);
 
 UsingContainer(IndexBitfield<HouseClass*>);
 UsingContainer(CounterClass);
@@ -350,6 +355,7 @@ UsingDynamicVectorClass(Point2D);
 UsingDynamicVectorClass(IConnectionPoint*);
 UsingDynamicVectorClass(ZoneConnectionClass);
 UsingDynamicVectorClass(SubzoneTrackingStruct);
+UsingDynamicVectorClass(LightSourceClass*);
 
 UsingTypeList(AircraftTypeClass*);
 UsingTypeList(InfantryTypeClass*);
@@ -369,6 +375,13 @@ UsingIndexClass(MainVoxelIndexKey, VoxelCacheStruct*);
 UsingIndexClass(TurretWeaponVoxelIndexKey, VoxelCacheStruct*);
 UsingIndexClass(TurretBarrelVoxelIndexKey, VoxelCacheStruct*);
 UsingIndexClass(ShadowVoxelIndexKey, VoxelCacheStruct*);
+
+UsingHashTable(DWORD, DWORD);
+UsingHashTable(DWORD, SubzoneConnectionStruct);
+UsingHashTable(RadarTrackingStruct, TechnoClass*);
+
+using _ptr_HashTable_DWROD_SubzoneConnectionStruct = HashTable<DWORD, SubzoneConnectionStruct>*;
+UsingArray(_ptr_HashTable_DWROD_SubzoneConnectionStruct);
 
 UsingReferenceConverter(LinkClass);
 UsingReferenceConverter(GadgetClass);

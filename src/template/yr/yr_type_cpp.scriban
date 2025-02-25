@@ -14,6 +14,7 @@
 #include <FoggedObjectClass.h>
 #include <Blitters/Blitter.h>
 #include <YRDDraw.h>
+#include <IsometricTileTypeClass.h>
 #define wchar wchar_t
 
 {{get_meta_gen_header()}}

@@ -80,6 +80,7 @@ UsingPointer(AnimTypeClass**);
 UsingPointer(BuildingTypeClass**);
 UsingPointer(VoxelAnimTypeClass**);
 UsingPointer(RGBClass**);
+UsingPointer(LightSourceClass**);
 
 UsingPointer(AbstractClass*const*);
 UsingPointer(AbstractTypeClass*const*);
@@ -150,6 +151,7 @@ UsingPointer(AnimTypeClass*const*);
 UsingPointer(BuildingTypeClass*const*);
 UsingPointer(VoxelAnimTypeClass*const*);
 UsingPointer(RGBClass*const*);
+UsingPointer(LightSourceClass*const*);
 
 template<typename CLS>
 void RegisterVectorClass()
@@ -294,6 +296,9 @@ void __JsRegister_YrContainers()
     REGISTER_DYNAMIC_VECTOR_CLASS(CoordStruct);
     REGISTER_DYNAMIC_VECTOR_CLASS(Point2D);
     REGISTER_DYNAMIC_VECTOR_CLASS(IConnectionPoint*);
+    REGISTER_DYNAMIC_VECTOR_CLASS(ZoneConnectionClass);
+    REGISTER_DYNAMIC_VECTOR_CLASS(SubzoneTrackingStruct);
+    REGISTER_DYNAMIC_VECTOR_CLASS(LightSourceClass*);
 
     REGISTER_TYPE_LIST(AircraftTypeClass*);
     REGISTER_TYPE_LIST(InfantryTypeClass*);

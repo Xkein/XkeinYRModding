@@ -8,7 +8,6 @@
 
 #include <GeneralStructures.h>
 #include <Matrix3D.h>
-#include <Quaternion.h>
 #include <ArrayClasses.h>
 #include <IndexClass.h>
 #include <UnitClass.h>

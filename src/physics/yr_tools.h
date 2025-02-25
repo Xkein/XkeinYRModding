@@ -27,14 +27,15 @@ inline static Quaternion GetObjectRotation(AbstractClass* pYrObject)
             VoxelIndexKey indexKey;
             indexKey.MainVoxel.RampType = pFoot->GetCell()->SlopeIndex;
             Matrix3D matrix =  pFoot->Locomotor->Draw_Matrix(&indexKey);
-            Quaternion ret = Quaternion::FromMatrix3D(matrix);
+            Quaternion ret = matrix.ToQuaternion();
             ret.Normalize();
             return ret;
         }
         case AbstractType::Bullet:
         {
             BulletVelocity velocity = static_cast<BulletClass*>(pYrObject)->Velocity;
-            Quaternion ret = Quaternion::FromAxis(ToVector3f(velocity), 0);
+            Quaternion ret;
+            Quaternion::FromAxis(&ret, ToVector3f(velocity), 0);
             ret.Normalize();
             return ret;
         }

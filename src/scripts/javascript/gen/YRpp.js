@@ -31,6 +31,7 @@ exports.BuildingClass = puerts.loadCPPType("BuildingClass")
 exports.BuildingTypeClass = puerts.loadCPPType("BuildingTypeClass")
 exports.BuildingAnimStruct = puerts.loadCPPType("BuildingAnimStruct")
 exports.OverlayTypeClass = puerts.loadCPPType("OverlayTypeClass")
+exports.IsometricTileTypeClass = puerts.loadCPPType("IsometricTileTypeClass")
 exports.UnitTypeClass = puerts.loadCPPType("UnitTypeClass")
 exports.BuildingAnimFrameStruct = puerts.loadCPPType("BuildingAnimFrameStruct")
 exports.FactoryClass = puerts.loadCPPType("FactoryClass")
@@ -66,8 +67,8 @@ exports.ConvertClass = puerts.loadCPPType("ConvertClass")
 exports.DSurface = puerts.loadCPPType("DSurface")
 exports.XSurface = puerts.loadCPPType("XSurface")
 exports.RGBClass = puerts.loadCPPType("RGBClass")
-exports.LaserDrawClass = puerts.loadCPPType("LaserDrawClass")
 exports.EventClass = puerts.loadCPPType("EventClass")
+exports.LaserDrawClass = puerts.loadCPPType("LaserDrawClass")
 exports.FlashData = puerts.loadCPPType("FlashData")
 exports.PassengersClass = puerts.loadCPPType("PassengersClass")
 exports.VeterancyStruct = puerts.loadCPPType("VeterancyStruct")
@@ -1433,7 +1434,7 @@ exports.WaveType = {
     Laser : 2,
     Magnetron : 3,
 }
-exports.TargetType = {
+exports.QuarryType = {
     None : 0,
     Anything : 1,
     Buildings : 2,
@@ -1441,30 +1442,31 @@ exports.TargetType = {
     Infantry : 4,
     Vehicles : 5,
     Factories : 6,
-    BaseDefenses : 7,
+    Defenses : 7,
+    Threats : 8,
     Power : 9,
-    Occupiable : 10,
+    OccupiableBuildings : 10,
     TechBuildings : 11,
 }
-exports.TargetFlags = {
-    None : 0,
-    unknown_1 : 1,
-    unknown_2 : 2,
+exports.ThreatType = {
+    Normal : 0,
+    Range : 1,
+    Area : 2,
     Air : 4,
     Infantry : 8,
     Vehicles : 16,
     Buildings : 32,
-    Economy : 64,
-    Ships : 128,
-    Neutral : 256,
+    Tiberium : 64,
+    Boats : 128,
+    Civilians : 256,
     Capture : 512,
     Fakes : 1024,
     Power : 2048,
     Factories : 4096,
     BaseDefense : 8192,
     Friendlies : 16384,
-    Occupiable : 32768,
-    TechCapture : 65536,
+    OccupiableBuildings : 32768,
+    TechBuildings : 65536,
 }
 exports.BlitterFlags = {
     None : 0,
@@ -1582,6 +1584,11 @@ exports.ZoneType = {
     East : 2,
     South : 3,
     West : 4,
+}
+exports.PCPType = {
+    Rotation : 0,
+    During : 1,
+    End : 2,
 }
 exports.BStateType = {
     Construction : 0,

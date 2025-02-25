@@ -11,10 +11,14 @@ class IniReader
 {
     CCINIClass* IniFile;
     YREXTCORE_API static char _readBuffer[2048];
+    bool _selfAlloc;
 
 public:
     FUNCTION()
-    explicit IniReader(CCINIClass* pIni) : IniFile(pIni) {}
+    YREXTCORE_API explicit IniReader(CCINIClass* pIni);
+    FUNCTION()
+    YREXTCORE_API explicit IniReader(const std::string& filename);
+    YREXTCORE_API ~IniReader();
 
     FUNCTION()
     CCINIClass* GetIni() const { return IniFile; }    

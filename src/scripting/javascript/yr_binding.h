@@ -5,6 +5,7 @@
 #include <AbstractTypeClass.h>
 #include <Helpers/String.h>
 #include <Helpers/Template.h>
+#include <HashTable.h>
 
 #define UsingYrClass(CLS)                                   \
     namespace PUERTS_NAMESPACE                              \
@@ -33,6 +34,12 @@ UsingContainer(TYPEDEF)
 
 #define UsingIndexClass(TKEY, TVALUE) __UsingIndexClass(TKEY, TVALUE, CONCAT(__IndexClass__, CONCAT(__LINE__, __COUNTER__)));
 
+#define __UsingHashTable(TKEY, TVALUE, TYPEDEF) \
+typedef HashTable<TKEY, TVALUE> TYPEDEF; \
+UsingContainer(TYPEDEF)
+
+#define UsingHashTable(TKEY, TVALUE) __UsingHashTable(TKEY, TVALUE, CONCAT(__HashTable__, CONCAT(__LINE__, __COUNTER__)));
+
 #define UsingVectorClass(CLS) UsingContainer(VectorClass<CLS>)
 #define UsingDynamicVectorClass(CLS) UsingVectorClass(CLS) UsingContainer(DynamicVectorClass<CLS>)
 #define UsingTypeList(CLS) UsingDynamicVectorClass(CLS) UsingContainer(TypeList<CLS>)
@@ -48,7 +55,7 @@ namespace PUERTS_NAMESPACE
         static void getter(typename API::CallbackInfoType info)
         {
             auto context = API::GetContext(info);
-            API::SetReturn(info, DecayTypeConverter<Ret*>::toScript(context, Variable->get()));
+            API::SetReturn(info, DecayTypeConverter<Ret*>::toScript(context, Variable->operator()()));
         }
 
         static void setter(typename API::CallbackInfoType info)
@@ -73,15 +80,15 @@ namespace PUERTS_NAMESPACE
             auto context = API::GetContext(info);
             if constexpr (Count > 1)
             {
-                API::SetReturn(info, typename API::template Converter<Ret[Count]>::toScript(context, Variable->get()));
+                API::SetReturn(info, typename API::template Converter<Ret[Count]>::toScript(context, Variable->operator()()));
             }
             else if constexpr (std::is_pointer_v<Ret> || std::is_enum_v<Ret>)
             {
-                API::SetReturn(info, DecayTypeConverter<Ret>::toScript(context, Variable->get()));
+                API::SetReturn(info, DecayTypeConverter<Ret>::toScript(context, Variable->operator()()));
             }
             else
             {
-                API::SetReturn(info, DecayTypeConverter<Ret*>::toScript(context, &Variable->get()));
+                API::SetReturn(info, DecayTypeConverter<Ret*>::toScript(context, &Variable->operator()()));
             }
         }
 
@@ -90,7 +97,7 @@ namespace PUERTS_NAMESPACE
             if constexpr (std::is_move_assignable_v<Ret>)
             {
                 auto context = API::GetContext(info);
-                Variable->get() = DecayTypeConverter<Ret>::toCpp(context, API::GetArg(info, 0));
+                Variable->operator()() = DecayTypeConverter<Ret>::toCpp(context, API::GetArg(info, 0));
             }
             else
             {
@@ -111,17 +118,17 @@ namespace PUERTS_NAMESPACE
         {
             static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const constant_ptr<T, Address>& value)
             {
-                return Converter<decltype(constant_ptr<T, Address>().get())>::toScript(context, value.get());
+                return Converter<decltype(constant_ptr<T, Address>().operator()())>::toScript(context, value.operator()());
             }
 
             static decltype(auto) toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
-                return constant_ptr<T, Address>().get();
+                return constant_ptr<T, Address>().operator()();
             }
 
             static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
-                return Converter<decltype(constant_ptr<T, Address>().get())>::accept(context, value);
+                return Converter<decltype(constant_ptr<T, Address>().operator()())>::accept(context, value);
             }
         };
         template<typename T, unsigned int Address, size_t Count>
@@ -129,17 +136,17 @@ namespace PUERTS_NAMESPACE
         {
             static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const reference<T, Address, Count>& value)
             {
-                return Converter<decltype(reference<T, Address, Count>().get())>::toScript(context, value.get());
+                return Converter<decltype(reference<T, Address, Count>().operator()())>::toScript(context, value.operator()());
             }
 
             static decltype(auto) toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
-                return reference<T, Address, Count>().get();
+                return reference<T, Address, Count>().operator()();
             }
 
             static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
-                return Converter<decltype(reference<T, Address, Count>().get())>::accept(context, value);
+                return Converter<decltype(reference<T, Address, Count>().operator()())>::accept(context, value);
             }
         };
 
@@ -231,6 +238,15 @@ namespace PUERTS_NAMESPACE
         static constexpr auto value()
         {
             return internal::Literal("IndexClass<") + ScriptTypeNameWithNamespace<TKey>::value() + internal::Literal(", ") + ScriptTypeNameWithNamespace<TValue>::value() + internal::Literal(">");
+        }
+    };
+    
+    template<typename TKey, typename TValue>
+    struct ScriptTypeName<HashTable<TKey, TValue>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("HashTable<") + ScriptTypeNameWithNamespace<TKey>::value() + internal::Literal(", ") + ScriptTypeNameWithNamespace<TValue>::value() + internal::Literal(">");
         }
     };
 

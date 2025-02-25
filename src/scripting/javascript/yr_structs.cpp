@@ -4,7 +4,6 @@
 
 #include <GeneralStructures.h>
 #include <Matrix3D.h>
-#include <Quaternion.h>
 
 template<typename T, typename API, typename RegisterAPI>
 void RegisterVector2D(PUERTS_NAMESPACE::ClassDefineBuilder<Vector2D<T>, API, RegisterAPI>&& builder)

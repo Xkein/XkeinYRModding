@@ -278,7 +278,7 @@ void YrObjectInspector::OnFrame()
         }
     }
 
-    for (ObjectClass* pObject : ObjectClass::CurrentObjects.get())
+    for (ObjectClass* pObject : ObjectClass::CurrentObjects())
     {
         InspectYrObject(pObject);
         break;
