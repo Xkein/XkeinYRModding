@@ -75,7 +75,7 @@ void Helldivers::Tick()
             if (inst->type->sequence == gInputSequence && inst->super->IsReady)
             {
                 Unsorted::CurrentSWType = inst->type->swType->ArrayIndex;
-                for (ObjectClass* pObject : ObjectClass::CurrentObjects.get() | std::views::reverse)
+                for (ObjectClass* pObject : ObjectClass::CurrentObjects() | std::views::reverse)
                 {
                     entt::entity entity = GetYrEntity(pObject);
                     gEntt->emplace_or_replace<SelectingTag>(entity, pObject);
