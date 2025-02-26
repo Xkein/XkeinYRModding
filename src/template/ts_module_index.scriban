@@ -74,7 +74,7 @@
         end
     end
     func gen_property(property)
-        ret (property.is_static ? 's_' : 'm_') + $'{property.name} : {get_ts_type(property.cpp_field.type)};'
+        ret (property.is_static ? 'static s_' : 'm_') + $'{property.name} : {get_ts_type(property.cpp_field.type)};'
     end
     func gen_method(function, cppFunction)
         $result = ""

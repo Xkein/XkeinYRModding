@@ -119,23 +119,23 @@ class JsHouseEvents
 }
 class JsEvents
 {
-    s_game : JsGameEvents;
-    s_input : JsInputEvents;
-    s_physics : JsPhysicsEvents;
-    s_unit : JsTechnoEvents;
-    s_unitType : JsAbstractTypeEvents;
-    s_infantry : JsTechnoEvents;
-    s_infantryType : JsAbstractTypeEvents;
-    s_building : JsTechnoEvents;
-    s_buildingType : JsAbstractTypeEvents;
-    s_aircraft : JsTechnoEvents;
-    s_aircraftType : JsAbstractTypeEvents;
-    s_bullet : JsBulletEvents;
-    s_bulletType : JsAbstractTypeEvents;
-    s_superWeapon : JsSuperWeaponEvents;
-    s_superWeaponType : JsSuperWeaponTypeEvents;
-    s_house : JsHouseEvents;
-    s_houseType : JsAbstractTypeEvents;
+    static s_game : JsGameEvents;
+    static s_input : JsInputEvents;
+    static s_physics : JsPhysicsEvents;
+    static s_unit : JsTechnoEvents;
+    static s_unitType : JsAbstractTypeEvents;
+    static s_infantry : JsTechnoEvents;
+    static s_infantryType : JsAbstractTypeEvents;
+    static s_building : JsTechnoEvents;
+    static s_buildingType : JsAbstractTypeEvents;
+    static s_aircraft : JsTechnoEvents;
+    static s_aircraftType : JsAbstractTypeEvents;
+    static s_bullet : JsBulletEvents;
+    static s_bulletType : JsAbstractTypeEvents;
+    static s_superWeapon : JsSuperWeaponEvents;
+    static s_superWeaponType : JsSuperWeaponTypeEvents;
+    static s_house : JsHouseEvents;
+    static s_houseType : JsAbstractTypeEvents;
 }
 enum EPhysicShapeType {
     Auto = 0,

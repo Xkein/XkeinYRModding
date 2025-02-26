@@ -4,11 +4,11 @@ import { CDTimerClass, AbstractClass, CCINIClass } from "YRpp";
 class YrInputBlocker
 {
     static BlockAllInput() : void;
-    s_blockGadgetInput : boolean;
-    s_blockUserInterfaceInput : boolean;
-    s_blockKeyboardInput : boolean;
-    s_blockMouseLeftInput : boolean;
-    s_blockMouseRightInput : boolean;
+    static s_blockGadgetInput : boolean;
+    static s_blockUserInterfaceInput : boolean;
+    static s_blockKeyboardInput : boolean;
+    static s_blockMouseLeftInput : boolean;
+    static s_blockMouseRightInput : boolean;
 }
 class IniReader
 {

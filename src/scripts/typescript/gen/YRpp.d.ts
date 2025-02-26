@@ -294,8 +294,8 @@ class TechnoClass
     TurretFacing() : DirStruct;
     GetRealFacing() : DirStruct;
     BaseIsAttacked(pEnemy_0 : TechnoClass) : void;
-    s_AbsDerivateID : any;
-    s_Array : any;
+    static s_AbsDerivateID : any;
+    static s_Array : any;
     m_Flashing : FlashData;
     m___Flashing : string;
     m_Animation : StageClass;
@@ -670,10 +670,10 @@ class HouseClass
     AddTracking(pTechno_0 : TechnoClass) : void;
     GetWeedStoragePercentage() : number;
     AISupers() : boolean;
-    s_AbsID : any;
-    s_Array : any;
-    s_CurrentPlayer : any;
-    s_Observer : any;
+    static s_AbsID : any;
+    static s_Array : any;
+    static s_CurrentPlayer : any;
+    static s_Observer : any;
     m_ArrayIndex : number;
     m_Type : HouseTypeClass;
     m_RelatedTags : any;
@@ -1033,9 +1033,9 @@ class AbstractClass
     GetTargetDirection(pTarget_0 : AbstractClass) : DirStruct;
     DistanceFrom(that_0 : AbstractClass) : number;
     DistanceFrom3D(that_0 : AbstractClass) : number;
-    s_AbsID : any;
-    s_Array : any;
-    s_TargetIndex : any;
+    static s_AbsID : any;
+    static s_Array : any;
+    static s_TargetIndex : any;
     m_UniqueID : number;
     m_AbstractFlags : any;
     m_unknown_18 : number;
@@ -1163,8 +1163,8 @@ class ObjectClass
     GetTargetCoords() : CoordStruct;
     GetRenderCoords() : CoordStruct;
     GetFLH(idxWeapon_0 : number, base_1 : CoordStruct) : CoordStruct;
-    s_AbsDerivateID : any;
-    s_CurrentObjects : any;
+    static s_AbsDerivateID : any;
+    static s_CurrentObjects : any;
     m_unknown_24 : number;
     m_unknown_28 : number;
     m_FallRate : number;
@@ -1214,8 +1214,8 @@ class AnimClass
     Unpause() : void;
     Start() : void;
     Middle() : boolean;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Animation : StageClass;
     m___Animation : string;
     m_Type : AnimTypeClass;
@@ -1274,8 +1274,8 @@ class AnimTypeClass
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     LoadImageA() : any;
     Load2DArt() : void;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_MiddleFrameIndex : number;
     m_MiddleFrameWidth : number;
@@ -1418,8 +1418,8 @@ class AbstractTypeClass
     LoadFromINI(pINI_0 : CCINIClass) : boolean;
     SaveToINI(pINI_0 : CCINIClass) : boolean;
     get_ID() : string;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ID : string;
     m_UINameLabel : string;
     m_UIName : number;
@@ -1434,14 +1434,14 @@ class CCINIClass
     ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number, szBufferSize_3 : any) : number;
     ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
     GetCRC() : number;
-    s_RulesHash : any;
-    s_ArtHash : any;
-    s_AIHash : any;
-    s_INI_Rules : any;
-    s_INI_AI : any;
-    s_INI_Art : any;
-    s_INI_UIMD : any;
-    s_INI_RA2MD : any;
+    static s_RulesHash : any;
+    static s_ArtHash : any;
+    static s_AIHash : any;
+    static s_INI_Rules : any;
+    static s_INI_AI : any;
+    static s_INI_Art : any;
+    static s_INI_UIMD : any;
+    static s_INI_RA2MD : any;
     m_Digested : boolean;
     m_Digest : number;
 }
@@ -1552,8 +1552,8 @@ class TechnoTypeClass
     InForbiddenHouses(bitHouseType_0 : number) : boolean;
     GetWeapon(index_0 : any, elite_1 : boolean) : WeaponStruct;
     GetWeapon(index_0 : any, elite_1 : boolean) : WeaponStruct;
-    s_Array : any;
-    s_MaxWeapons : any;
+    static s_Array : any;
+    static s_MaxWeapons : any;
     m_WalkRate : number;
     m_IdleRate : number;
     m_VeteranAbilities : AbilitiesStruct;
@@ -1901,8 +1901,8 @@ class WeaponTypeClass
     Size() : number;
     CalculateSpeed() : void;
     AllowedThreats() : any;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_AmbientDamage : number;
     m_Burst : number;
     m_Projectile : BulletTypeClass;
@@ -1984,8 +1984,8 @@ class BulletTypeClass
     Rotates() : boolean;
     SetScaledSpawnDelay(delay_0 : number) : void;
     CreateBullet(Target_0 : AbstractClass, Owner_1 : TechnoClass, Damage_2 : number, WH_3 : WarheadTypeClass, Speed_4 : number, Bright_5 : boolean) : BulletClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Airburst : boolean;
     m_Floater : boolean;
     m_SubjectToCliffs : boolean;
@@ -2051,9 +2051,9 @@ class BulletClass
     InitScalable() : void;
     NukeMaker() : void;
     GetTargetCoords() : CoordStruct;
-    s_AbsID : any;
-    s_Array : any;
-    s_ScalableBullets : any;
+    static s_AbsID : any;
+    static s_Array : any;
+    static s_ScalableBullets : any;
     m_Type : BulletTypeClass;
     m_Owner : TechnoClass;
     m_unknown_B4 : boolean;
@@ -2163,9 +2163,9 @@ class InfantryTypeClass
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_Pip : any;
     m_OccupyPip : any;
@@ -2313,9 +2313,9 @@ class CellClass
     DrawOverlay(Location_0 : Point2D, Bound_1 : RectangleStruct) : void;
     DrawOverlayShadow(Location_0 : Point2D, Bound_1 : RectangleStruct) : void;
     IsClearToMove(speedType_0 : any, ignoreInfantry_1 : boolean, ignoreVehicles_2 : boolean, zone_3 : number, movementZone_4 : any, level_5 : number, isBridge_6 : boolean) : boolean;
-    s_AbsID : any;
-    s_BridgeLevels : number;
-    s_BridgeHeight : number;
+    static s_AbsID : any;
+    static s_BridgeLevels : number;
+    static s_BridgeHeight : number;
     m_MapCoords : CellStruct;
     m_FoggedObjects : any;
     m_BridgeOwnerCell : CellClass;
@@ -2436,9 +2436,9 @@ class BuildingClass
     GetAnim(slot_0 : any) : AnimClass;
     GetAnimState(slot_0 : any) : boolean;
     GetAnimState(slot_0 : any) : boolean;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_Type : BuildingTypeClass;
     m_Factory : FactoryClass;
     m_C4Timer : CDTimerClass;
@@ -2535,9 +2535,9 @@ class BuildingTypeClass
     CanTogglePower() : boolean;
     GetBuildingAnim(slot_0 : any) : BuildingAnimStruct;
     GetBuildingAnim(slot_0 : any) : BuildingAnimStruct;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_FoundationData : CellStruct;
     m_Buildup : any;
@@ -2764,8 +2764,8 @@ class OverlayTypeClass
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     Draw(pClientCoords_0 : Point2D, pClipRect_1 : RectangleStruct, nFrame_2 : number) : void;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_LandType : any;
     m_CellAnim : AnimTypeClass;
@@ -2802,9 +2802,9 @@ class UnitTypeClass
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_MovementRestrictedTo : any;
     m_HalfDamageSmokeLocation : CoordStruct;
@@ -2874,8 +2874,8 @@ class FactoryClass
     CountTotal(pType_0 : TechnoTypeClass) : number;
     IsQueued(pType_0 : TechnoTypeClass) : boolean;
     static FindByOwnerAndProduct(pHouse_0 : HouseClass, pItem_1 : TechnoTypeClass) : FactoryClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Production : StageClass;
     m_QueuedObjects : any;
     m_Object : TechnoClass;
@@ -2909,9 +2909,9 @@ class InfantryClass
     GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : number | any, ignoreRange_2 : boolean | any) : any;
     IsDeployed() : boolean;
     PlayAnim(index_0 : any, force_1 : boolean, randomStartFrame_2 : boolean) : boolean;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_Type : InfantryTypeClass;
     m_SequenceAnim : any;
     m_unknown_Timer_6C8 : CDTimerClass;
@@ -2980,8 +2980,8 @@ class FootClass
     ClearNavigationList() : void;
     MoveToTiberium(radius_0 : number, scanClose_1 : boolean) : boolean;
     MoveToWeed(radius_0 : number) : boolean;
-    s_AbsDerivateID : any;
-    s_Array : any;
+    static s_AbsDerivateID : any;
+    static s_Array : any;
     m_PlanningPathIdx : number;
     m_WaypointNearbyAccessibleCellDelta : CellStruct;
     m_WaypointCell : CellStruct;
@@ -3073,8 +3073,8 @@ class TeamClass
     AssignMissionTarget(pTarget_0 : AbstractClass) : void;
     WhatAmI() : any;
     Size() : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Type : TeamTypeClass;
     m_CurrentScript : ScriptClass;
     m_Owner : HouseClass;
@@ -3132,8 +3132,8 @@ class TeamTypeClass
     ProcessTaskForce() : void;
     static ProcessAllTaskforces() : void;
     GetHouse() : HouseClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_Group : number;
     m_VeteranLevel : number;
@@ -3205,8 +3205,8 @@ class TagClass
     AddTrigger(pTrigger_0 : TriggerClass) : void;
     RemoveTrigger(pTrigger_0 : TriggerClass) : boolean;
     ContainsTrigger(pTrigger_0 : TriggerClass) : boolean;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Type : TagTypeClass;
     m_FirstTrigger : TriggerClass;
     m_InstanceCount : number;
@@ -3240,8 +3240,8 @@ class TagTypeClass
     AddTrigger(pTrigger_0 : TriggerTypeClass) : boolean;
     RemoveTrigger(pTrigger_0 : TriggerTypeClass) : boolean;
     ContainsTrigger(pTrigger_0 : TriggerTypeClass) : boolean;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_Persistence : any;
     m_FirstTrigger : TriggerTypeClass;
@@ -3279,8 +3279,8 @@ class TriggerClass
     Disable() : void;
     RegisterEvent(event_0 : any, pObject_1 : ObjectClass, forceFire_2 : boolean, persistent_3 : boolean, pSource_4 : TechnoClass) : boolean;
     FireActions(pObj_0 : ObjectClass, location_1 : CellStruct) : boolean;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Type : TriggerTypeClass;
     m_NextTrigger : TriggerClass;
     m_House : HouseClass;
@@ -3301,8 +3301,8 @@ class ScriptTypeClass
     WhatAmI() : any;
     Size() : number;
     static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_IsGlobal : boolean;
     m_ActionsCount : number;
@@ -3323,8 +3323,8 @@ class TaskForceClass
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Group : number;
     m_CountEntries : number;
     m_IsGlobal : boolean;
@@ -3349,7 +3349,7 @@ class ScriptClass
     SetMission(nLine_0 : number) : boolean;
     NextMission() : boolean;
     HasNextMission() : boolean;
-    s_AbsID : any;
+    static s_AbsID : any;
     m_Type : ScriptTypeClass;
     m_field_28 : number;
     m_CurrentMission : number;
@@ -3368,8 +3368,8 @@ class ParasiteClass
     CanInfect(pTarget_0 : FootClass) : boolean;
     TryInfect(pTarget_0 : FootClass) : void;
     CanExistOnVictimCell() : boolean;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Owner : FootClass;
     m_Victim : FootClass;
     m_SuppressionTimer : CDTimerClass;
@@ -3388,8 +3388,8 @@ class BuildingLightClass
     WhatAmI() : any;
     Size() : number;
     SetBehaviour(mode_0 : any) : void;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Speed : number;
     m_field_B8 : CoordStruct;
     m_field_C4 : CoordStruct;
@@ -3411,8 +3411,8 @@ class LightSourceClass
     Deactivate(dwZero_0 : number) : void;
     ChangeLevels(nIntensity_0 : number, Tint_1 : TintStruct, mode_2 : number) : void;
     static UpdateLightConverts(value_0 : number) : void;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_LightIntensity : number;
     m_LightTint : TintStruct;
     m_DetailLevel : number;
@@ -3458,9 +3458,9 @@ class UnitClass
     ShouldCrashIt(pTarget_0 : TechnoClass) : boolean;
     AssignDestination_7447B0(pTarget_0 : AbstractClass) : AbstractClass;
     AStarAttempt(cell1_0 : CellStruct, cell2_1 : CellStruct) : boolean;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_unknown_int_6C0 : number;
     m_Type : UnitTypeClass;
     m_FollowerCar : UnitClass;
@@ -3524,7 +3524,7 @@ class EBolt
     GetSourceCoords(outBuffer_0 : CoordStruct) : CoordStruct;
     GetSourceCoords() : CoordStruct;
     Fire(P1_0 : CoordStruct, P2_1 : CoordStruct, arg18_2 : number) : void;
-    s_Array : any;
+    static s_Array : any;
     m_Point1 : CoordStruct;
     m_Point2 : CoordStruct;
     m_unknown_18 : number;
@@ -3552,9 +3552,9 @@ class AircraftClass
     WhatAmI() : any;
     Size() : number;
     FindFireLocation(pTarget_0 : AbstractClass) : AbstractClass;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_Type : AircraftTypeClass;
     m_ShouldLoseAmmo : boolean;
     m_HasPassengers : boolean;
@@ -3577,9 +3577,9 @@ class AircraftTypeClass
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_Carryall : boolean;
     m_Trailer : AnimTypeClass;
@@ -3600,8 +3600,8 @@ class TerrainClass
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Animation : StageClass;
     m_Type : TerrainTypeClass;
     m_IsBurning : boolean;
@@ -3621,8 +3621,8 @@ class TerrainTypeClass
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_Foundation : number;
     m_RadarColor : any;
@@ -3651,8 +3651,8 @@ class TiberiumClass
     RegisterForGrowth(cell_0 : CellStruct) : void;
     static FindIndex(idxOverlayType_0 : number) : number;
     static Find(idxOverlayType_0 : number) : TiberiumClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_Spread : number;
     m_SpreadPercentage : number;
@@ -3703,8 +3703,8 @@ class RadSiteClass
     GetSpread() : void;
     SetSpread(nCells_0 : number) : void;
     GetEffectPercentage() : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_LightSource : LightSourceClass;
     m_RadLevelTimer : CDTimerClass;
     m___RadLevelTimer : string;
@@ -3727,7 +3727,7 @@ class LightConvertClass
 {
     UpdateColors(red_0 : number, green_1 : number, blue_2 : number, tinted_3 : boolean) : void;
     static InitLightConvert(red_0 : number, green_1 : number, blue_2 : number) : LightConvertClass;
-    s_Array : any;
+    static s_Array : any;
     m_UsedPalette1 : RGBClass;
     m_UsedPalette2 : RGBClass;
     m_IndexesToIgnore : number;
@@ -3741,7 +3741,7 @@ class ConvertClass
     static CreateFromFile(pFilename_0 : string, pPalette_1 : BytePalette, pDestination_2 : ConvertClass) : void;
     SelectPlainBlitter(flags_0 : any) : any;
     SelectRLEBlitter(flags_0 : any) : any;
-    s_Array : any;
+    static s_Array : any;
     m_BytesPerPixel : number;
     m_Blitters : any;
     m_RLEBlitters : any;
@@ -3762,16 +3762,16 @@ class DSurface
     DrawTextA(pText_0 : number, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : any) : void;
     DrawTextA(pText_0 : number, pLoction_1 : Point2D, Color_2 : number) : void;
     DrawTextA(pText_0 : number, X_1 : number, Y_2 : number, Color_3 : number) : void;
-    s_Tile : any;
-    s_Sidebar : any;
-    s_Primary : any;
-    s_Hidden : any;
-    s_Alternate : any;
-    s_Temp : any;
-    s_Composite : any;
-    s_SidebarBounds : any;
-    s_ViewBounds : any;
-    s_WindowBounds : any;
+    static s_Tile : any;
+    static s_Sidebar : any;
+    static s_Primary : any;
+    static s_Hidden : any;
+    static s_Alternate : any;
+    static s_Temp : any;
+    static s_Composite : any;
+    static s_SidebarBounds : any;
+    static s_ViewBounds : any;
+    static s_WindowBounds : any;
     m_Buffer : void;
     m_IsAllocated : boolean;
     m_IsInVideoRam : boolean;
@@ -3791,13 +3791,13 @@ class RGBClass
     Adjust(ratio_0 : number, rgb_1 : RGBClass) : void;
     Difference(rgb_0 : RGBClass) : number;
     ToInt() : number;
-    s_White : any;
-    s_RedShiftLeft : any;
-    s_RedShiftRight : any;
-    s_GreenShiftLeft : any;
-    s_GreenShiftRight : any;
-    s_BlueShiftLeft : any;
-    s_BlueShiftRight : any;
+    static s_White : any;
+    static s_RedShiftLeft : any;
+    static s_RedShiftRight : any;
+    static s_GreenShiftLeft : any;
+    static s_GreenShiftRight : any;
+    static s_BlueShiftLeft : any;
+    static s_BlueShiftRight : any;
     m_Red : number;
     m_Green : number;
     m_Blue : number;
@@ -3871,9 +3871,9 @@ class TemporalClass
     LetGo() : void;
     JustLetGo() : void;
     Detach() : void;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
     m_Owner : TechnoClass;
     m_Target : TechnoClass;
     m_LifeTimer : CDTimerClass;
@@ -3912,10 +3912,10 @@ class SuperClass
     NameReadiness() : number;
     ShouldDrawProgress() : boolean;
     ShouldFlashTab() : boolean;
-    s_AbsID : any;
-    s_AbsVTable : number;
-    s_Array : any;
-    s_ShowTimers : any;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
+    static s_ShowTimers : any;
     m_CustomChargeTime : number;
     m_Type : SuperWeaponTypeClass;
     m_Owner : HouseClass;
@@ -3948,8 +3948,8 @@ class SuperWeaponTypeClass
     Size() : number;
     MouseOverObject(cell_0 : CellStruct, pObjBelowMouse_1 : ObjectClass) : any;
     static FindFirstOfAction(Action_0 : any) : SuperWeaponTypeClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_WeaponType : WeaponTypeClass;
     m_RechargeVoice : number;
@@ -3986,7 +3986,7 @@ class AirstrikeClass
     WhatAmI() : any;
     Size() : number;
     StartMission(pTarget_0 : ObjectClass) : void;
-    s_AbsID : any;
+    static s_AbsID : any;
     m_AirstrikeTeam : number;
     m_EliteAirstrikeTeam : number;
     m_AirstrikeTeamTypeIndex : number;
@@ -4025,8 +4025,8 @@ class CaptureManagerClass
     DrawLinks() : boolean;
     DecideUnitFate(Unit_0 : TechnoClass) : void;
     GetOriginalOwner(Unit_0 : TechnoClass) : HouseClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ControlNodes : any;
     m_MaxControlNodes : number;
     m_InfiniteMindControl : boolean;
@@ -4058,8 +4058,8 @@ class SpawnManagerClass
     CountDockedSpawns() : number;
     CountLaunchingSpawns() : number;
     UnlinkPointer() : void;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Owner : TechnoClass;
     m_SpawnType : AircraftTypeClass;
     m_SpawnCount : number;
@@ -4096,8 +4096,8 @@ class SlaveManagerClass
     ZeroOutSlaves() : void;
     SuspendWork() : void;
     ResumeWork() : void;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Owner : TechnoClass;
     m_SlaveType : InfantryTypeClass;
     m_SlaveCount : number;
@@ -4116,8 +4116,8 @@ class ParticleSystemClass
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Type : ParticleSystemTypeClass;
     m_SpawnDistanceToOwner : CoordStruct;
     m_Particles : any;
@@ -4146,8 +4146,8 @@ class ParticleSystemTypeClass
     Size() : number;
     SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_HoldsWhat : number;
     m_Spawns : boolean;
     m_SpawnFrames : number;
@@ -4181,8 +4181,8 @@ class ParticleClass
     WhatAmI() : any;
     Size() : number;
     vt_entry_1E8() : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Type : ParticleTypeClass;
     m_unknown_B0 : number;
     m_unknown_B1 : number;
@@ -4224,8 +4224,8 @@ class ParticleTypeClass
     Size() : number;
     SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_NextParticleOffset : CoordStruct;
     m_XVelocity : number;
     m_YVelocity : number;
@@ -4268,8 +4268,8 @@ class WarheadTypeClass
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
     Size() : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Deform : number;
     m_Verses : number;
     m_ProneDamage : number;
@@ -4340,8 +4340,8 @@ class VoxelAnimTypeClass
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Normalized : boolean;
     m_Translucent : boolean;
     m_SourceShared : boolean;
@@ -4379,8 +4379,8 @@ class WaveClass
     Draw_NonMagnetic(xyzFrom_0 : CoordStruct, xyzTo_1 : CoordStruct) : void;
     Update_Wave() : void;
     DamageArea(location_0 : CoordStruct) : void;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Target : AbstractClass;
     m_Type : any;
     m_LimboCoords : CoordStruct;
@@ -4459,7 +4459,7 @@ class RadBeam
     SetColor(color_0 : any) : void;
     SetCoordsSource(loc_0 : CoordStruct) : void;
     SetCoordsTarget(loc_0 : CoordStruct) : void;
-    s_Array : any;
+    static s_Array : any;
     m_unknown_0 : number;
     m_Owner : TechnoClass;
     m_unknown_8 : number;
@@ -4499,7 +4499,7 @@ class RadBeam
 }
 class PlanningTokenClass
 {
-    s_Array : any;
+    static s_Array : any;
     m_OwnerUnit : TechnoClass;
     m_PlanningNodes : any;
     m_field_1C : boolean;
@@ -4514,10 +4514,10 @@ class PlanningTokenClass
 }
 class PlanningNodeClass
 {
-    s_Unknown1 : any;
-    s_Unknown2 : any;
-    s_Unknown3 : any;
-    s_PlanningModeActive : any;
+    static s_Unknown1 : any;
+    static s_Unknown2 : any;
+    static s_Unknown3 : any;
+    static s_PlanningModeActive : any;
     m_PlanningMembers : any;
     m_field_18 : number;
     m_field_1C : boolean;
@@ -4548,7 +4548,7 @@ class ColorScheme
     static GetNumberOfSchemes() : number;
     static GeneratePalette(name_0 : string) : any;
     static GetPaletteSchemesFromIterator(it_0 : any) : any;
-    s_Array : any;
+    static s_Array : any;
     m_ArrayIndex : number;
     m_Colors : BytePalette;
     m_ID : string;
@@ -4607,7 +4607,7 @@ class BombClass
     IsDeathBomb() : number;
     GetCurrentFlickerFrame() : number;
     TimeToExplode() : boolean;
-    s_AbsID : any;
+    static s_AbsID : any;
     m_Owner : TechnoClass;
     m_OwnerHouse : HouseClass;
     m_Target : ObjectClass;
@@ -4623,7 +4623,7 @@ class LineTrail
 {
     SetDecrement(val_0 : number) : void;
     static DeleteAll() : void;
-    s_Array : any;
+    static s_Array : any;
     m_Color : any;
     m_Owner : ObjectClass;
     m_Decrement : number;
@@ -4653,8 +4653,8 @@ class HouseTypeClass
     FindParentCountry() : HouseTypeClass;
     FindParentCountryIndex() : number;
     static FindIndexOfName(name_0 : string) : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_ParentCountry : any;
     m_ArrayIndex : number;
     m_ArrayIndex2 : number;
@@ -4712,7 +4712,7 @@ class WaypointPathClass
     GetWaypoint(idx_0 : number) : WaypointClass;
     GetWaypointAfter(idx_0 : number) : WaypointClass;
     WaypointExistsAt(wpt_0 : WaypointClass) : boolean;
-    s_AbsID : any;
+    static s_AbsID : any;
     m_CurrentWaypointIndex : number;
     m_Waypoints : any;
 }
@@ -4783,7 +4783,7 @@ class Randomizer
     Random() : number;
     RandomRanged(nMin_0 : number, nMax_1 : number) : number;
     RandomDouble() : number;
-    s_Global : any;
+    static s_Global : any;
     m_unknown_00 : boolean;
     m_Next1 : number;
     m_Next2 : number;
@@ -4916,7 +4916,7 @@ class RulesClass
     Read_Movies(pINI_0 : CCINIClass) : void;
     Read_AdvancedCommandBar(pINI_0 : CCINIClass) : void;
     PointerGotInvalid(pInvalid_0 : AbstractClass, removed_1 : boolean) : void;
-    s_Instance : any;
+    static s_Instance : any;
     m_DetailMinFrameRateNormal : number;
     m_DetailMinFrameRateMovie : number;
     m_DetailBufferZoneWidth : number;
@@ -5776,9 +5776,9 @@ class ScenarioClass
     IsDefinedWaypoint(idx_0 : number) : boolean;
     GetWaypointCoords(dest_0 : CellStruct, idx_1 : number) : CellStruct;
     GetWaypointCoords(idx_0 : number) : CellStruct;
-    s_Instance : any;
-    s_NewINIFormat : any;
-    s_LastTheater : any;
+    static s_Instance : any;
+    static s_NewINIFormat : any;
+    static s_LastTheater : any;
     m_SpecialFlags : ScenarioFlags;
     m_NextScenario : string;
     m_AltNextScenario : string;
@@ -5911,8 +5911,8 @@ class OverlayClass
     WhatAmI() : any;
     Size() : number;
     static GetTiberiumType(overlayTypeIndex_0 : number) : number;
-    s_AbsID : any;
-    s_Array : any;
+    static s_AbsID : any;
+    static s_Array : any;
     m_Type : OverlayTypeClass;
 }
 class FlyLocomotionClass
@@ -5934,7 +5934,7 @@ class FlyLocomotionClass
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     Size() : number;
-    s_ILocoVTable : number;
+    static s_ILocoVTable : number;
     m_AirportBound : boolean;
     m_MovingDestination : CoordStruct;
     m_XYZ2 : CoordStruct;
@@ -6010,7 +6010,7 @@ class TeleportLocomotionClass
     Size() : number;
     vt_entry_28(dwUnk_0 : number) : void;
     IsStill() : boolean;
-    s_ILocoVTable : number;
+    static s_ILocoVTable : number;
     m_MovingDestination : CoordStruct;
     m_LastCoords : CoordStruct;
     m_Moving : boolean;
@@ -6044,7 +6044,7 @@ class GScreenClass
     RestoreCursor() : boolean;
     UpdateCursorMinimapState(miniMap_0 : boolean) : void;
     Render() : void;
-    s_Instance : any;
+    static s_Instance : any;
     m_ScreenShakeX : number;
     m_ScreenShakeY : number;
     m_Bitfield : number;
@@ -6070,7 +6070,7 @@ class LogicClass
     PointerGotInvalid(pInvalid_0 : AbstractClass, removed_1 : boolean) : void;
     RemoveObject(pObject_0 : ObjectClass) : void;
     Update() : void;
-    s_Instance : any;
+    static s_Instance : any;
 }
 class MapClass
     extends GScreenClass
@@ -6147,11 +6147,11 @@ class MapClass
     RecalculateZones(cell_0 : CellStruct) : void;
     ResetZones(cell_0 : CellStruct) : void;
     RecalculateSubZones(cell_0 : CellStruct) : void;
-    s_Instance : any;
-    s_InvalidCell : any;
-    s_MaxCells : number;
-    s_ObjectsInLayers : any;
-    s_MovementAdjustArray : any;
+    static s_Instance : any;
+    static s_InvalidCell : any;
+    static s_MaxCells : number;
+    static s_ObjectsInLayers : any;
+    static s_MovementAdjustArray : any;
     m_unknown_10 : number;
     m_unknown_pointer_14 : any;
     m_MovementZones : void;
@@ -6216,7 +6216,7 @@ class DisplayClass
     MarkFoundation(BaseCell_0 : CellStruct, Mark_1 : boolean) : void;
     Submit(pObject_0 : ObjectClass) : void;
     Remove(pObject_0 : ObjectClass) : void;
-    s_Instance : any;
+    static s_Instance : any;
     m_CurrentFoundation_CenterCell : CellStruct;
     m_CurrentFoundation_TopLeftOffset : CellStruct;
     m_CurrentFoundation_Data : CellStruct;
@@ -6260,7 +6260,7 @@ class RadarClass
     vt_entry_CC(out_pUnk_0 : void, pPoint_1 : Point2D) : void;
     vt_entry_D0(dwUnk_0 : number) : void;
     Init_For_House() : void;
-    s_Instance : any;
+    static s_Instance : any;
     m_unknown_11E8 : number;
     m_unknown_11EC : number;
     m_unknown_11F0 : number;
@@ -6317,7 +6317,7 @@ class RadarClass
 class PowerClass
     extends RadarClass
 {
-    s_Instance : any;
+    static s_Instance : any;
     m_PowerNeedRedraw : boolean;
     m_unknown_timer_1510 : CDTimerClass;
     m_unknown_151C : number;
@@ -6370,8 +6370,8 @@ class SidebarClass
     static GetObjectTabIdx(abs_0 : any, idxType_1 : number, unused_2 : number) : number;
     static GetObjectTabIdx(abs_0 : any, buildCat_1 : any, isNaval_2 : boolean) : number;
     Scroll(up_0 : boolean, column_1 : number) : boolean;
-    s_Instance : any;
-    s_TooltipBuffer : any;
+    static s_Instance : any;
+    static s_TooltipBuffer : any;
     m_Tabs : StripClass;
     m_unknown_5394 : number;
     m_unknown_5398 : number;
@@ -6411,7 +6411,7 @@ class TabClass
     extends SidebarClass
 {
     Activate(control_0 : number) : void;
-    s_Instance : any;
+    static s_Instance : any;
     m_TabData : TabDataClass;
     m_unknown_timer_552C : CDTimerClass;
     m_InsufficientFundsBlinkTimer : CDTimerClass;
@@ -6422,7 +6422,7 @@ class TabClass
 class ScrollClass
     extends TabClass
 {
-    s_Instance : any;
+    static s_Instance : any;
     m_unknown_int_5548 : number;
     m_unknown_byte_554C : number;
     m_unknown_int_5550 : number;
@@ -6439,7 +6439,7 @@ class MouseClass
     RestoreCursor() : boolean;
     UpdateCursorMinimapState(miniMap_0 : boolean | any) : void;
     GetLastMouseCursor() : any;
-    s_Instance : any;
+    static s_Instance : any;
     m_MouseCursorIsMini : boolean;
     m_MouseCursorIndex : any;
     m_MouseCursorLastIndex : any;
