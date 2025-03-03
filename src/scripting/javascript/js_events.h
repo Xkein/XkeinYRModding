@@ -37,9 +37,9 @@ CLASS(BindJs)
 struct JsAbstractEvents
 {
     PROPERTY()
-    ScriptBehaviour<void(AbstractClass*)> onCtor;
+    ScriptBehaviour<void(AbstractClass*, entt::entity)> onCtor;
     PROPERTY()
-    ScriptBehaviour<void(AbstractClass*)> onDtor;
+    ScriptBehaviour<void(AbstractClass*, entt::entity)> onDtor;
 
     PROPERTY()
     ScriptBehaviour<void(AbstractClass*, IStream*)> onSaveGameBegin;

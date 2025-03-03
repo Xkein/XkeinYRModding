@@ -32,7 +32,18 @@ struct EnttInvoker
     static auto Invoke(TFunc* behavior, entt::registry& reg, entt::entity entity)
     {
         TTarget* pYrObject = reg.get<YrEntityComponent<TTarget>>(entity).yrObject;
-        return INVOKE_JS_EVENT(*behavior, pYrObject);
+        return INVOKE_JS_EVENT(*behavior, pYrObject, entity);
+    }
+};
+
+template<typename TTarget, typename TFunc>
+struct EnttInvokerDtor
+{
+    static auto Invoke(TFunc* behavior, entt::registry& reg, entt::entity entity)
+    {
+        TTarget* pYrObject = reg.get<YrEntityComponent<TTarget>>(entity).yrObject;
+        INVOKE_JS_EVENT(*behavior, pYrObject, entity);
+        gJsEnv->Unbind(pYrObject);
     }
 };
 
@@ -41,11 +52,11 @@ struct EnttInvoker
 
 #define ENTT_CONNECT_EVENTS(TargetType, events) \
     gEntt->on_construct<YrEntityComponent<TargetType>>().connect<&EnttInvoker<TargetType, decltype(events.onCtor)>::Invoke>(&events.onCtor); \
-    gEntt->on_destroy<YrEntityComponent<TargetType>>().connect<&EnttInvoker<TargetType, decltype(events.onDtor)>::Invoke>(&events.onDtor)
+    gEntt->on_destroy<YrEntityComponent<TargetType>>().connect<&EnttInvokerDtor<TargetType, decltype(events.onDtor)>::Invoke>(&events.onDtor)
 
 #define ENTT_DISCONNECT_EVENTS(TargetType, events) \
     gEntt->on_construct<YrEntityComponent<TargetType>>().disconnect<&EnttInvoker<TargetType, decltype(events.onCtor)>::Invoke>(&events.onCtor); \
-    gEntt->on_destroy<YrEntityComponent<TargetType>>().disconnect<&EnttInvoker<TargetType, decltype(events.onDtor)>::Invoke>(&events.onDtor)
+    gEntt->on_destroy<YrEntityComponent<TargetType>>().disconnect<&EnttInvokerDtor<TargetType, decltype(events.onDtor)>::Invoke>(&events.onDtor)
 
 void JsEvents::Init()
 {
@@ -53,6 +64,7 @@ void JsEvents::Init()
     Physics::gOnCollisionPersist->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionPersist);
     Physics::gOnCollisionExit->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionExit);
 
+    ENTT_CONNECT_EVENTS(AircraftClass, JsEvents::aircraft);
     ENTT_CONNECT_EVENTS(AircraftTypeClass, JsEvents::aircraftType);
     ENTT_CONNECT_EVENTS(InfantryClass, JsEvents::infantry);
     ENTT_CONNECT_EVENTS(InfantryTypeClass, JsEvents::infantryType);
@@ -157,6 +169,17 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrPointerExpireEvent)
 {
     if (gJsEnv)
     {
+        // Limbo will also raise PointerExpire
+        // so ignore them, and wait dtor to unbind
+        switch (E->pAbstract->WhatAmI())
+        {
+            case AbstractType::Aircraft:
+            case AbstractType::Building:
+            case AbstractType::Bullet:
+            case AbstractType::Infantry:
+            case AbstractType::Unit:
+                return;
+        }
         gJsEnv->Unbind(E->pAbstract);
     }
 }

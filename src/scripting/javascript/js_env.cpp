@@ -1172,3 +1172,26 @@ void JsEnv::Unbind(AbstractClass* YrObject)
         ObjectMap.erase(PersistentValuePtr);
     }
 }
+
+void JsEnv::UnbindAllYrObjects()
+{
+    if (ObjectMap.empty())
+        return;
+    
+    auto Isolate = MainIsolate;
+    v8::Isolate::Scope IsolateScope(Isolate);
+    v8::HandleScope    HandleScope(Isolate);
+    auto               Context = DefaultContext.Get(Isolate);
+    v8::Context::Scope ContextScope(Context);
+    gLogger->info("unbind {} yr objects", ObjectMap.size());
+    while(!ObjectMap.empty()) {
+        auto PersistentValuePtr = ObjectMap.begin();
+        v8::Local<v8::Value> JsObject = v8::Local<v8::Value>::New(Isolate, PersistentValuePtr->second);
+        const void* TypeId = DataTransfer::GetPointerFast<const void>(JsObject.As<v8::Object>(), 1);
+        auto JsRegistration = const_cast<JSClassDefinition*>(FindClassByID(TypeId));
+        AbstractClass* YrObject = PersistentValuePtr->first;
+        CppObjectMapper.UnBindCppObject(JsRegistration, YrObject);
+        // CppObjectMapper.UnBindCppObject(Isolate, JsRegistration, YrObject);
+        ObjectMap.erase(PersistentValuePtr);
+    }
+}

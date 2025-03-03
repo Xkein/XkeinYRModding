@@ -88,6 +88,7 @@ void Engine::OnSceneStart()
 void Engine::OnSceneClear()
 {
     gLogger->info("Engine::OnSceneClear()");
+    gJsEnv->UnbindAllYrObjects();
     Physics::ExitWorld();
     AudioSystem::DestroyWorld();
 }

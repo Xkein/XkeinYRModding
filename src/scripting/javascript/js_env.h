@@ -74,6 +74,8 @@ public:
 
     void Unbind(AbstractClass* YrObject);
 
+    void UnbindAllYrObjects();
+
     static std::string TryCatchToString(v8::Isolate* Isolate, v8::TryCatch* TryCatch);
 
     static v8::Local<v8::String> ToV8String(v8::Isolate* Isolate, const char* String);
