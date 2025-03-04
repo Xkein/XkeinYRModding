@@ -1,9 +1,9 @@
 {{- include 'include/meta.scriban'
     init_extra_vars(this)
-    include 'yr/yrpp.scriban'
+    include 'include/yrpp.scriban'
     is_yrpp = module_name == "YRpp"
     func need_codegen(htType)
-        ret get_meta_tag(htType.meta, "BindJs") || (is_yrpp && yr_need_codegen(htType))
+        ret get_meta_tag(htType.meta, "BindJs")
     end
     type_map = {}
     type_map["void"] = "void"
@@ -97,7 +97,10 @@
 /// <reference path = "../index.d.ts"/>
 declare module "{{module_name}}" {
 {{- if !is_yrpp }}
-import { CDTimerClass, AbstractClass, CCINIClass } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
+{{- if module_name != "wwise"}}
+import { AKRESULT } from "wwise";
+{{- end }}
 {{- end }}
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}

@@ -37,7 +37,8 @@ func gen_meta_class_function(htClass, htFunction)
         $arg_types = (htFunction.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
         ret $'factory.ctor<{$arg_types}>();'
     end
-    $class_name = htClass.cpp_class.name
+    $class_name = htClass.name
+    $class_full_name = htClass.full_name
     $func_type = get_function_ptr_type(htFunction, htClass)
     
     $meta_args = ""
@@ -46,9 +47,9 @@ func gen_meta_class_function(htClass, htFunction)
     end
 
     if htFunction.is_overload
-        ret $'register_func<static_cast<{$func_type}>(&{$class_name}::{$function_name})>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
+        ret $'register_func<static_cast<{$func_type}>(&{$class_full_name}::{$function_name})>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
     else
-        ret $'register_func<&{$class_name}::{$function_name}>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
+        ret $'register_func<&{$class_full_name}::{$function_name}>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
     end
 end
 
@@ -61,14 +62,15 @@ func gen_meta_class_property(htClass, htProperty)
         ret null
     end
     $class_name = htClass.name
+    $class_full_name = htClass.full_name
     if htProperty.is_bit_field
-        ret $'// skip bit field: {$class_name}::{$field_name}'
+        ret $'// skip bit field: {$class_full_name}::{$field_name}'
     end
-    ret $'register_data<&{$class_name}::{$field_name}>(factory, "{$field_name}"_hs).prop("name"_hs, "{$field_name}");'
+    ret $'register_data<&{$class_full_name}::{$field_name}>(factory, "{$field_name}"_hs).prop("name"_hs, "{$field_name}");'
 end
 
 func gen_meta_class(htClass)
-    $klass = $'auto factory = entt::meta<{htClass.class_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}");'
+    $klass = $'auto factory = entt::meta<{htClass.full_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}");'
     for base in htClass.base_classes
         $klass = append_line($klass, $"factory.base<{base.full_display_name}>();")
     end
@@ -84,13 +86,12 @@ func gen_meta_class(htClass)
 end
 
 func gen_meta_enum_constant(htEnum, htConstant)
-    $enum_name = htEnum.name
     $enum_const_name = htConstant.name
-    ret $'factory.data<{$enum_name}::{$enum_const_name}>("{$enum_const_name}"_hs).prop("name"_hs, "{$enum_const_name}");'
+    ret $'factory.data<{htEnum.full_name}::{$enum_const_name}>("{$enum_const_name}"_hs).prop("name"_hs, "{$enum_const_name}");'
 end
 
 func gen_meta_enum(htEnum)
-    $enum = $'auto factory = entt::meta<{htEnum.enum_name}>().type("{htEnum.enum_name}"_hs).prop("name"_hs, "{htEnum.enum_name}");'
+    $enum = $'auto factory = entt::meta<{htEnum.full_name}>().type("{htEnum.enum_name}"_hs).prop("name"_hs, "{htEnum.enum_name}");'
     $enum = append_line($enum, (htEnum.enum_constants | array.each do
             ret "   " + gen_meta_enum_constant(htEnum, $0)
         end) | array.join "\n")
@@ -120,7 +121,7 @@ func gen_meta_register_snippet(htType)
 
         $snippet = append_line($snippet, $'void {htType.gen_type_name}::Unregister()')
         $snippet = append_line($snippet, '{')
-        $snippet = append_line($snippet, $'   entt::meta_reset<{htType.class_name}>();')
+        $snippet = append_line($snippet, $'   entt::meta_reset<{htType.full_name}>();')
         $snippet = append_line($snippet, '}')
     else if htType.is_enum
         $snippet = append_line($snippet, $'void {htType.gen_type_name}::Register()')
@@ -130,14 +131,14 @@ func gen_meta_register_snippet(htType)
 
         $snippet = append_line($snippet, $'void {htType.gen_type_name}::Unregister()')
         $snippet = append_line($snippet, '{')
-        $snippet = append_line($snippet, $'   entt::meta_reset<{htType.enum_name}>();')
+        $snippet = append_line($snippet, $'   entt::meta_reset<{htType.full_name}>();')
         $snippet = append_line($snippet, '}')
     else if htType.is_module
         $snippet = append_line($snippet, $'void {htType.gen_type_name}::Register()')
         $snippet = append_line($snippet, '{')
         $snippet = append_line($snippet, $'   sync_meta_ctx();')
         for klass in array.concat(module_classes, module_enums)
-            if has_meta(klass.meta)
+            if has_meta(klass.meta) && !get_meta_tag(klass.meta, "HookEvent")
         $snippet = append_line($snippet, $'   {get_gen_type_name(klass.name)}::Register();')
             end
         end
@@ -146,7 +147,7 @@ func gen_meta_register_snippet(htType)
         $snippet = append_line($snippet, $'void {htType.gen_type_name}::Unregister()')
         $snippet = append_line($snippet, '{')
         for klass in array.concat(module_classes, module_enums)
-            if has_meta(klass.meta)
+            if has_meta(klass.meta) && !get_meta_tag(klass.meta, "HookEvent")
         $snippet = append_line($snippet, $'   {get_gen_type_name(klass.name)}::Unregister();')
             end
         end

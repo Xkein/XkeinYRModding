@@ -32,6 +32,7 @@ func init_extra_vars(htType)
         htType.class_properties = htType.properties
         
         htType.type_name = htType.class_name
+        htType.type_full_name = htType.full_name
         htType.gen_type_name = get_gen_type_name(htType.type_name)
         htType.source_file = htType.source_file ?? "core/macro.h"
     else if htType.cpp_enum
@@ -41,6 +42,7 @@ func init_extra_vars(htType)
         htType.enum_constants = htType.constants
         
         htType.type_name = htType.enum_name
+        htType.type_full_name = htType.full_name
         htType.gen_type_name = get_gen_type_name(htType.type_name)
         htType.source_file = htType.source_file ?? "core/macro.h"
     else if htType.module_name

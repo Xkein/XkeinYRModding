@@ -2,6 +2,11 @@ gainput_dir = get_thirdparty_path("gainput")
 
 target("gainput")
     set_kind("shared")
+    set_languages("cxx20")
+    add_rules("codegen-cpp", {
+        parser_includes = {
+            "gainput/gainput.h",
+    }})
     add_headerfiles(gainput_dir.."/lib/include/**.h")
     add_headerfiles(gainput_dir.."/lib/source/**.h")
     add_files(gainput_dir.."/lib/source/**.cpp")

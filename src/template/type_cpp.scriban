@@ -3,10 +3,21 @@
         ret
     end
     init_extra_vars(this)
+    is_yrpp = module.module_name == "YRpp"
 }}
 #include "{{type_name}}.gen.h"
+{{- if is_yrpp }}
+#include <CRC.h>
+#include <TubeClass.h>
+#include <PixelFXClass.h>
+#include <TriggerTypeClass.h>
+#include <FoggedObjectClass.h>
+#include <Blitters/Blitter.h>
+#include <YRDDraw.h>
+#include <IsometricTileTypeClass.h>
+{{- end }}
 
-{{- include 'yr/yrpp.scriban'
+{{- include 'include/yrpp.scriban'
 component_target_list = get_derived_classes_by_list(get_meta_list(meta, "ComponentTarget"))
 has_component_target = array.size(component_target_list) > 0
 is_ini_component = get_meta_tag(meta, "IniComponent")
@@ -23,13 +34,13 @@ is_ini_component_theme = is_ini_component && array.contains(component_target_lis
 func user_gen_meta_class(htClass)
     $result = ""
     for target_type in component_target_list
-        $result = append_line($result, $'ComponentInstantiation::RegisterComponentInstantiation<{type_name}, {target_type}>();')
+        $result = append_line($result, $'ComponentInstantiation::RegisterComponentInstantiation<{type_full_name}, {target_type}>();')
     end
     if is_ini_component
-        $result = append_line($result, $'IniComponentLoader::RegisterLoader<{type_name}, &LoadIni_{type_name}>(factory);')
+        $result = append_line($result, $'IniComponentLoader::RegisterLoader<{type_full_name}, &LoadIni_{type_name}>(factory);')
     end
     if is_ini_auto_load
-        $result = append_line($result, $'IniComponentLoader::RegisterAutoLoad<{type_name}>(factory);')
+        $result = append_line($result, $'IniComponentLoader::RegisterAutoLoad<{type_full_name}>(factory);')
     end
     ret $result
 end }}
@@ -45,7 +56,7 @@ end }}
 #include "yr/component/ini_component.h"
 #include <GameClasses.h>
 #include <IsometricTileTypeClass.h>
-static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader, const char* pSection)
+static bool LoadIni_{{type_name}}({{type_full_name}}& iniComponent, IniReader& reader, const char* pSection)
 {
     bool success = false;
 {{- for property in class_properties ; $cpp_field = property.cpp_field
@@ -61,50 +72,53 @@ static bool LoadIni_{{type_name}}({{type_name}}& iniComponent, IniReader& reader
 #include "yr/yr_all_events.h"
 {{- if is_ini_component_techno }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pTechnoType, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->pTechnoType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_terrain }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pTerrainType, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->pTerrainType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_bullet }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pBulletType, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->pBulletType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_anim }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrAnimTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pAnimType, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->pAnimType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_house }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pHouseType, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->pHouseType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_super }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pSuperWeaponType, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->pSuperWeaponType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_weapon }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrWeaponTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pWeaponType, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->pWeaponType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_warhead }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrWarheadTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->pWarheadType, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->pWarheadType, E->pIni);
 }
 {{- end }}
 {{- if is_ini_component_theme }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{type_name}}>(E->themeCtrl, E->pIni);
+    IniComponentLoader::LoadComponent<{{type_full_name}}>(E->themeCtrl, E->pIni);
 }
 {{- end }}
 {{- end }}
 
 {{get_meta_gen_header()}}
+{{- if is_yrpp }}
+#include "yr/reflection/yr_container.h"
+{{- end }}
 {{gen_meta_register_snippet(this)}}

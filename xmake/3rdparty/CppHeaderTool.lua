@@ -13,15 +13,15 @@ target("cpp-header-tool")
     set_kind("phony")
     on_load(function (target)
         local header_tool_project_dir = os.projectdir().."/3rdparty/CppHeaderTool"
-        local obj_dir = path.absolute(header_tool_project_dir.."/obj")
         local csproj = header_tool_project_dir.."/src/CppHeaderTool/CppHeaderTool.csproj"
         local files = { csproj }
         local csfiles = os.files(header_tool_project_dir.."/**.cs")
         for _, file in ipairs(csfiles) do
-            if not file:startswith(obj_dir) then
+            if not string.find(file, "obj") then
                 table.insert(files, file)
             end
         end
+        table.sort(files)
         import("core.project.depend")
         depend.on_changed(function ()
             import("core.base.task")
@@ -40,6 +40,7 @@ task("run-header-tool")
             templateDir = info.templateDir,
             moduleTemplates = info.moduleTemplates,
             typeTemplates = info.typeTemplates,
+            injectMetaTemplates = info.injectMetaTemplates,
             moduleName = info.module,
             inputText = info.input_text,
             preHeaderText = info.preHeaderText,

@@ -27,14 +27,7 @@ target("Core")
 target("YrExtCore")
     set_kind("shared")
     set_languages("cxxlatest")
-    add_rules("codegen-cpp", {
-        templates = get_templates({
-            module = {
-                ["module_header.scriban"] =  "{0}.gen.h",
-                ["yr/yr_module_cpp.scriban"] =  "{0}.gen.cpp",
-            },
-        })
-    })
+    add_rules("codegen-cpp")
     add_deps("Core", "YRpp")
     add_packages("asmjit", "zydis", { public = true })
     -- export symbols

@@ -1,9 +1,8 @@
 {{- include 'include/meta.scriban'
     init_extra_vars(this)
-    include 'yr/yrpp.scriban'
     is_yrpp = module_name == "YRpp"
     func need_codegen(htType)
-        ret get_meta_tag(htType.meta, "BindJs") || (is_yrpp && yr_need_codegen(htType))
+        ret get_meta_tag(htType.meta, "BindJs")
     end
 -}}
 

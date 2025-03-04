@@ -1,8 +1,21 @@
 {{- include 'include/meta.scriban'
     init_extra_vars(this)
+    include 'include/yrpp.scriban'
+    is_yrpp = module_name == "YRpp"
+    is_yr_ext_core = module_name == "YrExtCore"
 -}}
 #include "{{module_name}}.gen.h"
+{{- if is_yr_ext_core }}
+#include "yr/yr_all_events.h"
+{{- for klass in module_classes }}
+{{- if get_meta_tag(klass.meta, "HookEvent") }}
+__IMPLEMENT_YR_HOOK_EVENT({{klass.full_name}})
+{{- end; end }}
+{{- end }}
+
+{{- if !is_yrpp && module_name != "wwise" && module_name != "gainput" }}
 #include "yr/extension_manager.h"
+{{- end }}
 {{- for enum in module_enums}}
     {{- if has_meta(enum.meta) }}
 #include "type/{{enum.name}}.gen.h"
@@ -10,11 +23,13 @@
 {{- end }}
 {{- for klass in module_classes }}
     {{- if has_meta(klass.meta) }}
+        {{- if !get_meta_tag(klass.meta, "HookEvent") }}
 #include "type/{{klass.name}}.gen.h"
+        {{- end }}
         {{- if get_meta_tag(klass.meta, "YrExtension") }}
 void OnExit_{{klass.name}}();
 struct ModuleImpl_{{klass.name}} {
-    {{klass.name}} ext;
+    {{klass.full_name}} ext;
     ModuleImpl_{{klass.name}}() {
         ExtensionManager::AddExtension(&ext);
         atexit(OnExit_{{klass.name}});

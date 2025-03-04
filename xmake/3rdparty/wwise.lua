@@ -17,6 +17,11 @@ end
 
 target("wwise")
     set_kind("static")
+    set_languages("cxx20")
+    add_rules("codegen-cpp", {
+        parser_includes = {
+            "AK/SoundEngine/Common/AkSoundEngine.h",
+    }})
     add_headerfiles(wwise_includes_dir.."/**.h")
     add_includedirs(wwise_includes_dir, {public = true})
     add_files(wwise_sdk_path.."/samples/SoundEngine/Common/**.cpp", wwise_sdk_path.."/samples/SoundEngine/Win32/**.cpp")

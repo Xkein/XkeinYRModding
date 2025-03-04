@@ -30,7 +30,7 @@ rule("codegen-cpp")
                 table.insert(depend_files, path.join(template_dir, template))
             end
         end
-        table.insert(depend_files, path.join(common_tool.get_build_dir(), "tools/CppHeaderTool.dll"))
+        -- table.insert(depend_files, path.join(common_tool.get_build_dir(), "tools/CppHeaderTool.dll"))
         table.sort(depend_files)
         -- run codegen task
         if has_config("skip_codegen") then
@@ -94,11 +94,13 @@ rule("codegen-cpp")
     
                 local mmoduleTemplates = table.join(templates.module, templates.js_module)
                 local typeTemplates = table.join(templates.type, templates.js_type)
+                local injectMetaTemplates = templates.inject_meta
 
                 local runInfo = {
                     templateDir = template_dir,
                     moduleTemplates = mmoduleTemplates,
                     typeTemplates = typeTemplates,
+                    injectMetaTemplates = injectMetaTemplates,
                     module = target_name,
                     input_text = input_text,
                     preHeaderText = preHeaderText,

@@ -1,0 +1,27 @@
+{{- include 'include/meta.scriban'
+    init_extra_vars(this)
+    include 'include/yrpp.scriban'
+
+    inject_tags_list = {}
+    if module_name == "YRpp"
+        $gen_types = get_yr_game_types()
+        inject_tags_list["BindJs"] = $gen_types
+        inject_tags_list["AllPublicVisible"] = $gen_types
+    else if module_name == "wwise"
+        $gen_types = ["AKRESULT"]
+        inject_tags_list["BindJs"] = $gen_types
+        inject_tags_list["AllPublicVisible"] = $gen_types
+    else if module_name == "gainput"
+        $gen_types = [##"gainput::InputMap",## "gainput::Key"]
+        inject_tags_list["BindJs"] = $gen_types
+        inject_tags_list["AllPublicVisible"] = $gen_types
+    end
+    
+    for klass in array.concat(module_classes, module_enums)
+        for key in object.keys(inject_tags_list)
+            if array.contains(inject_tags_list[key], klass.unique_name)
+                htmeta.set_meta_tag(klass, key);
+            end
+        end
+    end
+-}}

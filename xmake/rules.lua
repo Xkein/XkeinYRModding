@@ -21,6 +21,9 @@ rule("CoreRule")
         else
             -- target:add("defines", "ENTT_API=ENTT_IMPORT", {private=true})
             target:add("defines", "CORE_API=__declspec(dllimport)", {private=true})
+            if target:name() ~= "Core" and target:name() ~= "YRpp" then
+                target:add("links", "YrExtCore.lib", {private=true})
+            end
         end
 
         local api = string.upper(target:name())

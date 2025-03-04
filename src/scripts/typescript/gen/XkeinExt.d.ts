@@ -1,6 +1,7 @@
 /// <reference path = "../index.d.ts"/>
 declare module "XkeinExt" {
-import { CDTimerClass, AbstractClass, CCINIClass } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
+import { AKRESULT } from "wwise";
 class PhysicsCollisionAddAndPersistResult
 {
     m_com1 : PhysicsComponent;

@@ -5,6 +5,12 @@
     init_extra_vars(this)
 -}}
 #pragma once
+{{- if module.module_name == "YRpp" }}
+#include <EventClass.h>
+#include <YRPP.h>
+{{- else if module.module_name == "gainput"}}
+#include "gainput/gainput.h"
+{{- end }}
 #include "{{source_file}}"
 
 class {{gen_type_name}}

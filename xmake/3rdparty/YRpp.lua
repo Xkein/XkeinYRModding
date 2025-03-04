@@ -13,18 +13,9 @@ target("YRpp")
             yrpp_includes_dir.."/StaticInits.cpp",
         },
         pre_header_text = get_pre_header_text(),
-        templates = get_templates({
-            type = {
-                ["yr/yr_type_header.scriban"] =  "type/{0}.gen.h",
-                ["yr/yr_type_cpp.scriban"] =  "type/{0}.gen.cpp",
-            },
-            module = {
-                ["module_header.scriban"] =  "{0}.gen.h",
-                ["yr/yr_module_cpp.scriban"] =  "{0}.gen.cpp",
-            },
-        }, {
+        templates = get_templates({}, {
             depends = {
-                ["yr/yrpp.scriban"] = "not use to generate!",
+                ["include/yrpp.scriban"] = "not use to generate!",
             }
         })
     })

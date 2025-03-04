@@ -164,16 +164,6 @@ func get_yr_types()
     ret $result
 end
 
-func yr_need_codegen(htType)
-    $element = htType.element
-    ret get_yr_game_types() | array.contains $element.name
-end
-
-func yr_inject_meta(htType)
-    htType.meta.raw.has_meta = true
-    htType.all_public_visible = true
-end
-
 func get_yr_derived_classes(klass)
     if klass == "AbstractClass"
         ret array.concat(["AirstrikeClass", "AlphaShapeClass", "BombClass",

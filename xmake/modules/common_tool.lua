@@ -45,6 +45,9 @@ function get_default_templates()
             ["js_module_setup.scriban"] = root_dir.."/src/scripts/javascript/gen/{0}.js",
             ["js_module_cpp.scriban"] =  codegen_dir.."/XkeinExt/codegen/{1}/{0}.js_module.cpp",
         },
+        inject_meta = {
+            ["inject_meta.scriban"] = "inject_meta.log",
+        },
         depends = {
             ["include/common.scriban"] = "not use to generate!",
             ["include/meta.scriban"] = "not use to generate!",
