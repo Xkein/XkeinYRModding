@@ -51,7 +51,7 @@ struct IniComponentLoader
     template<typename Type, bool (*Func)(Type&, IniReader&, const char*)>
     static void RegisterLoader(entt::meta_factory<Type>& factory)
     {
-        factory.func<Func>("__LoadIniComponent"_hs).prop("name"_hs, "__LoadIniComponent");
+        factory.func<Func>("__LoadIniComponent"_hs);
     }
 
     template<typename Type>
@@ -82,7 +82,7 @@ struct IniComponentLoader
             }
         };
 
-        factory.func<&AutoLoad::FindOrAllocate>("__FindOrAllocate"_hs).prop("name"_hs, "__FindOrAllocate");
+        factory.func<&AutoLoad::FindOrAllocate>("__FindOrAllocate"_hs);
     }
 
     template<typename Type, typename TargetType>

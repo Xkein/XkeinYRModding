@@ -42,15 +42,15 @@
 #include <EBolt.h>
 
 using namespace entt::literals;
-#define INIT_META_FACTORY(CLASS) entt::meta<CLASS>().type(#CLASS##_hs).prop("name"_hs, #CLASS)
+#define INIT_META_FACTORY(CLASS) entt::meta<CLASS>().type(#CLASS##_hs).custom<ClassMeta>(#CLASS)
 
 template <typename T>
 void RegisterVector2D(entt::meta_factory<Vector2D<T>>&& factory)
 {
     factory.ctor<>();
     factory.ctor<T, T>();
-    register_data<&Vector2D<T>::X>(factory, "X"_hs).prop("name"_hs, "X");
-    register_data<&Vector2D<T>::Y>(factory, "Y"_hs).prop("name"_hs, "Y");
+    register_data<&Vector2D<T>::X>(factory, "X"_hs).custom<FieldMeta>("X");
+    register_data<&Vector2D<T>::Y>(factory, "Y"_hs).custom<FieldMeta>("Y");
 }
 
 template <typename T>
@@ -58,9 +58,9 @@ void RegisterVector3D(entt::meta_factory<Vector3D<T>>&& factory)
 {
     factory.ctor<>();
     factory.ctor<T, T, T>();
-    register_data<&Vector3D<T>::X>(factory, "X"_hs).prop("name"_hs, "X");
-    register_data<&Vector3D<T>::Y>(factory, "Y"_hs).prop("name"_hs, "Y");
-    register_data<&Vector3D<T>::Z>(factory, "Z"_hs).prop("name"_hs, "Z");
+    register_data<&Vector3D<T>::X>(factory, "X"_hs).custom<FieldMeta>("X");
+    register_data<&Vector3D<T>::Y>(factory, "Y"_hs).custom<FieldMeta>("Y");
+    register_data<&Vector3D<T>::Z>(factory, "Z"_hs).custom<FieldMeta>("Z");
 }
 
 template <typename T>
@@ -68,27 +68,27 @@ void RegisterVector4D(entt::meta_factory<Vector4D<T>>&& factory)
 {
     factory.ctor<>();
     factory.ctor<T, T, T, T>();
-    register_data<&Vector4D<T>::X>(factory, "X"_hs).prop("name"_hs, "X");
-    register_data<&Vector4D<T>::Y>(factory, "Y"_hs).prop("name"_hs, "Y");
-    register_data<&Vector4D<T>::Z>(factory, "Z"_hs).prop("name"_hs, "Z");
-    register_data<&Vector4D<T>::W>(factory, "W"_hs).prop("name"_hs, "W");
+    register_data<&Vector4D<T>::X>(factory, "X"_hs).custom<FieldMeta>("X");
+    register_data<&Vector4D<T>::Y>(factory, "Y"_hs).custom<FieldMeta>("Y");
+    register_data<&Vector4D<T>::Z>(factory, "Z"_hs).custom<FieldMeta>("Z");
+    register_data<&Vector4D<T>::W>(factory, "W"_hs).custom<FieldMeta>("W");
 }
 
 template <typename T>
 void RegisterVectorClass(entt::meta_factory<VectorClass<T>> factory)
 {
     factory.ctor<>();
-    register_func<&VectorClass<T>::SetCapacity>(factory, "SetCapacity"_hs).prop("name"_hs, "SetCapacity").prop("arg0"_hs, "capacity").prop("arg1"_hs, "pMem");
-    register_func<&VectorClass<T>::Clear>(factory, "Clear"_hs).prop("name"_hs, "Clear");
-    register_func<&VectorClass<T>::FindItemIndex>(factory, "FindItemIndex"_hs).prop("name"_hs, "FindItemIndex").prop("arg0"_hs, "item");
-    register_func<&VectorClass<T>::GetItemIndex>(factory, "GetItemIndex"_hs).prop("name"_hs, "GetItemIndex").prop("arg0"_hs, "pItem");
-    register_func<&VectorClass<T>::GetItem>(factory, "GetItem"_hs).prop("name"_hs, "GetItem").prop("arg0"_hs, "i");
-    register_func<&VectorClass<T>::Reserve>(factory, "Reserve"_hs).prop("name"_hs, "Reserve").prop("arg0"_hs, "capacity");
-    register_func<&VectorClass<T>::Swap>(factory, "Swap"_hs).prop("name"_hs, "Swap").prop("arg0"_hs, "other");
-    register_data<&VectorClass<T>::Items>(factory, "Items"_hs).prop("name"_hs, "Items");
-    register_data<&VectorClass<T>::Capacity>(factory, "Capacity"_hs).prop("name"_hs, "Capacity");
-    register_data<&VectorClass<T>::IsInitialized>(factory, "IsInitialized"_hs).prop("name"_hs, "IsInitialized");
-    register_data<&VectorClass<T>::IsAllocated>(factory, "IsAllocated"_hs).prop("name"_hs, "IsAllocated");
+    register_func<&VectorClass<T>::SetCapacity>(factory, "SetCapacity"_hs).custom<FunctionMeta>("SetCapacity", std::vector<ParameterMeta>{ ParameterMeta{"capacity"}, ParameterMeta{"pMem"} });
+    register_func<&VectorClass<T>::Clear>(factory, "Clear"_hs).custom<FunctionMeta>("Clear", std::vector<ParameterMeta>{ });
+    register_func<&VectorClass<T>::FindItemIndex>(factory, "FindItemIndex"_hs).custom<FunctionMeta>("FindItemIndex", std::vector<ParameterMeta>{ ParameterMeta{"item"} });
+    register_func<&VectorClass<T>::GetItemIndex>(factory, "GetItemIndex"_hs).custom<FunctionMeta>("GetItemIndex", std::vector<ParameterMeta>{ ParameterMeta{"pItem"} });
+    register_func<&VectorClass<T>::GetItem>(factory, "GetItem"_hs).custom<FunctionMeta>("GetItem", std::vector<ParameterMeta>{ ParameterMeta{"i"} });
+    register_func<&VectorClass<T>::Reserve>(factory, "Reserve"_hs).custom<FunctionMeta>("Reserve", std::vector<ParameterMeta>{ ParameterMeta{"capacity"} });
+    register_func<&VectorClass<T>::Swap>(factory, "Swap"_hs).custom<FunctionMeta>("Swap", std::vector<ParameterMeta>{ ParameterMeta{"other"} });
+    register_data<&VectorClass<T>::Items>(factory, "Items"_hs).custom<FieldMeta>("Items");
+    register_data<&VectorClass<T>::Capacity>(factory, "Capacity"_hs).custom<FieldMeta>("Capacity");
+    register_data<&VectorClass<T>::IsInitialized>(factory, "IsInitialized"_hs).custom<FieldMeta>("IsInitialized");
+    register_data<&VectorClass<T>::IsAllocated>(factory, "IsAllocated"_hs).custom<FieldMeta>("IsAllocated");
 }
 
 template <typename T>
@@ -96,14 +96,14 @@ void RegisterDynamicVectorClass(entt::meta_factory<DynamicVectorClass<T>> factor
 {
     factory.ctor<>();
     factory.base<VectorClass<T>>();
-    register_func<&DynamicVectorClass<T>::ValidIndex>(factory, "ValidIndex"_hs).prop("name"_hs, "ValidIndex").prop("arg0"_hs, "index");
-    register_func<&DynamicVectorClass<T>::AddItem>(factory, "AddItem"_hs).prop("name"_hs, "AddItem").prop("arg0"_hs, "item");
-    register_func<&DynamicVectorClass<T>::RemoveItem>(factory, "RemoveItem"_hs).prop("name"_hs, "RemoveItem").prop("arg0"_hs, "index");
-    register_func<&DynamicVectorClass<T>::Remove>(factory, "Remove"_hs).prop("name"_hs, "Remove").prop("arg0"_hs, "item");
-    register_func<&DynamicVectorClass<T>::AddUnique>(factory, "AddUnique"_hs).prop("name"_hs, "AddUnique").prop("arg0"_hs, "item");
-    register_func<&DynamicVectorClass<T>::Swap>(factory, "Swap"_hs).prop("name"_hs, "Swap").prop("arg0"_hs, "other");
-    register_data<&DynamicVectorClass<T>::Count>(factory, "Count"_hs).prop("name"_hs, "Count");
-    register_data<&DynamicVectorClass<T>::CapacityIncrement>(factory, "CapacityIncrement"_hs).prop("name"_hs, "CapacityIncrement");
+    register_func<&DynamicVectorClass<T>::ValidIndex>(factory, "ValidIndex"_hs).custom<FunctionMeta>("ValidIndex", std::vector<ParameterMeta>{ ParameterMeta{"index"} });
+    register_func<&DynamicVectorClass<T>::AddItem>(factory, "AddItem"_hs).custom<FunctionMeta>("AddItem", std::vector<ParameterMeta>{ ParameterMeta{"item"} });
+    register_func<&DynamicVectorClass<T>::RemoveItem>(factory, "RemoveItem"_hs).custom<FunctionMeta>("RemoveItem", std::vector<ParameterMeta>{ ParameterMeta{"index"} });
+    register_func<&DynamicVectorClass<T>::Remove>(factory, "Remove"_hs).custom<FunctionMeta>("Remove", std::vector<ParameterMeta>{ ParameterMeta{"item"} });
+    register_func<&DynamicVectorClass<T>::AddUnique>(factory, "AddUnique"_hs).custom<FunctionMeta>("AddUnique", std::vector<ParameterMeta>{ ParameterMeta{"item"} });
+    register_func<&DynamicVectorClass<T>::Swap>(factory, "Swap"_hs).custom<FunctionMeta>("Swap", std::vector<ParameterMeta>{ ParameterMeta{"other"} });
+    register_data<&DynamicVectorClass<T>::Count>(factory, "Count"_hs).custom<FieldMeta>("Count");
+    register_data<&DynamicVectorClass<T>::CapacityIncrement>(factory, "CapacityIncrement"_hs).custom<FieldMeta>("CapacityIncrement");
 }
 
 #define REGISTER_DYNAMIC_VECTOR_CLASS(ITEM_CLASS) \
@@ -193,50 +193,50 @@ void YrReflectionRegister()
         auto factory = INIT_META_FACTORY(ColorStruct);
         factory.ctor<>();
         factory.ctor<byte, byte, byte>();
-        register_data<&ColorStruct::R>(factory, "R"_hs).prop("name"_hs, "R");
-        register_data<&ColorStruct::G>(factory, "G"_hs).prop("name"_hs, "G");
-        register_data<&ColorStruct::B>(factory, "B"_hs).prop("name"_hs, "B");
+        register_data<&ColorStruct::R>(factory, "R"_hs).custom<FieldMeta>("R");
+        register_data<&ColorStruct::G>(factory, "G"_hs).custom<FieldMeta>("G");
+        register_data<&ColorStruct::B>(factory, "B"_hs).custom<FieldMeta>("B");
     }
     {
         auto factory = INIT_META_FACTORY(Quaternion);
         factory.ctor<>();
         factory.ctor<float, float, float, float>();
-        register_data<&Quaternion::X>(factory, "X"_hs).prop("name"_hs, "X");
-        register_data<&Quaternion::Y>(factory, "Y"_hs).prop("name"_hs, "Y");
-        register_data<&Quaternion::Z>(factory, "Z"_hs).prop("name"_hs, "Z");
-        register_data<&Quaternion::W>(factory, "W"_hs).prop("name"_hs, "W");
+        register_data<&Quaternion::X>(factory, "X"_hs).custom<FieldMeta>("X");
+        register_data<&Quaternion::Y>(factory, "Y"_hs).custom<FieldMeta>("Y");
+        register_data<&Quaternion::Z>(factory, "Z"_hs).custom<FieldMeta>("Z");
+        register_data<&Quaternion::W>(factory, "W"_hs).custom<FieldMeta>("W");
     }
     {
         auto factory = INIT_META_FACTORY(RectangleStruct);
         factory.ctor<>();
         factory.ctor<int, int, int, int>();
-        register_data<&RectangleStruct::X>(factory, "X"_hs).prop("name"_hs, "X");
-        register_data<&RectangleStruct::Y>(factory, "Y"_hs).prop("name"_hs, "Y");
-        register_data<&RectangleStruct::Width>(factory, "Width"_hs).prop("name"_hs, "Width");
-        register_data<&RectangleStruct::Height>(factory, "Height"_hs).prop("name"_hs, "Height");
+        register_data<&RectangleStruct::X>(factory, "X"_hs).custom<FieldMeta>("X");
+        register_data<&RectangleStruct::Y>(factory, "Y"_hs).custom<FieldMeta>("Y");
+        register_data<&RectangleStruct::Width>(factory, "Width"_hs).custom<FieldMeta>("Width");
+        register_data<&RectangleStruct::Height>(factory, "Height"_hs).custom<FieldMeta>("Height");
     }
     {
         auto factory = INIT_META_FACTORY(Matrix3D);
         factory.ctor<>();
         factory.ctor<Vector3D<float>, Vector3D<float>, Vector3D<float>, Vector3D<float>>();
         factory.ctor<float, float, float, float, float, float, float, float, float, float, float, float>();
-        register_data<&Matrix3D::Data>(factory, "Data"_hs).prop("name"_hs, "Data");
+        register_data<&Matrix3D::Data>(factory, "Data"_hs).custom<FieldMeta>("Data");
     }
     {
         auto factory = INIT_META_FACTORY(CDTimerClass);
-        register_func<&CDTimerClass::Start>(factory, "Start"_hs).prop("name"_hs, "Start").prop("arg0"_hs, "duration");
-        register_func<&CDTimerClass::Stop>(factory, "Stop"_hs).prop("name"_hs, "Stop");
-        register_func<&CDTimerClass::Pause>(factory, "Pause"_hs).prop("name"_hs, "Pause");
-        register_func<&CDTimerClass::Resume>(factory, "Resume"_hs).prop("name"_hs, "Resume");
-        register_func<&CDTimerClass::GetTimeLeft>(factory, "GetTimeLeft"_hs).prop("name"_hs, "GetTimeLeft");
-        register_func<&CDTimerClass::Completed>(factory, "Completed"_hs).prop("name"_hs, "Completed");
-        register_func<&CDTimerClass::InProgress>(factory, "InProgress"_hs).prop("name"_hs, "InProgress");
-        register_func<&CDTimerClass::Expired>(factory, "Expired"_hs).prop("name"_hs, "Expired");
-        register_func<&CDTimerClass::HasStarted>(factory, "HasStarted"_hs).prop("name"_hs, "HasStarted");
-        register_func<&CDTimerClass::IsTicking>(factory, "IsTicking"_hs).prop("name"_hs, "IsTicking");
-        register_func<&CDTimerClass::HasTimeLeft>(factory, "HasTimeLeft"_hs).prop("name"_hs, "HasTimeLeft");
-        register_data<&CDTimerClass::StartTime>(factory, "StartTime"_hs).prop("name"_hs, "StartTime");
-        register_data<&CDTimerClass::TimeLeft>(factory, "TimeLeft"_hs).prop("name"_hs, "TimeLeft");
+        register_func<&CDTimerClass::Start>(factory, "Start"_hs).custom<FunctionMeta>("Start", std::vector<ParameterMeta>{ ParameterMeta{"duration"} });
+        register_func<&CDTimerClass::Stop>(factory, "Stop"_hs).custom<FunctionMeta>("Stop", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::Pause>(factory, "Pause"_hs).custom<FunctionMeta>("Pause", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::Resume>(factory, "Resume"_hs).custom<FunctionMeta>("Resume", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::GetTimeLeft>(factory, "GetTimeLeft"_hs).custom<FunctionMeta>("GetTimeLeft", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::Completed>(factory, "Completed"_hs).custom<FunctionMeta>("Completed", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::InProgress>(factory, "InProgress"_hs).custom<FunctionMeta>("InProgress", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::Expired>(factory, "Expired"_hs).custom<FunctionMeta>("Expired", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::HasStarted>(factory, "HasStarted"_hs).custom<FunctionMeta>("HasStarted", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::IsTicking>(factory, "IsTicking"_hs).custom<FunctionMeta>("IsTicking", std::vector<ParameterMeta>{ });
+        register_func<&CDTimerClass::HasTimeLeft>(factory, "HasTimeLeft"_hs).custom<FunctionMeta>("HasTimeLeft", std::vector<ParameterMeta>{ });
+        register_data<&CDTimerClass::StartTime>(factory, "StartTime"_hs).custom<FieldMeta>("StartTime");
+        register_data<&CDTimerClass::TimeLeft>(factory, "TimeLeft"_hs).custom<FieldMeta>("TimeLeft");
     }
 }
 

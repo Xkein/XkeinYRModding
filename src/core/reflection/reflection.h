@@ -3,20 +3,36 @@
 #include "core/reflection/macro.h"
 #include "core/reflection/container.h"
 #include <entt/meta/resolve.hpp>
+#include <vector>
 
-static std::pair<entt::meta_type, size_t> get_array_info(entt::meta_type type)
-{
-    if (!type.is_array())
-        return {};
+// entt provide basic meta and below classes store more extra meta
+struct ArrayMeta {
+    entt::type_info element;
+    size_t count;
+};
 
-    using namespace entt::literals;
-    entt::meta_prop elementTypeFnProp = type.prop("array_element_type_fn"_hs);
-    if (elementTypeFnProp)
-    {
-        auto elementTypeFn = elementTypeFnProp.value().cast<entt::meta_type(*)()>();
-        entt::meta_prop sizeProp = type.prop("array_size"_hs);
-        return {elementTypeFn(), sizeProp.value().cast<int>()};
-    }
-    return {};
-}
+struct EnumMeta {
+    const char* name;
+};
+
+struct EnumConstantMeta {
+    const char* name;
+};
+
+struct ClassMeta {
+    const char* name;
+};
+
+struct ParameterMeta {
+    const char* name;
+};
+
+struct FunctionMeta {
+    const char* name;
+    std::vector<ParameterMeta> parameters;
+};
+
+struct FieldMeta {
+    const char* name;
+};
 

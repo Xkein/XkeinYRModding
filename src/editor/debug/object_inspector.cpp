@@ -43,44 +43,40 @@ void InspectObject(entt::meta_any& inst, const char* name);
 
 void InspectField(entt::meta_any& inst, entt::meta_data field)
 {
-    entt::meta_prop prop = field.prop("name"_hs);
-    if (!prop)
+    FieldMeta* fieldMeta = field.custom();
+    if (!fieldMeta)
     {
         ImGui::LabelText("<unknown field name>", "<unknown type> 0x%08X", inst);
         return;
     }
-    const char*     fieldName = field.prop("name"_hs).value().cast<const char*>();
+    const char*     fieldName = fieldMeta->name;
     entt::meta_type fieldType = field.type();
 
-    if (fieldType.is_pointer() || fieldType.is_pointer_like()
-        || fieldType.is_array()
-        || fieldType.is_class()
-        || fieldType.is_enum()
-        || fieldType.is_arithmetic()
-        || fieldType.can_convert(entt::resolve<const char*>()))
+    if (fieldType.is_pointer() || fieldType.is_pointer_like() || fieldType.is_array() || fieldType.is_class() || fieldType.is_enum() || fieldType.is_arithmetic() ||
+        fieldType.can_convert(entt::resolve<const char*>()))
     {
         entt::meta_any data = field.get(inst);
         InspectObject(data, fieldName);
         return;
     }
 
-    entt::meta_prop fieldTypeProp = fieldType.prop("name"_hs);
-    const char*     fieldTypeName = fieldTypeProp ? fieldTypeProp.value().cast<const char*>() : "<unknown type>";
+    ClassMeta*  classMeta     = fieldType.custom();
+    const char* fieldTypeName = classMeta ? classMeta->name : "<unknown type>";
 
     ImGui::LabelText(fieldName, "%s unsupported", fieldTypeName);
 }
 
 void InspectObject(entt::meta_any& inst, const char* name)
 {
-    entt::meta_type type = inst.type();
-    void*           ptr  = inst.data();
-    
-    entt::meta_prop nameProp = type.prop("name"_hs);
-    const char*     typeName = nameProp ? nameProp.value().cast<const char*>() : "<unknown type>";
+    entt::meta_type type      = inst.type();
+    ClassMeta*      classMeta = type.custom();
+    void*           ptr       = inst.data();
+
+    const char* typeName = classMeta ? classMeta->name : "<unknown type>";
 
     if (type.is_class())
     {
-        if (nameProp)
+        if (classMeta)
         {
             if (ImGui::TreeNode(typeName, "%s %s 0x%08X", name, typeName, ptr))
             {
@@ -92,7 +88,8 @@ void InspectObject(entt::meta_any& inst, const char* name)
 
                 for (auto&& [id, field] : type.data())
                 {
-                    std::string_view fieldName = field.prop("name"_hs).value().cast<const char*>();
+                    FieldMeta*       fieldMeta = field.custom();
+                    std::string_view fieldName = fieldMeta->name;
                     // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
                     ImGui::PushID(id);
 
@@ -100,7 +97,7 @@ void InspectObject(entt::meta_any& inst, const char* name)
 
                     ImGui::PopID();
                 }
-        
+
                 if (type.is_sequence_container())
                 {
                     auto view = inst.as_sequence_container();
@@ -119,7 +116,7 @@ void InspectObject(entt::meta_any& inst, const char* name)
         }
         return;
     }
-    
+
     if (type.is_pointer() || type.is_pointer_like())
     {
         entt::meta_any ref = *inst;
@@ -133,15 +130,17 @@ void InspectObject(entt::meta_any& inst, const char* name)
         }
         return;
     }
-    
+
     if (type.is_array())
     {
-        auto [elemType, count] = get_array_info(type);
+        ArrayMeta* arrayMeta = type.custom();
+        auto       elemType  = entt::resolve(arrayMeta->element);
+        size_t     count     = arrayMeta->count;
         ImGui::LabelText(name, "-- array size: %d", count);
         size_t elemSize = elemType.size_of();
         for (size_t idx = 0; idx < count; idx++)
         {
-            void* elemPtr = *(void**)((size_t)ptr + elemSize * idx);
+            void*          elemPtr  = *(void**)((size_t)ptr + elemSize * idx);
             entt::meta_any elemInst = elemType.from_void(elemPtr);
             InspectObject(elemInst, "#");
         }
@@ -237,7 +236,7 @@ void InspectObject(entt::meta_any& inst, const char* name)
 void InspectYrObject(AbstractClass* pObject)
 {
     entt::meta_type meta = GetYrClassMeta(pObject);
-    entt::meta_any inst = meta.from_void(pObject);
+    entt::meta_any  inst = meta.from_void(pObject);
     InspectObject(inst, "Inspecting Object");
 }
 

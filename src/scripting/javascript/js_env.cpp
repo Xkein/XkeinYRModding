@@ -1110,10 +1110,9 @@ const void* GetYrJsTypeID(AbstractType type)
     const void* TypeId  = gYrJsTypeID[WhatAmI];
     if (!TypeId)
     {
-        auto        meta     = GetYrClassMeta(static_cast<size_t>(type));
-        const char* TypeName = meta.prop("name"_hs).value().cast<const char*>();
-
-        auto JsRegistration  = FindCppTypeClassByName(TypeName);
+        entt::meta_type meta           = GetYrClassMeta(static_cast<size_t>(type));
+        ClassMeta*      classMeta      = meta.custom();
+        auto            JsRegistration = FindCppTypeClassByName(classMeta->name);
         gYrJsTypeID[WhatAmI] = TypeId = JsRegistration->TypeId;
     }
     return TypeId;

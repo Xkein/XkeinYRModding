@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/reflection/container.h"
+#include "core/reflection/reflection.h"
 #include "core/tool/function.hpp"
 #include <entt/meta/factory.hpp>
 #include <entt/meta/pointer.hpp>
@@ -92,11 +93,9 @@ namespace _core_detail_
     {
         static void register_info()
         {
-            if (entt::resolve<Type[Size]>().prop("array_element_type_fn"_hs))
+            if (entt::resolve<Type[Size]>().custom())
                 return;
-            entt::meta<Type[Size]>()
-                .prop("array_size"_hs, Size)
-                .prop("array_element_type_fn"_hs, static_cast<entt::meta_type(*)()>(&entt::resolve<Type>));
+            entt::meta<Type[Size]>().custom<ArrayMeta>(entt::type_id<Type>(), Size);
         }
     };
 } // namespace _core_detail_

@@ -124,15 +124,15 @@ namespace detail
         static bool Read(std::string_view str, T& result)
         {
             entt::meta_type type = entt::resolve<T>();
-            if (!type)
+            if (!type || !static_cast<EnumMeta*>(type.custom()))
             {
                 gLogger->error("could not parse enum {}: no meta!", typeid(T).name());
                 return false;
             }
             for (auto&& [id, data] : type.data())
             {
-                auto name = data.prop("name"_hs).value().cast<const char*>();
-                if (str == name)
+                EnumConstantMeta* enumConstMeta = data.custom();
+                if (str == enumConstMeta->name)
                 {
                     result = data.get({}).cast<T>();
                     return true;

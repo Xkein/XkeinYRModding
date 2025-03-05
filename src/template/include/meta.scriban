@@ -41,15 +41,18 @@ func gen_meta_class_function(htClass, htFunction)
     $class_full_name = htClass.full_name
     $func_type = get_function_ptr_type(htFunction, htClass)
     
-    $meta_args = ""
+    $meta_args = "std::vector<ParameterMeta>{"
     for arg in htFunction.cpp_function.parameters
-        $meta_args += $'.prop("arg{for.index}"_hs, "{arg.name}")'
+        $meta_args += ' ParameterMeta{'
+        $meta_args += $'"{arg.name}"'
+        $meta_args += '},'
     end
+    $meta_args += " }"
 
     if htFunction.is_overload
-        ret $'register_func<static_cast<{$func_type}>(&{$class_full_name}::{$function_name})>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
+        ret $'register_func<static_cast<{$func_type}>(&{$class_full_name}::{$function_name})>(factory, "{$function_name}"_hs).custom<FunctionMeta>("{$function_name}", {$meta_args});'
     else
-        ret $'register_func<&{$class_full_name}::{$function_name}>(factory, "{$function_name}"_hs).prop("name"_hs, "{$function_name}"){$meta_args};'
+        ret $'register_func<&{$class_full_name}::{$function_name}>(factory, "{$function_name}"_hs).custom<FunctionMeta>("{$function_name}", {$meta_args});'
     end
 end
 
@@ -66,11 +69,11 @@ func gen_meta_class_property(htClass, htProperty)
     if htProperty.is_bit_field
         ret $'// skip bit field: {$class_full_name}::{$field_name}'
     end
-    ret $'register_data<&{$class_full_name}::{$field_name}>(factory, "{$field_name}"_hs).prop("name"_hs, "{$field_name}");'
+    ret $'register_data<&{$class_full_name}::{$field_name}>(factory, "{$field_name}"_hs).custom<FieldMeta>("{$field_name}");'
 end
 
 func gen_meta_class(htClass)
-    $klass = $'auto factory = entt::meta<{htClass.full_name}>().type("{htClass.class_name}"_hs).prop("name"_hs, "{htClass.class_name}");'
+    $klass = $'auto factory = entt::meta<{htClass.full_name}>().type("{htClass.full_name}"_hs).custom<ClassMeta>("{htClass.class_name}");'
     for base in htClass.base_classes
         $klass = append_line($klass, $"factory.base<{base.full_display_name}>();")
     end
@@ -87,11 +90,11 @@ end
 
 func gen_meta_enum_constant(htEnum, htConstant)
     $enum_const_name = htConstant.name
-    ret $'factory.data<{htEnum.full_name}::{$enum_const_name}>("{$enum_const_name}"_hs).prop("name"_hs, "{$enum_const_name}");'
+    ret $'factory.data<{htEnum.full_name}::{$enum_const_name}>("{$enum_const_name}"_hs).custom<EnumConstantMeta>("{$enum_const_name}");'
 end
 
 func gen_meta_enum(htEnum)
-    $enum = $'auto factory = entt::meta<{htEnum.full_name}>().type("{htEnum.enum_name}"_hs).prop("name"_hs, "{htEnum.enum_name}");'
+    $enum = $'auto factory = entt::meta<{htEnum.full_name}>().type("{htEnum.full_name}"_hs).custom<EnumMeta>("{htEnum.enum_name}");'
     $enum = append_line($enum, (htEnum.enum_constants | array.each do
             ret "   " + gen_meta_enum_constant(htEnum, $0)
         end) | array.join "\n")
