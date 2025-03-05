@@ -1,4 +1,5 @@
 
+exports.InputMap = puerts.loadCPPType("InputMap")
 exports.Key = {
     KeyEscape : 0,
     KeyF1 : 1,

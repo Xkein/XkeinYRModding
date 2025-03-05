@@ -22,6 +22,15 @@ UsingCppType(PhysicsTypeComponent)
 UsingCppType(PhysicsCollisionAddAndPersistResult);
 UsingCppType(PhysicsCollisionRemoveResult);
 
+#include "input/input.h"
+UsingCppType(Input);
+UsingCppType(gainput::InputMap);
+// not implement
+UsingCppType(gainput::InputManager);
+UsingCppType(gainput::MappedInputListener);
+UsingCppType(gainput::DeviceButtonSpec);
+MuteFunctionPtr(std::remove_pointer_t<gainput::FilterFunc_T>);
+
 #include "yr/parse/ini_reader.h"
 UsingCppType(IniReader);
 

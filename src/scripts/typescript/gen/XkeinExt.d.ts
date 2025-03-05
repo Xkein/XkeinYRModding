@@ -138,6 +138,14 @@ class JsEvents
     static s_house : JsHouseEvents;
     static s_houseType : JsAbstractTypeEvents;
 }
+class Input
+{
+    static s_gMap : any;
+    static s_gMouseId : number;
+    static s_gKeyboardId : number;
+    static s_gJoystickId : number;
+    static s_gTouchId : number;
+}
 enum EPhysicShapeType {
     Auto = 0,
     Sphere = 1,

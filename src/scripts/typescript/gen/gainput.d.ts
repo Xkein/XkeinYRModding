@@ -2,6 +2,32 @@
 declare module "gainput" {
 import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
 import { AKRESULT } from "wwise";
+class InputMap
+{
+    Clear() : void;
+    GetManager() : any;
+    GetName() : string;
+    GetId() : number;
+    MapBool(userButton_0 : any, device_1 : any, deviceButton_2 : any) : boolean;
+    MapFloat(userButton_0 : any, device_1 : any, deviceButton_2 : any, min_3 : number, max_4 : number, filterFunc_5 : any, filterUserData_6 : void) : boolean;
+    Unmap(userButton_0 : any) : void;
+    IsMapped(userButton_0 : any) : boolean;
+    GetMappings(userButton_0 : any, outButtons_1 : any, maxButtonCount_2 : number) : number;
+    SetUserButtonPolicy(userButton_0 : any, policy_1 : any) : boolean;
+    SetDeadZone(userButton_0 : any, deadZone_1 : number) : boolean;
+    GetBool(userButton_0 : any) : boolean;
+    GetBoolIsNew(userButton_0 : any) : boolean;
+    GetBoolPrevious(userButton_0 : any) : boolean;
+    GetBoolWasDown(userButton_0 : any) : boolean;
+    GetFloat(userButton_0 : any) : number;
+    GetFloatPrevious(userButton_0 : any) : number;
+    GetFloatDelta(userButton_0 : any) : number;
+    GetUserButtonName(userButton_0 : any, buffer_1 : string, bufferLength_2 : number) : number;
+    GetUserButtonId(device_0 : any, deviceButton_1 : any) : any;
+    AddListener(listener_0 : any) : any;
+    RemoveListener(listenerId_0 : any) : void;
+    ReorderListeners() : void;
+}
 enum Key {
     KeyEscape = 0,
     KeyF1 = 1,

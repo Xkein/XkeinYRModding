@@ -12,7 +12,7 @@
         inject_tags_list["BindJs"] = $gen_types
         inject_tags_list["AllPublicVisible"] = $gen_types
     else if module_name == "gainput"
-        $gen_types = [##"gainput::InputMap",## "gainput::Key"]
+        $gen_types = ["gainput::InputMap", "gainput::Key"]
         inject_tags_list["BindJs"] = $gen_types
         inject_tags_list["AllPublicVisible"] = $gen_types
     end

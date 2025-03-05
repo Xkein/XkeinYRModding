@@ -15,6 +15,7 @@ exports.JsSuperWeaponEvents = puerts.loadCPPType("JsSuperWeaponEvents")
 exports.JsSuperWeaponTypeEvents = puerts.loadCPPType("JsSuperWeaponTypeEvents")
 exports.JsHouseEvents = puerts.loadCPPType("JsHouseEvents")
 exports.JsEvents = puerts.loadCPPType("JsEvents")
+exports.Input = puerts.loadCPPType("Input")
 exports.EPhysicShapeType = {
     Auto : 0,
     Sphere : 1,
