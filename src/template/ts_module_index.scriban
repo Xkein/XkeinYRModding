@@ -81,15 +81,21 @@
         if function.is_static
             $result += "static "
         end
-        $result += function.name
+        if function.is_constructor
+            $result += "constructor"
+        else
+            $result += function.name
+        end
         $result += "("
         if function.is_override
             $result += array.each(cppFunction.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)} | any'); end) | array.join ", "
         else
             $result += array.each(cppFunction.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)}'); end) | array.join ", "
         end
-        $result += ") : "
-        $result += get_ts_type(cppFunction.return_type)
+        $result += ")"
+        if !function.is_constructor
+            $result += " : " + get_ts_type(cppFunction.return_type)
+        end
         $result += ";"
         ret $result
     end
@@ -112,11 +118,11 @@ $base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
     {{- end }}
 {{- end }}
 {
-{{- for function in klass.functions ; $cpp_function = function.cpp_function }}
+{{- for function in klass.all_functions ; $cpp_function = function.cpp_function }}
         {{- if function.name | string.contains "operator";
             continue
         end
-        if should_skip_visibility_ex(klass, function) || function.is_deleted || function.is_destructor || function.is_constructor
+        if should_skip_visibility_ex(klass, function) || function.is_deleted || function.is_destructor
             continue
         end
         param_idx = 0

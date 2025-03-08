@@ -13,6 +13,8 @@ class YrInputBlocker
 }
 class IniReader
 {
+    constructor(pIni_0 : CCINIClass);
+    constructor(filename_0 : any);
     GetIni() : CCINIClass;
     value() : string;
     max_size() : number;

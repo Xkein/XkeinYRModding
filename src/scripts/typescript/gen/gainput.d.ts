@@ -4,6 +4,7 @@ import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
 import { AKRESULT } from "wwise";
 class InputMap
 {
+    constructor(manager_0 : any, name_1 : string, allocator_2 : any);
     Clear() : void;
     GetManager() : any;
     GetName() : string;

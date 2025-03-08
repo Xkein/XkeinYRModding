@@ -6,6 +6,8 @@ class BytePalette
 }
 class TintStruct
 {
+    constructor();
+    constructor(r_0 : number, g_1 : number, b_2 : number);
     m_Red : number;
     m_Green : number;
     m_Blue : number;
@@ -24,11 +26,19 @@ class LTRBStruct
 }
 class RateTimer
 {
+    constructor();
+    constructor(rate_0 : number);
     Start(rate_0 : number) : void;
     m_Rate : number;
 }
 class FacingClass
 {
+    constructor();
+    constructor(_0 : any);
+    constructor(rate_0 : number);
+    constructor(facing_0 : DirStruct);
+    constructor(dir_0 : any);
+    constructor(another_0 : FacingClass);
     SetDesired(facing_0 : DirStruct) : boolean;
     SetCurrent(facing_0 : DirStruct) : boolean;
     Desired() : DirStruct;
@@ -104,6 +114,7 @@ interface IPiggyback
 class TechnoClass
     extends RadioClass
 {
+    constructor(pOwner_0 : HouseClass);
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     Limbo() : boolean;
@@ -512,6 +523,7 @@ class TechnoClass
 class HouseClass
     extends AbstractClass
 {
+    constructor(pCountry_0 : HouseTypeClass);
     EnumConnectionPoints(ppEnum_0 : any | any) : number;
     FindConnectionPoint(riid_0 : any | any, ppCP_1 : any | any) : number;
     Apparent_Category_Quantity(category_0 : any | any) : number;
@@ -1202,6 +1214,7 @@ class ObjectClass
 class AnimClass
     extends ObjectClass
 {
+    constructor(pAnimType_0 : AnimTypeClass, Location_1 : CoordStruct, LoopDelay_2 : number, LoopCount_3 : number, flags_4 : number, ForceZAdjust_5 : number, reverse_6 : boolean);
     GetClassID(pClassID_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     PointerExpired(pAbstract_0 : AbstractClass | any, detachFromAll_1 : boolean | any) : void;
@@ -1264,6 +1277,7 @@ class AnimClass
 class AnimTypeClass
     extends ObjectTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : AnimTypeClass;
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : AnimTypeClass;
@@ -1350,6 +1364,7 @@ class AnimTypeClass
 class ObjectTypeClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     GetSizeMax(pcbSize_0 : any | any) : number;
@@ -1414,6 +1429,7 @@ class ObjectTypeClass
 class AbstractTypeClass
     extends AbstractClass
 {
+    constructor(pID_0 : string);
     LoadTheaterSpecificArt(th_type_0 : any) : void;
     LoadFromINI(pINI_0 : CCINIClass) : boolean;
     SaveToINI(pINI_0 : CCINIClass) : boolean;
@@ -1428,6 +1444,7 @@ class AbstractTypeClass
 class CCINIClass
     extends INIClass
 {
+    constructor();
     LoadFromFile(filename_0 : string) : void;
     ReadCCFile(pCCFile_0 : any, bDigest_1 : boolean, bLoadComments_2 : boolean) : CCINIClass;
     WriteCCFile(pCCFile_0 : any, bDigest_1 : boolean) : void;
@@ -1447,6 +1464,7 @@ class CCINIClass
 }
 class INIClass
 {
+    constructor();
     Reset() : void;
     Clear(s1_0 : string, s2_1 : string) : void;
     GetSection(pSection_0 : string) : any;
@@ -1530,6 +1548,7 @@ class INIClass
 class TechnoTypeClass
     extends ObjectTypeClass
 {
+    constructor(id_0 : string, speedtype_1 : any);
     static Find(pID_0 : string) : TechnoTypeClass;
     static FindIndex(pID_0 : string) : number;
     Load(pStm_0 : any | any) : number;
@@ -1882,6 +1901,7 @@ class TechnoTypeClass
 }
 class WeaponStruct
 {
+    constructor();
     m_WeaponType : WeaponTypeClass;
     m_FLH : CoordStruct;
     m_BarrelLength : number;
@@ -1891,6 +1911,7 @@ class WeaponStruct
 class WeaponTypeClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : WeaponTypeClass;
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : WeaponTypeClass;
@@ -1973,6 +1994,7 @@ class WeaponTypeClass
 class BulletTypeClass
     extends ObjectTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : BulletTypeClass;
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : BulletTypeClass;
@@ -2086,6 +2108,7 @@ class BulletClass
 class RadioClass
     extends MissionClass
 {
+    constructor();
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     SendToFirstLink(command_0 : any) : any;
@@ -2106,6 +2129,7 @@ class RadioClass
 class MissionClass
     extends ObjectClass
 {
+    constructor();
     QueueMission(mission_0 : any, start_mission_1 : boolean) : boolean;
     NextMission() : boolean;
     ForceMission(mission_0 : any) : void;
@@ -2154,6 +2178,7 @@ class MissionClass
 class InfantryTypeClass
     extends TechnoTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string | any) : InfantryTypeClass;
     static FindIndex(pID_0 : string | any) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -2376,6 +2401,7 @@ class CellClass
 class BuildingClass
     extends TechnoClass
 {
+    constructor(pType_0 : BuildingTypeClass, pOwner_1 : HouseClass);
     GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
@@ -2517,6 +2543,7 @@ class BuildingClass
 class BuildingTypeClass
     extends TechnoTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string | any) : BuildingTypeClass;
     static FindIndex(pID_0 : string | any) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -2753,6 +2780,7 @@ class BuildingAnimStruct
 class OverlayTypeClass
     extends ObjectTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : OverlayTypeClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -2793,6 +2821,7 @@ class IsometricTileTypeClass
 class UnitTypeClass
     extends TechnoTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string | any) : UnitTypeClass;
     static FindIndex(pID_0 : string | any) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -2853,6 +2882,7 @@ class BuildingAnimFrameStruct
 class FactoryClass
     extends AbstractClass
 {
+    constructor();
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -2890,6 +2920,8 @@ class FactoryClass
 }
 class StageClass
 {
+    constructor();
+    constructor(rate_0 : number);
     Start(rate_0 : number) : void;
     Start(rate_0 : number, step_1 : number) : void;
     Update() : boolean;
@@ -2902,6 +2934,7 @@ class StageClass
 class InfantryClass
     extends FootClass
 {
+    constructor(pType_0 : InfantryTypeClass, pOwner_1 : HouseClass);
     GetClassID(pClassID_0 : any | any) : number;
     WhatAmI() : any;
     Size() : number;
@@ -2929,6 +2962,7 @@ class InfantryClass
 class FootClass
     extends TechnoClass
 {
+    constructor(pOwner_0 : HouseClass);
     Mission_AreaGuard() : number;
     Destroyed(Killer_0 : ObjectClass | any) : void;
     ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : number | any) : boolean;
@@ -3064,6 +3098,7 @@ class FootClass
 class TeamClass
     extends AbstractClass
 {
+    constructor(pType_0 : TeamTypeClass, pOwner_1 : HouseClass, _unknown_44_2 : number);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3113,6 +3148,7 @@ class TeamClass
 class TeamTypeClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : TeamTypeClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -3180,6 +3216,7 @@ class TeamTypeClass
 class TagClass
     extends AbstractClass
 {
+    constructor(pType_0 : TagTypeClass);
     static GetInstance(pType_0 : TagTypeClass) : TagClass;
     static DeleteAll() : void;
     static NotifyGlobalChanged(idxGlobal_0 : number) : void;
@@ -3217,6 +3254,7 @@ class TagClass
 class TagTypeClass
     extends AbstractTypeClass
 {
+    constructor(pName_0 : string);
     static Find(pID_0 : string) : TagTypeClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -3252,6 +3290,7 @@ class TriggerTypeClass
 class TriggerClass
     extends AbstractClass
 {
+    constructor(pType_0 : TriggerTypeClass);
     static GetInstance(pType_0 : TriggerTypeClass) : TriggerClass;
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
@@ -3292,6 +3331,7 @@ class TriggerClass
 class ScriptTypeClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : ScriptTypeClass;
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : ScriptTypeClass;
@@ -3316,6 +3356,7 @@ class ScriptActionNode
 class TaskForceClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : TaskForceClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -3338,6 +3379,7 @@ class TaskForceEntryStruct
 class ScriptClass
     extends AbstractClass
 {
+    constructor(pType_0 : ScriptTypeClass);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3357,6 +3399,7 @@ class ScriptClass
 class ParasiteClass
     extends AbstractClass
 {
+    constructor(pOwner_0 : FootClass);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3383,6 +3426,7 @@ class ParasiteClass
 class BuildingLightClass
     extends ObjectClass
 {
+    constructor(pOwner_0 : ObjectClass);
     GetClassID(pClassID_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     WhatAmI() : any;
@@ -3402,6 +3446,8 @@ class BuildingLightClass
 class LightSourceClass
     extends AbstractClass
 {
+    constructor(X_0 : number, Y_1 : number, Z_2 : number, nVisibility_3 : number, nIntensity_4 : number, Red_5 : number, Green_6 : number, Blue_7 : number);
+    constructor(Crd_0 : CoordStruct, nVisibility_1 : number, nIntensity_2 : number, Tint_3 : TintStruct);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3423,6 +3469,7 @@ class LightSourceClass
 class UnitClass
     extends FootClass
 {
+    constructor(pType_0 : UnitTypeClass, pOwner_1 : HouseClass);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3480,6 +3527,7 @@ class UnitClass
 }
 class Surface
 {
+    constructor();
     CopyFromWhole(pSrc_0 : Surface, bUnk1_1 : boolean, bUnk2_2 : boolean) : boolean;
     CopyFromPart(pClipRect_0 : RectangleStruct, pSrc_1 : Surface, pSrcRect_2 : RectangleStruct, bUnk1_3 : boolean, bUnk2_4 : boolean) : boolean;
     CopyFrom(pClipRect_0 : RectangleStruct, pClipRect2_1 : RectangleStruct, pSrc_2 : Surface, pDestRect_3 : RectangleStruct, pSrcRect_4 : RectangleStruct, bUnk1_5 : boolean, bUnk2_6 : boolean) : boolean;
@@ -3519,6 +3567,7 @@ class Surface
 }
 class EBolt
 {
+    constructor();
     SetOwner(pOwner_0 : UnitClass, idxWeapon_1 : number) : void;
     ClearOwner() : void;
     GetSourceCoords(outBuffer_0 : CoordStruct) : CoordStruct;
@@ -3537,6 +3586,7 @@ class EBolt
 class AircraftClass
     extends FootClass
 {
+    constructor(pType_0 : AircraftTypeClass, pOwner_1 : HouseClass);
     Landing_Altitude() : number;
     Landing_Direction() : number;
     Is_Loaded() : number;
@@ -3570,6 +3620,7 @@ class AircraftClass
 class AircraftTypeClass
     extends TechnoTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string | any) : AircraftTypeClass;
     static FindIndex(pID_0 : string | any) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -3595,6 +3646,7 @@ class AircraftTypeClass
 class TerrainClass
     extends ObjectClass
 {
+    constructor(tt_0 : TerrainTypeClass, coords_1 : CellStruct);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3611,6 +3663,7 @@ class TerrainClass
 class TerrainTypeClass
     extends ObjectTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : TerrainTypeClass;
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : TerrainTypeClass;
@@ -3640,6 +3693,7 @@ class TerrainTypeClass
 class TiberiumClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : TiberiumClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -3685,6 +3739,8 @@ class TiberiumLogic
 class RadSiteClass
     extends AbstractClass
 {
+    constructor();
+    constructor(nBaseCoords_0 : CellStruct, nSpread_1 : number, nRadLevel_2 : number);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3725,6 +3781,7 @@ class RadSiteClass
 class LightConvertClass
     extends ConvertClass
 {
+    constructor(palette1_0 : BytePalette, palette2_1 : BytePalette, pSurface_2 : Surface, color_R_3 : number, color_G_4 : number, color_B_5 : number, skipBlitters_6 : boolean, pBuffer_7 : number, shadeCount_8 : any);
     UpdateColors(red_0 : number, green_1 : number, blue_2 : number, tinted_3 : boolean) : void;
     static InitLightConvert(red_0 : number, green_1 : number, blue_2 : number) : LightConvertClass;
     static s_Array : any;
@@ -3738,6 +3795,7 @@ class LightConvertClass
 }
 class ConvertClass
 {
+    constructor(palette_0 : BytePalette, eightbitpalette_1 : BytePalette, pSurface_2 : DSurface, shadeCount_3 : any, skipBlitters_4 : boolean);
     static CreateFromFile(pFilename_0 : string, pPalette_1 : BytePalette, pDestination_2 : ConvertClass) : void;
     SelectPlainBlitter(flags_0 : any) : any;
     SelectRLEBlitter(flags_0 : any) : any;
@@ -3781,6 +3839,7 @@ class DSurface
 class XSurface
     extends Surface
 {
+    constructor(nWidth_0 : number, nHeight_1 : number);
     PutPixelClip(pPoint_0 : Point2D, nUkn_1 : number, pRect_2 : RectangleStruct) : boolean;
     GetPixelClip(pPoint_0 : Point2D, pRect_1 : RectangleStruct) : number;
     m_LockLevel : number;
@@ -3788,6 +3847,9 @@ class XSurface
 }
 class RGBClass
 {
+    constructor();
+    constructor(r_0 : number, g_1 : number, b_2 : number);
+    constructor(rgb_0 : number, wordcolor_1 : boolean);
     Adjust(ratio_0 : number, rgb_1 : RGBClass) : void;
     Difference(rgb_0 : RGBClass) : number;
     ToInt() : number;
@@ -3807,6 +3869,8 @@ class EventClass
 }
 class LaserDrawClass
 {
+    constructor(source_0 : CoordStruct, target_1 : CoordStruct, innerColor_2 : any, outerColor_3 : any, outerSpread_4 : any, duration_5 : number);
+    constructor(source_0 : CoordStruct, target_1 : CoordStruct, zAdjust_2 : number, unknown_3 : number, innerColor_4 : any, outerColor_5 : any, outerSpread_6 : any, duration_7 : number, blinks_8 : boolean, fades_9 : boolean, startIntensity_10 : number, endIntensity_11 : number);
     m_Progress : StageClass;
     m___Progress : string;
     m_Thickness : number;
@@ -3834,6 +3898,7 @@ class FlashData
 }
 class PassengersClass
 {
+    constructor();
     AddPassenger(pPassenger_0 : FootClass) : void;
     GetFirstPassenger() : FootClass;
     RemoveFirstPassenger() : FootClass;
@@ -3844,6 +3909,8 @@ class PassengersClass
 }
 class VeterancyStruct
 {
+    constructor();
+    constructor(value_0 : number);
     Add(ownerCost_0 : number, victimCost_1 : number) : void;
     Add(value_0 : number) : void;
     GetRemainingLevel() : any;
@@ -3860,6 +3927,7 @@ class VeterancyStruct
 class TemporalClass
     extends AbstractClass
 {
+    constructor(pOwnerUnit_0 : TechnoClass);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3887,6 +3955,7 @@ class TemporalClass
 class SuperClass
     extends AbstractClass
 {
+    constructor(pSWType_0 : SuperWeaponTypeClass, pOwner_1 : HouseClass);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -3939,6 +4008,7 @@ class SuperClass
 class SuperWeaponTypeClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : SuperWeaponTypeClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -3980,6 +4050,7 @@ class SuperWeaponTypeClass
 class AirstrikeClass
     extends AbstractClass
 {
+    constructor(pOwner_0 : TechnoClass);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -4007,6 +4078,7 @@ class AirstrikeClass
 class CaptureManagerClass
     extends AbstractClass
 {
+    constructor(pOwner_0 : TechnoClass, nMaxControlNodes_1 : number, bInfiniteControl_2 : boolean);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -4037,6 +4109,7 @@ class CaptureManagerClass
 }
 class ControlNode
 {
+    constructor();
     m_Unit : TechnoClass;
     m_OriginalOwner : HouseClass;
     m_LinkDrawTimer : CDTimerClass;
@@ -4045,6 +4118,7 @@ class ControlNode
 class SpawnManagerClass
     extends AbstractClass
 {
+    constructor(pOwner_0 : TechnoClass, pSpawnType_1 : AircraftTypeClass, nMaxNodes_2 : number, RegenRate_3 : number, ReloadRate_4 : number);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -4082,6 +4156,7 @@ class SpawnControl
 class SlaveManagerClass
     extends AbstractClass
 {
+    constructor(pOwner_0 : TechnoClass, pSlave_1 : InfantryTypeClass, num_2 : number, RegenRate_3 : number, ReloadRate_4 : number);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -4111,6 +4186,7 @@ class SlaveManagerClass
 class ParticleSystemClass
     extends ObjectClass
 {
+    constructor(pParticleSystemType_0 : ParticleSystemTypeClass, coords_1 : CoordStruct, pTarget_2 : AbstractClass, pOwner_3 : ObjectClass, targetCoords_4 : CoordStruct, pOwnerHouse_5 : HouseClass);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -4136,6 +4212,7 @@ class ParticleSystemClass
 class ParticleSystemTypeClass
     extends ObjectTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : ParticleSystemTypeClass;
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : ParticleSystemTypeClass;
@@ -4175,6 +4252,7 @@ class ParticleSystemTypeClass
 class ParticleClass
     extends ObjectClass
 {
+    constructor(pParticleType_0 : ParticleTypeClass, pCrd1_1 : CoordStruct, pCrd2_2 : CoordStruct, pParticleSystem_3 : ParticleSystemClass);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -4215,6 +4293,7 @@ class ParticleClass
 class ParticleTypeClass
     extends ObjectTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : ParticleTypeClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -4260,6 +4339,7 @@ class ParticleTypeClass
 class WarheadTypeClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : WarheadTypeClass;
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : WarheadTypeClass;
@@ -4333,6 +4413,7 @@ class WarheadTypeClass
 class VoxelAnimTypeClass
     extends ObjectTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : VoxelAnimTypeClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -4370,6 +4451,7 @@ class VoxelAnimTypeClass
 class WaveClass
     extends ObjectClass
 {
+    constructor(From_0 : CoordStruct, To_1 : CoordStruct, Owner_2 : TechnoClass, mode_3 : any, Target_4 : AbstractClass);
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -4420,6 +4502,7 @@ class WaveClass
 }
 class TransitionTimer
 {
+    constructor();
     AreStates11() : boolean;
     AreStates10() : boolean;
     AreStates01() : boolean;
@@ -4542,6 +4625,7 @@ class BulletData
 }
 class ColorScheme
 {
+    constructor(pID_0 : string, BaseColor_1 : any, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number, AddToArray_5 : boolean);
     static Find(pID_0 : string, ShadeCount_1 : number) : ColorScheme;
     static FindIndex(pID_0 : string, ShadeCount_1 : number) : number;
     static FindByName(pID_0 : string, BaseColor_1 : any, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number) : ColorScheme;
@@ -4580,6 +4664,8 @@ class AbilitiesStruct
 }
 class BounceClass
 {
+    constructor();
+    constructor(coords_0 : CoordStruct, elasticity_1 : number, gravity_2 : number, maxVelocity_3 : number, velocity_4 : any, angularVelocity_5 : number);
     Initialize(coords_0 : CoordStruct, elasticity_1 : number, gravity_2 : number, maxVelocity_3 : number, velocity_4 : any, angularVelocity_5 : number) : void;
     GetCoords(pBuffer_0 : CoordStruct) : CoordStruct;
     GetCoords() : CoordStruct;
@@ -4597,6 +4683,7 @@ class BounceClass
 class BombClass
     extends AbstractClass
 {
+    constructor();
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -4621,6 +4708,7 @@ class BombClass
 }
 class LineTrail
 {
+    constructor();
     SetDecrement(val_0 : number) : void;
     static DeleteAll() : void;
     static s_Array : any;
@@ -4643,6 +4731,7 @@ class WaypointClass
 class HouseTypeClass
     extends AbstractTypeClass
 {
+    constructor(pID_0 : string);
     static Find(pID_0 : string) : HouseTypeClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
@@ -4704,6 +4793,7 @@ class StartingTechnoStruct
 class WaypointPathClass
     extends AbstractClass
 {
+    constructor(idx_0 : number);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -4718,6 +4808,7 @@ class WaypointPathClass
 }
 class UnitTrackerClass
 {
+    constructor();
     IncrementUnitCount(nUnit_0 : number) : void;
     DecrementUnitCount(nUnit_0 : number) : void;
     PopulateUnitCount(nCount_0 : number) : void;
@@ -4748,6 +4839,7 @@ class ScoutStruct
 }
 class DropshipStruct
 {
+    constructor();
     m_Timer : CDTimerClass;
     m___Timer : string;
     m_unknown_C : number;
@@ -4757,6 +4849,7 @@ class DropshipStruct
 }
 class BaseClass
 {
+    constructor();
     Load(pStm_0 : any) : number;
     Save(pStm_0 : any) : number;
     ComputeCRC(crc_0 : any) : void;
@@ -4780,6 +4873,7 @@ class BaseNodeClass
 }
 class Randomizer
 {
+    constructor(dwSeed_0 : number);
     Random() : number;
     RandomRanged(nMin_0 : number, nMax_1 : number) : number;
     RandomDouble() : number;
@@ -4791,6 +4885,7 @@ class Randomizer
 }
 class LinkClass
 {
+    constructor(another_0 : LinkClass);
     GetNext() : LinkClass;
     GetPrev() : LinkClass;
     Add(another_0 : LinkClass) : LinkClass;
@@ -4806,6 +4901,8 @@ class LinkClass
 class GadgetClass
     extends LinkClass
 {
+    constructor(nX_0 : number, nY_1 : number, nWidth_2 : number, nHeight_3 : number, eFlag_4 : any, bSticky_5 : boolean);
+    constructor(another_0 : GadgetClass);
     GetNext() : GadgetClass;
     GetPrev() : GadgetClass;
     Remove() : GadgetClass;
@@ -4860,6 +4957,8 @@ class DifficultyStruct
 }
 class RocketStruct
 {
+    constructor();
+    constructor(_0 : any);
     m_PauseFrames : number;
     m_TiltFrames : number;
     m_PitchInitial : number;
@@ -4876,6 +4975,7 @@ class RocketStruct
 }
 class RulesClass
 {
+    constructor();
     Init(pINI_0 : CCINIClass) : void;
     Read_File(pINI_0 : CCINIClass) : void;
     Read_SpecialWeapons(pINI_0 : CCINIClass) : void;
@@ -5644,6 +5744,7 @@ class RulesClass
 }
 class LocomotionClass
 {
+    constructor();
     QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
@@ -5761,6 +5862,7 @@ class ScenarioFlags
 }
 class ScenarioClass
 {
+    constructor();
     static UpdateCellLighting() : void;
     static UpdateLighting() : void;
     static UpdateHashPalLighting(R_0 : number, G_1 : number, B_2 : number, tint_3 : boolean) : void;
@@ -5905,6 +6007,7 @@ class ScenarioClass
 class OverlayClass
     extends ObjectClass
 {
+    constructor(pType_0 : OverlayTypeClass, mapCoord_1 : CellStruct, flag_2 : number);
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
@@ -5918,6 +6021,7 @@ class OverlayClass
 class FlyLocomotionClass
     extends LocomotionClass
 {
+    constructor();
     QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
@@ -5956,6 +6060,7 @@ class FlyLocomotionClass
 class RocketLocomotionClass
     extends LocomotionClass
 {
+    constructor();
     QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
@@ -5987,6 +6092,7 @@ class RocketLocomotionClass
 class TeleportLocomotionClass
     extends LocomotionClass
 {
+    constructor();
     QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
@@ -6331,6 +6437,8 @@ class PowerClass
 }
 class BuildType
 {
+    constructor();
+    constructor(itemIndex_0 : number, itemType_1 : any);
     static SortsBefore(leftType_0 : any, leftIndex_1 : number, rightType_2 : any, rightIndex_3 : number) : boolean;
     m_ItemIndex : number;
     m_ItemType : any;
