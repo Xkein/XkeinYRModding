@@ -148,12 +148,16 @@ void PhysicsComponent::CreatePhysicsComponent(entt::registry& reg, entt::entity 
     PhysicsTypeComponent* const pPhysicsType = GetYrComponent<PhysicsTypeComponent>(pYrType);
     if (pPhysicsType && pPhysicsType->enable && InitShapeSetting(pPhysicsType, pYrType))
     {
-        PhysicsComponent& com = reg.emplace<PhysicsComponent>(entity);
-
         JPH::BodyCreationSettings settings   = GetBodySettings(pPhysicsType, pYrObject, pYrType);
         JPH::Body*                body       = gBodyInterface->CreateBody(settings);
+        if (!body) {
+            gLogger->error("could not create JPH::Body!");
+            return;
+        }
         JPH::EActivation          activation = settings.mMotionType == JPH::EMotionType::Static ? JPH::EActivation::DontActivate : JPH::EActivation::Activate;
         gBodyInterface->AddBody(body->GetID(), activation);
+        
+        PhysicsComponent& com = reg.emplace<PhysicsComponent>(entity);
         body->SetUserData(reinterpret_cast<uint64>(&com));
         com.owner = pYrObject;
         com.body  = body;
