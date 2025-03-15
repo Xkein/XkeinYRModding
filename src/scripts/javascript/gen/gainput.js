@@ -1,5 +1,5 @@
 
-exports.InputMap = puerts.loadCPPType("InputMap")
+exports.InputMap = puerts.loadCPPType("gainput::InputMap")
 exports.Key = {
     KeyEscape : 0,
     KeyF1 : 1,

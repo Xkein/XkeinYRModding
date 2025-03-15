@@ -179,6 +179,7 @@ gameEvents.removeGroupEventHandler = (group, name, handler) => {
 gameEvents.technoGroupEvents = [gameEvents.unit, gameEvents.infantry, gameEvents.building, gameEvents.aircraft]
 gameEvents.objectGroupEvents = [gameEvents.bullet].concat(gameEvents.technoGroupEvents)
 gameEvents.technoTypeGroupEvents = [gameEvents.unitType, gameEvents.infantryType, gameEvents.buildingType, gameEvents.aircraftType]
+gameEvents.objectTypeGroupEvents = [gameEvents.bulletType].concat(gameEvents.technoTypeGroupEvents)
 
 let __JsEvents = XkeinExt.JsEvents
 function bind_js_event(type, eventName) {

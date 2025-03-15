@@ -8,7 +8,7 @@
 
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-exports.{{klass.name}} = puerts.loadCPPType("{{klass.name}}")
+exports.{{klass.name}} = puerts.loadCPPType("{{klass.full_name}}")
 {{- end; end }}
 
 {{- for enum in module_enums }}
