@@ -11,19 +11,11 @@ target("puerts")
     set_languages("cxx17")
     -- add_deps("v8")
     add_deps("nodejs")
-    -- -- no good idea
-    -- on_load(function(target)
-    --     import("common_tool")
-    --     puerts_dir = common_tool.get_thirdparty_path("puerts")
-    --     puerts_unreal_dir = puerts_dir.."/unreal"
-    --     puerts_unreal_puerts_dir = puerts_unreal_dir.."/Puerts"
-    --     os.rm(puerts_unreal_puerts_dir.."/Source/JsEnv/Public/V8Utils.h")
-    -- end)
     add_includedirs(
-        puerts_native_dir.."/Inc",
+        -- puerts_native_dir.."/Inc",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Public",
-        -- puerts_native_dir.."/Inc",
+        puerts_native_dir.."/Inc",
         puerts_3rd_dir.."/Include/websocketpp", 
         puerts_3rd_dir.."/Include/asio",
         {public = true})
@@ -42,7 +34,7 @@ target("puerts")
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/DataTransfer.cpp",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/JSClassRegister.cpp",
         puerts_native_dir.."/Src/BackendEnv.cpp",
-        puerts_native_dir.."/Src/JSFunction.cpp",
+        -- puerts_native_dir.."/Src/JSFunction.cpp",
         puerts_unreal_puerts_dir.."/Source/JsEnv/Private/V8InspectorImpl.cpp"
     )
     -- add_defines("MAPPER_ISOLATE_DATA_POS=2", "PLATFORM_WINDOWS", {public = true})

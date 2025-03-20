@@ -67,11 +67,11 @@ static v8::Local<v8::String> ToV8StringFromFileContent(v8::Isolate* Isolate, con
 
 namespace puerts
 {
-    void PLog(LogLevel Level, const std::string Fmt, ...) {
+    void PLog(LogLevel Level, const char* Fmt, ...) {
         auto& buffer = gJsEnv->StrBuffer;
         va_list argptr;
         va_start(argptr, Fmt);
-        vsprintf_s(buffer.data(), buffer.size(), Fmt.c_str(), argptr);
+        vsprintf_s(buffer.data(), buffer.size(), Fmt, argptr);
         va_end(argptr);
         switch (Level)
         {
@@ -86,7 +86,6 @@ namespace puerts
                 break;
         }
     }
-
 } // namespace puerts
 
 JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), Inspector(nullptr)
@@ -1166,8 +1165,7 @@ void JsEnv::Unbind(AbstractClass* YrObject)
     if (PersistentValuePtr != ObjectMap.end()) // create and link
     {
         auto JsRegistration = const_cast<JSClassDefinition*>(FindClassByID(GetYrJsTypeID(YrObject->WhatAmI())));
-        CppObjectMapper.UnBindCppObject(JsRegistration, YrObject);
-        // CppObjectMapper.UnBindCppObject(MainIsolate, JsRegistration, YrObject);
+        CppObjectMapper.UnBindCppObject(MainIsolate, JsRegistration, YrObject);
         ObjectMap.erase(PersistentValuePtr);
     }
 }
@@ -1182,15 +1180,14 @@ void JsEnv::UnbindAllYrObjects()
     v8::HandleScope    HandleScope(Isolate);
     auto               Context = DefaultContext.Get(Isolate);
     v8::Context::Scope ContextScope(Context);
-    gLogger->info("unbind {} yr objects", ObjectMap.size());
+    gLogger->info("JsEnv::unbind {} yr objects", ObjectMap.size());
     while(!ObjectMap.empty()) {
         auto PersistentValuePtr = ObjectMap.begin();
         v8::Local<v8::Value> JsObject = v8::Local<v8::Value>::New(Isolate, PersistentValuePtr->second);
         const void* TypeId = DataTransfer::GetPointerFast<const void>(JsObject.As<v8::Object>(), 1);
         auto JsRegistration = const_cast<JSClassDefinition*>(FindClassByID(TypeId));
         AbstractClass* YrObject = PersistentValuePtr->first;
-        CppObjectMapper.UnBindCppObject(JsRegistration, YrObject);
-        // CppObjectMapper.UnBindCppObject(Isolate, JsRegistration, YrObject);
+        CppObjectMapper.UnBindCppObject(Isolate, JsRegistration, YrObject);
         ObjectMap.erase(PersistentValuePtr);
     }
 }
