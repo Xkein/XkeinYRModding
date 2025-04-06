@@ -129,9 +129,11 @@ private:
     v8::MaybeLocal<v8::Module> FetchCJSModuleAsESModule(v8::Local<v8::Context> Context, const char* ModuleName);
 
     std::unordered_multimap<int, FModuleInfo*>::iterator FindModuleInfo(v8::Local<v8::Module> Module);
-
-    static v8::MaybeLocal<v8::Module> ResolveModuleCallback(v8::Local<v8::Context> Context, v8::Local<v8::String> Specifier, v8::Local<v8::Module> Referrer);
-
+    static v8::MaybeLocal<v8::Module> ResolveModuleCallback(v8::Local<v8::Context> Context, v8::Local<v8::String> Specifier,
+#if V8_94_OR_NEWER
+        v8::Local<v8::FixedArray> ImportAssertions,
+#endif
+        v8::Local<v8::Module> Referrer);
     PUERTS_NAMESPACE::V8Inspector* Inspector;
 
     PUERTS_NAMESPACE::V8InspectorChannel* InspectorChannel;

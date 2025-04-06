@@ -95,6 +95,8 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     ModuleLoader = std::make_shared<DefaultJSModuleLoader>("assets/JavaScript");
     BackendEnv   = std::make_unique<PUERTS_NAMESPACE::FBackendEnv>();
 
+    // Before initializing V8, disable the --freeze-flags-after-init flag
+    v8::V8::SetFlagsFromString("--no-freeze-flags-after-init");
     FBackendEnv::GlobalPrepare();
     BackendEnv->Initialize(nullptr, nullptr);
     MainIsolate = BackendEnv->MainIsolate;
@@ -107,6 +109,9 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     Isolate->SetData(0, this);
     Isolate->SetData(1, BackendEnv.get());
 
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope Isolatescope(Isolate);
     v8::HandleScope    HandleScope(Isolate);
 
@@ -366,6 +371,9 @@ void JsEnv::ExecuteModule(const char* ModuleName)
     // #endif
 
     auto               Isolate = MainIsolate;
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope IsolateScope(Isolate);
     v8::HandleScope    HandleScope(Isolate);
     auto               Context = v8::Local<v8::Context>::New(Isolate, DefaultContext);
@@ -515,6 +523,9 @@ bool JsEnv::InspectorTick()
 
 bool JsEnv::ClearModuleCache(const char* Path)
 {
+#ifdef THREAD_SAFE
+    v8::Locker Locker(MainIsolate);
+#endif
     v8::Isolate::Scope     IsolateScope(MainIsolate);
     v8::HandleScope        HandleScope(MainIsolate);
     v8::Local<v8::Context> Context = DefaultContext.Get(MainIsolate);
@@ -535,6 +546,9 @@ void JsEnv::JsHotReload(const char* ModuleName, const char* JsSource)
     ensureMsgf(BoundThreadId == FPlatformTLS::GetCurrentThreadId(), TEXT("Access by illegal thread!"));
 #endif
     auto               Isolate = MainIsolate;
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope IsolateScope(Isolate);
     v8::HandleScope    HandleScope(Isolate);
     auto               Context = DefaultContext.Get(Isolate);
@@ -622,6 +636,9 @@ std::string JsEnv::ObjectToString(v8::Local<v8::Value> value)
 
 std::string JsEnv::ObjectToString(const v8::PersistentBase<v8::Value>& value)
 {
+#ifdef THREAD_SAFE
+    v8::Locker Locker(MainIsolate);
+#endif
     v8::Isolate::Scope     IsolateScope(MainIsolate);
     v8::HandleScope        HandleScope(MainIsolate);
     v8::Local<v8::Context> Context = DefaultContext.Get(MainIsolate);
@@ -661,6 +678,9 @@ bool JsEnv::LoadFile(const char* RequiringDir, const char* ModuleName, std::stri
 void JsEnv::EvalScript(const v8::FunctionCallbackInfo<v8::Value>& Info)
 {
     v8::Isolate*           Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope     IsolateScope(Isolate);
     v8::HandleScope        HandleScope(Isolate);
     v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
@@ -748,6 +768,9 @@ void JsEnv::EvalScript(const v8::FunctionCallbackInfo<v8::Value>& Info)
 void JsEnv::Log(const v8::FunctionCallbackInfo<v8::Value>& Info)
 {
     v8::Isolate*           Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope     IsolateScope(Isolate);
     v8::HandleScope        HandleScope(Isolate);
     v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
@@ -798,6 +821,9 @@ void JsEnv::SearchModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
 void JsEnv::LoadModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
 {
     v8::Isolate*           Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope     IsolateScope(Isolate);
     v8::HandleScope        HandleScope(Isolate);
     v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
@@ -820,6 +846,9 @@ void JsEnv::SetInspectorCallback(const v8::FunctionCallbackInfo<v8::Value>& Info
 {
 #ifndef WITH_QUICKJS
     v8::Isolate* Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope Isolatescope(Isolate);
     v8::HandleScope HandleScope(Isolate);
     v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
@@ -837,6 +866,9 @@ void JsEnv::SetInspectorCallback(const v8::FunctionCallbackInfo<v8::Value>& Info
             [this](std::string Message)
             {
                 // UE_LOG(LogTemp, Warning, TEXT("<-- %s"), UTF8_TO_TCHAR(Message.c_str()));
+#ifdef THREAD_SAFE
+                v8::Locker Locker(MainIsolate);
+#endif
                 v8::Isolate::Scope IsolatescopeObject(MainIsolate);
                 v8::HandleScope HandleScopeObject(MainIsolate);
                 v8::Local<v8::Context> ContextInner = DefaultContext.Get(MainIsolate);
@@ -863,6 +895,9 @@ void JsEnv::DispatchProtocolMessage(const v8::FunctionCallbackInfo<v8::Value>& I
 {
 #ifndef WITH_QUICKJS
     v8::Isolate* Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope Isolatescope(Isolate);
     v8::HandleScope HandleScope(Isolate);
     v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
@@ -939,10 +974,19 @@ v8::MaybeLocal<v8::Module> JsEnv::FetchESModuleTree(v8::Local<v8::Context> Conte
 
     auto DirName = Paths::GetPath(FileName);
 
-    for (int i = 0, Length = Module->GetModuleRequestsLength(); i < Length; ++i)
+#if V8_MAJOR_VERSION >= 12
+    auto ModuleRequests = Module->GetModuleRequests();
+    int ModuleRequestsLength = ModuleRequests->Length();
+#else
+    int ModuleRequestsLength = Module->GetModuleRequestsLength();
+#endif
+    for (int i = 0, Length = ModuleRequestsLength; i < Length; ++i)
     {
+#if V8_MAJOR_VERSION >= 12
+        auto RefModuleName = ObjectToString(ModuleRequests->Get(Context, i).As<v8::ModuleRequest>()->GetSpecifier());
+#else
         auto RefModuleName = ObjectToString(Module->GetModuleRequest(i));
-
+#endif
         std::string OutPath;
         std::string OutDebugPath;
         if (ModuleLoader->Search(DirName.c_str(), RefModuleName.c_str(), OutPath, OutDebugPath))
@@ -1034,8 +1078,13 @@ v8::MaybeLocal<v8::Module> JsEnv::FetchCJSModuleAsESModule(v8::Local<v8::Context
         }
     }
 
+#if V8_MAJOR_VERSION >= 12
+    v8::MemorySpan<const v8::Local<v8::String>> ExportNamesSpan(ExportNames.data(), ExportNames.size());
+#else
+    auto& ExportNamesSpan = ExportNames; 
+#endif
     v8::Local<v8::Module> SyntheticModule = v8::Module::CreateSyntheticModule(
-        Isolate, FV8Utils::V8String(Isolate, ModuleName), ExportNames, [](v8::Local<v8::Context> ContextInner, v8::Local<v8::Module> Module) -> v8::MaybeLocal<v8::Value> {
+        Isolate, FV8Utils::V8String(Isolate, ModuleName), ExportNamesSpan, [](v8::Local<v8::Context> ContextInner, v8::Local<v8::Module> Module) -> v8::MaybeLocal<v8::Value> {
         const auto IsolateInner = ContextInner->GetIsolate();
         auto       Self         = FV8Utils::IsolateData<JsEnv>(IsolateInner);
 
@@ -1086,7 +1135,11 @@ std::unordered_multimap<int, JsEnv::FModuleInfo*>::iterator JsEnv::FindModuleInf
     return HashToModuleInfo.end();
 }
 
-v8::MaybeLocal<v8::Module> JsEnv::ResolveModuleCallback(v8::Local<v8::Context> Context, v8::Local<v8::String> Specifier, v8::Local<v8::Module> Referrer)
+v8::MaybeLocal<v8::Module> JsEnv::ResolveModuleCallback(v8::Local<v8::Context> Context, v8::Local<v8::String> Specifier, 
+#if V8_94_OR_NEWER
+    v8::Local<v8::FixedArray> ImportAssertions,
+#endif
+    v8::Local<v8::Module> Referrer)
 {
     auto       Self         = FV8Utils::IsolateData<JsEnv>(Context->GetIsolate());
     const auto ItModuleInfo = Self->FindModuleInfo(Referrer);
@@ -1176,6 +1229,9 @@ void JsEnv::UnbindAllYrObjects()
         return;
     
     auto Isolate = MainIsolate;
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope IsolateScope(Isolate);
     v8::HandleScope    HandleScope(Isolate);
     auto               Context = DefaultContext.Get(Isolate);
