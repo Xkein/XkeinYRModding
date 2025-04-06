@@ -6,9 +6,16 @@ target("codegen-policy")
     before_build(function(target)
     end)
 
+target("_link_YrExtCore_First")
+    set_kind("phony")
+    add_deps("YrExtCore", {inherit = false})
+
 rule("codegen-cpp")
     on_load(function (target, opt)
         target:add("deps", "codegen-policy", { public = false })
+        if target:name() ~= "YrExtCore" and target:name() ~= "YRpp" then
+            target:add("deps", "_link_YrExtCore_First", { public = false })
+        end
         target:add("deps", "Core")
     end)
     after_load(function(target)

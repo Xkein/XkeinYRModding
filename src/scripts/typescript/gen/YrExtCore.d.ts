@@ -1,7 +1,7 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YrExtCore" {
 import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
-import { AKRESULT } from "wwise";
+import { AKRESULT } from "Wwise";
 class YrInputBlocker
 {
     static BlockAllInput() : void;

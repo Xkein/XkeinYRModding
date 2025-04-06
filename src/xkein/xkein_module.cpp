@@ -24,7 +24,7 @@ void YrXkeinModule::Startup()
 
     REGISTER_JS_MODULE(YRpp);
     REGISTER_JS_MODULE(YrExtCore);
-    REGISTER_JS_MODULE(wwise);
+    REGISTER_JS_MODULE(Wwise);
     REGISTER_JS_MODULE(gainput);
     REGISTER_JS_MODULE(XkeinExt);
 

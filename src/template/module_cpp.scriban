@@ -13,7 +13,7 @@ __IMPLEMENT_YR_HOOK_EVENT({{klass.full_name}})
 {{- end; end }}
 {{- end }}
 
-{{- if !is_yrpp && module_name != "wwise" && module_name != "gainput" }}
+{{- if !is_yrpp && module_name != "Wwise" && module_name != "gainput" }}
 #include "yr/extension_manager.h"
 {{- end }}
 {{- for enum in module_enums}}

@@ -42,7 +42,7 @@ target("XkeinExt")
     set_languages("cxxlatest")
     add_rules("codegen-cpp")
 
-    add_deps("YrExtCore", "JoltPhysics", "wwise", "puerts", "gainput")
+    add_deps("YrExtCore", "JoltPhysics", "Wwise", "puerts", "gainput")
     add_packages("cppzmq", "stb", "msgpack-cxx")
 
     add_headerfiles("src/audio/**.h", "src/physics/**.h", "src/render/**.h", "src/scripting/**.h", "src/input/**.h")

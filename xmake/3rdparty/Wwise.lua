@@ -15,7 +15,7 @@ if not os.exists(wwise_includes_dir) or not os.exists(wwise_lib_dir) then
     error("wwise include or library directory not exists")
 end
 
-target("wwise")
+target("Wwise")
     set_kind("static")
     set_languages("cxx20")
     add_rules("codegen-cpp", {
@@ -69,4 +69,4 @@ target("wwise")
               "AkVorbisDecoder.lib",
               "AkOpusDecoder.lib",
         {public=true})
-    add_filegroups("wwise", {rootdir = wwise_includes_dir})
+    add_filegroups("Wwise", {rootdir = wwise_includes_dir})

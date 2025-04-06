@@ -1,7 +1,7 @@
 /// <reference path = "../index.d.ts"/>
 declare module "gainput" {
 import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
-import { AKRESULT } from "wwise";
+import { AKRESULT } from "Wwise";
 class InputMap
 {
     constructor(manager_0 : any, name_1 : string, allocator_2 : any);

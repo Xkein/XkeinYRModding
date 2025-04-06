@@ -1,5 +1,5 @@
 /// <reference path = "../index.d.ts"/>
-declare module "wwise" {
+declare module "Wwise" {
 import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
 enum AKRESULT {
     AK_NotImplemented = 0,

@@ -104,8 +104,8 @@
 declare module "{{module_name}}" {
 {{- if !is_yrpp }}
 import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
-{{- if module_name != "wwise"}}
-import { AKRESULT } from "wwise";
+{{- if module_name != "Wwise"}}
+import { AKRESULT } from "Wwise";
 {{- end }}
 {{- end }}
 {{- for klass in module_classes }}

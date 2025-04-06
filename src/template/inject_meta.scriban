@@ -7,7 +7,7 @@
         $gen_types = get_yr_game_types()
         inject_tags_list["BindJs"] = $gen_types
         inject_tags_list["AllPublicVisible"] = $gen_types
-    else if module_name == "wwise"
+    else if module_name == "Wwise"
         $gen_types = ["AKRESULT"]
         inject_tags_list["BindJs"] = $gen_types
         inject_tags_list["AllPublicVisible"] = $gen_types
