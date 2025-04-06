@@ -1,6 +1,8 @@
 #pragma once
+#include "core/reflection/macro.h"
 #include <memory>
 #include <string_view>
+#include <string>
 #include <GeneralDefinitions.h>
 #include <AK/SoundEngine/Common/AkTypes.h>
 
@@ -31,11 +33,20 @@ public:
     ~WwiseSoundBank();
 
     bool success;
-    std::string_view bankName;
+    std::string bankName;
     AkBankID bankID;
 };
 
+CLASS(BindJs)
+class WwiseSoundBankRef
+{
+    std::shared_ptr<WwiseSoundBank> soundBank;
+public:
+    WwiseSoundBankRef(const std::string& bankName);
+    ~WwiseSoundBankRef();
+};
 
+CLASS(BindJs)
 class AudioSystem
 {
 public:
@@ -46,7 +57,20 @@ public:
     static void InitWorld();
     static void DestroyWorld();
 
+    FUNCTION()
     static AkUniqueID GetSurfaceID(LandType landType);
+
+    FUNCTION()
+    static AkUniqueID GetIDFromString(const char* in_pszString);
+
+    FUNCTION()
+    static AkPlayingID PostEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID);
+
+    FUNCTION()
+    static AKRESULT SetSwitch(AkSwitchGroupID in_switchGroup, AkSwitchStateID in_switchState, AkGameObjectID in_gameObjectID);
+
+    FUNCTION()
+    static AKRESULT SetRTPCValue(AkRtpcID in_rtpcID, AkRtpcValue in_value, AkGameObjectID in_gameObjectID);
 
     static void SetMusicState(EMusicState state);
     static EMusicState GetMusicState();

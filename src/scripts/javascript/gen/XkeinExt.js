@@ -1,8 +1,12 @@
 
+exports.WwiseSoundBankRef = puerts.loadCPPType("WwiseSoundBankRef")
+exports.AudioSystem = puerts.loadCPPType("AudioSystem")
+exports.AudioComponent = puerts.loadCPPType("AudioComponent")
 exports.PhysicsCollisionAddAndPersistResult = puerts.loadCPPType("PhysicsCollisionAddAndPersistResult")
 exports.PhysicsCollisionRemoveResult = puerts.loadCPPType("PhysicsCollisionRemoveResult")
 exports.PhysicsComponent = puerts.loadCPPType("PhysicsComponent")
 exports.PhysicsTypeComponent = puerts.loadCPPType("PhysicsTypeComponent")
+exports.JsCppHelper = puerts.loadCPPType("JsCppHelper")
 exports.JsAbstractEvents = puerts.loadCPPType("JsAbstractEvents")
 exports.JsObjectEvents = puerts.loadCPPType("JsObjectEvents")
 exports.JsAbstractTypeEvents = puerts.loadCPPType("JsAbstractTypeEvents")

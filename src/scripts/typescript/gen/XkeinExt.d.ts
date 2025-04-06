@@ -2,6 +2,23 @@
 declare module "XkeinExt" {
 import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
 import { AKRESULT } from "Wwise";
+class WwiseSoundBankRef
+{
+}
+class AudioSystem
+{
+    static GetSurfaceID(landType_0 : LandType) : number;
+    static GetIDFromString(in_pszString_0 : string) : number;
+    static PostEvent(in_eventID_0 : number, in_gameObjectID_1 : number) : number;
+    static SetSwitch(in_switchGroup_0 : number, in_switchState_1 : number, in_gameObjectID_2 : number) : AKRESULT;
+    static SetRTPCValue(in_rtpcID_0 : number, in_value_1 : number, in_gameObjectID_2 : number) : AKRESULT;
+}
+class AudioComponent
+{
+    static CreateAudioComponent(entity_0 : any, pYrObject_1 : AbstractClass) : AudioComponent;
+    m_owner : AbstractClass;
+    m_akGameObjId : number;
+}
 class PhysicsCollisionAddAndPersistResult
 {
     m_com1 : PhysicsComponent;
@@ -29,6 +46,10 @@ class PhysicsTypeComponent
     m_radius : number;
     m_halfHeight : number;
     m_halfExtent : any;
+}
+class JsCppHelper
+{
+    static GetEntityByYrObject(pObject_0 : AbstractClass) : any;
 }
 class JsAbstractEvents
 {

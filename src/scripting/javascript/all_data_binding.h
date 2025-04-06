@@ -14,6 +14,14 @@ UsingCppTypeWithRefCache(JsSuperWeaponEvents)
 UsingCppTypeWithRefCache(JsSuperWeaponTypeEvents)
 UsingCppTypeWithRefCache(JsHouseEvents)
 UsingCppTypeWithRefCache(JsEvents)
+#include "scripting/javascript/js_cpp_helper.h"
+UsingCppTypeWithRefCache(JsCppHelper);
+
+#include "audio/audio.h"
+UsingCppType(WwiseSoundBankRef);
+#include "audio/audio_component.h"
+UsingCppType(AudioSystem);
+UsingCppType(AudioComponent);
 
 #include "physics/physics_component.h"
 UsingCppType(PhysicsComponent)

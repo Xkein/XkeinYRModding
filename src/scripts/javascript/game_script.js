@@ -61,23 +61,23 @@ class GameScriptable
 (function (global) {
     global.gameScripts = gameScripts
     
-    var iniReaderXkein = new YrExtCore.IniReader("XkeinExt.ini")
-    if (iniReaderXkein.ReadString("Scripting", "InitScript") > 0) {
-        var scriptName = iniReaderXkein.value().trim()
-        require(scriptName)
+    let iniReaderXkein = new YrExtCore.IniReader("XkeinExt.ini")
+    let initScriptName = IniHelper.ReadString(iniReaderXkein, "Scripting", "InitScript")
+    if (initScriptName) {
+        require(initScriptName)
     }
 
     gameEvents.game.onRulesLoadAfterTypeData.add((yrRules, iniReader) => {
-        if (iniReader.ReadString("Basic", "JsMapScript") > 0) {
-            var scriptName = iniReader.value().trim()
-            var mapScriptable = gameScripts.getOrCreate(scriptName)
+        let mapScriptName = IniHelper.ReadString(iniReader, "Basic", "JsMapScript")
+        if (mapScriptName) {
+            var mapScriptable = gameScripts.getOrCreate(mapScriptName)
         }
     })
 
     let onLoadType = (yrObjectType, iniReader) => {
-        if (iniReader.ReadString(yrObjectType.m_ID, "JsScript") > 0) {
-            var scriptName = iniReader.value().trim()
-            let scriptable = gameScripts.getOrCreate(scriptName)
+        let objectScriptName = IniHelper.ReadString(iniReader, yrObjectType.m_ID, "JsScript")
+        if (objectScriptName) {
+            let scriptable = gameScripts.getOrCreate(objectScriptName)
             yrObjectType.__scriptable = scriptable
             if (scriptable && scriptable.script.onLoadType) {
                 scriptable.script.onLoadType(yrObjectType, iniReader)

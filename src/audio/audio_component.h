@@ -25,25 +25,6 @@ struct WwiseStringID
     }
 };
 
-CLASS(IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass])
-struct AudioTypeComponent final
-{
-    PROPERTY(IniField = "Audio.Enable")
-    bool enable {false};
-    PROPERTY(IniField = "Audio.SoundBank")
-    std::string_view soundBankName;
-    PROPERTY(IniField = "Audio.DetonateEvent")
-    WwiseStringID detonateEvent;
-    PROPERTY(IniField = "Audio.DamageEvent")
-    WwiseStringID damageEvent;
-    PROPERTY(IniField = "Audio.CreateEvent")
-    WwiseStringID createEvent;
-    PROPERTY(IniField = "Audio.RemoveEvent")
-    WwiseStringID removeEvent;
-    
-    std::shared_ptr<WwiseSoundBank> soundBank;
-};
-
 CLASS(IniComponent, ComponentTarget = [ThemeControl])
 struct ThemeComponent final
 {
@@ -58,26 +39,23 @@ struct ThemeComponent final
     AkPlayingID playingID;
 };
 
-CLASS(ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass])
+CLASS(BindJs)
 class AudioComponent final
 {
 public:
-    template<typename TargetType>
-    static void OnEntityConstruct(entt::registry& reg, entt::entity entity, TargetType* pYrObject) {
-        CreateAudioComponent(reg, entity, pYrObject, pYrObject->Type);
-    }
-
     AudioComponent() = default;
     AudioComponent(AudioComponent&&) = default;
     ~AudioComponent();
 
     void Tick();
 
-    AudioTypeComponent* type;
+    FUNCTION()
+    static AudioComponent* CreateAudioComponent(entt::entity entity, AbstractClass* pYrObject);
+
+    PROPERTY()
     AbstractClass* owner;
+    PROPERTY()
     AkGameObjectID akGameObjId {0};
-private:
-    static void CreateAudioComponent(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);
 };
 
 #ifndef __HEADER_TOOL__

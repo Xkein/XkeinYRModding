@@ -343,6 +343,26 @@ AkUniqueID AudioSystem::GetSurfaceID(LandType landType)
     }
 }
 
+AkUniqueID AudioSystem::GetIDFromString(const char* in_pszString)
+{
+    return AK::SoundEngine::GetIDFromString(in_pszString);
+}
+
+AkPlayingID AudioSystem::PostEvent(AkUniqueID in_eventID, AkGameObjectID in_gameObjectID)
+{
+    return AK::SoundEngine::PostEvent(in_eventID, in_gameObjectID);
+}
+
+AKRESULT AudioSystem::SetSwitch(AkSwitchGroupID in_switchGroup, AkSwitchStateID in_switchState, AkGameObjectID in_gameObjectID)
+{
+    return AK::SoundEngine::SetSwitch(in_switchGroup, in_switchState, in_gameObjectID);
+}
+
+AKRESULT AudioSystem::SetRTPCValue(AkRtpcID in_rtpcID, AkRtpcValue in_value, AkGameObjectID in_gameObjectID)
+{
+    return AK::SoundEngine::SetRTPCValue(in_rtpcID, in_value, in_gameObjectID);
+}
+
 static std::map<std::string_view, std::weak_ptr<WwiseSoundBank>> gSoundBanks;
 
 std::shared_ptr<WwiseSoundBank> AudioSystem::GetSoundBank(std::string_view path)
@@ -377,6 +397,14 @@ WwiseSoundBank::~WwiseSoundBank()
         gLogger->info("AudioSystem: unload sound bank \"{}\"", bankName);
         AK::SoundEngine::UnloadBank(bankID, nullptr);
     }
+}
+
+WwiseSoundBankRef::WwiseSoundBankRef(const std::string& bankName) {
+    soundBank = AudioSystem::GetSoundBank(bankName);
+}
+
+WwiseSoundBankRef::~WwiseSoundBankRef() {
+    soundBank.reset();
 }
 
 #include "yr/yr_all_events.h"
