@@ -18,7 +18,7 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent) { if(gEngine) gEngine->OnSceneCl
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneLoadEvent) { if(gEngine) gEngine->OnSceneLoad(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent) { if(gEngine) gEngine->OnBeginUpdate(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicEndUpdateEvent) { if(gEngine) gEngine->OnEndUpdate(); }
-DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) { if(gEngine) gEngine->OnUIUpdate(); }
+DEFINE_YR_HOOK_EVENT_LISTENER(YrUIUpdateEvent) { if(gEngine && gEngine->started) gEngine->OnUIUpdate(); }
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBeginRenderEvent) { if(gEngine) gEngine->OnBeginRender(); }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrEndRenderEvent) { if(gEngine) gEngine->OnEndRender(); }

@@ -46,7 +46,7 @@ BROADCAST_HOOK_EVENT(0x46AF9E, 0x7, YrBulletLoadGameEndEvent)
 }
 BROADCAST_HOOK_EVENT(0x466556, 0x6, YrBulletConstructEvent)
 {
-    E->pBullet     = R->ESI<BulletClass*>();
+    E->pBullet     = R->ECX<BulletClass*>();
     E->pBulletType = R->Stack<BulletTypeClass*>(STACK_OFFSET(0x4, 0x4));
     E->pTarget     = R->Stack<AbstractClass*>(STACK_OFFSET(0x4, 0x8));
     E->pOwner      = R->Stack<TechnoClass*>(STACK_OFFSET(0x4, 0xC));
