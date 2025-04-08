@@ -19,7 +19,10 @@ namespace SyringePatchData { \
     syringe_patch_data _hk__ ## hook ## funcname { hook, size, &funcname }; \
 };
 
-#define SYRINGE_PATCH(hook, funcname, size) \
+#define __SYRINGE_PATCH_IMPL(hook, funcname, size) \
 EXPORT_FUNC(funcname); \
 decl_patch_data(hook, funcname, size) \
 EXPORT_FUNC(funcname)
+
+#define SYRINGE_PATCH(hook, funcname, size) \
+__SYRINGE_PATCH_IMPL(hook, funcname##_HOOK_##hook##_##size, size)

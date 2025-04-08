@@ -142,7 +142,6 @@ public:
         return GetEvent<T>()->meta(handle);
     }
 
-#ifdef YREXTCORE_IMPL
     template<class TEvent, DWORD HookAddress>
     inline static DWORD Broadcast(REGISTERS* R)
     {
@@ -151,7 +150,6 @@ public:
         hookEvent->InitHookInfo<TEvent, HookAddress>(R, &e);
         return Broadcast_Impl<TEvent, HookAddress>(hookEvent, R, &e);
     }
-#endif // YREXTCORE_IMPL
 
 private:
     template<class T>

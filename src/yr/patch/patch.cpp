@@ -151,3 +151,8 @@ void ApplyModulePatch(HANDLE hInstance)
         }
     }
 }
+
+void RemoveModulePatch(HANDLE hInstance)
+{
+    gLogger->warn("RemoveModulePatch is not implemented yet!");
+}

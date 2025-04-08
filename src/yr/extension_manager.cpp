@@ -2,6 +2,7 @@
 #include "extension_manager.h"
 #include "runtime/logger/logger.h"
 #include "yr/debug_util.h"
+#include "yr/patch/patch.h"
 #include <filesystem>
 #include <boost/nowide/convert.hpp>
 using boost::nowide::widen;
@@ -25,6 +26,7 @@ bool ExtensionManager::LoadExtension(const char* extension)
     GuardExecute([&](){
         gLogger->info("Loading extension {}", extension);
         module = LoadLibraryW(WIDEN(extension));
+        ApplyModulePatch(module);
     }, [=](std::string error){
         gLogger->error("could not load extension {}: {}", extension, error);
     });
@@ -39,6 +41,7 @@ bool ExtensionManager::UnloadExtension(const char* extension)
     gLogger->info("Unloading extension {}", extension);
     bool success = false;
     GuardExecute([&](){
+        RemoveModulePatch(hModule);
         success = FreeLibrary(hModule);
     }, [=](std::string error){
         gLogger->error("could not unload extension {}: {}", extension, error);
