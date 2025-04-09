@@ -1,4 +1,5 @@
 #include "ui/yr_uiext.h"
+#include "yr/extcore_config.h"
 #include "yr/event/general_event.h"
 #include "yr/event/ui_event.h"
 #include "ui/imgui/yr_imgui.h"
@@ -79,7 +80,9 @@ std::unique_ptr<ImGuiThread> imguiThread;
 
 void YrExtUIModule::InitUIModule()
 {
-    imguiThread = std::make_unique<ImGuiThread>();
+    if (gYrExtConfig->rawData.value("enable_imgui_module", false)) {
+        imguiThread = std::make_unique<ImGuiThread>();
+    }
 }
 
 void YrExtUIModule::DestroyUIModule()

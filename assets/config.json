@@ -1,13 +1,13 @@
 {
     "extensions": [
-        "XkeinExt",
-        "XkeinEditor"
+        "XkeinExt"
     ],
     "assets_dir": "assets",
     "plugins_dir": "plugins",
     "log_level": 2,
 
     "enable_js_module": true,
+    "enable_imgui_module": false,
 
     "render_server_port": 9900,
     
