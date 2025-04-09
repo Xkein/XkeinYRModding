@@ -18,9 +18,9 @@ BROADCAST_HOOK_EVENT(0x517D90, 0x5, YrInfantryDtorEvent)
     E->pInfantry = R->ECX<InfantryClass*>();
 }
 
-BROADCAST_HOOK_EVENT(0x523970, 0x5, YrInfantryTypeCtorEvent)
+BROADCAST_HOOK_EVENT(0x523974, 0x5, YrInfantryTypeCtorEvent)
 {
-    E->pInfantryType = R->ESI<InfantryTypeClass*>();
+    E->pInfantryType = R->EAX<InfantryTypeClass*>();
 }
 BROADCAST_HOOK_EVENT(0x524D70, 0x6, YrInfantryTypeDtorEvent)
 {
