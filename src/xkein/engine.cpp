@@ -51,8 +51,10 @@ void Engine::Start()
     AudioSystem::Init();
     Input::Init();
     YrExtUIModule::InitUIModule();
-
+    if (gYrExtConfig->rawData.value("enable_js_module", true))
+    {
     gJsEnv = new JsEnv();
+    }
 }
 
 void Engine::Exit()
@@ -62,10 +64,11 @@ void Engine::Exit()
     started = false;
     gLogger->info("Engine::Exit()");
 
+    if (gJsEnv) {
     // INVOKE_JS_EVENT(JsEvents::game.onApplicationQuit);
-
     delete gJsEnv;
     gJsEnv = nullptr;
+    }
 
     Physics::Destroy();
     AudioSystem::Destroy();
@@ -88,7 +91,9 @@ void Engine::OnSceneStart()
 void Engine::OnSceneClear()
 {
     gLogger->info("Engine::OnSceneClear()");
+    if (gJsEnv) {
     gJsEnv->UnbindAllYrObjects();
+    }
     Physics::ExitWorld();
     AudioSystem::DestroyWorld();
 }

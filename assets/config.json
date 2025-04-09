@@ -7,6 +7,8 @@
     "plugins_dir": "plugins",
     "log_level": 2,
 
+    "enable_js_module": true,
+
     "render_server_port": 9900,
     
     "enable_graphic_debug_layer": true,
