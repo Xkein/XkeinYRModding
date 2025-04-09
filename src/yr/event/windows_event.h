@@ -14,7 +14,7 @@ public:
 };
 
 CLASS(HookEvent)
-class YrMainWndProcEvent : public YrWndProcEvent
+class YrMainWndProcEvent : public YrWndProcEvent, public YrHookOverrideReturn<LRESULT>
 {};
 
 CLASS(HookEvent)
@@ -25,3 +25,6 @@ class YrTerminateEvent { };
 
 CLASS(HookEvent)
 class YrAfterCreateWindoweEvent { };
+
+CLASS(HookEvent)
+class YrAfterSetCooperativeLevelEvent { };

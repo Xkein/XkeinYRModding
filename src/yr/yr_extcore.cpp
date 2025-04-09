@@ -159,6 +159,7 @@ BOOL WINAPI CtrlHandler(DWORD fdwCtrlType) {
 static bool appInited = false;
 static bool breakOnExit = false;
 #include "yr/patch/patch.h"
+
 void OnAppOpen()
 {
     MetaRegistration::Register();
@@ -173,6 +174,7 @@ void OnAppOpen()
     LoadExtensions();
     
     SetConsoleCtrlHandler(CtrlHandler, true);
+    atexit(OnAppExit);
     appInited = true;
 }
 
@@ -215,7 +217,12 @@ __declspec(dllexport) BOOL WINAPI DllMain(HANDLE hInstance, DWORD dwReason, LPVO
 
 #include "yr/event/windows_event.h"
 #include "yr/event/general_event.h"
-void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+#include <Interfaces.h>
+#include <Unsorted.h>
+
+LONG oriWndProc = 0;
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
@@ -226,12 +233,25 @@ void WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case WM_QUIT:
             OnAppExit();
             break;
+        case WM_SYSCOMMAND:
+            switch( wParam & 0xFFF0 ) {
+                case SC_CLOSE:
+                OnAppExit();
+            }
+            break;
     }
+
+    return CallWindowProcW((WNDPROC)oriWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-DEFINE_YR_HOOK_EVENT_LISTENER(YrMainWndProcEvent) {
-    WndProc(E->hWnd, E->uMsg, E->wParam, E->lParam);
-}
+// DEFINE_YR_HOOK_EVENT_LISTENER(YrMainWndProcEvent) {
+//     WndProc(E->hWnd, E->uMsg, E->wParam, E->lParam);
+// }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTerminateEvent) {
     OnAppExit();
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrAfterSetCooperativeLevelEvent) {
+    if (!oriWndProc) {
+        oriWndProc = SetWindowLongPtr(Game::hWnd, GWLP_WNDPROC, (LONG_PTR)WndProc);
+    }
 }
