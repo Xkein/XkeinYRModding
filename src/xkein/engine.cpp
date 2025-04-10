@@ -9,6 +9,7 @@
 #include "physics/physics.h"
 #include "ui/yr_uiext.h"
 #include "input/input.h"
+#include "xkein/fog/fog_data.h"
 #include <GameClasses.h>
 
 Engine* gEngine = nullptr;
@@ -53,7 +54,7 @@ void Engine::Start()
     YrExtUIModule::InitUIModule();
     if (gYrExtConfig->rawData.value("enable_js_module", true))
     {
-    gJsEnv = new JsEnv();
+        gJsEnv = new JsEnv();
     }
 }
 
@@ -65,9 +66,9 @@ void Engine::Exit()
     gLogger->info("Engine::Exit()");
 
     if (gJsEnv) {
-    // INVOKE_JS_EVENT(JsEvents::game.onApplicationQuit);
-    delete gJsEnv;
-    gJsEnv = nullptr;
+        // INVOKE_JS_EVENT(JsEvents::game.onApplicationQuit);
+        delete gJsEnv;
+        gJsEnv = nullptr;
     }
 
     Physics::Destroy();
@@ -86,13 +87,18 @@ void Engine::OnSceneStart()
     gLogger->info("Engine::OnSceneStart()");
     Physics::EnterWorld();
     AudioSystem::InitWorld();
+
+    FogSystem::Init();
 }
 
 void Engine::OnSceneClear()
 {
     gLogger->info("Engine::OnSceneClear()");
+    
+    FogSystem::Clear();
+
     if (gJsEnv) {
-    gJsEnv->UnbindAllYrObjects();
+        gJsEnv->UnbindAllYrObjects();
     }
     Physics::ExitWorld();
     AudioSystem::DestroyWorld();
