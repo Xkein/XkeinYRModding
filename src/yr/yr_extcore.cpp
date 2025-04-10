@@ -196,6 +196,7 @@ void OnAppExit()
         MetaRegistration::Unregister();
         delete gYrExtConfig;
         gYrExtConfig = nullptr;
+        gLogger->flush();
     }
 }
 
