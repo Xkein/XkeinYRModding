@@ -48,6 +48,80 @@ void InitCodeHolder(asmjit::CodeHolder& code)
     // code.setLogger(&gJitLogger);
 }
 
+void EmbedOriginalCode(asmjit::x86::Assembler& assembly, syringe_patch_data* data, std::vector<byte>& originalCode)
+{
+    // fix relative jump or call
+    if (originalCode[0] == 0xE9 || originalCode[0] == 0xE8)
+    {
+        DWORD dest = data->hookAddr + 5 + *(DWORD*)(originalCode.data() + 1);
+        switch (originalCode[0])
+        {
+            case 0xE9: // jmp
+                assembly.jmp(dest);
+                originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
+                break;
+            case 0xE8: // call
+                assembly.call(dest);
+                originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
+                break;
+        }
+    }
+    assembly.embed(originalCode.data(), originalCode.size());
+}
+
+void CheckHookRace(syringe_patch_data* data, std::vector<byte>& originalCode)
+{
+    void* hookAddress = (void*)data->hookAddr;
+    bool maybeConflicted = false;
+    // check hook race
+    for (byte originalByte : originalCode)
+    {
+        switch (originalByte)
+        {
+            case 0xE9:
+            case 0xE8:
+                maybeConflicted = true;
+                break;
+        }
+        if (maybeConflicted)
+            break;
+    }
+    std::string disassemblyResult;
+    if (maybeConflicted) {
+        // Initialize decoder context
+        ZydisDecoder decoder;
+        ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_COMPAT_32, ZYDIS_STACK_WIDTH_32);
+    
+        // Initialize formatter. Only required when you actually plan to do instruction
+        // formatting ("disassembling"), like we do here
+        ZydisFormatter formatter;
+        ZydisFormatterInit(&formatter, ZYDIS_FORMATTER_STYLE_INTEL);
+
+        // Loop over the instructions in our buffer.
+        // The runtime-address (instruction pointer) is chosen arbitrary here in order to better
+        // visualize relative addressing
+        ZyanU64 runtime_address = data->hookAddr;
+        ZyanUSize offset = 0;
+        const ZyanUSize length = data->hookSize + 4;
+        ZydisDecodedInstruction instruction;
+        ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
+        while (ZYAN_SUCCESS(ZydisDecoderDecodeFull(&decoder, (void*)(data->hookAddr + offset), length - offset, &instruction, operands)))
+        {
+            // Format & print the binary instruction structure to human-readable format
+            char buffer[256];
+            ZydisFormatterFormatInstruction(&formatter, &instruction, operands,
+                instruction.operand_count_visible, buffer, sizeof(buffer), runtime_address, ZYAN_NULL);
+            disassemblyResult += std::format("\n-- 0x{:08x}  {}", runtime_address, buffer);
+    
+            offset += instruction.length;
+            runtime_address += instruction.length;
+        }
+    }
+    if (disassemblyResult.contains("jmp") || disassemblyResult.contains("call")) {
+        gLogger->warn("Hook {} seems to be conflicted with other hooks! disassembly: {}", hookAddress, disassemblyResult);
+    }
+}
+
 void ApplySyringePatch(syringe_patch_data* data)
 {
     if (data->hookFunc == nullptr || data->hookAddr == 0)
@@ -81,23 +155,7 @@ void ApplySyringePatch(syringe_patch_data* data)
     DWORD             hookSize    = std::max(data->hookSize, 5u);
     std::vector<byte> originalCode(hookSize);
     memcpy(originalCode.data(), hookAddress, hookSize);
-    // fix relative jump or call
-    if (originalCode[0] == 0xE9 || originalCode[0] == 0xE8)
-    {
-        DWORD dest = data->hookAddr + 5 + *(DWORD*)(originalCode.data() + 1);
-        switch (originalCode[0])
-        {
-            case 0xE9: // jmp
-                assembly.jmp(dest);
-                originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
-                break;
-            case 0xE8: // call
-                assembly.call(dest);
-                originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
-                break;
-        }
-    }
-    assembly.embed(originalCode.data(), originalCode.size());
+    EmbedOriginalCode(assembly, data, originalCode);
     // jump back
     assembly.jmp(data->hookAddr + hookSize);
     // generate code
@@ -112,23 +170,14 @@ void ApplySyringePatch(syringe_patch_data* data)
     code.flatten();
     code.resolveUnresolvedLinks();
     code.relocateToBase(data->hookAddr);
+    // check hook race
+    CheckHookRace(data, originalCode);
     // override hook address
     DWORD protect_flag;
     VirtualProtect(hookAddress, hookSize, PAGE_EXECUTE_READWRITE, &protect_flag);
     code.copyFlattenedData(hookAddress, hookSize);
     VirtualProtect(hookAddress, hookSize, protect_flag, NULL);
     FlushInstructionCache(GetCurrentProcess(), hookAddress, hookSize);
-    // check hook race
-    for (byte originalByte : originalCode)
-    {
-        switch (originalByte)
-        {
-            case 0xE9:
-            case 0xE8:
-                gLogger->warn("Hook {} seems to be conflicted with other hooks!", hookAddress);
-                break;
-        }
-    }
 }
 
 void ApplyModulePatch(HANDLE hInstance)
