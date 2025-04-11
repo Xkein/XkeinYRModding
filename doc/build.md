@@ -7,7 +7,8 @@
 在编译前，你需要安装[xmake](https://xmake.io/), dotnet 8, VS2022
 
 2. 准备第三方库
-- [v8-backend](https://github.com/puerts/backend-v8/releases): 版本V8_9.4，需要设置环境变量V8_PATH路径为v8 backend的路径
+- [nodejs-backend](https://github.com/Xkein/backend-nodejs/releases/tag/NodeJS_22.14.0_ssl_114514): 下载nodejs_bin_22.14.0.zip
+，然后需要设置环境变量NODEJS_PATH路径为nodejs backend的路径
 - [Wwise SDK](https://www.audiokinetic.com/zh/wwise/overview): 版本Wwise2024.1
 
 3. 配置
@@ -42,7 +43,7 @@ xmake build -v
 Before compiling, you must install [xmake](https://xmake.io/), dotnet 8, VS2022
 
 2. Preparing third party
-- [v8-backend](https://github.com/puerts/backend-v8/releases): Version V8_9.4, we need to set the environment variable `V8_PATH` to v8 backend path
+- [nodejs-backend](https://github.com/Xkein/backend-nodejs/releases/tag/NodeJS_22.14.0_ssl_114514): Download nodejs_bin_22.14.0.zip. We need to set the environment variable `NODEJS_PATH` to nodejs backend path
 - [Wwise SDK](https://www.audiokinetic.com/zh/wwise/overview): Version Wwise2024.1
 
 3. Configure
