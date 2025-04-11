@@ -1,0 +1,53 @@
+name: build release
+
+on: 
+  workflow_dispatch:
+
+env:
+  NODEJS_PATH: ${{github.workspace}}/nodejs_bin_22.14.0/nodejs_22
+  WWISESDK: ${{github.workspace}}/Wwise2024.1.2.8726_SDK_Win32
+
+jobs:
+  build_artifact_release:
+    name: Build release artifact
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Download nodejs backend
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: 'Xkein/backend-nodejs'
+        tag: 'NodeJS_22.14.0_ssl_114514'
+        fileName: 'nodejs_bin_22.14.0.zip'
+        extract: true
+
+    - name: Download Wwise SDK
+      uses: robinraju/release-downloader@v1
+      with:
+        repository: 'Xkein/archives'
+        tag: 'Wwise2024.1.2.8726_SDK_Win32'
+        fileName: 'Wwise2024.1.2.8726_SDK_Win32.zip'
+        extract: true
+        out-file-path: Wwise2024.1.2.8726_SDK_Win32
+
+    - name: Setup xmake
+      uses: xmake-io/github-action-setup-xmake@v1
+      with:
+        xmake-version: latest
+        actions-cache-folder: '.xmake-cache'
+
+    - name: Configure xmake project
+      shell: bash
+      run: xmake f -p windows -a x86 -y --skip_codegen=n --make_artifacts=y -m release
+
+    - name: Build xmake project
+      shell: bash
+      run: xmake build -v
+      
+    - uses: actions/upload-artifact@v4
+      with:
+        name: release-artifact
+        path: build/artifacts/release/**/*
