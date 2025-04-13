@@ -1,5 +1,6 @@
 #include "yr/patch/patch.h"
 #include "runtime/logger/logger.h"
+#include "yr/debug_util.h"
 #include <asmjit/asmjit.h>
 #include <Zydis/Zydis.h>
 #include <memory>
@@ -122,10 +123,23 @@ void CheckHookRace(syringe_patch_data* data, std::vector<byte>& originalCode)
     }
 }
 
+typedef DWORD __cdecl SyringePatchFunc (REGISTERS*);
+DWORD __cdecl CallSyringePatchSafe(SyringePatchFunc* patchFunc, REGISTERS *R)
+{
+    std::string* stackTrace = nullptr;
+    __try
+    {
+        return patchFunc(R);
+    }
+    __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
+    {
+        gLogger->error("syringe patch encounter error!");
+        gLogger->error("stack trace : {}", *stackTrace);
+    }
+}
+
 void ApplySyringePatch(syringe_patch_data* data)
 {
-    if (data->hookFunc == nullptr || data->hookAddr == 0)
-        return;
     using namespace asmjit;
     CodeHolder code;
     InitCodeHolder(code);
@@ -139,8 +153,15 @@ void ApplySyringePatch(syringe_patch_data* data)
     assembly.sub(x86::esp, 4);
     assembly.lea(x86::eax, x86::ptr(x86::esp, 4));
     assembly.push(x86::eax);
-    assembly.call(data->hookFunc);
-    assembly.add(x86::esp, 0xC);
+    if (data->unsafe) {
+        assembly.call(data->hookFunc);
+        assembly.add(x86::esp, 0xC);    
+    }
+    else {
+        assembly.push(data->hookFunc);
+        assembly.call(&CallSyringePatchSafe);
+        assembly.add(x86::esp, 0x10);
+    }
     assembly.mov(x86::ptr(x86::esp, -8), x86::eax);
     assembly.popfd();
     assembly.popad();
@@ -182,8 +203,11 @@ void ApplySyringePatch(syringe_patch_data* data)
 
 void ApplyModulePatch(HANDLE hInstance)
 {
+    char moduleName[MAX_PATH] {};
+    GetModuleFileName((HMODULE)hInstance, moduleName, sizeof(moduleName));
+    gLogger->info("Applying patchs: module = {}", moduleName);
     auto pHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(((PIMAGE_DOS_HEADER)hInstance)->e_lfanew + (long)hInstance);
-
+    int patchCount = 0;
     for (int i = 0; i < pHeader->FileHeader.NumberOfSections; i++)
     {
         auto sct_hdr = IMAGE_FIRST_SECTION(pHeader) + i;
@@ -195,10 +219,15 @@ void ApplyModulePatch(HANDLE hInstance)
 
             for (size_t idx = 0; idx < size; idx++)
             {
-                ApplySyringePatch(&data[idx]);
+                syringe_patch_data* curPatch = &data[idx];
+                if (curPatch->hookFunc == nullptr || curPatch->hookAddr == 0)
+                    continue;
+                ApplySyringePatch(curPatch);
+                patchCount++;
             }
         }
     }
+    gLogger->info("Patchs applied: module = {}, count = {}", moduleName, patchCount);
 }
 
 void RemoveModulePatch(HANDLE hInstance)

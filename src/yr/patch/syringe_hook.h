@@ -11,18 +11,22 @@ __declspec(align(16)) struct syringe_patch_data {
     unsigned int hookAddr;
     unsigned int hookSize;
     const void * hookFunc;
+    bool unsafe;
 };
 
-#define decl_patch_data(hook, funcname, size) \
+#define decl_patch_data(hook, funcname, size, unsafe) \
 namespace SyringePatchData { \
     __declspec(allocate(SYRINGE_PATCH_SECTION_NAME)) \
-    syringe_patch_data _hk__ ## hook ## funcname { hook, size, &funcname }; \
+    syringe_patch_data _hk__ ## hook ## funcname { hook, size, &funcname, unsafe }; \
 };
 
-#define __SYRINGE_PATCH_IMPL(hook, funcname, size) \
+#define __SYRINGE_PATCH_IMPL(hook, funcname, size, unsafe) \
 EXPORT_FUNC(funcname); \
-decl_patch_data(hook, funcname, size) \
+decl_patch_data(hook, funcname, size, unsafe) \
 EXPORT_FUNC(funcname)
 
 #define SYRINGE_PATCH(hook, funcname, size) \
-__SYRINGE_PATCH_IMPL(hook, funcname##_HOOK_##hook##_##size, size)
+__SYRINGE_PATCH_IMPL(hook, funcname##_HOOK_##hook##_##size, size, false)
+
+#define SYRINGE_PATCH_UNSAFE(hook, funcname, size) \
+__SYRINGE_PATCH_IMPL(hook, funcname##_HOOK_##hook##_##size, size, true)
