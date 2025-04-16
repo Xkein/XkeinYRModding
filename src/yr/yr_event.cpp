@@ -140,6 +140,7 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
                 gLogger->error("could not get hook info! maybe the dll is unload!");
                 gLogger->error("stack trace : {}", *stackTrace);
             }
+            gLogger->flush();
 
             delete stackTrace;
             stackTrace = nullptr;

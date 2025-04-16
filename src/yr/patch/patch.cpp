@@ -135,6 +135,7 @@ DWORD __cdecl CallSyringePatchSafe(SyringePatchFunc* patchFunc, REGISTERS *R)
     {
         gLogger->error("syringe patch encounter error!");
         gLogger->error("stack trace : {}", *stackTrace);
+        gLogger->flush();
     }
 }
 
