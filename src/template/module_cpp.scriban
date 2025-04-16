@@ -3,6 +3,7 @@
     include 'include/yrpp.scriban'
     is_yrpp = module_name == "YRpp"
     is_yr_ext_core = module_name == "YrExtCore"
+    is_gainput = module_name == "gainput"
 -}}
 #include "{{module_name}}.gen.h"
 {{- if is_yr_ext_core }}
@@ -13,18 +14,27 @@ __IMPLEMENT_YR_HOOK_EVENT({{klass.full_name}})
 {{- end; end }}
 {{- end }}
 
-{{- if !is_yrpp && module_name != "Wwise" && module_name != "gainput" }}
+{{- if !is_yrpp && module_name != "Wwise" && !is_gainput }}
 #include "yr/extension_manager.h"
 {{- end }}
+
+{{- if is_gainput }}
+#include "gainput/gainput.h"
+{{- end }}
+
 {{- for enum in module_enums}}
     {{- if has_meta(enum.meta) }}
-#include "type/{{enum.name}}.gen.h"
+{{-         if enum.source_file }}
+#include "{{enum.source_file}}"
+{{-         end }}
     {{- end }}
 {{- end }}
 {{- for klass in module_classes }}
     {{- if has_meta(klass.meta) }}
         {{- if !get_meta_tag(klass.meta, "HookEvent") }}
-#include "type/{{klass.name}}.gen.h"
+{{-             if klass.source_file }}
+#include "{{klass.source_file}}"
+{{-             end }}
         {{- end }}
         {{- if get_meta_tag(klass.meta, "YrExtension") }}
 void OnExit_{{klass.name}}();
@@ -45,5 +55,234 @@ void OnExit_{{klass.name}}() {
     {{- end }}
 {{- end }}
 
+
+// ==== class registrations begin
+{{- if is_yrpp }}
+#include <CRC.h>
+#include <TubeClass.h>
+#include <PixelFXClass.h>
+#include <TriggerTypeClass.h>
+#include <FoggedObjectClass.h>
+#include <Blitters/Blitter.h>
+#include <YRDDraw.h>
+#include <IsometricTileTypeClass.h>
+#include <EventClass.h>
+#include <YRPP.h>
+#include "yr/reflection/yr_container.h"
+{{- end }}
 #include "core/reflection/reflection_register.h"
-{{gen_meta_register_snippet(this)}}
+#include <entt/core/hashed_string.hpp>
+#include <entt/meta/meta.hpp>
+#include <entt/meta/factory.hpp>
+#include <entt/meta/policy.hpp>
+using namespace entt::literals;
+
+{{ for klass in module_classes }}
+{{-
+if !has_meta(klass.meta) || get_meta_tag(klass.meta, "HookEvent")
+    continue
+end
+component_target_list = get_derived_classes_by_list(get_meta_list(klass.meta, "ComponentTarget"))
+has_component_target = array.size(component_target_list) > 0
+is_ini_component = get_meta_tag(klass.meta, "IniComponent")
+is_ini_auto_load = get_meta_tag(klass.meta, "IniAutoLoad")
+is_ini_component_techno = is_ini_component && array_contains_any_of(component_target_list, ["AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"])
+is_ini_component_terrain = is_ini_component && array.contains(component_target_list, "TerrainTypeClass")
+is_ini_component_bullet = is_ini_component && array.contains(component_target_list, "BulletTypeClass")
+is_ini_component_anim = is_ini_component && array.contains(component_target_list, "AnimTypeClass")
+is_ini_component_house = is_ini_component && array.contains(component_target_list, "HouseTypeClass")
+is_ini_component_super = is_ini_component && array.contains(component_target_list, "SuperWeaponTypeClass")
+is_ini_component_weapon = is_ini_component && array.contains(component_target_list, "WeaponTypeClass")
+is_ini_component_warhead = is_ini_component && array.contains(component_target_list, "WarheadTypeClass")
+is_ini_component_theme = is_ini_component && array.contains(component_target_list, "ThemeControl")
+}}
+{{- if has_component_target }}
+#include "yr/component/component.h"
+#include <GameClasses.h>
+{{- end }}
+{{- if is_ini_component_theme }}
+#include <ThemeClass.h>
+{{- end}}
+
+{{- if is_ini_component }}
+#include "yr/parse/ini_reader.h"
+#include "yr/component/ini_component.h"
+#include <GameClasses.h>
+#include <IsometricTileTypeClass.h>
+static bool LoadIni_{{klass.name}}({{klass.full_name}}& iniComponent, IniReader& reader, const char* pSection)
+{
+    bool success = false;
+{{- for property in klass.properties ; $cpp_field = property.cpp_field
+    if should_skip_visibility(klass, property) || string.empty(property.name) || property.is_static || property.is_const || property.is_constexpr
+        continue
+    end
+    $ini_key = get_meta_value(property.meta, "IniField") ?? property.name
+    }}
+    success |= IniComponentLoader::Load(reader, pSection, "{{$ini_key}}", iniComponent.{{property.name}});
+{{- end }}
+    return success;
+}
+#include "yr/yr_all_events.h"
+{{- if is_ini_component_techno }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pTechnoType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_terrain }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pTerrainType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_bullet }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pBulletType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_anim }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrAnimTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pAnimType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_house }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pHouseType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_super }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pSuperWeaponType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_weapon }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrWeaponTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pWeaponType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_warhead }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrWarheadTypeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pWarheadType, E->pIni);
+}
+{{- end }}
+{{- if is_ini_component_theme }}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeLoadIniEvent) {
+    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->themeCtrl, E->pIni);
+}
+{{- end }}
+
+{{- end }}
+
+void {{get_gen_type_name(klass.name)}}__Register()
+{
+    auto factory = entt::meta<{{klass.full_name}}>().type("{{klass.full_name}}"_hs).custom<ClassMeta>("{{klass.name}}");
+{{ for base in klass.base_classes}}
+    factory.base<{{base.full_display_name}}>();
+{{- end }}
+{{ for function in klass.all_functions}}
+{{- $function_name = function.name
+    if should_skip_visibility(klass, function) || function.is_deleted
+        continue
+    end
+    if function.is_destructor || $function_name | string.contains "operator"
+        continue # not supported yet
+    end
+    if function.cpp_function.is_function_template}}
+    // skip template function: {klass.cpp_class.name}::{$function_name}
+{{-     continue
+    end
+    if function.is_constructor
+        if klass.is_abstract
+            continue
+        end}}
+    factory.ctor<{{(function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "}}>();
+{{-     continue
+    end
+    $class_name = klass.name
+    $class_full_name = klass.full_name
+    $func_type = get_function_ptr_type(function, klass)
+    
+    $meta_args = "std::vector<ParameterMeta>{"
+    for arg in function.cpp_function.parameters
+        $meta_args += ' ParameterMeta{'
+        $meta_args += $'"{arg.name}"'
+        $meta_args += '},'
+    end
+    $meta_args += " }"
+    if function.is_overload }}
+    register_func<static_cast<{{$func_type}}>(&{{$class_full_name}}::{{$function_name}})>(factory, "{{$function_name}}"_hs).custom<FunctionMeta>("{{$function_name}}", {{$meta_args}});
+{{  else }}
+    register_func<&{{$class_full_name}}::{{$function_name}}>(factory, "{{$function_name}}"_hs).custom<FunctionMeta>("{{$function_name}}", {{$meta_args}});
+{{- end }}
+{{- end }}
+
+{{ for property in klass.properties}}
+{{- $field_name = property.name
+    if should_skip_visibility(klass, property) || property.is_static || string.empty($field_name)
+        continue
+    end
+    $class_name = klass.name
+    $class_full_name = klass.full_name
+    if property.is_bit_field }}
+    // skip bit field: {{$class_full_name}}::{{$field_name}}
+{{-     continue
+    end}}
+    register_data<&{{$class_full_name}}::{{$field_name}}>(factory, "{{$field_name}}"_hs).custom<FieldMeta>("{{$field_name}}");
+{{- end }}
+
+{{ for target_type in component_target_list }}
+    ComponentInstantiation::RegisterComponentInstantiation<{{klass.full_name}}, {{target_type}}>();
+{{- end}}
+{{ if is_ini_component}}
+    IniComponentLoader::RegisterLoader<{{klass.full_name}}, &LoadIni_{{klass.name}}>(factory);
+{{- end}}
+{{ if is_ini_auto_load}}
+    IniComponentLoader::RegisterAutoLoad<{{klass.full_name}}>(factory);
+{{- end}}
+}
+void {{get_gen_type_name(klass.name)}}__Unregister()
+{
+    entt::meta_reset<{{klass.full_name}}>();
+}
+
+{{- end }}
+
+// ==== class registrations end
+
+// ==== enum registrations begin
+
+{{  for enum in module_enums
+    if !has_meta(enum.meta) || get_meta_tag(enum.meta, "HookEvent")
+        continue
+    end }}
+void {{get_gen_type_name(enum.name)}}__Register()
+{
+    auto factory = entt::meta<{{enum.full_name}}>().type("{{enum.full_name}}"_hs).custom<EnumMeta>("{{enum.enum_name}}");
+{{ for enum_constant in enum.enum_constants ; $enum_const_name = htConstant.name }}
+    factory.data<{{enum.full_name}}::{{$enum_const_name}}>("{{$enum_const_name}}"_hs).custom<EnumConstantMeta>("{{$enum_const_name}}");
+{{- end }}
+}
+    
+void {{get_gen_type_name(enum.name)}}__Unregister()
+{
+    entt::meta_reset<{{enum.full_name}}>();
+}
+{{- end }}
+// ==== enum registrations end
+
+void {{gen_type_name}}::Register()
+{
+    sync_meta_ctx();
+{{for klass in array.concat(module_classes, module_enums)
+    if has_meta(klass.meta) && !get_meta_tag(klass.meta, "HookEvent") }}
+    {{get_gen_type_name(klass.name)}}__Register();
+    {{-end
+end }}
+}
+void {{gen_type_name}}::Unregister()
+{
+    sync_meta_ctx();
+{{for klass in array.concat(module_classes, module_enums)
+    if has_meta(klass.meta) && !get_meta_tag(klass.meta, "HookEvent") }}
+    {{get_gen_type_name(klass.name)}}__Unregister();
+    {{-end
+end }}
+}

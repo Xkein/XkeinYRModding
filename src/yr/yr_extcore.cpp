@@ -162,7 +162,6 @@ static bool breakOnExit = false;
 
 void OnAppOpen()
 {
-    MetaRegistration::Register();
     gYrExtConfig = new YrExtCoreConfig();
     if (gYrExtConfig->rawData.value("break_on_start", false))
     {
@@ -170,6 +169,7 @@ void OnAppOpen()
     }
     breakOnExit = gYrExtConfig->rawData.value("break_on_exit", false);
     InitLogger();
+    MetaRegistration::Register();
     InitPatch();
     LoadExtensions();
     

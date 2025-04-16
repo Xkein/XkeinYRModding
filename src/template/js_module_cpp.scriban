@@ -3,12 +3,183 @@
     func need_codegen(htType)
         ret get_meta_tag(htType.meta, "BindJs")
     end
+    is_yrpp = module_name == "YRpp"
 -}}
+
+{{- if is_yrpp }}
+#include "scripting/javascript/yr_data_bindings.h"
+#include <EventClass.h>
+#include <YRPP.h>
+#include <CRC.h>
+#include <HouseClass.h>
+#include <ColorScheme.h>
+#include <TriggerTypeClass.h>
+{{- else}}
+#include "scripting/javascript/all_data_binding.h"
+{{- end }}
+#include "core/raii_invoker.h"
+#include <Binding.hpp>
+#ifdef UNICODE
+#define GetClassNameA GetClassNameW
+#define LoadImageA LoadImageW
+#define DrawTextA DrawTextW
+#endif
+
+// ==== class registrations begin
+
+{{- for klass in module_classes
+    if !need_codegen(klass)
+        continue
+    end
+}}
+{{ if klass.source_file }}
+#include "{{klass.source_file}}"
+{{- end }}
+void __JsRegister_{{klass.name}}() {
+{{ func gen_js_class(htClass)
+    $klass = $'auto builder = PUERTS_NAMESPACE::DefineClass<{htClass.full_name}>();'
+    for base in htClass.base_classes
+        if base.klass && !base.klass.is_interface
+            $klass = append_line($klass, $'builder.Extends<{base.full_display_name}>();')
+        end
+    end
+    for function in htClass.all_functions ; $cpp_function = function.cpp_function
+        if should_skip_visibility(htClass, function) || function.is_deleted || function.is_destructor
+            continue
+        end
+        if function.is_overload || function.cpp_function.is_function_template
+            continue
+        end
+        if function.is_constructor
+            if !htClass.is_abstract
+                $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+                if !string.contains($arg_types, "char const *")
+                    $klass = append_line($klass, $'builder.Constructor<{$arg_types}>();')
+                end
+            end
+        else if function.is_static
+            if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
+                $klass = append_line($klass, $'MakeFunctionCheck<static_cast<{$func_type}>(&{htClass.full_name}::{function.name})>(builder, "{function.name}");')
+            else
+                $klass = append_line($klass, $'MakeFunctionCheck<&{htClass.full_name}::{function.name}>(builder, "{function.name}");')
+            end
+        else if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
+            $klass = append_line($klass, $'MakeMethodCheck<static_cast<{$func_type}>(&{htClass.full_name}::{function.name})>(builder, "{function.name}");')
+        else
+            $klass = append_line($klass, $'MakeMethodCheck<&{htClass.full_name}::{function.name}>(builder, "{function.name}");')
+        end
+    end
+
+    for pair in htClass.overload_functions
+        $overload_name = pair.key
+        $static_list = ""
+        $member_list = ""
+        $ctor_list = ""
+        $static_count = 0
+        $member_count = 0
+        $ctor_count = 0
+        for function in pair.value
+            $func_type = get_function_ptr_type(function, htClass)
+            if !should_skip_visibility(htClass, function) && !function.cpp_function.is_function_template
+                if function.is_constructor
+                    $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+                    if string.empty($arg_types)
+                        $ctor_list = append_line($ctor_list, $'MakeConstructor({htClass.full_name}),')
+                    else
+                        $ctor_list = append_line($ctor_list, $'MakeConstructor({htClass.full_name}, {$arg_types}),')
+                    end
+                    $ctor_count = $ctor_count + 1
+                else if function.is_static
+                    $static_list = append_line($static_list, $'MakeOverload({$func_type}, &{htClass.full_name}::{function.name}),')
+                    $static_count = $static_count + 1
+                else
+                    $member_list = append_line($member_list, $'MakeOverload({$func_type}, &{htClass.full_name}::{function.name}),')
+                    $member_count = $member_count + 1
+                end
+            end
+            if for.last
+                $ctor_list = string.remove_last($ctor_list, ",")
+                $static_list = string.remove_last($static_list, ",")
+                $member_list = string.remove_last($member_list, ",")
+            end
+        end
+        
+        if !string.empty($ctor_list) && !htClass.is_abstract
+            if $ctor_count > 1
+                $klass = append_line($klass, $'builder.Constructor(CombineConstructors(')
+                $klass = append_line($klass, $ctor_list)
+                $klass = append_line($klass, $'));')
+            else
+                if !string.contains($ctor_list, "char const *")
+                    $decay = $ctor_list | string.remove_first $'MakeConstructor({htClass.full_name}' | string.remove_first ',' | string.remove_first ')'
+                    $klass = append_line($klass, $'builder.Constructor<{$decay}>();')
+                end
+            end
+        end
+        if !string.empty($static_list)
+            if $static_count > 1
+                $klass = append_line($klass, $'builder.Function("{$overload_name}", CombineOverloads(')
+                $klass = append_line($klass, $static_list)
+                $klass = append_line($klass, $'));')
+            else
+                $decay = $static_list | string.remove_first 'MakeOverload(' | string.remove_first $', &{htClass.full_name}::{$overload_name})'
+                $klass = append_line($klass, $'MakeFunctionCheck<static_cast<{$decay}>(&{htClass.full_name}::{$overload_name})>(builder, "{$overload_name}");')
+            end
+        end
+        if !string.empty($member_list)
+            if $member_count > 1
+                $klass = append_line($klass, $'builder.Method("{$overload_name}", CombineOverloads(')
+                $klass = append_line($klass, $member_list)
+                $klass = append_line($klass, $'));')
+            else
+                $decay = $member_list | string.remove_first 'MakeOverload(' | string.remove_first $', &{htClass.full_name}::{$overload_name})'
+                $klass = append_line($klass, $'MakeMethodCheck<static_cast<{$decay}>(&{htClass.full_name}::{$overload_name})>(builder, "{$overload_name}");')
+            end
+        end
+    end
+    for property in htClass.properties ; $cpp_field = property.cpp_field
+        if should_skip_visibility(htClass, property) || property.is_bit_field
+            continue
+        end
+        if string.empty(property.name)
+            if property.is_anonymous
+                for inner_property in property.anonymous_class.properties
+                    if inner_property.is_const || inner_property.is_array
+                        $klass = append_line($klass, $'builder.Property("m_{inner_property.name}", MakeReadonlyProperty(&{htClass.full_name}::{inner_property.name}));')
+                    else
+                        $klass = append_line($klass, $'MakePropertyCheck<&{htClass.full_name}::{inner_property.name}>(builder, "m_{inner_property.name}");')
+                    end
+                end
+            end
+            continue
+        end
+        if property.is_static && (property.is_const || property.is_constexpr || property.is_array)
+            $klass = append_line($klass, $'builder.Variable("s_{property.name}", MakeReadonlyVariable(std::addressof({htClass.full_name}::{property.name})));')
+        else if property.is_const || property.is_array
+            $klass = append_line($klass, $'builder.Property("m_{property.name}", MakeReadonlyProperty(&{htClass.full_name}::{property.name}));')
+        else if property.is_static
+            $klass = append_line($klass, $'builder.Variable("s_{property.name}", MakeVariable(std::addressof({htClass.full_name}::{property.name})));')
+        else
+            $klass = append_line($klass, $'MakePropertyCheck<&{htClass.full_name}::{property.name}>(builder, "m_{property.name}");')
+        end
+    end
+    $klass = append_line($klass, 'RegisterCheck(builder);')
+    ret $klass
+end -}}
+{{gen_js_class(klass)}}
+{{- for property in klass.properties
+    if property.is_anonymous && !string.empty(property.name)
+        gen_js_class(property.anonymous_class)
+    end
+end }}
+}
+{{ end }}
+
+// ==== class registrations end
 
 void __JsRegister_{{module_name}}() {
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-    extern void __JsRegister_{{klass.name}}();
     __JsRegister_{{klass.name}}();
 {{- end; end }}
 }
