@@ -42,7 +42,7 @@
 #include <EBolt.h>
 
 using namespace entt::literals;
-#define INIT_META_FACTORY(CLASS) entt::meta<CLASS>().type(#CLASS##_hs).custom<ClassMeta>(#CLASS)
+#define INIT_META_FACTORY(CLASS) entt::meta_factory<CLASS>().type(#CLASS##_hs).custom<ClassMeta>(#CLASS)
 
 template <typename T>
 void RegisterVector2D(entt::meta_factory<Vector2D<T>>&& factory)

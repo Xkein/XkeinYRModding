@@ -173,7 +173,7 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeLoadIniEvent) {
 
 void {{get_gen_type_name(klass.name)}}__Register()
 {
-    auto factory = entt::meta<{{klass.full_name}}>().type("{{klass.full_name}}"_hs).custom<ClassMeta>("{{klass.name}}");
+    auto factory = entt::meta_factory<{{klass.full_name}}>().type("{{klass.full_name}}"_hs).custom<ClassMeta>("{{klass.name}}");
 {{ for base in klass.base_classes}}
     factory.base<{{base.full_display_name}}>();
 {{- end }}
@@ -216,7 +216,7 @@ void {{get_gen_type_name(klass.name)}}__Register()
 
 {{ for property in klass.properties}}
 {{- $field_name = property.name
-    if should_skip_visibility(klass, property) || property.is_static || string.empty($field_name)
+    if should_skip_visibility(klass, property) || string.empty($field_name)
         continue
     end
     $class_name = klass.name
@@ -224,9 +224,13 @@ void {{get_gen_type_name(klass.name)}}__Register()
     if property.is_bit_field }}
     // skip bit field: {{$class_full_name}}::{{$field_name}}
 {{-     continue
-    end}}
+    end
+    if property.is_static }}
+    register_data<std::addressof({{$class_full_name}}::{{$field_name}})>(factory, "{{$field_name}}"_hs).custom<FieldMeta>("{{$field_name}}");
+{{- else }}
     register_data<&{{$class_full_name}}::{{$field_name}}>(factory, "{{$field_name}}"_hs).custom<FieldMeta>("{{$field_name}}");
-{{- end }}
+{{- end
+end }}
 
 {{ for target_type in component_target_list }}
     ComponentInstantiation::RegisterComponentInstantiation<{{klass.full_name}}, {{target_type}}>();
@@ -255,7 +259,7 @@ void {{get_gen_type_name(klass.name)}}__Unregister()
     end }}
 void {{get_gen_type_name(enum.name)}}__Register()
 {
-    auto factory = entt::meta<{{enum.full_name}}>().type("{{enum.full_name}}"_hs).custom<EnumMeta>("{{enum.enum_name}}");
+    auto factory = entt::meta_factory<{{enum.full_name}}>().type("{{enum.full_name}}"_hs).custom<EnumMeta>("{{enum.enum_name}}");
 {{ for enum_constant in enum.enum_constants ; $enum_const_name = htConstant.name }}
     factory.data<{{enum.full_name}}::{{$enum_const_name}}>("{{$enum_const_name}}"_hs).custom<EnumConstantMeta>("{{$enum_const_name}}");
 {{- end }}

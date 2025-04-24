@@ -3,6 +3,7 @@
 #include "core/reflection/container.h"
 #include "core/reflection/reflection.h"
 #include "core/tool/function.hpp"
+#include "core/tool/type_traits.hpp"
 #include <entt/meta/factory.hpp>
 #include <entt/meta/pointer.hpp>
 
@@ -95,7 +96,7 @@ namespace _core_detail_
         {
             if (entt::resolve<Type[Size]>().custom())
                 return;
-            entt::meta<Type[Size]>().custom<ArrayMeta>(entt::type_id<Type>(), Size);
+            entt::meta_factory<Type[Size]>().custom<ArrayMeta>(entt::type_id<Type>(), Size);
         }
     };
 } // namespace _core_detail_
@@ -114,32 +115,52 @@ auto register_func(entt::meta_factory<Type>& factory, const entt::id_type id)
 }
 
 template<auto Data, typename Type>
+auto register_member(entt::meta_factory<Type>& factory, const entt::id_type id)
+{
+    static_assert(std::is_member_object_pointer_v<decltype(Data)>, "not member object");
+    using data_type = std::invoke_result_t<decltype(Data), Type&>;
+    if constexpr (std::is_move_assignable_v<data_type>)
+    {
+        return factory.data<Data, entt::as_ref_t>(id);
+    }
+    else
+    {
+        if constexpr (std::is_copy_assignable_v<data_type>)
+        {
+            return factory.data<nullptr, Data, entt::as_ref_t>(id);
+        }
+        else
+        {
+            return factory.data<nullptr, Data, entt::as_ref_t>(id);
+        }
+    }
+
+    _core_detail_::type_extra_info_register<data_type>::register_info();
+}
+
+template<auto Data, typename Type>
+auto register_field(entt::meta_factory<Type>& factory, const entt::id_type id)
+{
+    static_assert(!std::is_member_object_pointer_v<decltype(Data)>, "unexpected member object!");
+    using data_type = std::remove_pointer_t<decltype(Data)>;
+    if constexpr (is_constexpr_var<Data>) {
+        return factory.data<Data, entt::as_cref_t>(id);
+    }
+    else {
+        return factory.data<Data, entt::as_ref_t>(id);
+    }
+}
+
+template<auto Data, typename Type>
 auto register_data(entt::meta_factory<Type>& factory, const entt::id_type id)
 {
     if constexpr (std::is_member_object_pointer_v<decltype(Data)>)
     {
-        using data_type = std::invoke_result_t<decltype(Data), Type&>;
-        if constexpr (std::is_move_assignable_v<data_type>)
-        {
-            return factory.data<Data, entt::as_ref_t>(id);
-        }
-        else
-        {
-            if constexpr (std::is_copy_assignable_v<data_type>)
-            {
-                return factory.data<nullptr, Data, entt::as_ref_t>(id);
-            }
-            else
-            {
-                return factory.data<nullptr, Data, entt::as_ref_t>(id);
-            }
-        }
-
-        _core_detail_::type_extra_info_register<data_type>::register_info();
+        return register_member<Data>(factory, id);
     }
     else
     {
-        return factory.data<Data>(id);
+        return register_field<Data>(factory, id);
     }
 }
 

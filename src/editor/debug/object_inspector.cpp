@@ -70,7 +70,7 @@ void InspectObject(entt::meta_any& inst, const char* name)
 {
     entt::meta_type type      = inst.type();
     ClassMeta*      classMeta = type.custom();
-    void*           ptr       = inst.data();
+    void*           ptr       = const_cast<void*>(inst.base().data());
 
     const char* typeName = classMeta ? classMeta->name : "<unknown type>";
 
