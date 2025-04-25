@@ -18,6 +18,7 @@ __declspec(align(16)) struct syringe_patch_data {
 namespace SyringePatchData { \
     __declspec(allocate(SYRINGE_PATCH_SECTION_NAME)) \
     syringe_patch_data _hk__ ## hook ## funcname { hook, size, &funcname, unsafe }; \
+    static_assert(size >= 5, "hook override size must be >= 5 !"); \
 };
 
 #define __SYRINGE_PATCH_IMPL(hook, funcname, size, unsafe) \
