@@ -15,17 +15,6 @@ static const AkReal32 MS_PER_FRAME  = ( 1000 / (AkReal32)DESIRED_FPS );
 static const AkGameObjectID LISTENER_ID = 100;
 static const AkGameObjectID MUSIC_ID = 101;
 
-enum EMusicState
-{
-    None,
-    Normal,
-    GameOver,
-    Winning,
-    UnderAttack,
-    Invasion,
-    Max
-};
-
 class WwiseSoundBank
 {
 public:
@@ -71,9 +60,6 @@ public:
 
     FUNCTION()
     static AKRESULT SetRTPCValue(AkRtpcID in_rtpcID, AkRtpcValue in_value, AkGameObjectID in_gameObjectID);
-
-    static void SetMusicState(EMusicState state);
-    static EMusicState GetMusicState();
 
     static std::shared_ptr<WwiseSoundBank> GetSoundBank(std::string_view path);
 

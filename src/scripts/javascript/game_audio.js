@@ -19,6 +19,15 @@ let AK = {
     GAME_PARAMETERS : {
         OBJECTHP : 1335699628
     },
+    EVENTS :
+    {
+        M_GAMEOVER : 155272345,
+        M_INVASION : 4033210584,
+        M_NONE : 443355295,
+        M_NORMAL : 2309605244,
+        M_UNDERATTACK : 2821901421,
+        M_WINNING : 3431848355,
+    } // namespace EVENTS
 }
 global.AK = AK;
 
@@ -36,6 +45,65 @@ IniHelper.RegisterIniField(AudioConfig, "createEvent", "Audio.CreateEvent", Read
 IniHelper.RegisterIniField(AudioConfig, "detonateEvent", "Audio.DetonateEvent", ReadWwiseEvent);
 IniHelper.RegisterIniField(AudioConfig, "damageEvent", "Audio.DamageEvent", ReadWwiseEvent);
 IniHelper.RegisterIniField(AudioConfig, "removeEvent", "Audio.RemoveEvent", ReadWwiseEvent);
+
+const EMusicState = {
+    None : 0,
+    Normal : 1,
+    GameOver : 2,
+    Winning : 3,
+    UnderAttack : 4,
+    Invasion : 5,
+}
+class InteractiveMusic
+{
+    static lastTimeBattle;
+    static musicState;
+    
+    static setMusicState(state) {
+        if (InteractiveMusic.musicState == state)
+            return;
+        InteractiveMusic.musicState = state
+        console.log("set music state" + state)
+        let musicEvent
+        switch (state) {
+            case EMusicState.Normal:
+                musicEvent = AK.EVENTS.M_NORMAL;
+                break;
+            case EMusicState.GameOver:
+                musicEvent = AK.EVENTS.M_GAMEOVER;
+                break;
+            case EMusicState.Winning:
+                musicEvent = AK.EVENTS.M_WINNING;
+                break;
+            case EMusicState.Invasion:
+                musicEvent = AK.EVENTS.M_INVASION;
+                break;
+            case EMusicState.UnderAttack:
+                musicEvent = AK.EVENTS.M_UNDERATTACK;
+                break;
+            default:
+                musicEvent = AK.EVENTS.M_NONE;
+                break;
+        }
+    }
+
+    static onReceiveDamage(yrObject, pDamage, DistanceFromEpicenter, pWH, Attacker, IgnoreDefenses, PreventPassengerEscape, pAttackingHouse) {
+        let player = YRpp.HouseClass.s_CurrentPlayer;
+        let isPlayerAttacked = player == yrObject.GetOwningHouse();
+        let isPlayerInvasion = player == pAttackingHouse;
+        if (isPlayerAttacked && isPlayerInvasion) {
+            // player attack own unit
+            return;
+        }
+        if (isPlayerInvasion) {
+            InteractiveMusic.setMusicState(EMusicState.Invasion);
+            InteractiveMusic.lastTimeBattle = Date.now();
+        } else if (isPlayerAttacked) {
+            InteractiveMusic.setMusicState(EMusicState.UnderAttack);
+            InteractiveMusic.lastTimeBattle = Date.now();
+        }
+    }
+}
 
 (function (global) {
     let iniReaderXkein = new YrExtCore.IniReader("XkeinExt.ini")
@@ -95,6 +163,8 @@ IniHelper.RegisterIniField(AudioConfig, "removeEvent", "Audio.RemoveEvent", Read
                 XkeinExt.AudioSystem.SetRTPCValue(AK.GAME_PARAMETERS.OBJECTHP, yrObject.GetHealthPercentage(), yrObject.audioComponent.m_akGameObjId);
                 XkeinExt.AudioSystem.PostEvent(audioConfig.damageEvent, yrObject.audioComponent.m_akGameObjId);
             }
+
+            InteractiveMusic.onReceiveDamage(yrObject, pDamage, DistanceFromEpicenter, pWH, Attacker, IgnoreDefenses, PreventPassengerEscape, pAttackingHouse)
         })
         
     gameEvents.addGroupEventHandler(gameEvents.objectGroupEvents, "onUnlimboChecked", (yrObject, coords, faceDir) => {
@@ -107,6 +177,37 @@ IniHelper.RegisterIniField(AudioConfig, "removeEvent", "Audio.RemoveEvent", Read
         let audioConfig = yrObject.m_Type.audioConfig;
         if (audioConfig && audioConfig.removeEvent) {
             XkeinExt.AudioSystem.PostEvent(audioConfig.removeEvent, yrObject.audioComponent.m_akGameObjId);
+        }
+    })
+
+    gameEvents.game.onSceneEnter.add(() => {
+        InteractiveMusic.setMusicState(EMusicState.Normal);
+    })
+
+    gameEvents.game.onSceneExit.add(() => {
+        InteractiveMusic.setMusicState(EMusicState.None);
+    })
+
+    gameEvents.game.onEndUpdate.add(() => {
+        if (YRpp.ScenarioClass.s_Instance) {
+            let nextState = InteractiveMusic.musicState;
+            if (InteractiveMusic.musicState == EMusicState.Invasion || InteractiveMusic.musicState == EMusicState.UnderAttack) {
+                let elapsedTime = (Date.now() - InteractiveMusic.lastTimeBattle) / 1000;
+                if (elapsedTime > 10) {
+                    nextState = EMusicState.Normal;
+                }
+            }
+
+            let player = YRpp.HouseClass.s_CurrentPlayer
+            if (player) {
+                if (player.m_IsWinner) {
+                    nextState = EMusicState.Winning;
+                } else if (player.m_IsGameOver) {
+                    nextState = EMusicState.GameOver;
+                }
+            }
+
+            InteractiveMusic.setMusicState(nextState);
         }
     })
 }(global));

@@ -23,11 +23,6 @@ static bool                                 gInited = false;
 static CAkFilePackageLowLevelIODeferred* gLowLevelIO;
 static AkResourceMonitorDataSummary      gResourceDataSummary;
 
-struct _AudioData {
-    EMusicState musicState {EMusicState::None};
-    std::chrono::steady_clock::time_point lastTimeBattle;
-} gAudioData;
-
 #define DATA_SUMMARY_REFRESH_COOLDOWN 7; // Refresh cooldown affecting the refresh rate of the resource monitor data summary
 
 void ResourceMonitorDataCallback(const AkResourceMonitorDataSummary* in_pdataSummary)
@@ -189,12 +184,10 @@ void AudioSystem::Destroy()
 void AudioSystem::InitWorld()
 {
     gNextId = 10000;
-    SetMusicState(EMusicState::Normal);
 }
 
 void AudioSystem::DestroyWorld()
 {
-    SetMusicState(EMusicState::None);
 }
 
 inline AkVector ToAkVector(JPH::Vec3 vec)
@@ -244,25 +237,6 @@ void AudioSystem::Tick()
         AkSoundPosition cameraPos;
         cameraPos.Set(ToAkVector(screenCenterPos), {1, 0, 0}, {0, 0, 1});
         AK::SoundEngine::SetPosition(LISTENER_ID, cameraPos);
-
-        EMusicState nextState = gAudioData.musicState;
-        if (gAudioData.musicState == EMusicState::Invasion || gAudioData.musicState == EMusicState::UnderAttack) {
-            using namespace std::chrono;
-            duration<float> timeSpan = duration_cast<duration<float>>(steady_clock::now() - gAudioData.lastTimeBattle);
-            if (timeSpan.count() > 10.0f) {
-                nextState = EMusicState::Normal;
-            }
-        }
-
-        if (HouseClass* player = HouseClass::CurrentPlayer) {
-            if (player->IsWinner) {
-                nextState = EMusicState::Winning;
-            } else if (player->IsGameOver) {
-                nextState = EMusicState::GameOver;
-            }
-        }
-
-        SetMusicState(nextState);
     }
 
     AK::SoundEngine::RenderAudio();
@@ -275,41 +249,6 @@ void AudioSystem::Tick()
 AkGameObjectID AudioSystem::GetNextGameObjId()
 {
     return gNextId++;
-}
-
-EMusicState AudioSystem::GetMusicState()
-{
-    return gAudioData.musicState;
-}
-
-void AudioSystem::SetMusicState(EMusicState state)
-{
-    if (gAudioData.musicState == state)
-        return;
-    gAudioData.musicState = state;
-    AkUniqueID musicEvent;
-    switch (state)
-    {
-    case EMusicState::Normal:
-        musicEvent = AK::EVENTS::M_NORMAL;
-        break;
-    case EMusicState::GameOver:
-        musicEvent = AK::EVENTS::M_GAMEOVER;
-        break;
-    case EMusicState::Winning:
-        musicEvent = AK::EVENTS::M_WINNING;
-        break;
-    case EMusicState::Invasion:
-        musicEvent = AK::EVENTS::M_INVASION;
-        break;
-    case EMusicState::UnderAttack:
-        musicEvent = AK::EVENTS::M_UNDERATTACK;
-        break;
-    default:
-        musicEvent = AK::EVENTS::M_NONE;
-        break;
-    }
-    AK::SoundEngine::PostEvent(musicEvent, MUSIC_ID);
 }
 
 AkUniqueID AudioSystem::GetSurfaceID(LandType landType)
@@ -405,24 +344,4 @@ WwiseSoundBankRef::WwiseSoundBankRef(const std::string& bankName) {
 
 WwiseSoundBankRef::~WwiseSoundBankRef() {
     soundBank.reset();
-}
-
-#include "yr/yr_all_events.h"
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectReceiveDamageEvent)
-{
-    HouseClass* player = HouseClass::CurrentPlayer;
-    bool isPlayerAttacked = player == E->pObject->GetOwningHouse();
-    bool isPlayerInvasion = player == E->pAttackingHouse;
-    if (isPlayerAttacked && isPlayerInvasion) {
-        // player attack own unit
-        return;
-    }
-    if (isPlayerInvasion) {
-        AudioSystem::SetMusicState(EMusicState::Invasion);
-        gAudioData.lastTimeBattle = std::chrono::steady_clock::now();
-    } else if (isPlayerAttacked) {
-        AudioSystem::SetMusicState(EMusicState::UnderAttack);
-        gAudioData.lastTimeBattle = std::chrono::steady_clock::now();
-    }
 }
