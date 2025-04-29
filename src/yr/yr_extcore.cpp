@@ -12,6 +12,8 @@ void LoadExtensions();
 #include "codegen/YrExtCore.gen.h"
 #include "runtime/ecs/entt.h"
 #include "yr/reflection/yr_reflection.h"
+#include "yr/api/yr_entity.h"
+
 struct MetaRegistration
 {
     static void Register() {
@@ -170,6 +172,7 @@ void OnAppOpen()
     breakOnExit = gYrExtConfig->rawData.value("break_on_exit", false);
     InitLogger();
     MetaRegistration::Register();
+    yr_entity::Init();
     InitPatch();
     LoadExtensions();
     

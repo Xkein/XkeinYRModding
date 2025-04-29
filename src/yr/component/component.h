@@ -2,6 +2,7 @@
 #include "core/reflection/reflection.h"
 #include "yr/api/yr_entity.h"
 #ifndef __HEADER_TOOL__
+#include "yr/serialization/serialization.h"
 #include <entt/meta/factory.hpp>
 #include <concepts>
 using namespace entt::literals;
@@ -29,6 +30,10 @@ struct ComponentInstantiation
     template<typename Type, typename TargetType>
     static void CreateComponent(entt::registry& reg, entt::entity entity)
     {
+        // TODO: maybe has another good way?
+        if (Serialization::IsSerializing()) {
+            return;
+        }
         if constexpr (detail::component_has_creator<Type, TargetType>)
         {
             Type::OnEntityConstruct(reg, entity);

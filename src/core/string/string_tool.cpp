@@ -40,3 +40,16 @@ void buffer_to_string(std::string& result, const uint8* buffer, uint32 size)
         result.back() = '\0';
     }
 }
+
+#include <map>
+static std::map<std::size_t, std::string> string_dict;
+std::string_view get_pool_string_view(std::string_view str_view)
+{
+    std::size_t strHash = std::hash<std::string_view> {}(str_view);
+    auto        iter    = string_dict.find(strHash);
+    if (iter == string_dict.end())
+    {
+        iter = string_dict.try_emplace(strHash, str_view).first;
+    }
+    return std::string_view(iter->second);
+}

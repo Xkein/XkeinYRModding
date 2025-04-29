@@ -2,6 +2,7 @@
 #include "core/reflection/reflection.h"
 #include "yr/component/component.h"
 #include "yr/parse/parser.h"
+#include "yr/serialization/serialization.h"
 #include <AbstractClass.h>
 #include "audio/audio.h"
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
@@ -23,38 +24,49 @@ struct WwiseStringID
     operator bool() const {
         return id != 0;
     }
+    
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        Serialization::Serialize(str);
+        ResolveID();
+    }
 };
+REMOVE_SERIALIZE_BRACKET(WwiseStringID);
 
-CLASS(IniComponent, ComponentTarget = [ThemeControl])
+CLASS(IniComponent, ComponentTarget = [ThemeControl], AutoSavegame)
 struct ThemeComponent final
 {
-    PROPERTY(IniField = "Theme.Enable")
+    PROPERTY(IniField = "Theme.Enable", Savegame)
     bool enable {false};
-    PROPERTY(IniField = "Theme.SoundBank")
+    PROPERTY(IniField = "Theme.SoundBank", Savegame)
     std::string_view soundBankName;
-    PROPERTY(IniField = "Theme.PlayEvent")
+    PROPERTY(IniField = "Theme.PlayEvent", Savegame)
     WwiseStringID playEvent;
     
     std::shared_ptr<WwiseSoundBank> soundBank;
     AkPlayingID playingID;
 };
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 class AudioComponent final
 {
 public:
     AudioComponent() = default;
+    AudioComponent(const AudioComponent&) = default;
     AudioComponent(AudioComponent&&) = default;
     ~AudioComponent();
+    
+    void LoadDeferred();
 
     void Tick();
 
     FUNCTION()
     static AudioComponent* CreateAudioComponent(entt::entity entity, AbstractClass* pYrObject);
 
-    PROPERTY()
+    PROPERTY(Savegame)
     AbstractClass* owner;
-    PROPERTY()
+    PROPERTY(Savegame)
     AkGameObjectID akGameObjId {0};
 };
 

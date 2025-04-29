@@ -85,3 +85,15 @@ YREXTCORE_API void GuardExecute(const std::function<void()>& func, const std::fu
         finallyCallBack();
     }
 }
+
+#include <boost/stacktrace.hpp>
+
+std::string GetStackTrace()
+{
+    return boost::stacktrace::to_string(boost::stacktrace::stacktrace{});
+}
+
+inline void LogStackTrace(spdlog::level::level_enum level)
+{
+    gLogger->log(level, "stacktrace: {}", GetStackTrace());
+}

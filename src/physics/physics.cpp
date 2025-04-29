@@ -10,6 +10,7 @@
 #include <Jolt/Physics/Collision/CollideShape.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
+#include <Jolt/Physics/PhysicsScene.h>
 #include <Jolt/RegisterTypes.h>
 #include <stdarg.h>
 
@@ -494,3 +495,51 @@ void Physics::BeginTick()
 }
 
 void Physics::EndTick() {}
+
+
+#include "yr/event/general_event.h"
+#include <fstream>
+#include <Jolt/Core/StreamWrapper.h>
+
+static std::string GetPhysicsArchivePath()
+{
+    return Serialization::GetArchivePath(Serialization::GetCurrentContext()->savegameName.c_str(), "savex.physics");
+} 
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameBeginStreamEvent)
+{
+    std::string path = GetPhysicsArchivePath();
+    std::ifstream savefile = std::ifstream(path, std::ifstream::in | std::ifstream::binary);
+    if (!savefile.is_open()) {
+        gLogger->error("could not open file: {}", path);
+        return;
+    }
+    JPH::StreamInWrapper streamWrapper(savefile);
+    gLogger->info("loading physics scene from {}", path);
+    
+    JPH::PhysicsScene::PhysicsSceneResult result = JPH::PhysicsScene::sRestoreFromBinaryState(streamWrapper);
+    if (result.HasError()) {
+        gLogger->error("could not load physics scene from file: {}", path);
+        gLogger->error("error: {}", result.GetError().c_str());
+        return;
+    }
+    JPH::Ref<JPH::PhysicsScene> physicsScene = result.Get();
+    physicsScene->CreateBodies(gPhysicsSystem);
+
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSaveGameBeginStreamEvent)
+{
+    std::string path = GetPhysicsArchivePath();
+    std::ofstream savefile = std::ofstream(path, std::ofstream::out | std::ofstream::binary | std::ofstream::trunc);
+    if (!savefile.is_open()) {
+        gLogger->error("could not open file: {}", path);
+        return;
+    }
+    JPH::StreamOutWrapper streamWrapper(savefile);
+    gLogger->info("saving physics scene to {}", path);
+
+    JPH::Ref<JPH::PhysicsScene> physicsScene = new JPH::PhysicsScene();
+    physicsScene->FromPhysicsSystem(gPhysicsSystem);
+    physicsScene->SaveBinaryState(streamWrapper, true, true);
+    
+}

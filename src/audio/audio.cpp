@@ -345,3 +345,14 @@ WwiseSoundBankRef::WwiseSoundBankRef(const std::string& bankName) {
 WwiseSoundBankRef::~WwiseSoundBankRef() {
     soundBank.reset();
 }
+
+#include "yr/event/general_event.h"
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameBeginStreamEvent)
+{
+    Serialization::Serialize(cereal::make_nvp("audio::next_go_id", gNextId));
+}
+DEFINE_YR_HOOK_EVENT_LISTENER(YrSaveGameBeginStreamEvent)
+{
+    Serialization::Serialize(cereal::make_nvp("audio::next_go_id", gNextId));
+}

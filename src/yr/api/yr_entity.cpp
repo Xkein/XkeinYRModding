@@ -27,6 +27,7 @@
 
 #include <unordered_map>
 #include "runtime/logger/logger.h"
+#include "yr/serialization/serialization.h"
 
 template<typename T>
 using ExtMap = std::unordered_map<T*, entt::entity>;
@@ -48,13 +49,16 @@ inline ExtMap<T>& GetExtMap()
 template<typename T>
 inline void CreateEntity(T* pObject)
 {
+    if (Serialization::IsSerializing()) {
+        return;
+    }
     auto&        extMap = GetExtMap<T>();
     entt::entity entity = gEntt->create();
     extMap[pObject]     = entity;
     gEntt->emplace<YrEntityComponent<T>>(entity, pObject);
     //if constexpr (std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>)
     //{
-    //    gLogger->info("api::CreateEntity: create entity ({} - {})", (void*)pObject, (int)pObject->WhatAmI());
+    //    gLogger->info("yr_entity::CreateEntity: create entity ({} - {})", (void*)pObject, (int)pObject->WhatAmI());
     //}
 }
 
@@ -79,7 +83,7 @@ inline void DestroyEntity(T* pObject)
         {
             cacheExtMap.erase(cacheIter);
         }
-        //gLogger->info("api::DestroyEntity: destroy entity ({} - {})", (void*)pObject, (int)pObject->WhatAmI());
+        //gLogger->info("yr_entity::DestroyEntity: destroy entity ({} - {})", (void*)pObject, (int)pObject->WhatAmI());
     }
 }
 
@@ -199,7 +203,7 @@ inline entt::entity get_entity_by_switch(AbstractClass* pObject)
     return entt::null;
 }
 
-YREXTCORE_API entt::entity api::GetEntity(AbstractClass* pObject)
+YREXTCORE_API entt::entity yr_entity::GetEntity(AbstractClass* pObject)
 {
     auto& extMap = GetExtMap<AbstractClass>();
     auto  iter   = extMap.find(pObject);
@@ -211,7 +215,7 @@ YREXTCORE_API entt::entity api::GetEntity(AbstractClass* pObject)
         }
         else
         {
-            //gLogger->error("api::GetEntity: invalid cache to ({} - {})! what happen???", (void*)pObject, (int)pObject->WhatAmI());
+            //gLogger->error("yr_entity::GetEntity: invalid cache to ({} - {})! what happen???", (void*)pObject, (int)pObject->WhatAmI());
         }
     }
 
@@ -231,7 +235,7 @@ YREXTCORE_API entt::entity api::GetEntity(AbstractClass* pObject)
     return entity;
 }
 
-YREXTCORE_API entt::entity api::GetEntityAny(void* pObject)
+YREXTCORE_API entt::entity yr_entity::GetEntityAny(void* pObject)
 {
     return ::GetEntity<void>(pObject);
 }
@@ -240,7 +244,7 @@ YREXTCORE_API entt::entity api::GetEntityAny(void* pObject)
     case CLASS::AbsID: \
         return entt::resolve<CLASS>();
 #define NULL_CLASS_META entt::resolve(entt::type_id<void>())
-YREXTCORE_API entt::meta_type api::GetYrClassMeta(size_t whatAmI)
+YREXTCORE_API entt::meta_type yr_entity::GetYrClassMeta(size_t whatAmI)
 {
     switch (static_cast<AbstractType>(whatAmI))
     {
@@ -328,8 +332,8 @@ YREXTCORE_API entt::meta_type api::GetYrClassMeta(size_t whatAmI)
     return NULL_CLASS_META;
 }
 
-YREXTCORE_API entt::meta_type api::GetYrClassMeta(AbstractClass const* pAbstract) {
-    return api::GetYrClassMeta(static_cast<size_t>(pAbstract->WhatAmI()));
+YREXTCORE_API entt::meta_type yr_entity::GetYrClassMeta(AbstractClass const* pAbstract) {
+    return yr_entity::GetYrClassMeta(static_cast<size_t>(pAbstract->WhatAmI()));
 }
 
 #define DO_ENTITY_ACTION(EntityAction, HookEvent, Class, Member) DEFINE_YR_HOOK_EVENT_LISTENER(HookEvent) { EntityAction(Class, Member); }
@@ -406,4 +410,98 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneEnterEvent)
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent)
 {
     DESTROY_ENTITY(MouseClass, (MouseClass*)MouseClass::Instance);
+}
+
+template<typename T>
+inline void prologue(SERIALIZATION_INPUT_ARCHIVE& ar, YrEntityComponent<T> const&) { }
+template<typename T>
+inline void prologue(SERIALIZATION_OUTPUT_ARCHIVE& ar, YrEntityComponent<T> const&) { }
+template<typename T>
+inline void epilogue(SERIALIZATION_INPUT_ARCHIVE& ar, YrEntityComponent<T> const&) { }
+template<typename T>
+inline void epilogue(SERIALIZATION_OUTPUT_ARCHIVE& ar, YrEntityComponent<T> const&) { }
+template<class Archive, typename T>
+void save(Archive& ar, YrEntityComponent<T> const& data)
+{
+    Serialization::Save(ar, data.yrObject);
+};
+template<class Archive, typename T>
+void load(Archive& ar, YrEntityComponent<T>& data)
+{
+    Serialization::Load(ar, data.yrObject);
+};
+
+template<typename T>
+void YrEntityComponentLoadDeferredProcess()
+{
+    for (auto&& [entity, yrEntityCom] : gEntt->view<YrEntityComponent<T>>().each())
+    {
+        auto& extMap = GetExtMap<T>();
+        if (auto iter = extMap.find(yrEntityCom.yrObject); iter != extMap.end()) {
+            entt::entity oldEntity = iter->second;
+            if (gEntt->valid(oldEntity)) {
+                gLogger->warn("entity {} unexpectly reference to {}, why?", static_cast<uint>(oldEntity), entt::type_id<T>().name());
+                if (!gEntt->orphan(oldEntity)) {
+                    gLogger->warn("entity {} not orphan, force destroying.", static_cast<uint>(oldEntity));
+                }
+                gEntt->destroy(oldEntity);
+            }
+        }
+        
+        extMap[yrEntityCom.yrObject] = entity;
+    }
+}
+
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameEndEvent)
+{
+    YrEntityComponentLoadDeferredProcess<AircraftClass>();
+    YrEntityComponentLoadDeferredProcess<AircraftTypeClass>();
+    YrEntityComponentLoadDeferredProcess<BuildingClass>();
+    YrEntityComponentLoadDeferredProcess<BuildingTypeClass>();
+    YrEntityComponentLoadDeferredProcess<InfantryClass>();
+    YrEntityComponentLoadDeferredProcess<InfantryTypeClass>();
+    YrEntityComponentLoadDeferredProcess<UnitClass>();
+    YrEntityComponentLoadDeferredProcess<UnitTypeClass>();
+    YrEntityComponentLoadDeferredProcess<BulletClass>();
+    YrEntityComponentLoadDeferredProcess<BulletTypeClass>();
+    YrEntityComponentLoadDeferredProcess<AnimClass>();
+    YrEntityComponentLoadDeferredProcess<AnimTypeClass>();
+    YrEntityComponentLoadDeferredProcess<HouseClass>();
+    YrEntityComponentLoadDeferredProcess<HouseTypeClass>();
+    YrEntityComponentLoadDeferredProcess<TerrainClass>();
+    YrEntityComponentLoadDeferredProcess<TerrainTypeClass>();
+    YrEntityComponentLoadDeferredProcess<SuperClass>();
+    YrEntityComponentLoadDeferredProcess<SuperWeaponTypeClass>();
+    YrEntityComponentLoadDeferredProcess<WeaponTypeClass>();
+    YrEntityComponentLoadDeferredProcess<WarheadTypeClass>();
+    YrEntityComponentLoadDeferredProcess<ThemeControl>();
+    YrEntityComponentLoadDeferredProcess<MouseClass>();
+}
+
+#define YR_ENTITY_SERIALIZATION(Class) 
+void yr_entity::Init()
+{
+    Serialization::RegisterSerialization<YrEntityComponent<AircraftClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<AircraftTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<BuildingClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<BuildingTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<InfantryClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<InfantryTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<UnitClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<UnitTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<BulletClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<BulletTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<AnimClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<AnimTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<HouseClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<HouseTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<TerrainClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<TerrainTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<SuperClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<SuperWeaponTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<WeaponTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<WarheadTypeClass>>();
+    Serialization::RegisterSerialization<YrEntityComponent<ThemeControl>>();
+    Serialization::RegisterSerialization<YrEntityComponent<MouseClass>>();
 }

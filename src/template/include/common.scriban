@@ -1,81 +1,4 @@
 {{
-# helpers for meta BEGIN
-func has_meta(meta)
-    ret meta && meta.raw.has_meta
-end
-
-func get_meta_tag(meta, key)
-    ret has_meta(meta) ? meta.raw.meta_data.tags[key] : null
-end
-
-func get_meta_value(meta, key)
-    ret has_meta(meta) ? meta.raw.meta_data.kv_pairs[key] : null
-end
-
-func get_meta_list(meta, key)
-    ret has_meta(meta) ? meta.raw.meta_data.string_list[key] : null
-end
-# helpers for meta END
-
-func user_init_extra_vars(htType)
-end
-
-func init_extra_vars(htType)
-    htType.is_class = false
-    htType.is_enum = false
-    htType.is_module = false
-    
-    if htType.cpp_class
-        htType.is_class = true
-        htType.class_name = htType.name
-        htType.class_functions = htType.all_functions
-        htType.class_properties = htType.properties
-        
-        htType.type_name = htType.class_name
-        htType.type_full_name = htType.full_name
-        htType.gen_type_name = get_gen_type_name(htType.type_name)
-        htType.source_file = htType.source_file ?? "core/macro.h"
-    else if htType.cpp_enum
-        htType.is_enum = true
-        htType.enum_name = htType.name
-        htType.gen_type_name = get_gen_type_name(htType.enum_name)
-        htType.enum_constants = htType.constants
-        
-        htType.type_name = htType.enum_name
-        htType.type_full_name = htType.full_name
-        htType.gen_type_name = get_gen_type_name(htType.type_name)
-        htType.source_file = htType.source_file ?? "core/macro.h"
-    else if htType.module_name
-        htType.is_module = true
-        htType.gen_type_name = get_gen_type_name(htType.module_name)
-        htType.module_classes = htType.classes
-        htType.module_enums = htType.enums
-    end
-    
-    $meta = htType.meta
-    if has_meta($meta)
-        htType.all_visible = get_meta_tag(meta, "AllVisible")
-        htType.all_public_visible = get_meta_tag(meta, "AllPublicVisible")
-
-        htType.is_yr_extension = get_meta_tag(meta, "YrExtension")
-    end
-    htType.__extra_inited = true
-
-    user_init_extra_vars(htType)
-end
-
-func should_skip_visibility(htType, htElement)
-    $has_meta = has_meta(htElement.meta)
-    $is_all_visible = htType.__extra_inited ? htType.all_visible : get_meta_tag(htType.meta, "AllVisible")
-    $is_all_all_public_visible = htType.__extra_inited ? htType.all_public_visible : get_meta_tag(htType.meta, "AllPublicVisible")
-    case htElement.element.visibility
-        when 2, 3 # protected or private
-            ret !($is_all_visible || $has_meta)
-        else
-            ret !($is_all_visible || $is_all_all_public_visible || $has_meta)
-    end
-end
-
 func get_gen_type_name(name)
     ret "__Gen_Type_"+name
 end
@@ -89,6 +12,10 @@ func get_calling_convention(callConvention)
         else
             ret ""
     end
+end
+
+func is_private_or_protected(visibility)
+    ret visibility == 2 || visibility == 3
 end
 
 func get_function_ptr_type(htFunction, htClass)

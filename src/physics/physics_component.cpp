@@ -175,6 +175,25 @@ PhysicsComponent::~PhysicsComponent()
     }
 }
 
+void PhysicsComponent::SaveEpilogue() const
+{
+    Serialization::Serialize(cereal::make_nvp("bodyId", body->GetID()));
+}
+void PhysicsComponent::LoadEpilogue()
+{
+    JPH::BodyID bodyId;
+    Serialization::Serialize(cereal::make_nvp("bodyId", bodyId));
+
+    JPH::BodyLockRead bodyLock(gPhysicsSystem->GetBodyLockInterface(), bodyId);
+    if (bodyLock.Succeeded()) {
+        body = const_cast<JPH::Body*>(&bodyLock.GetBody());
+    }
+    else {
+        gLogger->error("could not lock body with id: {}", bodyId.GetIndexAndSequenceNumber());
+    }
+}
+
+
 #include "yr/event/bullet_event.h"
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletConstructEvent)
 {

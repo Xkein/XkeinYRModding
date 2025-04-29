@@ -1,4 +1,4 @@
-add_requires("xmake::boost", {alias = "boost", configs = {nowide = true, container = true}})
+add_requires("xmake::boost", {alias = "boost", configs = {nowide = true, container = true, stacktrace = true}})
 add_requires("utfcpp")
 add_requires("efsw")
 add_requires("spdlog")

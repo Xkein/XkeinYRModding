@@ -30,6 +30,11 @@ AudioComponent::~AudioComponent()
     }
 }
 
+void AudioComponent::LoadDeferred()
+{
+    AK::SoundEngine::RegisterGameObj(akGameObjId, static_cast<ClassMeta*>(GetYrClassMeta(owner).custom())->name);
+}
+
 void AudioComponent::Tick()
 {
     

@@ -2,6 +2,7 @@
 #ifndef __HEADER_TOOL__
 #include "runtime/logger/logger.h"
 #include "core/reflection/reflection.h"
+#include "yr/debug_util.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <string>
@@ -65,23 +66,9 @@ struct Parser : private ::detail::Parser<T>
 
 #include <BasicStructures.h>
 #include <YRMathVector.h>
+#include "core/string/string_tool.h"
 namespace detail
 {
-    struct ini_string_pool
-    {
-        static YREXTCORE_API std::map<std::size_t, std::string> string_dict;
-        static std::string_view get_pool_string_view(std::string_view str_view)
-        {
-            std::size_t strHash = std::hash<std::string_view> {}(str_view);
-            auto        iter    = string_dict.find(strHash);
-            if (iter == string_dict.end())
-            {
-                iter = string_dict.try_emplace(strHash, str_view).first;
-            }
-            return std::string_view(iter->second);
-        }
-    };
-    
     struct ParserHelper
     {
         template<typename T>
@@ -123,22 +110,7 @@ namespace detail
     {
         static bool Read(std::string_view str, T& result)
         {
-            entt::meta_type type = entt::resolve<T>();
-            if (!type || !static_cast<EnumMeta*>(type.custom()))
-            {
-                gLogger->error("could not parse enum {}: no meta!", typeid(T).name());
-                return false;
-            }
-            for (auto&& [id, data] : type.data())
-            {
-                EnumConstantMeta* enumConstMeta = data.custom();
-                if (str == enumConstMeta->name)
-                {
-                    result = data.get({}).cast<T>();
-                    return true;
-                }
-            }
-            return false;
+            return Reflection::TryGetEnumValue(str, result);
         }
     };
 
@@ -180,7 +152,7 @@ namespace detail
     {
         static bool Read(std::string_view str, std::string_view& result)
         {
-            result = ini_string_pool::get_pool_string_view(str);
+            result = get_pool_string_view(str);
             return true;
         }
     };
@@ -240,7 +212,7 @@ namespace detail
     {
         static bool Read(std::string_view str, T*& result)
         {
-            std::string_view copied_str = ini_string_pool::get_pool_string_view(str);
+            std::string_view copied_str = get_pool_string_view(str);
             T* ptr = nullptr;
             if constexpr(detail::parser_has_find_or_allocate<T>)
             {
@@ -261,11 +233,13 @@ namespace detail
                     }
                     else {
                         gLogger->error("could not parse {}: it is not auto load!", typeid(T).name());
+                        LogErrorStackTrace();
                         return false;
                     }
                 }
                 else {
                     gLogger->error("could not parse {}: no meta!", typeid(T).name());
+                    LogErrorStackTrace();
                     return false;
                 }
             }

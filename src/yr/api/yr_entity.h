@@ -10,8 +10,9 @@ struct YrEntityComponent
     T* yrObject;
 };
 
-namespace api
+namespace yr_entity
 {
+    void Init();
     YREXTCORE_API entt::entity GetEntity(AbstractClass* pObject);
     YREXTCORE_API entt::entity GetEntityAny(void* pObject);
     YREXTCORE_API entt::meta_type GetYrClassMeta(AbstractClass const* pAbstract);
@@ -22,10 +23,10 @@ template<typename T>
 entt::entity GetYrEntity(T* pObject)
 {
     if constexpr (std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>) {
-        return api::GetEntity(pObject);
+        return yr_entity::GetEntity(pObject);
     }
     else {
-        return api::GetEntityAny(pObject);
+        return yr_entity::GetEntityAny(pObject);
     }
 }
 
@@ -37,8 +38,8 @@ TCom* GetYrComponent(T* pObject)
 }
 
 inline entt::meta_type GetYrClassMeta(AbstractClass const* pAbstract) {
-    return api::GetYrClassMeta(pAbstract);
+    return yr_entity::GetYrClassMeta(pAbstract);
 }
 inline entt::meta_type GetYrClassMeta(size_t whatAmI){
-    return api::GetYrClassMeta(whatAmI);
+    return yr_entity::GetYrClassMeta(whatAmI);
 }

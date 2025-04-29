@@ -86,23 +86,27 @@ component_target_list = get_derived_classes_by_list(get_meta_list(klass.meta, "C
 has_component_target = array.size(component_target_list) > 0
 is_ini_component = get_meta_tag(klass.meta, "IniComponent")
 is_ini_auto_load = get_meta_tag(klass.meta, "IniAutoLoad")
-is_ini_component_techno = is_ini_component && array_contains_any_of(component_target_list, ["AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"])
-is_ini_component_terrain = is_ini_component && array.contains(component_target_list, "TerrainTypeClass")
-is_ini_component_bullet = is_ini_component && array.contains(component_target_list, "BulletTypeClass")
-is_ini_component_anim = is_ini_component && array.contains(component_target_list, "AnimTypeClass")
-is_ini_component_house = is_ini_component && array.contains(component_target_list, "HouseTypeClass")
-is_ini_component_super = is_ini_component && array.contains(component_target_list, "SuperWeaponTypeClass")
-is_ini_component_weapon = is_ini_component && array.contains(component_target_list, "WeaponTypeClass")
-is_ini_component_warhead = is_ini_component && array.contains(component_target_list, "WarheadTypeClass")
-is_ini_component_theme = is_ini_component && array.contains(component_target_list, "ThemeControl")
+component_target_to_techno = array_contains_any_of(component_target_list, ["AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"])
+component_target_to_terrain = array.contains(component_target_list, "TerrainTypeClass")
+component_target_to_bullet = array.contains(component_target_list, "BulletTypeClass")
+component_target_to_anim = array.contains(component_target_list, "AnimTypeClass")
+component_target_to_house = array.contains(component_target_list, "HouseTypeClass")
+component_target_to_super = array.contains(component_target_list, "SuperWeaponTypeClass")
+component_target_to_weapon = array.contains(component_target_list, "WeaponTypeClass")
+component_target_to_warhead = array.contains(component_target_list, "WarheadTypeClass")
+component_target_to_theme = array.contains(component_target_list, "ThemeControl")
+is_savegame = get_meta_tag(klass.meta, "AutoSavegame")
 }}
 {{- if has_component_target }}
 #include "yr/component/component.h"
 #include <GameClasses.h>
 {{- end }}
-{{- if is_ini_component_theme }}
+{{- if is_ini_component && component_target_to_theme }}
 #include <ThemeClass.h>
 {{- end}}
+{{- if is_savegame }}
+#include "yr/serialization/serialization.h"
+{{- end }}
 
 {{- if is_ini_component }}
 #include "yr/parse/ini_reader.h"
@@ -123,51 +127,76 @@ static bool LoadIni_{{klass.name}}({{klass.full_name}}& iniComponent, IniReader&
     return success;
 }
 #include "yr/yr_all_events.h"
-{{- if is_ini_component_techno }}
+{{- if is_ini_component && component_target_to_techno }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pTechnoType, E->pIni);
 }
 {{- end }}
-{{- if is_ini_component_terrain }}
+{{- if is_ini_component && component_target_to_terrain }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pTerrainType, E->pIni);
 }
 {{- end }}
-{{- if is_ini_component_bullet }}
+{{- if is_ini_component && component_target_to_bullet }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pBulletType, E->pIni);
 }
 {{- end }}
-{{- if is_ini_component_anim }}
+{{- if is_ini_component && component_target_to_anim }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrAnimTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pAnimType, E->pIni);
 }
 {{- end }}
-{{- if is_ini_component_house }}
+{{- if is_ini_component && component_target_to_house }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pHouseType, E->pIni);
 }
 {{- end }}
-{{- if is_ini_component_super }}
+{{- if is_ini_component && component_target_to_super }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pSuperWeaponType, E->pIni);
 }
 {{- end }}
-{{- if is_ini_component_weapon }}
+{{- if is_ini_component && component_target_to_weapon }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrWeaponTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pWeaponType, E->pIni);
 }
 {{- end }}
-{{- if is_ini_component_warhead }}
+{{- if is_ini_component && component_target_to_warhead }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrWarheadTypeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pWarheadType, E->pIni);
 }
 {{- end }}
-{{- if is_ini_component_theme }}
+{{- if is_ini_component && component_target_to_theme }}
 DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeLoadIniEvent) {
     IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->themeCtrl, E->pIni);
 }
 {{- end }}
+
+{{- end }}
+
+{{- if is_savegame }}
+template<typename Archive>
+void Serialize_{{klass.name}}(Archive& ar, {{klass.full_name}}& data) {
+    ar.startNode();
+    std::string typeName = entt::type_id<{{klass.full_name}}>().name().data();
+    // Serialization::Serialize(cereal::make_nvp("$type", typeName));
+    {{- is_swizzleable = get_meta_tag(klass.meta, "Swizzleable")
+        if is_swizzleable }}
+        {{klass.full_name}}* pThis = &data;
+    Serialization::Serialize(cereal::make_nvp("$ptr", pThis));
+    if constexpr(std::is_same_v<Archive, SERIALIZATION_INPUT_ARCHIVE>) {
+        SwizzleManagerClass::Instance->Here_I_Am(reinterpret_cast<long>(pThis), &data);
+    }
+    {{- end }}
+    {{- for property in klass.properties ; $cpp_field = property.cpp_field
+        if should_savegame(klass, property) || string.empty(property.name) || property.is_static || property.is_const || property.is_constexpr
+            continue
+        end }}
+        Serialization::Serialize(cereal::make_nvp("{{property.name}}", data.{{property.name}}));
+    {{- end }}
+    ar.finishNode();
+}
 
 {{- end }}
 
@@ -240,6 +269,9 @@ end }}
 {{- end}}
 {{ if is_ini_auto_load}}
     IniComponentLoader::RegisterAutoLoad<{{klass.full_name}}>(factory);
+{{- end}}
+{{ if is_savegame }}
+    Serialization::RegisterSerialization<{{klass.full_name}}, &Serialize_{{klass.name}}, &Serialize_{{klass.name}}>();
 {{- end}}
 }
 void {{get_gen_type_name(klass.name)}}__Unregister()
