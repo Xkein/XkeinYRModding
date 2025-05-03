@@ -14,11 +14,15 @@ class Delegate
     }
 
     invoke(...args) {
-        for (const handler of this.handlers) {
-            const ret = handler(...args)
-            if (ret !== null && ret !== undefined) {
-                return ret
+        try {
+            for (const handler of this.handlers) {
+                const ret = handler(...args)
+                if (ret !== null && ret !== undefined) {
+                    return ret
+                }
             }
+        } catch (error) {
+            console.error(error.stack);
         }
     }
 }
