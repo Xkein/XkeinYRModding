@@ -32,6 +32,10 @@ struct EnttInvoker
     static auto Invoke(TFunc* behavior, entt::registry& reg, entt::entity entity)
     {
         TTarget* pYrObject = reg.get<YrEntityComponent<TTarget>>(entity).yrObject;
+        if (!pYrObject) {
+            // when we are loading a game...
+            return std::invoke_result_t<TFunc, TTarget*, entt::entity>{};
+        }
         return INVOKE_JS_EVENT(*behavior, pYrObject, entity);
     }
 };
