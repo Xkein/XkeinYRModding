@@ -1,12 +1,8 @@
 #include "scripting/javascript/js_events.h"
-
+#include "yr/component/ini_component.h"
 #include "scripting/javascript/all_data_binding.h"
 #include "scripting/javascript/js_env.h"
 #include "physics/physics.h"
-#include <boost/function_types/function_type.hpp>
-#include <boost/function_types/parameter_types.hpp>
-#include <boost/function_types/result_type.hpp>
-#include <boost/function_types/function_arity.hpp>
 
 JsGameEvents            JsEvents::game;
 JsInputEvents           JsEvents::input;
@@ -61,54 +57,6 @@ struct EnttInvokerDtor
 #define ENTT_DISCONNECT_EVENTS(TargetType, events) \
     gEntt->on_construct<YrEntityComponent<TargetType>>().disconnect<&EnttInvoker<TargetType, decltype(events.onCtor)>::Invoke>(&events.onCtor); \
     gEntt->on_destroy<YrEntityComponent<TargetType>>().disconnect<&EnttInvokerDtor<TargetType, decltype(events.onDtor)>::Invoke>(&events.onDtor)
-
-void JsEvents::Init()
-{
-    Physics::gOnCollisionEnter->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionEnter);
-    Physics::gOnCollisionPersist->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionPersist);
-    Physics::gOnCollisionExit->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionExit);
-
-    ENTT_CONNECT_EVENTS(AircraftClass, JsEvents::aircraft);
-    ENTT_CONNECT_EVENTS(AircraftTypeClass, JsEvents::aircraftType);
-    ENTT_CONNECT_EVENTS(InfantryClass, JsEvents::infantry);
-    ENTT_CONNECT_EVENTS(InfantryTypeClass, JsEvents::infantryType);
-    ENTT_CONNECT_EVENTS(UnitClass, JsEvents::unit);
-    ENTT_CONNECT_EVENTS(UnitTypeClass, JsEvents::unitType);
-    ENTT_CONNECT_EVENTS(BuildingClass, JsEvents::building);
-    ENTT_CONNECT_EVENTS(BuildingTypeClass, JsEvents::buildingType);
-    ENTT_CONNECT_EVENTS(BulletClass, JsEvents::bullet);
-    ENTT_CONNECT_EVENTS(BulletTypeClass, JsEvents::bulletType);
-    ENTT_CONNECT_EVENTS(HouseClass, JsEvents::house);
-    ENTT_CONNECT_EVENTS(HouseTypeClass, JsEvents::houseType);
-    ENTT_CONNECT_EVENTS(SuperClass, JsEvents::superWeapon);
-    ENTT_CONNECT_EVENTS(SuperWeaponTypeClass, JsEvents::superWeaponType);
-}
-
-void JsEvents::Shutdown()
-{
-    Physics::gOnCollisionEnter->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionEnter);
-    Physics::gOnCollisionPersist->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionPersist);
-    Physics::gOnCollisionExit->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionExit);
-
-    ENTT_DISCONNECT_EVENTS(AircraftClass, JsEvents::aircraft);
-    ENTT_DISCONNECT_EVENTS(AircraftTypeClass, JsEvents::aircraftType);
-    ENTT_DISCONNECT_EVENTS(InfantryClass, JsEvents::infantry);
-    ENTT_DISCONNECT_EVENTS(InfantryTypeClass, JsEvents::infantryType);
-    ENTT_DISCONNECT_EVENTS(UnitClass, JsEvents::unit);
-    ENTT_DISCONNECT_EVENTS(UnitTypeClass, JsEvents::unitType);
-    ENTT_DISCONNECT_EVENTS(BuildingClass, JsEvents::building);
-    ENTT_DISCONNECT_EVENTS(BuildingTypeClass, JsEvents::buildingType);
-    ENTT_DISCONNECT_EVENTS(BulletClass, JsEvents::bullet);
-    ENTT_DISCONNECT_EVENTS(BulletTypeClass, JsEvents::bulletType);
-    ENTT_DISCONNECT_EVENTS(HouseClass, JsEvents::house);
-    ENTT_DISCONNECT_EVENTS(HouseTypeClass, JsEvents::houseType);
-    ENTT_DISCONNECT_EVENTS(SuperClass, JsEvents::superWeapon);
-    ENTT_DISCONNECT_EVENTS(SuperWeaponTypeClass, JsEvents::superWeaponType);
-}
-
-#include "yr/yr_all_events.h"
-#include "yr/api/yr_entity.h"
-#include <SuperClass.h>
 
 #define GET_OBJECT_BEHAVIOR(object, behavior)                               \
     [](ObjectClass* pObject) -> decltype(&JsEvents::aircraft.behavior) {    \
@@ -168,6 +116,72 @@ void JsEvents::Shutdown()
                 return nullptr;                                                  \
         }                                                                        \
     }(object);
+
+template<typename T>
+void RegisterLoadingFunction()
+{
+    IniComponentLoader::RegisterLoadingFunc<T>([](IniReader& reader, T* loadingObj) {
+        auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(loadingObj, onLoadIni);
+        INVOKE_JS_EVENT(*behavior, loadingObj, &reader);
+    });
+}
+
+void JsEvents::Init()
+{
+    Physics::gOnCollisionEnter->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionEnter);
+    Physics::gOnCollisionPersist->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionPersist);
+    Physics::gOnCollisionExit->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionExit);
+
+    ENTT_CONNECT_EVENTS(AircraftClass, JsEvents::aircraft);
+    ENTT_CONNECT_EVENTS(AircraftTypeClass, JsEvents::aircraftType);
+    ENTT_CONNECT_EVENTS(InfantryClass, JsEvents::infantry);
+    ENTT_CONNECT_EVENTS(InfantryTypeClass, JsEvents::infantryType);
+    ENTT_CONNECT_EVENTS(UnitClass, JsEvents::unit);
+    ENTT_CONNECT_EVENTS(UnitTypeClass, JsEvents::unitType);
+    ENTT_CONNECT_EVENTS(BuildingClass, JsEvents::building);
+    ENTT_CONNECT_EVENTS(BuildingTypeClass, JsEvents::buildingType);
+    ENTT_CONNECT_EVENTS(BulletClass, JsEvents::bullet);
+    ENTT_CONNECT_EVENTS(BulletTypeClass, JsEvents::bulletType);
+    ENTT_CONNECT_EVENTS(HouseClass, JsEvents::house);
+    ENTT_CONNECT_EVENTS(HouseTypeClass, JsEvents::houseType);
+    ENTT_CONNECT_EVENTS(SuperClass, JsEvents::superWeapon);
+    ENTT_CONNECT_EVENTS(SuperWeaponTypeClass, JsEvents::superWeaponType);
+
+    RegisterLoadingFunction<TechnoTypeClass>();
+    RegisterLoadingFunction<TerrainTypeClass>();
+    RegisterLoadingFunction<BulletTypeClass>();
+    RegisterLoadingFunction<AnimTypeClass>();
+    RegisterLoadingFunction<HouseTypeClass>();
+    RegisterLoadingFunction<SuperWeaponTypeClass>();
+    RegisterLoadingFunction<WeaponTypeClass>();
+    RegisterLoadingFunction<WarheadTypeClass>();
+}
+
+void JsEvents::Shutdown()
+{
+    Physics::gOnCollisionEnter->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionEnter);
+    Physics::gOnCollisionPersist->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionPersist);
+    Physics::gOnCollisionExit->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionExit);
+
+    ENTT_DISCONNECT_EVENTS(AircraftClass, JsEvents::aircraft);
+    ENTT_DISCONNECT_EVENTS(AircraftTypeClass, JsEvents::aircraftType);
+    ENTT_DISCONNECT_EVENTS(InfantryClass, JsEvents::infantry);
+    ENTT_DISCONNECT_EVENTS(InfantryTypeClass, JsEvents::infantryType);
+    ENTT_DISCONNECT_EVENTS(UnitClass, JsEvents::unit);
+    ENTT_DISCONNECT_EVENTS(UnitTypeClass, JsEvents::unitType);
+    ENTT_DISCONNECT_EVENTS(BuildingClass, JsEvents::building);
+    ENTT_DISCONNECT_EVENTS(BuildingTypeClass, JsEvents::buildingType);
+    ENTT_DISCONNECT_EVENTS(BulletClass, JsEvents::bullet);
+    ENTT_DISCONNECT_EVENTS(BulletTypeClass, JsEvents::bulletType);
+    ENTT_DISCONNECT_EVENTS(HouseClass, JsEvents::house);
+    ENTT_DISCONNECT_EVENTS(HouseTypeClass, JsEvents::houseType);
+    ENTT_DISCONNECT_EVENTS(SuperClass, JsEvents::superWeapon);
+    ENTT_DISCONNECT_EVENTS(SuperWeaponTypeClass, JsEvents::superWeaponType);
+}
+
+#include "yr/yr_all_events.h"
+#include "yr/api/yr_entity.h"
+#include <SuperClass.h>
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrPointerExpireEvent)
 {
@@ -394,73 +408,6 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadGameEndEvent) {
     INVOKE_JS_EVENT(JsEvents::superWeaponType.onLoadGameEnd, E->pSuperWeaponType, E->stream);
 }
 // ======================= save/load game =======================
-
-// ======================= load ini =======================
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
-    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTechnoType, onLoadIni);
-    if (behavior)
-    {
-        IniReader reader {E->pIni};
-        INVOKE_JS_EVENT(*behavior, E->pTechnoType, &reader);
-    }
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
-    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pTerrainType, onLoadIni);
-    if (behavior)
-    {
-        IniReader reader {E->pIni};
-        INVOKE_JS_EVENT(*behavior, E->pTerrainType, &reader);
-    }
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadIniEvent) {
-    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pBulletType, onLoadIni);
-    if (behavior)
-    {
-        IniReader reader {E->pIni};
-        INVOKE_JS_EVENT(*behavior, E->pBulletType, &reader);
-    }
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrAnimTypeLoadIniEvent) {
-    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pAnimType, onLoadIni);
-    if (behavior)
-    {
-        IniReader reader {E->pIni};
-        INVOKE_JS_EVENT(*behavior, E->pAnimType, &reader);
-    }
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeLoadIniEvent) {
-    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pHouseType, onLoadIni);
-    if (behavior)
-    {
-        IniReader reader {E->pIni};
-        INVOKE_JS_EVENT(*behavior, E->pHouseType, &reader);
-    }
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadIniEvent) {
-    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pSuperWeaponType, onLoadIni);
-    if (behavior)
-    {
-        IniReader reader {E->pIni};
-        INVOKE_JS_EVENT(*behavior, E->pSuperWeaponType, &reader);
-    }
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrWeaponTypeLoadIniEvent) {
-    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pWeaponType, onLoadIni);
-    if (behavior)
-    {
-        IniReader reader {E->pIni};
-        INVOKE_JS_EVENT(*behavior, E->pWeaponType, &reader);
-    }
-}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrWarheadTypeLoadIniEvent) {
-    auto behavior = GET_ABSTRACT_TYPE_BEHAVIOR(E->pWarheadType, onLoadIni);
-    if (behavior)
-    {
-        IniReader reader {E->pIni};
-        INVOKE_JS_EVENT(*behavior, E->pWarheadType, &reader);
-    }
-}
-// ======================= load ini =======================
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletConstructEvent)
 {

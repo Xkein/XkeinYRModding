@@ -10,19 +10,22 @@ class TerrainBody;
 class PhysicsCollisionAddAndPersistResult;
 class PhysicsCollisionRemoveResult;
 
-template<class Archive>
-void save(Archive& ar, JPH::BodyID const& data)
+namespace cereal
 {
-    ar(cereal::make_nvp("id", data.GetIndexAndSequenceNumber()));
+    template<class Archive>
+    void save(Archive& ar, JPH::BodyID const& data)
+    {
+        ar(data.GetIndexAndSequenceNumber());
+    }
+    template<class Archive>
+    void load(Archive& ar, JPH::BodyID& data)
+    {
+        uint32 id = data.GetIndexAndSequenceNumber();
+        ar(id);
+        data = JPH::BodyID(id);
+    }
+    REMOVE_SERIALIZE_BRACKET(JPH::BodyID);
 }
-template<class Archive>
-void load(Archive& ar, JPH::BodyID& data)
-{
-    uint32 id = data.GetIndexAndSequenceNumber();
-    ar(cereal::make_nvp("id", id));
-    data = JPH::BodyID(id);
-}
-REMOVE_SERIALIZE_BRACKET(JPH::BodyID);
 
 class Physics
 {

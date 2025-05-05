@@ -126,52 +126,6 @@ static bool LoadIni_{{klass.name}}({{klass.full_name}}& iniComponent, IniReader&
 {{- end }}
     return success;
 }
-#include "yr/yr_all_events.h"
-{{- if is_ini_component && component_target_to_techno }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pTechnoType, E->pIni);
-}
-{{- end }}
-{{- if is_ini_component && component_target_to_terrain }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrTerrainTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pTerrainType, E->pIni);
-}
-{{- end }}
-{{- if is_ini_component && component_target_to_bullet }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pBulletType, E->pIni);
-}
-{{- end }}
-{{- if is_ini_component && component_target_to_anim }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrAnimTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pAnimType, E->pIni);
-}
-{{- end }}
-{{- if is_ini_component && component_target_to_house }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrHouseTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pHouseType, E->pIni);
-}
-{{- end }}
-{{- if is_ini_component && component_target_to_super }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pSuperWeaponType, E->pIni);
-}
-{{- end }}
-{{- if is_ini_component && component_target_to_weapon }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrWeaponTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pWeaponType, E->pIni);
-}
-{{- end }}
-{{- if is_ini_component && component_target_to_warhead }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrWarheadTypeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->pWarheadType, E->pIni);
-}
-{{- end }}
-{{- if is_ini_component && component_target_to_theme }}
-DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeLoadIniEvent) {
-    IniComponentLoader::LoadComponent<{{klass.full_name}}>(E->themeCtrl, E->pIni);
-}
-{{- end }}
 
 {{- end }}
 
@@ -179,11 +133,12 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrThemeLoadIniEvent) {
 template<typename Archive>
 void Serialize_{{klass.name}}(Archive& ar, {{klass.full_name}}& data) {
     ar.startNode();
+    Serialization::CallPrologue(ar, data);
     std::string typeName = entt::type_id<{{klass.full_name}}>().name().data();
     // Serialization::Serialize(cereal::make_nvp("$type", typeName));
     {{- is_swizzleable = get_meta_tag(klass.meta, "Swizzleable")
         if is_swizzleable }}
-        {{klass.full_name}}* pThis = &data;
+    {{klass.full_name}}* pThis = &data;
     Serialization::Serialize(cereal::make_nvp("$ptr", pThis));
     if constexpr(std::is_same_v<Archive, SERIALIZATION_INPUT_ARCHIVE>) {
         SwizzleManagerClass::Instance->Here_I_Am(reinterpret_cast<long>(pThis), &data);
@@ -195,6 +150,7 @@ void Serialize_{{klass.name}}(Archive& ar, {{klass.full_name}}& data) {
         end }}
         Serialization::Serialize(cereal::make_nvp("{{property.name}}", data.{{property.name}}));
     {{- end }}
+    Serialization::CallEpilogue(ar, data);
     ar.finishNode();
 }
 
@@ -270,6 +226,33 @@ end }}
 {{ if is_ini_auto_load}}
     IniComponentLoader::RegisterAutoLoad<{{klass.full_name}}>(factory);
 {{- end}}
+{{- if is_ini_component && component_target_to_techno }}
+    IniComponentLoader::RegisterLoadingComponent<TechnoTypeClass, {{klass.full_name}}>();
+{{- end }}
+{{- if is_ini_component && component_target_to_terrain }}
+    IniComponentLoader::RegisterLoadingComponent<TerrainTypeClass, {{klass.full_name}}>();
+{{- end }}
+{{- if is_ini_component && component_target_to_bullet }}
+    IniComponentLoader::RegisterLoadingComponent<BulletTypeClass, {{klass.full_name}}>();
+{{- end }}
+{{- if is_ini_component && component_target_to_anim }}
+    IniComponentLoader::RegisterLoadingComponent<AnimTypeClass, {{klass.full_name}}>();
+{{- end }}
+{{- if is_ini_component && component_target_to_house }}
+    IniComponentLoader::RegisterLoadingComponent<HouseTypeClass, {{klass.full_name}}>();
+{{- end }}
+{{- if is_ini_component && component_target_to_super }}
+    IniComponentLoader::RegisterLoadingComponent<SuperWeaponTypeClass, {{klass.full_name}}>();
+{{- end }}
+{{- if is_ini_component && component_target_to_weapon }}
+    IniComponentLoader::RegisterLoadingComponent<WeaponTypeClass, {{klass.full_name}}>();
+{{- end }}
+{{- if is_ini_component && component_target_to_warhead }}
+    IniComponentLoader::RegisterLoadingComponent<WarheadTypeClass, {{klass.full_name}}>();
+{{- end }}
+{{- if is_ini_component && component_target_to_theme }}
+    IniComponentLoader::RegisterLoadingComponent<ThemeControl, {{klass.full_name}}>();
+{{- end }}
 {{ if is_savegame }}
     Serialization::RegisterSerialization<{{klass.full_name}}, &Serialize_{{klass.name}}, &Serialize_{{klass.name}}>();
 {{- end}}

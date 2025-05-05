@@ -34,14 +34,14 @@ struct WwiseStringID
 };
 REMOVE_SERIALIZE_BRACKET(WwiseStringID);
 
-CLASS(IniComponent, ComponentTarget = [ThemeControl], AutoSavegame)
+CLASS(IniComponent, ComponentTarget = [ThemeControl])
 struct ThemeComponent final
 {
-    PROPERTY(IniField = "Theme.Enable", Savegame)
+    PROPERTY(IniField = "Theme.Enable")
     bool enable {false};
-    PROPERTY(IniField = "Theme.SoundBank", Savegame)
+    PROPERTY(IniField = "Theme.SoundBank")
     std::string_view soundBankName;
-    PROPERTY(IniField = "Theme.PlayEvent", Savegame)
+    PROPERTY(IniField = "Theme.PlayEvent")
     WwiseStringID playEvent;
     
     std::shared_ptr<WwiseSoundBank> soundBank;

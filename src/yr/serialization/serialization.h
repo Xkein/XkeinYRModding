@@ -4,11 +4,39 @@
 #include "yr/serialization/serializer.h"
 #include "yr/debug_util.h"
 #include "runtime/platform/platform.h"
+#include "yr/serialization/snapshot.h"
 #include <string>
 #include <entt/meta/factory.hpp>
 #include <entt/entity/registry.hpp>
-#include <entt/entity/snapshot.hpp>
 #include <functional>
+
+namespace detail
+{
+    template<typename Type>
+    concept has_save_prologue = requires(Type const& data) {
+        data.SavePrologue();
+    };
+    template<typename Type>
+    concept has_save_epilogue = requires(Type const& data) {
+        data.SaveEpilogue();
+    };
+    template<typename Type>
+    concept has_save_deferred = requires(Type const& data) {
+        data.SaveDeferred();
+    };
+    template<typename Type>
+    concept has_load_prologue = requires(Type& data) {
+        data.LoadPrologue();
+    };
+    template<typename Type>
+    concept has_load_epilogue = requires(Type& data) {
+        data.LoadEpilogue();
+    };
+    template<typename Type>
+    concept has_load_deferred = requires(Type& data) {
+        data.LoadDeferred();
+    };
+}
 
 struct SerializeContext
 {
@@ -16,8 +44,8 @@ struct SerializeContext
     std::string archivePath;
     SERIALIZATION_INPUT_ARCHIVE* inputArchive;
     SERIALIZATION_OUTPUT_ARCHIVE* outputArchive;
-    entt::snapshot* snapshot;
-    entt::continuous_loader* snapshotLoader;
+    ENTITY_SNAPSHOT* snapshot;
+    ENTITY_SNAPSHOT_LOADER* snapshotLoader;
     uint counter;
 };
 
@@ -36,6 +64,29 @@ public:
     static void Save(SERIALIZATION_OUTPUT_ARCHIVE& ar, const Type& data);
     template<typename Type>
     static void Load(SERIALIZATION_INPUT_ARCHIVE& ar, Type& data);
+    
+    template<typename Archive, typename Type>
+    static void CallPrologue(Archive& ar, Type&& data) {
+        if constexpr(std::is_same_v<Archive, SERIALIZATION_INPUT_ARCHIVE>) {
+            if constexpr (detail::has_load_prologue<std::remove_reference_t<Type>>)
+                data.LoadPrologue();
+        }
+        else if constexpr(std::is_same_v<Archive, SERIALIZATION_OUTPUT_ARCHIVE>) {
+            if constexpr (detail::has_save_prologue<std::remove_reference_t<Type>>)
+                data.SavePrologue();
+        }
+    }
+    template<typename Archive, typename Type>
+    static void CallEpilogue(Archive& ar, Type&& data) {
+        if constexpr(std::is_same_v<Archive, SERIALIZATION_INPUT_ARCHIVE>) {
+            if constexpr (detail::has_load_epilogue<std::remove_reference_t<Type>>)
+                data.LoadEpilogue();
+        }
+        else if constexpr(std::is_same_v<Archive, SERIALIZATION_OUTPUT_ARCHIVE>) {
+            if constexpr (detail::has_save_epilogue<std::remove_reference_t<Type>>)
+                data.SaveEpilogue();
+        }
+    }
     
     template<typename Type>
     static void Save(SERIALIZATION_OUTPUT_ARCHIVE& ar, const cereal::NameValuePair<Type>& data)
@@ -73,9 +124,9 @@ public:
         if (LoadFromArchive) {
             factory.func<reinterpret_cast<void (*)(SERIALIZATION_INPUT_ARCHIVE*, Type&)>(LoadFromArchive)>("__LoadFromArchive"_hs);
         }
-        RegisterSnapshotInternal(entt::resolve<Type>(), [](entt::snapshot& snapshot) {
+        RegisterSnapshotInternal(entt::resolve<Type>(), [](ENTITY_SNAPSHOT& snapshot) {
             snapshot.get<Type>(gArchive);
-        }, [](entt::continuous_loader& snapshot) {
+        }, [](ENTITY_SNAPSHOT_LOADER& snapshot) {
             snapshot.get<Type>(gArchive);
         });
     }
@@ -95,7 +146,7 @@ public:
         RegisterDeferredProcessInternal(&data, [](entt::meta_any cur){ cur.cast<Type*>()->LoadDeferred(); });
     }
 private:
-    YREXTCORE_API static void RegisterSnapshotInternal(entt::meta_type type, void(*snapshotSave)(entt::snapshot&), void(*snapshotLoad)(entt::continuous_loader&));
+    YREXTCORE_API static void RegisterSnapshotInternal(entt::meta_type type, void(*snapshotSave)(ENTITY_SNAPSHOT&), void(*snapshotLoad)(ENTITY_SNAPSHOT_LOADER&));
     YREXTCORE_API static void RegisterDeferredProcessInternal(entt::meta_any data, void(*processFunc)(entt::meta_any));
     
     struct SerializationArchive
@@ -108,34 +159,6 @@ private:
     };
     YREXTCORE_API static SerializationArchive gArchive;
 };
-
-namespace detail
-{
-    template<typename Type>
-    concept has_save_prologue = requires(Type const& data) {
-        data.SavePrologue();
-    };
-    template<typename Type>
-    concept has_save_epilogue = requires(Type const& data) {
-        data.SaveEpilogue();
-    };
-    template<typename Type>
-    concept has_save_deferred = requires(Type const& data) {
-        data.SaveDeferred();
-    };
-    template<typename Type>
-    concept has_load_prologue = requires(Type& data) {
-        data.LoadPrologue();
-    };
-    template<typename Type>
-    concept has_load_epilogue = requires(Type& data) {
-        data.LoadEpilogue();
-    };
-    template<typename Type>
-    concept has_load_deferred = requires(Type& data) {
-        data.LoadDeferred();
-    };
-}
 
 template<typename Type>
 void Serialization::Serialize(Type&& data)
@@ -175,24 +198,19 @@ void Serialization::Save(SERIALIZATION_OUTPUT_ARCHIVE& ar, const Type& data)
             entt::meta_func func = type.func("__SaveToArchive"_hs);
             if (func)
             {
-                if constexpr (detail::has_save_prologue<Type>) {
-                    data.SavePrologue();
-                }
-                func.invoke({}, &ar, data);
-                if constexpr (detail::has_save_epilogue<Type>) {
-                    data.SaveEpilogue();
-                }
+                func.invoke({}, &ar, entt::forward_as_meta(const_cast<Type&>(data)));
+                
                 if constexpr (detail::has_save_deferred<Type>) {
                     Serialization::RegisterSaveDeferredProcess(data);
                 }
             }
             else {
-                gLogger->error("could not save {}: it is not auto serialize!", typeid(Type).name());
+                gLogger->error("could not save {}: it is not auto serialize!", entt::type_id<Type>().name());
                 LogErrorStackTrace();
             }
         }
         else {
-            gLogger->error("could not save {}: meta not register!", typeid(Type).name());
+            gLogger->error("could not save {}: meta not register!", entt::type_id<Type>().name());
             LogErrorStackTrace();
         }
     }
@@ -214,24 +232,19 @@ void Serialization::Load(SERIALIZATION_INPUT_ARCHIVE& ar, Type& data)
             entt::meta_func func = type.func("__LoadFromArchive"_hs);
             if (func)
             {
-                if constexpr (detail::has_load_prologue<Type>) {
-                    data.LoadPrologue();
-                }
-                func.invoke({}, &ar, data);
-                if constexpr (detail::has_load_epilogue<Type>) {
-                    data.LoadEpilogue();
-                }
+                func.invoke({}, &ar, entt::forward_as_meta(data));
+
                 if constexpr (detail::has_load_deferred<Type>) {
                     Serialization::RegisterLoadDeferredProcess(data);
                 }
             }
             else {
-                gLogger->error("could not load {}: it is not auto serialize!", typeid(Type).name());
+                gLogger->error("could not load {}: it is not auto serialize!", entt::type_id<Type>().name());
                 LogErrorStackTrace();
             }
         }
         else {
-            gLogger->error("could not load {}: meta not register!", typeid(Type).name());
+            gLogger->error("could not load {}: meta not register!", entt::type_id<Type>().name());
             LogErrorStackTrace();
         }
     }

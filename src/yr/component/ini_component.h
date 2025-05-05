@@ -17,6 +17,21 @@ namespace detail
 struct IniComponentLoader
 {
     template<typename T>
+    using LoadingFunc = void(*)(IniReader& reader, T* loadingObj);
+
+    /// @brief Called when loading game types or loading a savegame.
+    /// @note To reduce the size of savegames, we load components again when loading a savegame.
+    template<typename T>
+    static void OnLoading(CCINIClass* pIni, T* loadingObj);
+
+    template<typename T, typename TCom>
+    static void RegisterLoadingComponent() {
+        RegisterLoadingFunc<T>(&LoadComponent<TCom, T>);
+    }
+    template<typename T>
+    YREXTCORE_API static void RegisterLoadingFunc(LoadingFunc<T> loadingFunc);
+
+    template<typename T>
     static bool Load(IniReader& parser, const char* pSection, const char* pKey, T& value)
     {
         bool hasLoader = false;
@@ -86,16 +101,15 @@ struct IniComponentLoader
     }
 
     template<typename Type, typename TargetType>
-    static void LoadComponent(TargetType* pObject, CCINIClass* pIni)
+    static void LoadComponent(IniReader& reader, TargetType* pObject)
     {
         const char* pID  = pObject->ID;
         Type* pCom = GetYrComponent<Type>(pObject);
         if (pCom == nullptr)
         {
-            gLogger->error("could not get {} for {}[{}]", typeid(Type).name(), typeid(TargetType).name(), pID);
+            gLogger->error("could not get {} for {}[{}]", entt::type_id<Type>().name(), entt::type_id<TargetType>().name(), pID);
             return;
         }
-        IniReader reader {pIni};
         IniComponentLoader::Load(reader, pID, nullptr, *pCom);
     }
 private:

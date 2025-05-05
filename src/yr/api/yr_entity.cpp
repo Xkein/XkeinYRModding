@@ -475,11 +475,10 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameEndEvent)
     YrEntityComponentLoadDeferredProcess<SuperWeaponTypeClass>();
     YrEntityComponentLoadDeferredProcess<WeaponTypeClass>();
     YrEntityComponentLoadDeferredProcess<WarheadTypeClass>();
-    YrEntityComponentLoadDeferredProcess<ThemeControl>();
+    // YrEntityComponentLoadDeferredProcess<ThemeControl>();
     YrEntityComponentLoadDeferredProcess<MouseClass>();
 }
 
-#define YR_ENTITY_SERIALIZATION(Class) 
 void yr_entity::Init()
 {
     Serialization::RegisterSerialization<YrEntityComponent<AircraftClass>>();
@@ -502,6 +501,6 @@ void yr_entity::Init()
     Serialization::RegisterSerialization<YrEntityComponent<SuperWeaponTypeClass>>();
     Serialization::RegisterSerialization<YrEntityComponent<WeaponTypeClass>>();
     Serialization::RegisterSerialization<YrEntityComponent<WarheadTypeClass>>();
-    Serialization::RegisterSerialization<YrEntityComponent<ThemeControl>>();
+    // Serialization::RegisterSerialization<YrEntityComponent<ThemeControl>>();
     Serialization::RegisterSerialization<YrEntityComponent<MouseClass>>();
 }

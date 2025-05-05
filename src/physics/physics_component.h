@@ -21,28 +21,28 @@ enum class EPhysicShapeType : unsigned int {
 CLASS(BindJs, IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass], AutoSavegame, Swizzleable)
 struct PhysicsTypeComponent final
 {
-    PROPERTY(IniField = "Physics.Enable", Savegame)
+    PROPERTY(IniField = "Physics.Enable")
     bool enable {false};
-    PROPERTY(IniField = "Physics.Kinematic", Savegame)
+    PROPERTY(IniField = "Physics.Kinematic")
     bool isKinematic {false};
-    PROPERTY(IniField = "Physics.Sensor", Savegame)
+    PROPERTY(IniField = "Physics.Sensor")
     bool isSensor {false};
-    PROPERTY(IniField = "Physics.Shape", Savegame)
+    PROPERTY(IniField = "Physics.Shape")
     EPhysicShapeType shapeType {EPhysicShapeType::Auto};
-    PROPERTY(IniField = "Physics.Mass", Savegame)
+    PROPERTY(IniField = "Physics.Mass")
     float mass {0.0f};
-    PROPERTY(IniField = "Physics.Radius", Savegame)
+    PROPERTY(IniField = "Physics.Radius")
     float radius {0.5f};
-    PROPERTY(IniField = "Physics.HalfHeight", Savegame)
+    PROPERTY(IniField = "Physics.HalfHeight")
     float halfHeight {0.5f};
-    PROPERTY(IniField = "Physics.HalfExtent", Savegame)
+    PROPERTY(IniField = "Physics.HalfExtent")
     Vector3D<float> halfExtent {0.5f, 0.5f, 0.5f};
 
     JPH::Ref<JPH::ShapeSettings> shapeSettings;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(PhysicsTypeComponent);
 
-CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass])
+CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass], AutoSavegame)
 class PhysicsComponent final
 {
 public:
@@ -52,6 +52,7 @@ public:
     }
 
     PhysicsComponent() = default;
+    PhysicsComponent(const PhysicsComponent&) = default;
     PhysicsComponent(PhysicsComponent&&) = default;
     ~PhysicsComponent();
 
