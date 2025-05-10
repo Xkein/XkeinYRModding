@@ -30,10 +30,15 @@ rule("CoreRule")
         end
 
         local api = string.upper(target:name())
-        target:add("defines", api.."_IMPL")
-        if target:name() ~= "Core" then
-            target:add("defines", api.."_API=__declspec(dllimport)", {interface=true})
+        if target:kind() == "static" and target:name() ~= "Core" then
+            target:add("defines", api.."_IMPL")
+            target:add("defines", api.."_API=", {public=true})
+        else
+            target:add("defines", api.."_IMPL")
+            if target:name() ~= "Core" then
+                target:add("defines", api.."_API=__declspec(dllimport)", {interface=true})
+            end
+            target:add("defines", api.."_API=__declspec(dllexport)", {private=true})
         end
-        target:add("defines", api.."_API=__declspec(dllexport)", {private=true})
     end)
 rule_end()

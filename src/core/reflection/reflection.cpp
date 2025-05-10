@@ -6,7 +6,7 @@ entt::meta_any Reflection::GetEnumValueInternal(entt::meta_type type, std::strin
     if (!type || !static_cast<EnumMeta*>(type.custom()))
     {
         gLogger->error("could not parse enum {}: no meta!", type.info().name());
-        return false;
+        return {};
     }
     for (auto&& [id, data] : type.data())
     {

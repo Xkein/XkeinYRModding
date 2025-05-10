@@ -39,8 +39,8 @@ struct FieldMeta {
 
 class Reflection
 {
-    static entt::meta_any GetEnumValueInternal(entt::meta_type type, std::string_view str);
-    static std::string_view GetEnumValueNameInternal(entt::meta_type type, entt::meta_any value);
+    CORE_API static entt::meta_any GetEnumValueInternal(entt::meta_type type, std::string_view str);
+    CORE_API static std::string_view GetEnumValueNameInternal(entt::meta_type type, entt::meta_any value);
 public:
     template<typename T>
     static bool TryGetEnumValue(std::string_view str, T& value) {

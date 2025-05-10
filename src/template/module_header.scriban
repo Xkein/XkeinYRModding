@@ -5,6 +5,6 @@
 class {{gen_type_name}}
 {
 public:
-    static void Register();
-    static void Unregister();
+    {{string.upcase(module_name)}}_API static void Register();
+    {{string.upcase(module_name)}}_API static void Unregister();
 };

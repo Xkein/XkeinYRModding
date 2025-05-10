@@ -275,7 +275,7 @@ void {{get_gen_type_name(klass.name)}}__Unregister()
 void {{get_gen_type_name(enum.name)}}__Register()
 {
     auto factory = entt::meta_factory<{{enum.full_name}}>().type("{{enum.full_name}}"_hs).custom<EnumMeta>("{{enum.enum_name}}");
-{{ for enum_constant in enum.enum_constants ; $enum_const_name = htConstant.name }}
+{{ for enum_constant in enum.constants ; $enum_const_name = enum_constant.name }}
     factory.data<{{enum.full_name}}::{{$enum_const_name}}>("{{$enum_const_name}}"_hs).custom<EnumConstantMeta>("{{$enum_const_name}}");
 {{- end }}
 }

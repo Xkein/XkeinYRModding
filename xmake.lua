@@ -31,7 +31,7 @@ target("YrExtCore")
     add_deps("Core", "YRpp")
     add_packages("asmjit", "zydis", { public = true })
     -- export symbols
-    -- add_files("src/core/**.cpp", "src/runtime/**.cpp")
+    add_files("src/core/**.cpp", "src/runtime/**.cpp")
     add_headerfiles("src/yr/**.h")
     add_files("src/yr/**.cpp")
     add_filegroups("YrExtCore", {rootdir = "src"})

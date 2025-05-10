@@ -1,5 +1,7 @@
 #include "xkein/xkein_module.h"
 #include "codegen/XkeinExt.gen.h"
+#include "codegen/gainput.gen.h"
+#include "codegen/Wwise.gen.h"
 #include "physics/physics.h"
 #include "audio/audio.h"
 #include "xkein/engine.h"
@@ -20,6 +22,8 @@ void EnsureStart()
 
 void YrXkeinModule::Startup()
 {
+    __Gen_Type_gainput::Register();
+    __Gen_Type_Wwise::Register();
     __Gen_Type_XkeinExt::Register();
 
     REGISTER_JS_MODULE(YRpp);
@@ -39,6 +43,8 @@ void YrXkeinModule::Shutdown()
     }
 
     __Gen_Type_XkeinExt::Unregister();
+    __Gen_Type_Wwise::Unregister();
+    __Gen_Type_gainput::Unregister();
 }
 
 #include "yr/event/windows_event.h"
