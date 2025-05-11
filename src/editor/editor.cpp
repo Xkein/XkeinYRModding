@@ -2,6 +2,8 @@
 #include "editor.h"
 #include "yr/extcore_config.h"
 #include "runtime/logger/logger.h"
+#include "input/input.h"
+#include "core/reflection/reflection.h"
 #include <map>
 #include <ranges>
 
@@ -145,30 +147,33 @@ bool YrEditorWindow::IsOpened() const
 
 auto& GetKeyListeners()
 {
-    static std::map<ImGuiKey, std::vector<YrEditorKeyListener::ListenerFuncType>> gKeyListeners {};
+    static std::map<gainput::Key, std::vector<YrEditorKeyListener::ListenerFuncType>> gKeyListeners {};
     return gKeyListeners;
 }
 
-ImGuiKey GetConfigKey(std::string_view config)
+gainput::Key GetConfigKey(std::string_view config)
 {
     if (!gYrExtConfig)
-        return ImGuiKey_None;
-    return gYrExtConfig->rawData["editor_key_config"].value(config, ImGuiKey_None);
+        return gainput::KeyCount_;
+    std::string str = gYrExtConfig->rawData["editor_key_config"].value(config, "KeyCount_");
+    gainput::Key key = gainput::KeyCount_;
+    if (Reflection::TryGetEnumValue(str, key)) {
+        return key;
+    }
+    return key;
 }
+
+static std::vector<std::pair<std::string, YrEditorKeyListener::ListenerFuncType>> gRegisterQueue;
 
 void YrEditorKeyListener::Register(std::string_view config, ListenerFuncType listener)
 {
-    ImGuiKey key = GetConfigKey(config);
-    if (key == ImGuiKey_None)
-        return;
-    GetKeyListeners()[key].push_back(listener);
-    gLogger->info("editor: key register {} <- {}", config, (void*)listener);
+    gRegisterQueue.emplace_back(std::pair{config, listener});
 }
 
-void YrEditorKeyListener::Unregistere(std::string_view config, ListenerFuncType listener)
+void YrEditorKeyListener::Unregister(std::string_view config, ListenerFuncType listener)
 {
-    ImGuiKey key = GetConfigKey(config);
-    if (key == ImGuiKey_None)
+    gainput::Key key = GetConfigKey(config);
+    if (key == gainput::KeyCount_)
         return;
     auto& list = GetKeyListeners()[key];
     if (auto iter = std::find(list.begin(), list.end(), listener); iter != list.end()){
@@ -181,9 +186,18 @@ void StepEditorKeyListener()
 {
     if (!ImGui::GetCurrentContext())
         return;
+    for (auto&& [config, listener] : gRegisterQueue)
+    {
+        gainput::Key key = GetConfigKey(config);
+        if (key == gainput::KeyCount_)
+            return;
+        GetKeyListeners()[key].push_back(listener);
+        gLogger->info("editor: key register {} <- {}", config, (void*)listener);
+    }
+    gRegisterQueue.clear();
     for (auto&& [key, list] : GetKeyListeners())
     {
-        if (!ImGui::IsKeyPressed(key))
+        if (!Input::IsKeyDown(key))
             continue;
         for (auto const& listener : list | std::views::reverse) {
             if (listener())

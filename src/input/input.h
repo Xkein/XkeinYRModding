@@ -7,17 +7,24 @@ class Input
 {
 
 public:
-    static gainput::InputManager* gManager;
+    XKEINEXT_API static gainput::InputManager* gManager;
     PROPERTY()
-    static gainput::InputMap*     gMap;
+    XKEINEXT_API static gainput::InputMap*     gMap;
     PROPERTY()
-    static gainput::DeviceId      gMouseId;
+    XKEINEXT_API static gainput::DeviceId      gMouseId;
     PROPERTY()
-    static gainput::DeviceId      gKeyboardId;
+    XKEINEXT_API static gainput::DeviceId      gKeyboardId;
     PROPERTY()
-    static gainput::DeviceId      gJoystickId;
+    XKEINEXT_API static gainput::DeviceId      gJoystickId;
     PROPERTY()
-    static gainput::DeviceId      gTouchId;
+    XKEINEXT_API static gainput::DeviceId      gTouchId;
+
+    FUNCTION()
+    XKEINEXT_API static bool IsKeyDown(gainput::Key key);
+    FUNCTION()
+    XKEINEXT_API static bool IsKeyUp(gainput::Key key);
+    FUNCTION()
+    XKEINEXT_API static bool IsKeyHeld(gainput::Key key);
 
     static void Init();
     static void Destroy();

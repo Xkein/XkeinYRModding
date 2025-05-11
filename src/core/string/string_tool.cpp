@@ -53,3 +53,9 @@ std::string_view get_pool_string_view(std::string_view str_view)
     }
     return std::string_view(iter->second);
 }
+
+#include <boost/nowide/convert.hpp>
+std::wstring widen(std::string_view str)
+{
+    return boost::nowide::widen(str);
+}

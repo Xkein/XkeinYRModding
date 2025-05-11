@@ -47,7 +47,7 @@ struct YrEditorKeyListener
 {
     using ListenerFuncType = bool(*)();
     static void Register(std::string_view config, ListenerFuncType listener);
-    static void Unregistere(std::string_view config, ListenerFuncType listener);
+    static void Unregister(std::string_view config, ListenerFuncType listener);
 };
 #define IMPL_EDITOR_WINDOW(CLASS, KEY_CONFIG)                                           \
     bool __##CLASS##KeyListener() {                                                     \
@@ -57,4 +57,4 @@ struct YrEditorKeyListener
     }                                                                                   \
     GLOBAL_INVOKE_ON_CTOR_DTOR(                                                         \
         []() {YrEditorKeyListener::Register(KEY_CONFIG, __##CLASS##KeyListener);}       \
-        , []() {YrEditorKeyListener::Unregistere(KEY_CONFIG, __##CLASS##KeyListener);}) \
+        , []() {YrEditorKeyListener::Unregister(KEY_CONFIG, __##CLASS##KeyListener);}) \

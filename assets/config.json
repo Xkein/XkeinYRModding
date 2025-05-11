@@ -20,8 +20,9 @@
     "break_on_exit": false,
 
     "editor_key_config": {
-        "js_terminal": 606,
-        "imgui_demo": 626,
-        "object_inspector": 598
+        "net_debug_tool": "KeyF8",
+        "js_terminal": "KeyF9",
+        "imgui_demo": "KeyF10",
+        "object_inspector": "KeyF11"
     }
 }

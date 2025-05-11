@@ -161,6 +161,9 @@ class JsEvents
 }
 class Input
 {
+    static IsKeyDown(key_0 : any) : boolean;
+    static IsKeyUp(key_0 : any) : boolean;
+    static IsKeyHeld(key_0 : any) : boolean;
     static s_gMap : any;
     static s_gMouseId : number;
     static s_gKeyboardId : number;

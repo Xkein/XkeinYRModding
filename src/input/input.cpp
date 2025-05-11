@@ -35,3 +35,21 @@ void Input::Tick()
         return;
     gManager->Update();
 }
+
+bool Input::IsKeyDown(gainput::Key key)
+{
+    gainput::InputDevice* keyboard = gManager->GetDevice(Input::gKeyboardId);
+    return keyboard->GetBool(key) && !keyboard->GetBoolPrevious(key);
+}
+
+bool Input::IsKeyUp(gainput::Key key)
+{
+    gainput::InputDevice* keyboard = gManager->GetDevice(Input::gKeyboardId);
+    return !keyboard->GetBool(key) && keyboard->GetBoolPrevious(key);
+}
+
+bool Input::IsKeyHeld(gainput::Key key)
+{
+    return gManager->GetDevice(Input::gKeyboardId)->GetBool(key);
+}
+
