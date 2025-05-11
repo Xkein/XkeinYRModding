@@ -65,7 +65,7 @@ void InitLogger()
     }
 
     namespace fs = std::filesystem;
-    fs::path logDir = fs::path("logs");
+    fs::path logDir = fs::path("debug") / "yrextcore";
     fs::path logPath = logDir / "yr_extcore.log";
     if (fs::exists(logPath))
     {

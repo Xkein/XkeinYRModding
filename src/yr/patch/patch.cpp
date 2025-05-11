@@ -124,16 +124,16 @@ void CheckHookRace(syringe_patch_data* data, std::vector<byte>& originalCode)
 }
 
 typedef DWORD __cdecl SyringePatchFunc (REGISTERS*);
-DWORD __cdecl CallSyringePatchSafe(SyringePatchFunc* patchFunc, REGISTERS *R)
+DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
 {
     std::string* stackTrace = nullptr;
     __try
     {
-        return patchFunc(R);
+        return reinterpret_cast<SyringePatchFunc*>(data->hookFunc)(R);
     }
     __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
     {
-        gLogger->error("syringe patch encounter error!");
+        gLogger->error("syringe patch encounter error! hook address: 0x{:08x}", data->hookAddr);
         gLogger->error("stack trace : {}", *stackTrace);
         gLogger->flush();
     }
@@ -159,7 +159,7 @@ void ApplySyringePatch(syringe_patch_data* data)
         assembly.add(x86::esp, 0xC);    
     }
     else {
-        assembly.push(data->hookFunc);
+        assembly.push(data);
         assembly.call(&CallSyringePatchSafe);
         assembly.add(x86::esp, 0x10);
     }
