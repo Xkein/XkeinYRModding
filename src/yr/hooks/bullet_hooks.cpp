@@ -97,7 +97,7 @@ BROADCAST_HOOK_EVENT(0x46C722, 0x5, YrBulletTypeLoadGameEndEvent)
 }
 
 BROADCAST_HOOK_EVENT_AGAIN(0x46C429, 0xA, YrBulletTypeLoadIniEvent, 0x46C41C)
-BROADCAST_HOOK_EVENT(0x46C41C, 0x5, YrBulletTypeLoadIniEvent)
+BROADCAST_HOOK_EVENT(0x46C41C, 0xA, YrBulletTypeLoadIniEvent)
 {
     E->pBulletType = R->ESI<BulletTypeClass*>();
     E->pIni        = R->Stack<CCINIClass*>(0x90);

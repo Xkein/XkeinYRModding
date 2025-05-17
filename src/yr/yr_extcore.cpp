@@ -175,10 +175,12 @@ void OnAppOpen()
     yr_entity::Init();
     InitPatch();
     LoadExtensions();
+    ApplyModulePatch(GetModuleHandle("YrExtCore.dll"));
     
     SetConsoleCtrlHandler(CtrlHandler, true);
     atexit(OnAppExit);
     appInited = true;
+    gLogger->flush();
 }
 
 void OnAppExit()

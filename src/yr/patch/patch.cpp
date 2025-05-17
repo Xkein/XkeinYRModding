@@ -5,6 +5,8 @@
 #include <Zydis/Zydis.h>
 #include <memory>
 
+#define ENTRY_POINT_ADDRESS 0x7CD810
+
 void ApplyModulePatch(HANDLE hInstance);
 
 class JitErrorHandler : public asmjit::ErrorHandler
@@ -33,7 +35,6 @@ JitLogger           gJitLogger;
 void InitPatch()
 {
     gJitRuntime = new asmjit::JitRuntime();
-    ApplyModulePatch(GetModuleHandle("YrExtCore.dll"));
 }
 
 void UninitPatch()
@@ -224,6 +225,41 @@ void ApplyModulePatch(HANDLE hInstance)
                 if (curPatch->hookFunc == nullptr || curPatch->hookAddr == 0)
                     continue;
                 ApplySyringePatch(curPatch);
+                patchCount++;
+            }
+        }
+        else if (std::string_view(moduleName).contains("YrExtCore")) {
+            continue;
+        }
+        else if (strncmp(".syhks00", (char*)sct_hdr->Name, 8) == 0)
+        {
+            gLogger->info("found real syringe patch section, converting to our syringe patch pattern.");
+            auto data = (hookdecl*)((DWORD)hInstance + sct_hdr->VirtualAddress);
+            auto size = sct_hdr->Misc.VirtualSize / sizeof(hookdecl);
+
+            for (size_t idx = 0; idx < size; idx++)
+            {
+                hookdecl* curHook = &data[idx];
+                if (curHook->hookName == nullptr || curHook->hookAddr == 0)
+                    continue;
+                syringe_patch_data* curPatch = new syringe_patch_data;
+                curPatch->hookAddr = curHook->hookAddr;
+                curPatch->hookSize = curHook->hookSize;
+                curPatch->hookFunc = GetProcAddress((HMODULE)hInstance, curHook->hookName);
+                if (curPatch->hookFunc == nullptr)
+                {
+                    gLogger->error("could not get hook function {}", curHook->hookName);
+                    delete curPatch;
+                    continue;
+                }
+                
+                curPatch->unsafe = false;
+                if (curPatch->hookAddr == ENTRY_POINT_ADDRESS) {
+                    gLogger->info("found entry point hook {}, directly invoking", curHook->hookName);
+                    CallSyringePatchSafe(curPatch, nullptr);
+                } else {
+                    ApplySyringePatch(curPatch);
+                }
                 patchCount++;
             }
         }
