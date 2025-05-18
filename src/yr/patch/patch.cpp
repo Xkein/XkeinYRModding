@@ -4,6 +4,7 @@
 #include <asmjit/asmjit.h>
 #include <Zydis/Zydis.h>
 #include <memory>
+#include <queue>
 
 #define ENTRY_POINT_ADDRESS 0x7CD810
 
@@ -71,22 +72,37 @@ void EmbedOriginalCode(asmjit::x86::Assembler& assembly, syringe_patch_data* dat
     assembly.embed(originalCode.data(), originalCode.size());
 }
 
-void CheckHookRace(syringe_patch_data* data, std::vector<byte>& originalCode)
+void CheckHookRace(syringe_patch_data* data)
 {
-    void* hookAddress = (void*)data->hookAddr;
+    const size_t frontOffset = 4;
+    byte* hookAddress = (byte*)data->hookAddr;
     bool maybeConflicted = false;
+    bool beforeAddress = false;
     // check hook race
-    for (byte originalByte : originalCode)
+    for (int offset = -frontOffset; offset < (int)data->hookSize; offset++)
     {
-        switch (originalByte)
+        byte cur = hookAddress[offset];
+        switch (cur)
         {
             case 0xE9:
             case 0xE8:
+                if (offset == 0)
+                {
+                    offset += 5 - 1;
+                    continue;
+                }
+                else if (offset < 0 && cur != 0xE9) {
+                    continue;
+                }
                 maybeConflicted = true;
                 break;
         }
-        if (maybeConflicted)
+        if (maybeConflicted) {
+            if (offset < 0) {
+                beforeAddress = true;
+            }
             break;
+        }
     }
     std::string disassemblyResult;
     if (maybeConflicted) {
@@ -120,9 +136,15 @@ void CheckHookRace(syringe_patch_data* data, std::vector<byte>& originalCode)
         }
     }
     if (disassemblyResult.contains("jmp") || disassemblyResult.contains("call")) {
-        gLogger->warn("Hook {} seems to be conflicted with other hooks! disassembly: {}", hookAddress, disassemblyResult);
+        gLogger->warn("Hook {} seems to be conflicted with other hooks! disassembly: {}", (void*)hookAddress, disassemblyResult);
+    }
+    if (beforeAddress) {
+        gLogger->warn("Hook {} seems to be conflicted with other hooks! see assembly before address", (void*)hookAddress);
     }
 }
+
+static std::vector<syringe_patch_data*> gCallingPatchs;
+static std::deque<syringe_patch_data*> gLastCalledPatchs;
 
 typedef DWORD __cdecl SyringePatchFunc (REGISTERS*);
 DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
@@ -130,7 +152,32 @@ DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
     std::string* stackTrace = nullptr;
     __try
     {
-        return reinterpret_cast<SyringePatchFunc*>(data->hookFunc)(R);
+// #define _LOG_HOOK
+#ifdef _LOG_HOOK
+        gLogger->info("call syringe patch at {}, begin", (void*)data->hookAddr);
+#endif
+#ifdef DEBUG
+        gCallingPatchs.push_back(data);
+#endif
+        DWORD ret = reinterpret_cast<SyringePatchFunc*>(data->hookFunc)(R);
+#ifdef DEBUG
+        if (gCallingPatchs.back() == data) {
+            gCallingPatchs.pop_back();
+        }
+        else {
+            gCallingPatchs.erase(std::find(gCallingPatchs.begin(), gCallingPatchs.end(), data));
+            gLogger->error("patch {}-{} finish but it is not the last calling patch!", (void*)data->hookAddr, data->hookFunc);
+            gLogger->error("the last calling patch is {}-{}", (void*)gCallingPatchs.back()->hookAddr, gCallingPatchs.back()->hookFunc);
+        }
+        gLastCalledPatchs.push_back(data);
+        if (gLastCalledPatchs.size() > 16) {
+            gLastCalledPatchs.pop_front();
+        }
+#endif
+#ifdef _LOG_HOOK
+        gLogger->info("call syringe patch at {}, end, return {}", (void*)data->hookAddr, (void*)ret);
+#endif
+        return ret;
     }
     __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
     {
@@ -140,8 +187,24 @@ DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
     }
 }
 
+#include "yr/yr_hook_diagnostic.h"
+DebugPatchCallInfo GetDebugPatchCallInfo()
+{
+    DebugPatchCallInfo info;
+    info.callingList = gCallingPatchs;
+    std::reverse(info.callingList.begin(), info.callingList.end());
+    for (auto &&data : gLastCalledPatchs)
+    {
+        info.calledList.push_back(data);
+    }
+    std::reverse(info.calledList.begin(), info.calledList.end());
+    return info;
+}
+
 void ApplySyringePatch(syringe_patch_data* data)
 {
+    // check hook race
+    CheckHookRace(data);
     using namespace asmjit;
     CodeHolder code;
     InitCodeHolder(code);
@@ -156,8 +219,14 @@ void ApplySyringePatch(syringe_patch_data* data)
     assembly.lea(x86::eax, x86::ptr(x86::esp, 4));
     assembly.push(x86::eax);
     if (data->unsafe) {
+#ifdef DEBUG
+        assembly.push(data);
+        assembly.call(&CallSyringePatchSafe);
+        assembly.add(x86::esp, 0x10);
+#else
         assembly.call(data->hookFunc);
-        assembly.add(x86::esp, 0xC);    
+        assembly.add(x86::esp, 0xC);  
+#endif  
     }
     else {
         assembly.push(data);
@@ -175,7 +244,7 @@ void ApplySyringePatch(syringe_patch_data* data)
     assembly.bind(l_origin);
 
     void*             hookAddress = (void*)data->hookAddr;
-    DWORD             hookSize    = std::max(data->hookSize, 5u);
+    DWORD             hookSize    = data->hookSize;
     std::vector<byte> originalCode(hookSize);
     memcpy(originalCode.data(), hookAddress, hookSize);
     EmbedOriginalCode(assembly, data, originalCode);
@@ -193,8 +262,6 @@ void ApplySyringePatch(syringe_patch_data* data)
     code.flatten();
     code.resolveUnresolvedLinks();
     code.relocateToBase(data->hookAddr);
-    // check hook race
-    CheckHookRace(data, originalCode);
     // override hook address
     DWORD protect_flag;
     VirtualProtect(hookAddress, hookSize, PAGE_EXECUTE_READWRITE, &protect_flag);
@@ -244,7 +311,7 @@ void ApplyModulePatch(HANDLE hInstance)
                     continue;
                 syringe_patch_data* curPatch = new syringe_patch_data;
                 curPatch->hookAddr = curHook->hookAddr;
-                curPatch->hookSize = curHook->hookSize;
+                curPatch->hookSize = std::max(curHook->hookSize, 5u);
                 curPatch->hookFunc = GetProcAddress((HMODULE)hInstance, curHook->hookName);
                 if (curPatch->hookFunc == nullptr)
                 {

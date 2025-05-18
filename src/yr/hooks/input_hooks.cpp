@@ -16,7 +16,7 @@ void YrInputBlocker::BlockAllInput()
     blockMouseRightInput = true;
 }
 
-BROADCAST_HOOK_EVENT(0x4E18BC, 0x7, YrGadgetInputEvent)
+BROADCAST_HOOK_EVENT(0x4E18BC, 0x8, YrGadgetInputEvent)
 {
     E->pGadget     = R->ESI<GadgetClass*>();
     E->pKey        = R->lea_Stack<DWORD*>(STACK_OFFSET(0x1C, -0xC));
