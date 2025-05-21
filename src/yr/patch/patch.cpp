@@ -1,14 +1,30 @@
 #include "yr/patch/patch.h"
 #include "runtime/logger/logger.h"
+#include "runtime/platform/platform.h"
 #include "yr/debug_util.h"
 #include <asmjit/asmjit.h>
 #include <Zydis/Zydis.h>
 #include <memory>
 #include <queue>
+#include <fstream>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/lexical_cast.hpp>
 
 #define ENTRY_POINT_ADDRESS 0x7CD810
 
 void ApplyModulePatch(HANDLE hInstance);
+
+template <typename ElemT>
+struct HexTo {
+    ElemT value;
+    operator ElemT() const {return value;}
+    friend std::istream& operator>>(std::istream& in, HexTo& out) {
+        in >> std::hex >> out.value;
+        return in;
+    }
+};
 
 class JitErrorHandler : public asmjit::ErrorHandler
 {
@@ -32,6 +48,7 @@ public:
 asmjit::JitRuntime* gJitRuntime;
 JitErrorHandler     gJitErrorHandler;
 JitLogger           gJitLogger;
+std::map<uint, std::vector<syringe_patch_data*>> gPatchBucket;
 
 void InitPatch()
 {
@@ -78,9 +95,15 @@ void CheckHookRace(syringe_patch_data* data)
     byte* hookAddress = (byte*)data->hookAddr;
     bool maybeConflicted = false;
     bool beforeAddress = false;
+    bool conflictConfirmed = false;
     // check hook race
     for (int offset = -frontOffset; offset < (int)data->hookSize; offset++)
     {
+        if(offset != 0 && gPatchBucket.contains(data->hookAddr + offset)) {
+            gLogger->error("hook {}-{} conflict with other hook: {}", (void*)data->hookAddr, data->hookFunc, (void*)(data->hookAddr + offset));
+            conflictConfirmed = true;
+            continue;
+        }
         byte cur = hookAddress[offset];
         switch (cur)
         {
@@ -104,6 +127,8 @@ void CheckHookRace(syringe_patch_data* data)
             break;
         }
     }
+    if (conflictConfirmed)
+        return;
     std::string disassemblyResult;
     if (maybeConflicted) {
         // Initialize decoder context
@@ -135,11 +160,11 @@ void CheckHookRace(syringe_patch_data* data)
             runtime_address += instruction.length;
         }
     }
-    if (disassemblyResult.contains("jmp") || disassemblyResult.contains("call")) {
-        gLogger->warn("Hook {} seems to be conflicted with other hooks! disassembly: {}", (void*)hookAddress, disassemblyResult);
-    }
     if (beforeAddress) {
         gLogger->warn("Hook {} seems to be conflicted with other hooks! see assembly before address", (void*)hookAddress);
+    }
+    if (disassemblyResult.contains("jmp") || disassemblyResult.contains("call")) {
+        gLogger->warn("Hook {} seems to be conflicted with other hooks! disassembly: {}", (void*)hookAddress, disassemblyResult);
     }
 }
 
@@ -268,6 +293,8 @@ void ApplySyringePatch(syringe_patch_data* data)
     code.copyFlattenedData(hookAddress, hookSize);
     VirtualProtect(hookAddress, hookSize, protect_flag, NULL);
     FlushInstructionCache(GetCurrentProcess(), hookAddress, hookSize);
+
+    gPatchBucket[data->hookAddr].push_back(data);
 }
 
 void ApplyModulePatch(HANDLE hInstance)
@@ -330,6 +357,50 @@ void ApplyModulePatch(HANDLE hInstance)
                 patchCount++;
             }
         }
+    }
+    std::ifstream injFile(std::string(moduleName) + ".inj");
+    if (injFile.is_open())
+    {
+        std::string line;
+        while(std::getline(injFile, line)) {
+            size_t commentIdx = line.find(';');
+            if (commentIdx != std::string::npos) {
+                line.erase(line.begin() + commentIdx, line.end());
+            }
+            if (!line.contains('='))
+                continue;
+            boost::replace_all(line, " ", "");
+            if (line.empty())
+                continue;
+            boost::replace_all(line, "=", ",");
+            std::vector<std::string> strs;
+            boost::split(strs, line, boost::is_any_of(","));
+            if (strs.size() != 3) {
+                gLogger->error("invalid line: {}", line);
+                continue;
+            }
+            std::string& hookName = strs[1];
+            syringe_patch_data* curPatch = new syringe_patch_data;
+            curPatch->hookAddr = boost::lexical_cast<HexTo<size_t>>("0x" + strs[0]);
+            curPatch->hookSize = std::max((size_t)boost::lexical_cast<HexTo<size_t>>("0x" + strs[2]), 5u);
+            curPatch->hookFunc = GetProcAddress((HMODULE)hInstance, hookName.data());
+            if (curPatch->hookFunc == nullptr)
+            {
+                gLogger->warn("could not get hook function {}", hookName);
+                delete curPatch;
+                continue;
+            }
+            
+            curPatch->unsafe = false;
+            if (curPatch->hookAddr == ENTRY_POINT_ADDRESS) {
+                gLogger->info("found entry point hook {}, directly invoking", hookName);
+                CallSyringePatchSafe(curPatch, nullptr);
+            } else {
+                ApplySyringePatch(curPatch);
+            }
+            patchCount++;
+        }
+        injFile.close();
     }
     gLogger->info("Patchs applied: module = {}, count = {}", moduleName, patchCount);
 }
