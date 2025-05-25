@@ -497,6 +497,19 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectObjectClickedActionEvent)
     }
 }
 
+DEFINE_YR_HOOK_EVENT_LISTENER(YrMissionExecuteEvent)
+{
+    auto behavior = GET_OBJECT_BEHAVIOR(E->pMission, onMissionExecute);
+    if (behavior)
+    {
+        std::optional<int> ret = INVOKE_JS_EVENT(*behavior, E->pMission);
+        if (ret)
+        {
+            E->OverrideReturn(ret.value());
+        }
+    }
+}
+
 DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoFireEvent)
 {
     auto behavior = GET_TECHNO_BEHAVIOR(E->pTechno, onFire);

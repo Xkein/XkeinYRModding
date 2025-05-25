@@ -24,6 +24,7 @@ interface ObjectEvents extends AbstractEvents
     onMouseOverObject: Delegate;
     onCellClickedAction: Delegate;
     onObjectClickedAction: Delegate;
+    onMissionExecute: Delegate;
 }
 
 interface AbstractTypeEvents extends AbstractEvents

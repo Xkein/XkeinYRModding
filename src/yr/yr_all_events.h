@@ -18,6 +18,7 @@
 #include "yr/event/terrain_event.h"
 #include "yr/event/terrain_type_event.h"
 #include "yr/event/object_event.h"
+#include "yr/event/mission_event.h"
 #include "yr/event/super_event.h"
 #include "yr/event/super_weapon_type_event.h"
 #include "yr/event/weapon_type_event.h"

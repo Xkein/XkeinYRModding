@@ -70,6 +70,7 @@ class JsObjectEvents
     m_onMouseOverObject : any;
     m_onCellClickedAction : any;
     m_onObjectClickedAction : any;
+    m_onMissionExecute : any;
 }
 class JsAbstractTypeEvents
     extends JsAbstractEvents

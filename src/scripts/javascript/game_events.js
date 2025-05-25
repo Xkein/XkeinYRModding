@@ -50,6 +50,7 @@ class ObjectEvents extends AbstractEvents
         this.onMouseOverObject = new Delegate()
         this.onCellClickedAction = new Delegate()
         this.onObjectClickedAction = new Delegate()
+        this.onMissionExecute = new Delegate();
     }
 }
 
@@ -206,6 +207,7 @@ function bind_js_object_events(type) {
     bind_js_event(type, "onMouseOverObject")
     bind_js_event(type, "onCellClickedAction")
     bind_js_event(type, "onObjectClickedAction")
+    bind_js_event(type, "onMissionExecute")
 }
 function bind_js_techno_events(type) {
     bind_js_object_events(type)

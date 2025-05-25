@@ -12,6 +12,7 @@ class RulesClass;
 class IniReader;
 class WarheadTypeClass;
 class ObjectClass;
+class MissionClass;
 class HouseClass;
 class BulletClass;
 class SuperClass;
@@ -68,6 +69,8 @@ struct JsObjectEvents : public JsAbstractEvents
     ScriptBehaviour<std::optional<bool>(ObjectClass*, Action, CellStruct)> onCellClickedAction;
     PROPERTY()
     ScriptBehaviour<std::optional<bool>(ObjectClass*, Action, ObjectClass*)> onObjectClickedAction;
+    PROPERTY()
+    ScriptBehaviour<std::optional<int>(MissionClass*)> onMissionExecute;
 };
 
 CLASS(BindJs)
