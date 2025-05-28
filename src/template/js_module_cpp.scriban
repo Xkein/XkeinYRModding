@@ -1,5 +1,6 @@
 {{- include 'include/meta.scriban'
     init_extra_vars(this)
+    include 'include/js_ts.scriban'
     func need_codegen(htType)
         ret get_meta_tag(htType.meta, "BindJs")
     end
@@ -50,6 +51,10 @@ void __JsRegister_{{klass.name}}() {
         if function.is_overload || function.cpp_function.is_function_template
             continue
         end
+        $js_function_name = get_js_function_name(function.name)
+        if string.empty($js_function_name)
+            continue
+        end
         if function.is_constructor
             if !htClass.is_abstract
                 $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
@@ -58,15 +63,9 @@ void __JsRegister_{{klass.name}}() {
                 end
             end
         else if function.is_static
-            if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
-                $klass = append_line($klass, $'MakeFunctionCheck<static_cast<{$func_type}>(&{htClass.full_name}::{function.name})>(builder, "{function.name}");')
-            else
-                $klass = append_line($klass, $'MakeFunctionCheck<&{htClass.full_name}::{function.name}>(builder, "{function.name}");')
-            end
-        else if function.is_overload ; $func_type = get_function_ptr_type(function, htClass)
-            $klass = append_line($klass, $'MakeMethodCheck<static_cast<{$func_type}>(&{htClass.full_name}::{function.name})>(builder, "{function.name}");')
+            $klass = append_line($klass, $'MakeFunctionCheck<&{htClass.full_name}::{function.name}>(builder, "{$js_function_name}");')
         else
-            $klass = append_line($klass, $'MakeMethodCheck<&{htClass.full_name}::{function.name}>(builder, "{function.name}");')
+            $klass = append_line($klass, $'MakeMethodCheck<&{htClass.full_name}::{function.name}>(builder, "{$js_function_name}");')
         end
     end
 
@@ -78,6 +77,10 @@ void __JsRegister_{{klass.name}}() {
         $static_count = 0
         $member_count = 0
         $ctor_count = 0
+        $js_function_name = get_js_function_name($overload_name)
+        if string.empty($js_function_name)
+            continue
+        end
         for function in pair.value
             $func_type = get_function_ptr_type(function, htClass)
             if !should_skip_visibility(htClass, function) && !function.cpp_function.is_function_template
@@ -118,22 +121,22 @@ void __JsRegister_{{klass.name}}() {
         end
         if !string.empty($static_list)
             if $static_count > 1
-                $klass = append_line($klass, $'builder.Function("{$overload_name}", CombineOverloads(')
+                $klass = append_line($klass, $'builder.Function("{$js_function_name}", CombineOverloads(')
                 $klass = append_line($klass, $static_list)
                 $klass = append_line($klass, $'));')
             else
                 $decay = $static_list | string.remove_first 'MakeOverload(' | string.remove_first $', &{htClass.full_name}::{$overload_name})'
-                $klass = append_line($klass, $'MakeFunctionCheck<static_cast<{$decay}>(&{htClass.full_name}::{$overload_name})>(builder, "{$overload_name}");')
+                $klass = append_line($klass, $'MakeFunctionCheck<static_cast<{$decay}>(&{htClass.full_name}::{$overload_name})>(builder, "{$js_function_name}");')
             end
         end
         if !string.empty($member_list)
             if $member_count > 1
-                $klass = append_line($klass, $'builder.Method("{$overload_name}", CombineOverloads(')
+                $klass = append_line($klass, $'builder.Method("{$js_function_name}", CombineOverloads(')
                 $klass = append_line($klass, $member_list)
                 $klass = append_line($klass, $'));')
             else
                 $decay = $member_list | string.remove_first 'MakeOverload(' | string.remove_first $', &{htClass.full_name}::{$overload_name})'
-                $klass = append_line($klass, $'MakeMethodCheck<static_cast<{$decay}>(&{htClass.full_name}::{$overload_name})>(builder, "{$overload_name}");')
+                $klass = append_line($klass, $'MakeMethodCheck<static_cast<{$decay}>(&{htClass.full_name}::{$overload_name})>(builder, "{$js_function_name}");')
             end
         end
     end

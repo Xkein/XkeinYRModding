@@ -2,12 +2,17 @@
 declare module "YRpp" {
 class BytePalette
 {
-    m_Entries : any;
+    // skip operator[]
+    // skip operator[]
+    m_Entries : ColorStruct;
 }
 class TintStruct
 {
     constructor();
     constructor(r_0 : number, g_1 : number, b_2 : number);
+    op_Equality(rhs_0 : TintStruct) : boolean;
+    op_Inequality(rhs_0 : TintStruct) : boolean;
+    op_LessThan(rhs_0 : TintStruct) : boolean;
     m_Red : number;
     m_Green : number;
     m_Blue : number;
@@ -39,6 +44,7 @@ class FacingClass
     constructor(facing_0 : DirStruct);
     constructor(dir_0 : any);
     constructor(another_0 : FacingClass);
+    // skip operator=
     SetDesired(facing_0 : DirStruct) : boolean;
     SetCurrent(facing_0 : DirStruct) : boolean;
     Desired() : DirStruct;
@@ -940,8 +946,8 @@ class HouseClass
     m___DropshipData : string;
     m_CurrentDropshipIndex : number;
     m_HasCloakingRanges : number;
-    m_Color : any;
-    m_LaserColor : any;
+    m_Color : ColorStruct;
+    m_LaserColor : ColorStruct;
     m_Base : BaseClass;
     m_RecheckPower : boolean;
     m_RecheckRadar : boolean;
@@ -1045,6 +1051,9 @@ class AbstractClass
     GetTargetDirection(pTarget_0 : AbstractClass) : DirStruct;
     DistanceFrom(that_0 : AbstractClass) : number;
     DistanceFrom3D(that_0 : AbstractClass) : number;
+    op_LessThan(rhs_0 : AbstractClass) : boolean;
+    // skip operator new
+    // skip operator delete
     static s_AbsID : any;
     static s_Array : any;
     static s_TargetIndex : any;
@@ -1158,7 +1167,7 @@ class ObjectClass
     IsWarpingSomethingOut() : boolean;
     IsNotWarping() : boolean;
     GetRemapColour() : LightConvertClass;
-    static DrawALinkTo(src_X_0 : number, src_Y_1 : number, src_Z_2 : number, dst_X_3 : number, dst_Y_4 : number, dst_Z_5 : number, color_6 : any) : void;
+    static DrawALinkTo(src_X_0 : number, src_Y_1 : number, src_Z_2 : number, dst_X_3 : number, dst_Y_4 : number, dst_Z_5 : number, color_6 : ColorStruct) : void;
     GetHealthPercentage() : number;
     SetHealthPercentage(percentage_0 : number) : void;
     IsRedHP() : boolean;
@@ -1384,7 +1393,7 @@ class ObjectTypeClass
     static IsBuildCat5(abstractID_0 : any, idx_1 : number) : boolean;
     static GetTechnoType(abstractID_0 : any, idx_1 : number) : TechnoTypeClass;
     LoadVoxel() : void;
-    m_RadialColor : any;
+    m_RadialColor : ColorStruct;
     m_unused_9B : number;
     m_Armor : any;
     m_Strength : number;
@@ -1419,7 +1428,7 @@ class ObjectTypeClass
     m_HasRadialIndicator : boolean;
     m_IgnoresFirestorm : boolean;
     m_UseLineTrail : boolean;
-    m_LineTrailColor : any;
+    m_LineTrailColor : ColorStruct;
     m_LineTrailColorDecrement : number;
     m_VoxelMainCache : any;
     m_VoxelTurretWeaponCache : any;
@@ -1524,10 +1533,10 @@ class INIClass
     ReadPowerup(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
     ReadLayer(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
     ReadVHPScan(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
-    ReadColor(pBuffer_0 : any, pSection_1 : string, pKey_2 : string, defValue_3 : any) : any;
-    ReadColor(pSection_0 : number, pKey_1 : number, defValue_2 : any) : any;
-    GetColor(pSection_0 : number, pKey_1 : number, value_2 : any) : void;
-    WriteColor(pSection_0 : number, pKey_1 : number, color_2 : any) : boolean;
+    ReadColor(pBuffer_0 : ColorStruct, pSection_1 : string, pKey_2 : string, defValue_3 : ColorStruct) : ColorStruct;
+    ReadColor(pSection_0 : number, pKey_1 : number, defValue_2 : ColorStruct) : ColorStruct;
+    GetColor(pSection_0 : number, pKey_1 : number, value_2 : ColorStruct) : void;
+    WriteColor(pSection_0 : number, pKey_1 : number, color_2 : ColorStruct) : boolean;
     ReadUUBlock(pSection_0 : number, pBuffer_1 : void, length_2 : any) : any;
     WriteUUBlock(pSection_0 : number, pBuffer_1 : void, length_2 : any) : boolean;
     ReadAbilities(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
@@ -1902,6 +1911,7 @@ class TechnoTypeClass
 class WeaponStruct
 {
     constructor();
+    op_Equality(pWeap_0 : WeaponStruct) : boolean;
     m_WeaponType : WeaponTypeClass;
     m_FLH : CoordStruct;
     m_BarrelLength : number;
@@ -1943,9 +1953,9 @@ class WeaponTypeClass
     m_AssaultAnim : AnimTypeClass;
     m_OpenToppedAnim : AnimTypeClass;
     m_AttachedParticleSystem : ParticleSystemTypeClass;
-    m_LaserInnerColor : any;
-    m_LaserOuterColor : any;
-    m_LaserOuterSpread : any;
+    m_LaserInnerColor : ColorStruct;
+    m_LaserOuterColor : ColorStruct;
+    m_LaserOuterSpread : ColorStruct;
     m_UseFireParticles : boolean;
     m_UseSparkParticles : boolean;
     m_OmniFire : boolean;
@@ -2530,7 +2540,7 @@ class BuildingClass
     m_Translucency : number;
     m_StorageFilledSlots : number;
     m_SecretProduction : TechnoTypeClass;
-    m_ColorAdd : any;
+    m_ColorAdd : ColorStruct;
     m_unknown_int_6FC : number;
     m_unknown_short_700 : number;
     m_UpgradeLevel : number;
@@ -2813,7 +2823,7 @@ class OverlayTypeClass
     m_DrawFlat : boolean;
     m_IsRubble : boolean;
     m_IsARock : boolean;
-    m_RadarColor : any;
+    m_RadarColor : ColorStruct;
 }
 class IsometricTileTypeClass
 {
@@ -3534,7 +3544,7 @@ class Surface
     FillRectEx(pClipRect_0 : RectangleStruct, pFillRect_1 : RectangleStruct, nColor_2 : number) : boolean;
     FillRect(pFillRect_0 : RectangleStruct, nColor_1 : number) : boolean;
     Fill(nColor_0 : number) : boolean;
-    FillRectTrans(pClipRect_0 : RectangleStruct, pColor_1 : any, nOpacity_2 : number) : boolean;
+    FillRectTrans(pClipRect_0 : RectangleStruct, pColor_1 : ColorStruct, nOpacity_2 : number) : boolean;
     DrawEllipse(XOff_0 : number, YOff_1 : number, CenterX_2 : number, CenterY_3 : number, Rect_4 : RectangleStruct, nColor_5 : number) : boolean;
     SetPixel(pPoint_0 : Point2D, nColor_1 : number) : boolean;
     GetPixel(pPoint_0 : Point2D) : number;
@@ -3542,8 +3552,8 @@ class Surface
     DrawLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number) : boolean;
     DrawLineColor_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, nColor_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
     DrawMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, dwMultiplier_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
-    DrawSubtractiveLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : any, dwUnk1_4 : number, dwUnk2_5 : number, bUnk1_6 : boolean, bUnk2_7 : boolean, bUkn3_8 : boolean, bUkn4_9 : boolean, fUkn_10 : number) : boolean;
-    DrawRGBMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : any, Intensity_4 : number, dwUnk1_5 : number, dwUnk2_6 : number) : boolean;
+    DrawSubtractiveLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : ColorStruct, dwUnk1_4 : number, dwUnk2_5 : number, bUnk1_6 : boolean, bUnk2_7 : boolean, bUkn3_8 : boolean, bUkn4_9 : boolean, fUkn_10 : number) : boolean;
+    DrawRGBMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : ColorStruct, Intensity_4 : number, dwUnk1_5 : number, dwUnk2_6 : number) : boolean;
     PlotLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, fpDrawCallback_3 : any) : boolean;
     DrawDashedLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number) : boolean;
     DrawDashedLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number, bUkn_5 : boolean) : boolean;
@@ -3573,6 +3583,8 @@ class EBolt
     GetSourceCoords(outBuffer_0 : CoordStruct) : CoordStruct;
     GetSourceCoords() : CoordStruct;
     Fire(P1_0 : CoordStruct, P2_1 : CoordStruct, arg18_2 : number) : void;
+    // skip operator new
+    // skip operator delete
     static s_Array : any;
     m_Point1 : CoordStruct;
     m_Point2 : CoordStruct;
@@ -3678,7 +3690,7 @@ class TerrainTypeClass
     static s_Array : any;
     m_ArrayIndex : number;
     m_Foundation : number;
-    m_RadarColor : any;
+    m_RadarColor : ColorStruct;
     m_AnimationRate : number;
     m_AnimationProbability : number;
     m_TemperateOccupationBits : number;
@@ -3814,7 +3826,7 @@ class ConvertClass
 class DSurface
     extends XSurface
 {
-    DrawGradientLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pStartColor_3 : any, pEndColor_4 : any, fStep_5 : number, nColor_6 : number) : boolean;
+    DrawGradientLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pStartColor_3 : ColorStruct, pEndColor_4 : ColorStruct, fStep_5 : number, nColor_6 : number) : boolean;
     CanBlit() : boolean;
     DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : number, Position_3 : Point2D, Bounds_4 : RectangleStruct, Flags_5 : any, Remap_6 : number, ZAdjust_7 : number, ZGradientDescIndex_8 : any, Brightness_9 : number, TintColor_10 : number, ZShape_11 : any, ZShapeFrame_12 : number, XOffset_13 : number, YOffset_14 : number) : void;
     DrawTextA(pText_0 : number, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : any) : void;
@@ -3869,8 +3881,10 @@ class EventClass
 }
 class LaserDrawClass
 {
-    constructor(source_0 : CoordStruct, target_1 : CoordStruct, innerColor_2 : any, outerColor_3 : any, outerSpread_4 : any, duration_5 : number);
-    constructor(source_0 : CoordStruct, target_1 : CoordStruct, zAdjust_2 : number, unknown_3 : number, innerColor_4 : any, outerColor_5 : any, outerSpread_6 : any, duration_7 : number, blinks_8 : boolean, fades_9 : boolean, startIntensity_10 : number, endIntensity_11 : number);
+    constructor(source_0 : CoordStruct, target_1 : CoordStruct, innerColor_2 : ColorStruct, outerColor_3 : ColorStruct, outerSpread_4 : ColorStruct, duration_5 : number);
+    constructor(source_0 : CoordStruct, target_1 : CoordStruct, zAdjust_2 : number, unknown_3 : number, innerColor_4 : ColorStruct, outerColor_5 : ColorStruct, outerSpread_6 : ColorStruct, duration_7 : number, blinks_8 : boolean, fades_9 : boolean, startIntensity_10 : number, endIntensity_11 : number);
+    // skip operator new
+    // skip operator delete
     m_Progress : StageClass;
     m___Progress : string;
     m_Thickness : number;
@@ -3880,9 +3894,9 @@ class LaserDrawClass
     m_Target : CoordStruct;
     m_ZAdjust : number;
     m_field_40 : number;
-    m_InnerColor : any;
-    m_OuterColor : any;
-    m_OuterSpread : any;
+    m_InnerColor : ColorStruct;
+    m_OuterColor : ColorStruct;
+    m_OuterSpread : ColorStruct;
     m_Duration : number;
     m_Blinks : boolean;
     m_BlinkState : boolean;
@@ -4245,7 +4259,7 @@ class ParticleSystemTypeClass
     m_SpawnSparkPercentage : number;
     m_SparkSpawnFrames : number;
     m_LightSize : number;
-    m_LaserColor : any;
+    m_LaserColor : ColorStruct;
     m_Laser : boolean;
     m_OneFrameLight : boolean;
 }
@@ -4312,8 +4326,8 @@ class ParticleTypeClass
     m_ZVelocityRange : number;
     m_ColorSpeed : number;
     m_ColorList : any;
-    m_StartColor1 : any;
-    m_StartColor2 : any;
+    m_StartColor1 : ColorStruct;
+    m_StartColor2 : ColorStruct;
     m_MaxDC : number;
     m_MaxEC : number;
     m_Warhead : WarheadTypeClass;
@@ -4539,7 +4553,7 @@ class TurretControl
 class RadBeam
 {
     static Allocate(mode_0 : any) : RadBeam;
-    SetColor(color_0 : any) : void;
+    SetColor(color_0 : ColorStruct) : void;
     SetCoordsSource(loc_0 : CoordStruct) : void;
     SetCoordsTarget(loc_0 : CoordStruct) : void;
     static s_Array : any;
@@ -4550,7 +4564,7 @@ class RadBeam
     m_Type : any;
     m_unknown_14 : number;
     m_unknown_18 : number;
-    m_Color : any;
+    m_Color : ColorStruct;
     m_SourceLocation : CoordStruct;
     m_TargetLocation : CoordStruct;
     m_Period : number;
@@ -4625,10 +4639,10 @@ class BulletData
 }
 class ColorScheme
 {
-    constructor(pID_0 : string, BaseColor_1 : any, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number, AddToArray_5 : boolean);
+    constructor(pID_0 : string, BaseColor_1 : ColorStruct, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number, AddToArray_5 : boolean);
     static Find(pID_0 : string, ShadeCount_1 : number) : ColorScheme;
     static FindIndex(pID_0 : string, ShadeCount_1 : number) : number;
-    static FindByName(pID_0 : string, BaseColor_1 : any, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number) : ColorScheme;
+    static FindByName(pID_0 : string, BaseColor_1 : ColorStruct, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number) : ColorScheme;
     static GetNumberOfSchemes() : number;
     static GeneratePalette(name_0 : string) : any;
     static GetPaletteSchemesFromIterator(it_0 : any) : any;
@@ -4636,13 +4650,14 @@ class ColorScheme
     m_ArrayIndex : number;
     m_Colors : BytePalette;
     m_ID : string;
-    m_BaseColor : any;
+    m_BaseColor : ColorStruct;
     m_LightConvert : LightConvertClass;
     m_ShadeCount : number;
     m_MainShadeIndex : number;
 }
 class AbilitiesStruct
 {
+    // skip operator[]
     m_FASTER : boolean;
     m_STRONGER : boolean;
     m_FIREPOWER : boolean;
@@ -4711,8 +4726,10 @@ class LineTrail
     constructor();
     SetDecrement(val_0 : number) : void;
     static DeleteAll() : void;
+    // skip operator new
+    // skip operator delete
     static s_Array : any;
-    m_Color : any;
+    m_Color : ColorStruct;
     m_Owner : ObjectClass;
     m_Decrement : number;
     m_ActiveSlot : number;
@@ -4725,6 +4742,7 @@ class LineTrailNode
 }
 class WaypointClass
 {
+    op_Equality(tWaypoint_0 : WaypointClass) : boolean;
     m_Coords : CellStruct;
     m_unknown : number;
 }
@@ -4829,11 +4847,13 @@ class ZoneInfoStruct
 }
 class AngerStruct
 {
+    op_Equality(tAnger_0 : AngerStruct) : boolean;
     m_House : HouseClass;
     m_AngerLevel : number;
 }
 class ScoutStruct
 {
+    op_Equality(tScout_0 : ScoutStruct) : boolean;
     m_House : HouseClass;
     m_IsPreferred : boolean;
 }
@@ -4866,6 +4886,7 @@ class BaseClass
 }
 class BaseNodeClass
 {
+    op_Equality(tBaseNode_0 : BaseNodeClass) : boolean;
     m_BuildingTypeIndex : number;
     m_MapCoords : CellStruct;
     m_Placed : boolean;
@@ -4877,6 +4898,8 @@ class Randomizer
     Random() : number;
     RandomRanged(nMin_0 : number, nMax_1 : number) : number;
     RandomDouble() : number;
+    // skip operator()
+    // skip operator()
     static s_Global : any;
     m_unknown_00 : boolean;
     m_Next1 : number;
@@ -4895,6 +4918,7 @@ class LinkClass
     TailOfList(another_0 : LinkClass) : LinkClass;
     Zap() : void;
     Remove() : LinkClass;
+    // skip operator=
     m_Next : LinkClass;
     m_Previous : LinkClass;
 }
@@ -4929,6 +4953,7 @@ class GadgetClass
     StickyProcess(Flags_0 : any) : void;
     Action(Flags_0 : any, pKey_1 : number, Modifier_2 : any) : boolean;
     Clicked(pKey_0 : number, Flags_1 : any, X_2 : number, Y_3 : number, Modifier_4 : any) : boolean;
+    // skip operator=
     ExtractGadgetAt(X_0 : number, Y_1 : number) : GadgetClass;
     static GetColorScheme() : number;
     m_X : number;
@@ -5721,20 +5746,20 @@ class RulesClass
     m_RadLevelFactor : number;
     m_RadLightFactor : number;
     m_RadTintFactor : number;
-    m_RadColor : any;
+    m_RadColor : ColorStruct;
     m_RadSiteWarhead : WarheadTypeClass;
     m_ElevationIncrement : number;
     m_ElevationIncrementBonus : number;
     m_ElevationBonusCap : number;
     m_AlliedWallTransparency : boolean;
     m_WallPenetratorThreshold : number;
-    m_LocalRadarColor : any;
-    m_LineTrailColorOverride : any;
-    m_ChronoBeamColor : any;
-    m_MagnaBeamColor : any;
+    m_LocalRadarColor : ColorStruct;
+    m_LineTrailColorOverride : ColorStruct;
+    m_ChronoBeamColor : ColorStruct;
+    m_MagnaBeamColor : ColorStruct;
     m_OreTwinkleChance : number;
     m_OreTwinkle : AnimTypeClass;
-    m_ColorAdd : any;
+    m_ColorAdd : ColorStruct;
     m_LaserTargetColor : number;
     m_IronCurtainColor : number;
     m_BerserkColor : number;
@@ -6439,6 +6464,9 @@ class BuildType
 {
     constructor();
     constructor(itemIndex_0 : number, itemType_1 : any);
+    op_Equality(rhs_0 : BuildType) : boolean;
+    op_Inequality(rhs_0 : BuildType) : boolean;
+    op_LessThan(rhs_0 : BuildType) : boolean;
     static SortsBefore(leftType_0 : any, leftIndex_1 : number, rightType_2 : any, rightIndex_3 : number) : boolean;
     m_ItemIndex : number;
     m_ItemType : any;
@@ -6552,6 +6580,20 @@ class MouseClass
     m_MouseCursorIndex : any;
     m_MouseCursorLastIndex : any;
     m_MouseCursorCurrentFrame : number;
+}
+class SpotlightClass
+{
+    constructor(coords_0 : CoordStruct, size_1 : number);
+    Draw() : void;
+    Update() : void;
+    static DrawAll() : void;
+    // skip operator new
+    // skip operator delete
+    static s_Array : any;
+    m_Coords : CoordStruct;
+    m_MovementRadius : number;
+    m_Size : number;
+    m_DisableFlags : any;
 }
 enum DirType {
     North = 0,

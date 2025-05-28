@@ -16,6 +16,7 @@
 #include <HouseClass.h>
 #include <TerrainClass.h>
 #include <LineTrail.h>
+#include <SpotlightClass.h>
 #include <SpawnManagerClass.h>
 #include <SuperWeaponTypeClass.h>
 #include <WarheadTypeClass.h>
@@ -145,6 +146,7 @@ UsingCppType(ControlNode);
 UsingCppType(BulletData);
 UsingCppType(LineTrail);
 UsingYrStruct(LineTrailNode);
+UsingCppType(SpotlightClass);
 UsingYrStruct(TintStruct);
 UsingCppType(VeterancyStruct);
 UsingCppType(PassengersClass);
@@ -346,6 +348,7 @@ UsingDynamicVectorClass(ScriptTypeClass*);
 UsingDynamicVectorClass(TaskForceClass*);
 UsingDynamicVectorClass(BaseNodeClass);
 UsingDynamicVectorClass(LineTrail*);
+UsingDynamicVectorClass(SpotlightClass*);
 UsingDynamicVectorClass(StartingTechnoStruct*);
 UsingDynamicVectorClass(AngerStruct);
 UsingDynamicVectorClass(ScoutStruct);

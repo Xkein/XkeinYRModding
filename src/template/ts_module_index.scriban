@@ -1,6 +1,7 @@
 {{- include 'include/meta.scriban'
     init_extra_vars(this)
     include 'include/yrpp.scriban'
+    include 'include/js_ts.scriban'
     is_yrpp = module_name == "YRpp"
     func need_codegen(htType)
         ret get_meta_tag(htType.meta, "BindJs")
@@ -77,6 +78,10 @@
         ret (property.is_static ? 'static s_' : 'm_') + $'{property.name} : {get_ts_type(property.cpp_field.type)};'
     end
     func gen_method(function, cppFunction)
+        $js_function_name = get_js_function_name(function.name)
+        if string.empty($js_function_name)
+            ret "// skip " + function.name
+        end
         $result = ""
         if function.is_static
             $result += "static "
@@ -84,7 +89,7 @@
         if function.is_constructor
             $result += "constructor"
         else
-            $result += function.name
+            $result += $js_function_name
         end
         $result += "("
         if function.is_override
@@ -119,10 +124,7 @@ $base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
 {{- end }}
 {
 {{- for function in klass.all_functions ; $cpp_function = function.cpp_function }}
-        {{- if function.name | string.contains "operator";
-            continue
-        end
-        if should_skip_visibility_ex(klass, function) || function.is_deleted || function.is_destructor
+        {{- if should_skip_visibility_ex(klass, function) || function.is_deleted || function.is_destructor
             continue
         end
         param_idx = 0

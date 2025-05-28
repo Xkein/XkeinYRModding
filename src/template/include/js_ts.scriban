@@ -1,0 +1,31 @@
+{{
+    js_operator_map = {}
+    js_operator_map['operator=='] = "op_Equality"
+    js_operator_map['operator!='] = "op_Inequality"
+    js_operator_map['operator>'] = "op_GreaterThan"
+    js_operator_map['operator<'] = "op_LessThan"
+    js_operator_map['operator>='] = "op_GreaterThanOrEqual"
+    js_operator_map['operator<='] = "op_LessThanOrEqual"
+    js_operator_map['operator&'] = "op_BitwiseAnd"
+    js_operator_map['operator|'] = "op_BitwiseOr"
+    js_operator_map['operator+'] = "op_Addition"
+    js_operator_map['operator-'] = "op_Subtraction"
+    js_operator_map['operator/'] = "op_Division"
+    js_operator_map['operator%'] = "op_Modulus"
+    js_operator_map['operator*'] = "op_Multiply"
+    js_operator_map['operator<<'] = "op_LeftShift"
+    js_operator_map['operator>>'] = "op_RightShift"
+    js_operator_map['operator^'] = "op_ExclusiveOr"
+    js_operator_map['operator-'] = "op_UnaryNegation"
+    js_operator_map['operator+'] = "op_UnaryPlus"
+    js_operator_map['operator!'] = "op_LogicalNot"
+    js_operator_map['operator~'] = "op_OnesComplement"
+    js_operator_map['operator++'] = "op_Increment"
+    js_operator_map['operator--'] = "op_Decrement"
+    func get_js_function_name(name)
+        if string.starts_with(name, "operator")
+            ret js_operator_map[name] ?? ""
+        end
+        ret name
+    end
+}}

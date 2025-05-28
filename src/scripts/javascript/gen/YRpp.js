@@ -144,6 +144,7 @@ exports.TabDataClass = puerts.loadCPPType("TabDataClass")
 exports.TabClass = puerts.loadCPPType("TabClass")
 exports.ScrollClass = puerts.loadCPPType("ScrollClass")
 exports.MouseClass = puerts.loadCPPType("MouseClass")
+exports.SpotlightClass = puerts.loadCPPType("SpotlightClass")
 exports.DirType = {
     North : 0,
     NorthEast : 32,

@@ -65,4 +65,11 @@ declare module "YRpp" {
         Width: number;
         Height: number;
     }
+
+    class ColorStruct {
+        constructor(r : number, g : number, b : number);
+        R: number;
+        G: number;
+        B: number;
+    }
 }
