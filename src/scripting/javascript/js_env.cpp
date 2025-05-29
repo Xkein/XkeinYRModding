@@ -90,6 +90,7 @@ namespace puerts
 
 JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), Inspector(nullptr)
 {
+    gJsEnv = this;
     StrBuffer.resize(1024);
 
     ModuleLoader = std::make_shared<DefaultJSModuleLoader>("assets/JavaScript");

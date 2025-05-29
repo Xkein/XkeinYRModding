@@ -172,7 +172,7 @@ namespace PUERTS_NAMESPACE
         inline v8::Local<v8::Value> FindOrAddYrObject(v8::Isolate* InIsolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial);
         inline const void* GetYrJsTypeID(AbstractType type);
         template<typename T>
-        struct Converter<T*, typename std::enable_if<std::is_convertible<T*, const AbstractClass*>::value>::type>
+        struct Converter<T*, typename std::enable_if_t<std::is_convertible_v<T*, const AbstractClass*>>>
         {
             static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, T* value)
             {

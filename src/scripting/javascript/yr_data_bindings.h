@@ -392,6 +392,12 @@ UsingReferenceConverter(GadgetClass);
 using __func__fastcall__bool__int_ptr = bool __fastcall (int *);
 MuteFunctionPtr(__func__fastcall__bool__int_ptr);
 
+MuteClassFinalize(AbstractClass);
+MuteClassFinalize(EBolt);
+MuteClassFinalize(LaserDrawClass);
+MuteClassFinalize(LineTrail);
+MuteClassFinalize(SpotlightClass);
+
 namespace PUERTS_NAMESPACE
 {
     namespace v8_impl

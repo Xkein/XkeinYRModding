@@ -220,6 +220,16 @@ namespace PUERTS_NAMESPACE                                                      
     }                                                                                              \
 }
 
+#define MuteClassFinalize(CLS)                                                                       \
+namespace detail {                                                                                   \
+template <class T>                                                                                   \
+struct JsFinalizeBuilder<T, typename std::enable_if_t<std::is_convertible_v<T*, const CLS*>>> {      \
+    static JsFinalizeFuncType Build() {                                                              \
+        return nullptr;                                                                              \
+    }                                                                                                \
+};                                                                                                   \
+}
+
 namespace PUERTS_NAMESPACE
 {
 
@@ -795,15 +805,24 @@ void MakeFunctionCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>
     builder.Function(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
 }
 
+namespace detail {
+    typedef void (*JsFinalizeFuncType)(void* Ptr, void* ClassData, void* EnvData);
+    template <class T, typename Enable = void>
+    struct JsFinalizeBuilder
+    {
+        static JsFinalizeFuncType Build()
+        {
+            return PUERTS_NAMESPACE::ClassDefineBuilder<
+                T, PUERTS_NAMESPACE::PUERTS_BINDING_IMPL::API, PUERTS_NAMESPACE::PUERTS_BINDING_IMPL::API
+                >::template FinalizeBuilder<T>::Build();
+        }
+    };
+}
+
 template<typename T, typename API, typename RegisterAPI>
 static void RegisterCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder)
 {
     using namespace PUERTS_NAMESPACE;
-    if constexpr (!is_uetype<T>::value)
-    {
-        builder.Register();
-        return;
-    }
     auto& Cdb = builder;
 
     static std::vector<JSFunctionInfo> s_functions_ {};
@@ -824,7 +843,7 @@ static void RegisterCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterA
     ClassDef.SuperTypeId = Cdb.superTypeId_;
 
     ClassDef.SetInitialize(Cdb.constructor_);
-    ClassDef.Finalize   = PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>::template FinalizeBuilder<T>::Build();
+    ClassDef.Finalize = detail::JsFinalizeBuilder<T>::Build();
 
     s_functions_ = std::move(Cdb.functions_);
     s_functions_.push_back(JSFunctionInfo());
