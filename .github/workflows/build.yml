@@ -2,6 +2,11 @@ name: build release
 
 on: 
   workflow_dispatch:
+    inputs:
+      clean_cache:
+        description: 'Clean up cache'
+        type: boolean
+        default: false
 
 env:
   NODEJS_PATH: ${{github.workspace}}/nodejs_bin_22.14.0/nodejs_22
@@ -25,8 +30,36 @@ jobs:
         path: |
           ${{github.workspace}}/.xmake-cache-package
           ${{github.workspace}}/.xmake-install-package
+          ${{github.workspace}}/nodejs_bin_22.14.0/nodejs_22
+          ${{github.workspace}}/Wwise2024.1.2.8726_SDK_Win32
+          ${{github.workspace}}/build
+
+    - name: Clean up files
+      if: ${{ github.event.inputs.clean_cache == 'true' }} # 检查输入参数
+      shell: bash
+      run: |
+        echo "Cleaning up cache..."
+        rm -rf "${{github.workspace}}/.xmake-cache-package"
+        rm -rf "${{github.workspace}}/.xmake-install-package"
+        rm -rf "${{github.workspace}}/nodejs_bin_22.14.0/nodejs_22"
+        rm -rf "${{github.workspace}}/Wwise2024.1.2.8726_SDK_Win32"
+        rm -rf "${{github.workspace}}/build"
+        echo "Files cleaned up."
+
+    - name: Check if sdks exists
+      id: check_sdks
+      shell: bash
+      run: |
+        if [ -d "${{github.workspace}}/nodejs_bin_22.14.0/nodejs_22" ] && [ -d "${{github.workspace}}/Wwise2024.1.2.8726_SDK_Win32" ]; then
+          echo "sdks exists."
+          echo "sdks_exists=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "sdks does not exist."
+          echo "sdks_exists=false" >> "$GITHUB_OUTPUT"
+        fi
 
     - name: Download nodejs backend
+      if: ${{ steps.check_sdks.outputs.sdks_exists == 'false' }}
       uses: robinraju/release-downloader@v1
       with:
         repository: 'Xkein/backend-nodejs'
@@ -35,6 +68,7 @@ jobs:
         extract: true
 
     - name: Download Wwise SDK
+      if: ${{ steps.check_sdks.outputs.sdks_exists == 'false' }}
       uses: robinraju/release-downloader@v1
       with:
         repository: 'Xkein/archives'
