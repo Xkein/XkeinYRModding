@@ -4,6 +4,7 @@
 #include "core/reflection/reflection.h"
 #include "core/tool/function.hpp"
 #include "core/tool/type_traits.hpp"
+#include "runtime/logger/logger.h"
 #include <entt/meta/factory.hpp>
 #include <entt/meta/pointer.hpp>
 
@@ -162,6 +163,26 @@ auto register_data(entt::meta_factory<Type>& factory, const entt::id_type id)
     {
         return register_field<Data>(factory, id);
     }
+}
+
+template<typename Type>
+ClassMeta* GetOrAddClassMeta()
+{
+    ClassMeta* classMeta = entt::resolve<Type>().custom();
+    if (!classMeta) {
+        entt::meta_factory<Type>().custom<ClassMeta>();
+        classMeta = entt::resolve<Type>().custom();
+    }
+    return classMeta;
+}
+
+template<typename From, typename To>
+void register_ref_convertion() {
+    constexpr auto conv = +[](const void *instance) {
+        return entt::forward_as_meta(*static_cast<To*>(const_cast<From*>(static_cast<const From *>(instance))));
+    };
+    ClassMeta* classMeta = GetOrAddClassMeta<From>();
+    classMeta->refConv[entt::type_id<To>().hash()] = conv;
 }
 
 CORE_API entt::locator<entt::meta_ctx>::node_type get_meta_ctx_handle();

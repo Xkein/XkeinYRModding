@@ -4,7 +4,10 @@
 #include "core/reflection/container.h"
 #include <entt/meta/resolve.hpp>
 #include <vector>
+#include <map>
 #include <string_view>
+
+using ConvFunc = entt::meta_any(*)(const void * instance);
 
 // entt provide basic meta and below classes store more extra meta
 struct ArrayMeta {
@@ -22,6 +25,7 @@ struct EnumConstantMeta {
 
 struct ClassMeta {
     const char* name;
+    std::map<entt::id_type, ConvFunc> refConv;
 };
 
 struct ParameterMeta {
@@ -59,4 +63,10 @@ public:
         return GetEnumValueNameInternal(entt::resolve<T>(), value);
     }
 
+    CORE_API static void* CastPtr(const entt::type_info& from, const entt::type_info& to, void* ptr);
+
+    template<typename TMeta>
+    TMeta* GetMeta(entt::meta_type& type) {
+        
+    }
 };
