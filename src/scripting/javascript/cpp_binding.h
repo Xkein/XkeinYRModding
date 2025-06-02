@@ -4,6 +4,7 @@
 #include <DataTransfer.h>
 #include <PuertsNamespaceDef.h>
 #include <runtime/logger/logger.h>
+#include <core/reflection/reflection.h>
 #include <core/macro.h>
 #include <optional>
 #include <comdef.h>
@@ -880,6 +881,8 @@ static void RegisterCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterA
     s_variableInfos_ = std::move(Cdb.variableInfos_);
     s_variableInfos_.push_back(NamedPropertyInfo {nullptr, nullptr});
     ClassDef.VariableInfos = s_variableInfos_.data();
+
+    ClassDef.Data = const_cast<entt::type_info*>(&entt::type_id<T>());
 
     RegisterJSClass(ClassDef);
 }

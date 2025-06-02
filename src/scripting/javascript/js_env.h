@@ -115,6 +115,8 @@ private:
 
     void LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
+    void ConvertCppType(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
 #ifndef WITH_QUICKJS
     struct FModuleInfo
     {

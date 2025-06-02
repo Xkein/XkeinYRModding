@@ -22,6 +22,8 @@ using namespace PUERTS_NAMESPACE;
 
 typedef void (JsEnv::*V8MethodCallback)(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
+void ConvertCppType(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
 template<V8MethodCallback callback>
 struct MethodBindingHelper
 {
@@ -141,6 +143,8 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     MethodBindingHelper<&JsEnv::SetInspectorCallback>::Bind(Isolate, Context, Global, "__tgjsSetInspectorCallback", This);
 
     MethodBindingHelper<&JsEnv::DispatchProtocolMessage>::Bind(Isolate, Context, Global, "__tgjsDispatchProtocolMessage", This);
+    
+    MethodBindingHelper<&JsEnv::ConvertCppType>::Bind(Isolate, Context, Global, "convertCPPType", This);
 
     CppObjectMapper.Initialize(Isolate, Context);
     Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
@@ -938,6 +942,23 @@ void JsEnv::FindModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
 void JsEnv::LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
 {
     CppObjectMapper.LoadCppType(Info);
+    {
+        v8::Isolate* Isolate = Info.GetIsolate();
+        v8::Isolate::Scope IsolateScope(Isolate);
+        v8::HandleScope HandleScope(Isolate);
+        v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+        v8::Context::Scope ContextScope(Context);
+
+        v8::Local<v8::Value> ret = Info.GetReturnValue().Get();
+        if (ret.IsEmpty()) {
+            return;
+        }
+
+        v8::Local<v8::Function> func = ret.As<v8::Function>();
+        PString TypeName = *(v8::String::Utf8Value(Isolate, Info[0]));
+        JSClassDefinition* ClassDef = const_cast<JSClassDefinition*>(FindCppTypeClassByName(TypeName));
+        func->Set(Context, FV8Utils::V8String(Isolate, "__ClassDefinition"), v8::External::New(Isolate, ClassDef));
+    }
 }
 
 v8::MaybeLocal<v8::Module> JsEnv::FetchESModuleTree(v8::Local<v8::Context> Context, const char* FileName)
@@ -1187,7 +1208,6 @@ namespace PUERTS_NAMESPACE
     } // namespace v8_impl
 } // namespace PUERTS_NAMESPACE
 
-
 v8::Local<v8::Value> JsEnv::FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Context>& Context, AbstractClass* YrObject, bool SkipTypeScriptInitial)
 {
     // create and link
@@ -1207,6 +1227,39 @@ v8::Local<v8::Value> JsEnv::FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Contex
     else
     {
         return v8::Local<v8::Value>::New(Isolate, PersistentValuePtr->second);
+    }
+}
+
+void JsEnv::ConvertCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    v8::Isolate* Isolate = Info.GetIsolate();
+    v8::Isolate::Scope IsolateScope(Isolate);
+    v8::HandleScope HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope ContextScope(Context);
+
+    if (!Info[0]->IsFunction())
+    {
+        FV8Utils::ThrowException(Isolate, "#0 argument expect a cpp type");
+        return;
+    }
+    v8::Local<v8::Function> func = Info[0].As<v8::Function>();
+    auto localClassDef = func->Get(Context, FV8Utils::V8String(Isolate, "__ClassDefinition"));
+    if (localClassDef.IsEmpty()) {
+        gLogger->error("JsEnv::could not convert cpp type");
+        return;
+    }
+    const JSClassDefinition* ToClassDef = reinterpret_cast<const JSClassDefinition*>(localClassDef.ToLocalChecked().As<v8::External>()->Value());
+    v8::Local<v8::Object> objToConv = Info[1].As<v8::Object>();
+    void* TypeId = DataTransfer::GetPointerFast<void>(objToConv, 1);
+    const JSClassDefinition* FromClassDef = FindClassByID(TypeId);
+    void* FromPtr = DataTransfer::GetPointerFast<void>(objToConv);
+    const entt::type_info& FromTypeInfo = *reinterpret_cast<const entt::type_info*>(FromClassDef->Data);
+    const entt::type_info& ToTypeInfo = *reinterpret_cast<const entt::type_info*>(ToClassDef->Data);
+    void* ToPtr = Reflection::CastPtr(FromTypeInfo, ToTypeInfo, FromPtr);
+    if (ToPtr) {
+        v8::Local<v8::Value> ret = gJsEnv->CppObjectMapper.FindOrAddCppObject(Isolate, Context, ToClassDef->TypeId, ToPtr, true);
+        Info.GetReturnValue().Set(ret);
     }
 }
 
