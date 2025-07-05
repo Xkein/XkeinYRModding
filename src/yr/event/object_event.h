@@ -75,3 +75,18 @@ public:
     Action       action;
     ObjectClass* pTarget;
 };
+
+CLASS(HookEvent)
+class YrObjectGetFLHEvent : public YrHookOverrideReturn<CoordStruct*>
+{
+public:
+    ObjectClass* pObject;
+    CoordStruct* pDest;
+    int idxWeapon;
+    CoordStruct BaseCoords;
+    
+    void OverrideReturn(CoordStruct result) {
+        *pDest = result;
+        YrHookOverrideReturn<CoordStruct*>::OverrideReturn(pDest);
+    }
+};

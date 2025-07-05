@@ -67,6 +67,7 @@ interface TechnoEvents extends ObjectEvents
     onFire: Delegate;
     onSelectWeapon: Delegate;
     onGetFireError: Delegate;
+    onGetFLH: Delegate;
 }
 
 interface BulletEvents extends ObjectEvents

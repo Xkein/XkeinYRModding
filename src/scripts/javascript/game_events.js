@@ -115,6 +115,7 @@ class TechnoEvents extends ObjectEvents
         this.onFire = new Delegate()
         this.onSelectWeapon = new Delegate()
         this.onGetFireError = new Delegate()
+        this.onGetFLH = new Delegate()
     }
 }
 
@@ -214,6 +215,7 @@ function bind_js_techno_events(type) {
     bind_js_event(type, "onFire")
     bind_js_event(type, "onSelectWeapon")
     bind_js_event(type, "onGetFireError")
+    bind_js_event(type, "onGetFLH")
 }
 function bind_js_abstract_type_events(type) {
     bind_js_abstract_events(type)

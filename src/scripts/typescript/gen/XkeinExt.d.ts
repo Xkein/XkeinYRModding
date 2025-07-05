@@ -119,6 +119,7 @@ class JsTechnoEvents
     m_onFire : any;
     m_onSelectWeapon : any;
     m_onGetFireError : any;
+    m_onGetFLH : any;
 }
 class JsBulletEvents
     extends JsObjectEvents

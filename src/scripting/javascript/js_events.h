@@ -161,6 +161,8 @@ struct JsTechnoEvents : public JsObjectEvents
     ScriptBehaviour<std::optional<int>(TechnoClass*, AbstractClass*)> onSelectWeapon;
     PROPERTY()
     ScriptBehaviour<std::optional<FireError>(TechnoClass*, AbstractClass*, int, bool)> onGetFireError;
+    PROPERTY()
+    ScriptBehaviour<std::optional<CoordStruct>(TechnoClass*, int, CoordStruct)> onGetFLH;
 };
 
 CLASS(BindJs)

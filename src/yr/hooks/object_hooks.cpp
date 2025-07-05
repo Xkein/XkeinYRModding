@@ -265,3 +265,43 @@ BROADCAST_HOOK_EVENT(0x738890, 0x5, YrObjectObjectClickedActionEvent)
     E->pTarget = R->Stack<ObjectClass*>(0x8);
 }
 // END hooks for ObjectClass::ObjectClickedAction ===================================
+
+// BEGIN hooks for ObjectClass::YrObjectGetFLHEvent ===================================
+// TechnoClass::YrObjectGetFLHEvent
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectGetFLHEvent, 0x6F3AD0, 0x6F3D5A)
+BROADCAST_HOOK_EVENT(0x6F3AD0, 0x6, YrObjectGetFLHEvent)
+{
+    E->pObject    = R->ECX<ObjectClass*>();
+    E->pDest      = R->Stack<CoordStruct*>(0x4);
+    E->idxWeapon  = R->Stack<int>(0x8);
+    E->BaseCoords = R->Stack<CoordStruct>(0xC);
+}
+IMPL_HOOK_BROADCAST(YrObjectGetFLHEvent, 0x6F3AD0)
+{
+    switch (E->pObject->WhatAmI())
+    {
+        case AbstractType::Building:
+        case AbstractType::Infantry:
+            return 0;
+    }
+    return Broadcast_Impl_Default<YrObjectGetFLHEvent, 0x6F3AD0>(hookEvent, R, E);
+}
+// BuildingClass::YrObjectGetFLHEvent
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectGetFLHEvent, 0x453840, 0x4538C2)
+BROADCAST_HOOK_EVENT(0x453840, 0x5, YrObjectGetFLHEvent)
+{
+    E->pObject    = R->ECX<ObjectClass*>();
+    E->pDest      = R->Stack<CoordStruct*>(0x4);
+    E->idxWeapon  = R->Stack<int>(0x8);
+    E->BaseCoords = R->Stack<CoordStruct>(0xC);
+}
+// InfantryClass::YrObjectGetFLHEvent
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectGetFLHEvent, 0x523250, 0x5232EC)
+BROADCAST_HOOK_EVENT(0x523250, 0x5, YrObjectGetFLHEvent)
+{
+    E->pObject    = R->ECX<ObjectClass*>();
+    E->pDest      = R->Stack<CoordStruct*>(0x4);
+    E->idxWeapon  = R->Stack<int>(0x8);
+    E->BaseCoords = R->Stack<CoordStruct>(0xC);
+}
+// END hooks for ObjectClass::YrObjectGetFLHEvent ===================================

@@ -549,6 +549,19 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrTechnoGetFireErrorEvent)
     }
 }
 
+DEFINE_YR_HOOK_EVENT_LISTENER(YrObjectGetFLHEvent)
+{
+    auto behavior = GET_TECHNO_BEHAVIOR(E->pObject, onGetFLH);
+    if (behavior)
+    {
+        std::optional<CoordStruct> flh = INVOKE_JS_EVENT(*behavior, (TechnoClass*)E->pObject, E->idxWeapon, E->BaseCoords);
+        if (flh)
+        {
+            E->OverrideReturn(flh.value());
+        }
+    }
+}
+
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletDetonateEvent)
 {
     INVOKE_JS_EVENT(JsEvents::bullet.onDetonate, E->pBullet, E->pCoords);

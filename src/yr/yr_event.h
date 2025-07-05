@@ -83,6 +83,19 @@ public:
     }
 };
 
+template<>
+class YrHookOverrideReturn<void>
+{
+    friend class YrHookEvent;
+    friend class YrHookEventSystem;
+
+    bool hasSet {false};
+public:
+    void OverrideReturn() {
+        hasSet = true;
+    }
+};
+
 class YrHookOverride
 {
     friend class YrHookEvent;
@@ -102,6 +115,11 @@ namespace detail
         e.OverrideReturn({});
     };
     
+    template<typename THookEvent>
+    concept hook_event_override_return_void = requires(THookEvent e) {
+        e.OverrideReturn();
+    };
+
     template<typename THookEvent>
     concept hook_event_override = std::is_base_of_v<YrHookOverride, THookEvent>;
 
@@ -168,6 +186,11 @@ private:
         if constexpr (detail::hook_event_override_return<TEvent>) {
             if (E->hasSet) {
                 R->EAX(E->returnValue);
+                return detail::get_hook_override_return_address<TEvent, HookAddress>();
+            }
+        }
+        if constexpr (detail::hook_event_override_return_void<TEvent>) {
+            if (E->hasSet) {
                 return detail::get_hook_override_return_address<TEvent, HookAddress>();
             }
         }
