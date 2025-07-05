@@ -110,8 +110,48 @@ void __JsRegister_YrStructs()
         auto builder = PUERTS_NAMESPACE::DefineClass<Matrix3D>();
         builder
             .Constructor<Vector3D<float>, Vector3D<float>, Vector3D<float>, Vector3D<float>>()
-            .Constructor<float, float, float, float, float, float, float, float, float, float, float, float>();
+            .Constructor<float, float, float, float, float, float, float, float, float, float, float, float>()
+            .Method("MakeIdentity", MakeFunction(&Matrix3D::MakeIdentity))
+            .Method("Translate", CombineOverloads(
+                MakeOverload(void(Matrix3D::*)(float, float, float), &Matrix3D::Translate),
+                MakeOverload(void(Matrix3D::*)(Vector3D<float> const&), &Matrix3D::Translate)
+            ))
+            .Method("TranslateX", MakeFunction(&Matrix3D::TranslateX))
+            .Method("TranslateY", MakeFunction(&Matrix3D::TranslateY))
+            .Method("TranslateZ", MakeFunction(&Matrix3D::TranslateZ))
+            .Method("Scale", CombineOverloads(
+                MakeOverload(void(Matrix3D::*)(float, float, float), &Matrix3D::Scale),
+                MakeOverload(void(Matrix3D::*)(float), &Matrix3D::Scale)
+            ))
+            .Method("ScaleX", MakeFunction(&Matrix3D::ScaleX))
+            .Method("ScaleY", MakeFunction(&Matrix3D::ScaleY))
+            .Method("ScaleZ", MakeFunction(&Matrix3D::ScaleZ))
+            .Method("ShearYZ", MakeFunction(&Matrix3D::ShearYZ))
+            .Method("ShearXY", MakeFunction(&Matrix3D::ShearXY))
+            .Method("ShearXZ", MakeFunction(&Matrix3D::ShearXZ))
+            .Method("PreRotateX", MakeFunction(&Matrix3D::PreRotateX))
+            .Method("PreRotateY", MakeFunction(&Matrix3D::PreRotateY))
+            .Method("PreRotateZ", MakeFunction(&Matrix3D::PreRotateZ))
+            .Method("RotateX", CombineOverloads(
+                MakeOverload(void(Matrix3D::*)(float), &Matrix3D::RotateX),
+                MakeOverload(void(Matrix3D::*)(float, float), &Matrix3D::RotateX)
+            ))
+            .Method("RotateY", CombineOverloads(
+                MakeOverload(void(Matrix3D::*)(float), &Matrix3D::RotateY),
+                MakeOverload(void(Matrix3D::*)(float, float), &Matrix3D::RotateY)
+            ))
+            .Method("RotateZ", CombineOverloads(
+                MakeOverload(void(Matrix3D::*)(float), &Matrix3D::RotateZ),
+                MakeOverload(void(Matrix3D::*)(float, float), &Matrix3D::RotateZ)
+            ))
+            .Function("FromQuaternion", SelectFunction(Matrix3D(*)(const Quaternion&), &Matrix3D::FromQuaternion))
+            .Method("ToQuaternion", SelectFunction(Quaternion(Matrix3D::*)() const, &Matrix3D::ToQuaternion))
+            .Method("ApplyQuaternion", MakeFunction(&Matrix3D::ApplyQuaternion))
+            .Function("GetIdentity", MakeFunction(&Matrix3D::GetIdentity))
+        ;
         MakePropertyCheck<&Matrix3D::Data>(builder, "Data");
+        MakePropertyCheck<&Matrix3D::Row>(builder, "Row");
+        MakePropertyCheck<&Matrix3D::row>(builder, "row");
         builder.Register();
     }
     

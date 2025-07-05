@@ -44,7 +44,39 @@ declare module "YRpp" {
         W: number;
     }
     class Matrix3D {
-
+        constructor(col1 : Vector3D, col2 : Vector3D, col3 : Vector3D, col4 : Vector3D);
+        constructor(m00 : number, m01 : number, m02 : number, m03 : number, m10 : number, m11 : number, m12 : number, m13 : number, m20 : number, m21 : number, m22 : number, m23 : number);
+        MakeIdentity() : void;
+        Translate(x : number, y : number, z : number) : void;
+        Translate(vec : Vector3D) : void;
+        TranslateX(x : number) : void;
+        TranslateY(y : number) : void;
+        TranslateZ(z : number) : void;
+        Scale(x : number, y : number, z : number) : void;
+        Scale(factor : number) : void;
+        ScaleX(factor : number) : void;
+        ScaleY(factor : number) : void;
+        ScaleZ(factor : number) : void;
+        ShearYZ(y : number, z : number) : void;
+        ShearXY(x : number, y : number) : void;
+        ShearXZ(x : number, z : number) : void;
+        PreRotateX(theta : number) : void;
+        PreRotateY(theta : number) : void;
+        PreRotateZ(theta : number) : void;
+        RotateX(theta : number) : void;
+        RotateX(Sin : number, Cos : number) : void;
+        RotateY(theta : number) : void;
+        RotateY(Sin : number, Cos : number) : void;
+        RotateZ(theta : number) : void;
+        RotateZ(Sin : number, Cos : number) : void;
+        static FromQuaternion(quat : Quaternion) : Matrix3D;
+        ToQuaternion() : Quaternion;
+        ApplyQuaternion(quat : Quaternion) : void;
+        static GetIdentity() : Matrix3D;
+        
+        Data: any;
+        Row: any;
+        row: any;
     }
     class Quaternion {
         constructor(x : number, y : number, z : number, w : number);

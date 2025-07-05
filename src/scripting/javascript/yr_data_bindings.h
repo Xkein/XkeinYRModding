@@ -213,6 +213,7 @@ UsingYrStruct(CellStruct);
 UsingYrStruct(ColorStruct);
 UsingYrStruct(BulletVelocity);
 UsingYrStruct(Vector3D<float>);
+UsingYrStruct(Vector4D<float>);
 UsingYrStruct(Quaternion);
 UsingYrStruct(RectangleStruct);
 UsingYrStruct(Matrix3D);
