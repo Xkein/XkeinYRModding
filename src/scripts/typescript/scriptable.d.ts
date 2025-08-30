@@ -3,6 +3,7 @@
 interface Delegate
 {
     add(handler);
+    addMethod(obj, method);
     remove(handler);
     invoke(...args);
 }

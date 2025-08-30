@@ -9,6 +9,10 @@ class Delegate
         this.handlers.add(handler)
     }
 
+    addMethod(obj, method) {
+        this.add((...args) => { return method.call(obj, ...args); })
+    }
+
     remove(handler) {
         this.handlers.delete(handler)
     }

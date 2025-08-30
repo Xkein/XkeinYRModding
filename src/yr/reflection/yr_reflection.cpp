@@ -207,6 +207,10 @@ void YrReflectionRegister()
         register_data<&Quaternion::W>(factory, "W"_hs).custom<FieldMeta>("W");
     }
     {
+        auto factory = INIT_META_FACTORY(DirStruct);
+        register_data<&DirStruct::Raw>(factory, "Raw"_hs).custom<FieldMeta>("Raw");
+    }
+    {
         auto factory = INIT_META_FACTORY(RectangleStruct);
         factory.ctor<>();
         factory.ctor<int, int, int, int>();
@@ -319,6 +323,7 @@ void YrReflectionUnregister()
     
     entt::meta_reset<ColorStruct>();
     entt::meta_reset<Quaternion>();
+    entt::meta_reset<DirStruct>();
     entt::meta_reset<RectangleStruct>();
     entt::meta_reset<Matrix3D>();
     

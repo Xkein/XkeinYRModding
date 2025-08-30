@@ -204,7 +204,7 @@ void {{get_gen_type_name(klass.name)}}__Register()
 
 {{ for property in klass.properties}}
 {{- $field_name = property.name
-    if should_skip_visibility(klass, property) || string.empty($field_name)
+    if should_skip_visibility(klass, property)
         continue
     end
     $class_name = klass.name
@@ -212,6 +212,14 @@ void {{get_gen_type_name(klass.name)}}__Register()
     if property.is_bit_field }}
     // skip bit field: {{$class_full_name}}::{{$field_name}}
 {{-     continue
+    end
+    if string.empty(property.name)
+        if property.is_anonymous
+            for inner_property in property.anonymous_class.properties }}
+    register_data<&{{$class_full_name}}::{{inner_property.name}}>(factory, "{{inner_property.name}}"_hs).custom<FieldMeta>("{{inner_property.name}}");
+            {{- end
+        end
+        continue
     end
     if property.is_static }}
     register_data<std::addressof({{$class_full_name}}::{{$field_name}})>(factory, "{{$field_name}}"_hs).custom<FieldMeta>("{{$field_name}}");

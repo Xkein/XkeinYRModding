@@ -4,6 +4,15 @@ declare module "YRpp" {
     class _ULARGE_INTEGER { }
 
     class DirStruct {
+        constructor();
+        constructor(radian : number);
+        constructor(dirType : DirType);
+        op_Equality(a: DirStruct) : boolean;
+        op_Inequality(a: DirStruct) : boolean;
+        SetDir(dirType: DirType) : void;
+        GetDir() : DirType;
+        SetRadian(radian: number) : void;
+        GetRadian() : number;
     }
 
     class CDTimerClass {

@@ -97,6 +97,21 @@ void __JsRegister_YrStructs()
             .Register();
     }
     {
+        auto builder = PUERTS_NAMESPACE::DefineClass<DirStruct>();
+        builder
+            .Constructor<>()
+            .Constructor<double>()
+            .Constructor<const DirType>()
+            .Method("op_Equality", MakeFunction(&DirStruct::operator==))
+            .Method("op_Inequality", MakeFunction(&DirStruct::operator!=))
+            .Method("SetDir", MakeFunction(&DirStruct::SetDir))
+            .Method("GetDir", MakeFunction(&DirStruct::GetDir))
+            .Method("SetRadian", MakeFunction(&DirStruct::SetRadian<65536>))
+            .Method("GetRadian", MakeFunction(&DirStruct::GetRadian<65536>))
+            .Property("Raw", MakeProperty(&DirStruct::Raw))
+            .Register();
+    }
+    {
         auto builder = PUERTS_NAMESPACE::DefineClass<RectangleStruct>();
         builder
             .Constructor<int, int, int, int>()
