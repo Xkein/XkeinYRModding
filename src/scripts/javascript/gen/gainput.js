@@ -1,179 +1,181 @@
 
 exports.InputMap = puerts.loadCPPType("gainput::InputMap")
-exports.Key = {
-    KeyEscape : 0,
-    KeyF1 : 1,
-    KeyF2 : 2,
-    KeyF3 : 3,
-    KeyF4 : 4,
-    KeyF5 : 5,
-    KeyF6 : 6,
-    KeyF7 : 7,
-    KeyF8 : 8,
-    KeyF9 : 9,
-    KeyF10 : 10,
-    KeyF11 : 11,
-    KeyF12 : 12,
-    KeyF13 : 13,
-    KeyF14 : 14,
-    KeyF15 : 15,
-    KeyF16 : 16,
-    KeyF17 : 17,
-    KeyF18 : 18,
-    KeyF19 : 19,
-    KeyPrint : 20,
-    KeyScrollLock : 21,
-    KeyBreak : 22,
-    KeySpace : 32,
-    KeyApostrophe : 39,
-    KeyComma : 44,
-    KeyMinus : 45,
-    KeyPeriod : 46,
-    KeySlash : 47,
-    Key0 : 48,
-    Key1 : 49,
-    Key2 : 50,
-    Key3 : 51,
-    Key4 : 52,
-    Key5 : 53,
-    Key6 : 54,
-    Key7 : 55,
-    Key8 : 56,
-    Key9 : 57,
-    KeySemicolon : 59,
-    KeyLess : 60,
-    KeyEqual : 61,
-    KeyA : 65,
-    KeyB : 66,
-    KeyC : 67,
-    KeyD : 68,
-    KeyE : 69,
-    KeyF : 70,
-    KeyG : 71,
-    KeyH : 72,
-    KeyI : 73,
-    KeyJ : 74,
-    KeyK : 75,
-    KeyL : 76,
-    KeyM : 77,
-    KeyN : 78,
-    KeyO : 79,
-    KeyP : 80,
-    KeyQ : 81,
-    KeyR : 82,
-    KeyS : 83,
-    KeyT : 84,
-    KeyU : 85,
-    KeyV : 86,
-    KeyW : 87,
-    KeyX : 88,
-    KeyY : 89,
-    KeyZ : 90,
-    KeyBracketLeft : 91,
-    KeyBackslash : 92,
-    KeyBracketRight : 93,
-    KeyGrave : 96,
-    KeyLeft : 97,
-    KeyRight : 98,
-    KeyUp : 99,
-    KeyDown : 100,
-    KeyInsert : 101,
-    KeyHome : 102,
-    KeyDelete : 103,
-    KeyEnd : 104,
-    KeyPageUp : 105,
-    KeyPageDown : 106,
-    KeyNumLock : 107,
-    KeyKpEqual : 108,
-    KeyKpDivide : 109,
-    KeyKpMultiply : 110,
-    KeyKpSubtract : 111,
-    KeyKpAdd : 112,
-    KeyKpEnter : 113,
-    KeyKpInsert : 114,
-    KeyKpEnd : 115,
-    KeyKpDown : 116,
-    KeyKpPageDown : 117,
-    KeyKpLeft : 118,
-    KeyKpBegin : 119,
-    KeyKpRight : 120,
-    KeyKpHome : 121,
-    KeyKpUp : 122,
-    KeyKpPageUp : 123,
-    KeyKpDelete : 124,
-    KeyBackSpace : 125,
-    KeyTab : 126,
-    KeyReturn : 127,
-    KeyCapsLock : 128,
-    KeyShiftL : 129,
-    KeyCtrlL : 130,
-    KeySuperL : 131,
-    KeyAltL : 132,
-    KeyAltR : 133,
-    KeySuperR : 134,
-    KeyMenu : 135,
-    KeyCtrlR : 136,
-    KeyShiftR : 137,
-    KeyBack : 138,
-    KeySoftLeft : 139,
-    KeySoftRight : 140,
-    KeyCall : 141,
-    KeyEndcall : 142,
-    KeyStar : 143,
-    KeyPound : 144,
-    KeyDpadCenter : 145,
-    KeyVolumeUp : 146,
-    KeyVolumeDown : 147,
-    KeyPower : 148,
-    KeyCamera : 149,
-    KeyClear : 150,
-    KeySymbol : 151,
-    KeyExplorer : 152,
-    KeyEnvelope : 153,
-    KeyEquals : 154,
-    KeyAt : 155,
-    KeyHeadsethook : 156,
-    KeyFocus : 157,
-    KeyPlus : 158,
-    KeyNotification : 159,
-    KeySearch : 160,
-    KeyMediaPlayPause : 161,
-    KeyMediaStop : 162,
-    KeyMediaNext : 163,
-    KeyMediaPrevious : 164,
-    KeyMediaRewind : 165,
-    KeyMediaFastForward : 166,
-    KeyMute : 167,
-    KeyPictsymbols : 168,
-    KeySwitchCharset : 169,
-    KeyForward : 170,
-    KeyExtra1 : 171,
-    KeyExtra2 : 172,
-    KeyExtra3 : 173,
-    KeyExtra4 : 174,
-    KeyExtra5 : 175,
-    KeyExtra6 : 176,
-    KeyFn : 177,
-    KeyCircumflex : 178,
-    KeySsharp : 179,
-    KeyAcute : 180,
-    KeyAltGr : 181,
-    KeyNumbersign : 182,
-    KeyUdiaeresis : 183,
-    KeyAdiaeresis : 184,
-    KeyOdiaeresis : 185,
-    KeySection : 186,
-    KeyAring : 187,
-    KeyDiaeresis : 188,
-    KeyTwosuperior : 189,
-    KeyRightParenthesis : 190,
-    KeyDollar : 191,
-    KeyUgrave : 192,
-    KeyAsterisk : 193,
-    KeyColon : 194,
-    KeyExclam : 195,
-    KeyBraceLeft : 196,
-    KeyBraceRight : 197,
-    KeySysRq : 198,
-    KeyCount_ : 199,
-}
+exports.Key = (function () {
+    let Key = {}
+    Key[Key["KeyEscape"] = 0] = "KeyEscape";
+    Key[Key["KeyF1"] = 1] = "KeyF1";
+    Key[Key["KeyF2"] = 2] = "KeyF2";
+    Key[Key["KeyF3"] = 3] = "KeyF3";
+    Key[Key["KeyF4"] = 4] = "KeyF4";
+    Key[Key["KeyF5"] = 5] = "KeyF5";
+    Key[Key["KeyF6"] = 6] = "KeyF6";
+    Key[Key["KeyF7"] = 7] = "KeyF7";
+    Key[Key["KeyF8"] = 8] = "KeyF8";
+    Key[Key["KeyF9"] = 9] = "KeyF9";
+    Key[Key["KeyF10"] = 10] = "KeyF10";
+    Key[Key["KeyF11"] = 11] = "KeyF11";
+    Key[Key["KeyF12"] = 12] = "KeyF12";
+    Key[Key["KeyF13"] = 13] = "KeyF13";
+    Key[Key["KeyF14"] = 14] = "KeyF14";
+    Key[Key["KeyF15"] = 15] = "KeyF15";
+    Key[Key["KeyF16"] = 16] = "KeyF16";
+    Key[Key["KeyF17"] = 17] = "KeyF17";
+    Key[Key["KeyF18"] = 18] = "KeyF18";
+    Key[Key["KeyF19"] = 19] = "KeyF19";
+    Key[Key["KeyPrint"] = 20] = "KeyPrint";
+    Key[Key["KeyScrollLock"] = 21] = "KeyScrollLock";
+    Key[Key["KeyBreak"] = 22] = "KeyBreak";
+    Key[Key["KeySpace"] = 32] = "KeySpace";
+    Key[Key["KeyApostrophe"] = 39] = "KeyApostrophe";
+    Key[Key["KeyComma"] = 44] = "KeyComma";
+    Key[Key["KeyMinus"] = 45] = "KeyMinus";
+    Key[Key["KeyPeriod"] = 46] = "KeyPeriod";
+    Key[Key["KeySlash"] = 47] = "KeySlash";
+    Key[Key["Key0"] = 48] = "Key0";
+    Key[Key["Key1"] = 49] = "Key1";
+    Key[Key["Key2"] = 50] = "Key2";
+    Key[Key["Key3"] = 51] = "Key3";
+    Key[Key["Key4"] = 52] = "Key4";
+    Key[Key["Key5"] = 53] = "Key5";
+    Key[Key["Key6"] = 54] = "Key6";
+    Key[Key["Key7"] = 55] = "Key7";
+    Key[Key["Key8"] = 56] = "Key8";
+    Key[Key["Key9"] = 57] = "Key9";
+    Key[Key["KeySemicolon"] = 59] = "KeySemicolon";
+    Key[Key["KeyLess"] = 60] = "KeyLess";
+    Key[Key["KeyEqual"] = 61] = "KeyEqual";
+    Key[Key["KeyA"] = 65] = "KeyA";
+    Key[Key["KeyB"] = 66] = "KeyB";
+    Key[Key["KeyC"] = 67] = "KeyC";
+    Key[Key["KeyD"] = 68] = "KeyD";
+    Key[Key["KeyE"] = 69] = "KeyE";
+    Key[Key["KeyF"] = 70] = "KeyF";
+    Key[Key["KeyG"] = 71] = "KeyG";
+    Key[Key["KeyH"] = 72] = "KeyH";
+    Key[Key["KeyI"] = 73] = "KeyI";
+    Key[Key["KeyJ"] = 74] = "KeyJ";
+    Key[Key["KeyK"] = 75] = "KeyK";
+    Key[Key["KeyL"] = 76] = "KeyL";
+    Key[Key["KeyM"] = 77] = "KeyM";
+    Key[Key["KeyN"] = 78] = "KeyN";
+    Key[Key["KeyO"] = 79] = "KeyO";
+    Key[Key["KeyP"] = 80] = "KeyP";
+    Key[Key["KeyQ"] = 81] = "KeyQ";
+    Key[Key["KeyR"] = 82] = "KeyR";
+    Key[Key["KeyS"] = 83] = "KeyS";
+    Key[Key["KeyT"] = 84] = "KeyT";
+    Key[Key["KeyU"] = 85] = "KeyU";
+    Key[Key["KeyV"] = 86] = "KeyV";
+    Key[Key["KeyW"] = 87] = "KeyW";
+    Key[Key["KeyX"] = 88] = "KeyX";
+    Key[Key["KeyY"] = 89] = "KeyY";
+    Key[Key["KeyZ"] = 90] = "KeyZ";
+    Key[Key["KeyBracketLeft"] = 91] = "KeyBracketLeft";
+    Key[Key["KeyBackslash"] = 92] = "KeyBackslash";
+    Key[Key["KeyBracketRight"] = 93] = "KeyBracketRight";
+    Key[Key["KeyGrave"] = 96] = "KeyGrave";
+    Key[Key["KeyLeft"] = 97] = "KeyLeft";
+    Key[Key["KeyRight"] = 98] = "KeyRight";
+    Key[Key["KeyUp"] = 99] = "KeyUp";
+    Key[Key["KeyDown"] = 100] = "KeyDown";
+    Key[Key["KeyInsert"] = 101] = "KeyInsert";
+    Key[Key["KeyHome"] = 102] = "KeyHome";
+    Key[Key["KeyDelete"] = 103] = "KeyDelete";
+    Key[Key["KeyEnd"] = 104] = "KeyEnd";
+    Key[Key["KeyPageUp"] = 105] = "KeyPageUp";
+    Key[Key["KeyPageDown"] = 106] = "KeyPageDown";
+    Key[Key["KeyNumLock"] = 107] = "KeyNumLock";
+    Key[Key["KeyKpEqual"] = 108] = "KeyKpEqual";
+    Key[Key["KeyKpDivide"] = 109] = "KeyKpDivide";
+    Key[Key["KeyKpMultiply"] = 110] = "KeyKpMultiply";
+    Key[Key["KeyKpSubtract"] = 111] = "KeyKpSubtract";
+    Key[Key["KeyKpAdd"] = 112] = "KeyKpAdd";
+    Key[Key["KeyKpEnter"] = 113] = "KeyKpEnter";
+    Key[Key["KeyKpInsert"] = 114] = "KeyKpInsert";
+    Key[Key["KeyKpEnd"] = 115] = "KeyKpEnd";
+    Key[Key["KeyKpDown"] = 116] = "KeyKpDown";
+    Key[Key["KeyKpPageDown"] = 117] = "KeyKpPageDown";
+    Key[Key["KeyKpLeft"] = 118] = "KeyKpLeft";
+    Key[Key["KeyKpBegin"] = 119] = "KeyKpBegin";
+    Key[Key["KeyKpRight"] = 120] = "KeyKpRight";
+    Key[Key["KeyKpHome"] = 121] = "KeyKpHome";
+    Key[Key["KeyKpUp"] = 122] = "KeyKpUp";
+    Key[Key["KeyKpPageUp"] = 123] = "KeyKpPageUp";
+    Key[Key["KeyKpDelete"] = 124] = "KeyKpDelete";
+    Key[Key["KeyBackSpace"] = 125] = "KeyBackSpace";
+    Key[Key["KeyTab"] = 126] = "KeyTab";
+    Key[Key["KeyReturn"] = 127] = "KeyReturn";
+    Key[Key["KeyCapsLock"] = 128] = "KeyCapsLock";
+    Key[Key["KeyShiftL"] = 129] = "KeyShiftL";
+    Key[Key["KeyCtrlL"] = 130] = "KeyCtrlL";
+    Key[Key["KeySuperL"] = 131] = "KeySuperL";
+    Key[Key["KeyAltL"] = 132] = "KeyAltL";
+    Key[Key["KeyAltR"] = 133] = "KeyAltR";
+    Key[Key["KeySuperR"] = 134] = "KeySuperR";
+    Key[Key["KeyMenu"] = 135] = "KeyMenu";
+    Key[Key["KeyCtrlR"] = 136] = "KeyCtrlR";
+    Key[Key["KeyShiftR"] = 137] = "KeyShiftR";
+    Key[Key["KeyBack"] = 138] = "KeyBack";
+    Key[Key["KeySoftLeft"] = 139] = "KeySoftLeft";
+    Key[Key["KeySoftRight"] = 140] = "KeySoftRight";
+    Key[Key["KeyCall"] = 141] = "KeyCall";
+    Key[Key["KeyEndcall"] = 142] = "KeyEndcall";
+    Key[Key["KeyStar"] = 143] = "KeyStar";
+    Key[Key["KeyPound"] = 144] = "KeyPound";
+    Key[Key["KeyDpadCenter"] = 145] = "KeyDpadCenter";
+    Key[Key["KeyVolumeUp"] = 146] = "KeyVolumeUp";
+    Key[Key["KeyVolumeDown"] = 147] = "KeyVolumeDown";
+    Key[Key["KeyPower"] = 148] = "KeyPower";
+    Key[Key["KeyCamera"] = 149] = "KeyCamera";
+    Key[Key["KeyClear"] = 150] = "KeyClear";
+    Key[Key["KeySymbol"] = 151] = "KeySymbol";
+    Key[Key["KeyExplorer"] = 152] = "KeyExplorer";
+    Key[Key["KeyEnvelope"] = 153] = "KeyEnvelope";
+    Key[Key["KeyEquals"] = 154] = "KeyEquals";
+    Key[Key["KeyAt"] = 155] = "KeyAt";
+    Key[Key["KeyHeadsethook"] = 156] = "KeyHeadsethook";
+    Key[Key["KeyFocus"] = 157] = "KeyFocus";
+    Key[Key["KeyPlus"] = 158] = "KeyPlus";
+    Key[Key["KeyNotification"] = 159] = "KeyNotification";
+    Key[Key["KeySearch"] = 160] = "KeySearch";
+    Key[Key["KeyMediaPlayPause"] = 161] = "KeyMediaPlayPause";
+    Key[Key["KeyMediaStop"] = 162] = "KeyMediaStop";
+    Key[Key["KeyMediaNext"] = 163] = "KeyMediaNext";
+    Key[Key["KeyMediaPrevious"] = 164] = "KeyMediaPrevious";
+    Key[Key["KeyMediaRewind"] = 165] = "KeyMediaRewind";
+    Key[Key["KeyMediaFastForward"] = 166] = "KeyMediaFastForward";
+    Key[Key["KeyMute"] = 167] = "KeyMute";
+    Key[Key["KeyPictsymbols"] = 168] = "KeyPictsymbols";
+    Key[Key["KeySwitchCharset"] = 169] = "KeySwitchCharset";
+    Key[Key["KeyForward"] = 170] = "KeyForward";
+    Key[Key["KeyExtra1"] = 171] = "KeyExtra1";
+    Key[Key["KeyExtra2"] = 172] = "KeyExtra2";
+    Key[Key["KeyExtra3"] = 173] = "KeyExtra3";
+    Key[Key["KeyExtra4"] = 174] = "KeyExtra4";
+    Key[Key["KeyExtra5"] = 175] = "KeyExtra5";
+    Key[Key["KeyExtra6"] = 176] = "KeyExtra6";
+    Key[Key["KeyFn"] = 177] = "KeyFn";
+    Key[Key["KeyCircumflex"] = 178] = "KeyCircumflex";
+    Key[Key["KeySsharp"] = 179] = "KeySsharp";
+    Key[Key["KeyAcute"] = 180] = "KeyAcute";
+    Key[Key["KeyAltGr"] = 181] = "KeyAltGr";
+    Key[Key["KeyNumbersign"] = 182] = "KeyNumbersign";
+    Key[Key["KeyUdiaeresis"] = 183] = "KeyUdiaeresis";
+    Key[Key["KeyAdiaeresis"] = 184] = "KeyAdiaeresis";
+    Key[Key["KeyOdiaeresis"] = 185] = "KeyOdiaeresis";
+    Key[Key["KeySection"] = 186] = "KeySection";
+    Key[Key["KeyAring"] = 187] = "KeyAring";
+    Key[Key["KeyDiaeresis"] = 188] = "KeyDiaeresis";
+    Key[Key["KeyTwosuperior"] = 189] = "KeyTwosuperior";
+    Key[Key["KeyRightParenthesis"] = 190] = "KeyRightParenthesis";
+    Key[Key["KeyDollar"] = 191] = "KeyDollar";
+    Key[Key["KeyUgrave"] = 192] = "KeyUgrave";
+    Key[Key["KeyAsterisk"] = 193] = "KeyAsterisk";
+    Key[Key["KeyColon"] = 194] = "KeyColon";
+    Key[Key["KeyExclam"] = 195] = "KeyExclam";
+    Key[Key["KeyBraceLeft"] = 196] = "KeyBraceLeft";
+    Key[Key["KeyBraceRight"] = 197] = "KeyBraceRight";
+    Key[Key["KeySysRq"] = 198] = "KeySysRq";
+    Key[Key["KeyCount_"] = 199] = "KeyCount_";
+    return Key;
+})();

@@ -33,6 +33,7 @@ __IMPLEMENT_YR_HOOK_EVENT({{klass.full_name}})
     {{- if has_meta(klass.meta) }}
         {{- if !get_meta_tag(klass.meta, "HookEvent") }}
 {{-             if klass.source_file }}
+// {{klass.full_name}}
 #include "{{klass.source_file}}"
 {{-             end }}
         {{- end }}
@@ -61,7 +62,6 @@ void OnExit_{{klass.name}}() {
 #include <CRC.h>
 #include <TubeClass.h>
 #include <PixelFXClass.h>
-#include <TriggerTypeClass.h>
 #include <FoggedObjectClass.h>
 #include <Blitters/Blitter.h>
 #include <YRDDraw.h>
@@ -214,11 +214,6 @@ void {{get_gen_type_name(klass.name)}}__Register()
 {{-     continue
     end
     if string.empty(property.name)
-        if property.is_anonymous
-            for inner_property in property.anonymous_class.properties }}
-    register_data<&{{$class_full_name}}::{{inner_property.name}}>(factory, "{{inner_property.name}}"_hs).custom<FieldMeta>("{{inner_property.name}}");
-            {{- end
-        end
         continue
     end
     if property.is_static }}
@@ -227,6 +222,9 @@ void {{get_gen_type_name(klass.name)}}__Register()
     register_data<&{{$class_full_name}}::{{$field_name}}>(factory, "{{$field_name}}"_hs).custom<FieldMeta>("{{$field_name}}");
 {{- end
 end }}
+{{ for inline_property in klass.anonymous_inline_properties }}
+    register_data<&{{$class_full_name}}::{{inline_property.name}}>(factory, "{{inline_property.name}}"_hs).custom<FieldMeta>("{{inline_property.name}}");
+{{- end }}
 
 {{ for target_type in component_target_list }}
     ComponentInstantiation::RegisterComponentInstantiation<{{klass.full_name}}, {{target_type}}>();

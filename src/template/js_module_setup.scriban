@@ -13,9 +13,11 @@ exports.{{klass.name}} = puerts.loadCPPType("{{klass.full_name}}")
 
 {{- for enum in module_enums }}
 {{- if need_codegen(enum) || is_yrpp }}
-exports.{{enum.name}} = {
+exports.{{enum.name}} = (function () {
+    let {{enum.name}} = {}
     {{- for enum_item in enum.constants }}
-    {{enum_item.name}} : {{enum_item.value}},
+    {{enum.name}}[{{enum.name}}["{{enum_item.name}}"] = {{enum_item.value}}] = "{{enum_item.name}}";
     {{- end}}
-}
+    return {{enum.name}};
+})();
 {{- end; end }}

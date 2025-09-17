@@ -1,81 +1,83 @@
 
-exports.AKRESULT = {
-    AK_NotImplemented : 0,
-    AK_Success : 1,
-    AK_Fail : 2,
-    AK_PartialSuccess : 3,
-    AK_NotCompatible : 4,
-    AK_AlreadyConnected : 5,
-    AK_InvalidFile : 7,
-    AK_AudioFileHeaderTooLarge : 8,
-    AK_MaxReached : 9,
-    AK_InvalidID : 14,
-    AK_IDNotFound : 15,
-    AK_InvalidInstanceID : 16,
-    AK_NoMoreData : 17,
-    AK_InvalidStateGroup : 20,
-    AK_ChildAlreadyHasAParent : 21,
-    AK_InvalidLanguage : 22,
-    AK_CannotAddItselfAsAChild : 23,
-    AK_InvalidParameter : 31,
-    AK_ElementAlreadyInList : 35,
-    AK_PathNotFound : 36,
-    AK_PathNoVertices : 37,
-    AK_PathNotRunning : 38,
-    AK_PathNotPaused : 39,
-    AK_PathNodeAlreadyInList : 40,
-    AK_PathNodeNotInList : 41,
-    AK_DataNeeded : 43,
-    AK_NoDataNeeded : 44,
-    AK_DataReady : 45,
-    AK_NoDataReady : 46,
-    AK_InsufficientMemory : 52,
-    AK_Cancelled : 53,
-    AK_UnknownBankID : 54,
-    AK_BankReadError : 56,
-    AK_InvalidSwitchType : 57,
-    AK_FormatNotReady : 63,
-    AK_WrongBankVersion : 64,
-    AK_FileNotFound : 66,
-    AK_DeviceNotReady : 67,
-    AK_BankAlreadyLoaded : 69,
-    AK_RenderedFX : 71,
-    AK_ProcessNeeded : 72,
-    AK_ProcessDone : 73,
-    AK_MemManagerNotInitialized : 74,
-    AK_StreamMgrNotInitialized : 75,
-    AK_SSEInstructionsNotSupported : 76,
-    AK_Busy : 77,
-    AK_UnsupportedChannelConfig : 78,
-    AK_PluginMediaNotAvailable : 79,
-    AK_MustBeVirtualized : 80,
-    AK_CommandTooLarge : 81,
-    AK_RejectedByFilter : 82,
-    AK_InvalidCustomPlatformName : 83,
-    AK_DLLCannotLoad : 84,
-    AK_DLLPathNotFound : 85,
-    AK_NoJavaVM : 86,
-    AK_OpenSLError : 87,
-    AK_PluginNotRegistered : 88,
-    AK_DataAlignmentError : 89,
-    AK_DeviceNotCompatible : 90,
-    AK_DuplicateUniqueID : 91,
-    AK_InitBankNotLoaded : 92,
-    AK_DeviceNotFound : 93,
-    AK_PlayingIDNotFound : 94,
-    AK_InvalidFloatValue : 95,
-    AK_FileFormatMismatch : 96,
-    AK_NoDistinctListener : 97,
-    AK_ResourceInUse : 99,
-    AK_InvalidBankType : 100,
-    AK_AlreadyInitialized : 101,
-    AK_NotInitialized : 102,
-    AK_FilePermissionError : 103,
-    AK_UnknownFileError : 104,
-    AK_TooManyConcurrentOperations : 105,
-    AK_InvalidFileSize : 106,
-    AK_Deferred : 107,
-    AK_FilePathTooLong : 108,
-    AK_InvalidState : 109,
-    AKRESULT_Last : 110,
-}
+exports.AKRESULT = (function () {
+    let AKRESULT = {}
+    AKRESULT[AKRESULT["AK_NotImplemented"] = 0] = "AK_NotImplemented";
+    AKRESULT[AKRESULT["AK_Success"] = 1] = "AK_Success";
+    AKRESULT[AKRESULT["AK_Fail"] = 2] = "AK_Fail";
+    AKRESULT[AKRESULT["AK_PartialSuccess"] = 3] = "AK_PartialSuccess";
+    AKRESULT[AKRESULT["AK_NotCompatible"] = 4] = "AK_NotCompatible";
+    AKRESULT[AKRESULT["AK_AlreadyConnected"] = 5] = "AK_AlreadyConnected";
+    AKRESULT[AKRESULT["AK_InvalidFile"] = 7] = "AK_InvalidFile";
+    AKRESULT[AKRESULT["AK_AudioFileHeaderTooLarge"] = 8] = "AK_AudioFileHeaderTooLarge";
+    AKRESULT[AKRESULT["AK_MaxReached"] = 9] = "AK_MaxReached";
+    AKRESULT[AKRESULT["AK_InvalidID"] = 14] = "AK_InvalidID";
+    AKRESULT[AKRESULT["AK_IDNotFound"] = 15] = "AK_IDNotFound";
+    AKRESULT[AKRESULT["AK_InvalidInstanceID"] = 16] = "AK_InvalidInstanceID";
+    AKRESULT[AKRESULT["AK_NoMoreData"] = 17] = "AK_NoMoreData";
+    AKRESULT[AKRESULT["AK_InvalidStateGroup"] = 20] = "AK_InvalidStateGroup";
+    AKRESULT[AKRESULT["AK_ChildAlreadyHasAParent"] = 21] = "AK_ChildAlreadyHasAParent";
+    AKRESULT[AKRESULT["AK_InvalidLanguage"] = 22] = "AK_InvalidLanguage";
+    AKRESULT[AKRESULT["AK_CannotAddItselfAsAChild"] = 23] = "AK_CannotAddItselfAsAChild";
+    AKRESULT[AKRESULT["AK_InvalidParameter"] = 31] = "AK_InvalidParameter";
+    AKRESULT[AKRESULT["AK_ElementAlreadyInList"] = 35] = "AK_ElementAlreadyInList";
+    AKRESULT[AKRESULT["AK_PathNotFound"] = 36] = "AK_PathNotFound";
+    AKRESULT[AKRESULT["AK_PathNoVertices"] = 37] = "AK_PathNoVertices";
+    AKRESULT[AKRESULT["AK_PathNotRunning"] = 38] = "AK_PathNotRunning";
+    AKRESULT[AKRESULT["AK_PathNotPaused"] = 39] = "AK_PathNotPaused";
+    AKRESULT[AKRESULT["AK_PathNodeAlreadyInList"] = 40] = "AK_PathNodeAlreadyInList";
+    AKRESULT[AKRESULT["AK_PathNodeNotInList"] = 41] = "AK_PathNodeNotInList";
+    AKRESULT[AKRESULT["AK_DataNeeded"] = 43] = "AK_DataNeeded";
+    AKRESULT[AKRESULT["AK_NoDataNeeded"] = 44] = "AK_NoDataNeeded";
+    AKRESULT[AKRESULT["AK_DataReady"] = 45] = "AK_DataReady";
+    AKRESULT[AKRESULT["AK_NoDataReady"] = 46] = "AK_NoDataReady";
+    AKRESULT[AKRESULT["AK_InsufficientMemory"] = 52] = "AK_InsufficientMemory";
+    AKRESULT[AKRESULT["AK_Cancelled"] = 53] = "AK_Cancelled";
+    AKRESULT[AKRESULT["AK_UnknownBankID"] = 54] = "AK_UnknownBankID";
+    AKRESULT[AKRESULT["AK_BankReadError"] = 56] = "AK_BankReadError";
+    AKRESULT[AKRESULT["AK_InvalidSwitchType"] = 57] = "AK_InvalidSwitchType";
+    AKRESULT[AKRESULT["AK_FormatNotReady"] = 63] = "AK_FormatNotReady";
+    AKRESULT[AKRESULT["AK_WrongBankVersion"] = 64] = "AK_WrongBankVersion";
+    AKRESULT[AKRESULT["AK_FileNotFound"] = 66] = "AK_FileNotFound";
+    AKRESULT[AKRESULT["AK_DeviceNotReady"] = 67] = "AK_DeviceNotReady";
+    AKRESULT[AKRESULT["AK_BankAlreadyLoaded"] = 69] = "AK_BankAlreadyLoaded";
+    AKRESULT[AKRESULT["AK_RenderedFX"] = 71] = "AK_RenderedFX";
+    AKRESULT[AKRESULT["AK_ProcessNeeded"] = 72] = "AK_ProcessNeeded";
+    AKRESULT[AKRESULT["AK_ProcessDone"] = 73] = "AK_ProcessDone";
+    AKRESULT[AKRESULT["AK_MemManagerNotInitialized"] = 74] = "AK_MemManagerNotInitialized";
+    AKRESULT[AKRESULT["AK_StreamMgrNotInitialized"] = 75] = "AK_StreamMgrNotInitialized";
+    AKRESULT[AKRESULT["AK_SSEInstructionsNotSupported"] = 76] = "AK_SSEInstructionsNotSupported";
+    AKRESULT[AKRESULT["AK_Busy"] = 77] = "AK_Busy";
+    AKRESULT[AKRESULT["AK_UnsupportedChannelConfig"] = 78] = "AK_UnsupportedChannelConfig";
+    AKRESULT[AKRESULT["AK_PluginMediaNotAvailable"] = 79] = "AK_PluginMediaNotAvailable";
+    AKRESULT[AKRESULT["AK_MustBeVirtualized"] = 80] = "AK_MustBeVirtualized";
+    AKRESULT[AKRESULT["AK_CommandTooLarge"] = 81] = "AK_CommandTooLarge";
+    AKRESULT[AKRESULT["AK_RejectedByFilter"] = 82] = "AK_RejectedByFilter";
+    AKRESULT[AKRESULT["AK_InvalidCustomPlatformName"] = 83] = "AK_InvalidCustomPlatformName";
+    AKRESULT[AKRESULT["AK_DLLCannotLoad"] = 84] = "AK_DLLCannotLoad";
+    AKRESULT[AKRESULT["AK_DLLPathNotFound"] = 85] = "AK_DLLPathNotFound";
+    AKRESULT[AKRESULT["AK_NoJavaVM"] = 86] = "AK_NoJavaVM";
+    AKRESULT[AKRESULT["AK_OpenSLError"] = 87] = "AK_OpenSLError";
+    AKRESULT[AKRESULT["AK_PluginNotRegistered"] = 88] = "AK_PluginNotRegistered";
+    AKRESULT[AKRESULT["AK_DataAlignmentError"] = 89] = "AK_DataAlignmentError";
+    AKRESULT[AKRESULT["AK_DeviceNotCompatible"] = 90] = "AK_DeviceNotCompatible";
+    AKRESULT[AKRESULT["AK_DuplicateUniqueID"] = 91] = "AK_DuplicateUniqueID";
+    AKRESULT[AKRESULT["AK_InitBankNotLoaded"] = 92] = "AK_InitBankNotLoaded";
+    AKRESULT[AKRESULT["AK_DeviceNotFound"] = 93] = "AK_DeviceNotFound";
+    AKRESULT[AKRESULT["AK_PlayingIDNotFound"] = 94] = "AK_PlayingIDNotFound";
+    AKRESULT[AKRESULT["AK_InvalidFloatValue"] = 95] = "AK_InvalidFloatValue";
+    AKRESULT[AKRESULT["AK_FileFormatMismatch"] = 96] = "AK_FileFormatMismatch";
+    AKRESULT[AKRESULT["AK_NoDistinctListener"] = 97] = "AK_NoDistinctListener";
+    AKRESULT[AKRESULT["AK_ResourceInUse"] = 99] = "AK_ResourceInUse";
+    AKRESULT[AKRESULT["AK_InvalidBankType"] = 100] = "AK_InvalidBankType";
+    AKRESULT[AKRESULT["AK_AlreadyInitialized"] = 101] = "AK_AlreadyInitialized";
+    AKRESULT[AKRESULT["AK_NotInitialized"] = 102] = "AK_NotInitialized";
+    AKRESULT[AKRESULT["AK_FilePermissionError"] = 103] = "AK_FilePermissionError";
+    AKRESULT[AKRESULT["AK_UnknownFileError"] = 104] = "AK_UnknownFileError";
+    AKRESULT[AKRESULT["AK_TooManyConcurrentOperations"] = 105] = "AK_TooManyConcurrentOperations";
+    AKRESULT[AKRESULT["AK_InvalidFileSize"] = 106] = "AK_InvalidFileSize";
+    AKRESULT[AKRESULT["AK_Deferred"] = 107] = "AK_Deferred";
+    AKRESULT[AKRESULT["AK_FilePathTooLong"] = 108] = "AK_FilePathTooLong";
+    AKRESULT[AKRESULT["AK_InvalidState"] = 109] = "AK_InvalidState";
+    AKRESULT[AKRESULT["AKRESULT_Last"] = 110] = "AKRESULT_Last";
+    return AKRESULT;
+})();

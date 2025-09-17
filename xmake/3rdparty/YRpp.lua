@@ -12,6 +12,7 @@ target("YRpp")
         parser_includes = {
             yrpp_includes_dir.."/StaticInits.cpp",
             yrpp_includes_dir.."/SpotlightClass.h",
+            yrpp_includes_dir.."/TriggerTypeClass.h",
         },
         pre_header_text = get_pre_header_text(),
         templates = get_templates({}, {

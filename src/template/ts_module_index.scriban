@@ -136,15 +136,13 @@ $base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
             continue
         end
         if string.empty(property.name)
-            if property.is_anonymous
-                for inner_property in property.anonymous_class.properties }}
-    {{gen_property(inner_property)}}
-            {{- end
-            end
             continue
         end }}
     {{gen_property(property)}}
-    {{- end }}
+{{- end }}
+{{- for inner_property in klass.anonymous_inline_properties }}
+    {{gen_property(inner_property)}}
+{{- end }}
 }
 {{- end }}
 {{- end }}

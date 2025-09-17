@@ -313,12 +313,6 @@ class TechnoClass
     BaseIsAttacked(pEnemy_0 : TechnoClass) : void;
     static s_AbsDerivateID : any;
     static s_Array : any;
-    m_Flashing : FlashData;
-    m___Flashing : string;
-    m_Animation : StageClass;
-    m___Animation : string;
-    m_Passengers : PassengersClass;
-    m___Passengers : string;
     m_Transporter : TechnoClass;
     m_LastFireBulletFrame : number;
     m_CurrentTurretNumber : number;
@@ -332,26 +326,10 @@ class TechnoClass
     m_GattlingValue : number;
     m_TurretAnimFrame : number;
     m_InitialOwner : HouseClass;
-    m_Veterancy : VeterancyStruct;
-    m___Veterancy : string;
     m_align_154 : number;
     m_ArmorMultiplier : number;
     m_FirepowerMultiplier : number;
-    m_IdleActionTimer : CDTimerClass;
-    m___IdleActionTimer : string;
-    m_RadarFlashTimer : CDTimerClass;
-    m___RadarFlashTimer : string;
-    m_TargetingTimer : CDTimerClass;
-    m___TargetingTimer : string;
-    m_IronCurtainTimer : CDTimerClass;
-    m___IronCurtainTimer : string;
-    m_IronTintTimer : CDTimerClass;
-    m___IronTintTimer : string;
     m_IronTintStage : number;
-    m_AirstrikeTimer : CDTimerClass;
-    m___AirstrikeTimer : string;
-    m_AirstrikeTintTimer : CDTimerClass;
-    m___AirstrikeTintTimer : string;
     m_AirstrikeTintStage : number;
     m_ForceShielded : number;
     m_Deactivated : boolean;
@@ -360,24 +338,12 @@ class TechnoClass
     m_DrainAnim : AnimClass;
     m_Disguised : boolean;
     m_DisguiseCreationFrame : number;
-    m_InfantryBlinkTimer : CDTimerClass;
-    m___InfantryBlinkTimer : string;
-    m_DisguiseBlinkTimer : CDTimerClass;
-    m___DisguiseBlinkTimer : string;
     m_UnlimboingInfantry : boolean;
-    m_ReloadTimer : CDTimerClass;
-    m___ReloadTimer : string;
     m_RadarPosition : Point2D;
-    m_DisplayProductionTo : any;
-    m___DisplayProductionTo : string;
     m_Group : number;
     m_ArchiveTarget : AbstractClass;
     m_Owner : HouseClass;
     m_CloakState : any;
-    m_CloakProgress : StageClass;
-    m___CloakProgress : string;
-    m_CloakDelayTimer : CDTimerClass;
-    m___CloakDelayTimer : string;
     m_WarpFactor : number;
     m_unknown_bool_250 : boolean;
     m_LastSightCoords : CoordStruct;
@@ -418,8 +384,6 @@ class TechnoClass
     m_OriginallyOwnedByHouse : HouseClass;
     m_BunkerLinkedItem : TechnoClass;
     m_PitchAngle : number;
-    m_RearmTimer : CDTimerClass;
-    m___RearmTimer : string;
     m_ChargeTurretDelay : number;
     m_Ammo : number;
     m_Value : number;
@@ -437,20 +401,8 @@ class TechnoClass
     m_RockingSidewaysPerFrame : number;
     m_RockingForwardsPerFrame : number;
     m_HijackerInfantryType : number;
-    m_Tiberium : StorageClass;
-    m___Tiberium : string;
     m_unknown_34C : number;
-    m_UnloadTimer : TransitionTimer;
-    m___UnloadTimer : string;
-    m_BarrelFacing : FacingClass;
-    m___BarrelFacing : string;
-    m_PrimaryFacing : FacingClass;
-    m___PrimaryFacing : string;
-    m_SecondaryFacing : FacingClass;
-    m___SecondaryFacing : string;
     m_CurrentBurstIndex : number;
-    m_TargetLaserTimer : CDTimerClass;
-    m___TargetLaserTimer : string;
     m_unknown_short_3C8 : number;
     m_unknown_3CA : number;
     m_CountedAsOwned : boolean;
@@ -463,10 +415,6 @@ class TechnoClass
     m_IsPrimaryFactory : boolean;
     m_Spawned : boolean;
     m_IsInPlayfield : boolean;
-    m_TurretRecoil : RecoilData;
-    m___TurretRecoil : string;
-    m_BarrelRecoil : RecoilData;
-    m___BarrelRecoil : string;
     m_IsTether : boolean;
     m_IsAlternativeTether : boolean;
     m_IsOwnedByCurrentPlayer : boolean;
@@ -493,26 +441,12 @@ class TechnoClass
     m_Absorbed : boolean;
     m_unknown_bool_43A : boolean;
     m_unknown_43C : number;
-    m_CurrentTargetThreatValues : any;
-    m___CurrentTargetThreatValues : string;
-    m_CurrentTargets : any;
-    m___CurrentTargets : string;
-    m_AttackedTargets : any;
-    m___AttackedTargets : string;
-    m_Audio3 : any;
-    m___Audio3 : string;
     m_unknown_BOOL_49C : number;
     m_TurretIsRotating : number;
-    m_Audio4 : any;
-    m___Audio4 : string;
     m_unknown_bool_4B8 : boolean;
     m_unknown_4BC : number;
-    m_Audio5 : any;
-    m___Audio5 : string;
     m_unknown_bool_4D4 : boolean;
     m_unknown_4D8 : number;
-    m_Audio6 : any;
-    m___Audio6 : string;
     m_QueuedVoiceIndex : number;
     m_unknown_4F4 : number;
     m_unknown_bool_4F8 : boolean;
@@ -525,6 +459,72 @@ class TechnoClass
     m_PlanningToken : PlanningTokenClass;
     m_Disguise : ObjectTypeClass;
     m_DisguisedAsHouse : HouseClass;
+    m_Flashing : FlashData;
+    m___Flashing : string;
+    m_Animation : StageClass;
+    m___Animation : string;
+    m_Passengers : PassengersClass;
+    m___Passengers : string;
+    m_Veterancy : VeterancyStruct;
+    m___Veterancy : string;
+    m_IdleActionTimer : CDTimerClass;
+    m___IdleActionTimer : string;
+    m_RadarFlashTimer : CDTimerClass;
+    m___RadarFlashTimer : string;
+    m_TargetingTimer : CDTimerClass;
+    m___TargetingTimer : string;
+    m_IronCurtainTimer : CDTimerClass;
+    m___IronCurtainTimer : string;
+    m_IronTintTimer : CDTimerClass;
+    m___IronTintTimer : string;
+    m_AirstrikeTimer : CDTimerClass;
+    m___AirstrikeTimer : string;
+    m_AirstrikeTintTimer : CDTimerClass;
+    m___AirstrikeTintTimer : string;
+    m_InfantryBlinkTimer : CDTimerClass;
+    m___InfantryBlinkTimer : string;
+    m_DisguiseBlinkTimer : CDTimerClass;
+    m___DisguiseBlinkTimer : string;
+    m_ReloadTimer : CDTimerClass;
+    m___ReloadTimer : string;
+    m_DisplayProductionTo : any;
+    m___DisplayProductionTo : string;
+    m_CloakProgress : StageClass;
+    m___CloakProgress : string;
+    m_CloakDelayTimer : CDTimerClass;
+    m___CloakDelayTimer : string;
+    m_RearmTimer : CDTimerClass;
+    m___RearmTimer : string;
+    m_Tiberium : StorageClass;
+    m___Tiberium : string;
+    m_UnloadTimer : TransitionTimer;
+    m___UnloadTimer : string;
+    m_BarrelFacing : FacingClass;
+    m___BarrelFacing : string;
+    m_PrimaryFacing : FacingClass;
+    m___PrimaryFacing : string;
+    m_SecondaryFacing : FacingClass;
+    m___SecondaryFacing : string;
+    m_TargetLaserTimer : CDTimerClass;
+    m___TargetLaserTimer : string;
+    m_TurretRecoil : RecoilData;
+    m___TurretRecoil : string;
+    m_BarrelRecoil : RecoilData;
+    m___BarrelRecoil : string;
+    m_CurrentTargetThreatValues : any;
+    m___CurrentTargetThreatValues : string;
+    m_CurrentTargets : any;
+    m___CurrentTargets : string;
+    m_AttackedTargets : any;
+    m___AttackedTargets : string;
+    m_Audio3 : any;
+    m___Audio3 : string;
+    m_Audio4 : any;
+    m___Audio4 : string;
+    m_Audio5 : any;
+    m___Audio5 : string;
+    m_Audio6 : any;
+    m___Audio6 : string;
 }
 class HouseClass
     extends AbstractClass
@@ -694,37 +694,11 @@ class HouseClass
     static s_Observer : any;
     m_ArrayIndex : number;
     m_Type : HouseTypeClass;
-    m_RelatedTags : any;
-    m___RelatedTags : string;
-    m_ConYards : any;
-    m___ConYards : string;
-    m_Buildings : any;
-    m___Buildings : string;
-    m_UnitRepairStations : any;
-    m___UnitRepairStations : string;
-    m_Grinders : any;
-    m___Grinders : string;
-    m_Absorbers : any;
-    m___Absorbers : string;
-    m_Bunkers : any;
-    m___Bunkers : string;
-    m_Occupiables : any;
-    m___Occupiables : string;
-    m_CloningVats : any;
-    m___CloningVats : string;
-    m_SecretLabs : any;
-    m___SecretLabs : string;
-    m_PsychicDetectionBuildings : any;
-    m___PsychicDetectionBuildings : string;
-    m_FactoryPlants : any;
-    m___FactoryPlants : string;
     m_CountResourceGatherers : number;
     m_CountResourceDestinations : number;
     m_CountWarfactories : number;
     m_InfantrySelfHeal : number;
     m_UnitsSelfHeal : number;
-    m_StartingUnits : any;
-    m___StartingUnits : string;
     m_AIDifficulty : any;
     m_FirepowerMultiplier : number;
     m_GroundspeedMultiplier : number;
@@ -778,23 +752,11 @@ class HouseClass
     m_IsToLook : boolean;
     m_IQLevel2 : number;
     m_AIMode : any;
-    m_Supers : any;
-    m___Supers : string;
     m_LastBuiltBuildingType : number;
     m_LastBuiltInfantryType : number;
     m_LastBuiltAircraftType : number;
     m_LastBuiltVehicleType : number;
     m_AllowWinBlocks : number;
-    m_RepairTimer : CDTimerClass;
-    m___RepairTimer : string;
-    m_AlertTimer : CDTimerClass;
-    m___AlertTimer : string;
-    m_BorrowedTime : CDTimerClass;
-    m___BorrowedTime : string;
-    m_PowerBlackoutTimer : CDTimerClass;
-    m___PowerBlackoutTimer : string;
-    m_RadarBlackoutTimer : CDTimerClass;
-    m___RadarBlackoutTimer : string;
     m_Side2TechInfiltrated : boolean;
     m_Side1TechInfiltrated : boolean;
     m_Side0TechInfiltrated : boolean;
@@ -814,33 +776,9 @@ class HouseClass
     m_OwnedBuildings : number;
     m_OwnedInfantry : number;
     m_OwnedAircraft : number;
-    m_OwnedTiberium : StorageClass;
-    m___OwnedTiberium : string;
     m_Balance : number;
     m_TotalStorage : number;
-    m_OwnedWeed : StorageClass;
-    m___OwnedWeed : string;
     m_unknown_324 : number;
-    m_BuiltAircraftTypes : UnitTrackerClass;
-    m___BuiltAircraftTypes : string;
-    m_BuiltInfantryTypes : UnitTrackerClass;
-    m___BuiltInfantryTypes : string;
-    m_BuiltUnitTypes : UnitTrackerClass;
-    m___BuiltUnitTypes : string;
-    m_BuiltBuildingTypes : UnitTrackerClass;
-    m___BuiltBuildingTypes : string;
-    m_KilledAircraftTypes : UnitTrackerClass;
-    m___KilledAircraftTypes : string;
-    m_KilledInfantryTypes : UnitTrackerClass;
-    m___KilledInfantryTypes : string;
-    m_KilledUnitTypes : UnitTrackerClass;
-    m___KilledUnitTypes : string;
-    m_KilledBuildingTypes : UnitTrackerClass;
-    m___KilledBuildingTypes : string;
-    m_CapturedBuildings : UnitTrackerClass;
-    m___CapturedBuildings : string;
-    m_CollectedCrates : UnitTrackerClass;
-    m___CollectedCrates : string;
     m_NumAirpads : number;
     m_NumBarracks : number;
     m_NumWarFactories : number;
@@ -885,8 +823,6 @@ class HouseClass
     m_BaseSpawnCell : CellStruct;
     m_BaseCenter : CellStruct;
     m_Radius : number;
-    m_ZoneInfos : ZoneInfoStruct;
-    m___ZoneInfos : string;
     m_LATime : number;
     m_LAEnemy : number;
     m_ToCapture : number;
@@ -897,6 +833,115 @@ class HouseClass
     m_PreferredDefensiveCell : CellStruct;
     m_PreferredDefensiveCell2 : CellStruct;
     m_PreferredDefensiveCellStartTime : number;
+    m_InitialAttackDelay : number;
+    m_EnemyHouseIndex : number;
+    m_ProducingBuildingTypeIndex : number;
+    m_ProducingUnitTypeIndex : number;
+    m_ProducingInfantryTypeIndex : number;
+    m_ProducingAircraftTypeIndex : number;
+    m_RatioAITriggerTeam : number;
+    m_RatioTeamAircraft : number;
+    m_RatioTeamInfantry : number;
+    m_RatioTeamBuildings : number;
+    m_BaseDefenseTeamCount : number;
+    m_CurrentDropshipIndex : number;
+    m_HasCloakingRanges : number;
+    m_Color : ColorStruct;
+    m_LaserColor : ColorStruct;
+    m_Base : BaseClass;
+    m_RecheckPower : boolean;
+    m_RecheckRadar : boolean;
+    m_SpySatActive : boolean;
+    m_IsBeingDrained : boolean;
+    m_Edge : any;
+    m_EMPTarget : CellStruct;
+    m_NukeTarget : CellStruct;
+    m_Allies : any;
+    m_AIGeneral : any;
+    m_ThreatPosedEstimates : number;
+    m_PlainName : string;
+    m_UINameString : string;
+    m_UIName : number;
+    m_ColorSchemeIndex : number;
+    m_StartingAllies : any;
+    m_unknown_16060 : number;
+    m_unknown_1607C : number;
+    m_unknown_16080 : number;
+    m_unknown_16084 : number;
+    m_unused_16088 : number;
+    m_unused_16090 : number;
+    m_padding_16098 : number;
+    m_PredictionEnemyArmor : number;
+    m_PredictionEnemyAir : number;
+    m_PredictionEnemyInfantry : number;
+    m_TotalOwnedInfantryCost : number;
+    m_TotalOwnedVehicleCost : number;
+    m_TotalOwnedAircraftCost : number;
+    m_PowerSurplus : number;
+    m_RelatedTags : any;
+    m___RelatedTags : string;
+    m_ConYards : any;
+    m___ConYards : string;
+    m_Buildings : any;
+    m___Buildings : string;
+    m_UnitRepairStations : any;
+    m___UnitRepairStations : string;
+    m_Grinders : any;
+    m___Grinders : string;
+    m_Absorbers : any;
+    m___Absorbers : string;
+    m_Bunkers : any;
+    m___Bunkers : string;
+    m_Occupiables : any;
+    m___Occupiables : string;
+    m_CloningVats : any;
+    m___CloningVats : string;
+    m_SecretLabs : any;
+    m___SecretLabs : string;
+    m_PsychicDetectionBuildings : any;
+    m___PsychicDetectionBuildings : string;
+    m_FactoryPlants : any;
+    m___FactoryPlants : string;
+    m_StartingUnits : any;
+    m___StartingUnits : string;
+    m_Supers : any;
+    m___Supers : string;
+    m_RepairTimer : CDTimerClass;
+    m___RepairTimer : string;
+    m_AlertTimer : CDTimerClass;
+    m___AlertTimer : string;
+    m_BorrowedTime : CDTimerClass;
+    m___BorrowedTime : string;
+    m_PowerBlackoutTimer : CDTimerClass;
+    m___PowerBlackoutTimer : string;
+    m_RadarBlackoutTimer : CDTimerClass;
+    m___RadarBlackoutTimer : string;
+    m_OwnedTiberium : StorageClass;
+    m___OwnedTiberium : string;
+    m_OwnedWeed : StorageClass;
+    m___OwnedWeed : string;
+    m_BuiltAircraftTypes : UnitTrackerClass;
+    m___BuiltAircraftTypes : string;
+    m_BuiltInfantryTypes : UnitTrackerClass;
+    m___BuiltInfantryTypes : string;
+    m_BuiltUnitTypes : UnitTrackerClass;
+    m___BuiltUnitTypes : string;
+    m_BuiltBuildingTypes : UnitTrackerClass;
+    m___BuiltBuildingTypes : string;
+    m_KilledAircraftTypes : UnitTrackerClass;
+    m___KilledAircraftTypes : string;
+    m_KilledInfantryTypes : UnitTrackerClass;
+    m___KilledInfantryTypes : string;
+    m_KilledUnitTypes : UnitTrackerClass;
+    m___KilledUnitTypes : string;
+    m_KilledBuildingTypes : UnitTrackerClass;
+    m___KilledBuildingTypes : string;
+    m_CapturedBuildings : UnitTrackerClass;
+    m___CapturedBuildings : string;
+    m_CollectedCrates : UnitTrackerClass;
+    m___CollectedCrates : string;
+    m_ZoneInfos : ZoneInfoStruct;
+    m___ZoneInfos : string;
     m_OwnedBuildingTypes : any;
     m___OwnedBuildingTypes : string;
     m_OwnedUnitTypes : any;
@@ -923,8 +968,6 @@ class HouseClass
     m___FactoryProducedAircraftTypes : string;
     m_AttackTimer : CDTimerClass;
     m___AttackTimer : string;
-    m_InitialAttackDelay : number;
-    m_EnemyHouseIndex : number;
     m_AngerNodes : any;
     m___AngerNodes : string;
     m_ScoutNodes : any;
@@ -933,30 +976,8 @@ class HouseClass
     m___AITimer : string;
     m_Unknown_Timer_5640 : CDTimerClass;
     m___Unknown_Timer_5640 : string;
-    m_ProducingBuildingTypeIndex : number;
-    m_ProducingUnitTypeIndex : number;
-    m_ProducingInfantryTypeIndex : number;
-    m_ProducingAircraftTypeIndex : number;
-    m_RatioAITriggerTeam : number;
-    m_RatioTeamAircraft : number;
-    m_RatioTeamInfantry : number;
-    m_RatioTeamBuildings : number;
-    m_BaseDefenseTeamCount : number;
     m_DropshipData : DropshipStruct;
     m___DropshipData : string;
-    m_CurrentDropshipIndex : number;
-    m_HasCloakingRanges : number;
-    m_Color : ColorStruct;
-    m_LaserColor : ColorStruct;
-    m_Base : BaseClass;
-    m_RecheckPower : boolean;
-    m_RecheckRadar : boolean;
-    m_SpySatActive : boolean;
-    m_IsBeingDrained : boolean;
-    m_Edge : any;
-    m_EMPTarget : CellStruct;
-    m_NukeTarget : CellStruct;
-    m_Allies : any;
     m_DamageDelayTimer : CDTimerClass;
     m___DamageDelayTimer : string;
     m_TeamDelayTimer : CDTimerClass;
@@ -971,31 +992,10 @@ class HouseClass
     m___SpeakMoneyDelayTimer : string;
     m_SpeakMaxedDelayTimer : CDTimerClass;
     m___SpeakMaxedDelayTimer : string;
-    m_AIGeneral : any;
-    m_ThreatPosedEstimates : number;
-    m_PlainName : string;
-    m_UINameString : string;
-    m_UIName : number;
-    m_ColorSchemeIndex : number;
     m_StartingPoint : number;
     m_StartingCell : CellStruct;
-    m_StartingAllies : any;
-    m_unknown_16060 : number;
     m_WaypointPath : any;
     m___WaypointPath : string;
-    m_unknown_1607C : number;
-    m_unknown_16080 : number;
-    m_unknown_16084 : number;
-    m_unused_16088 : number;
-    m_unused_16090 : number;
-    m_padding_16098 : number;
-    m_PredictionEnemyArmor : number;
-    m_PredictionEnemyAir : number;
-    m_PredictionEnemyInfantry : number;
-    m_TotalOwnedInfantryCost : number;
-    m_TotalOwnedVehicleCost : number;
-    m_TotalOwnedAircraftCost : number;
-    m_PowerSurplus : number;
 }
 class StorageClass
 {
@@ -1192,10 +1192,6 @@ class ObjectClass
     m_NextObject : ObjectClass;
     m_AttachedTag : TagClass;
     m_AttachedBomb : BombClass;
-    m_AmbientSoundController : any;
-    m___AmbientSoundController : string;
-    m_CustomSoundController : any;
-    m___CustomSoundController : string;
     m_CustomSound : number;
     m_BombVisible : boolean;
     m_Health : number;
@@ -1219,6 +1215,10 @@ class ObjectClass
     m_IsVisible : boolean;
     m_Location : CoordStruct;
     m_LineTrailer : LineTrail;
+    m_AmbientSoundController : any;
+    m___AmbientSoundController : string;
+    m_CustomSoundController : any;
+    m___CustomSoundController : string;
 }
 class AnimClass
     extends ObjectClass
@@ -1238,8 +1238,6 @@ class AnimClass
     Middle() : boolean;
     static s_AbsID : any;
     static s_Array : any;
-    m_Animation : StageClass;
-    m___Animation : string;
     m_Type : AnimTypeClass;
     m_OwnerObject : ObjectClass;
     m_unknown_D0 : number;
@@ -1258,8 +1256,6 @@ class AnimClass
     m_PausedAnimFrame : number;
     m_Reverse : boolean;
     m_unknown_124 : number;
-    m_Bounce : BounceClass;
-    m___Bounce : string;
     m_TranslucencyLevel : number;
     m_TimeToDie : boolean;
     m_AttachedBullet : BulletClass;
@@ -1278,6 +1274,10 @@ class AnimClass
     m_SkipProcessOnce : boolean;
     m_Invisible : boolean;
     m_PowerOff : boolean;
+    m_Animation : StageClass;
+    m___Animation : string;
+    m_Bounce : BounceClass;
+    m___Bounce : string;
     m_Audio3 : any;
     m___Audio3 : string;
     m_Audio4 : any;
@@ -1548,11 +1548,11 @@ class INIClass
     static IsBlank(pValue_0 : string) : boolean;
     m_CurrentSectionName : string;
     m_CurrentSection : any;
+    m_LineComments : any;
     m_Sections : any;
     m___Sections : string;
     m_SectionIndex : any;
     m___SectionIndex : string;
-    m_LineComments : any;
 }
 class TechnoTypeClass
     extends ObjectTypeClass
@@ -1943,12 +1943,6 @@ class WeaponTypeClass
     m_ROF : number;
     m_Range : number;
     m_MinimumRange : number;
-    m_Report : any;
-    m___Report : string;
-    m_DownReport : any;
-    m___DownReport : string;
-    m_Anim : any;
-    m___Anim : string;
     m_OccupantAnim : AnimTypeClass;
     m_AssaultAnim : AnimTypeClass;
     m_OpenToppedAnim : AnimTypeClass;
@@ -2000,6 +1994,12 @@ class WeaponTypeClass
     m_IsRadEruption : boolean;
     m_RadLevel : number;
     m_IsMagBeam : boolean;
+    m_Report : any;
+    m___Report : string;
+    m_DownReport : any;
+    m___DownReport : string;
+    m_Anim : any;
+    m___Anim : string;
 }
 class BulletTypeClass
     extends ObjectTypeClass
@@ -3035,8 +3035,6 @@ class FootClass
     m_WalkedFramesSoFar : number;
     m_IsMoveSoundPlaying : boolean;
     m_MoveSoundDelay : number;
-    m_MoveSoundAudioController : any;
-    m___MoveSoundAudioController : string;
     m_CurrentMapCoords : CellStruct;
     m_LastMapCoords : CellStruct;
     m_LastFlightMapCoords : CellStruct;
@@ -3044,13 +3042,9 @@ class FootClass
     m_unknown_coords_568 : CoordStruct;
     m_SpeedPercentage : number;
     m_SpeedMultiplier : number;
-    m_unknown_abstract_array_588 : any;
-    m___unknown_abstract_array_588 : string;
     m_unknown_5A0 : AbstractClass;
     m_Destination : AbstractClass;
     m_LastDestination : AbstractClass;
-    m_NavQueue : any;
-    m___NavQueue : string;
     m_MegaMission : any;
     m_MegaDestination : AbstractClass;
     m_MegaTarget : AbstractClass;
@@ -3060,17 +3054,7 @@ class FootClass
     m_NextTeamMember : FootClass;
     m_unknown_5DC : number;
     m_PathDirections : number;
-    m_PathDelayTimer : CDTimerClass;
-    m___PathDelayTimer : string;
     m_unknown_int_64C : number;
-    m_unknown_timer_650 : CDTimerClass;
-    m___unknown_timer_650 : string;
-    m_SightTimer : CDTimerClass;
-    m___SightTimer : string;
-    m_BlockagePathTimer : CDTimerClass;
-    m___BlockagePathTimer : string;
-    m_Locomotor : any;
-    m___Locomotor : string;
     m_unknown_point3d_678 : CoordStruct;
     m_TubeIndex : number;
     m_unknown_bool_685 : boolean;
@@ -3089,8 +3073,6 @@ class FootClass
     m_ParasiteEatingMe : FootClass;
     m_LastBeParasitedStartFrame : number;
     m_ParasiteImUsing : ParasiteClass;
-    m_ParalysisTimer : CDTimerClass;
-    m___ParalysisTimer : string;
     m_unknown_bool_6AC : boolean;
     m_IsAttackedByLocomotor : boolean;
     m_IsLetGoByLocomotor : boolean;
@@ -3104,6 +3086,24 @@ class FootClass
     m_FrozenStill : boolean;
     m_unknown_bool_6B7 : boolean;
     m_unknown_bool_6B8 : boolean;
+    m_MoveSoundAudioController : any;
+    m___MoveSoundAudioController : string;
+    m_unknown_abstract_array_588 : any;
+    m___unknown_abstract_array_588 : string;
+    m_NavQueue : any;
+    m___NavQueue : string;
+    m_PathDelayTimer : CDTimerClass;
+    m___PathDelayTimer : string;
+    m_unknown_timer_650 : CDTimerClass;
+    m___unknown_timer_650 : string;
+    m_SightTimer : CDTimerClass;
+    m___SightTimer : string;
+    m_BlockagePathTimer : CDTimerClass;
+    m___BlockagePathTimer : string;
+    m_Locomotor : any;
+    m___Locomotor : string;
+    m_ParalysisTimer : CDTimerClass;
+    m___ParalysisTimer : string;
 }
 class TeamClass
     extends AbstractClass
@@ -3295,7 +3295,211 @@ class TagTypeClass
     m_FirstTrigger : TriggerTypeClass;
 }
 class TriggerTypeClass
+    extends AbstractTypeClass
 {
+    constructor(pName_0 : string);
+    static Find(pID_0 : string) : TriggerTypeClass;
+    static FindIndex(pID_0 : string) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
+    WhatAmI() : any;
+    Size() : number;
+    ComputeCRC(crc_0 : any | any) : void;
+    GetArrayIndex() : number;
+    LoadFromINI(pINI_0 : CCINIClass | any) : boolean;
+    SaveToINI(pINI_0 : CCINIClass | any) : boolean;
+    static LoadFromINIList(pINI_0 : CCINIClass) : void;
+    static SaveToINIList(pINI_0 : CCINIClass) : void;
+    FindByNameOrID(pName_0 : string) : TagTypeClass;
+    GetFlags() : any;
+    HasAllowWinAction() : boolean;
+    HasGlobalSetOrClearedEvent(idxGlobal_0 : number) : boolean;
+    HasLocalSetOrClearedEvent(idxLocal_0 : number) : boolean;
+    HasCrossesHorizontalLineEvent() : boolean;
+    HasCrossesVerticalLineEvent() : boolean;
+    HasZoneEntryByEvent() : boolean;
+    RemoveAction(pAction_0 : TActionClass) : boolean;
+    RemoveEvent(pEvent_0 : TEventClass) : boolean;
+    static s_AbsID : any;
+    static s_Array : any;
+    m_ArrayIndex : number;
+    m_Difficulty : boolean;
+    m_Enabled : boolean;
+    m_MustTransfer : boolean;
+    m_House : HouseTypeClass;
+    m_NextTrigger : TriggerTypeClass;
+    m_FirstEvent : TEventClass;
+    m_FirstAction : TActionClass;
+}
+class TActionClass
+    extends AbstractClass
+{
+    constructor();
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
+    WhatAmI() : any;
+    Size() : number;
+    ComputeCRC(crc_0 : any | any) : void;
+    GetArrayIndex() : number;
+    LoadFromINI() : void;
+    PrepareSaveToINI(buffer_0 : string) : void;
+    static GetFlags(actionKind_0 : number) : number;
+    static GetMode(actionKind_0 : number) : number;
+    Execute(pHouse_0 : HouseClass, pObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    LightningStrikeAt(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    RemoveParticleSystemsAt(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    WakeupAttachedObjects(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetVeinGrowth(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetTiberiumGrowth(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetIceGrowth(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    WakeupAllIdle(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    WakeupAllHarmless(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    WakeupGroup(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayerWin(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayerLose(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    EndScenario(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    Apply100DamageAt(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SmallLightFlashAt(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MediumLightFlashAt(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    LargeLightFlashAt(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SellAttachedBuildings(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    BerserkAttachedInfantry(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SendAttachedBuildingsOffline(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SendAttachedBuildingsOnline(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SwitchAttachedObjectsToHouse(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SwitchAllObjectsToHouse(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MindControlBuildingsOfHouse(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    RelinquishMindControlOfBuildingsOfHouse(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PrintMessage(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MakeTwoHousesAlly(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MakeTwoHousesEnemy(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetTargetCell(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    GrowShroud(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    GlobalSet(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    GlobalClear(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    RevealAroundWaypoint(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ReduceTiberiumAt(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    RevealZoneOfWaypoint(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MissionTimerStart(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MissionTimerStop(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MissionTimerExtend(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MissionTimerShorten(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MissionTimerStartWithText(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    MissionTimerSetText(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayMovie(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayMovieInSidebar(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayMovieInSidebarPauseGame(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayAudio(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayAudioAtRandomWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayAudioAtSpecificWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    StopAudioAtSpecificWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    TeleportAllHouseObjectTo(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ReshroudMapAroundWaypoint(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayTheme(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayEVA(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    Grant1ShotSW(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    GrantPermanentSW(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DiplayDropFlare(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    WinnerIs(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    LoserIs(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    EnableProductionForHouse(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    FireSale(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    EnableAutocreateForHouse(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    CreateTeam(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DestroyAllInstancesOfTeam(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SpawnTeam(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SpawnTeamAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DestroyAttached(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ResizePlayerView(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayAnimAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    FireWeaponAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PlayVoxelAnimAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    LightningStormStart(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    LightningStormStop(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    JumpCameraHome(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ZoomIn(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ZoomOut(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetAttachedSpotlightBehaviour(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DeleteTrigger(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DeleteTag(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ForceTrigger(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    EnableTrigger(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    RadarEventAdd(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    LocalSet(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    LocalClear(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ClearSmudges(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    StartMeteorShower(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetAmbientChangeStep(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetAmbientChangeRate(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetTintRed(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetTintGreen(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetTintBlue(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetAmbientLevel(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetChronoScreenEffectState(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    EnableAITriggers(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DisableAITriggers(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    Cheer(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    RestoreStartingUnitsOf(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    RestoreStartingBuildingsOf(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DestroyAllObjectsOf(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DestroyAllBuildingsOf(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DestroyAllNonNavalUnitsOf(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    DestroyAllNavalUnitsOf(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetRatioAITeam(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetRatioAITeamAircraft(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetRatioAITeamInfantry(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetRatioAITeamUnits(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    IonBlastAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    NukeAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    LightningStormAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    IronCurtainAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetTechLevelOfTechnoType(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ChronoInTeam(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    CrateAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ChemLauncherAtWP(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ToggleTrainCrate(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    RadarBlackout(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    FlashTeamFor(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    TalkBubble(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    PauseScenarioFor(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    EjectOccupantsOfFirstAttachedBuilding(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SwitchToTab(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    FlashCameo(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SpawnBuilding(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetSWChargeLevel(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetSWRechargeTime(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ResetSWRechargeTime(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ResetSW(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetPreferredTargetCell(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ResetTargetCell(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetDefenseCell(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ResetDefenseCell(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    SetBaseCenter(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    ResetBaseCenter(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    FlashBuildingsOfType(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
+    FindHouseByIndex(pTrigger_0 : TriggerClass, idxHouse_1 : number) : HouseClass;
+    static s_AbsID : any;
+    static s_Array : any;
+    m_ArrayIndex : number;
+    m_NextAction : TActionClass;
+    m_ActionKind : any;
+    m_TeamType : TeamTypeClass;
+    m_Waypoint : number;
+    m_Value2 : number;
+    m_TagType : TagTypeClass;
+    m_TriggerType : TriggerTypeClass;
+    m_TechnoID : string;
+    m_Text : string;
+    m_Value : number;
+    m_Bounds : RectangleStruct;
+    m_Param3 : number;
+    m_Param4 : number;
+    m_Param5 : number;
+    m_Param6 : number;
 }
 class TriggerClass
     extends AbstractClass
@@ -3337,6 +3541,114 @@ class TriggerClass
     m_Timer : CDTimerClass;
     m_OccuredEvents : number;
     m_Enabled : boolean;
+}
+class TEventClass
+    extends AbstractClass
+{
+    constructor();
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    WhatAmI() : any;
+    Size() : number;
+    LoadFromINI() : void;
+    PrepareSaveToINI(buffer_0 : string) : void;
+    static GetAttachType(eventKind_0 : number) : any;
+    GetStateA() : boolean;
+    GetStateB() : boolean;
+    HasOccured(eventKind_0 : number, pHouse_1 : HouseClass, Object_2 : ObjectClass, ActivationFrame_3 : CDTimerClass, isRepeating_4 : boolean) : boolean;
+    static s_AbsID : any;
+    static s_Array : any;
+    m_ArrayIndex : number;
+    m_NextEvent : TEventClass;
+    m_EventKind : any;
+    m_TeamType : TeamTypeClass;
+    m_Value : number;
+    m_String : string;
+    m_House : HouseClass;
+}
+class HouseTypeClass
+    extends AbstractTypeClass
+{
+    constructor(pID_0 : string);
+    static Find(pID_0 : string) : HouseTypeClass;
+    static FindIndex(pID_0 : string) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    WhatAmI() : any;
+    Size() : number;
+    FindParentCountry() : HouseTypeClass;
+    FindParentCountryIndex() : number;
+    static FindIndexOfName(name_0 : string) : number;
+    static s_AbsID : any;
+    static s_Array : any;
+    m_ParentCountry : any;
+    m_ArrayIndex : number;
+    m_ArrayIndex2 : number;
+    m_SideIndex : number;
+    m_ColorSchemeIndex : number;
+    m_FirepowerMult : number;
+    m_GroundspeedMult : number;
+    m_AirspeedMult : number;
+    m_ArmorMult : number;
+    m_ROFMult : number;
+    m_CostMult : number;
+    m_BuildtimeMult : number;
+    m_ArmorInfantryMult : number;
+    m_ArmorUnitsMult : number;
+    m_ArmorAircraftMult : number;
+    m_ArmorBuildingsMult : number;
+    m_ArmorDefensesMult : number;
+    m_CostInfantryMult : number;
+    m_CostUnitsMult : number;
+    m_CostAircraftMult : number;
+    m_CostBuildingsMult : number;
+    m_CostDefensesMult : number;
+    m_SpeedInfantryMult : number;
+    m_SpeedUnitsMult : number;
+    m_SpeedAircraftMult : number;
+    m_BuildtimeInfantryMult : number;
+    m_BuildtimeUnitsMult : number;
+    m_BuildtimeAircraftMult : number;
+    m_BuildtimeBuildingsMult : number;
+    m_BuildtimeDefensesMult : number;
+    m_IncomeMult : number;
+    m_VeteranInfantry : any;
+    m_VeteranUnits : any;
+    m_VeteranAircraft : any;
+    m_Suffix : string;
+    m_Prefix : number;
+    m_Multiplay : boolean;
+    m_MultiplayPassive : boolean;
+    m_WallOwner : boolean;
+    m_SmartAI : boolean;
+}
+class AircraftTypeClass
+    extends TechnoTypeClass
+{
+    constructor(pID_0 : string);
+    static Find(pID_0 : string | any) : AircraftTypeClass;
+    static FindIndex(pID_0 : string | any) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    WhatAmI() : any;
+    Size() : number;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
+    static s_AbsID : any;
+    static s_AbsVTable : number;
+    static s_Array : any;
+    m_ArrayIndex : number;
+    m_Carryall : boolean;
+    m_Trailer : AnimTypeClass;
+    m_SpawnDelay : number;
+    m_Rotors : boolean;
+    m_CustomRotor : boolean;
+    m_Landable : boolean;
+    m_FlyBy : boolean;
+    m_FlyBack : boolean;
+    m_AirportBound : boolean;
+    m_Fighter : boolean;
 }
 class ScriptTypeClass
     extends AbstractTypeClass
@@ -3629,32 +3941,6 @@ class AircraftClass
     m_IsCarryallNotLanding : boolean;
     m_IsReturningFromAttackRun : boolean;
 }
-class AircraftTypeClass
-    extends TechnoTypeClass
-{
-    constructor(pID_0 : string);
-    static Find(pID_0 : string | any) : AircraftTypeClass;
-    static FindIndex(pID_0 : string | any) : number;
-    GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
-    Size() : number;
-    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
-    CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
-    static s_AbsID : any;
-    static s_AbsVTable : number;
-    static s_Array : any;
-    m_ArrayIndex : number;
-    m_Carryall : boolean;
-    m_Trailer : AnimTypeClass;
-    m_SpawnDelay : number;
-    m_Rotors : boolean;
-    m_CustomRotor : boolean;
-    m_Landable : boolean;
-    m_FlyBy : boolean;
-    m_FlyBack : boolean;
-    m_AirportBound : boolean;
-    m_Fighter : boolean;
-}
 class TerrainClass
     extends ObjectClass
 {
@@ -3727,12 +4013,12 @@ class TiberiumClass
     m_Value : number;
     m_Power : number;
     m_Color : number;
-    m_Debris : any;
-    m___Debris : string;
     m_Image : OverlayTypeClass;
     m_NumFrames : number;
     m_NumImages : number;
     m_NumSlopes : number;
+    m_Debris : any;
+    m___Debris : string;
     m_SpreadLogic : TiberiumLogic;
     m___SpreadLogic : string;
     m_GrowthLogic : TiberiumLogic;
@@ -3774,10 +4060,6 @@ class RadSiteClass
     static s_AbsID : any;
     static s_Array : any;
     m_LightSource : LightSourceClass;
-    m_RadLevelTimer : CDTimerClass;
-    m___RadLevelTimer : string;
-    m_RadLightTimer : CDTimerClass;
-    m___RadLightTimer : string;
     m_BaseCell : CellStruct;
     m_Spread : number;
     m_SpreadInLeptons : number;
@@ -3789,6 +4071,10 @@ class RadSiteClass
     m_IntensityDecrement : number;
     m_RadDuration : number;
     m_RadTimeLeft : number;
+    m_RadLevelTimer : CDTimerClass;
+    m___RadLevelTimer : string;
+    m_RadLightTimer : CDTimerClass;
+    m___RadLightTimer : string;
 }
 class LightConvertClass
     extends ConvertClass
@@ -3885,8 +4171,6 @@ class LaserDrawClass
     constructor(source_0 : CoordStruct, target_1 : CoordStruct, zAdjust_2 : number, unknown_3 : number, innerColor_4 : ColorStruct, outerColor_5 : ColorStruct, outerSpread_6 : ColorStruct, duration_7 : number, blinks_8 : boolean, fades_9 : boolean, startIntensity_10 : number, endIntensity_11 : number);
     // skip operator new
     // skip operator delete
-    m_Progress : StageClass;
-    m___Progress : string;
     m_Thickness : number;
     m_IsHouseColor : boolean;
     m_IsSupported : boolean;
@@ -3903,6 +4187,8 @@ class LaserDrawClass
     m_Fades : boolean;
     m_StartIntensity : number;
     m_EndIntensity : number;
+    m_Progress : StageClass;
+    m___Progress : string;
 }
 class FlashData
 {
@@ -4210,8 +4496,6 @@ class ParticleSystemClass
     static s_Array : any;
     m_Type : ParticleSystemTypeClass;
     m_SpawnDistanceToOwner : CoordStruct;
-    m_Particles : any;
-    m___Particles : string;
     m_TargetCoords : CoordStruct;
     m_Owner : ObjectClass;
     m_Target : AbstractClass;
@@ -4222,6 +4506,8 @@ class ParticleSystemClass
     m_TimeToDie : boolean;
     m_unknown_bool_F9 : boolean;
     m_OwnerHouse : HouseClass;
+    m_Particles : any;
+    m___Particles : string;
 }
 class ParticleSystemTypeClass
     extends ObjectTypeClass
@@ -4601,13 +4887,13 @@ class PlanningTokenClass
     m_PlanningNodes : any;
     m_field_1C : boolean;
     m_field_1D : boolean;
-    m_unknown_20_88 : number;
-    m___unknown_20_88 : string;
     m_field_8C : number;
     m_ClosedLoopNodeCount : number;
     m_StepsToClosedLoop : number;
     m_field_98 : boolean;
     m_field_99 : boolean;
+    m_unknown_20_88 : number;
+    m___unknown_20_88 : string;
 }
 class PlanningNodeClass
 {
@@ -4746,63 +5032,6 @@ class WaypointClass
     m_Coords : CellStruct;
     m_unknown : number;
 }
-class HouseTypeClass
-    extends AbstractTypeClass
-{
-    constructor(pID_0 : string);
-    static Find(pID_0 : string) : HouseTypeClass;
-    static FindIndex(pID_0 : string) : number;
-    GetClassID(pClassID_0 : any | any) : number;
-    Load(pStm_0 : any | any) : number;
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
-    Size() : number;
-    FindParentCountry() : HouseTypeClass;
-    FindParentCountryIndex() : number;
-    static FindIndexOfName(name_0 : string) : number;
-    static s_AbsID : any;
-    static s_Array : any;
-    m_ParentCountry : any;
-    m_ArrayIndex : number;
-    m_ArrayIndex2 : number;
-    m_SideIndex : number;
-    m_ColorSchemeIndex : number;
-    m_FirepowerMult : number;
-    m_GroundspeedMult : number;
-    m_AirspeedMult : number;
-    m_ArmorMult : number;
-    m_ROFMult : number;
-    m_CostMult : number;
-    m_BuildtimeMult : number;
-    m_ArmorInfantryMult : number;
-    m_ArmorUnitsMult : number;
-    m_ArmorAircraftMult : number;
-    m_ArmorBuildingsMult : number;
-    m_ArmorDefensesMult : number;
-    m_CostInfantryMult : number;
-    m_CostUnitsMult : number;
-    m_CostAircraftMult : number;
-    m_CostBuildingsMult : number;
-    m_CostDefensesMult : number;
-    m_SpeedInfantryMult : number;
-    m_SpeedUnitsMult : number;
-    m_SpeedAircraftMult : number;
-    m_BuildtimeInfantryMult : number;
-    m_BuildtimeUnitsMult : number;
-    m_BuildtimeAircraftMult : number;
-    m_BuildtimeBuildingsMult : number;
-    m_BuildtimeDefensesMult : number;
-    m_IncomeMult : number;
-    m_VeteranInfantry : any;
-    m_VeteranUnits : any;
-    m_VeteranAircraft : any;
-    m_Suffix : string;
-    m_Prefix : number;
-    m_Multiplay : boolean;
-    m_MultiplayPassive : boolean;
-    m_WallOwner : boolean;
-    m_SmartAI : boolean;
-}
 class StartingTechnoStruct
 {
     m_Unit : TechnoTypeClass;
@@ -4860,12 +5089,12 @@ class ScoutStruct
 class DropshipStruct
 {
     constructor();
-    m_Timer : CDTimerClass;
-    m___Timer : string;
     m_unknown_C : number;
     m_Count : number;
     m_Types : TechnoTypeClass;
     m_TotalCost : number;
+    m_Timer : CDTimerClass;
+    m___Timer : string;
 }
 class BaseClass
 {
@@ -4874,15 +5103,15 @@ class BaseClass
     Save(pStm_0 : any) : number;
     ComputeCRC(crc_0 : any) : void;
     FailedToPlaceNode(Node_0 : BaseNodeClass) : number;
+    m_PercentBuilt : number;
+    m_Center : CellStruct;
+    m_Owner : HouseClass;
     m_BaseNodes : any;
     m___BaseNodes : string;
-    m_PercentBuilt : number;
     m_Cells_24 : any;
     m___Cells_24 : string;
     m_Cells_38 : any;
     m___Cells_38 : string;
-    m_Center : CellStruct;
-    m_Owner : HouseClass;
 }
 class BaseNodeClass
 {

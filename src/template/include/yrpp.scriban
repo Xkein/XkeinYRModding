@@ -60,6 +60,8 @@ func get_yr_game_types()
         "LaserDrawClass",
         "TriggerClass",
         "TriggerTypeClass",
+        "TEventClass",
+        "TActionClass",
         "ScriptClass",
         "ScriptTypeClass",
         "TaskForceClass",
