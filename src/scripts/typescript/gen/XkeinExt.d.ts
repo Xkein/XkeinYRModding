@@ -113,6 +113,10 @@ class JsPhysicsEvents
     m_onCollisionPersist : any;
     m_onCollisionExit : any;
 }
+class JsTriggerEvents
+{
+    m_onTActionExecute : any;
+}
 class JsTechnoEvents
     extends JsObjectEvents
 {
@@ -144,6 +148,7 @@ class JsHouseEvents
 class JsEvents
 {
     static s_game : JsGameEvents;
+    static s_trigger : JsTriggerEvents;
     static s_input : JsInputEvents;
     static s_physics : JsPhysicsEvents;
     static s_unit : JsTechnoEvents;

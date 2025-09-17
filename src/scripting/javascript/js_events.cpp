@@ -5,6 +5,7 @@
 #include "physics/physics.h"
 
 JsGameEvents            JsEvents::game;
+JsTriggerEvents         JsEvents::trigger;
 JsInputEvents           JsEvents::input;
 JsPhysicsEvents         JsEvents::physics;
 JsBulletEvents          JsEvents::bullet;
@@ -408,6 +409,20 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrSuperWeaponTypeLoadGameEndEvent) {
     INVOKE_JS_EVENT(JsEvents::superWeaponType.onLoadGameEnd, E->pSuperWeaponType, E->stream);
 }
 // ======================= save/load game =======================
+
+// ======================= trigger events =======================
+
+DEFINE_YR_HOOK_EVENT_LISTENER(YrTActionExecuteEvent)
+{
+    std::optional<bool> ret = INVOKE_JS_EVENT(JsEvents::trigger.onTActionExecute, E->pAction, E->pHouse, E->pObject, E->pTrigger, *E->location);
+    if (ret)
+    {
+        E->OverrideReturn(ret.value());
+    }
+}
+
+// ======================= trigger =======================
+
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrBulletConstructEvent)
 {

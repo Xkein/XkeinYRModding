@@ -26,6 +26,7 @@ class AircraftTypeClass;
 class UnitTypeClass;
 class BuildingTypeClass;
 class SuperWeaponTypeClass;
+class TActionClass;
 struct IStream;
 
 class PhysicsCollisionAddAndPersistResult;
@@ -153,6 +154,13 @@ struct JsPhysicsEvents
 };
 
 CLASS(BindJs)
+struct JsTriggerEvents
+{
+    PROPERTY()
+    ScriptBehaviour<std::optional<bool>(TActionClass*, HouseClass*, ObjectClass*, TriggerClass*, CellStruct const&)> onTActionExecute;
+};
+
+CLASS(BindJs)
 struct JsTechnoEvents : public JsObjectEvents
 {
     PROPERTY()
@@ -220,6 +228,9 @@ struct JsEvents final
     
     PROPERTY()
     static JsGameEvents game;
+
+    PROPERTY()
+    static JsTriggerEvents trigger;
     
     PROPERTY()
     static JsInputEvents input;

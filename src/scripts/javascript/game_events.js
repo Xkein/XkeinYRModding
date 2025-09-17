@@ -112,6 +112,13 @@ class PhysicsEvents
     }
 }
 
+class TriggerEvents
+{
+    constructor() {
+        this.onTActionExecute = new Delegate()
+    }
+}
+
 class TechnoEvents extends ObjectEvents
 {
     constructor() {
@@ -159,6 +166,7 @@ const gameEvents = {}
 gameEvents.game = new GameEvents()
 gameEvents.input = new InputEvents()
 gameEvents.physics = new PhysicsEvents()
+gameEvents.trigger = new TriggerEvents()
 gameEvents.unit = new TechnoEvents()
 gameEvents.unitType = new AbstractTypeEvents()
 gameEvents.infantry = new TechnoEvents()
@@ -252,6 +260,8 @@ bind_js_event("input", "onConvertAction")
 bind_js_event("input", "onLeftMouseButtonDown")
 bind_js_event("input", "onLeftMouseButtonUp")
 bind_js_event("input", "onRightMouseButtonUp")
+
+bind_js_event("trigger", "onTActionExecute")
 
 bind_js_event("physics", "onCollisionEnter")
 bind_js_event("physics", "onCollisionPersist")

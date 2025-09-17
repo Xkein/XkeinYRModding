@@ -23,6 +23,7 @@
 #include "yr/event/super_weapon_type_event.h"
 #include "yr/event/weapon_type_event.h"
 #include "yr/event/general_event.h"
+#include "yr/event/trigger_event.h"
 #include "yr/event/input_event.h"
 #include "yr/event/ui_event.h"
 #include "yr/event/theme_event.h"
