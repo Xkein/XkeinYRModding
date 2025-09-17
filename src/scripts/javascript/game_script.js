@@ -64,6 +64,7 @@ class GameScriptable
     let iniReaderXkein = new YrExtCore.IniReader("XkeinExt.ini")
     let initScriptName = IniHelper.ReadString(iniReaderXkein, "Scripting", "InitScript")
     if (initScriptName) {
+        console.log(`load init script: ${initScriptName}`)
         require(initScriptName)
     }
 

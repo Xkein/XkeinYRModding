@@ -10,5 +10,5 @@ const XkeinExt = require("XkeinExt")
 
 require("ini_helper")
 require("game_events")
-require("game_script")
 require("game_audio")
+require("game_script")
