@@ -172,37 +172,12 @@ static std::vector<syringe_patch_data*> gCallingPatchs;
 static std::deque<syringe_patch_data*> gLastCalledPatchs;
 
 typedef DWORD __cdecl SyringePatchFunc (REGISTERS*);
-DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
+inline DWORD CallSyringePatch(syringe_patch_data* data, REGISTERS *R)
 {
     std::string* stackTrace = nullptr;
     __try
     {
-// #define _LOG_HOOK
-#ifdef _LOG_HOOK
-        gLogger->info("call syringe patch at {}, begin", (void*)data->hookAddr);
-#endif
-#ifdef DEBUG
-        gCallingPatchs.push_back(data);
-#endif
-        DWORD ret = reinterpret_cast<SyringePatchFunc*>(data->hookFunc)(R);
-#ifdef DEBUG
-        if (gCallingPatchs.back() == data) {
-            gCallingPatchs.pop_back();
-        }
-        else {
-            gCallingPatchs.erase(std::find(gCallingPatchs.begin(), gCallingPatchs.end(), data));
-            gLogger->error("patch {}-{} finish but it is not the last calling patch!", (void*)data->hookAddr, data->hookFunc);
-            gLogger->error("the last calling patch is {}-{}", (void*)gCallingPatchs.back()->hookAddr, gCallingPatchs.back()->hookFunc);
-        }
-        gLastCalledPatchs.push_back(data);
-        if (gLastCalledPatchs.size() > 16) {
-            gLastCalledPatchs.pop_front();
-        }
-#endif
-#ifdef _LOG_HOOK
-        gLogger->info("call syringe patch at {}, end, return {}", (void*)data->hookAddr, (void*)ret);
-#endif
-        return ret;
+        return reinterpret_cast<SyringePatchFunc*>(data->hookFunc)(R);
     }
     __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
     {
@@ -210,6 +185,37 @@ DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
         gLogger->error("stack trace : {}", *stackTrace);
         gLogger->flush();
     }
+    return 0;
+}
+DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
+{
+    std::string* stackTrace = nullptr;
+// #define _LOG_HOOK
+#ifdef _LOG_HOOK
+    gLogger->info("call syringe patch at {}, begin", (void*)data->hookAddr);
+#endif
+#ifdef DEBUG
+    gCallingPatchs.push_back(data);
+#endif
+    DWORD ret = CallSyringePatch(data, R);
+#ifdef DEBUG
+    if (gCallingPatchs.back() == data) {
+        gCallingPatchs.pop_back();
+    }
+    else {
+        gCallingPatchs.erase(std::find(gCallingPatchs.begin(), gCallingPatchs.end(), data));
+        gLogger->error("patch {}-{} finish but it is not the last calling patch!", (void*)data->hookAddr, data->hookFunc);
+        gLogger->error("the last calling patch is {}-{}", (void*)gCallingPatchs.back()->hookAddr, gCallingPatchs.back()->hookFunc);
+    }
+    gLastCalledPatchs.push_back(data);
+    if (gLastCalledPatchs.size() > 16) {
+        gLastCalledPatchs.pop_front();
+    }
+#endif
+#ifdef _LOG_HOOK
+    gLogger->info("call syringe patch at {}, end, return {}", (void*)data->hookAddr, (void*)ret);
+#endif
+    return ret;
 }
 
 #include "yr/yr_hook_diagnostic.h"
