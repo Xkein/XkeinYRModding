@@ -1,3 +1,4 @@
+/// <reference path = "index.d.ts"/>
 import { PhysicsCollisionAddAndPersistResult, PhysicsCollisionRemoveResult } from "XkeinExt";
 import { IniReader } from "YrExtCore";
 import { AbstractClass, CoordStruct, DirType, TActionClass, HouseClass, ObjectClass, TriggerClass, CellStruct, DamageState, WarheadTypeClass, Action, MissionClass, AbstractTypeClass, RulesClass, GadgetClass, GadgetFlag, KeyModifier, Point2D, TechnoClass, BulletClass, FireError, BulletTypeClass, SuperClass, SuperWeaponTypeClass } from "YRpp";
@@ -23,10 +24,10 @@ interface AbstractEvents
 {
     onCtor: Delegate<(obj: AbstractClass) => void>;
     onDtor: Delegate<(obj: AbstractClass) => void>;
-    onSaveGameBegin: Delegate<(obj: AbstractClass, stream) => void>
-    onSaveGameEnd: Delegate<(obj: AbstractClass, stream) => void>
-    onLoadGameBegin: Delegate<(obj: AbstractClass, stream) => void>
-    onLoadGameEnd: Delegate<(obj: AbstractClass, stream) => void>
+    onSaveGameBegin: Delegate<(obj: AbstractClass, stream: any) => void>
+    onSaveGameEnd: Delegate<(obj: AbstractClass, stream: any) => void>
+    onLoadGameBegin: Delegate<(obj: AbstractClass, stream: any) => void>
+    onLoadGameEnd: Delegate<(obj: AbstractClass, stream: any) => void>
 }
 
 interface ObjectEvents extends AbstractEvents
@@ -58,12 +59,12 @@ interface GameEvents
     onEndUpdate: Delegate<() => void>;
     onSaveGameBegin: Delegate<(fileName: string) => void>;
     onSaveGameEnd: Delegate<(fileName: string) => void>;
-    onSaveGameBeginStream: Delegate<(stream) => void>;
-    onSaveGameEndStream: Delegate<(stream) => void>;
+    onSaveGameBeginStream: Delegate<(stream: any) => void>;
+    onSaveGameEndStream: Delegate<(stream: any) => void>;
     onLoadGameBegin: Delegate<(fileName: string) => void>;
     onLoadGameEnd: Delegate<(fileName: string) => void>;
-    onLoadGameBeginStream: Delegate<(stream) => void>;
-    onLoadGameEndStream: Delegate<(stream) => void>;
+    onLoadGameBeginStream: Delegate<(stream: any) => void>;
+    onLoadGameEndStream: Delegate<(stream: any) => void>;
     // onApplicationQuit: Delegate<() => void>;
 }
 
