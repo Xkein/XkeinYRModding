@@ -116,6 +116,21 @@ auto register_func(entt::meta_factory<Type>& factory, const entt::id_type id)
 }
 
 template<auto Data, typename Type>
+auto& meta_getter_array_klass(Type& klass)
+{
+    static_assert(std::is_member_object_pointer_v<decltype(Data)>, "not member object");
+    using array_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>>;
+    using std_array_type = std::array<std::remove_extent_t<array_type>, std::extent_v<array_type>>;
+    return reinterpret_cast<std_array_type&>(std::invoke(Data, klass));
+}
+template<auto Data, typename Type>
+auto meta_getter_array_static()
+{
+    static_assert(!std::is_member_object_pointer_v<decltype(Data)>, "not member object");
+    return *Data;
+}
+
+template<auto Data, typename Type>
 auto register_member(entt::meta_factory<Type>& factory, const entt::id_type id)
 {
     static_assert(std::is_member_object_pointer_v<decltype(Data)>, "not member object");
@@ -129,6 +144,10 @@ auto register_member(entt::meta_factory<Type>& factory, const entt::id_type id)
         if constexpr (std::is_copy_assignable_v<data_type>)
         {
             return factory.data<nullptr, Data, entt::as_ref_t>(id);
+        }
+        else if constexpr (std::is_array_v<std::remove_reference_t<data_type>>)
+        {
+            return factory.data<nullptr, meta_getter_array_klass<Data, Type>, entt::as_ref_t>(id);
         }
         else
         {
@@ -146,6 +165,10 @@ auto register_field(entt::meta_factory<Type>& factory, const entt::id_type id)
     using data_type = std::remove_pointer_t<decltype(Data)>;
     if constexpr (is_constexpr_var<Data>) {
         return factory.data<Data, entt::as_cref_t>(id);
+    }
+    else if constexpr (std::is_array_v<std::remove_reference_t<data_type>>)
+    {
+        return factory.data<Data, entt::as_ref_t>(id);
     }
     else {
         return factory.data<Data, entt::as_ref_t>(id);

@@ -5089,6 +5089,7 @@ class ScoutStruct
 class DropshipStruct
 {
     constructor();
+    constructor(other_0 : DropshipStruct);
     m_unknown_C : number;
     m_Count : number;
     m_Types : TechnoTypeClass;

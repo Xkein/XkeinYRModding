@@ -98,15 +98,36 @@ void InspectObject(entt::meta_any& inst, const char* name)
                     ImGui::PopID();
                 }
 
-                if (type.is_sequence_container())
+                ImGui::Text("----- end %s -----", typeName);
+                ImGui::TreePop();
+            }
+        }
+        else if (type.is_sequence_container())
+        {
+            auto view = inst.as_sequence_container();
+            if (ImGui::TreeNode(name, "sequence(%d) %s 0x%08X", view.size(), name, ptr))
+            {
+                int idx = 0;
+                for (auto elem : view)
                 {
-                    auto view = inst.as_sequence_container();
-                    ImGui::Text("-- sequence size: %d", view.size());
-                    for (auto elem : view)
-                    {
-                        InspectObject(elem, "#");
-                    }
+                    ImGui::PushID(elem.base().data());
+                    InspectObject(elem, "#");
+                    ImGui::PopID();
                 }
+                ImGui::Text("----- end %s -----", name);
+                ImGui::TreePop();
+            }
+        }
+        else if (type.is_associative_container())
+        {
+            auto view = inst.as_associative_container();
+            if (ImGui::TreeNode(name, "sequence(%d) %s 0x%08X", view.size(), name, ptr))
+            {
+                //for (auto elem : view)
+                //{
+                //    InspectObject(elem, "#");
+                //}
+                ImGui::Text("----- end %s -----", name);
                 ImGui::TreePop();
             }
         }
@@ -231,6 +252,8 @@ void InspectObject(entt::meta_any& inst, const char* name)
         ImGui::LabelText(name, inst.cast<const char*>());
         return;
     }
+
+    ImGui::LabelText(name, "%s unsupported object", typeName);
 }
 
 void InspectYrObject(AbstractClass* pObject)
