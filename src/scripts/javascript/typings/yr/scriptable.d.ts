@@ -14,8 +14,7 @@ declare global {
 // }
 interface Delegate<T extends (...args: any[]) => any>
 {
-    add(handler: T): void;
-    addMethod(obj: any, method: T): void;
+    add(handler: T): T;
     remove(handler: T): void;
     invoke(...args: Parameters<T>): ReturnType<T>;
 }
@@ -139,6 +138,13 @@ interface AllGameEvents {
     superWeaponType: SuperWeaponTypeEvents;
     house: HouseEvents;
     houseType: AbstractTypeEvents;
+
+    addGroupEventHandler(group, name, handler);
+    removeGroupEventHandler(group, name, handler);
+    technoGroupEvents;
+    objectGroupEvents;
+    technoTypeGroupEvents;
+    objectTypeGroupEvents;
 }
 
 var gameEvents: AllGameEvents;

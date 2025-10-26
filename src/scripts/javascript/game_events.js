@@ -7,10 +7,7 @@ class Delegate
 
     add(handler) {
         this.handlers.add(handler)
-    }
-
-    addMethod(obj, method) {
-        this.add((...args) => { return method.call(obj, ...args); })
+        return handler
     }
 
     remove(handler) {
@@ -186,6 +183,7 @@ gameEvents.addGroupEventHandler = (group, name, handler) => {
     for (const events of group) {
         events[name].add(handler)
     }
+    return handler
 }
 
 gameEvents.removeGroupEventHandler = (group, name, handler) => {

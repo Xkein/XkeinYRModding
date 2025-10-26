@@ -113,6 +113,8 @@ private:
 
     void DispatchProtocolMessage(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
+    void RegisterTickHandler(const v8::FunctionCallbackInfo<v8::Value>& Info);
+
     void LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info);
 
     void ConvertCppType(const v8::FunctionCallbackInfo<v8::Value>& Info);
@@ -152,6 +154,8 @@ private:
 
     v8::Global<v8::Function> ReloadJs;
 #endif
+
+    std::vector<v8::Global<v8::Function>> TickHandlers;
     
     std::unordered_map<AbstractClass*, v8::UniquePersistent<v8::Value>> ObjectMap;
 

@@ -41,7 +41,7 @@ function get_default_templates()
             -- ["js_type_cpp.scriban"] =  codegen_dir.."/XkeinExt/codegen/{1}/{0}.js_binding.cpp",
         },
         js_module = {
-            ["ts_module_index.scriban"] = root_dir.."/src/scripts/typescript/gen/{0}.d.ts",
+            ["ts_module_index.scriban"] = root_dir.."/src/scripts/javascript/typings/yr/gen/{0}.d.ts",
             ["js_module_setup.scriban"] = root_dir.."/src/scripts/javascript/gen/{0}.js",
             ["js_module_cpp.scriban"] =  codegen_dir.."/XkeinExt/codegen/{1}/{0}.js_module.cpp",
         },

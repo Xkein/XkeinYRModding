@@ -143,6 +143,8 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     MethodBindingHelper<&JsEnv::SetInspectorCallback>::Bind(Isolate, Context, Global, "__tgjsSetInspectorCallback", This);
 
     MethodBindingHelper<&JsEnv::DispatchProtocolMessage>::Bind(Isolate, Context, Global, "__tgjsDispatchProtocolMessage", This);
+
+    MethodBindingHelper<&JsEnv::RegisterTickHandler>::Bind(Isolate, Context, Global, "__tgjsRegisterTickHandler", This);
     
     MethodBindingHelper<&JsEnv::ConvertCppType>::Bind(Isolate, Context, Global, "convertCPPType", This);
 
@@ -169,6 +171,7 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     ExecuteModule("puerts/jit_stub.js");
     ExecuteModule("puerts/hot_reload.js");
     ExecuteModule("puerts/pesaddon.js");
+    ExecuteModule("puerts/timer.js");
 
     ExecuteModule("main.js");
 
@@ -198,6 +201,7 @@ JsEnv::~JsEnv()
     Require.Reset();
     GetESMMain.Reset();
     ReloadJs.Reset();
+    TickHandlers.clear();
     {
         auto Isolate = MainIsolate;
 #ifdef THREAD_SAFE
@@ -519,6 +523,18 @@ void JsEnv::WaitDebugger(double timeout)
 void JsEnv::LogicTick()
 {
     BackendEnv->LogicTick();
+    
+#ifdef THREAD_SAFE
+    v8::Locker Locker(MainIsolate);
+#endif
+    v8::Isolate::Scope     IsolateScope(MainIsolate);
+    v8::HandleScope        HandleScope(MainIsolate);
+    v8::Local<v8::Context> Context = DefaultContext.Get(MainIsolate);
+    v8::Context::Scope     ContextScope(Context);
+    for (auto&& func : TickHandlers)
+    {
+        func.Get(MainIsolate)->Call(Context, v8::Undefined(MainIsolate), 0, nullptr);
+    }
 }
 
 bool JsEnv::InspectorTick()
@@ -937,6 +953,26 @@ void JsEnv::FindModule(const v8::FunctionCallbackInfo<v8::Value>& Info)
     //    Func(Context, Exports);
     //    Info.GetReturnValue().Set(Exports);
     //}
+}
+
+void JsEnv::RegisterTickHandler(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+#ifndef WITH_QUICKJS
+    v8::Isolate* Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
+    v8::Isolate::Scope Isolatescope(Isolate);
+    v8::HandleScope HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope ContextScope(Context);
+
+    if (!Info[0]->IsFunction()) {
+        return;
+    }
+
+    TickHandlers.push_back(v8::Global<v8::Function>(MainIsolate, Info[0].As<v8::Function>()));
+#endif    // !WITH_QUICKJS
 }
 
 void JsEnv::LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
