@@ -120,6 +120,8 @@ target("make_artifacts")
         end
         -- copy javascript
         get_copy_files("src/scripts/javascript/", "**", output_dir.."/assets/JavaScript/")
+        get_copy_files("src/scripts/typescript", "**.js", output_dir.."/assets/JavaScript")
+        get_copy_files("src/scripts/typescript/node_modules", "**.json", output_dir.."/assets/JavaScript/node_modules")
         -- copy wwise sound banks
         get_copy_files("content/yr_wwise_template/GeneratedSoundBanks/Windows/", "**.bnk", output_dir.."/assets/wwise/")
         -- copy raw assets

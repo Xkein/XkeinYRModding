@@ -10,7 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "litegraph.js": "^0.7.18"
+    "litegraph.js": "^0.7.18",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@types/node": "^24.8.1"

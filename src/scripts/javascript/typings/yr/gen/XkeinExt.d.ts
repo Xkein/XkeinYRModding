@@ -4,6 +4,7 @@ import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
 import { AKRESULT } from "Wwise";
 class WwiseSoundBankRef
 {
+    constructor(bankName_0 : any);
 }
 class AudioSystem
 {

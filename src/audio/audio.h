@@ -31,6 +31,7 @@ class WwiseSoundBankRef
 {
     std::shared_ptr<WwiseSoundBank> soundBank;
 public:
+    FUNCTION()
     WwiseSoundBankRef(const std::string& bankName);
     ~WwiseSoundBankRef();
 };

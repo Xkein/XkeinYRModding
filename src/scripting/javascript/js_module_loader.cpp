@@ -3,6 +3,7 @@
 #include "runtime/platform/file_manager.h"
 #include "runtime/platform/path.h"
 #include "yr/extcore_config.h"
+#include <boost/algorithm/string.hpp>
 
 bool DefaultJSModuleLoader::Search(const std::string& RequiredDir, const std::string& RequiredModule, std::string& Path, std::string& AbsolutePath)
 {
@@ -14,6 +15,31 @@ bool DefaultJSModuleLoader::Search(const std::string& RequiredDir, const std::st
     if (SearchModuleInDir(Paths::GetLaunchDir() / ScriptRoot, RequiredModule, Path, AbsolutePath))
     {
         return true;
+
+    }
+    
+    if (!RequiredDir.empty() && RequiredModule.find('/') == std::string::npos &&
+        !boost::algorithm::ends_with(RequiredModule, ".js") &&
+        !boost::algorithm::ends_with(RequiredModule, ".mjs"))
+    {
+        // climb up from the directory that called require
+        std::vector<std::string> pathFrags;
+        boost::split(pathFrags, RequiredDir, boost::is_any_of("/"));
+        if (!pathFrags.empty())
+            pathFrags.pop_back(); // already tried RequiredDir above
+
+        while (!pathFrags.empty())
+        {
+            if (pathFrags.back() != "node_modules")
+            {
+                std::string dir = boost::algorithm::join(pathFrags, "/");
+                if (SearchModuleInDir(dir, RequiredModule, Path, AbsolutePath))
+                {
+                    return true;
+                }
+            }
+            pathFrags.pop_back();
+        }
     }
 
     if (ScriptRoot != "JavaScript")
