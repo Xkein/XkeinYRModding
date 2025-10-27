@@ -19,6 +19,7 @@ bool DefaultJSModuleLoader::Search(const std::string& RequiredDir, const std::st
     if (ScriptRoot != "JavaScript")
     {
         if (SearchModuleInDir(gYrExtConfig->assetsPath / "JavaScript", RequiredModule, Path, AbsolutePath) ||
+            SearchModuleInDir(gYrExtConfig->assetsPath / "JavaScript/deps", RequiredModule, Path, AbsolutePath) ||
             SearchModuleInDir(gYrExtConfig->assetsPath / "JavaScript/gen", RequiredModule, Path, AbsolutePath))
         {
             return true;

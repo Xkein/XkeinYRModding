@@ -108,8 +108,14 @@ static void JsUpdate()
 {
     if (gJsEnv)
     {
-        gJsEnv->InspectorTick();
-        gJsEnv->LogicTick();
+        GuardExecute(
+            []() {
+            gJsEnv->InspectorTick();
+            gJsEnv->LogicTick();
+        },
+            [](std::string stackTrace) {
+            gLogger->error(stackTrace);
+        });
     }
 }
 

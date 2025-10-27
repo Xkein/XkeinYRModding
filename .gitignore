@@ -8,3 +8,5 @@ build/
 
 /.vscode
 /vsxmake2022
+
+node_modules/
