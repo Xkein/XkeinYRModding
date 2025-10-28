@@ -47,7 +47,7 @@ export class GameGraph {
 
     private static createGraphServer() {
         const services = {
-            reloadGraph: (filename) => this.LoadGraph(filename),
+            reloadGraph: (filename) => { this.LoadGraph(filename); return true; },
         };
 
         const PORT = `7675`;
