@@ -171,7 +171,6 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     ExecuteModule("puerts/jit_stub.js");
     ExecuteModule("puerts/hot_reload.js");
     ExecuteModule("puerts/pesaddon.js");
-    ExecuteModule("puerts/timer.js");
 
     ExecuteModule("main.js");
 

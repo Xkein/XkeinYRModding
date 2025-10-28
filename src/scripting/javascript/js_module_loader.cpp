@@ -1,9 +1,9 @@
 #include "js_module_loader.h"
+#include <boost/algorithm/string.hpp>
 #include "runtime/platform/file_helper.h"
 #include "runtime/platform/file_manager.h"
 #include "runtime/platform/path.h"
 #include "yr/extcore_config.h"
-#include <boost/algorithm/string.hpp>
 
 bool DefaultJSModuleLoader::Search(const std::string& RequiredDir, const std::string& RequiredModule, std::string& Path, std::string& AbsolutePath)
 {
@@ -18,9 +18,7 @@ bool DefaultJSModuleLoader::Search(const std::string& RequiredDir, const std::st
 
     }
     
-    if (!RequiredDir.empty() && RequiredModule.find('/') == std::string::npos &&
-        !boost::algorithm::ends_with(RequiredModule, ".js") &&
-        !boost::algorithm::ends_with(RequiredModule, ".mjs"))
+    if (!RequiredDir.empty() && !RequiredModule.contains('/') && !RequiredModule.ends_with(".js") && !RequiredModule.ends_with(".mjs"))
     {
         // climb up from the directory that called require
         std::vector<std::string> pathFrags;
