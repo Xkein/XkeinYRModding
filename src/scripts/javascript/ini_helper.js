@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.IniHelper = void 0;
 exports.IniComponent = IniComponent;
 exports.IniField = IniField;
+exports.GetIniComponent = GetIniComponent;
 require("reflect-metadata");
 class IniHelper {
     static ReadString(iniReader, section, key) {
@@ -37,7 +38,7 @@ class JsIniManager {
         gameEvents.addGroupEventHandler(componentTargets, "onLoadIni", (yrObjectType, iniReader) => {
             if (!klass.__iniFields)
                 return;
-            let iniComponentName = klass.name.charAt(0).toLowerCase() + klass.name.slice(1);
+            let iniComponentName = klass.name;
             let iniComponent = yrObjectType[iniComponentName];
             if (!iniComponent) {
                 yrObjectType[iniComponentName] = iniComponent = new klass();
@@ -67,11 +68,15 @@ class JsIniManager {
 }
 function IniComponent(componentTargets) {
     return function (target) {
-        JsIniManager.RegisterIniComponent(target.prototype, componentTargets);
+        JsIniManager.RegisterIniComponent(target, componentTargets);
     };
 }
 function IniField(iniKey, readMethod) {
     return function (target, propertyKey) {
         JsIniManager.RegisterIniField(target, propertyKey, iniKey, readMethod);
     };
+}
+function GetIniComponent(klass, yrObjectType) {
+    let iniComponentName = klass.name;
+    return yrObjectType[iniComponentName];
 }

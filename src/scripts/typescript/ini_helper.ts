@@ -41,7 +41,7 @@ class JsIniManager {
     gameEvents.addGroupEventHandler(componentTargets, "onLoadIni", (yrObjectType: AbstractTypeClass, iniReader: IniReader) => {
       if (!klass.__iniFields)
         return
-      let iniComponentName = klass.name.charAt(0).toLowerCase() + klass.name.slice(1);
+      let iniComponentName = klass.name;
       let iniComponent = yrObjectType[iniComponentName]
       if (!iniComponent) {
         yrObjectType[iniComponentName] = iniComponent = new klass()
@@ -73,7 +73,7 @@ class JsIniManager {
 
 export function IniComponent(componentTargets) {
   return function (target) {
-    JsIniManager.RegisterIniComponent(target.prototype, componentTargets);
+    JsIniManager.RegisterIniComponent(target, componentTargets);
   }
 }
 
@@ -83,3 +83,7 @@ export function IniField(iniKey: string, readMethod: IniReadMethod) {
   }
 }
 
+export function GetIniComponent<T>(klass: {new(): T}, yrObjectType: AbstractTypeClass) : T {
+  let iniComponentName = klass.name;
+  return yrObjectType[iniComponentName];
+}
