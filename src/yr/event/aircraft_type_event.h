@@ -6,16 +6,18 @@ class AircraftTypeClass;
 class CCINIClass;
 struct IStream;
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrAircraftTypeCtorEvent
 {
 public:
+    PROPERTY()
     AircraftTypeClass* pAircraftType;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrAircraftTypeDtorEvent
 {
 public:
+    PROPERTY()
     AircraftTypeClass* pAircraftType;
 };

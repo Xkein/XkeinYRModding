@@ -57,7 +57,10 @@ rule("codegen-cpp")
                 local sysinclude_list = {}
                 for _, dep in pairs(target:deps()) do
                     for _, includeDir in ipairs(dep:get("includedirs", {interface = true})) do
-                        table.insert(sysinclude_list, path.absolute(includeDir))
+                        local dir = path.absolute(includeDir)
+                        if not table.contains(include_list, dir) then
+                            table.insert(sysinclude_list, dir)
+                        end
                     end
                 end
                 for _, sysincludeDir in ipairs(target:get("sysincludedirs")) do

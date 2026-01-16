@@ -39,6 +39,7 @@
 #include <TunnelLocomotionClass.h>
 #include <IsometricTileClass.h>
 #include <IsometricTileTypeClass.h>
+#include <ThemeClass.h>
 
 UsingYrClass(AbstractClass);
 UsingYrClass(AbstractTypeClass);
@@ -195,6 +196,8 @@ UsingCppType(RocketLocomotionClass);
 UsingCppType(ShipLocomotionClass);
 UsingCppType(TeleportLocomotionClass);
 UsingCppType(TunnelLocomotionClass);
+UsingCppType(ThemeControl);
+UsingCppType(ThemeClass);
 
 UsingCppType(INIClass);
 UsingCppType(CCINIClass);

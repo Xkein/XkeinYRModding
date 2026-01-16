@@ -4,6 +4,9 @@
     is_yrpp = module_name == "YRpp"
     is_yr_ext_core = module_name == "YrExtCore"
     is_gainput = module_name == "gainput"
+    func need_codegen(htType)
+        ret has_meta(htType.meta) && !htType.is_template_class
+    end
 -}}
 #include "{{module_name}}.gen.h"
 {{- if is_yr_ext_core }}
@@ -23,14 +26,14 @@ __IMPLEMENT_YR_HOOK_EVENT({{klass.full_name}})
 {{- end }}
 
 {{- for enum in module_enums}}
-    {{- if has_meta(enum.meta) }}
+    {{- if need_codegen(enum) }}
 {{-         if enum.source_file }}
 #include "{{enum.source_file}}"
 {{-         end }}
     {{- end }}
 {{- end }}
 {{- for klass in module_classes }}
-    {{- if has_meta(klass.meta) }}
+    {{- if need_codegen(klass) }}
         {{- if !get_meta_tag(klass.meta, "HookEvent") }}
 {{-             if klass.source_file }}
 // {{klass.full_name}}
@@ -38,19 +41,19 @@ __IMPLEMENT_YR_HOOK_EVENT({{klass.full_name}})
 {{-             end }}
         {{- end }}
         {{- if get_meta_tag(klass.meta, "YrExtension") }}
-void OnExit_{{klass.name}}();
-struct ModuleImpl_{{klass.name}} {
+void OnExit_{{klass.identifier}}();
+struct ModuleImpl_{{klass.identifier}} {
     {{klass.full_name}} ext;
-    ModuleImpl_{{klass.name}}() {
+    ModuleImpl_{{klass.identifier}}() {
         ExtensionManager::AddExtension(&ext);
-        atexit(OnExit_{{klass.name}});
+        atexit(OnExit_{{klass.identifier}});
     }
-    ~ModuleImpl_{{klass.name}}() {
+    ~ModuleImpl_{{klass.identifier}}() {
         ExtensionManager::RemoveExtension(&ext);
     }
-} _ModuleImpl_{{klass.name}};
-void OnExit_{{klass.name}}() {
-    ExtensionManager::RemoveExtension(&_ModuleImpl_{{klass.name}}.ext);
+} _ModuleImpl_{{klass.identifier}};
+void OnExit_{{klass.identifier}}() {
+    ExtensionManager::RemoveExtension(&_ModuleImpl_{{klass.identifier}}.ext);
 }
         {{- end }}
     {{- end }}
@@ -79,7 +82,7 @@ using namespace entt::literals;
 
 {{ for klass in module_classes }}
 {{-
-if !has_meta(klass.meta) || get_meta_tag(klass.meta, "HookEvent")
+if !need_codegen(klass) || get_meta_tag(klass.meta, "HookEvent")
     continue
 end
 component_target_list = get_derived_classes_by_list(get_meta_list(klass.meta, "ComponentTarget"))
@@ -113,7 +116,7 @@ is_savegame = get_meta_tag(klass.meta, "AutoSavegame")
 #include "yr/component/ini_component.h"
 #include <GameClasses.h>
 #include <IsometricTileTypeClass.h>
-static bool LoadIni_{{klass.name}}({{klass.full_name}}& iniComponent, IniReader& reader, const char* pSection)
+static bool LoadIni_{{klass.identifier}}({{klass.full_name}}& iniComponent, IniReader& reader, const char* pSection)
 {
     bool success = false;
 {{- for property in klass.properties ; $cpp_field = property.cpp_field
@@ -131,7 +134,7 @@ static bool LoadIni_{{klass.name}}({{klass.full_name}}& iniComponent, IniReader&
 
 {{- if is_savegame }}
 template<typename Archive>
-void Serialize_{{klass.name}}(Archive& ar, {{klass.full_name}}& data) {
+void Serialize_{{klass.identifier}}(Archive& ar, {{klass.full_name}}& data) {
     ar.startNode();
     Serialization::CallPrologue(ar, data);
     std::string typeName = entt::type_id<{{klass.full_name}}>().name().data();
@@ -156,14 +159,14 @@ void Serialize_{{klass.name}}(Archive& ar, {{klass.full_name}}& data) {
 
 {{- end }}
 
-void {{get_gen_type_name(klass.name)}}__Register()
+void {{get_gen_type_name(klass.identifier)}}__Register()
 {
     auto factory = entt::meta_factory<{{klass.full_name}}>().type("{{klass.full_name}}"_hs);
     ClassMeta* classMeta = GetOrAddClassMeta<{{klass.full_name}}>();
-    classMeta->name = "{{klass.name}}";
+    classMeta->name = "{{klass.full_name}}";
 {{ for base in klass.base_classes}}
     factory.base<{{base.full_display_name}}>();
-    register_ref_convertion<{{base.full_display_name}}, {{klass.name}}>();
+    register_ref_convertion<{{base.full_display_name}}, {{klass.full_name}}>();
 {{- end }}
 {{ for function in klass.all_functions}}
 {{- $function_name = function.name
@@ -184,7 +187,6 @@ void {{get_gen_type_name(klass.name)}}__Register()
     factory.ctor<{{(function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "}}>();
 {{-     continue
     end
-    $class_name = klass.name
     $class_full_name = klass.full_name
     $func_type = get_function_ptr_type(function, klass)
     
@@ -207,7 +209,6 @@ void {{get_gen_type_name(klass.name)}}__Register()
     if should_skip_visibility(klass, property)
         continue
     end
-    $class_name = klass.name
     $class_full_name = klass.full_name
     if property.is_bit_field }}
     // skip bit field: {{$class_full_name}}::{{$field_name}}
@@ -230,7 +231,7 @@ end }}
     ComponentInstantiation::RegisterComponentInstantiation<{{klass.full_name}}, {{target_type}}>();
 {{- end}}
 {{ if is_ini_component}}
-    IniComponentLoader::RegisterLoader<{{klass.full_name}}, &LoadIni_{{klass.name}}>(factory);
+    IniComponentLoader::RegisterLoader<{{klass.full_name}}, &LoadIni_{{klass.identifier}}>(factory);
 {{- end}}
 {{ if is_ini_auto_load}}
     IniComponentLoader::RegisterAutoLoad<{{klass.full_name}}>(factory);
@@ -263,10 +264,10 @@ end }}
     IniComponentLoader::RegisterLoadingComponent<ThemeControl, {{klass.full_name}}>();
 {{- end }}
 {{ if is_savegame }}
-    Serialization::RegisterSerialization<{{klass.full_name}}, &Serialize_{{klass.name}}, &Serialize_{{klass.name}}>();
+    Serialization::RegisterSerialization<{{klass.full_name}}, &Serialize_{{klass.identifier}}, &Serialize_{{klass.identifier}}>();
 {{- end}}
 }
-void {{get_gen_type_name(klass.name)}}__Unregister()
+void {{get_gen_type_name(klass.identifier)}}__Unregister()
 {
     entt::meta_reset<{{klass.full_name}}>();
 }
@@ -278,7 +279,7 @@ void {{get_gen_type_name(klass.name)}}__Unregister()
 // ==== enum registrations begin
 
 {{  for enum in module_enums
-    if !has_meta(enum.meta) || get_meta_tag(enum.meta, "HookEvent")
+    if !need_codegen(enum) || get_meta_tag(enum.meta, "HookEvent")
         continue
     end }}
 void {{get_gen_type_name(enum.name)}}__Register()
@@ -300,8 +301,8 @@ void {{gen_type_name}}::Register()
 {
     sync_meta_ctx();
 {{for klass in array.concat(module_classes, module_enums)
-    if has_meta(klass.meta) && !get_meta_tag(klass.meta, "HookEvent") }}
-    {{get_gen_type_name(klass.name)}}__Register();
+    if need_codegen(klass) && !get_meta_tag(klass.meta, "HookEvent") }}
+    {{get_gen_type_name(klass.identifier ?? klass.name)}}__Register();
     {{-end
 end }}
 }
@@ -309,8 +310,8 @@ void {{gen_type_name}}::Unregister()
 {
     sync_meta_ctx();
 {{for klass in array.concat(module_classes, module_enums)
-    if has_meta(klass.meta) && !get_meta_tag(klass.meta, "HookEvent") }}
-    {{get_gen_type_name(klass.name)}}__Unregister();
+    if need_codegen(klass) && !get_meta_tag(klass.meta, "HookEvent") }}
+    {{get_gen_type_name(klass.identifier ?? klass.name)}}__Unregister();
     {{-end
 end }}
 }

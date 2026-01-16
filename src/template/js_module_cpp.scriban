@@ -2,7 +2,7 @@
     init_extra_vars(this)
     include 'include/js_ts.scriban'
     func need_codegen(htType)
-        ret get_meta_tag(htType.meta, "BindJs")
+        ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
     end
     is_yrpp = module_name == "YRpp"
 -}}
@@ -36,7 +36,7 @@
 {{ if klass.source_file }}
 #include "{{klass.source_file}}"
 {{- end }}
-void __JsRegister_{{klass.name}}() {
+void __JsRegister_{{klass.identifier}}() {
 {{ func gen_js_class(htClass)
     $klass = $'auto builder = PUERTS_NAMESPACE::DefineClass<{htClass.full_name}>();'
     for base in htClass.base_classes
@@ -181,6 +181,6 @@ end }}
 void __JsRegister_{{module_name}}() {
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-    __JsRegister_{{klass.name}}();
+    __JsRegister_{{klass.identifier}}();
 {{- end; end }}
 }

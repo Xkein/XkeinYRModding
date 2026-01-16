@@ -2,7 +2,7 @@
 
 #include "yr/yr_event.h"
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrUIUpdateEvent
 {
 };

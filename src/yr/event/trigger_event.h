@@ -8,13 +8,18 @@ class HouseClass;
 class ObjectClass;
 class TriggerClass;
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrTActionExecuteEvent : public YrHookOverrideReturn<bool>
 {
 public:
+    PROPERTY()
     TActionClass*     pAction;
+    PROPERTY()
     HouseClass*       pHouse;
+    PROPERTY()
     ObjectClass*      pObject;
+    PROPERTY()
     TriggerClass*     pTrigger;
+    PROPERTY()
     CellStruct const* location;
 };

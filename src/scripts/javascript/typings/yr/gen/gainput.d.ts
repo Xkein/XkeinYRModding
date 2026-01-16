@@ -2,7 +2,7 @@
 declare module "gainput" {
 import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
 import { AKRESULT } from "Wwise";
-class InputMap
+class gainput__InputMap
 {
     constructor(manager_0 : any, name_1 : string, allocator_2 : any);
     Clear() : void;

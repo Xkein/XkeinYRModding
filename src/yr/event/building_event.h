@@ -5,16 +5,18 @@
 class BuildingClass;
 struct IStream;
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrBuildingCtorEvent
 {
 public:
+    PROPERTY()
     BuildingClass* pBuilding;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrBuildingDtorEvent
 {
 public:
+    PROPERTY()
     BuildingClass* pBuilding;
 };

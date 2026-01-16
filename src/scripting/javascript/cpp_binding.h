@@ -144,7 +144,7 @@ namespace PUERTS_NAMESPACE                                                      
                 return *ptr;                                                                                                     \
             }                                                                                                                    \
             else {                                                                                                               \
-                CLS tmp;                                                                                                         \
+                static CLS tmp;                                                                                                  \
                 return tmp;                                                                                                      \
             }                                                                                                                    \
         }                                                                                                                        \
@@ -886,6 +886,9 @@ static void RegisterCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterA
 
     RegisterJSClass(ClassDef);
 }
+
+UsingCppType(HWND);
+
 #else
 #define UsingArray
 #define UsingArray2D

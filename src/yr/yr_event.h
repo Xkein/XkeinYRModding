@@ -68,6 +68,7 @@ private:
         return &gHookEvent; \
     }
 
+CLASS(BindJs)
 template<typename TRet>
 class YrHookOverrideReturn
 {
@@ -77,12 +78,14 @@ class YrHookOverrideReturn
     bool hasSet {false};
     TRet returnValue {};
 public:
+    FUNCTION()
     void OverrideReturn(TRet val) {
         returnValue = val;
         hasSet = true;
     }
 };
 
+CLASS(BindJs)
 template<>
 class YrHookOverrideReturn<void>
 {
@@ -91,11 +94,13 @@ class YrHookOverrideReturn<void>
 
     bool hasSet {false};
 public:
+    FUNCTION()
     void OverrideReturn() {
         hasSet = true;
     }
 };
 
+CLASS(BindJs)
 class YrHookOverride
 {
     friend class YrHookEvent;
@@ -103,6 +108,7 @@ class YrHookOverride
 
     bool handled {false};
 public:
+    FUNCTION()
     void Override() {
         handled = true;
     }

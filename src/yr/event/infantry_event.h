@@ -5,16 +5,18 @@
 class InfantryClass;
 struct IStream;
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrInfantryCtorEvent
 {
 public:
+    PROPERTY()
     InfantryClass* pInfantry;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrInfantryDtorEvent
 {
 public:
+    PROPERTY()
     InfantryClass* pInfantry;
 };

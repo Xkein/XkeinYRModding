@@ -6,16 +6,18 @@ class BuildingTypeClass;
 class CCINIClass;
 struct IStream;
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrBuildingTypeCtorEvent
 {
 public:
+    PROPERTY()
     BuildingTypeClass* pBuildingType;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrBuildingTypeDtorEvent
 {
 public:
+    PROPERTY()
     BuildingTypeClass* pBuildingType;
 };

@@ -20,6 +20,22 @@ class AudioComponent
     m_owner : AbstractClass;
     m_akGameObjId : number;
 }
+class PhysicsTypeComponent
+{
+    m_enable : boolean;
+    m_isKinematic : boolean;
+    m_isSensor : boolean;
+    m_shapeType : EPhysicShapeType;
+    m_mass : number;
+    m_radius : number;
+    m_halfHeight : number;
+    m_halfExtent : any;
+}
+class PhysicsComponent
+{
+    m_owner : AbstractClass;
+    m_type : PhysicsTypeComponent;
+}
 class PhysicsCollisionAddAndPersistResult
 {
     m_com1 : PhysicsComponent;
@@ -31,22 +47,6 @@ class PhysicsCollisionRemoveResult
 {
     m_com1 : PhysicsComponent;
     m_com2 : PhysicsComponent;
-}
-class PhysicsComponent
-{
-    m_owner : AbstractClass;
-    m_type : PhysicsTypeComponent;
-}
-class PhysicsTypeComponent
-{
-    m_enable : boolean;
-    m_isKinematic : boolean;
-    m_isSensor : boolean;
-    m_shapeType : EPhysicShapeType;
-    m_mass : number;
-    m_radius : number;
-    m_halfHeight : number;
-    m_halfExtent : any;
 }
 class JsCppHelper
 {

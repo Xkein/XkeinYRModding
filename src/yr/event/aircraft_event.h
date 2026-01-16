@@ -5,16 +5,18 @@
 class AircraftClass;
 struct IStream;
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrAircraftCtorEvent
 {
 public:
+    PROPERTY()
     AircraftClass* pAircraft;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrAircraftDtorEvent
 {
 public:
+    PROPERTY()
     AircraftClass* pAircraft;
 };

@@ -1765,6 +1765,77 @@ exports.PCPType = (function () {
     PCPType[PCPType["End"] = 2] = "End";
     return PCPType;
 })();
+exports.tagTYPEKIND = (function () {
+    let tagTYPEKIND = {}
+    tagTYPEKIND[tagTYPEKIND["TKIND_ENUM"] = 0] = "TKIND_ENUM";
+    tagTYPEKIND[tagTYPEKIND["TKIND_RECORD"] = 1] = "TKIND_RECORD";
+    tagTYPEKIND[tagTYPEKIND["TKIND_MODULE"] = 2] = "TKIND_MODULE";
+    tagTYPEKIND[tagTYPEKIND["TKIND_INTERFACE"] = 3] = "TKIND_INTERFACE";
+    tagTYPEKIND[tagTYPEKIND["TKIND_DISPATCH"] = 4] = "TKIND_DISPATCH";
+    tagTYPEKIND[tagTYPEKIND["TKIND_COCLASS"] = 5] = "TKIND_COCLASS";
+    tagTYPEKIND[tagTYPEKIND["TKIND_ALIAS"] = 6] = "TKIND_ALIAS";
+    tagTYPEKIND[tagTYPEKIND["TKIND_UNION"] = 7] = "TKIND_UNION";
+    tagTYPEKIND[tagTYPEKIND["TKIND_MAX"] = 8] = "TKIND_MAX";
+    return tagTYPEKIND;
+})();
+exports.tagDESCKIND = (function () {
+    let tagDESCKIND = {}
+    tagDESCKIND[tagDESCKIND["DESCKIND_NONE"] = 0] = "DESCKIND_NONE";
+    tagDESCKIND[tagDESCKIND["DESCKIND_FUNCDESC"] = 1] = "DESCKIND_FUNCDESC";
+    tagDESCKIND[tagDESCKIND["DESCKIND_VARDESC"] = 2] = "DESCKIND_VARDESC";
+    tagDESCKIND[tagDESCKIND["DESCKIND_TYPECOMP"] = 3] = "DESCKIND_TYPECOMP";
+    tagDESCKIND[tagDESCKIND["DESCKIND_IMPLICITAPPOBJ"] = 4] = "DESCKIND_IMPLICITAPPOBJ";
+    tagDESCKIND[tagDESCKIND["DESCKIND_MAX"] = 5] = "DESCKIND_MAX";
+    return tagDESCKIND;
+})();
+exports.tagFUNCKIND = (function () {
+    let tagFUNCKIND = {}
+    tagFUNCKIND[tagFUNCKIND["FUNC_VIRTUAL"] = 0] = "FUNC_VIRTUAL";
+    tagFUNCKIND[tagFUNCKIND["FUNC_PUREVIRTUAL"] = 1] = "FUNC_PUREVIRTUAL";
+    tagFUNCKIND[tagFUNCKIND["FUNC_NONVIRTUAL"] = 2] = "FUNC_NONVIRTUAL";
+    tagFUNCKIND[tagFUNCKIND["FUNC_STATIC"] = 3] = "FUNC_STATIC";
+    tagFUNCKIND[tagFUNCKIND["FUNC_DISPATCH"] = 4] = "FUNC_DISPATCH";
+    return tagFUNCKIND;
+})();
+exports.tagINVOKEKIND = (function () {
+    let tagINVOKEKIND = {}
+    tagINVOKEKIND[tagINVOKEKIND["INVOKE_FUNC"] = 1] = "INVOKE_FUNC";
+    tagINVOKEKIND[tagINVOKEKIND["INVOKE_PROPERTYGET"] = 2] = "INVOKE_PROPERTYGET";
+    tagINVOKEKIND[tagINVOKEKIND["INVOKE_PROPERTYPUT"] = 4] = "INVOKE_PROPERTYPUT";
+    tagINVOKEKIND[tagINVOKEKIND["INVOKE_PROPERTYPUTREF"] = 8] = "INVOKE_PROPERTYPUTREF";
+    return tagINVOKEKIND;
+})();
+exports.tagCALLCONV = (function () {
+    let tagCALLCONV = {}
+    tagCALLCONV[tagCALLCONV["CC_FASTCALL"] = 0] = "CC_FASTCALL";
+    tagCALLCONV[tagCALLCONV["CC_CDECL"] = 1] = "CC_CDECL";
+    tagCALLCONV[tagCALLCONV["CC_MSCPASCAL"] = 2] = "CC_MSCPASCAL";
+    tagCALLCONV[tagCALLCONV["CC_PASCAL"] = 2] = "CC_PASCAL";
+    tagCALLCONV[tagCALLCONV["CC_MACPASCAL"] = 3] = "CC_MACPASCAL";
+    tagCALLCONV[tagCALLCONV["CC_STDCALL"] = 4] = "CC_STDCALL";
+    tagCALLCONV[tagCALLCONV["CC_FPFASTCALL"] = 5] = "CC_FPFASTCALL";
+    tagCALLCONV[tagCALLCONV["CC_SYSCALL"] = 6] = "CC_SYSCALL";
+    tagCALLCONV[tagCALLCONV["CC_MPWCDECL"] = 7] = "CC_MPWCDECL";
+    tagCALLCONV[tagCALLCONV["CC_MPWPASCAL"] = 8] = "CC_MPWPASCAL";
+    tagCALLCONV[tagCALLCONV["CC_MAX"] = 9] = "CC_MAX";
+    return tagCALLCONV;
+})();
+exports.tagVARKIND = (function () {
+    let tagVARKIND = {}
+    tagVARKIND[tagVARKIND["VAR_PERINSTANCE"] = 0] = "VAR_PERINSTANCE";
+    tagVARKIND[tagVARKIND["VAR_STATIC"] = 1] = "VAR_STATIC";
+    tagVARKIND[tagVARKIND["VAR_CONST"] = 2] = "VAR_CONST";
+    tagVARKIND[tagVARKIND["VAR_DISPATCH"] = 3] = "VAR_DISPATCH";
+    return tagVARKIND;
+})();
+exports.tagSYSKIND = (function () {
+    let tagSYSKIND = {}
+    tagSYSKIND[tagSYSKIND["SYS_WIN16"] = 0] = "SYS_WIN16";
+    tagSYSKIND[tagSYSKIND["SYS_WIN32"] = 1] = "SYS_WIN32";
+    tagSYSKIND[tagSYSKIND["SYS_MAC"] = 2] = "SYS_MAC";
+    tagSYSKIND[tagSYSKIND["SYS_WIN64"] = 3] = "SYS_WIN64";
+    return tagSYSKIND;
+})();
 exports.BStateType = (function () {
     let BStateType = {}
     BStateType[BStateType["Construction"] = 0] = "Construction";

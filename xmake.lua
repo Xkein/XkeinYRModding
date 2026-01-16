@@ -34,6 +34,7 @@ target("YrExtCore")
     add_files("src/core/**.cpp", "src/runtime/**.cpp")
     add_headerfiles("src/yr/**.h")
     add_files("src/yr/**.cpp")
+    add_includedirs("src", { public = true })
     add_filegroups("YrExtCore", {rootdir = "src"})
     add_syslinks("DbgHelp")
 
@@ -58,6 +59,7 @@ target("XkeinExt")
     -- wwise generated content
     add_includedirs("content/yr_wwise_template/GeneratedSoundBanks", { public = true })
 
+    add_includedirs("src", { public = true })
     add_filegroups("XkeinExt", {rootdir = "src"})
     
 target("XkeinEditor")
@@ -67,6 +69,7 @@ target("XkeinEditor")
     add_deps("YrExtCore", "XkeinExt")
     add_headerfiles("src/editor/**.h")
     add_files("src/editor/**.cpp")
+    add_includedirs("src", { public = true })
     add_filegroups("XkeinEditor", {rootdir = "src"})
 
 target("Scripts")

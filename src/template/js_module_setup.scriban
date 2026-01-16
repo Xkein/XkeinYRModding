@@ -2,13 +2,13 @@
     init_extra_vars(this)
     is_yrpp = module_name == "YRpp"
     func need_codegen(htType)
-        ret get_meta_tag(htType.meta, "BindJs")
+        ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
     end
 -}}
 
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-exports.{{klass.name}} = puerts.loadCPPType("{{klass.full_name}}")
+exports.{{klass.identifier}} = puerts.loadCPPType("{{klass.full_name}}")
 {{- end; end }}
 
 {{- for enum in module_enums }}

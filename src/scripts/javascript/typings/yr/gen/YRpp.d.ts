@@ -8271,6 +8271,63 @@ enum PCPType {
     During = 1,
     End = 2,
 }
+enum tagTYPEKIND {
+    TKIND_ENUM = 0,
+    TKIND_RECORD = 1,
+    TKIND_MODULE = 2,
+    TKIND_INTERFACE = 3,
+    TKIND_DISPATCH = 4,
+    TKIND_COCLASS = 5,
+    TKIND_ALIAS = 6,
+    TKIND_UNION = 7,
+    TKIND_MAX = 8,
+}
+enum tagDESCKIND {
+    DESCKIND_NONE = 0,
+    DESCKIND_FUNCDESC = 1,
+    DESCKIND_VARDESC = 2,
+    DESCKIND_TYPECOMP = 3,
+    DESCKIND_IMPLICITAPPOBJ = 4,
+    DESCKIND_MAX = 5,
+}
+enum tagFUNCKIND {
+    FUNC_VIRTUAL = 0,
+    FUNC_PUREVIRTUAL = 1,
+    FUNC_NONVIRTUAL = 2,
+    FUNC_STATIC = 3,
+    FUNC_DISPATCH = 4,
+}
+enum tagINVOKEKIND {
+    INVOKE_FUNC = 1,
+    INVOKE_PROPERTYGET = 2,
+    INVOKE_PROPERTYPUT = 4,
+    INVOKE_PROPERTYPUTREF = 8,
+}
+enum tagCALLCONV {
+    CC_FASTCALL = 0,
+    CC_CDECL = 1,
+    CC_MSCPASCAL = 2,
+    CC_PASCAL = 2,
+    CC_MACPASCAL = 3,
+    CC_STDCALL = 4,
+    CC_FPFASTCALL = 5,
+    CC_SYSCALL = 6,
+    CC_MPWCDECL = 7,
+    CC_MPWPASCAL = 8,
+    CC_MAX = 9,
+}
+enum tagVARKIND {
+    VAR_PERINSTANCE = 0,
+    VAR_STATIC = 1,
+    VAR_CONST = 2,
+    VAR_DISPATCH = 3,
+}
+enum tagSYSKIND {
+    SYS_WIN16 = 0,
+    SYS_WIN32 = 1,
+    SYS_MAC = 2,
+    SYS_WIN64 = 3,
+}
 enum BStateType {
     Construction = 0,
     Idle = 1,

@@ -33,72 +33,93 @@ public:
     YREXTCORE_API static void BlockAllInput();
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrGadgetInputEvent
 {
 public:
+    PROPERTY()
     GadgetClass* pGadget;
+    PROPERTY()
     DWORD*       pKey;
+    PROPERTY()
     int          mouseX;
+    PROPERTY()
     int          mouseY;
+    PROPERTY()
     bool         forceRedraw;
+    PROPERTY()
     GadgetFlag   flags;
+    PROPERTY()
     KeyModifier  modifier;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrUserInterfaceInputEvent
 {
 public:
+    PROPERTY()
     DWORD*   pKey;
+    PROPERTY()
     Point2D* pMouseCoords;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrKeyboardInputEvent
 {
 public:
+    PROPERTY()
     DWORD* pKey;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrDecideActionEvent : public YrHookOverrideReturn<Action>
 {
 public:
+    PROPERTY()
     CellStruct cell;
+    PROPERTY()
     ObjectClass* pObject;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrConvertActionEvent : public YrHookOverrideReturn<bool>
 {
 public:
+    PROPERTY()
     CellStruct cell;
+    PROPERTY()
     bool shrouded;
+    PROPERTY()
     ObjectClass* pObject;
+    PROPERTY()
     Action action;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrLeftMouseButtonDownEvent
 {
 public:
+    PROPERTY()
     Point2D point;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrLeftMouseButtonUpEvent
 {
 public:
+    PROPERTY()
     CoordStruct coords;
+    PROPERTY()
     CellStruct cell;
+    PROPERTY()
     ObjectClass* pObject;
+    PROPERTY()
     Action action;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrRightMouseButtonUpEvent
 {
 public:
-
+    // no members
 };

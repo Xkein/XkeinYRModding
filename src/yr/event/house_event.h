@@ -5,48 +5,58 @@
 class HouseClass;
 struct IStream;
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrHouseCtorEvent
 {
 public:
+    PROPERTY()
     HouseClass* pHouse;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrHouseDtorEvent
 {
 public:
+    PROPERTY()
     HouseClass* pHouse;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrHouseSaveGameBeginEvent
 {
 public:
+    PROPERTY()
     HouseClass* pHouse;
+    PROPERTY()
     IStream*    stream;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrHouseSaveGameEndEvent
 {
 public:
+    PROPERTY()
     HouseClass* pHouse;
+    PROPERTY()
     IStream*    stream;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrHouseLoadGameBeginEvent
 {
 public:
+    PROPERTY()
     HouseClass* pHouse;
+    PROPERTY()
     IStream*    stream;
 };
 
-CLASS(HookEvent)
+CLASS(HookEvent, BindJs)
 class YrHouseLoadGameEndEvent
 {
 public:
+    PROPERTY()
     HouseClass* pHouse;
+    PROPERTY()
     IStream*    stream;
 };

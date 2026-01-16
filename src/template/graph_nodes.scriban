@@ -51,15 +51,6 @@
         if $mapped_type
             ret $mapped_type
         end
-        if $unwrap_name | string.ends_with ">" # template
-            ret "any"
-        end
-        if $unwrap_name | string.contains "::"
-            ret "any"
-        end
-        if is_yrpp && !array.contains(yr_types, $unwrap_name)
-            ret "any"
-        end
         ret $unwrap_name
     end
     func should_skip_visibility_ex(htType, htElement)
@@ -74,62 +65,52 @@
             ret should_skip_visibility(htType, htElement)
         end
     end
-    func gen_property(property)
-        ret (property.is_static ? 'static s_' : 'm_') + $'{property.name} : {get_ts_type(property.cpp_field.type)};'
+    func gen_property(klass, property)
+        $result = klass.identifier + "Builder.addMember({"
+        $result += $'name: "{(property.is_static ? 's_' : 'm_') + property.name}", '
+        $result += $'type: "{get_ts_type(property.cpp_field.type)}", '
+        $result += $'isStatic: {property.is_static}, '
+        $result += "});"
+        ret $result
     end
-    func gen_method(function, cppFunction)
+    func gen_method(klass, function, cppFunction)
         $js_function_name = get_js_function_name(function.name)
         if string.empty($js_function_name)
             ret "// skip " + function.name
         end
-        $result = ""
-        if function.is_static
-            $result += "static "
-        end
-        if function.is_constructor
-            $result += "constructor"
-        else
-            $result += $js_function_name
-        end
-        $result += "("
-        if function.is_override
-            $result += array.each(cppFunction.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)} | any'); end) | array.join ", "
-        else
-            $result += array.each(cppFunction.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)}'); end) | array.join ", "
-        end
-        $result += ")"
-        if !function.is_constructor
-            $result += " : " + get_ts_type(cppFunction.return_type)
-        end
-        $result += ";"
+        $result = klass.identifier + "Builder.addMethod({"
+        $result += $'name: "{$js_function_name}", '
+        $result += $'isStatic: {function.is_static}, '
+        $result += $'isConstructor: {function.is_constructor}, '
+        $result += $'returnType: "{get_ts_type(cppFunction.return_type)}", '
+        $result += "params: ["
+        $result += array.each(cppFunction.parameters, do; ret ("{" + $'name: "{$0.name}", type: "{get_ts_type($0.type)}"' + "}"); end) | array.join ", "
+        $result += "],"
+        $result += "});"
         ret $result
     end
 -}}
-/// <reference path = "../index.d.ts"/>
-declare module "{{module_name}}" {
-{{- if !is_yrpp }}
-import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
-{{- if module_name != "Wwise"}}
-import { AKRESULT } from "Wwise";
-{{- end }}
-{{- end }}
+
+import { type IBaklavaViewModel } from "baklavajs";
+import { ClassBuilder } from "./class_builder";
+
+export function setup_{{module_name}}(viewModel: IBaklavaViewModel) {
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
-{{ klass.is_interface ? "interface" : "class" }} {{klass.identifier}}
-{{- if array.size(klass.base_classes) > 0 && klass.base_classes[0].klass && !klass.base_classes[0].klass.is_interface
-$base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
-    {{- if $base_name != "any"}}
-    extends {{$base_name}}
-    {{- end }}
-{{- end }}
-{
+    let {{klass.identifier}}Builder = new ClassBuilder("{{klass.full_name}}");
+
+    {{- for base in klass.base_classes
+        if base.klass}}
+    {{klass.identifier}}Builder.addBaseClass("{{base.full_display_name}}")
+        {{- end
+    end}}
 {{- for function in klass.all_functions ; $cpp_function = function.cpp_function }}
         {{- if should_skip_visibility_ex(klass, function) || function.is_deleted || function.is_destructor
             continue
         end
         param_idx = 0
         }}
-    {{gen_method(function, $cpp_function)}}
+    {{gen_method(klass, function, $cpp_function)}}
 {{- end }}
 {{- for property in klass.properties ; $cpp_field = property.cpp_field }}
     {{- if should_skip_visibility_ex(klass, property)
@@ -138,20 +119,15 @@ $base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
         if string.empty(property.name)
             continue
         end }}
-    {{gen_property(property)}}
+    {{gen_property(klass, property)}}
 {{- end }}
 {{- for inner_property in klass.anonymous_inline_properties }}
-    {{gen_property(inner_property)}}
-{{- end }}
-}
+    {{gen_property(klass, inner_property)}}
 {{- end }}
 {{- end }}
-{{- for enum in module_enums }}
-{{- if need_codegen(enum) || is_yrpp }}
-enum {{enum.name}} {
-    {{- for enum_item in enum.constants }}
-    {{enum_item.name}} = {{enum_item.value}},
-    {{- end}}
+{{- end }}
+{{- for klass in module_classes ; if need_codegen(klass) }}
+    {{klass.identifier}}Builder.build(viewModel, "{{module_name}}");
+{{- end ; end}}
 }
-{{- end; end }}
-}
+
