@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/reflection/macro.h"
+#include "core/reflection/reflection.h"
 #include "core/macro.h"
 
 #include <functional>
@@ -66,7 +67,8 @@ private:
     inline YREXTCORE_API YrHookEvent* YrHookEventSystem::GetEvent_Impl<HookEventType>() { \
         static YrHookEvent gHookEvent; \
         return &gHookEvent; \
-    }
+    } \
+    template<> YrHookEvent* YrHookEventSystem::AHookEvent<HookEventType> = YrHookEventSystem::GetEvent_Impl<HookEventType>();
 
 CLASS(BindJs)
 template<typename TRet>
@@ -133,19 +135,24 @@ namespace detail
     DWORD get_hook_override_return_address();
 }
 
+CLASS(BindJs)
 class YrHookEventSystem final
 {
 public:
     template<class T>
     inline static YrHookEvent* GetEvent()
     {
-        return GetEvent_Impl<T>();
+#ifdef YREXTCORE_IMPL
+    return YrHookEventSystem::AHookEvent<T>;
+#else
+    return GetEvent(entt::type_id<T>().name().data());
+#endif
     }
 
     template<class T>
     inline static HookEventListenerHandle Register(HookEventListener listener)
     {
-        return GetEvent<T>()->Register(std::move(listener));
+        return GetEvent_Impl<T>()->Register(std::move(listener));
     }
 
     template<class T>
@@ -153,6 +160,14 @@ public:
     {
         GetEvent<T>()->Unregister(handle);
     }
+
+    YREXTCORE_API static YrHookEvent* GetEvent(const char* eventName);
+    
+    FUNCTION()
+    YREXTCORE_API static HookEventListenerHandle Register(const char* eventName, HookEventListener listener);
+
+    FUNCTION()
+    YREXTCORE_API static void Unregister(const char* eventName, HookEventListenerHandle handle);
 
     template<class T>
     inline static void SetHookMeta(HookEventListenerHandle handle, YrHookMeta meta)
@@ -176,6 +191,8 @@ public:
     }
 
 private:
+    template<class T>
+    static YrHookEvent* AHookEvent;
     template<class T>
     static YrHookEvent* GetEvent_Impl();
 

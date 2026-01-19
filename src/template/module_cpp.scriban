@@ -226,6 +226,9 @@ end }}
 {{ for inline_property in klass.anonymous_inline_properties }}
     register_data<&{{$class_full_name}}::{{inline_property.name}}>(factory, "{{inline_property.name}}"_hs).custom<FieldMeta>("{{inline_property.name}}");
 {{- end }}
+{{- if is_yr_ext_core && get_meta_tag(klass.meta, "HookEvent") }}
+    register_data<&YrHookEventSystem::AHookEvent<{{$class_full_name}}>>(factory, "__Instance"_hs).custom<FieldMeta>("__Instance");
+{{- end }}
 
 {{ for target_type in component_target_list }}
     ComponentInstantiation::RegisterComponentInstantiation<{{klass.full_name}}, {{target_type}}>();

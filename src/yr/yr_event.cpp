@@ -146,3 +146,23 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
 
     return context.returnAddress;
 }
+
+YREXTCORE_API YrHookEvent* YrHookEventSystem::GetEvent(const char* eventName)
+{
+    using namespace entt::literals;
+    entt::meta_type type = entt::resolve(entt::hashed_string(eventName));
+    if (!type)
+        return nullptr;
+    return type.data("__Instance"_hs).get({}).try_cast<YrHookEvent>();
+    return nullptr;
+}
+
+YREXTCORE_API HookEventListenerHandle YrHookEventSystem::Register(const char* eventName, HookEventListener listener)
+{
+    return GetEvent(eventName)->Register(std::move(listener));
+}
+
+YREXTCORE_API void YrHookEventSystem::Unregister(const char* eventName, HookEventListenerHandle handle)
+{
+    GetEvent(eventName)->Unregister(handle);
+}
