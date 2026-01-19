@@ -269,6 +269,7 @@ UsingPointer(ILocomotion**);
 UsingPointer(IPiggyback**);
 UsingPointer(LocomotionClass**);
 UsingCppType(RadarTrackingStruct);
+UsingCppType(AudioStream);
 
 UsingArray(RadioCommand);
 UsingArray(Crate);
@@ -367,6 +368,7 @@ UsingDynamicVectorClass(IConnectionPoint*);
 UsingDynamicVectorClass(ZoneConnectionClass);
 UsingDynamicVectorClass(SubzoneTrackingStruct);
 UsingDynamicVectorClass(LightSourceClass*);
+UsingDynamicVectorClass(ThemeControl*);
 
 UsingTypeList(AircraftTypeClass*);
 UsingTypeList(InfantryTypeClass*);

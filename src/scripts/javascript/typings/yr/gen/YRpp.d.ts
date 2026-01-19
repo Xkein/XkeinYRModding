@@ -6825,6 +6825,47 @@ class SpotlightClass
     m_Size : number;
     m_DisableFlags : any;
 }
+class ThemeControl
+{
+    m_ID : any;
+    m_Sound : any;
+    m_UIName : any;
+    m_Scenario : number;
+    m_Length : number;
+    m_Normal : boolean;
+    m_Repeat : boolean;
+    m_Exists : boolean;
+    m_Side : number;
+}
+class ThemeClass
+{
+    GetID(index_0 : number) : string;
+    GetName(index_0 : number) : string;
+    GetFilename(index_0 : number) : string;
+    GetUIName(index_0 : number) : number;
+    GetLength(index_0 : number) : number;
+    IsAvailable(index_0 : number) : boolean;
+    IsNormal(index_0 : number) : boolean;
+    FindIndex(pID_0 : string) : number;
+    GetRandomIndex(lastTheme_0 : number) : number;
+    Queue(index_0 : number) : void;
+    Play(index_0 : number) : number;
+    Stop(fade_0 : boolean) : void;
+    Suspend() : void;
+    AI() : void;
+    Scan() : void;
+    static s_Instance : any;
+    static s_ScoresPresen : any;
+    m_CurrentTheme : number;
+    m_LastTheme : number;
+    m_QueuedTheme : number;
+    m_Volume : number;
+    m_IsScoreRepeat : boolean;
+    m_IsFading : boolean;
+    m_IsScoreShuffle : boolean;
+    m_Themes : any;
+    m_Stream : any;
+}
 enum DirType {
     North = 0,
     NorthEast = 32,

@@ -1,6 +1,7 @@
 
 exports.YrHookOverrideReturn_void_ = puerts.loadCPPType("YrHookOverrideReturn<void>")
 exports.YrHookOverride = puerts.loadCPPType("YrHookOverride")
+exports.YrHookEventSystem = puerts.loadCPPType("YrHookEventSystem")
 exports.YrAircraftCtorEvent = puerts.loadCPPType("YrAircraftCtorEvent")
 exports.YrAircraftDtorEvent = puerts.loadCPPType("YrAircraftDtorEvent")
 exports.YrAircraftTypeCtorEvent = puerts.loadCPPType("YrAircraftTypeCtorEvent")
@@ -175,3 +176,4 @@ exports.YrTerminateEvent = puerts.loadCPPType("YrTerminateEvent")
 exports.YrAfterCreateWindoweEvent = puerts.loadCPPType("YrAfterCreateWindoweEvent")
 exports.YrAfterSetCooperativeLevelEvent = puerts.loadCPPType("YrAfterSetCooperativeLevelEvent")
 exports.IniReader = puerts.loadCPPType("IniReader")
+exports.Serialization = puerts.loadCPPType("Serialization")

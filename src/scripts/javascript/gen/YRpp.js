@@ -147,6 +147,8 @@ exports.TabClass = puerts.loadCPPType("TabClass")
 exports.ScrollClass = puerts.loadCPPType("ScrollClass")
 exports.MouseClass = puerts.loadCPPType("MouseClass")
 exports.SpotlightClass = puerts.loadCPPType("SpotlightClass")
+exports.ThemeControl = puerts.loadCPPType("ThemeControl")
+exports.ThemeClass = puerts.loadCPPType("ThemeClass")
 exports.DirType = (function () {
     let DirType = {}
     DirType[DirType["North"] = 0] = "North";

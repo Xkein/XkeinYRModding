@@ -1,6 +1,6 @@
 /// <reference path = "../index.d.ts"/>
 declare module "gainput" {
-import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl } from "YRpp";
 import { AKRESULT } from "Wwise";
 class gainput__InputMap
 {

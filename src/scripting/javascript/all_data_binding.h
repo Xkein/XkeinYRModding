@@ -2,19 +2,11 @@
 #include "scripting/javascript/yr_data_bindings.h"
 #ifndef __HEADER_TOOL__
 #include "scripting/javascript/js_events.h"
-UsingCppTypeWithRefCache(JsAbstractEvents)
-UsingCppTypeWithRefCache(JsObjectEvents)
-UsingCppTypeWithRefCache(JsAbstractTypeEvents)
-UsingCppTypeWithRefCache(JsGameEvents)
-UsingCppTypeWithRefCache(JsTriggerEvents)
-UsingCppTypeWithRefCache(JsInputEvents)
-UsingCppTypeWithRefCache(JsPhysicsEvents)
-UsingCppTypeWithRefCache(JsTechnoEvents)
-UsingCppTypeWithRefCache(JsBulletEvents)
-UsingCppTypeWithRefCache(JsSuperWeaponEvents)
-UsingCppTypeWithRefCache(JsSuperWeaponTypeEvents)
-UsingCppTypeWithRefCache(JsHouseEvents)
-UsingCppTypeWithRefCache(JsEvents)
+UsingCppTypeWithRefCache(JsGameEvents);
+UsingCppTypeWithRefCache(JsPhysicsEvents);
+UsingCppTypeWithRefCache(JsEventOnCtor);
+UsingCppTypeWithRefCache(JsEventOnDtor);
+UsingCppTypeWithRefCache(JsEvents);
 #include "scripting/javascript/js_cpp_helper.h"
 UsingCppTypeWithRefCache(JsCppHelper);
 
@@ -43,10 +35,16 @@ MuteFunctionPtr(std::remove_pointer_t<gainput::FilterFunc_T>);
 #include "yr/parse/ini_reader.h"
 UsingCppType(IniReader);
 
+#include "yr/serialization/serialization.h"
+UsingCppType(Serialization);
+
 #include "yr/event/input_event.h"
 UsingCppType(YrInputBlocker);
 
 #include "yr/yr_all_events.h"
+UsingCppType(YrHookEventSystem);
+UsingCppType(YrHookContext);
+
 UsingCppType(YrHookOverrideReturn<void>);
 UsingCppType(YrHookOverride);
 UsingCppType(YrHookOverrideReturn<Action>);

@@ -61,6 +61,11 @@ bool Serialization::IsSerializing()
     return gContext.inputArchive || gContext.outputArchive;
 }
 
+YREXTCORE_API std::string Serialization::GetCurrentArchivePath()
+{
+    return GetArchivePath(Serialization::GetCurrentContext()->savegameName.c_str());
+}
+
 std::string Serialization::GetArchivePath(const char* savegameName, const char* extension)
 {
     return Paths::GetLaunchDir() / "Saved Games" / Paths::SetExtension(savegameName, extension ? extension : "savex.json");

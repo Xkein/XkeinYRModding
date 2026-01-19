@@ -1,6 +1,7 @@
 #pragma once
 #include "scripting/javascript/cpp_binding.h"
 #ifndef __HEADER_TOOL__
+#include "core/string/string_tool.h"
 #include <AbstractClass.h>
 #include <AbstractTypeClass.h>
 #include <Helpers/String.h>
@@ -155,12 +156,22 @@ namespace PUERTS_NAMESPACE
         {
             static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const FixedString<Capacity, T>& value)
             {
-                return v8::String::NewFromUtf8(context->GetIsolate(), static_cast<const T*>(value), v8::NewStringType::kNormal).ToLocalChecked();
+                if constexpr (std::is_same_v<T, wchar_t>) {
+                    return v8::String::NewFromTwoByte(context->GetIsolate(), reinterpret_cast<const uint16_t*>(static_cast<const T*>(value)), v8::NewStringType::kNormal).ToLocalChecked();
+                }
+                else {
+                    return v8::String::NewFromUtf8(context->GetIsolate(), static_cast<const T*>(value), v8::NewStringType::kNormal).ToLocalChecked();
+                }
             }
 
             static FixedString<Capacity, T> toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
             {
-                return FixedString<Capacity, T>(*v8::String::Utf8Value(context->GetIsolate(), value));
+                if constexpr (std::is_same_v<T, wchar_t>) {
+                    return FixedString<Capacity, T>(widen(*v8::String::Utf8Value(context->GetIsolate(), value)).data());
+                }
+                else {
+                    return FixedString<Capacity, T>(*v8::String::Utf8Value(context->GetIsolate(), value));
+                }
             }
 
             static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)

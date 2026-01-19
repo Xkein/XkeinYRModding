@@ -1,6 +1,6 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YrExtCore" {
-import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl } from "YRpp";
 import { AKRESULT } from "Wwise";
 class YrHookOverrideReturn_void_
 {
@@ -9,6 +9,11 @@ class YrHookOverrideReturn_void_
 class YrHookOverride
 {
     Override() : void;
+}
+class YrHookEventSystem
+{
+    static Register(eventName_0 : string, listener_1 : HookEventListener) : HookEventListenerHandle;
+    static Unregister(eventName_0 : string, handle_1 : HookEventListenerHandle) : void;
 }
 class YrAircraftCtorEvent
 {
@@ -459,7 +464,7 @@ class YrObjectGetFLHEvent
 }
 class YrHookOverrideReturn_Vector3D_int___
 {
-    OverrideReturn(val_0 : Vector3D<int> *) : void;
+    OverrideReturn(val_0 : any) : void;
 }
 class YrSuperCtorEvent
 {
@@ -834,5 +839,11 @@ class IniReader
     max_size() : number;
     empty() : boolean;
     ReadString(pSection_0 : string, pKey_1 : string) : number;
+}
+class Serialization
+{
+    static IsSerializing() : boolean;
+    static GetCurrentArchivePath() : any;
+    static GetArchivePath(savegameName_0 : string, extension_1 : string) : any;
 }
 }

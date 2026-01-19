@@ -49,11 +49,16 @@ struct SerializeContext
     uint counter;
 };
 
+CLASS(BindJs)
 class Serialization
 {
 public:
-    YREXTCORE_API static SerializeContext* GetCurrentContext();
+YREXTCORE_API static SerializeContext* GetCurrentContext();
+    FUNCTION()
     YREXTCORE_API static bool IsSerializing();
+    FUNCTION()
+    YREXTCORE_API static std::string GetCurrentArchivePath();
+    FUNCTION()
     YREXTCORE_API static std::string GetArchivePath(const char* savegameName, const char* extension = nullptr);
 
     /// @brief Serialize data when saving/loading a game.

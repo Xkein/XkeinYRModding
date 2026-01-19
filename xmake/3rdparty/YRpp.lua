@@ -13,6 +13,7 @@ target("YRpp")
             yrpp_includes_dir.."/StaticInits.cpp",
             yrpp_includes_dir.."/SpotlightClass.h",
             yrpp_includes_dir.."/TriggerTypeClass.h",
+            yrpp_includes_dir.."/ThemeClass.h",
         },
         pre_header_text = get_pre_header_text(),
         templates = get_templates({}, {

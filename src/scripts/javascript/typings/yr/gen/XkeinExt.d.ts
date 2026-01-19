@@ -1,6 +1,6 @@
 /// <reference path = "../index.d.ts"/>
 declare module "XkeinExt" {
-import { CDTimerClass, AbstractClass, CCINIClass, LandType } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl } from "YRpp";
 import { AKRESULT } from "Wwise";
 class WwiseSoundBankRef
 {
@@ -52,61 +52,44 @@ class JsCppHelper
 {
     static GetEntityByYrObject(pObject_0 : AbstractClass) : any;
 }
-class JsAbstractEvents
+class JsEventOnCtor
 {
-    m_onCtor : any;
-    m_onDtor : any;
-    m_onSaveGameBegin : any;
-    m_onSaveGameEnd : any;
-    m_onLoadGameBegin : any;
-    m_onLoadGameEnd : any;
+    m_unit : any;
+    m_infantry : any;
+    m_building : any;
+    m_aircraft : any;
+    m_bullet : any;
+    m_superWeapon : any;
+    m_house : any;
+    m_unitType : any;
+    m_infantryType : any;
+    m_buildingType : any;
+    m_aircraftType : any;
+    m_bulletType : any;
+    m_superWeaponType : any;
+    m_houseType : any;
 }
-class JsObjectEvents
-    extends JsAbstractEvents
+class JsEventOnDtor
 {
-    m_onLimboChecked : any;
-    m_onUnlimboChecked : any;
-    m_onReceiveDamage : any;
-    m_onMouseOverCell : any;
-    m_onMouseOverObject : any;
-    m_onCellClickedAction : any;
-    m_onObjectClickedAction : any;
-    m_onMissionExecute : any;
-}
-class JsAbstractTypeEvents
-    extends JsAbstractEvents
-{
-    m_onLoadIni : any;
+    m_unit : any;
+    m_infantry : any;
+    m_building : any;
+    m_aircraft : any;
+    m_bullet : any;
+    m_superWeapon : any;
+    m_house : any;
+    m_unitType : any;
+    m_infantryType : any;
+    m_buildingType : any;
+    m_aircraftType : any;
+    m_bulletType : any;
+    m_superWeaponType : any;
+    m_houseType : any;
 }
 class JsGameEvents
 {
-    m_onRulesLoadBeforeGeneralData : any;
-    m_onRulesLoadBeforeTypeData : any;
-    m_onRulesLoadAfterTypeData : any;
-    m_onSceneEnter : any;
-    m_onSceneExit : any;
-    m_onSceneLoad : any;
-    m_onSaveGameBegin : any;
-    m_onSaveGameEnd : any;
-    m_onSaveGameBeginStream : any;
-    m_onSaveGameEndStream : any;
-    m_onLoadGameBegin : any;
-    m_onLoadGameEnd : any;
-    m_onLoadGameBeginStream : any;
-    m_onLoadGameEndStream : any;
     m_onBeginUpdate : any;
     m_onEndUpdate : any;
-}
-class JsInputEvents
-{
-    m_onGadgetInput : any;
-    m_onUserInterfaceInput : any;
-    m_onKeyboardInput : any;
-    m_onDecideAction : any;
-    m_onConvertAction : any;
-    m_onLeftMouseButtonDown : any;
-    m_onLeftMouseButtonUp : any;
-    m_onRightMouseButtonUp : any;
 }
 class JsPhysicsEvents
 {
@@ -114,58 +97,12 @@ class JsPhysicsEvents
     m_onCollisionPersist : any;
     m_onCollisionExit : any;
 }
-class JsTriggerEvents
-{
-    m_onTActionExecute : any;
-}
-class JsTechnoEvents
-    extends JsObjectEvents
-{
-    m_onFire : any;
-    m_onSelectWeapon : any;
-    m_onGetFireError : any;
-    m_onGetFLH : any;
-}
-class JsBulletEvents
-    extends JsObjectEvents
-{
-    m_onDetonate : any;
-    m_onConstruct : any;
-}
-class JsSuperWeaponEvents
-    extends JsAbstractEvents
-{
-    m_onLaunch : any;
-}
-class JsSuperWeaponTypeEvents
-    extends JsAbstractTypeEvents
-{
-    m_onMouseOverObject : any;
-}
-class JsHouseEvents
-    extends JsAbstractEvents
-{
-}
 class JsEvents
 {
     static s_game : JsGameEvents;
-    static s_trigger : JsTriggerEvents;
-    static s_input : JsInputEvents;
     static s_physics : JsPhysicsEvents;
-    static s_unit : JsTechnoEvents;
-    static s_unitType : JsAbstractTypeEvents;
-    static s_infantry : JsTechnoEvents;
-    static s_infantryType : JsAbstractTypeEvents;
-    static s_building : JsTechnoEvents;
-    static s_buildingType : JsAbstractTypeEvents;
-    static s_aircraft : JsTechnoEvents;
-    static s_aircraftType : JsAbstractTypeEvents;
-    static s_bullet : JsBulletEvents;
-    static s_bulletType : JsAbstractTypeEvents;
-    static s_superWeapon : JsSuperWeaponEvents;
-    static s_superWeaponType : JsSuperWeaponTypeEvents;
-    static s_house : JsHouseEvents;
-    static s_houseType : JsAbstractTypeEvents;
+    static s_onCtor : JsEventOnCtor;
+    static s_onDtor : JsEventOnDtor;
 }
 class Input
 {

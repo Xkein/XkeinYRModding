@@ -36,109 +36,54 @@ template<typename TFunc>
 using ScriptBehaviour = std::function<TFunc>;
 
 CLASS(BindJs)
-struct JsAbstractEvents
+struct JsEventOnCtor
 {
-    PROPERTY()
-    ScriptBehaviour<void(AbstractClass*, entt::entity)> onCtor;
-    PROPERTY()
-    ScriptBehaviour<void(AbstractClass*, entt::entity)> onDtor;
-
-    PROPERTY()
-    ScriptBehaviour<void(AbstractClass*, IStream*)> onSaveGameBegin;
-    PROPERTY()
-    ScriptBehaviour<void(AbstractClass*, IStream*)> onSaveGameEnd;
-    PROPERTY()
-    ScriptBehaviour<void(AbstractClass*, IStream*)> onLoadGameBegin;
-    PROPERTY()
-    ScriptBehaviour<void(AbstractClass*, IStream*)> onLoadGameEnd;
+    PROPERTY() ScriptBehaviour<void(UnitClass*, entt::entity)> unit;
+    PROPERTY() ScriptBehaviour<void(InfantryClass*, entt::entity)> infantry;
+    PROPERTY() ScriptBehaviour<void(BuildingClass*, entt::entity)> building;
+    PROPERTY() ScriptBehaviour<void(AircraftClass*, entt::entity)> aircraft;
+    PROPERTY() ScriptBehaviour<void(BulletClass*, entt::entity)> bullet;
+    PROPERTY() ScriptBehaviour<void(SuperClass*, entt::entity)> superWeapon;
+    PROPERTY() ScriptBehaviour<void(HouseClass*, entt::entity)> house;
+    
+    PROPERTY() ScriptBehaviour<void(UnitTypeClass*, entt::entity)> unitType;
+    PROPERTY() ScriptBehaviour<void(InfantryTypeClass*, entt::entity)> infantryType;
+    PROPERTY() ScriptBehaviour<void(BuildingTypeClass*, entt::entity)> buildingType;
+    PROPERTY() ScriptBehaviour<void(AircraftTypeClass*, entt::entity)> aircraftType;
+    PROPERTY() ScriptBehaviour<void(BulletTypeClass*, entt::entity)> bulletType;
+    PROPERTY() ScriptBehaviour<void(SuperWeaponTypeClass*, entt::entity)> superWeaponType;
+    PROPERTY() ScriptBehaviour<void(HouseTypeClass*, entt::entity)> houseType;
 };
 
 CLASS(BindJs)
-struct JsObjectEvents : public JsAbstractEvents
+struct JsEventOnDtor
 {
-    PROPERTY()
-    ScriptBehaviour<void(ObjectClass*)> onLimboChecked;
-    PROPERTY()
-    ScriptBehaviour<void(ObjectClass*, CoordStruct*, DirType)> onUnlimboChecked;
-    PROPERTY()
-    ScriptBehaviour<std::optional<DamageState>(ObjectClass*, int*, int, WarheadTypeClass*, ObjectClass*, bool, bool, HouseClass*)> onReceiveDamage;
-    PROPERTY()
-    ScriptBehaviour<std::optional<Action>(ObjectClass*, CellStruct, bool, bool)> onMouseOverCell;
-    PROPERTY()
-    ScriptBehaviour<std::optional<Action>(ObjectClass*, ObjectClass const*, bool)> onMouseOverObject;
-    PROPERTY()
-    ScriptBehaviour<std::optional<bool>(ObjectClass*, Action, CellStruct)> onCellClickedAction;
-    PROPERTY()
-    ScriptBehaviour<std::optional<bool>(ObjectClass*, Action, ObjectClass*)> onObjectClickedAction;
-    PROPERTY()
-    ScriptBehaviour<std::optional<int>(MissionClass*)> onMissionExecute;
-};
-
-CLASS(BindJs)
-struct JsAbstractTypeEvents : public JsAbstractEvents
-{
-    PROPERTY()
-    ScriptBehaviour<void(AbstractTypeClass*, IniReader*)> onLoadIni;
+    PROPERTY() ScriptBehaviour<void(UnitClass*, entt::entity)> unit;
+    PROPERTY() ScriptBehaviour<void(InfantryClass*, entt::entity)> infantry;
+    PROPERTY() ScriptBehaviour<void(BuildingClass*, entt::entity)> building;
+    PROPERTY() ScriptBehaviour<void(AircraftClass*, entt::entity)> aircraft;
+    PROPERTY() ScriptBehaviour<void(BulletClass*, entt::entity)> bullet;
+    PROPERTY() ScriptBehaviour<void(SuperClass*, entt::entity)> superWeapon;
+    PROPERTY() ScriptBehaviour<void(HouseClass*, entt::entity)> house;
+    
+    PROPERTY() ScriptBehaviour<void(UnitTypeClass*, entt::entity)> unitType;
+    PROPERTY() ScriptBehaviour<void(InfantryTypeClass*, entt::entity)> infantryType;
+    PROPERTY() ScriptBehaviour<void(BuildingTypeClass*, entt::entity)> buildingType;
+    PROPERTY() ScriptBehaviour<void(AircraftTypeClass*, entt::entity)> aircraftType;
+    PROPERTY() ScriptBehaviour<void(BulletTypeClass*, entt::entity)> bulletType;
+    PROPERTY() ScriptBehaviour<void(SuperWeaponTypeClass*, entt::entity)> superWeaponType;
+    PROPERTY() ScriptBehaviour<void(HouseTypeClass*, entt::entity)> houseType;
 };
 
 CLASS(BindJs)
 struct JsGameEvents
 {
     PROPERTY()
-    ScriptBehaviour<void(RulesClass*, IniReader*)> onRulesLoadBeforeGeneralData;
-    PROPERTY()
-    ScriptBehaviour<void(RulesClass*, IniReader*)> onRulesLoadBeforeTypeData;
-    PROPERTY()
-    ScriptBehaviour<void(RulesClass*, IniReader*)> onRulesLoadAfterTypeData;
-    PROPERTY()
-    ScriptBehaviour<void()> onSceneEnter;
-    PROPERTY()
-    ScriptBehaviour<void()> onSceneExit;
-    PROPERTY()
-    ScriptBehaviour<void()> onSceneLoad;
-    PROPERTY()
-    ScriptBehaviour<void(const char*)> onSaveGameBegin;
-    PROPERTY()
-    ScriptBehaviour<void(const char*)> onSaveGameEnd;
-    PROPERTY()
-    ScriptBehaviour<void(IStream*)> onSaveGameBeginStream;
-    PROPERTY()
-    ScriptBehaviour<void(IStream*)> onSaveGameEndStream;
-    PROPERTY()
-    ScriptBehaviour<void(const char*)> onLoadGameBegin;
-    PROPERTY()
-    ScriptBehaviour<void(const char*)> onLoadGameEnd;
-    PROPERTY()
-    ScriptBehaviour<void(IStream*)> onLoadGameBeginStream;
-    PROPERTY()
-    ScriptBehaviour<void(IStream*)> onLoadGameEndStream;
-    PROPERTY()
     ScriptBehaviour<void()> onBeginUpdate;
     PROPERTY()
     ScriptBehaviour<void()> onEndUpdate;
     // PROPERTY()
     // ScriptBehaviour<void()> onApplicationQuit;
-};
-
-CLASS(BindJs)
-struct JsInputEvents
-{
-    PROPERTY()
-    ScriptBehaviour<void(GadgetClass*, DWORD*, int, int, bool, GadgetFlag, KeyModifier)> onGadgetInput;
-    PROPERTY()
-    ScriptBehaviour<void(DWORD*, Point2D*)> onUserInterfaceInput;
-    PROPERTY()
-    ScriptBehaviour<void(DWORD*)> onKeyboardInput;
-    PROPERTY()
-    ScriptBehaviour<std::optional<Action>(CellStruct, ObjectClass*)> onDecideAction;
-    PROPERTY()
-    ScriptBehaviour<std::optional<bool>(CellStruct, bool, ObjectClass*, Action)> onConvertAction;
-    PROPERTY()
-    ScriptBehaviour<void(Point2D)> onLeftMouseButtonDown;
-    PROPERTY()
-    ScriptBehaviour<void(CoordStruct, CellStruct, ObjectClass*, Action)> onLeftMouseButtonUp;
-    PROPERTY()
-    ScriptBehaviour<void()> onRightMouseButtonUp;
 };
 
 CLASS(BindJs)
@@ -153,56 +98,8 @@ struct JsPhysicsEvents
     ScriptBehaviour<void(const PhysicsCollisionRemoveResult&)> onCollisionExit;
 };
 
-CLASS(BindJs)
-struct JsTriggerEvents
-{
-    PROPERTY()
-    ScriptBehaviour<std::optional<bool>(TActionClass*, HouseClass*, ObjectClass*, TriggerClass*, CellStruct const&)> onTActionExecute;
-};
 
 CLASS(BindJs)
-struct JsTechnoEvents : public JsObjectEvents
-{
-    PROPERTY()
-    ScriptBehaviour<std::optional<BulletClass*>(TechnoClass*, AbstractClass*, int)> onFire;
-    PROPERTY()
-    ScriptBehaviour<std::optional<int>(TechnoClass*, AbstractClass*)> onSelectWeapon;
-    PROPERTY()
-    ScriptBehaviour<std::optional<FireError>(TechnoClass*, AbstractClass*, int, bool)> onGetFireError;
-    PROPERTY()
-    ScriptBehaviour<std::optional<CoordStruct>(TechnoClass*, int, CoordStruct)> onGetFLH;
-};
-
-CLASS(BindJs)
-struct JsBulletEvents : public JsObjectEvents
-{
-    PROPERTY()
-    ScriptBehaviour<void(BulletClass*, const CoordStruct*)> onDetonate;
-    PROPERTY()
-    ScriptBehaviour<void(BulletClass*)> onConstruct;
-};
-
-CLASS(BindJs)
-struct JsSuperWeaponEvents : public JsAbstractEvents
-{
-    PROPERTY()
-    ScriptBehaviour<void(SuperClass*, const CellStruct*, bool)> onLaunch;
-};
-
-CLASS(BindJs)
-struct JsSuperWeaponTypeEvents : public JsAbstractTypeEvents
-{
-    PROPERTY()
-    ScriptBehaviour<std::optional<Action>(SuperWeaponTypeClass*, CellStruct, ObjectClass*)> onMouseOverObject;
-};
-
-CLASS(BindJs)
-struct JsHouseEvents : public JsAbstractEvents
-{
-
-};
-
-CLASS(BindJs) //  ComponentTarget = [TechnoClass, BulletClass, SuperClass, AnimClass, HouseClass]
 struct JsEvents final
 {
     static void Init();
@@ -228,50 +125,14 @@ struct JsEvents final
     
     PROPERTY()
     static JsGameEvents game;
-
-    PROPERTY()
-    static JsTriggerEvents trigger;
-    
-    PROPERTY()
-    static JsInputEvents input;
     
     PROPERTY()
     static JsPhysicsEvents physics;
 
     PROPERTY()
-    static JsTechnoEvents unit;
+    static JsEventOnCtor onCtor;
     PROPERTY()
-    static JsAbstractTypeEvents unitType;
-
-    PROPERTY()
-    static JsTechnoEvents infantry;
-    PROPERTY()
-    static JsAbstractTypeEvents infantryType;
-
-    PROPERTY()
-    static JsTechnoEvents building;
-    PROPERTY()
-    static JsAbstractTypeEvents buildingType;
-
-    PROPERTY()
-    static JsTechnoEvents aircraft;
-    PROPERTY()
-    static JsAbstractTypeEvents aircraftType;
-
-    PROPERTY()
-    static JsBulletEvents bullet;
-    PROPERTY()
-    static JsAbstractTypeEvents bulletType;
-
-    PROPERTY()
-    static JsSuperWeaponEvents superWeapon;
-    PROPERTY()
-    static JsSuperWeaponTypeEvents superWeaponType;
-
-    PROPERTY()
-    static JsHouseEvents house;
-    PROPERTY()
-    static JsAbstractTypeEvents houseType;
+    static JsEventOnDtor onDtor;
 };
 
 #define INVOKE_JS_EVENT(behavior, ...) JsEvents::_Invoker<std::remove_reference_t<decltype(behavior)>>::Invoke(&behavior, __VA_ARGS__)
