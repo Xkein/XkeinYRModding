@@ -31,6 +31,12 @@
         any_types = array.concat(any_types, ["IndexClass"])
         yr_types = get_yr_types()
     end
+    
+    for klass in module_classes
+        if need_codegen(klass)
+            type_map[klass.full_name] = klass.identifier
+        end
+    end
     func get_ts_type(type)
         $type_name = type.full_name
         for any_type in any_types

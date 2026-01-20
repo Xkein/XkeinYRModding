@@ -364,6 +364,7 @@ class YrKeyboardInputEvent
     m_pKey : number;
 }
 class YrDecideActionEvent
+    extends YrHookOverrideReturn_Action_
 {
     m_cell : any;
     m_pObject : ObjectClass;
@@ -373,6 +374,7 @@ class YrHookOverrideReturn_Action_
     OverrideReturn(val_0 : Action) : void;
 }
 class YrConvertActionEvent
+    extends YrHookOverrideReturn_bool_
 {
     m_cell : any;
     m_shrouded : boolean;
@@ -398,6 +400,7 @@ class YrRightMouseButtonUpEvent
 {
 }
 class YrMissionExecuteEvent
+    extends YrHookOverrideReturn_int_
 {
     m_pMission : MissionClass;
 }
@@ -406,6 +409,7 @@ class YrHookOverrideReturn_int_
     OverrideReturn(val_0 : number) : void;
 }
 class YrObjectReceiveDamageEvent
+    extends YrHookOverrideReturn_DamageState_
 {
     m_pObject : ObjectClass;
     m_pDamage : number;
@@ -431,6 +435,7 @@ class YrObjectUnlimboCheckedEvent
     m_dFaceDir : DirType;
 }
 class YrObjectMouseOverCellEvent
+    extends YrHookOverrideReturn_Action_
 {
     m_pObject : ObjectClass;
     m_cell : any;
@@ -438,24 +443,28 @@ class YrObjectMouseOverCellEvent
     m_ignoreForce : boolean;
 }
 class YrObjectMouseOverObjectEvent
+    extends YrHookOverrideReturn_Action_
 {
     m_pObject : ObjectClass;
     m_pTarget : ObjectClass;
     m_ignoreForce : boolean;
 }
 class YrObjectCellClickedActionEvent
+    extends YrHookOverrideReturn_bool_
 {
     m_pObject : ObjectClass;
     m_action : Action;
     m_cell : any;
 }
 class YrObjectObjectClickedActionEvent
+    extends YrHookOverrideReturn_bool_
 {
     m_pObject : ObjectClass;
     m_action : Action;
     m_pTarget : ObjectClass;
 }
 class YrObjectGetFLHEvent
+    extends YrHookOverrideReturn_Vector3D_int___
 {
     m_pObject : ObjectClass;
     m_pDest : any;
@@ -534,6 +543,7 @@ class YrSuperWeaponTypeLoadIniEvent
     m_pIni : CCINIClass;
 }
 class YrSuperWeaponTypeMouseOverObjectEvent
+    extends YrHookOverrideReturn_Action_
 {
     m_pSuperWeaponType : SuperWeaponTypeClass;
     m_cell : any;
@@ -568,6 +578,7 @@ class YrTechnoLoadGameEndEvent
     m_stream : IStream;
 }
 class YrTechnoFireEvent
+    extends YrHookOverrideReturn_BulletClass__
 {
     m_pTechno : TechnoClass;
     m_pTarget : AbstractClass;
@@ -575,14 +586,16 @@ class YrTechnoFireEvent
 }
 class YrHookOverrideReturn_BulletClass__
 {
-    OverrideReturn(val_0 : BulletClass *) : void;
+    OverrideReturn(val_0 : BulletClass) : void;
 }
 class YrTechnoSelectWeaponEvent
+    extends YrHookOverrideReturn_int_
 {
     m_pTechno : TechnoClass;
     m_pTarget : AbstractClass;
 }
 class YrTechnoGetFireErrorEvent
+    extends YrHookOverrideReturn_FireError_
 {
     m_pTechno : TechnoClass;
     m_pTarget : AbstractClass;
@@ -711,6 +724,7 @@ class YrThemeLoadIniEvent
     m_pIni : CCINIClass;
 }
 class YrTActionExecuteEvent
+    extends YrHookOverrideReturn_bool_
 {
     m_pAction : TActionClass;
     m_pHouse : HouseClass;
