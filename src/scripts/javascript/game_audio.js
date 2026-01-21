@@ -14,6 +14,7 @@ const XkeinExt_1 = require("XkeinExt");
 const ini_helper_1 = require("./ini_helper");
 const YrExtCore_1 = require("YrExtCore");
 const YRpp_1 = require("YRpp");
+const game_event_1 = require("./game_event");
 function ReadWwiseSoundBank(iniReader, section, key) {
     let soundBankName = ini_helper_1.IniHelper.ReadString(iniReader, section, key);
     return soundBankName ? new XkeinExt_1.WwiseSoundBankRef(soundBankName) : null;
@@ -126,7 +127,7 @@ __decorate([
     __metadata("design:type", Number)
 ], AudioConfig.prototype, "removeEvent", void 0);
 AudioConfig = __decorate([
-    (0, ini_helper_1.IniComponent)([gameEvents.bulletType, gameEvents.superWeaponType].concat(gameEvents.technoTypeGroupEvents))
+    (0, ini_helper_1.IniComponent)([YRpp_1.AbstractType.BulletType, YRpp_1.AbstractType.SuperWeaponType, YRpp_1.AbstractType.AircraftType, YRpp_1.AbstractType.BuildingType, YRpp_1.AbstractType.InfantryType, YRpp_1.AbstractType.UnitType])
 ], AudioConfig);
 var EMusicState;
 (function (EMusicState) {
@@ -167,23 +168,6 @@ class InteractiveMusic {
                 break;
         }
     }
-    static onReceiveDamage(yrObject, pDamage, DistanceFromEpicenter, pWH, Attacker, IgnoreDefenses, PreventPassengerEscape, pAttackingHouse) {
-        let player = YRpp_1.HouseClass.s_CurrentPlayer;
-        let isPlayerAttacked = player == yrObject.GetOwningHouse();
-        let isPlayerInvasion = player == pAttackingHouse;
-        if (isPlayerAttacked && isPlayerInvasion) {
-            // player attack own unit
-            return;
-        }
-        if (isPlayerInvasion) {
-            InteractiveMusic.setMusicState(EMusicState.Invasion);
-            InteractiveMusic.lastTimeBattle = Date.now();
-        }
-        else if (isPlayerAttacked) {
-            InteractiveMusic.setMusicState(EMusicState.UnderAttack);
-            InteractiveMusic.lastTimeBattle = Date.now();
-        }
-    }
 }
 let iniReaderXkein = new YrExtCore_1.IniReader("XkeinExt.ini");
 let initSoundBankNames = ini_helper_1.IniHelper.ReadStringList(iniReaderXkein, "Audio", "InitSoundBanks");
@@ -194,19 +178,6 @@ if (initSoundBankNames && initSoundBankNames.length) {
     }
     global.__globalSoundBanks = globalSoundBanks;
 }
-gameEvents.game.onRulesLoadAfterTypeData.add((yrRules, iniReader) => {
-    let mapSoundBankNames = ini_helper_1.IniHelper.ReadStringList(iniReaderXkein, "Audio", "MapSoundBanks");
-    if (mapSoundBankNames && mapSoundBankNames.length) {
-        let mapSoundBanks = [];
-        for (const soundBank of mapSoundBankNames) {
-            mapSoundBanks.push(new XkeinExt_1.WwiseSoundBankRef(soundBank));
-        }
-        global.__mapSoundBanks = mapSoundBanks;
-    }
-});
-gameEvents.game.onSceneExit.add(() => {
-    global.__mapSoundBanks = null;
-});
 let audio_component_add = (yrObject, entity) => {
     if (!yrObject.m_Type.audioConfig)
         return;
@@ -215,14 +186,17 @@ let audio_component_add = (yrObject, entity) => {
     let audioComponent = XkeinExt_1.AudioComponent.CreateAudioComponent(entity, yrObject);
     yrObject.audioComponent = audioComponent;
 };
-gameEvents.unit.onCtor.add(audio_component_add);
-gameEvents.infantry.onCtor.add(audio_component_add);
-gameEvents.building.onCtor.add(audio_component_add);
-gameEvents.aircraft.onCtor.add(audio_component_add);
-gameEvents.bullet.onConstruct.add(audio_component_add);
-gameEvents.superWeapon.onCtor.add(audio_component_add);
-gameEvents.house.onCtor.add(audio_component_add);
-gameEvents.bullet.onDetonate.add((yrObject, coords) => {
+game_event_1.gameEvents.onCtor.unit.add(audio_component_add);
+game_event_1.gameEvents.onCtor.infantry.add(audio_component_add);
+game_event_1.gameEvents.onCtor.building.add(audio_component_add);
+game_event_1.gameEvents.onCtor.aircraft.add(audio_component_add);
+game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrBulletConstructEvent, (E) => {
+    audio_component_add(E.m_pBullet, null);
+});
+game_event_1.gameEvents.onCtor.superWeapon.add(audio_component_add);
+game_event_1.gameEvents.onCtor.house.add(audio_component_add);
+game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrBulletDetonateEvent, (E) => {
+    let yrObject = E.m_pBullet;
     let audioConfig = (0, ini_helper_1.GetIniComponent)(AudioConfig, yrObject.m_Type);
     if (audioConfig && audioConfig.detonateEvent) {
         let audioComponent = yrObject.audioComponent;
@@ -230,33 +204,50 @@ gameEvents.bullet.onDetonate.add((yrObject, coords) => {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.detonateEvent, audioComponent.m_akGameObjId);
     }
 });
-gameEvents.addGroupEventHandler(gameEvents.technoGroupEvents, "onReceiveDamage", (yrObject, pDamage, DistanceFromEpicenter, pWH, Attacker, IgnoreDefenses, PreventPassengerEscape, pAttackingHouse) => {
+game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrObjectReceiveDamageEvent, (E) => {
+    let yrObject = E.m_pObject;
     let audioConfig = (0, ini_helper_1.GetIniComponent)(AudioConfig, yrObject.m_Type);
     if (audioConfig && audioConfig.damageEvent) {
         XkeinExt_1.AudioSystem.SetRTPCValue(AK.GAME_PARAMETERS.OBJECTHP, yrObject.GetHealthPercentage(), yrObject.audioComponent.m_akGameObjId);
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.damageEvent, yrObject.audioComponent.m_akGameObjId);
     }
-    InteractiveMusic.onReceiveDamage(yrObject, pDamage, DistanceFromEpicenter, pWH, Attacker, IgnoreDefenses, PreventPassengerEscape, pAttackingHouse);
+    let player = YRpp_1.HouseClass.s_CurrentPlayer;
+    let isPlayerAttacked = player == yrObject.GetOwningHouse();
+    let isPlayerInvasion = player == E.m_pAttackingHouse;
+    if (isPlayerAttacked && isPlayerInvasion) {
+        // player attack own unit
+        return;
+    }
+    if (isPlayerInvasion) {
+        InteractiveMusic.setMusicState(EMusicState.Invasion);
+        InteractiveMusic.lastTimeBattle = Date.now();
+    }
+    else if (isPlayerAttacked) {
+        InteractiveMusic.setMusicState(EMusicState.UnderAttack);
+        InteractiveMusic.lastTimeBattle = Date.now();
+    }
 });
-gameEvents.addGroupEventHandler(gameEvents.objectGroupEvents, "onUnlimboChecked", (yrObject, coords, faceDir) => {
+game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrObjectUnlimboCheckedEvent, (E) => {
+    let yrObject = E.m_pObject;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.createEvent) {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.createEvent, yrObject.audioComponent.m_akGameObjId);
     }
 });
-gameEvents.addGroupEventHandler(gameEvents.objectGroupEvents, "onLimboChecked", (yrObject) => {
+game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrObjectLimboCheckedEvent, (E) => {
+    let yrObject = E.m_pObject;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.removeEvent) {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.removeEvent, yrObject.audioComponent.m_akGameObjId);
     }
 });
-gameEvents.game.onSceneEnter.add(() => {
+game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrSceneEnterEvent, (E) => {
     InteractiveMusic.setMusicState(EMusicState.Normal);
 });
-gameEvents.game.onSceneExit.add(() => {
+game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrSceneExitEvent, (E) => {
     InteractiveMusic.setMusicState(EMusicState.None);
 });
-gameEvents.game.onEndUpdate.add(() => {
+game_event_1.gameEvents.game.onEndUpdate.add(() => {
     if (YRpp_1.ScenarioClass.s_Instance) {
         let nextState = InteractiveMusic.musicState;
         if (InteractiveMusic.musicState == EMusicState.Invasion || InteractiveMusic.musicState == EMusicState.UnderAttack) {

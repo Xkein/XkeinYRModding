@@ -37,6 +37,11 @@
             type_map[klass.full_name] = klass.identifier
         end
     end
+    for enum in module_enums
+        if need_codegen(enum) || is_yrpp
+            type_map[enum.name] = enum.name
+        end
+    end
     func get_ts_type(type)
         $type_name = type.full_name
         for any_type in any_types

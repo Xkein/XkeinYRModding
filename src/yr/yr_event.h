@@ -34,9 +34,10 @@ class YrHookEvent final
 {
     friend class YrHookEventSystem;
     friend class YrHookDiagnostic;
-private:
+public:
     YrHookEvent();
     ~YrHookEvent();
+private:
 
     YREXTCORE_API HookEventListenerHandle Register(HookEventListener listener);
 

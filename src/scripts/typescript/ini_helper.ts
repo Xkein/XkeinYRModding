@@ -1,34 +1,35 @@
-import { IniReader } from "YrExtCore"
-import { AbstractTypeClass } from "YRpp"
+import { IniReader, YrBulletTypeLoadIniEvent, YrHouseTypeLoadIniEvent, YrSuperWeaponTypeLoadIniEvent, YrTechnoTypeLoadIniEvent } from "YrExtCore"
+import { AbstractType, AbstractTypeClass, CCINIClass } from "YRpp"
 import "reflect-metadata"
+import { gameEvents } from "./game_event";
 
 type IniReadMethod = (iniReader: IniReader, section: string, key: string) => any;
 
 export class IniHelper {
   static ReadString(iniReader: IniReader, section: string, key: string) {
     if (iniReader.ReadString(section, key) > 0) {
-      return iniReader.value().trim()
+      return iniReader.value().trim();
     }
-    return null
+    return null;
   }
 
   static ReadBool(iniReader: IniReader, section: string, key: string) {
     if (iniReader.ReadString(section, key) > 0) {
-      return iniReader.value().trim()
+      return iniReader.value().trim();
     }
-    return ""
+    return "";
   }
 
   static ReadStringList(iniReader: IniReader, section: string, key: string) {
-    let str = IniHelper.ReadString(iniReader, section, key)
+    let str = IniHelper.ReadString(iniReader, section, key);
     if (str) {
-      let list = str.split(",")
+      let list = str.split(",");
       for (let index = 0; index < list.length; index++) {
         list[index] = list[index].trim();
       }
-      return list
+      return list;
     }
-    return null
+    return null;
   }
 }
 
@@ -37,41 +38,58 @@ global.IniHelper = IniHelper;
 class JsIniManager {
   static components : any[];
 
-  static RegisterIniComponent(klass, componentTargets) {
-    gameEvents.addGroupEventHandler(componentTargets, "onLoadIni", (yrObjectType: AbstractTypeClass, iniReader: IniReader) => {
+  static RegisterIniComponent(klass, componentTargets: AbstractType[]) {
+    const onLoadIni = (yrObjectType: AbstractTypeClass, pIni: CCINIClass) => {
       if (!klass.__iniFields)
-        return
+        return;
+      if (componentTargets.indexOf(yrObjectType.WhatAmI()) >= 0) {
+        return;
+      }
       let iniComponentName = klass.name;
       let iniComponent = yrObjectType[iniComponentName]
       if (!iniComponent) {
-        yrObjectType[iniComponentName] = iniComponent = new klass()
+        yrObjectType[iniComponentName] = iniComponent = new klass();
       }
+      let iniReader = new IniReader(pIni);
       for (const iniField of klass.__iniFields) {
-        let iniValue = iniField.readMethod(iniReader, yrObjectType.m_ID, iniField.iniKey)
+        let iniValue = iniField.readMethod(iniReader, yrObjectType.m_ID, iniField.iniKey);
         if (iniValue !== null && iniValue !== undefined) {
           if (!iniComponent) {
-            yrObjectType[iniComponentName] = iniComponent = new klass()
+            yrObjectType[iniComponentName] = iniComponent = new klass();
           }
-          iniComponent[iniField.field] = iniValue
+          iniComponent[iniField.field] = iniValue;
         }
       }
-    })
+    };
+    gameEvents.regitserHookEventHandler(YrTechnoTypeLoadIniEvent, (E) => {
+        onLoadIni(E.m_pTechnoType, E.m_pIni);
+    });
+    gameEvents.regitserHookEventHandler(YrBulletTypeLoadIniEvent, (E) => {
+        onLoadIni(E.m_pBulletType, E.m_pIni);
+    });
+    gameEvents.regitserHookEventHandler(YrSuperWeaponTypeLoadIniEvent, (E) => {
+        onLoadIni(E.m_pSuperWeaponType, E.m_pIni);
+    });
+    gameEvents.regitserHookEventHandler(YrHouseTypeLoadIniEvent, (E) => {
+        onLoadIni(E.m_pHouseType, E.m_pIni);
+    });
+
   }
 
   static RegisterIniField(klass, field, iniKey, readMethod) {
     if (!klass.__iniFields) {
-      klass.__iniFields = []
+      klass.__iniFields = [];
     }
     let iniField = {
       field: field,
       iniKey: iniKey,
       readMethod: readMethod
-    }
-    klass.__iniFields.push(iniField)
+    };
+    klass.__iniFields.push(iniField);
   }
 }
 
-export function IniComponent(componentTargets) {
+export function IniComponent(componentTargets: AbstractType[]) {
   return function (target) {
     JsIniManager.RegisterIniComponent(target, componentTargets);
   }

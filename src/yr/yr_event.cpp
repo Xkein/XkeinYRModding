@@ -153,8 +153,7 @@ YREXTCORE_API YrHookEvent* YrHookEventSystem::GetEvent(const char* eventName)
     entt::meta_type type = entt::resolve(entt::hashed_string(eventName));
     if (!type)
         return nullptr;
-    return type.data("__Instance"_hs).get({}).try_cast<YrHookEvent>();
-    return nullptr;
+    return type.func("__GetInstance"_hs).invoke({}).try_cast<YrHookEvent>();
 }
 
 YREXTCORE_API HookEventListenerHandle YrHookEventSystem::Register(const char* eventName, HookEventListener listener)

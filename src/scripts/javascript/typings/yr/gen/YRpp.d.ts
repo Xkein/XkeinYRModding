@@ -42,7 +42,7 @@ class FacingClass
     constructor(_0 : any);
     constructor(rate_0 : number);
     constructor(facing_0 : DirStruct);
-    constructor(dir_0 : any);
+    constructor(dir_0 : DirType);
     constructor(another_0 : FacingClass);
     // skip operator=
     SetDesired(facing_0 : DirStruct) : boolean;
@@ -65,15 +65,15 @@ interface ILocomotion
     Is_Moving() : boolean;
     Destination() : CoordStruct;
     Head_To_Coord() : CoordStruct;
-    Can_Enter_Cell(cell_0 : CellStruct) : any;
+    Can_Enter_Cell(cell_0 : CellStruct) : Move;
     Is_To_Have_Shadow() : boolean;
     Draw_Matrix(pIndex_0 : any) : Matrix3D;
     Shadow_Matrix(pIndex_0 : any) : Matrix3D;
     Draw_Point() : Point2D;
     Shadow_Point() : Point2D;
-    Visual_Character(raw_0 : boolean) : any;
+    Visual_Character(raw_0 : boolean) : VisualType;
     Z_Adjust() : number;
-    Z_Gradient() : any;
+    Z_Gradient() : ZGradient;
     Process() : boolean;
     Move_To(to_0 : CoordStruct) : void;
     Stop_Moving() : void;
@@ -87,17 +87,17 @@ interface ILocomotion
     Push(dir_0 : DirStruct) : boolean;
     Shove(dir_0 : DirStruct) : boolean;
     Force_Track(track_0 : number, coord_1 : CoordStruct) : void;
-    In_Which_Layer() : any;
+    In_Which_Layer() : Layer;
     Force_Immediate_Destination(coord_0 : CoordStruct) : void;
     Force_New_Slope(ramp_0 : number) : void;
     Is_Moving_Now() : boolean;
     Apparent_Speed() : number;
     Drawing_Code() : number;
-    Can_Fire() : any;
+    Can_Fire() : FireError;
     Get_Status() : number;
     Acquire_Hunter_Seeker_Target() : void;
     Is_Surfacing() : boolean;
-    Mark_All_Occupation_Bits(mark_0 : any) : void;
+    Mark_All_Occupation_Bits(mark_0 : MarkType) : void;
     Is_Moving_Here(to_0 : CoordStruct) : boolean;
     Will_Jump_Tracks() : boolean;
     Is_Really_Moving_Now() : boolean;
@@ -151,7 +151,7 @@ class TechnoClass
     SelectWeapon(pTarget_0 : AbstractClass) : number;
     SelectNavalTargeting(pTarget_0 : AbstractClass) : number;
     GetZAdjustment() : number;
-    GetZGradient() : any;
+    GetZGradient() : ZGradient;
     GetLastFlightMapCoords() : CellStruct;
     SetLastFlightMapCoords(coord_0 : CellStruct) : void;
     vt_entry_2FC(Buffer_0 : CellStruct, dwUnk2_1 : number, dwUnk3_2 : number) : CellStruct;
@@ -184,8 +184,8 @@ class TechnoClass
     VoiceMove() : number;
     VoiceDeploy() : number;
     VoiceAttack(pTarget_0 : ObjectClass) : number;
-    ClickedEvent(event_0 : any) : boolean;
-    ClickedMission(Mission_0 : any, pTarget_1 : ObjectClass, TargetCell_2 : CellClass, NearestTargetCellICanEnter_3 : CellClass) : boolean;
+    ClickedEvent(event_0 : EventType) : boolean;
+    ClickedMission(Mission_0 : Mission, pTarget_1 : ObjectClass, TargetCell_2 : CellClass, NearestTargetCellICanEnter_3 : CellClass) : boolean;
     IsUnderEMP() : boolean;
     IsParalyzed() : boolean;
     CanCheer() : boolean;
@@ -194,7 +194,7 @@ class TechnoClass
     DecreaseAmmo() : void;
     AddPassenger(pPassenger_0 : FootClass) : void;
     CanDisguiseAs(pTarget_0 : AbstractClass) : boolean;
-    TargetAndEstimateDamage(coord_0 : CoordStruct, threat_1 : any) : boolean;
+    TargetAndEstimateDamage(coord_0 : CoordStruct, threat_1 : ThreatType) : boolean;
     Stun() : void;
     TriggersCellInset(pTarget_0 : AbstractClass) : boolean;
     IsCloseEnough(pTarget_0 : AbstractClass, idxWeapon_1 : number) : boolean;
@@ -202,9 +202,9 @@ class TechnoClass
     IsCloseEnoughToAttackCoords(Coords_0 : CoordStruct) : boolean;
     InAuxiliarySearchRange(pTarget_0 : AbstractClass) : boolean;
     Destroyed(Killer_0 : ObjectClass) : void;
-    GetFireErrorWithoutRange(pTarget_0 : AbstractClass, nWeaponIndex_1 : number) : any;
-    GetFireError(pTarget_0 : AbstractClass, nWeaponIndex_1 : number, ignoreRange_2 : boolean) : any;
-    GreatestThreat(threat_0 : any, pCoord_1 : CoordStruct, onlyTargetHouseEnemy_2 : boolean) : AbstractClass;
+    GetFireErrorWithoutRange(pTarget_0 : AbstractClass, nWeaponIndex_1 : number) : FireError;
+    GetFireError(pTarget_0 : AbstractClass, nWeaponIndex_1 : number, ignoreRange_2 : boolean) : FireError;
+    GreatestThreat(threat_0 : ThreatType, pCoord_1 : CoordStruct, onlyTargetHouseEnemy_2 : boolean) : AbstractClass;
     SetTarget(pTarget_0 : AbstractClass) : void;
     Fire(pTarget_0 : AbstractClass, nWeaponIndex_1 : number) : BulletClass;
     Guard() : void;
@@ -260,11 +260,11 @@ class TechnoClass
     RadarTrackingStop() : void;
     RadarTrackingFlash() : void;
     RadarTrackingUpdate(bUnk_0 : boolean) : void;
-    RespondMegaEventMission(pRespondTo_0 : EventClass) : any;
+    RespondMegaEventMission(pRespondTo_0 : EventClass) : Mission;
     ClearMegaMissionData() : void;
     HaveMegaMission() : boolean;
     HaveAttackMoveTarget() : boolean;
-    GetMegaMission() : any;
+    GetMegaMission() : Mission;
     GetAttackMoveCoords(pBuffer_0 : CoordStruct) : CoordStruct;
     CanUseWaypoint() : boolean;
     CanAttackOnTheMove() : boolean;
@@ -280,8 +280,8 @@ class TechnoClass
     CanBePermaMindControlled() : boolean;
     CreateLaser(pTarget_0 : ObjectClass, idxWeapon_1 : number, pWeapon_2 : WeaponTypeClass, Coords_3 : CoordStruct) : LaserDrawClass;
     UpdateThreatInCell(Cell_0 : CellClass) : void;
-    CanAutoTargetObject(targetFlags_0 : any, canTargetWhatAmI_1 : number, wantedDistance_2 : number, pTarget_3 : TechnoClass, pThreatPosed_4 : number, dwUnk_5 : number, pSourceCoords_6 : CoordStruct) : boolean;
-    TryAutoTargetObject(targetFlags_0 : any, canTargetWhatAmI_1 : number, pCoords_2 : CellStruct, dwUnk1_3 : number, dwUnk2_4 : number, pThreatPosed_5 : number, dwUnk3_6 : number) : boolean;
+    CanAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : number, wantedDistance_2 : number, pTarget_3 : TechnoClass, pThreatPosed_4 : number, dwUnk_5 : number, pSourceCoords_6 : CoordStruct) : boolean;
+    TryAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : number, pCoords_2 : CellStruct, dwUnk1_3 : number, dwUnk2_4 : number, pThreatPosed_5 : number, dwUnk3_6 : number) : boolean;
     Reactivate() : void;
     Deactivate() : void;
     EnteredOpenTopped(pWho_0 : TechnoClass) : void;
@@ -290,14 +290,14 @@ class TechnoClass
     SetCurrentWeaponStage(idx_0 : number) : void;
     SetArchiveTarget(pTarget_0 : AbstractClass) : void;
     DrawVoxelShadow(vxl_0 : any, shadow_index_1 : number, vxl_index_key_2 : any, shadow_cache_3 : any, bound_4 : RectangleStruct, a3_5 : Point2D, matrix_6 : Matrix3D, again_7 : boolean, surface_8 : Surface, shadow_point_9 : Point2D) : void;
-    DrawObject(pSHP_0 : any, nFrame_1 : number, pLocation_2 : Point2D, pBounds_3 : RectangleStruct, _4 : number, _5 : number, nZAdjust_6 : number, eZGradientDescIdx_7 : any, _8 : number, nBrightness_9 : number, TintColor_10 : number, pZShape_11 : any, nZFrame_12 : number, nZOffsetX_13 : number, nZOffsetY_14 : number, _15 : number) : void;
+    DrawObject(pSHP_0 : any, nFrame_1 : number, pLocation_2 : Point2D, pBounds_3 : RectangleStruct, _4 : number, _5 : number, nZAdjust_6 : number, eZGradientDescIdx_7 : ZGradient, _8 : number, nBrightness_9 : number, TintColor_10 : number, pZShape_11 : any, nZFrame_12 : number, nZOffsetX_13 : number, nZOffsetY_14 : number, _15 : number) : void;
     sub_70DE00(State_0 : number) : number;
     ClearPlanningTokens(pEvent_0 : EventClass) : number;
     SetTargetForPassengers(pTarget_0 : AbstractClass) : void;
     KillPassengers(pSource_0 : TechnoClass) : void;
     GetOriginalOwner() : HouseClass;
     FireDeathWeapon(additionalDamage_0 : number) : void;
-    HasAbility(ability_0 : any) : boolean;
+    HasAbility(ability_0 : Ability) : boolean;
     ClearSidebarTabObject() : void;
     GetDrawer() : LightConvertClass;
     GetEffectTintIntensity(currentIntensity_0 : number) : number;
@@ -306,12 +306,12 @@ class TechnoClass
     CombatDamage(nWeaponIndex_0 : number) : number;
     GetPrimaryWeapon() : WeaponStruct;
     TryNextPlanningTokenNode() : boolean;
-    GetIonCannonValue(difficulty_0 : any) : number;
-    GetIonCannonValue(difficulty_0 : any, maxHealth_1 : number) : number;
+    GetIonCannonValue(difficulty_0 : AIDifficulty) : number;
+    GetIonCannonValue(difficulty_0 : AIDifficulty, maxHealth_1 : number) : number;
     TurretFacing() : DirStruct;
     GetRealFacing() : DirStruct;
     BaseIsAttacked(pEnemy_0 : TechnoClass) : void;
-    static s_AbsDerivateID : any;
+    static s_AbsDerivateID : AbstractFlags;
     static s_Array : any;
     m_Transporter : TechnoClass;
     m_LastFireBulletFrame : number;
@@ -321,7 +321,7 @@ class TechnoClass
     m_DeployAnim : AnimClass;
     m_InAir : boolean;
     m_CurrentWeaponNumber : number;
-    m_CurrentRanking : any;
+    m_CurrentRanking : Rank;
     m_CurrentGattlingStage : number;
     m_GattlingValue : number;
     m_TurretAnimFrame : number;
@@ -343,7 +343,7 @@ class TechnoClass
     m_Group : number;
     m_ArchiveTarget : AbstractClass;
     m_Owner : HouseClass;
-    m_CloakState : any;
+    m_CloakState : CloakState;
     m_WarpFactor : number;
     m_unknown_bool_250 : boolean;
     m_LastSightCoords : CoordStruct;
@@ -532,8 +532,8 @@ class HouseClass
     constructor(pCountry_0 : HouseTypeClass);
     EnumConnectionPoints(ppEnum_0 : any | any) : number;
     FindConnectionPoint(riid_0 : any | any, ppCP_1 : any | any) : number;
-    Apparent_Category_Quantity(category_0 : any | any) : number;
-    Apparent_Category_Power(category_0 : any | any) : number;
+    Apparent_Category_Quantity(category_0 : Category | any) : number;
+    Apparent_Category_Power(category_0 : Category | any) : number;
     Apparent_Base_Center() : CellStruct;
     Is_Powered() : boolean;
     ID_Number() : number;
@@ -543,8 +543,8 @@ class HouseClass
     Available_Storage() : number;
     Power_Output() : number;
     Power_Drain() : number;
-    Category_Quantity(category_0 : any | any) : number;
-    Category_Power(category_0 : any | any) : number;
+    Category_Quantity(category_0 : Category | any) : number;
+    Category_Power(category_0 : Category | any) : number;
     Base_Center() : CellStruct;
     Fire_Sale() : number;
     All_To_Hunt() : number;
@@ -554,7 +554,7 @@ class HouseClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     IsAlliedWith(idxHouse_0 : number) : boolean;
     IsAlliedWith(pHouse_0 : HouseClass) : boolean;
@@ -619,13 +619,13 @@ class HouseClass
     GetPlanningWaypointAt(coords_0 : CellStruct) : WaypointClass;
     GetPlanningWaypointProperties(wpt_0 : WaypointClass, idxPath_1 : number, idxWP_2 : number) : boolean;
     EnsurePlanningPathExists(idx_0 : number) : void;
-    Update_FactoriesQueues(factoryOf_0 : any, isNaval_1 : boolean, buildCat_2 : any) : void;
+    Update_FactoriesQueues(factoryOf_0 : AbstractType, isNaval_1 : boolean, buildCat_2 : BuildCat) : void;
     GetFactoryProducing(pItem_0 : TechnoTypeClass) : FactoryClass;
     FirstBuildableFromArray(items_0 : any) : BuildingTypeClass;
     AllPrerequisitesAvailable(pItem_0 : TechnoTypeClass, vectorBuildings_1 : any, vectorLength_2 : number) : boolean;
     IsControlledByHuman() : boolean;
     IsControlledByCurrentPlayer() : boolean;
-    SendSpyPlanes(AircraftTypeIdx_0 : number, AircraftAmount_1 : number, SetMission_2 : any, Target_3 : AbstractClass, Destination_4 : ObjectClass) : void;
+    SendSpyPlanes(AircraftTypeIdx_0 : number, AircraftAmount_1 : number, SetMission_2 : Mission, Target_3 : AbstractClass, Destination_4 : ObjectClass) : void;
     RegisterGain(pTechno_0 : TechnoClass, ownerChange_1 : boolean) : void;
     RegisterLoss(pTechno_0 : TechnoClass, keepTiberium_1 : boolean) : void;
     FindBuildingOfType(idx_0 : number, sector_1 : number) : BuildingClass;
@@ -636,8 +636,8 @@ class HouseClass
     Fire_GenMutator(pSuper_0 : SuperClass) : boolean;
     IonSensitivesShouldBeOffline() : boolean;
     get_ID() : string;
-    FindSuperWeaponIndex(type_0 : any) : number;
-    FindSuperWeapon(type_0 : any) : SuperClass;
+    FindSuperWeaponIndex(type_0 : SuperWeaponType) : number;
+    FindSuperWeapon(type_0 : SuperWeaponType) : SuperClass;
     CountOwnedNow(pItem_0 : TechnoTypeClass) : number;
     CountOwnedNow(pItem_0 : BuildingTypeClass) : number;
     CountOwnedNow(pItem_0 : AircraftTypeClass) : number;
@@ -661,21 +661,21 @@ class HouseClass
     InOwners(pItem_0 : TechnoTypeClass) : boolean;
     InRequiredHouses(pItem_0 : TechnoTypeClass) : boolean;
     InForbiddenHouses(pItem_0 : TechnoTypeClass) : boolean;
-    CanBuild(pItem_0 : TechnoTypeClass, buildLimitOnly_1 : boolean, allowIfInProduction_2 : boolean) : any;
+    CanBuild(pItem_0 : TechnoTypeClass, buildLimitOnly_1 : boolean, allowIfInProduction_2 : boolean) : CanBuildResult;
     AI_BaseConstructionUpdate() : number;
     AI_VehicleConstructionUpdate() : number;
     AI_TryFireSW() : void;
     Fire_SW(idx_0 : number, coords_1 : CellStruct) : boolean;
-    PickTargetByType(outBuffer_0 : CellStruct, targetType_1 : any) : CellStruct;
-    PickTargetByType(targetType_0 : any) : CellStruct;
+    PickTargetByType(outBuffer_0 : CellStruct, targetType_1 : QuarryType) : CellStruct;
+    PickTargetByType(targetType_0 : QuarryType) : CellStruct;
     PickIonCannonTarget(outBuffer_0 : CellStruct) : CellStruct;
     PickIonCannonTarget() : CellStruct;
     IsIonCannonEligibleTarget(pTechno_0 : TechnoClass) : boolean;
     UpdateFlagCoords(NewCarrier_0 : UnitClass, dwUnk_1 : number) : void;
     DroppedFlag(Where_0 : CellStruct, Who_1 : UnitClass) : void;
     PickedUpFlag(Who_0 : UnitClass, dwUnk_1 : number) : number;
-    GetPrimaryFactory(absID_0 : any, naval_1 : boolean, buildCat_2 : any) : FactoryClass;
-    SetPrimaryFactory(pFactory_0 : FactoryClass, absID_1 : any, naval_2 : boolean, buildCat_3 : any) : void;
+    GetPrimaryFactory(absID_0 : AbstractType, naval_1 : boolean, buildCat_2 : BuildCat) : FactoryClass;
+    SetPrimaryFactory(pFactory_0 : FactoryClass, absID_1 : AbstractType, naval_2 : boolean, buildCat_3 : BuildCat) : void;
     GetBaseCenter() : CellStruct;
     GetAIDifficultyIndex() : number;
     IsNeutral() : boolean;
@@ -688,7 +688,7 @@ class HouseClass
     AddTracking(pTechno_0 : TechnoClass) : void;
     GetWeedStoragePercentage() : number;
     AISupers() : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     static s_CurrentPlayer : any;
     static s_Observer : any;
@@ -699,7 +699,7 @@ class HouseClass
     m_CountWarfactories : number;
     m_InfantrySelfHeal : number;
     m_UnitsSelfHeal : number;
-    m_AIDifficulty : any;
+    m_AIDifficulty : AIDifficulty;
     m_FirepowerMultiplier : number;
     m_GroundspeedMultiplier : number;
     m_AirspeedMultiplier : number;
@@ -713,7 +713,7 @@ class HouseClass
     m_TechLevel : number;
     m_AltAllies : any;
     m_StartingCredits : number;
-    m_StartingEdge : any;
+    m_StartingEdge : Edge;
     m_AIState_1E4 : number;
     m_SideIndex : number;
     m_IsHumanPlayer : boolean;
@@ -751,7 +751,7 @@ class HouseClass
     m_IsParanoid : boolean;
     m_IsToLook : boolean;
     m_IQLevel2 : number;
-    m_AIMode : any;
+    m_AIMode : AIMode;
     m_LastBuiltBuildingType : number;
     m_LastBuiltInfantryType : number;
     m_LastBuiltAircraftType : number;
@@ -828,7 +828,7 @@ class HouseClass
     m_ToCapture : number;
     m_RadarVisibleTo : any;
     m_SiloMoney : number;
-    m_PreferredTargetType : any;
+    m_PreferredTargetType : QuarryType;
     m_PreferredTargetCell : CellStruct;
     m_PreferredDefensiveCell : CellStruct;
     m_PreferredDefensiveCell2 : CellStruct;
@@ -853,7 +853,7 @@ class HouseClass
     m_RecheckRadar : boolean;
     m_SpySatActive : boolean;
     m_IsBeingDrained : boolean;
-    m_Edge : any;
+    m_Edge : Edge;
     m_EMPTarget : CellStruct;
     m_NukeTarget : CellStruct;
     m_Allies : any;
@@ -1012,7 +1012,7 @@ class StorageClass
 class AbstractClass
 {
     GetRTTIName() : string;
-    static GetRTTIName(abs_0 : any) : string;
+    static GetRTTIName(abs_0 : AbstractType) : string;
     QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
     AddRef() : number;
     Release() : number;
@@ -1021,14 +1021,14 @@ class AbstractClass
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     GetSizeMax(pcbSize_0 : any | any) : number;
-    What_Am_I() : any;
+    What_Am_I() : AbstractType;
     Fetch_ID() : number;
     Create_ID() : void;
     INoticeSink_Unknown(dwUnknown_0 : number | any) : boolean;
     INoticeSource_Unknown() : void;
     Init() : void;
     PointerExpired(pAbstract_0 : AbstractClass, removed_1 : boolean) : void;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     ComputeCRC(crc_0 : any) : void;
     GetOwningHouseIndex() : number;
@@ -1054,11 +1054,11 @@ class AbstractClass
     op_LessThan(rhs_0 : AbstractClass) : boolean;
     // skip operator new
     // skip operator delete
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     static s_TargetIndex : any;
     m_UniqueID : number;
-    m_AbstractFlags : any;
+    m_AbstractFlags : AbstractFlags;
     m_unknown_18 : number;
     m_RefCount : number;
     m_Dirty : boolean;
@@ -1071,11 +1071,11 @@ class ObjectClass
     IsInAir() : boolean;
     AnimPointerExpired(pAnim_0 : AnimClass) : void;
     IsSelectable() : boolean;
-    VisualCharacter(SpecificOwner_0 : number, WhoIsAsking_1 : HouseClass) : any;
+    VisualCharacter(SpecificOwner_0 : number, WhoIsAsking_1 : HouseClass) : VisualType;
     GetImage() : any;
-    MouseOverCell(pCell_0 : CellStruct, checkFog_1 : boolean, ignoreForce_2 : boolean) : any;
-    MouseOverObject(pObject_0 : ObjectClass, ignoreForce_1 : boolean) : any;
-    InWhichLayer() : any;
+    MouseOverCell(pCell_0 : CellStruct, checkFog_1 : boolean, ignoreForce_2 : boolean) : Action;
+    MouseOverObject(pObject_0 : ObjectClass, ignoreForce_1 : boolean) : Action;
+    InWhichLayer() : Layer;
     IsSurfaced() : boolean;
     IsStrange() : boolean;
     GetTechnoType() : TechnoTypeClass;
@@ -1099,7 +1099,7 @@ class ObjectClass
     GetDisguise(DisguisedAgainstAllies_0 : boolean) : ObjectTypeClass;
     GetDisguiseHouse(DisguisedAgainstAllies_0 : boolean) : HouseClass;
     Limbo() : boolean;
-    Unlimbo(Crd_0 : CoordStruct, dFaceDir_1 : any) : boolean;
+    Unlimbo(Crd_0 : CoordStruct, dFaceDir_1 : DirType) : boolean;
     Disappear(permanently_0 : boolean) : void;
     RegisterDestruction(Destroyer_0 : TechnoClass) : void;
     RegisterKill(Destroyer_0 : HouseClass) : void;
@@ -1109,7 +1109,7 @@ class ObjectClass
     UnmarkAllOccupationBits(coords_0 : CoordStruct) : void;
     UnInit() : void;
     Reveal() : void;
-    KickOutUnit(pTechno_0 : TechnoClass, Cell_1 : CellStruct) : any;
+    KickOutUnit(pTechno_0 : TechnoClass, Cell_1 : CellStruct) : KickOutResult;
     DrawIfVisible(pBounds_0 : RectangleStruct, EvenIfCloaked_1 : boolean, dwUnk3_2 : number) : boolean;
     GetFoundationData(includeBib_0 : boolean) : CellStruct;
     DrawBehind(pLocation_0 : Point2D, pBounds_1 : RectangleStruct) : void;
@@ -1118,41 +1118,41 @@ class ObjectClass
     DrawAgain(location_0 : Point2D, bounds_1 : RectangleStruct) : void;
     Undiscover() : void;
     See(dwUnk_0 : number, dwUnk2_1 : number) : void;
-    Mark(value_0 : any) : boolean;
+    Mark(value_0 : MarkType) : boolean;
     GetDimensions(pRect_0 : RectangleStruct) : RectangleStruct;
     GetRenderDimensions(pRect_0 : RectangleStruct) : RectangleStruct;
     DrawRadialIndicator(dwUnk_0 : number) : void;
     MarkForRedraw() : void;
     CanBeSelected() : boolean;
     CanBeSelectedNow() : boolean;
-    CellClickedAction(action_0 : any, pCell_1 : CellStruct, pCell1_2 : CellStruct, bUnk_3 : boolean) : boolean;
-    ObjectClickedAction(action_0 : any, pTarget_1 : ObjectClass, bUnk_2 : boolean) : boolean;
+    CellClickedAction(action_0 : Action, pCell_1 : CellStruct, pCell1_2 : CellStruct, bUnk_3 : boolean) : boolean;
+    ObjectClickedAction(action_0 : Action, pTarget_1 : ObjectClass, bUnk_2 : boolean) : boolean;
     Flash(Duration_0 : number) : void;
     Select() : boolean;
     Deselect() : void;
-    IronCurtain(nDuration_0 : number, pSource_1 : HouseClass, ForceShield_2 : boolean) : any;
+    IronCurtain(nDuration_0 : number, pSource_1 : HouseClass, ForceShield_2 : boolean) : DamageState;
     StopAirstrikeTimer() : void;
     StartAirstrikeTimer(Duration_0 : number) : void;
     IsIronCurtained() : boolean;
     IsCloseEnough3D(dwUnk_0 : number, dwUnk2_1 : number) : boolean;
     GetWeaponRange(idxWeapon_0 : number) : number;
-    ReceiveDamage(pDamage_0 : number, DistanceFromEpicenter_1 : number, pWH_2 : WarheadTypeClass, Attacker_3 : ObjectClass, IgnoreDefenses_4 : boolean, PreventPassengerEscape_5 : boolean, pAttackingHouse_6 : HouseClass) : any;
+    ReceiveDamage(pDamage_0 : number, DistanceFromEpicenter_1 : number, pWH_2 : WarheadTypeClass, Attacker_3 : ObjectClass, IgnoreDefenses_4 : boolean, PreventPassengerEscape_5 : boolean, pAttackingHouse_6 : HouseClass) : DamageState;
     Destroy() : void;
     Scatter(crd_0 : CoordStruct, ignoreMission_1 : boolean, ignoreDestination_2 : boolean) : void;
     Ignite() : boolean;
     Extinguish() : void;
     GetPointsValue() : number;
-    GetCurrentMission() : any;
-    RestoreMission(mission_0 : any) : void;
-    UpdatePosition(how_0 : any) : void;
+    GetCurrentMission() : Mission;
+    RestoreMission(mission_0 : Mission) : void;
+    UpdatePosition(how_0 : PCPType) : void;
     FindFactory(allowOccupied_0 : boolean, requirePower_1 : boolean) : BuildingClass;
-    ReceiveCommand(pSender_0 : TechnoClass, command_1 : any, pInOut_2 : AbstractClass) : any;
+    ReceiveCommand(pSender_0 : TechnoClass, command_1 : RadioCommand, pInOut_2 : AbstractClass) : RadioCommand;
     DiscoveredBy(pHouse_0 : HouseClass) : boolean;
     SetRepairState(state_0 : number) : void;
     Sell(dwUnk_0 : number) : void;
     AssignPlanningPath(idxPath_0 : number, idxWP_1 : number) : void;
-    MoveToDirection(facing_0 : any) : void;
-    IsCellOccupied(pDestCell_0 : CellClass, facing_1 : any, level_2 : number, pSourceCell_3 : CellClass, alt_4 : boolean) : any;
+    MoveToDirection(facing_0 : FacingType) : void;
+    IsCellOccupied(pDestCell_0 : CellClass, facing_1 : FacingType, level_2 : number, pSourceCell_3 : CellClass, alt_4 : boolean) : Move;
     vt_entry_1B0(dwUnk_0 : number, dwUnk2_1 : number, dwUnk3_2 : number, dwUnk4_3 : number, dwUnk5_4 : number) : number;
     SetLocation(crd_0 : CoordStruct) : void;
     GetMapCoords(pUCell_0 : CellStruct) : CellStruct;
@@ -1173,7 +1173,7 @@ class ObjectClass
     IsRedHP() : boolean;
     IsYellowHP() : boolean;
     IsGreenHP() : boolean;
-    GetHealthStatus() : any;
+    GetHealthStatus() : HealthState;
     AttachTrigger(pTag_0 : TagClass) : boolean;
     BecomeUntargetable() : void;
     ReplaceTag(pTag_0 : TagClass) : void;
@@ -1184,7 +1184,7 @@ class ObjectClass
     GetTargetCoords() : CoordStruct;
     GetRenderCoords() : CoordStruct;
     GetFLH(idxWeapon_0 : number, base_1 : CoordStruct) : CoordStruct;
-    static s_AbsDerivateID : any;
+    static s_AbsDerivateID : AbstractFlags;
     static s_CurrentObjects : any;
     m_unknown_24 : number;
     m_unknown_28 : number;
@@ -1210,7 +1210,7 @@ class ObjectClass
     m_WasFallingDown : boolean;
     m_IsABomb : boolean;
     m_IsAlive : boolean;
-    m_LastLayer : any;
+    m_LastLayer : Layer;
     m_IsInLogic : boolean;
     m_IsVisible : boolean;
     m_Location : CoordStruct;
@@ -1227,7 +1227,7 @@ class AnimClass
     GetClassID(pClassID_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     PointerExpired(pAbstract_0 : AbstractClass | any, detachFromAll_1 : boolean | any) : void;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     AnimExtras() : number;
     GetEnd() : number;
@@ -1236,7 +1236,7 @@ class AnimClass
     Unpause() : void;
     Start() : void;
     Middle() : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Type : AnimTypeClass;
     m_OwnerObject : ObjectClass;
@@ -1262,7 +1262,7 @@ class AnimClass
     m_Owner : HouseClass;
     m_LoopDelay : number;
     m_Accum : number;
-    m_AnimFlags : any;
+    m_AnimFlags : BlitterFlags;
     m_HasExtras : boolean;
     m_RemainingIterations : number;
     m_unknown_196 : number;
@@ -1291,13 +1291,13 @@ class AnimTypeClass
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : AnimTypeClass;
     GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     LoadImageA() : any;
     Load2DArt() : void;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_MiddleFrameIndex : number;
@@ -1355,7 +1355,7 @@ class AnimTypeClass
     m_IsAnimatedTiberium : boolean;
     m_AltPalette : boolean;
     m_Normalized : boolean;
-    m_Layer : any;
+    m_Layer : Layer;
     m_DoubleThick : boolean;
     m_Flat : boolean;
     m_Translucent : boolean;
@@ -1390,12 +1390,12 @@ class ObjectTypeClass
     FindFactory(allowOccupied_0 : boolean, requirePower_1 : boolean, requireCanBuild_2 : boolean, pHouse_3 : HouseClass) : BuildingClass;
     GetCameo() : any;
     GetImage() : any;
-    static IsBuildCat5(abstractID_0 : any, idx_1 : number) : boolean;
-    static GetTechnoType(abstractID_0 : any, idx_1 : number) : TechnoTypeClass;
+    static IsBuildCat5(abstractID_0 : AbstractType, idx_1 : number) : boolean;
+    static GetTechnoType(abstractID_0 : AbstractType, idx_1 : number) : TechnoTypeClass;
     LoadVoxel() : void;
     m_RadialColor : ColorStruct;
     m_unused_9B : number;
-    m_Armor : any;
+    m_Armor : Armor;
     m_Strength : number;
     m_Image : any;
     m_ImageAllocated : boolean;
@@ -1439,11 +1439,11 @@ class AbstractTypeClass
     extends AbstractClass
 {
     constructor(pID_0 : string);
-    LoadTheaterSpecificArt(th_type_0 : any) : void;
+    LoadTheaterSpecificArt(th_type_0 : TheaterType) : void;
     LoadFromINI(pINI_0 : CCINIClass) : boolean;
     SaveToINI(pINI_0 : CCINIClass) : boolean;
     get_ID() : string;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ID : string;
     m_UINameLabel : string;
@@ -1557,7 +1557,7 @@ class INIClass
 class TechnoTypeClass
     extends ObjectTypeClass
 {
-    constructor(id_0 : string, speedtype_1 : any);
+    constructor(id_0 : string, speedtype_1 : SpeedType);
     static Find(pID_0 : string) : TechnoTypeClass;
     static FindIndex(pID_0 : string) : number;
     Load(pStm_0 : any | any) : number;
@@ -1571,7 +1571,7 @@ class TechnoTypeClass
     GetRepairStep() : number;
     GetRefund(pHouse_0 : HouseClass, bUnk_1 : boolean) : number;
     GetFlightLevel() : number;
-    static GetByTypeAndIndex(abs_0 : any, index_1 : number) : TechnoTypeClass;
+    static GetByTypeAndIndex(abs_0 : AbstractType, index_1 : number) : TechnoTypeClass;
     HasMultipleTurrets() : boolean;
     GetParticleSysOffset(pBuffer_0 : CoordStruct) : CoordStruct;
     GetParticleSysOffset() : CoordStruct;
@@ -1616,12 +1616,12 @@ class TechnoTypeClass
     m_PitchSpeed : number;
     m_PitchAngle : number;
     m_BuildLimit : number;
-    m_Category : any;
+    m_Category : Category;
     m_unknown_3C0 : number;
     m_align_3C4 : number;
     m_DeployTime : number;
     m_FireAngle : number;
-    m_PipScale : any;
+    m_PipScale : PipScale;
     m_PipsDrawForAll : boolean;
     m_LeptonMindControlOffset : number;
     m_PixelSelectionBracketDelta : number;
@@ -1675,7 +1675,7 @@ class TechnoTypeClass
     m_ActivateSound : number;
     m_DeactivateSound : number;
     m_MindClearedSound : number;
-    m_MovementZone : any;
+    m_MovementZone : MovementZone;
     m_GuardRange : number;
     m_MinDebris : number;
     m_MaxDebris : number;
@@ -1691,8 +1691,8 @@ class TechnoTypeClass
     m_DetectDisguiseRange : number;
     m_BombSight : number;
     m_LeadershipRating : number;
-    m_NavalTargeting : any;
-    m_LandTargeting : any;
+    m_NavalTargeting : NavalTargetingType;
+    m_LandTargeting : LandTargetingType;
     m_BuildTimeMultiplier : number;
     m_MindControlRingOffset : number;
     m_Cost : number;
@@ -1710,7 +1710,7 @@ class TechnoTypeClass
     m_ThreatPosed : number;
     m_Points : number;
     m_Speed : number;
-    m_SpeedType : any;
+    m_SpeedType : SpeedType;
     m_InitialAmmo : number;
     m_Ammo : number;
     m_IFVMode : number;
@@ -1928,11 +1928,11 @@ class WeaponTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     CalculateSpeed() : void;
-    AllowedThreats() : any;
-    static s_AbsID : any;
+    AllowedThreats() : ThreatType;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_AmbientDamage : number;
     m_Burst : number;
@@ -2009,14 +2009,14 @@ class BulletTypeClass
     static FindIndex(pID_0 : string) : number;
     static FindOrAllocate(id_0 : string) : BulletTypeClass;
     GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     Rotates() : boolean;
     SetScaledSpawnDelay(delay_0 : number) : void;
     CreateBullet(Target_0 : AbstractClass, Owner_1 : TechnoClass, Damage_2 : number, WH_3 : WarheadTypeClass, Speed_4 : number, Bright_5 : boolean) : BulletClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Airburst : boolean;
     m_Floater : boolean;
@@ -2066,7 +2066,7 @@ class BulletClass
 {
     GetClassID(pClassID_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     GetAnimFrame() : number;
     SetTarget(pTarget_0 : AbstractClass) : void;
@@ -2083,7 +2083,7 @@ class BulletClass
     InitScalable() : void;
     NukeMaker() : void;
     GetTargetCoords() : CoordStruct;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     static s_ScalableBullets : any;
     m_Type : BulletTypeClass;
@@ -2121,10 +2121,10 @@ class RadioClass
     constructor();
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    SendToFirstLink(command_0 : any) : any;
-    SendCommand(command_0 : any, pRecipient_1 : TechnoClass) : any;
-    SendCommandWithData(command_0 : any, pInOut_1 : AbstractClass, pRecipient_2 : TechnoClass) : any;
-    SendToEachLink(command_0 : any) : void;
+    SendToFirstLink(command_0 : RadioCommand) : RadioCommand;
+    SendCommand(command_0 : RadioCommand, pRecipient_1 : TechnoClass) : RadioCommand;
+    SendCommandWithData(command_0 : RadioCommand, pInOut_1 : AbstractClass, pRecipient_2 : TechnoClass) : RadioCommand;
+    SendToEachLink(command_0 : RadioCommand) : void;
     GetNthLink(idx_0 : number) : TechnoClass;
     ContainsLink(pLink_0 : TechnoClass) : boolean;
     FindLinkIndex(pLink_0 : TechnoClass) : number;
@@ -2132,7 +2132,7 @@ class RadioClass
     HasFreeLink(pIgnore_0 : TechnoClass) : boolean;
     HasAnyLink() : boolean;
     SetLinkCount(count_0 : number) : void;
-    m_LastCommands : any;
+    m_LastCommands : RadioCommand;
     m_RadioLinks : any;
     m___RadioLinks : string;
 }
@@ -2140,10 +2140,10 @@ class MissionClass
     extends ObjectClass
 {
     constructor();
-    QueueMission(mission_0 : any, start_mission_1 : boolean) : boolean;
+    QueueMission(mission_0 : Mission, start_mission_1 : boolean) : boolean;
     NextMission() : boolean;
-    ForceMission(mission_0 : any) : void;
-    Override_Mission(mission_0 : any, target_1 : AbstractClass, destination_2 : AbstractClass) : void;
+    ForceMission(mission_0 : Mission) : void;
+    Override_Mission(mission_0 : Mission, target_1 : AbstractClass, destination_2 : AbstractClass) : void;
     Mission_Revert() : boolean;
     MissionIsOverriden() : boolean;
     ReadyToNextMission() : boolean;
@@ -2175,9 +2175,9 @@ class MissionClass
     Mission_Wait() : number;
     Mission_SpyPlaneApproach() : number;
     Mission_SpyPlaneOverfly() : number;
-    m_CurrentMission : any;
-    m_SuspendedMission : any;
-    m_QueuedMission : any;
+    m_CurrentMission : Mission;
+    m_SuspendedMission : Mission;
+    m_QueuedMission : Mission;
     m_unknown_bool_B8 : boolean;
     m_MissionStatus : number;
     m_CurrentMissionStartTime : number;
@@ -2194,16 +2194,16 @@ class InfantryTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_ArrayIndex : number;
-    m_Pip : any;
-    m_OccupyPip : any;
+    m_Pip : PipIndex;
+    m_OccupyPip : PipIndex;
     m_OccupyWeapon : WeaponStruct;
     m_EliteOccupyWeapon : WeaponStruct;
     m_Sequence : any;
@@ -2246,10 +2246,10 @@ class CellClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     FindTechnoNearestTo(offsetPixel_0 : Point2D, alt_1 : boolean, pExcludeThis_2 : TechnoClass) : TechnoClass;
-    FindObjectOfType(abs_0 : any, alt_1 : boolean) : ObjectClass;
+    FindObjectOfType(abs_0 : AbstractType, alt_1 : boolean) : ObjectClass;
     GetBuilding() : BuildingClass;
     GetUnit(alt_0 : boolean) : UnitClass;
     GetInfantry(alt_0 : boolean) : InfantryClass;
@@ -2269,9 +2269,9 @@ class CellClass
     SetupLAT() : void;
     RecalcAttributes(cellLevel_0 : number) : void;
     BlowUpBridge() : void;
-    CanThisExistHere(SpeedType_0 : any, pObject_1 : BuildingTypeClass, pOwner_2 : HouseClass) : boolean;
+    CanThisExistHere(SpeedType_0 : SpeedType, pObject_1 : BuildingTypeClass, pOwner_2 : HouseClass) : boolean;
     ScatterContent(crd_0 : CoordStruct, ignoreMission_1 : boolean, ignoreDestination_2 : boolean, alt_3 : boolean) : void;
-    GetNeighbourCell(facing_0 : any) : CellClass;
+    GetNeighbourCell(facing_0 : FacingType) : CellClass;
     UpdateThreat(SourceHouse_0 : number, ThreatLevel_1 : number) : void;
     CollectCrate(pCollector_0 : FootClass) : void;
     ProcessColourComponents(arg0_0 : number, pIntensity_1 : number, pAmbient_2 : number, a5_3 : number, a6_4 : number, tintR_5 : number, tintG_6 : number, tintB_7 : number) : void;
@@ -2347,8 +2347,8 @@ class CellClass
     InitLightConvert(pDrawer_0 : LightConvertClass, nIntensity_1 : number, nAmbient_2 : number, Red1_3 : number, Green1_4 : number, Blue1_5 : number) : void;
     DrawOverlay(Location_0 : Point2D, Bound_1 : RectangleStruct) : void;
     DrawOverlayShadow(Location_0 : Point2D, Bound_1 : RectangleStruct) : void;
-    IsClearToMove(speedType_0 : any, ignoreInfantry_1 : boolean, ignoreVehicles_2 : boolean, zone_3 : number, movementZone_4 : any, level_5 : number, isBridge_6 : boolean) : boolean;
-    static s_AbsID : any;
+    IsClearToMove(speedType_0 : SpeedType, ignoreInfantry_1 : boolean, ignoreVehicles_2 : boolean, zone_3 : number, movementZone_4 : MovementZone, level_5 : number, isBridge_6 : boolean) : boolean;
+    static s_AbsID : AbstractType;
     static s_BridgeLevels : number;
     static s_BridgeHeight : number;
     m_MapCoords : CellStruct;
@@ -2361,7 +2361,7 @@ class CellClass
     m_Rubble : BuildingTypeClass;
     m_OverlayTypeIndex : number;
     m_SmudgeTypeIndex : number;
-    m_Passability : any;
+    m_Passability : PassabilityType;
     m_WallOwnerIndex : number;
     m_InfantryOwnerIndex : number;
     m_AltInfantryOwnerIndex : number;
@@ -2374,7 +2374,7 @@ class CellClass
     m_Jumpjet : FootClass;
     m_FirstObject : ObjectClass;
     m_AltObject : ObjectClass;
-    m_LandType : any;
+    m_LandType : LandType;
     m_RadLevel : number;
     m_RadSite : RadSiteClass;
     m_PixelFX : any;
@@ -2401,19 +2401,19 @@ class CellClass
     m_BlockedNeighbours : number;
     m_OccupationFlags : number;
     m_AltOccupationFlags : number;
-    m_AltFlags : any;
+    m_AltFlags : AltCellFlags;
     m_ShroudCounter : number;
     m_GapsCoveringThisCell : number;
     m_VisibilityChanged : boolean;
     m_unknown_13C : number;
-    m_Flags : any;
+    m_Flags : CellFlags;
 }
 class BuildingClass
     extends TechnoClass
 {
     constructor(pType_0 : BuildingTypeClass, pOwner_1 : HouseClass);
     GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     Destroyed(Killer_0 : ObjectClass | any) : void;
     ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : number | any) : boolean;
@@ -2445,9 +2445,9 @@ class BuildingClass
     ClearBunker() : void;
     EmptyBunker() : void;
     AfterDestruction() : void;
-    DestroyNthAnim(Slot_0 : any) : void;
-    PlayNthAnim(Slot_0 : any, effectDelay_1 : number) : void;
-    PlayAnim(animName_0 : string, Slot_1 : any, Damaged_2 : boolean, Garrisoned_3 : boolean, effectDelay_4 : number) : void;
+    DestroyNthAnim(Slot_0 : BuildingAnimSlot) : void;
+    PlayNthAnim(Slot_0 : BuildingAnimSlot, effectDelay_1 : number) : void;
+    PlayAnim(animName_0 : string, Slot_1 : BuildingAnimSlot, Damaged_2 : boolean, Garrisoned_3 : boolean, effectDelay_4 : number) : void;
     ToggleDamagedAnims(isDamaged_0 : boolean) : void;
     DisableStuff() : void;
     EnableStuff() : void;
@@ -2455,7 +2455,7 @@ class BuildingClass
     EnableTemporal() : void;
     FirstActiveSWIdx() : number;
     GetShapeNumber() : number;
-    BeginMode(bType_0 : any) : void;
+    BeginMode(bType_0 : BStateType) : void;
     SecondActiveSWIdx() : number;
     FireLaser(Coords_0 : CoordStruct) : void;
     IsBeingDrained() : boolean;
@@ -2468,11 +2468,11 @@ class BuildingClass
     DrawInfoTipAndSpiedSelection(pLocation_0 : Point2D, pRect_1 : RectangleStruct) : number;
     HasSuperWeapon(index_0 : number) : boolean;
     GetSecretProduction() : TechnoTypeClass;
-    GetAnim(slot_0 : any) : AnimClass;
-    GetAnim(slot_0 : any) : AnimClass;
-    GetAnimState(slot_0 : any) : boolean;
-    GetAnimState(slot_0 : any) : boolean;
-    static s_AbsID : any;
+    GetAnim(slot_0 : BuildingAnimSlot) : AnimClass;
+    GetAnim(slot_0 : BuildingAnimSlot) : AnimClass;
+    GetAnimState(slot_0 : BuildingAnimSlot) : boolean;
+    GetAnimState(slot_0 : BuildingAnimSlot) : boolean;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_Type : BuildingTypeClass;
@@ -2545,7 +2545,7 @@ class BuildingClass
     m_unknown_short_700 : number;
     m_UpgradeLevel : number;
     m_GateStage : number;
-    m_PrismStage : any;
+    m_PrismStage : PrismChargeState;
     m_PrismTargetCoords : CoordStruct;
     m_DelayBeforeFiring : number;
     m_BunkerState : number;
@@ -2557,7 +2557,7 @@ class BuildingTypeClass
     static Find(pID_0 : string | any) : BuildingTypeClass;
     static FindIndex(pID_0 : string | any) : number;
     GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
@@ -2570,16 +2570,16 @@ class BuildingTypeClass
     HasSuperWeapon(index_0 : number) : boolean;
     HasSuperWeapon() : boolean;
     CanTogglePower() : boolean;
-    GetBuildingAnim(slot_0 : any) : BuildingAnimStruct;
-    GetBuildingAnim(slot_0 : any) : BuildingAnimStruct;
-    static s_AbsID : any;
+    GetBuildingAnim(slot_0 : BuildingAnimSlot) : BuildingAnimStruct;
+    GetBuildingAnim(slot_0 : BuildingAnimSlot) : BuildingAnimStruct;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_ArrayIndex : number;
     m_FoundationData : CellStruct;
     m_Buildup : any;
     m_BuildupLoaded : boolean;
-    m_BuildCat : any;
+    m_BuildCat : BuildCat;
     m_HalfDamageSmokeLocation1 : CoordStruct;
     m_HalfDamageSmokeLocation2 : CoordStruct;
     m_align_E24 : number;
@@ -2608,7 +2608,7 @@ class BuildingTypeClass
     m_SecretBuilding : BuildingTypeClass;
     m_field_EB0 : number;
     m_Adjacent : number;
-    m_Factory : any;
+    m_Factory : AbstractType;
     m_TargetCoordOffset : CoordStruct;
     m_ExitCoord : CoordStruct;
     m_FoundationOutside : CellStruct;
@@ -2618,7 +2618,7 @@ class BuildingTypeClass
     m_PowerDrain : number;
     m_ExtraPowerBonus : number;
     m_ExtraPowerDrain : number;
-    m_Foundation : any;
+    m_Foundation : Foundation;
     m_Height : number;
     m_OccupyHeight : number;
     m_MidPoint : number;
@@ -2796,16 +2796,16 @@ class OverlayTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     vt_entry_6C(pDest_0 : CoordStruct | any, pSrc_1 : CoordStruct | any) : CoordStruct;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     Draw(pClientCoords_0 : Point2D, pClipRect_1 : RectangleStruct, nFrame_2 : number) : void;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
-    m_LandType : any;
+    m_LandType : LandType;
     m_CellAnim : AnimTypeClass;
     m_DamageLevels : number;
     m_Strength : number;
@@ -2837,15 +2837,15 @@ class UnitTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_ArrayIndex : number;
-    m_MovementRestrictedTo : any;
+    m_MovementRestrictedTo : LandType;
     m_HalfDamageSmokeLocation : CoordStruct;
     m_Passive : boolean;
     m_CrateGoodie : boolean;
@@ -2896,7 +2896,7 @@ class FactoryClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     HasProgressChanged() : boolean;
     DemandProduction(pType_0 : TechnoTypeClass, pOwner_1 : HouseClass, shouldQueue_2 : boolean) : boolean;
@@ -2914,7 +2914,7 @@ class FactoryClass
     CountTotal(pType_0 : TechnoTypeClass) : number;
     IsQueued(pType_0 : TechnoTypeClass) : boolean;
     static FindByOwnerAndProduct(pHouse_0 : HouseClass, pItem_1 : TechnoTypeClass) : FactoryClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Production : StageClass;
     m_QueuedObjects : any;
@@ -2946,17 +2946,17 @@ class InfantryClass
 {
     constructor(pType_0 : InfantryTypeClass, pOwner_1 : HouseClass);
     GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    MouseOverObject(pObject_0 : ObjectClass | any, ignoreForce_1 : boolean | any) : any;
-    GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : number | any, ignoreRange_2 : boolean | any) : any;
+    MouseOverObject(pObject_0 : ObjectClass | any, ignoreForce_1 : boolean | any) : Action;
+    GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : number | any, ignoreRange_2 : boolean | any) : FireError;
     IsDeployed() : boolean;
-    PlayAnim(index_0 : any, force_1 : boolean, randomStartFrame_2 : boolean) : boolean;
-    static s_AbsID : any;
+    PlayAnim(index_0 : Sequence, force_1 : boolean, randomStartFrame_2 : boolean) : boolean;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_Type : InfantryTypeClass;
-    m_SequenceAnim : any;
+    m_SequenceAnim : Sequence;
     m_unknown_Timer_6C8 : CDTimerClass;
     m_PanicDurationLeft : number;
     m_PermanentBerzerk : boolean;
@@ -2976,7 +2976,7 @@ class FootClass
     Mission_AreaGuard() : number;
     Destroyed(Killer_0 : ObjectClass | any) : void;
     ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : number | any) : boolean;
-    GreatestThreat(threat_0 : any | any, pCoord_1 : CoordStruct | any, onlyTargetHouseEnemy_2 : boolean | any) : AbstractClass;
+    GreatestThreat(threat_0 : ThreatType | any, pCoord_1 : CoordStruct | any, onlyTargetHouseEnemy_2 : boolean | any) : AbstractClass;
     ReceiveGunner(Gunner_0 : FootClass) : void;
     RemoveGunner(Gunner_0 : FootClass) : void;
     IsLeavingMap() : boolean;
@@ -2991,7 +2991,7 @@ class FootClass
     StopMoving() : boolean;
     vt_entry_504() : boolean;
     ChronoWarpTo(pDest_0 : CoordStruct) : boolean;
-    Draw_A_SHP(SHP_0 : any, idxFacing_1 : number, Coords_2 : Point2D, Rectangle_3 : RectangleStruct, dwUnk5_4 : number, dwUnk6_5 : number, dwUnk7_6 : number, ZGradient_7 : any, dwUnk9_8 : number, extraLight_9 : number, dwUnk11_10 : number, dwUnk12_11 : number, dwUnk13_12 : number, dwUnk14_13 : number, dwUnk15_14 : number, dwUnk16_15 : number) : void;
+    Draw_A_SHP(SHP_0 : any, idxFacing_1 : number, Coords_2 : Point2D, Rectangle_3 : RectangleStruct, dwUnk5_4 : number, dwUnk6_5 : number, dwUnk7_6 : number, ZGradient_7 : ZGradient, dwUnk9_8 : number, extraLight_9 : number, dwUnk11_10 : number, dwUnk12_11 : number, dwUnk13_12 : number, dwUnk14_13 : number, dwUnk15_14 : number, dwUnk16_15 : number) : void;
     Draw_A_VXL(VXL_0 : any, HVAFrameIndex_1 : number, Flags_2 : number, Cache_3 : any, Rectangle_4 : RectangleStruct, CenterPoint_5 : Point2D, Matrix_6 : Matrix3D, dwUnk8_7 : number, DrawFlags_8 : number, dwUnk10_9 : number) : void;
     GoBerzerk() : void;
     Panic() : void;
@@ -3024,7 +3024,7 @@ class FootClass
     ClearNavigationList() : void;
     MoveToTiberium(radius_0 : number, scanClose_1 : boolean) : boolean;
     MoveToWeed(radius_0 : number) : boolean;
-    static s_AbsDerivateID : any;
+    static s_AbsDerivateID : AbstractFlags;
     static s_Array : any;
     m_PlanningPathIdx : number;
     m_WaypointNearbyAccessibleCellDelta : CellStruct;
@@ -3045,7 +3045,7 @@ class FootClass
     m_unknown_5A0 : AbstractClass;
     m_Destination : AbstractClass;
     m_LastDestination : AbstractClass;
-    m_MegaMission : any;
+    m_MegaMission : Mission;
     m_MegaDestination : AbstractClass;
     m_MegaTarget : AbstractClass;
     m_unknown_5D0 : number;
@@ -3116,9 +3116,9 @@ class TeamClass
     LiberateMember(pFoot_0 : FootClass, idx_1 : number, count_2 : number) : void;
     AddMember(pFoot_0 : FootClass, bForce_1 : boolean) : boolean;
     AssignMissionTarget(pTarget_0 : AbstractClass) : void;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Type : TeamTypeClass;
     m_CurrentScript : ScriptClass;
@@ -3164,7 +3164,7 @@ class TeamTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
     CreateTeam(pHouse_0 : HouseClass) : TeamClass;
@@ -3178,7 +3178,7 @@ class TeamTypeClass
     ProcessTaskForce() : void;
     static ProcessAllTaskforces() : void;
     GetHouse() : HouseClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_Group : number;
@@ -3235,7 +3235,7 @@ class TagClass
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     ComputeCRC(crc_0 : any | any) : void;
     HasCrossesHorizontalLineEvent() : boolean;
@@ -3245,14 +3245,14 @@ class TagClass
     GlobalChanged(idxGlobal_0 : number) : void;
     LocalChanged(idxLocal_0 : number) : void;
     IsOnlyInstanceOfType() : boolean;
-    RaiseEvent(event_0 : any, pTagOwner_1 : ObjectClass, location_2 : CellStruct, forceAllOccured_3 : boolean, pSource_4 : TechnoClass) : boolean;
+    RaiseEvent(event_0 : TriggerEvent, pTagOwner_1 : ObjectClass, location_2 : CellStruct, forceAllOccured_3 : boolean, pSource_4 : TechnoClass) : boolean;
     ShouldReplace() : boolean;
     Destroy() : void;
     HasBeenDestroyed() : boolean;
     AddTrigger(pTrigger_0 : TriggerClass) : void;
     RemoveTrigger(pTrigger_0 : TriggerClass) : boolean;
     ContainsTrigger(pTrigger_0 : TriggerClass) : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Type : TagTypeClass;
     m_FirstTrigger : TriggerClass;
@@ -3271,7 +3271,7 @@ class TagTypeClass
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     ComputeCRC(crc_0 : any | any) : void;
     GetArrayIndex() : number;
@@ -3288,10 +3288,10 @@ class TagTypeClass
     AddTrigger(pTrigger_0 : TriggerTypeClass) : boolean;
     RemoveTrigger(pTrigger_0 : TriggerTypeClass) : boolean;
     ContainsTrigger(pTrigger_0 : TriggerTypeClass) : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
-    m_Persistence : any;
+    m_Persistence : TriggerPersistence;
     m_FirstTrigger : TriggerTypeClass;
 }
 class TriggerTypeClass
@@ -3304,7 +3304,7 @@ class TriggerTypeClass
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     ComputeCRC(crc_0 : any | any) : void;
     GetArrayIndex() : number;
@@ -3322,7 +3322,7 @@ class TriggerTypeClass
     HasZoneEntryByEvent() : boolean;
     RemoveAction(pAction_0 : TActionClass) : boolean;
     RemoveEvent(pEvent_0 : TEventClass) : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_Difficulty : boolean;
@@ -3341,7 +3341,7 @@ class TActionClass
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     ComputeCRC(crc_0 : any | any) : void;
     GetArrayIndex() : number;
@@ -3482,11 +3482,11 @@ class TActionClass
     ResetBaseCenter(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
     FlashBuildingsOfType(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
     FindHouseByIndex(pTrigger_0 : TriggerClass, idxHouse_1 : number) : HouseClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_NextAction : TActionClass;
-    m_ActionKind : any;
+    m_ActionKind : TriggerAction;
     m_TeamType : TeamTypeClass;
     m_Waypoint : number;
     m_Value2 : number;
@@ -3510,7 +3510,7 @@ class TriggerClass
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     ComputeCRC(crc_0 : any | any) : void;
     HasCrossesHorizontalLineEvent() : boolean;
@@ -3530,9 +3530,9 @@ class TriggerClass
     GetHouse() : HouseClass;
     Enable() : void;
     Disable() : void;
-    RegisterEvent(event_0 : any, pObject_1 : ObjectClass, forceFire_2 : boolean, persistent_3 : boolean, pSource_4 : TechnoClass) : boolean;
+    RegisterEvent(event_0 : TriggerEvent, pObject_1 : ObjectClass, forceFire_2 : boolean, persistent_3 : boolean, pSource_4 : TechnoClass) : boolean;
     FireActions(pObj_0 : ObjectClass, location_1 : CellStruct) : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Type : TriggerTypeClass;
     m_NextTrigger : TriggerClass;
@@ -3549,19 +3549,19 @@ class TEventClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     LoadFromINI() : void;
     PrepareSaveToINI(buffer_0 : string) : void;
-    static GetAttachType(eventKind_0 : number) : any;
+    static GetAttachType(eventKind_0 : number) : TriggerAttachType;
     GetStateA() : boolean;
     GetStateB() : boolean;
     HasOccured(eventKind_0 : number, pHouse_1 : HouseClass, Object_2 : ObjectClass, ActivationFrame_3 : CDTimerClass, isRepeating_4 : boolean) : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_NextEvent : TEventClass;
-    m_EventKind : any;
+    m_EventKind : TriggerEvent;
     m_TeamType : TeamTypeClass;
     m_Value : number;
     m_String : string;
@@ -3576,12 +3576,12 @@ class HouseTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     FindParentCountry() : HouseTypeClass;
     FindParentCountryIndex() : number;
     static FindIndexOfName(name_0 : string) : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ParentCountry : any;
     m_ArrayIndex : number;
@@ -3631,11 +3631,11 @@ class AircraftTypeClass
     static Find(pID_0 : string | any) : AircraftTypeClass;
     static FindIndex(pID_0 : string | any) : number;
     GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_ArrayIndex : number;
@@ -3660,10 +3660,10 @@ class ScriptTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_IsGlobal : boolean;
@@ -3684,9 +3684,9 @@ class TaskForceClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Group : number;
     m_CountEntries : number;
@@ -3705,7 +3705,7 @@ class ScriptClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     GetCurrentAction(buffer_0 : ScriptActionNode) : ScriptActionNode;
     GetNextAction(buffer_0 : ScriptActionNode) : ScriptActionNode;
@@ -3713,7 +3713,7 @@ class ScriptClass
     SetMission(nLine_0 : number) : boolean;
     NextMission() : boolean;
     HasNextMission() : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     m_Type : ScriptTypeClass;
     m_field_28 : number;
     m_CurrentMission : number;
@@ -3725,7 +3725,7 @@ class ParasiteClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     UpdateSquid() : void;
     UpdateGrapple() : boolean;
@@ -3733,14 +3733,14 @@ class ParasiteClass
     CanInfect(pTarget_0 : FootClass) : boolean;
     TryInfect(pTarget_0 : FootClass) : void;
     CanExistOnVictimCell() : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Owner : FootClass;
     m_Victim : FootClass;
     m_SuppressionTimer : CDTimerClass;
     m_DamageDeliveryTimer : CDTimerClass;
     m_GrappleAnim : AnimClass;
-    m_GrappleState : any;
+    m_GrappleState : ParasiteState;
     m_GrappleAnimFrame : number;
     m_GrappleAnimDelay : number;
     m_GrappleAnimGotInvalid : boolean;
@@ -3751,17 +3751,17 @@ class BuildingLightClass
     constructor(pOwner_0 : ObjectClass);
     GetClassID(pClassID_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    SetBehaviour(mode_0 : any) : void;
-    static s_AbsID : any;
+    SetBehaviour(mode_0 : SpotlightBehaviour) : void;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Speed : number;
     m_field_B8 : CoordStruct;
     m_field_C4 : CoordStruct;
     m_Acceleration : number;
     m_Direction : boolean;
-    m_BehaviourMode : any;
+    m_BehaviourMode : SpotlightBehaviour;
     m_FollowingObject : ObjectClass;
     m_OwnerObject : TechnoClass;
 }
@@ -3773,13 +3773,13 @@ class LightSourceClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     Activate(dwZero_0 : number) : void;
     Deactivate(dwZero_0 : number) : void;
     ChangeLevels(nIntensity_0 : number, Tint_1 : TintStruct, mode_2 : number) : void;
     static UpdateLightConverts(value_0 : number) : void;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_LightIntensity : number;
     m_LightTint : TintStruct;
@@ -3795,13 +3795,13 @@ class UnitClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    MouseOverCell(pCell_0 : CellStruct | any, checkFog_1 : boolean | any, ignoreForce_2 : boolean | any) : any;
-    MouseOverObject(pObject_0 : ObjectClass | any, ignoreForce_1 : boolean | any) : any;
+    MouseOverCell(pCell_0 : CellStruct | any, checkFog_1 : boolean | any, ignoreForce_2 : boolean | any) : Action;
+    MouseOverObject(pObject_0 : ObjectClass | any, ignoreForce_1 : boolean | any) : Action;
     MarkAllOccupationBits(coords_0 : CoordStruct | any) : void;
     UnmarkAllOccupationBits(coords_0 : CoordStruct | any) : void;
-    GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : number | any, ignoreRange_2 : boolean | any) : any;
+    GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : number | any, ignoreRange_2 : boolean | any) : FireError;
     DrawAsVXL(Coords_0 : Point2D, BoundingRect_1 : RectangleStruct, Brightness_2 : number, Tint_3 : number) : void;
     DrawAsSHP(Coords_0 : Point2D, BoundingRect_1 : RectangleStruct, Brightness_2 : number, Tint_3 : number) : void;
     DrawObject(pSurface_0 : Surface | any, Coords_1 : Point2D | any, CacheRect_2 : RectangleStruct | any, Brightness_3 : number | any, Tint_4 : number | any) : void;
@@ -3827,7 +3827,7 @@ class UnitClass
     ShouldCrashIt(pTarget_0 : TechnoClass) : boolean;
     AssignDestination_7447B0(pTarget_0 : AbstractClass) : AbstractClass;
     AStarAttempt(cell1_0 : CellStruct, cell2_1 : CellStruct) : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_unknown_int_6C0 : number;
@@ -3923,10 +3923,10 @@ class AircraftClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     FindFireLocation(pTarget_0 : AbstractClass) : AbstractClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_Type : AircraftTypeClass;
@@ -3948,9 +3948,9 @@ class TerrainClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Animation : StageClass;
     m_Type : TerrainTypeClass;
@@ -3968,11 +3968,11 @@ class TerrainTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_Foundation : number;
@@ -3998,12 +3998,12 @@ class TiberiumClass
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     GetSizeMax(pcbSize_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     RegisterForGrowth(cell_0 : CellStruct) : void;
     static FindIndex(idxOverlayType_0 : number) : number;
     static Find(idxOverlayType_0 : number) : TiberiumClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_Spread : number;
@@ -4042,7 +4042,7 @@ class RadSiteClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     Activate() : void;
     Deactivate() : void;
@@ -4057,7 +4057,7 @@ class RadSiteClass
     GetSpread() : void;
     SetSpread(nCells_0 : number) : void;
     GetEffectPercentage() : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_LightSource : LightSourceClass;
     m_BaseCell : CellStruct;
@@ -4095,8 +4095,8 @@ class ConvertClass
 {
     constructor(palette_0 : BytePalette, eightbitpalette_1 : BytePalette, pSurface_2 : DSurface, shadeCount_3 : any, skipBlitters_4 : boolean);
     static CreateFromFile(pFilename_0 : string, pPalette_1 : BytePalette, pDestination_2 : ConvertClass) : void;
-    SelectPlainBlitter(flags_0 : any) : any;
-    SelectRLEBlitter(flags_0 : any) : any;
+    SelectPlainBlitter(flags_0 : BlitterFlags) : any;
+    SelectRLEBlitter(flags_0 : BlitterFlags) : any;
     static s_Array : any;
     m_BytesPerPixel : number;
     m_Blitters : any;
@@ -4114,8 +4114,8 @@ class DSurface
 {
     DrawGradientLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pStartColor_3 : ColorStruct, pEndColor_4 : ColorStruct, fStep_5 : number, nColor_6 : number) : boolean;
     CanBlit() : boolean;
-    DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : number, Position_3 : Point2D, Bounds_4 : RectangleStruct, Flags_5 : any, Remap_6 : number, ZAdjust_7 : number, ZGradientDescIndex_8 : any, Brightness_9 : number, TintColor_10 : number, ZShape_11 : any, ZShapeFrame_12 : number, XOffset_13 : number, YOffset_14 : number) : void;
-    DrawTextA(pText_0 : number, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : any) : void;
+    DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : number, Position_3 : Point2D, Bounds_4 : RectangleStruct, Flags_5 : BlitterFlags, Remap_6 : number, ZAdjust_7 : number, ZGradientDescIndex_8 : ZGradient, Brightness_9 : number, TintColor_10 : number, ZShape_11 : any, ZShapeFrame_12 : number, XOffset_13 : number, YOffset_14 : number) : void;
+    DrawTextA(pText_0 : number, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : TextPrintType) : void;
     DrawTextA(pText_0 : number, pLoction_1 : Point2D, Color_2 : number) : void;
     DrawTextA(pText_0 : number, X_1 : number, Y_2 : number, Color_3 : number) : void;
     static s_Tile : any;
@@ -4213,7 +4213,7 @@ class VeterancyStruct
     constructor(value_0 : number);
     Add(ownerCost_0 : number, victimCost_1 : number) : void;
     Add(value_0 : number) : void;
-    GetRemainingLevel() : any;
+    GetRemainingLevel() : Rank;
     IsNegative() : boolean;
     IsRookie() : boolean;
     IsVeteran() : boolean;
@@ -4231,7 +4231,7 @@ class TemporalClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     Fire(pTarget_0 : TechnoClass) : void;
     CanWarpTarget(pTarget_0 : TechnoClass) : boolean;
@@ -4239,7 +4239,7 @@ class TemporalClass
     LetGo() : void;
     JustLetGo() : void;
     Detach() : void;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     m_Owner : TechnoClass;
@@ -4259,7 +4259,7 @@ class SuperClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     CreateChronoAnim(coords_0 : CoordStruct) : void;
     Reset() : void;
@@ -4281,7 +4281,7 @@ class SuperClass
     NameReadiness() : number;
     ShouldDrawProgress() : boolean;
     ShouldFlashTab() : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_AbsVTable : number;
     static s_Array : any;
     static s_ShowTimers : any;
@@ -4303,7 +4303,7 @@ class SuperClass
     m_IsSuspended : boolean;
     m_ReadyFrame : number;
     m_CameoChargeState : number;
-    m_ChargeDrainState : any;
+    m_ChargeDrainState : ChargeDrainState;
 }
 class SuperWeaponTypeClass
     extends AbstractTypeClass
@@ -4314,11 +4314,11 @@ class SuperWeaponTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    MouseOverObject(cell_0 : CellStruct, pObjBelowMouse_1 : ObjectClass) : any;
-    static FindFirstOfAction(Action_0 : any) : SuperWeaponTypeClass;
-    static s_AbsID : any;
+    MouseOverObject(cell_0 : CellStruct, pObjBelowMouse_1 : ObjectClass) : Action;
+    static FindFirstOfAction(Action_0 : Action) : SuperWeaponTypeClass;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ArrayIndex : number;
     m_WeaponType : WeaponTypeClass;
@@ -4327,9 +4327,9 @@ class SuperWeaponTypeClass
     m_ImpatientVoice : number;
     m_SuspendVoice : number;
     m_RechargeTime : number;
-    m_Type : any;
+    m_Type : SuperWeaponType;
     m_SidebarImage : any;
-    m_Action : any;
+    m_Action : Action;
     m_SpecialSound : number;
     m_StartSound : number;
     m_AuxBuilding : BuildingTypeClass;
@@ -4354,10 +4354,10 @@ class AirstrikeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     StartMission(pTarget_0 : ObjectClass) : void;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     m_AirstrikeTeam : number;
     m_EliteAirstrikeTeam : number;
     m_AirstrikeTeamTypeIndex : number;
@@ -4382,7 +4382,7 @@ class CaptureManagerClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     CaptureUnit(pUnit_0 : TechnoClass) : boolean;
     FreeUnit(pUnit_0 : TechnoClass) : boolean;
@@ -4397,7 +4397,7 @@ class CaptureManagerClass
     DrawLinks() : boolean;
     DecideUnitFate(Unit_0 : TechnoClass) : void;
     GetOriginalOwner(Unit_0 : TechnoClass) : HouseClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_ControlNodes : any;
     m_MaxControlNodes : number;
@@ -4422,7 +4422,7 @@ class SpawnManagerClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     KillNodes() : void;
     SetTarget(pTarget_0 : AbstractClass) : void;
@@ -4432,7 +4432,7 @@ class SpawnManagerClass
     CountDockedSpawns() : number;
     CountLaunchingSpawns() : number;
     UnlinkPointer() : void;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Owner : TechnoClass;
     m_SpawnType : AircraftTypeClass;
@@ -4444,12 +4444,12 @@ class SpawnManagerClass
     m_SpawnTimer : CDTimerClass;
     m_Target : AbstractClass;
     m_NewTarget : AbstractClass;
-    m_Status : any;
+    m_Status : SpawnManagerStatus;
 }
 class SpawnControl
 {
     m_Unit : AircraftClass;
-    m_Status : any;
+    m_Status : SpawnNodeStatus;
     m_SpawnTimer : CDTimerClass;
     m_IsSpawnMissile : number;
 }
@@ -4460,7 +4460,7 @@ class SlaveManagerClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SetOwner(NewOwner_0 : TechnoClass) : void;
     CreateSlave(Node_0 : any) : void;
@@ -4471,7 +4471,7 @@ class SlaveManagerClass
     ZeroOutSlaves() : void;
     SuspendWork() : void;
     ResumeWork() : void;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Owner : TechnoClass;
     m_SlaveType : InfantryTypeClass;
@@ -4480,7 +4480,7 @@ class SlaveManagerClass
     m_ReloadRate : number;
     m_SlaveNodes : any;
     m_RespawnTimer : CDTimerClass;
-    m_State : any;
+    m_State : SlaveManagerStatus;
     m_LastScanFrame : number;
 }
 class ParticleSystemClass
@@ -4490,9 +4490,9 @@ class ParticleSystemClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Type : ParticleSystemTypeClass;
     m_SpawnDistanceToOwner : CoordStruct;
@@ -4519,11 +4519,11 @@ class ParticleSystemTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_HoldsWhat : number;
     m_Spawns : boolean;
@@ -4533,7 +4533,7 @@ class ParticleSystemTypeClass
     m_SpawnRadius : number;
     m_SpawnCutoff : number;
     m_SpawnTranslucencyCutoff : number;
-    m_BehavesLike : any;
+    m_BehavesLike : BehavesLike;
     m_Lifetime : number;
     m_SpawnDirection : any;
     m_ParticlesPerCoord : number;
@@ -4556,10 +4556,10 @@ class ParticleClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     vt_entry_1E8() : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Type : ParticleTypeClass;
     m_unknown_B0 : number;
@@ -4599,11 +4599,11 @@ class ParticleTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_NextParticleOffset : CoordStruct;
     m_XVelocity : number;
@@ -4634,7 +4634,7 @@ class ParticleTypeClass
     m_Translucent50State : number;
     m_Normalized : boolean;
     m_NextParticle : ParticleTypeClass;
-    m_BehavesLike : any;
+    m_BehavesLike : BehavesLike;
 }
 class WarheadTypeClass
     extends AbstractTypeClass
@@ -4646,16 +4646,16 @@ class WarheadTypeClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Deform : number;
     m_Verses : number;
     m_ProneDamage : number;
     m_DeformTreshold : number;
     m_AnimList : any;
-    m_InfDeath : any;
+    m_InfDeath : InfDeath;
     m_CellSpread : number;
     m_CellInset : number;
     m_PercentAtMax : number;
@@ -4717,11 +4717,11 @@ class VoxelAnimTypeClass
     static Find(pID_0 : string) : VoxelAnimTypeClass;
     static FindIndex(pID_0 : string) : number;
     GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Normalized : boolean;
     m_Translucent : boolean;
@@ -4751,20 +4751,20 @@ class VoxelAnimTypeClass
 class WaveClass
     extends ObjectClass
 {
-    constructor(From_0 : CoordStruct, To_1 : CoordStruct, Owner_2 : TechnoClass, mode_3 : any, Target_4 : AbstractClass);
+    constructor(From_0 : CoordStruct, To_1 : CoordStruct, Owner_2 : TechnoClass, mode_3 : WaveType, Target_4 : AbstractClass);
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
     GetClassID(pClassID_0 : any | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     Draw_Magnetic(xyzFrom_0 : CoordStruct, xyzTo_1 : CoordStruct) : void;
     Draw_NonMagnetic(xyzFrom_0 : CoordStruct, xyzTo_1 : CoordStruct) : void;
     Update_Wave() : void;
     DamageArea(location_0 : CoordStruct) : void;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Target : AbstractClass;
-    m_Type : any;
+    m_Type : WaveType;
     m_LimboCoords : CoordStruct;
     m_Pos0 : CoordStruct;
     m_WaveStartMiddle : Point2D;
@@ -4838,7 +4838,7 @@ class TurretControl
 }
 class RadBeam
 {
-    static Allocate(mode_0 : any) : RadBeam;
+    static Allocate(mode_0 : RadBeamType) : RadBeam;
     SetColor(color_0 : ColorStruct) : void;
     SetCoordsSource(loc_0 : CoordStruct) : void;
     SetCoordsTarget(loc_0 : CoordStruct) : void;
@@ -4847,7 +4847,7 @@ class RadBeam
     m_Owner : TechnoClass;
     m_unknown_8 : number;
     m_unknown_C : number;
-    m_Type : any;
+    m_Type : RadBeamType;
     m_unknown_14 : number;
     m_unknown_18 : number;
     m_Color : ColorStruct;
@@ -4988,14 +4988,14 @@ class BombClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     Detonate() : void;
     Disarm() : void;
     IsDeathBomb() : number;
     GetCurrentFlickerFrame() : number;
     TimeToExplode() : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     m_Owner : TechnoClass;
     m_OwnerHouse : HouseClass;
     m_Target : ObjectClass;
@@ -5044,12 +5044,12 @@ class WaypointPathClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     GetWaypoint(idx_0 : number) : WaypointClass;
     GetWaypointAfter(idx_0 : number) : WaypointClass;
     WaypointExistsAt(wpt_0 : WaypointClass) : boolean;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     m_CurrentWaypointIndex : number;
     m_Waypoints : any;
 }
@@ -5155,7 +5155,7 @@ class LinkClass
 class GadgetClass
     extends LinkClass
 {
-    constructor(nX_0 : number, nY_1 : number, nWidth_2 : number, nHeight_3 : number, eFlag_4 : any, bSticky_5 : boolean);
+    constructor(nX_0 : number, nY_1 : number, nWidth_2 : number, nHeight_3 : number, eFlag_4 : GadgetFlag, bSticky_5 : boolean);
     constructor(another_0 : GadgetClass);
     GetNext() : GadgetClass;
     GetPrev() : GadgetClass;
@@ -5180,9 +5180,9 @@ class GadgetClass
     Draw(bForced_0 : boolean) : boolean;
     OnMouseEnter() : void;
     OnMouseLeave() : void;
-    StickyProcess(Flags_0 : any) : void;
-    Action(Flags_0 : any, pKey_1 : number, Modifier_2 : any) : boolean;
-    Clicked(pKey_0 : number, Flags_1 : any, X_2 : number, Y_3 : number, Modifier_4 : any) : boolean;
+    StickyProcess(Flags_0 : GadgetFlag) : void;
+    Action(Flags_0 : GadgetFlag, pKey_1 : number, Modifier_2 : KeyModifier) : boolean;
+    Clicked(pKey_0 : number, Flags_1 : GadgetFlag, X_2 : number, Y_3 : number, Modifier_4 : KeyModifier) : boolean;
     // skip operator=
     ExtractGadgetAt(X_0 : number, Y_1 : number) : GadgetClass;
     static GetColorScheme() : number;
@@ -5193,7 +5193,7 @@ class GadgetClass
     m_NeedsRedraw : boolean;
     m_IsSticky : boolean;
     m_Disabled : boolean;
-    m_Flags : any;
+    m_Flags : GadgetFlag;
 }
 class DifficultyStruct
 {
@@ -5816,9 +5816,9 @@ class RulesClass
     m_Harvester : number;
     m_SellBack : number;
     m_AIBaseSpacing : number;
-    m_SilverCrate : any;
-    m_WoodCrate : any;
-    m_WaterCrate : any;
+    m_SilverCrate : Powerup;
+    m_WoodCrate : Powerup;
+    m_WaterCrate : Powerup;
     m_CrateMinimum : number;
     m_CrateMaximum : number;
     m_unknown_int_1478 : number;
@@ -6013,15 +6013,15 @@ class LocomotionClass
     Is_Moving() : boolean;
     Destination() : CoordStruct;
     Head_To_Coord() : CoordStruct;
-    Can_Enter_Cell(cell_0 : CellStruct | any) : any;
+    Can_Enter_Cell(cell_0 : CellStruct | any) : Move;
     Is_To_Have_Shadow() : boolean;
     Draw_Matrix(pIndex_0 : any | any) : Matrix3D;
     Shadow_Matrix(pIndex_0 : any | any) : Matrix3D;
     Draw_Point() : Point2D;
     Shadow_Point() : Point2D;
-    Visual_Character(raw_0 : boolean | any) : any;
+    Visual_Character(raw_0 : boolean | any) : VisualType;
     Z_Adjust() : number;
-    Z_Gradient() : any;
+    Z_Gradient() : ZGradient;
     Process() : boolean;
     Move_To(to_0 : CoordStruct | any) : void;
     Stop_Moving() : void;
@@ -6035,17 +6035,17 @@ class LocomotionClass
     Push(dir_0 : DirStruct | any) : boolean;
     Shove(dir_0 : DirStruct | any) : boolean;
     Force_Track(track_0 : number | any, coord_1 : CoordStruct | any) : void;
-    In_Which_Layer() : any;
+    In_Which_Layer() : Layer;
     Force_Immediate_Destination(coord_0 : CoordStruct | any) : void;
     Force_New_Slope(ramp_0 : number | any) : void;
     Is_Moving_Now() : boolean;
     Apparent_Speed() : number;
     Drawing_Code() : number;
-    Can_Fire() : any;
+    Can_Fire() : FireError;
     Get_Status() : number;
     Acquire_Hunter_Seeker_Target() : void;
     Is_Surfacing() : boolean;
-    Mark_All_Occupation_Bits(mark_0 : any | any) : void;
+    Mark_All_Occupation_Bits(mark_0 : MarkType | any) : void;
     Is_Moving_Here(to_0 : CoordStruct | any) : boolean;
     Will_Jump_Tracks() : boolean;
     Is_Really_Moving_Now() : boolean;
@@ -6169,7 +6169,7 @@ class ScenarioClass
     m_unknown_timer_123c : CDTimerClass;
     m_AmbientTimer : CDTimerClass;
     m_TechLevel : number;
-    m_Theater : any;
+    m_Theater : TheaterType;
     m_FileName : string;
     m_Name : number;
     m_UIName : string;
@@ -6266,10 +6266,10 @@ class OverlayClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    WhatAmI() : any;
+    WhatAmI() : AbstractType;
     Size() : number;
     static GetTiberiumType(overlayTypeIndex_0 : number) : number;
-    static s_AbsID : any;
+    static s_AbsID : AbstractType;
     static s_Array : any;
     m_Type : OverlayTypeClass;
 }
@@ -6286,8 +6286,8 @@ class FlyLocomotionClass
     Move_To(to_0 : CoordStruct | any) : void;
     Stop_Moving() : void;
     Do_Turn(coord_0 : DirStruct | any) : void;
-    In_Which_Layer() : any;
-    Mark_All_Occupation_Bits(mark_0 : any | any) : void;
+    In_Which_Layer() : Layer;
+    Mark_All_Occupation_Bits(mark_0 : MarkType | any) : void;
     Limbo() : void;
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
@@ -6325,8 +6325,8 @@ class RocketLocomotionClass
     Move_To(to_0 : CoordStruct | any) : void;
     Stop_Moving() : void;
     Do_Turn(coord_0 : DirStruct | any) : void;
-    In_Which_Layer() : any;
-    Mark_All_Occupation_Bits(mark_0 : any | any) : void;
+    In_Which_Layer() : Layer;
+    Mark_All_Occupation_Bits(mark_0 : MarkType | any) : void;
     Limbo() : void;
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
@@ -6362,8 +6362,8 @@ class TeleportLocomotionClass
     Move_To(to_0 : CoordStruct | any) : void;
     Stop_Moving() : void;
     Do_Turn(coord_0 : DirStruct | any) : void;
-    In_Which_Layer() : any;
-    Mark_All_Occupation_Bits(mark_0 : any | any) : void;
+    In_Which_Layer() : Layer;
+    Mark_All_Occupation_Bits(mark_0 : MarkType | any) : void;
     Limbo() : void;
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
@@ -6400,8 +6400,8 @@ class GScreenClass
     DrawOnTop() : void;
     Draw(dwUnk_0 : number) : void;
     vt_entry_44() : void;
-    SetCursor(idxCursor_0 : any, miniMap_1 : boolean) : boolean;
-    UpdateCursor(idxCursor_0 : any, miniMap_1 : boolean) : boolean;
+    SetCursor(idxCursor_0 : MouseCursorType, miniMap_1 : boolean) : boolean;
+    UpdateCursor(idxCursor_0 : MouseCursorType, miniMap_1 : boolean) : boolean;
     RestoreCursor() : boolean;
     UpdateCursorMinimapState(miniMap_0 : boolean) : void;
     Render() : void;
@@ -6436,7 +6436,7 @@ class LogicClass
 class MapClass
     extends GScreenClass
 {
-    static GetLayer(lyr_0 : any) : LayerClass;
+    static GetLayer(lyr_0 : Layer) : LayerClass;
     Is_Visible(cell_0 : CellStruct | any) : number;
     AllocateCells() : void;
     DestructCells() : void;
@@ -6463,18 +6463,18 @@ class MapClass
     CenterMap() : void;
     CellIteratorReset() : void;
     CellIteratorNext() : CellClass;
-    GetMovementZoneType(MapCoords_0 : CellStruct, movementZone_1 : any, isBridge_2 : boolean) : number;
-    static DamageArea(Coords_0 : CoordStruct, Damage_1 : number, SourceObject_2 : TechnoClass, WH_3 : WarheadTypeClass, AffectsTiberium_4 : boolean, SourceHouse_5 : HouseClass) : any;
-    static SelectDamageAnimation(Damage_0 : number, WH_1 : WarheadTypeClass, LandType_2 : any, coords_3 : CoordStruct) : AnimTypeClass;
-    static FlashbangWarheadAt(Damage_0 : number, WH_1 : WarheadTypeClass, coords_2 : CoordStruct, Force_3 : boolean, CLDisableFlags_4 : any) : void;
-    static GetTotalDamage(damage_0 : number, pWarhead_1 : WarheadTypeClass, armor_2 : any, distance_3 : number) : number;
+    GetMovementZoneType(MapCoords_0 : CellStruct, movementZone_1 : MovementZone, isBridge_2 : boolean) : number;
+    static DamageArea(Coords_0 : CoordStruct, Damage_1 : number, SourceObject_2 : TechnoClass, WH_3 : WarheadTypeClass, AffectsTiberium_4 : boolean, SourceHouse_5 : HouseClass) : DamageAreaResult;
+    static SelectDamageAnimation(Damage_0 : number, WH_1 : WarheadTypeClass, LandType_2 : LandType, coords_3 : CoordStruct) : AnimTypeClass;
+    static FlashbangWarheadAt(Damage_0 : number, WH_1 : WarheadTypeClass, coords_2 : CoordStruct, Force_3 : boolean, CLDisableFlags_4 : SpotlightFlags) : void;
+    static GetTotalDamage(damage_0 : number, pWarhead_1 : WarheadTypeClass, armor_2 : Armor, distance_3 : number) : number;
     GetCellFloorHeight(crd_0 : CoordStruct) : number;
-    PickCellOnEdge(buffer_0 : CellStruct, Edge_1 : any, CurrentLocation_2 : CellStruct, Fallback_3 : CellStruct, SpeedType_4 : any, ValidateReachability_5 : boolean, MovZone_6 : any) : CellStruct;
-    PickCellOnEdge(Edge_0 : any, CurrentLocation_1 : CellStruct, Fallback_2 : CellStruct, SpeedType_3 : any, ValidateReachability_4 : boolean, MovZone_5 : any) : CellStruct;
+    PickCellOnEdge(buffer_0 : CellStruct, Edge_1 : Edge, CurrentLocation_2 : CellStruct, Fallback_3 : CellStruct, SpeedType_4 : SpeedType, ValidateReachability_5 : boolean, MovZone_6 : MovementZone) : CellStruct;
+    PickCellOnEdge(Edge_0 : Edge, CurrentLocation_1 : CellStruct, Fallback_2 : CellStruct, SpeedType_3 : SpeedType, ValidateReachability_4 : boolean, MovZone_5 : MovementZone) : CellStruct;
     Update_Pathfinding_1() : void;
     Update_Pathfinding_2(where_0 : any) : void;
-    NearByLocation(outBuffer_0 : CellStruct, position_1 : CellStruct, SpeedType_2 : any, a5_3 : number, MovementZone_4 : any, alt_5 : boolean, SpaceSizeX_6 : number, SpaceSizeY_7 : number, disallowOverlay_8 : boolean, a11_9 : boolean, requireBurrowable_10 : boolean, allowBridge_11 : boolean, closeTo_12 : CellStruct, a15_13 : boolean, buildable_14 : boolean) : CellStruct;
-    NearByLocation(position_0 : CellStruct, SpeedType_1 : any, a5_2 : number, MovementZone_3 : any, alt_4 : boolean, SpaceSizeX_5 : number, SpaceSizeY_6 : number, disallowOverlay_7 : boolean, a11_8 : boolean, requireBurrowable_9 : boolean, allowBridge_10 : boolean, closeTo_11 : CellStruct, a15_12 : boolean, buildable_13 : boolean) : CellStruct;
+    NearByLocation(outBuffer_0 : CellStruct, position_1 : CellStruct, SpeedType_2 : SpeedType, a5_3 : number, MovementZone_4 : MovementZone, alt_5 : boolean, SpaceSizeX_6 : number, SpaceSizeY_7 : number, disallowOverlay_8 : boolean, a11_9 : boolean, requireBurrowable_10 : boolean, allowBridge_11 : boolean, closeTo_12 : CellStruct, a15_13 : boolean, buildable_14 : boolean) : CellStruct;
+    NearByLocation(position_0 : CellStruct, SpeedType_1 : SpeedType, a5_2 : number, MovementZone_3 : MovementZone, alt_4 : boolean, SpaceSizeX_5 : number, SpaceSizeY_6 : number, disallowOverlay_7 : boolean, a11_8 : boolean, requireBurrowable_9 : boolean, allowBridge_10 : boolean, closeTo_11 : CellStruct, a15_12 : boolean, buildable_13 : boolean) : CellStruct;
     AddContentAt(coords_0 : CellStruct, Content_1 : TechnoClass) : void;
     RemoveContentAt(coords_0 : CellStruct, Content_1 : TechnoClass) : void;
     IsWithinUsableArea(cell_0 : CellStruct, checkLevel_1 : boolean) : boolean;
@@ -6482,7 +6482,7 @@ class MapClass
     IsWithinUsableArea(coords_0 : CoordStruct) : boolean;
     CoordinatesLegal(cell_0 : CellStruct) : boolean;
     IsLinkedBridgeDestroyed(cell_0 : CellStruct) : boolean;
-    PlacePowerupCrate(cell_0 : CellStruct, type_1 : any) : boolean;
+    PlacePowerupCrate(cell_0 : CellStruct, type_1 : Powerup) : boolean;
     FindFirstFirestorm(pOutBuffer_0 : CoordStruct, start_1 : CoordStruct, end_2 : CoordStruct, pHouse_3 : HouseClass) : CoordStruct;
     FindFirstFirestorm(start_0 : CoordStruct, end_1 : CoordStruct, pHouse_2 : HouseClass) : CoordStruct;
     RevealArea1(Coords_0 : CoordStruct, Radius_1 : number, OwnerHouse_2 : HouseClass, arg4_3 : CellStruct, RevealByHeight_4 : number, arg6_5 : number, arg7_6 : number, arg8_7 : number) : void;
@@ -6561,17 +6561,17 @@ class DisplayClass
     RevealFogShroud(pMapCoord_0 : CellStruct, pHouse_1 : HouseClass, bIncreaseShroudCounter_2 : boolean) : boolean;
     MapCellFoggedness(pMapCoord_0 : CellStruct, pHouse_1 : HouseClass) : boolean;
     MapCellVisibility(pMapCoord_0 : CellStruct, pHouse_1 : HouseClass) : boolean;
-    GetLastMouseCursor() : any;
+    GetLastMouseCursor() : MouseCursorType;
     ScrollMap(dwUnk1_0 : number, dwUnk2_1 : number, dwUnk3_2 : number) : boolean;
     Set_View_Dimensions(rect_0 : RectangleStruct) : void;
     vt_entry_AC(dwUnk_0 : number) : void;
     RightMouseButtonClick(pPoint_0 : Point2D) : void;
     LeftMouseButtonClick(pPoint_0 : Point2D) : void;
-    ConvertAction(cell_0 : CellStruct, bShrouded_1 : boolean, pObject_2 : ObjectClass, action_3 : any, dwUnk_4 : boolean) : boolean;
+    ConvertAction(cell_0 : CellStruct, bShrouded_1 : boolean, pObject_2 : ObjectClass, action_3 : Action, dwUnk_4 : boolean) : boolean;
     LeftMouseButtonDown(point_0 : Point2D) : void;
-    LeftMouseButtonUp(coords_0 : CoordStruct, cell_1 : CellStruct, pObject_2 : ObjectClass, action_3 : any, dwUnk2_4 : number) : void;
+    LeftMouseButtonUp(coords_0 : CoordStruct, cell_1 : CellStruct, pObject_2 : ObjectClass, action_3 : Action, dwUnk2_4 : number) : void;
     RightMouseButtonUp(dwUnk_0 : number) : void;
-    DecideAction(cell_0 : CellStruct, pObject_1 : ObjectClass, dwUnk_2 : number) : any;
+    DecideAction(cell_0 : CellStruct, pObject_1 : ObjectClass, dwUnk_2 : number) : Action;
     FoundationBoundsSize(outBuffer_0 : CellStruct, pFoundationData_1 : CellStruct) : CellStruct;
     FoundationBoundsSize(pFoundationData_0 : CellStruct) : CellStruct;
     MarkFoundation(BaseCell_0 : CellStruct, Mark_1 : boolean) : void;
@@ -6693,13 +6693,13 @@ class PowerClass
 class BuildType
 {
     constructor();
-    constructor(itemIndex_0 : number, itemType_1 : any);
+    constructor(itemIndex_0 : number, itemType_1 : AbstractType);
     op_Equality(rhs_0 : BuildType) : boolean;
     op_Inequality(rhs_0 : BuildType) : boolean;
     op_LessThan(rhs_0 : BuildType) : boolean;
-    static SortsBefore(leftType_0 : any, leftIndex_1 : number, rightType_2 : any, rightIndex_3 : number) : boolean;
+    static SortsBefore(leftType_0 : AbstractType, leftIndex_1 : number, rightType_2 : AbstractType, rightIndex_3 : number) : boolean;
     m_ItemIndex : number;
-    m_ItemType : any;
+    m_ItemType : AbstractType;
     m_IsAlt : boolean;
     m_CurrentFactory : FactoryClass;
     m_unknown_10 : number;
@@ -6730,11 +6730,11 @@ class SidebarClass
 {
     SidebarNeedsRepaint(mode_0 : number) : void;
     RepaintSidebar(tab_0 : number) : void;
-    AddCameo(absType_0 : any, idxType_1 : number) : boolean;
+    AddCameo(absType_0 : AbstractType, idxType_1 : number) : boolean;
     Draw(dwUnk_0 : number | any) : void;
     vt_entry_D8(nUnknown_0 : number) : boolean;
-    static GetObjectTabIdx(abs_0 : any, idxType_1 : number, unused_2 : number) : number;
-    static GetObjectTabIdx(abs_0 : any, buildCat_1 : any, isNaval_2 : boolean) : number;
+    static GetObjectTabIdx(abs_0 : AbstractType, idxType_1 : number, unused_2 : number) : number;
+    static GetObjectTabIdx(abs_0 : AbstractType, buildCat_1 : BuildCat, isNaval_2 : boolean) : number;
     Scroll(up_0 : boolean, column_1 : number) : boolean;
     static s_Instance : any;
     static s_TooltipBuffer : any;
@@ -6800,15 +6800,15 @@ class ScrollClass
 class MouseClass
     extends ScrollClass
 {
-    SetCursor(idxCursor_0 : any | any, miniMap_1 : boolean | any) : boolean;
-    UpdateCursor(idxCursor_0 : any | any, miniMap_1 : boolean | any) : boolean;
+    SetCursor(idxCursor_0 : MouseCursorType | any, miniMap_1 : boolean | any) : boolean;
+    UpdateCursor(idxCursor_0 : MouseCursorType | any, miniMap_1 : boolean | any) : boolean;
     RestoreCursor() : boolean;
     UpdateCursorMinimapState(miniMap_0 : boolean | any) : void;
-    GetLastMouseCursor() : any;
+    GetLastMouseCursor() : MouseCursorType;
     static s_Instance : any;
     m_MouseCursorIsMini : boolean;
-    m_MouseCursorIndex : any;
-    m_MouseCursorLastIndex : any;
+    m_MouseCursorIndex : MouseCursorType;
+    m_MouseCursorLastIndex : MouseCursorType;
     m_MouseCursorCurrentFrame : number;
 }
 class SpotlightClass
@@ -6823,7 +6823,7 @@ class SpotlightClass
     m_Coords : CoordStruct;
     m_MovementRadius : number;
     m_Size : number;
-    m_DisableFlags : any;
+    m_DisableFlags : SpotlightFlags;
 }
 class ThemeControl
 {

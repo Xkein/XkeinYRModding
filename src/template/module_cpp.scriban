@@ -61,7 +61,7 @@ void OnExit_{{klass.identifier}}() {
 
 
 // ==== class registrations begin
-{{- if is_yrpp }}
+{{- if is_yrpp || is_yr_ext_core }}
 #include <CRC.h>
 #include <TubeClass.h>
 #include <PixelFXClass.h>
@@ -82,7 +82,7 @@ using namespace entt::literals;
 
 {{ for klass in module_classes }}
 {{-
-if !need_codegen(klass) || get_meta_tag(klass.meta, "HookEvent")
+if !need_codegen(klass)
     continue
 end
 component_target_list = get_derived_classes_by_list(get_meta_list(klass.meta, "ComponentTarget"))
@@ -227,7 +227,7 @@ end }}
     register_data<&{{$class_full_name}}::{{inline_property.name}}>(factory, "{{inline_property.name}}"_hs).custom<FieldMeta>("{{inline_property.name}}");
 {{- end }}
 {{- if is_yr_ext_core && get_meta_tag(klass.meta, "HookEvent") }}
-    register_data<&YrHookEventSystem::AHookEvent<{{$class_full_name}}>>(factory, "__Instance"_hs).custom<FieldMeta>("__Instance");
+    register_func<&YrHookEventSystem::GetEvent<{{klass.full_name}}>>(factory, "__GetInstance"_hs).custom<FunctionMeta>("__GetInstance", std::vector<ParameterMeta>{});
 {{- end }}
 
 {{ for target_type in component_target_list }}
@@ -282,7 +282,7 @@ void {{get_gen_type_name(klass.identifier)}}__Unregister()
 // ==== enum registrations begin
 
 {{  for enum in module_enums
-    if !need_codegen(enum) || get_meta_tag(enum.meta, "HookEvent")
+    if !need_codegen(enum)
         continue
     end }}
 void {{get_gen_type_name(enum.name)}}__Register()
@@ -304,7 +304,7 @@ void {{gen_type_name}}::Register()
 {
     sync_meta_ctx();
 {{for klass in array.concat(module_classes, module_enums)
-    if need_codegen(klass) && !get_meta_tag(klass.meta, "HookEvent") }}
+    if need_codegen(klass) }}
     {{get_gen_type_name(klass.identifier ?? klass.name)}}__Register();
     {{-end
 end }}
@@ -313,7 +313,7 @@ void {{gen_type_name}}::Unregister()
 {
     sync_meta_ctx();
 {{for klass in array.concat(module_classes, module_enums)
-    if need_codegen(klass) && !get_meta_tag(klass.meta, "HookEvent") }}
+    if need_codegen(klass) }}
     {{get_gen_type_name(klass.identifier ?? klass.name)}}__Unregister();
     {{-end
 end }}

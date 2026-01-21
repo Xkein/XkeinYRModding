@@ -993,6 +993,7 @@ void JsEnv::LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
         PString TypeName = *(v8::String::Utf8Value(Isolate, Info[0]));
         JSClassDefinition* ClassDef = const_cast<JSClassDefinition*>(FindCppTypeClassByName(TypeName));
         func->Set(Context, FV8Utils::V8String(Isolate, "__ClassDefinition"), v8::External::New(Isolate, ClassDef));
+        func->Set(Context, FV8Utils::V8String(Isolate, "__ClassName"), FV8Utils::V8String(Isolate, ClassDef->ScriptName));
     }
 }
 
