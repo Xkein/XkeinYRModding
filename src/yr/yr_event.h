@@ -13,6 +13,11 @@ typedef unsigned long DWORD;
 
 using HookEventListenerFuncType = void(YrHookContext* const C, void* const E);
 using HookEventListener         = std::function<HookEventListenerFuncType>;
+template<typename T>
+using THookEventListenerFuncType = void(YrHookContext* const C, T* const E);
+template<typename T>
+using THookEventListener         = std::function<THookEventListenerFuncType<T>>;
+
 using HookEventListenerHandle   = const void*;
 
 struct YrHookMeta final
@@ -151,9 +156,18 @@ public:
     }
 
     template<class T>
-    inline static HookEventListenerHandle Register(HookEventListener listener)
+    inline static HookEventListenerHandle RegisterRaw(HookEventListener listener)
     {
         return GetEvent_Impl<T>()->Register(std::move(listener));
+    }
+
+    template<class T>
+    inline static HookEventListenerHandle Register(THookEventListener<T> listener)
+    {
+        return GetEvent_Impl<T>()->Register(HookEventListener(
+            [listener = std::move(listener)](YrHookContext* context, void* E) {
+                listener(context, reinterpret_cast<T*>(E));
+            }));
     }
 
     template<class T>
@@ -238,20 +252,18 @@ private:
 template<class T>
 class YrHookEventListenerRegister final
 {
-    YrHookEventListenerRegister(HookEventListener listener)
+    inline YrHookEventListenerRegister(HookEventListener listener)
     {
-        _handle = YrHookEventSystem::Register<T>(std::move(listener));
+        _handle = YrHookEventSystem::RegisterRaw<T>(std::move(listener));
         // YrHookEventSystem::SetHookMeta<T>(_handle, meta);
     }
 
 public:
-
-    inline YrHookEventListenerRegister(std::function<void(YrHookContext* const, T* const)> listener) :
-        YrHookEventListenerRegister(HookEventListener(
-            [listener = std::move(listener)](YrHookContext* context, void* E) {
-                listener(context, reinterpret_cast<T*>(E));
-            })
-        ) {}
+    inline YrHookEventListenerRegister(THookEventListener<T> listener)
+    {
+        _handle = YrHookEventSystem::Register<T>(std::move(listener));
+        // YrHookEventSystem::SetHookMeta<T>(_handle, meta);
+    }
 
     inline YrHookEventListenerRegister(std::function<void()> listener) :
         YrHookEventListenerRegister(HookEventListener(

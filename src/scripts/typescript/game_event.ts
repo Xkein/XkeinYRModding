@@ -106,9 +106,12 @@ export const gameEvents = {
         if (!delegate) {
             delegate = new Delegate<(E: any) => void>();
             YrHookDelegates.set(typeName, delegate);
-            YrHookEventSystem.Register(typeName, (C: any, E: any) => {
+            let handle: HookEventListenerHandle = (hookEventType as any).Register((C: any, E: any) => {
                 delegate!.invoke(E as T);
             });
+            if (!handle) {
+                console.log(`Failed to register hook event handler for ${typeName}`);
+            }
         }
         delegate.add(handler);
     },

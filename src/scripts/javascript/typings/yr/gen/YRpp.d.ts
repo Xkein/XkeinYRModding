@@ -5195,6 +5195,29 @@ class GadgetClass
     m_Disabled : boolean;
     m_Flags : GadgetFlag;
 }
+class SmudgeTypeClass
+    extends ObjectTypeClass
+{
+    constructor(pID_0 : string);
+    static Find(pID_0 : string) : SmudgeTypeClass;
+    static FindIndex(pID_0 : string) : number;
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    WhatAmI() : AbstractType;
+    Size() : number;
+    SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
+    CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
+    DrawIt(Point_0 : Point2D, Rect_1 : RectangleStruct, SmudgeData_2 : number, Height_3 : number, MapCoords_4 : CellStruct) : void;
+    static LoadFromIniList(idxTheatre_0 : number) : void;
+    static s_AbsID : AbstractType;
+    static s_Array : any;
+    m_ArrayIndex : number;
+    m_Width : number;
+    m_Height : number;
+    m_Crater : boolean;
+    m_Burn : boolean;
+}
 class DifficultyStruct
 {
     m_Firepower : number;
@@ -6272,6 +6295,43 @@ class OverlayClass
     static s_AbsID : AbstractType;
     static s_Array : any;
     m_Type : OverlayTypeClass;
+}
+class SmudgeClass
+    extends ObjectClass
+{
+    constructor(pType_0 : SmudgeTypeClass);
+    GetClassID(pClassID_0 : any | any) : number;
+    Load(pStm_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    WhatAmI() : AbstractType;
+    Size() : number;
+    static s_AbsID : AbstractType;
+    static s_Array : any;
+    m_Type : SmudgeTypeClass;
+}
+class VoxelAnimClass
+    extends ObjectClass
+{
+    constructor(pVoxelAnimType_0 : VoxelAnimTypeClass, pLocation_1 : CoordStruct, pOwnerHouse_2 : HouseClass);
+    GetClassID(pClassID_0 : any | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    WhatAmI() : AbstractType;
+    Size() : number;
+    static s_AbsID : AbstractType;
+    static s_Array : any;
+    m_unknown_int_100 : number;
+    m_Type : VoxelAnimTypeClass;
+    m_AttachedSystem : ParticleSystemClass;
+    m_OwnerHouse : HouseClass;
+    m_TimeToDie : boolean;
+    m_Invisible : boolean;
+    m_Duration : number;
+    m_Bounce : BounceClass;
+    m___Bounce : string;
+    m_Audio3 : any;
+    m___Audio3 : string;
+    m_Audio4 : any;
+    m___Audio4 : string;
 }
 class FlyLocomotionClass
     extends LocomotionClass

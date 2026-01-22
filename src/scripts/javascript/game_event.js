@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.gameEvents = exports.OnDtorEvent = exports.OnCtorEvent = exports.PhysicsEvents = exports.GameEvents = exports.Delegate = void 0;
 const XkeinExt_1 = require("XkeinExt");
-const YrExtCore_1 = require("YrExtCore");
 class Delegate {
     handlers;
     constructor() {
@@ -98,9 +97,12 @@ exports.gameEvents = {
         if (!delegate) {
             delegate = new Delegate();
             YrHookDelegates.set(typeName, delegate);
-            YrExtCore_1.YrHookEventSystem.Register(typeName, (C, E) => {
+            let handle = hookEventType.Register((C, E) => {
                 delegate.invoke(E);
             });
+            if (!handle) {
+                console.log(`Failed to register hook event handler for ${typeName}`);
+            }
         }
         delegate.add(handler);
     },

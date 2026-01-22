@@ -58,6 +58,9 @@ void InitLogger()
 
         gConsole = std::make_shared<spdlog::async_logger>("console", console_sink, spdlog::thread_pool(), spdlog::async_overflow_policy::block);
         gConsole->set_level(logLevel);
+
+        // std::cout redirection
+        freopen("CONOUT$", "w", stdout);
     }
     else
     {

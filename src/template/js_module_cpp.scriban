@@ -5,6 +5,7 @@
         ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
     end
     is_yrpp = module_name == "YRpp"
+    is_yr_ext_core = module_name == "YrExtCore"
 -}}
 
 {{- if is_yrpp }}
@@ -163,6 +164,10 @@ void __JsRegister_{{klass.identifier}}() {
         else
             $klass = append_line($klass, $'MakePropertyCheck<&{htClass.full_name}::{inline_property.name}>(builder, "m_{inline_property.name}");')
         end
+    end
+    
+    if is_yr_ext_core && get_meta_tag(klass.meta, "HookEvent")
+        $klass = append_line($klass, $'MakeFunctionCheck<&YrHookEventSystem::Register<{htClass.full_name}>>(builder, "Register");')
     end
     $klass = append_line($klass, 'RegisterCheck(builder);')
     ret $klass
