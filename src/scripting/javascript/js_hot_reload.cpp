@@ -37,7 +37,9 @@ class JsHotReloadListener : public efsw::FileWatchListener
         std::this_thread::sleep_for(100ms);
         switch (action)
         {
+            case efsw::Action::Add:
             case efsw::Action::Modified:
+            case efsw::Action::Moved:
                 OnFileModified(dir, filename);
                 break;
         }
