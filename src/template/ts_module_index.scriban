@@ -26,6 +26,7 @@
     type_map["bool"] = "boolean"
     type_map["char *"] = "string"
     type_map["char const *"] = "string"
+    type_map["std::basic_string<char, std::char_traits<char>, std::allocator<char>>"] = "string"
     any_types = []
     if is_yrpp 
         any_types = array.concat(any_types, ["IndexClass"])

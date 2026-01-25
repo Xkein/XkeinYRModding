@@ -190,12 +190,12 @@ game_event_1.gameEvents.onCtor.unit.add(audio_component_add);
 game_event_1.gameEvents.onCtor.infantry.add(audio_component_add);
 game_event_1.gameEvents.onCtor.building.add(audio_component_add);
 game_event_1.gameEvents.onCtor.aircraft.add(audio_component_add);
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrBulletConstructEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrBulletConstructEvent, (E) => {
     audio_component_add(E.m_pBullet, null);
 });
 game_event_1.gameEvents.onCtor.superWeapon.add(audio_component_add);
 game_event_1.gameEvents.onCtor.house.add(audio_component_add);
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrBulletDetonateEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrBulletDetonateEvent, (E) => {
     let yrObject = E.m_pBullet;
     let audioConfig = (0, ini_helper_1.GetIniComponent)(AudioConfig, yrObject.m_Type);
     if (audioConfig && audioConfig.detonateEvent) {
@@ -204,7 +204,7 @@ game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrBulletDetonateEve
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.detonateEvent, audioComponent.m_akGameObjId);
     }
 });
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrObjectReceiveDamageEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectReceiveDamageEvent, (E) => {
     let yrObject = E.m_pObject;
     let audioConfig = (0, ini_helper_1.GetIniComponent)(AudioConfig, yrObject.m_Type);
     if (audioConfig && audioConfig.damageEvent) {
@@ -227,24 +227,24 @@ game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrObjectReceiveDama
         InteractiveMusic.lastTimeBattle = Date.now();
     }
 });
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrObjectUnlimboCheckedEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectUnlimboCheckedEvent, (E) => {
     let yrObject = E.m_pObject;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.createEvent) {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.createEvent, yrObject.audioComponent.m_akGameObjId);
     }
 });
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrObjectLimboCheckedEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectLimboCheckedEvent, (E) => {
     let yrObject = E.m_pObject;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.removeEvent) {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.removeEvent, yrObject.audioComponent.m_akGameObjId);
     }
 });
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrSceneEnterEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSceneEnterEvent, (E) => {
     InteractiveMusic.setMusicState(EMusicState.Normal);
 });
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrSceneExitEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSceneExitEvent, (E) => {
     InteractiveMusic.setMusicState(EMusicState.None);
 });
 game_event_1.gameEvents.game.onEndUpdate.add(() => {

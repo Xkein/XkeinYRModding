@@ -186,13 +186,13 @@ gameEvents.onCtor.unit.add(audio_component_add);
 gameEvents.onCtor.infantry.add(audio_component_add);
 gameEvents.onCtor.building.add(audio_component_add);
 gameEvents.onCtor.aircraft.add(audio_component_add);
-gameEvents.regitserHookEventHandler(YrBulletConstructEvent, (E) => {
+gameEvents.registerHookEventHandler(YrBulletConstructEvent, (E) => {
     audio_component_add(E.m_pBullet, null);
 });
 gameEvents.onCtor.superWeapon.add(audio_component_add);
 gameEvents.onCtor.house.add(audio_component_add);
 
-gameEvents.regitserHookEventHandler(YrBulletDetonateEvent, (E) => {
+gameEvents.registerHookEventHandler(YrBulletDetonateEvent, (E) => {
     let yrObject = E.m_pBullet;
     let audioConfig = GetIniComponent(AudioConfig, yrObject.m_Type);
     if (audioConfig && audioConfig.detonateEvent) {
@@ -202,7 +202,7 @@ gameEvents.regitserHookEventHandler(YrBulletDetonateEvent, (E) => {
     }
 });
 
-gameEvents.regitserHookEventHandler(YrObjectReceiveDamageEvent, (E) => {
+gameEvents.registerHookEventHandler(YrObjectReceiveDamageEvent, (E) => {
     let yrObject: ObjectClass | any = E.m_pObject;
 
     let audioConfig = GetIniComponent(AudioConfig, yrObject.m_Type);
@@ -227,14 +227,14 @@ gameEvents.regitserHookEventHandler(YrObjectReceiveDamageEvent, (E) => {
     }
 });
     
-gameEvents.regitserHookEventHandler(YrObjectUnlimboCheckedEvent, (E) => {
+gameEvents.registerHookEventHandler(YrObjectUnlimboCheckedEvent, (E) => {
     let yrObject: ObjectClass | any = E.m_pObject;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.createEvent) {
         AudioSystem.PostEvent(audioConfig.createEvent, yrObject.audioComponent.m_akGameObjId);
     }
 });
-gameEvents.regitserHookEventHandler(YrObjectLimboCheckedEvent, (E) => {
+gameEvents.registerHookEventHandler(YrObjectLimboCheckedEvent, (E) => {
     let yrObject: ObjectClass | any = E.m_pObject;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.removeEvent) {
@@ -242,10 +242,10 @@ gameEvents.regitserHookEventHandler(YrObjectLimboCheckedEvent, (E) => {
     }
 });
 
-gameEvents.regitserHookEventHandler(YrSceneEnterEvent, (E) => {
+gameEvents.registerHookEventHandler(YrSceneEnterEvent, (E) => {
     InteractiveMusic.setMusicState(EMusicState.Normal);
 });
-gameEvents.regitserHookEventHandler(YrSceneExitEvent, (E) => {
+gameEvents.registerHookEventHandler(YrSceneExitEvent, (E) => {
     InteractiveMusic.setMusicState(EMusicState.None);
 });
 

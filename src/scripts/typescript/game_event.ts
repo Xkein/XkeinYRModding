@@ -100,7 +100,7 @@ export const gameEvents = {
     onCtor: new OnCtorEvent(),
     onDtor: new OnDtorEvent(),
 
-    regitserHookEventHandler<T>(hookEventType: {new(): T}, handler: (E: T) => void) : void {
+    registerHookEventHandler<T>(hookEventType: {new(): T}, handler: (E: T) => void) : void {
         let typeName = getCppTypeName(hookEventType);
         let delegate = YrHookDelegates.get(typeName);
         if (!delegate) {

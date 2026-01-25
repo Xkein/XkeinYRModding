@@ -61,6 +61,11 @@ bool Serialization::IsSerializing()
     return gContext.inputArchive || gContext.outputArchive;
 }
 
+YREXTCORE_API bool Serialization::IsLoading()
+{
+    return gContext.inputArchive;
+}
+
 YREXTCORE_API std::string Serialization::GetCurrentArchivePath()
 {
     return GetArchivePath(Serialization::GetCurrentContext()->savegameName.c_str());
@@ -69,6 +74,18 @@ YREXTCORE_API std::string Serialization::GetCurrentArchivePath()
 std::string Serialization::GetArchivePath(const char* savegameName, const char* extension)
 {
     return Paths::GetLaunchDir() / "Saved Games" / Paths::SetExtension(savegameName, extension ? extension : "savex.json");
+}
+
+YREXTCORE_API std::string Serialization::LoadKey(const char* key)
+{
+    std::string result{};
+    Serialize(cereal::make_nvp(key, result));
+    return std::move(result);
+}
+
+YREXTCORE_API void Serialization::SaveKey(const char* key, std::string val)
+{
+    Serialize(cereal::make_nvp(key, val));
 }
 
 void Serialization::RegisterSnapshotInternal(entt::meta_type type, void(*snapshotSave)(ENTITY_SNAPSHOT&), void(*snapshotLoad)(ENTITY_SNAPSHOT_LOADER&))

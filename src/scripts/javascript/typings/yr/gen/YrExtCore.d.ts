@@ -847,7 +847,7 @@ class YrAfterSetCooperativeLevelEvent
 class IniReader
 {
     constructor(pIni_0 : CCINIClass);
-    constructor(filename_0 : any);
+    constructor(filename_0 : string);
     GetIni() : CCINIClass;
     value() : string;
     max_size() : number;
@@ -857,7 +857,10 @@ class IniReader
 class Serialization
 {
     static IsSerializing() : boolean;
-    static GetCurrentArchivePath() : any;
-    static GetArchivePath(savegameName_0 : string, extension_1 : string) : any;
+    static IsLoading() : boolean;
+    static GetCurrentArchivePath() : string;
+    static GetArchivePath(savegameName_0 : string, extension_1 : string) : string;
+    static LoadKey(key_0 : string) : string;
+    static SaveKey(key_0 : string, val_1 : string) : void;
 }
 }

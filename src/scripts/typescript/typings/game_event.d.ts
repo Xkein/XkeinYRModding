@@ -42,7 +42,7 @@ export declare const gameEvents: {
     physics: PhysicsEvents;
     onCtor: OnCtorEvent;
     onDtor: OnDtorEvent;
-    regitserHookEventHandler<T>(hookEventType: {
+    registerHookEventHandler<T>(hookEventType: {
         new (): T;
     }, handler: (E: T) => void): void;
     unregisterHookEventHandler<T>(hookEventType: {

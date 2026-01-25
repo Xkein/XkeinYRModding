@@ -59,16 +59,16 @@ class JsIniManager {
                 }
             }
         };
-        game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrTechnoTypeLoadIniEvent, (E) => {
+        game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrTechnoTypeLoadIniEvent, (E) => {
             onLoadIni(E.m_pTechnoType, E.m_pIni);
         });
-        game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrBulletTypeLoadIniEvent, (E) => {
+        game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrBulletTypeLoadIniEvent, (E) => {
             onLoadIni(E.m_pBulletType, E.m_pIni);
         });
-        game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrSuperWeaponTypeLoadIniEvent, (E) => {
+        game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSuperWeaponTypeLoadIniEvent, (E) => {
             onLoadIni(E.m_pSuperWeaponType, E.m_pIni);
         });
-        game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrHouseTypeLoadIniEvent, (E) => {
+        game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrHouseTypeLoadIniEvent, (E) => {
             onLoadIni(E.m_pHouseType, E.m_pIni);
         });
     }

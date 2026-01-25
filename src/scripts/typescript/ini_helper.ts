@@ -61,16 +61,16 @@ class JsIniManager {
         }
       }
     };
-    gameEvents.regitserHookEventHandler(YrTechnoTypeLoadIniEvent, (E) => {
+    gameEvents.registerHookEventHandler(YrTechnoTypeLoadIniEvent, (E) => {
         onLoadIni(E.m_pTechnoType, E.m_pIni);
     });
-    gameEvents.regitserHookEventHandler(YrBulletTypeLoadIniEvent, (E) => {
+    gameEvents.registerHookEventHandler(YrBulletTypeLoadIniEvent, (E) => {
         onLoadIni(E.m_pBulletType, E.m_pIni);
     });
-    gameEvents.regitserHookEventHandler(YrSuperWeaponTypeLoadIniEvent, (E) => {
+    gameEvents.registerHookEventHandler(YrSuperWeaponTypeLoadIniEvent, (E) => {
         onLoadIni(E.m_pSuperWeaponType, E.m_pIni);
     });
-    gameEvents.regitserHookEventHandler(YrHouseTypeLoadIniEvent, (E) => {
+    gameEvents.registerHookEventHandler(YrHouseTypeLoadIniEvent, (E) => {
         onLoadIni(E.m_pHouseType, E.m_pIni);
     });
 

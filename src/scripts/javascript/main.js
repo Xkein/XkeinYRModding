@@ -12,7 +12,8 @@ global.getCppTypeName = function (type) {
     return type.__ClassName;
 }
 
-require("ini_helper")
 require("game_event")
+require("serialization")
+require("ini_helper")
 require("game_audio")
 require("game_script")

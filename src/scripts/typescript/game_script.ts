@@ -1,10 +1,10 @@
-import { IniReader, YrBulletConstructEvent, YrBulletTypeLoadIniEvent, YrHouseTypeLoadIniEvent, YrRulesLoadAfterTypeDataEvent, YrSuperWeaponTypeLoadIniEvent, YrTechnoTypeLoadIniEvent } from "YrExtCore"
+import { IniReader, YrBulletConstructEvent, YrBulletTypeLoadIniEvent, YrHouseTypeLoadIniEvent, YrLoadGameEndStreamEvent, YrRulesLoadAfterTypeDataEvent, YrSaveGameEndStreamEvent, YrSuperWeaponTypeLoadIniEvent, YrTechnoTypeLoadIniEvent } from "YrExtCore"
 import { IniHelper } from "./ini_helper"
-import { AbstractTypeClass, CCINIClass } from "YRpp";
+import { AbstractClass, AbstractTypeClass, CCINIClass } from "YRpp";
 import { gameEvents } from "./game_event";
+import { JsSerialization } from "./serialization";
 
-class GameScripts
-{
+class GameScripts {
     scriptables: Map<string, GameScriptable>;
     constructor() {
         this.scriptables = new Map();
@@ -19,7 +19,7 @@ class GameScripts
         this.scriptables.delete(scriptable.name);
     }
 
-    get(name: string) : GameScriptable | undefined {
+    get(name: string): GameScriptable | undefined {
         return this.scriptables.get(name);
     }
 
@@ -45,9 +45,8 @@ class GameScripts
 
 const gameScripts = new GameScripts();
 
-class GameScriptable
-{
-    insts: Set<unknown>;
+class GameScriptable {
+    insts: Set<any>;
     name: string;
     script: any;
     constructor(name: string, script) {
@@ -66,6 +65,29 @@ class GameScriptable
     }
 }
 
+const emptyComponents = new Map();
+
+export function GetScriptableComponent<T>(klass: { new(): T }, yrObject: AbstractClass): T | undefined {
+    let components = GetAllGetScriptableComponents(yrObject);
+    let componentName = klass.name;
+    return components[componentName];
+}
+
+export function CreateScriptableComponent<T>(klass: { new(): T }, yrObject: AbstractClass): T {
+    let components = (yrObject as any).__components;
+    if (!components) {
+        components = (yrObject as any).__components = new Map();
+    }
+    let componentName = klass.name;
+    let component = new klass();
+    components[componentName] = component;
+    return component;
+}
+
+export function GetAllGetScriptableComponents(yrObject: AbstractClass): Map<string, any> {
+    return (yrObject as any).__components ?? emptyComponents;
+}
+
 let iniReaderXkein = new IniReader("XkeinExt.ini");
 let initScriptName = IniHelper.ReadString(iniReaderXkein, "Scripting", "InitScript");
 if (initScriptName) {
@@ -73,7 +95,7 @@ if (initScriptName) {
     require(initScriptName);
 }
 
-gameEvents.regitserHookEventHandler(YrRulesLoadAfterTypeDataEvent, (E) => {
+gameEvents.registerHookEventHandler(YrRulesLoadAfterTypeDataEvent, (E) => {
     let mapScriptName = IniHelper.ReadString(new IniReader(E.m_pIni), "Basic", "JsMapScript");
     if (mapScriptName) {
         var mapScriptable = gameScripts.getOrCreate(mapScriptName);
@@ -102,7 +124,7 @@ let scriptable_add = (yrObject) => {
     let scriptable = get_scriptable(yrObject);
     if (!scriptable)
         return;
-    
+
     if (scriptable.script.onAddInst) {
         scriptable.script.onAddInst(yrObject);
     }
@@ -126,7 +148,7 @@ gameEvents.onCtor.unit.add(scriptable_add);
 gameEvents.onCtor.infantry.add(scriptable_add);
 gameEvents.onCtor.building.add(scriptable_add);
 gameEvents.onCtor.aircraft.add(scriptable_add);
-gameEvents.regitserHookEventHandler(YrBulletConstructEvent, (E) => {
+gameEvents.registerHookEventHandler(YrBulletConstructEvent, (E) => {
     scriptable_add(E.m_pBullet);
 });
 gameEvents.onCtor.superWeapon.add(scriptable_add);
@@ -140,15 +162,56 @@ gameEvents.onDtor.bullet.add(scriptable_remove);
 gameEvents.onDtor.superWeapon.add(scriptable_remove);
 gameEvents.onDtor.house.add(scriptable_remove);
 
-gameEvents.regitserHookEventHandler(YrTechnoTypeLoadIniEvent, (E) => {
+gameEvents.registerHookEventHandler(YrTechnoTypeLoadIniEvent, (E) => {
     onLoadType(E.m_pTechnoType, E.m_pIni)
 });
-gameEvents.regitserHookEventHandler(YrBulletTypeLoadIniEvent, (E) => {
+gameEvents.registerHookEventHandler(YrBulletTypeLoadIniEvent, (E) => {
     onLoadType(E.m_pBulletType, E.m_pIni)
 });
-gameEvents.regitserHookEventHandler(YrSuperWeaponTypeLoadIniEvent, (E) => {
+gameEvents.registerHookEventHandler(YrSuperWeaponTypeLoadIniEvent, (E) => {
     onLoadType(E.m_pSuperWeaponType, E.m_pIni)
 });
-gameEvents.regitserHookEventHandler(YrHouseTypeLoadIniEvent, (E) => {
+gameEvents.registerHookEventHandler(YrHouseTypeLoadIniEvent, (E) => {
     onLoadType(E.m_pHouseType, E.m_pIni)
+});
+
+gameEvents.registerHookEventHandler(YrSaveGameEndStreamEvent, (E) => {
+    for (const scriptable of gameScripts.scriptables.values()) {
+        if (scriptable.script.onSave) {
+            scriptable.script.onSave();
+        }
+        for (const yrObject of scriptable.insts) {
+            if (scriptable.script.onSaveInst) {
+                scriptable.script.onSaveInst(yrObject);
+            }
+            let components = GetAllGetScriptableComponents(yrObject);
+            JsSerialization.SaveNext(components.size);
+            for (const [name, component] of components) {
+                JsSerialization.SaveNext(name);
+                JsSerialization.SaveNext(component);
+            }
+        }
+    }
+});
+
+gameEvents.registerHookEventHandler(YrLoadGameEndStreamEvent, (E) => {
+    for (const scriptable of gameScripts.scriptables.values()) {
+        if (scriptable.script.onLoad) {
+            scriptable.script.onLoad();
+        }
+        for (const yrObject of scriptable.insts) {
+            if (scriptable.script.onLoadInst) {
+                scriptable.script.onLoadInst(yrObject);
+            }
+            let size = JsSerialization.LoadNext();
+            let components = new Map();
+            (yrObject as any).__components = components;
+            for (let index = 0; index < size; index++) {
+                let name = JsSerialization.LoadNext();
+                let component
+            }
+            if (yrObject.__)
+                JsSerialization.LoadNext();
+        }
+    }
 });

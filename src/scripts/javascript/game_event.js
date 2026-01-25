@@ -91,7 +91,7 @@ exports.gameEvents = {
     physics: new PhysicsEvents(),
     onCtor: new OnCtorEvent(),
     onDtor: new OnDtorEvent(),
-    regitserHookEventHandler(hookEventType, handler) {
+    registerHookEventHandler(hookEventType, handler) {
         let typeName = getCppTypeName(hookEventType);
         let delegate = YrHookDelegates.get(typeName);
         if (!delegate) {

@@ -1,8 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GetScriptableComponent = GetScriptableComponent;
+exports.CreateScriptableComponent = CreateScriptableComponent;
+exports.GetAllGetScriptableComponents = GetAllGetScriptableComponents;
 const YrExtCore_1 = require("YrExtCore");
 const ini_helper_1 = require("./ini_helper");
 const game_event_1 = require("./game_event");
+const serialization_1 = require("./serialization");
 class GameScripts {
     scriptables;
     constructor() {
@@ -54,13 +58,32 @@ class GameScriptable {
         this.insts.delete(inst);
     }
 }
+const emptyComponents = new Map();
+function GetScriptableComponent(klass, yrObject) {
+    let components = GetAllGetScriptableComponents(yrObject);
+    let componentName = klass.name;
+    return components[componentName];
+}
+function CreateScriptableComponent(klass, yrObject) {
+    let components = yrObject.__components;
+    if (!components) {
+        components = yrObject.__components = new Map();
+    }
+    let componentName = klass.name;
+    let component = new klass();
+    components[componentName] = component;
+    return component;
+}
+function GetAllGetScriptableComponents(yrObject) {
+    return yrObject.__components ?? emptyComponents;
+}
 let iniReaderXkein = new YrExtCore_1.IniReader("XkeinExt.ini");
 let initScriptName = ini_helper_1.IniHelper.ReadString(iniReaderXkein, "Scripting", "InitScript");
 if (initScriptName) {
     console.log(`load init script: ${initScriptName}`);
     require(initScriptName);
 }
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrRulesLoadAfterTypeDataEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrRulesLoadAfterTypeDataEvent, (E) => {
     let mapScriptName = ini_helper_1.IniHelper.ReadString(new YrExtCore_1.IniReader(E.m_pIni), "Basic", "JsMapScript");
     if (mapScriptName) {
         var mapScriptable = gameScripts.getOrCreate(mapScriptName);
@@ -104,7 +127,7 @@ game_event_1.gameEvents.onCtor.unit.add(scriptable_add);
 game_event_1.gameEvents.onCtor.infantry.add(scriptable_add);
 game_event_1.gameEvents.onCtor.building.add(scriptable_add);
 game_event_1.gameEvents.onCtor.aircraft.add(scriptable_add);
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrBulletConstructEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrBulletConstructEvent, (E) => {
     scriptable_add(E.m_pBullet);
 });
 game_event_1.gameEvents.onCtor.superWeapon.add(scriptable_add);
@@ -116,15 +139,54 @@ game_event_1.gameEvents.onDtor.aircraft.add(scriptable_remove);
 game_event_1.gameEvents.onDtor.bullet.add(scriptable_remove);
 game_event_1.gameEvents.onDtor.superWeapon.add(scriptable_remove);
 game_event_1.gameEvents.onDtor.house.add(scriptable_remove);
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrTechnoTypeLoadIniEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrTechnoTypeLoadIniEvent, (E) => {
     onLoadType(E.m_pTechnoType, E.m_pIni);
 });
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrBulletTypeLoadIniEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrBulletTypeLoadIniEvent, (E) => {
     onLoadType(E.m_pBulletType, E.m_pIni);
 });
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrSuperWeaponTypeLoadIniEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSuperWeaponTypeLoadIniEvent, (E) => {
     onLoadType(E.m_pSuperWeaponType, E.m_pIni);
 });
-game_event_1.gameEvents.regitserHookEventHandler(YrExtCore_1.YrHouseTypeLoadIniEvent, (E) => {
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrHouseTypeLoadIniEvent, (E) => {
     onLoadType(E.m_pHouseType, E.m_pIni);
+});
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSaveGameEndStreamEvent, (E) => {
+    for (const scriptable of gameScripts.scriptables.values()) {
+        if (scriptable.script.onSave) {
+            scriptable.script.onSave();
+        }
+        for (const yrObject of scriptable.insts) {
+            if (scriptable.script.onSaveInst) {
+                scriptable.script.onSaveInst(yrObject);
+            }
+            let components = GetAllGetScriptableComponents(yrObject);
+            serialization_1.JsSerialization.SaveNext(components.size);
+            for (const [name, component] of components) {
+                serialization_1.JsSerialization.SaveNext(name);
+                serialization_1.JsSerialization.SaveNext(component);
+            }
+        }
+    }
+});
+game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrLoadGameEndStreamEvent, (E) => {
+    for (const scriptable of gameScripts.scriptables.values()) {
+        if (scriptable.script.onLoad) {
+            scriptable.script.onLoad();
+        }
+        for (const yrObject of scriptable.insts) {
+            if (scriptable.script.onLoadInst) {
+                scriptable.script.onLoadInst(yrObject);
+            }
+            let size = serialization_1.JsSerialization.LoadNext();
+            let components = new Map();
+            yrObject.__components = components;
+            for (let index = 0; index < size; index++) {
+                let name = serialization_1.JsSerialization.LoadNext();
+                let component;
+            }
+            if (yrObject.__)
+                serialization_1.JsSerialization.LoadNext();
+        }
+    }
 });

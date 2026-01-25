@@ -53,13 +53,20 @@ CLASS(BindJs)
 class Serialization
 {
 public:
-YREXTCORE_API static SerializeContext* GetCurrentContext();
+    YREXTCORE_API static SerializeContext* GetCurrentContext();
     FUNCTION()
     YREXTCORE_API static bool IsSerializing();
+    FUNCTION()
+    YREXTCORE_API static bool IsLoading();
     FUNCTION()
     YREXTCORE_API static std::string GetCurrentArchivePath();
     FUNCTION()
     YREXTCORE_API static std::string GetArchivePath(const char* savegameName, const char* extension = nullptr);
+
+    FUNCTION()
+    YREXTCORE_API static std::string LoadKey(const char* key);
+    FUNCTION()
+    YREXTCORE_API static void SaveKey(const char* key, std::string val);
 
     /// @brief Serialize data when saving/loading a game.
     template<typename Type>
