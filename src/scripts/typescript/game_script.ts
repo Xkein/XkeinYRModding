@@ -204,14 +204,15 @@ gameEvents.registerHookEventHandler(YrLoadGameEndStreamEvent, (E) => {
                 scriptable.script.onLoadInst(yrObject);
             }
             let size = JsSerialization.LoadNext();
-            let components = new Map();
-            (yrObject as any).__components = components;
-            for (let index = 0; index < size; index++) {
-                let name = JsSerialization.LoadNext();
-                let component
+            if (size > 0) {
+                let components = new Map();
+                (yrObject as any).__components = components;
+                for (let index = 0; index < size; index++) {
+                    let name = JsSerialization.LoadNext();
+                    let component = JsSerialization.LoadNext();
+                    components[name] = component;
+                }
             }
-            if (yrObject.__)
-                JsSerialization.LoadNext();
         }
     }
 });

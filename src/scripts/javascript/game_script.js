@@ -179,14 +179,15 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrLoadGameEndStream
                 scriptable.script.onLoadInst(yrObject);
             }
             let size = serialization_1.JsSerialization.LoadNext();
-            let components = new Map();
-            yrObject.__components = components;
-            for (let index = 0; index < size; index++) {
-                let name = serialization_1.JsSerialization.LoadNext();
-                let component;
+            if (size > 0) {
+                let components = new Map();
+                yrObject.__components = components;
+                for (let index = 0; index < size; index++) {
+                    let name = serialization_1.JsSerialization.LoadNext();
+                    let component = serialization_1.JsSerialization.LoadNext();
+                    components[name] = component;
+                }
             }
-            if (yrObject.__)
-                serialization_1.JsSerialization.LoadNext();
         }
     }
 });
