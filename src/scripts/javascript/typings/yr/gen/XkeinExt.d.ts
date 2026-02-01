@@ -29,7 +29,7 @@ class PhysicsTypeComponent
     m_mass : number;
     m_radius : number;
     m_halfHeight : number;
-    m_halfExtent : any;
+    m_halfExtent : Vector3D;
 }
 class PhysicsComponent
 {
@@ -40,8 +40,8 @@ class PhysicsCollisionAddAndPersistResult
 {
     m_com1 : PhysicsComponent;
     m_com2 : PhysicsComponent;
-    m_point : any;
-    m_normal : any;
+    m_point : Vector3D;
+    m_normal : Vector3D;
 }
 class PhysicsCollisionRemoveResult
 {

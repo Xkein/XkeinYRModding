@@ -165,7 +165,8 @@ end
 
 func get_yr_types()
     $types = get_yr_game_types()
-    $handwrite_types = ["CoordStruct", "Point2D", "CellStruct", "Quaternion", "BulletVelocity", "Quaternion", "Matrix3D", "DirStruct", "RectangleStruct", "ColorStruct"]
+    $handwrite_types = ["CoordStruct", "Point2D", "CellStruct", "Quaternion", "BulletVelocity",
+        "Matrix3D", "DirStruct", "RectangleStruct", "ColorStruct", "CounterClass"]
     $result = array.concat($types, $handwrite_types)
     ret $result
 end

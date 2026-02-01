@@ -27,6 +27,15 @@
     type_map["char *"] = "string"
     type_map["char const *"] = "string"
     type_map["std::basic_string<char, std::char_traits<char>, std::allocator<char>>"] = "string"
+    # yr structs
+    type_map["Vector2D<int>"] = "Vector2D"
+    type_map["Vector2D<short>"] = "Vector2D"
+    type_map["Vector3D<int>"] = "Vector3D"
+    type_map["Vector3D<double>"] = "Vector3D"
+    type_map["Vector3D<float>"] = "Vector3D"
+
+    generic_types = ["VectorClass<", "DynamicVectorClass<", "TypeList<"]
+
     any_types = []
     if is_yrpp 
         any_types = array.concat(any_types, ["IndexClass"])
@@ -62,6 +71,15 @@
         $mapped_type = type_map[$unwrap_name]
         if $mapped_type
             ret $mapped_type
+        end
+        for generic_type in generic_types
+            if string.starts_with($unwrap_name, generic_type)
+                if string.ends_with($unwrap_name, "*>")
+                    ret string.replace($unwrap_name, "*>", ">")
+                else
+                    ret $unwrap_name
+                end
+            end
         end
         if $unwrap_name | string.contains ">" # template
             ret "any"

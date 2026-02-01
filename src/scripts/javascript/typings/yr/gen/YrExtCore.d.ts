@@ -150,7 +150,7 @@ class YrBulletConstructEvent
 class YrBulletDetonateEvent
 {
     m_pBullet : BulletClass;
-    m_pCoords : any;
+    m_pCoords : Vector3D;
 }
 class YrBulletTypeCtorEvent
 {
@@ -357,7 +357,7 @@ class YrGadgetInputEvent
 class YrUserInterfaceInputEvent
 {
     m_pKey : number;
-    m_pMouseCoords : any;
+    m_pMouseCoords : Vector2D;
 }
 class YrKeyboardInputEvent
 {
@@ -366,7 +366,7 @@ class YrKeyboardInputEvent
 class YrDecideActionEvent
     extends YrHookOverrideReturn_Action_
 {
-    m_cell : any;
+    m_cell : Vector2D;
     m_pObject : ObjectClass;
 }
 class YrHookOverrideReturn_Action_
@@ -376,7 +376,7 @@ class YrHookOverrideReturn_Action_
 class YrConvertActionEvent
     extends YrHookOverrideReturn_bool_
 {
-    m_cell : any;
+    m_cell : Vector2D;
     m_shrouded : boolean;
     m_pObject : ObjectClass;
     m_action : Action;
@@ -387,12 +387,12 @@ class YrHookOverrideReturn_bool_
 }
 class YrLeftMouseButtonDownEvent
 {
-    m_point : any;
+    m_point : Vector2D;
 }
 class YrLeftMouseButtonUpEvent
 {
-    m_coords : any;
-    m_cell : any;
+    m_coords : Vector3D;
+    m_cell : Vector2D;
     m_pObject : ObjectClass;
     m_action : Action;
 }
@@ -431,14 +431,14 @@ class YrObjectLimboCheckedEvent
 class YrObjectUnlimboCheckedEvent
 {
     m_pObject : ObjectClass;
-    m_pCrd : any;
+    m_pCrd : Vector3D;
     m_dFaceDir : DirType;
 }
 class YrObjectMouseOverCellEvent
     extends YrHookOverrideReturn_Action_
 {
     m_pObject : ObjectClass;
-    m_cell : any;
+    m_cell : Vector2D;
     m_checkFog : boolean;
     m_ignoreForce : boolean;
 }
@@ -454,7 +454,7 @@ class YrObjectCellClickedActionEvent
 {
     m_pObject : ObjectClass;
     m_action : Action;
-    m_cell : any;
+    m_cell : Vector2D;
 }
 class YrObjectObjectClickedActionEvent
     extends YrHookOverrideReturn_bool_
@@ -467,13 +467,13 @@ class YrObjectGetFLHEvent
     extends YrHookOverrideReturn_Vector3D_int___
 {
     m_pObject : ObjectClass;
-    m_pDest : any;
+    m_pDest : Vector3D;
     m_idxWeapon : number;
-    m_BaseCoords : any;
+    m_BaseCoords : Vector3D;
 }
 class YrHookOverrideReturn_Vector3D_int___
 {
-    OverrideReturn(val_0 : any) : void;
+    OverrideReturn(val_0 : Vector3D) : void;
 }
 class YrSuperCtorEvent
 {
@@ -506,7 +506,7 @@ class YrSuperLoadGameEndEvent
 class YrSuperLaunchEvent
 {
     m_pSuper : SuperClass;
-    m_pCell : any;
+    m_pCell : Vector2D;
     m_isPlayer : boolean;
 }
 class YrSuperWeaponTypeCtorEvent
@@ -546,7 +546,7 @@ class YrSuperWeaponTypeMouseOverObjectEvent
     extends YrHookOverrideReturn_Action_
 {
     m_pSuperWeaponType : SuperWeaponTypeClass;
-    m_cell : any;
+    m_cell : Vector2D;
     m_pObjBelowMouse : ObjectClass;
 }
 class YrTechnoCtorEvent
@@ -730,7 +730,7 @@ class YrTActionExecuteEvent
     m_pHouse : HouseClass;
     m_pObject : ObjectClass;
     m_pTrigger : TriggerClass;
-    m_location : any;
+    m_location : Vector2D;
 }
 class YrUIUpdateEvent
 {

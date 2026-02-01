@@ -163,6 +163,9 @@ template<typename CLS>
 void RegisterVectorClass()
 {
     auto builder = PUERTS_NAMESPACE::DefineClass<VectorClass<CLS>>();
+    builder.Constructor<>();
+    builder.Constructor<int>();
+    builder.Constructor<const VectorClass<CLS>&>();
     builder.Method("SetCapacity", MakeFunction(&VectorClass<CLS>::SetCapacity));
     builder.Method("Clear", MakeFunction(&VectorClass<CLS>::Clear));
     builder.Method("FindItemIndex", MakeFunction(&VectorClass<CLS>::FindItemIndex));
@@ -182,6 +185,9 @@ void RegisterDynamicVectorClass()
 {
     auto builder = PUERTS_NAMESPACE::DefineClass<DynamicVectorClass<CLS>>();
     builder.Extends<VectorClass<CLS>>();
+    builder.Constructor<>();
+    builder.Constructor<int>();
+    builder.Constructor<const DynamicVectorClass<CLS>&>();
     builder.Method("ValidIndex", MakeFunction(&DynamicVectorClass<CLS>::ValidIndex));
     builder.Method("AddItem", MakeFunction(&DynamicVectorClass<CLS>::AddItem));
     builder.Method("RemoveItem", MakeFunction(&DynamicVectorClass<CLS>::RemoveItem));
@@ -197,8 +203,27 @@ template<typename CLS>
 void RegisterTypeClass()
 {
     PUERTS_NAMESPACE::DefineClass<TypeList<CLS>>()
+        .Constructor<>()
+        .Constructor<int>()
+        .Constructor<const TypeList<CLS>&>()
         .Extends<DynamicVectorClass<CLS>>()
         .Register();
+}
+
+void RegisterCounterClass()
+{
+    auto builder = PUERTS_NAMESPACE::DefineClass<CounterClass>();
+    builder.Extends<VectorClass<int>>();
+    builder.Constructor<>();
+    builder.Constructor<const CounterClass&>();
+    builder.Method("GetTotal", MakeFunction(&CounterClass::GetTotal));
+    builder.Method("EnsureItem", MakeFunction(&CounterClass::EnsureItem));
+    builder.Method("GetItemCount", SelectFunction(int(CounterClass::*)(int), &CounterClass::GetItemCount));
+    builder.Method("Increment", MakeFunction(&CounterClass::Increment));
+    builder.Method("Decrement", MakeFunction(&CounterClass::Decrement));
+    MakeMethodCheck<&CounterClass::Swap>(builder, "Swap");
+    builder.Property("Total", MakeProperty(&CounterClass::Total));
+    builder.Register();
 }
 
 template<typename TKey, typename TValue>
@@ -328,6 +353,8 @@ void __JsRegister_YrContainers()
     RegisterIndexClass<TurretWeaponVoxelIndexKey, VoxelCacheStruct*>();
     RegisterIndexClass<TurretBarrelVoxelIndexKey, VoxelCacheStruct*>();
     RegisterIndexClass<ShadowVoxelIndexKey, VoxelCacheStruct*>();
+
+    RegisterCounterClass();
 }
 
 GLOBAL_INVOKE_ON_CTOR(__JsRegister_YrContainers);
