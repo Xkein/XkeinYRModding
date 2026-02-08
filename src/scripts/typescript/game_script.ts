@@ -67,6 +67,11 @@ class GameScriptable {
 
 const emptyComponents = new Map();
 
+interface ScriptableOwner {
+    __scriptables: Map<string, GameScriptable>;
+    __components: Map<string, any>;
+}
+
 export function GetScriptableComponent<T>(klass: { new(): T }, yrObject: AbstractClass): T | undefined {
     let components = GetAllGetScriptableComponents(yrObject);
     let componentName = klass.name;
@@ -74,9 +79,10 @@ export function GetScriptableComponent<T>(klass: { new(): T }, yrObject: Abstrac
 }
 
 export function CreateScriptableComponent<T>(klass: { new(): T }, yrObject: AbstractClass): T {
-    let components = (yrObject as any).__components;
+    let owner = yrObject as any as ScriptableOwner;
+    let components = owner.__components;
     if (!components) {
-        components = (yrObject as any).__components = new Map();
+        components = owner.__components = new Map();
     }
     let componentName = klass.name;
     let component = new klass();
@@ -85,7 +91,29 @@ export function CreateScriptableComponent<T>(klass: { new(): T }, yrObject: Abst
 }
 
 export function GetAllGetScriptableComponents(yrObject: AbstractClass): Map<string, any> {
-    return (yrObject as any).__components ?? emptyComponents;
+    let owner = yrObject as any as ScriptableOwner;
+    return owner.__components ?? emptyComponents;
+}
+
+interface GameObjectBlackboard {
+    __variables: Map<string, any>;
+}
+
+export function getCustomVariable(yrObject: AbstractClass, name: string): any {
+    let blackboard = yrObject as any as GameObjectBlackboard;
+    if (blackboard.__variables) {
+        return blackboard.__variables[name];
+    }
+    return undefined;
+}
+
+export function setCustomVariable(yrObject: AbstractClass, name: string, value: any) {
+    let blackboard = yrObject as any as GameObjectBlackboard;
+    if (!blackboard.__variables) {
+        blackboard.__variables = new Map();
+    }
+    blackboard.__variables[name] = value;
+    return value
 }
 
 let iniReaderXkein = new IniReader("XkeinExt.ini");
@@ -184,11 +212,21 @@ gameEvents.registerHookEventHandler(YrSaveGameEndStreamEvent, (E) => {
             if (scriptable.script.onSaveInst) {
                 scriptable.script.onSaveInst(yrObject);
             }
+            // serialize components
             let components = GetAllGetScriptableComponents(yrObject);
             JsSerialization.SaveNext(components.size);
             for (const [name, component] of components) {
                 JsSerialization.SaveNext(name);
                 JsSerialization.SaveNext(component);
+            }
+            // serialize blackboard
+            let blackboard = yrObject as any as GameObjectBlackboard;
+            if (blackboard.__variables) {
+                JsSerialization.SaveNext(blackboard.__variables.size);
+                for (const [name, value] of blackboard.__variables) {
+                    JsSerialization.SaveNext(name);
+                    JsSerialization.SaveNext(value);
+                }
             }
         }
     }
@@ -203,14 +241,28 @@ gameEvents.registerHookEventHandler(YrLoadGameEndStreamEvent, (E) => {
             if (scriptable.script.onLoadInst) {
                 scriptable.script.onLoadInst(yrObject);
             }
+            // serialize components
             let size = JsSerialization.LoadNext();
             if (size > 0) {
+                let owner = yrObject as any as ScriptableOwner;
                 let components = new Map();
-                (yrObject as any).__components = components;
+                owner.__components = components;
                 for (let index = 0; index < size; index++) {
                     let name = JsSerialization.LoadNext();
                     let component = JsSerialization.LoadNext();
                     components[name] = component;
+                }
+            }
+            // serialize blackboard
+            let variableCount = JsSerialization.LoadNext();
+            if (variableCount > 0) {
+                let blackboard = yrObject as any as GameObjectBlackboard;
+                let variables = new Map();
+                blackboard.__variables = variables;
+                for (let index = 0; index < variableCount; index++) {
+                    let name = JsSerialization.LoadNext();
+                    let value = JsSerialization.LoadNext();
+                    variables[name] = value;
                 }
             }
         }
