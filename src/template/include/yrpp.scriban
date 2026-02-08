@@ -156,6 +156,7 @@ func get_yr_game_types()
         "ShipLocomotionClass",
         "TeleportLocomotionClass",
         "TunnelLocomotionClass",
+        "FoggedObjectClass",
         "RulesClass",
         "INIClass",
         "CCINIClass",

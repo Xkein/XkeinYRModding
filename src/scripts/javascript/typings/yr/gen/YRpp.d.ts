@@ -511,11 +511,11 @@ class TechnoClass
     m___TurretRecoil : string;
     m_BarrelRecoil : RecoilData;
     m___BarrelRecoil : string;
-    m_CurrentTargetThreatValues : DynamicVectorClass<int>;
+    m_CurrentTargetThreatValues : DynamicVectorClass<number>;
     m___CurrentTargetThreatValues : string;
-    m_CurrentTargets : DynamicVectorClass<AbstractClass >;
+    m_CurrentTargets : DynamicVectorClass<AbstractClass>;
     m___CurrentTargets : string;
-    m_AttackedTargets : DynamicVectorClass<AbstractClass >;
+    m_AttackedTargets : DynamicVectorClass<AbstractClass>;
     m___AttackedTargets : string;
     m_Audio3 : any;
     m___Audio3 : string;
@@ -621,8 +621,8 @@ class HouseClass
     EnsurePlanningPathExists(idx_0 : number) : void;
     Update_FactoriesQueues(factoryOf_0 : AbstractType, isNaval_1 : boolean, buildCat_2 : BuildCat) : void;
     GetFactoryProducing(pItem_0 : TechnoTypeClass) : FactoryClass;
-    FirstBuildableFromArray(items_0 : DynamicVectorClass<BuildingTypeClass >) : BuildingTypeClass;
-    AllPrerequisitesAvailable(pItem_0 : TechnoTypeClass, vectorBuildings_1 : DynamicVectorClass<BuildingTypeClass >, vectorLength_2 : number) : boolean;
+    FirstBuildableFromArray(items_0 : DynamicVectorClass<BuildingTypeClass>) : BuildingTypeClass;
+    AllPrerequisitesAvailable(pItem_0 : TechnoTypeClass, vectorBuildings_1 : DynamicVectorClass<BuildingTypeClass>, vectorLength_2 : number) : boolean;
     IsControlledByHuman() : boolean;
     IsControlledByCurrentPlayer() : boolean;
     SendSpyPlanes(AircraftTypeIdx_0 : number, AircraftAmount_1 : number, SetMission_2 : Mission, Target_3 : AbstractClass, Destination_4 : ObjectClass) : void;
@@ -878,33 +878,33 @@ class HouseClass
     m_TotalOwnedVehicleCost : number;
     m_TotalOwnedAircraftCost : number;
     m_PowerSurplus : number;
-    m_RelatedTags : DynamicVectorClass<TagClass >;
+    m_RelatedTags : DynamicVectorClass<TagClass>;
     m___RelatedTags : string;
-    m_ConYards : DynamicVectorClass<BuildingClass >;
+    m_ConYards : DynamicVectorClass<BuildingClass>;
     m___ConYards : string;
-    m_Buildings : DynamicVectorClass<BuildingClass >;
+    m_Buildings : DynamicVectorClass<BuildingClass>;
     m___Buildings : string;
-    m_UnitRepairStations : DynamicVectorClass<BuildingClass >;
+    m_UnitRepairStations : DynamicVectorClass<BuildingClass>;
     m___UnitRepairStations : string;
-    m_Grinders : DynamicVectorClass<BuildingClass >;
+    m_Grinders : DynamicVectorClass<BuildingClass>;
     m___Grinders : string;
-    m_Absorbers : DynamicVectorClass<BuildingClass >;
+    m_Absorbers : DynamicVectorClass<BuildingClass>;
     m___Absorbers : string;
-    m_Bunkers : DynamicVectorClass<BuildingClass >;
+    m_Bunkers : DynamicVectorClass<BuildingClass>;
     m___Bunkers : string;
-    m_Occupiables : DynamicVectorClass<BuildingClass >;
+    m_Occupiables : DynamicVectorClass<BuildingClass>;
     m___Occupiables : string;
-    m_CloningVats : DynamicVectorClass<BuildingClass >;
+    m_CloningVats : DynamicVectorClass<BuildingClass>;
     m___CloningVats : string;
-    m_SecretLabs : DynamicVectorClass<BuildingClass >;
+    m_SecretLabs : DynamicVectorClass<BuildingClass>;
     m___SecretLabs : string;
-    m_PsychicDetectionBuildings : DynamicVectorClass<BuildingClass >;
+    m_PsychicDetectionBuildings : DynamicVectorClass<BuildingClass>;
     m___PsychicDetectionBuildings : string;
-    m_FactoryPlants : DynamicVectorClass<BuildingClass >;
+    m_FactoryPlants : DynamicVectorClass<BuildingClass>;
     m___FactoryPlants : string;
-    m_StartingUnits : DynamicVectorClass<StartingTechnoStruct >;
+    m_StartingUnits : DynamicVectorClass<StartingTechnoStruct>;
     m___StartingUnits : string;
-    m_Supers : DynamicVectorClass<SuperClass >;
+    m_Supers : DynamicVectorClass<SuperClass>;
     m___Supers : string;
     m_RepairTimer : CDTimerClass;
     m___RepairTimer : string;
@@ -994,7 +994,7 @@ class HouseClass
     m___SpeakMaxedDelayTimer : string;
     m_StartingPoint : number;
     m_StartingCell : CellStruct;
-    m_WaypointPath : DynamicVectorClass<IConnectionPoint >;
+    m_WaypointPath : DynamicVectorClass<any>;
     m___WaypointPath : string;
 }
 class StorageClass
@@ -1544,7 +1544,7 @@ class INIClass
     ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : number) : number;
     GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
     ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number) : number;
-    static GetPrerequisites(pBuffer_0 : TypeList<int>, pINI_1 : INIClass, pSection_2 : string, pKey_3 : string, Defaults_4 : TypeList<int>) : TypeList<int>;
+    static GetPrerequisites(pBuffer_0 : TypeList<number>, pINI_1 : INIClass, pSection_2 : string, pKey_3 : string, Defaults_4 : TypeList<number>) : TypeList<number>;
     static IsBlank(pValue_0 : string) : boolean;
     m_CurrentSectionName : string;
     m_CurrentSection : any;
@@ -1598,8 +1598,8 @@ class TechnoTypeClass
     m_unknown_double_300 : number;
     m_AccelerationFactor : number;
     m_CloakingSpeed : number;
-    m_DebrisTypes : TypeList<VoxelAnimTypeClass >;
-    m_DebrisMaximums : TypeList<int>;
+    m_DebrisTypes : TypeList<VoxelAnimTypeClass>;
+    m_DebrisMaximums : TypeList<number>;
     m_Locomotor : any;
     m_align_35C : number;
     m_VoxelScaleX : number;
@@ -1626,21 +1626,21 @@ class TechnoTypeClass
     m_LeptonMindControlOffset : number;
     m_PixelSelectionBracketDelta : number;
     m_PipWrap : number;
-    m_Dock : TypeList<BuildingTypeClass >;
+    m_Dock : TypeList<BuildingTypeClass>;
     m_DeploysInto : BuildingTypeClass;
     m_UndeploysInto : UnitTypeClass;
     m_PowersUnit : UnitTypeClass;
     m_PoweredUnit : boolean;
-    m_VoiceSelect : TypeList<int>;
-    m_VoiceSelectEnslaved : TypeList<int>;
-    m_VoiceSelectDeactivated : TypeList<int>;
-    m_VoiceMove : TypeList<int>;
-    m_VoiceAttack : TypeList<int>;
-    m_VoiceSpecialAttack : TypeList<int>;
-    m_VoiceDie : TypeList<int>;
-    m_VoiceFeedback : TypeList<int>;
-    m_MoveSound : TypeList<int>;
-    m_DieSound : TypeList<int>;
+    m_VoiceSelect : TypeList<number>;
+    m_VoiceSelectEnslaved : TypeList<number>;
+    m_VoiceSelectDeactivated : TypeList<number>;
+    m_VoiceMove : TypeList<number>;
+    m_VoiceAttack : TypeList<number>;
+    m_VoiceSpecialAttack : TypeList<number>;
+    m_VoiceDie : TypeList<number>;
+    m_VoiceFeedback : TypeList<number>;
+    m_MoveSound : TypeList<number>;
+    m_DieSound : TypeList<number>;
     m_AuxSound1 : number;
     m_AuxSound2 : number;
     m_CreateSound : number;
@@ -1679,7 +1679,7 @@ class TechnoTypeClass
     m_GuardRange : number;
     m_MinDebris : number;
     m_MaxDebris : number;
-    m_DebrisAnims : TypeList<AnimTypeClass >;
+    m_DebrisAnims : TypeList<AnimTypeClass>;
     m_Passengers : number;
     m_OpenTopped : boolean;
     m_Sight : number;
@@ -1705,8 +1705,8 @@ class TechnoTypeClass
     m_AirstrikeRechargeTime : number;
     m_EliteAirstrikeRechargeTime : number;
     m_TechLevel : number;
-    m_Prerequisite : TypeList<int>;
-    m_PrerequisiteOverride : TypeList<int>;
+    m_Prerequisite : TypeList<number>;
+    m_PrerequisiteOverride : TypeList<number>;
     m_ThreatPosed : number;
     m_Points : number;
     m_Speed : number;
@@ -1754,13 +1754,13 @@ class TechnoTypeClass
     m_TurretOffset : number;
     m_CanBeHidden : boolean;
     m_Points2 : number;
-    m_Explosion : TypeList<AnimTypeClass >;
-    m_DestroyAnim : TypeList<AnimTypeClass >;
+    m_Explosion : TypeList<AnimTypeClass>;
+    m_DestroyAnim : TypeList<AnimTypeClass>;
     m_NaturalParticleSystem : ParticleSystemTypeClass;
     m_NaturalParticleSystemLocation : CoordStruct;
     m_RefinerySmokeParticleSystem : ParticleSystemTypeClass;
-    m_DamageParticleSystems : TypeList<ParticleSystemTypeClass >;
-    m_DestroyParticleSystems : TypeList<ParticleSystemTypeClass >;
+    m_DamageParticleSystems : TypeList<ParticleSystemTypeClass>;
+    m_DestroyParticleSystems : TypeList<ParticleSystemTypeClass>;
     m_DamageSmokeOffset : CoordStruct;
     m_DamSmkOffScrnRel : boolean;
     m_DestroySmokeOffset : CoordStruct;
@@ -1905,7 +1905,7 @@ class TechnoTypeClass
     m_ZFudgeTunnel : number;
     m_ZFudgeBridge : number;
     m_PaletteFile : string;
-    m_Palette : DynamicVectorClass<ColorScheme >;
+    m_Palette : DynamicVectorClass<ColorScheme>;
     m_align_DF4 : number;
 }
 class WeaponStruct
@@ -1994,11 +1994,11 @@ class WeaponTypeClass
     m_IsRadEruption : boolean;
     m_RadLevel : number;
     m_IsMagBeam : boolean;
-    m_Report : TypeList<int>;
+    m_Report : TypeList<number>;
     m___Report : string;
-    m_DownReport : TypeList<int>;
+    m_DownReport : TypeList<number>;
     m___DownReport : string;
-    m_Anim : TypeList<AnimTypeClass >;
+    m_Anim : TypeList<AnimTypeClass>;
     m___Anim : string;
 }
 class BulletTypeClass
@@ -2133,7 +2133,7 @@ class RadioClass
     HasAnyLink() : boolean;
     SetLinkCount(count_0 : number) : void;
     m_LastCommands : RadioCommand;
-    m_RadioLinks : VectorClass<TechnoClass >;
+    m_RadioLinks : VectorClass<TechnoClass>;
     m___RadioLinks : string;
 }
 class MissionClass
@@ -2211,9 +2211,9 @@ class InfantryTypeClass
     m_FireProne : number;
     m_SecondaryFire : number;
     m_SecondaryProne : number;
-    m_DeadBodies : TypeList<AnimTypeClass >;
-    m_DeathAnims : TypeList<AnimTypeClass >;
-    m_VoiceComment : TypeList<int>;
+    m_DeadBodies : TypeList<AnimTypeClass>;
+    m_DeathAnims : TypeList<AnimTypeClass>;
+    m_VoiceComment : TypeList<number>;
     m_EnterWaterSound : number;
     m_LeaveWaterSound : number;
     m_Cyborg : boolean;
@@ -2352,7 +2352,7 @@ class CellClass
     static s_BridgeLevels : number;
     static s_BridgeHeight : number;
     m_MapCoords : CellStruct;
-    m_FoggedObjects : DynamicVectorClass<FoggedObjectClass >;
+    m_FoggedObjects : DynamicVectorClass<FoggedObjectClass>;
     m_BridgeOwnerCell : CellClass;
     m_unknown_30 : number;
     m_LightConvert : LightConvertClass;
@@ -2434,7 +2434,7 @@ class BuildingClass
     GetCurrentFrame() : number;
     IsAllFogged() : boolean;
     SetRallypoint(pTarget_0 : CellStruct, bPlayEVA_1 : boolean) : void;
-    FreezeInFog(pFoggedArray_0 : DynamicVectorClass<FoggedObjectClass >, pCell_1 : CellClass, Visible_2 : boolean) : void;
+    FreezeInFog(pFoggedArray_0 : DynamicVectorClass<FoggedObjectClass>, pCell_1 : CellClass, Visible_2 : boolean) : void;
     GoOnline() : void;
     GoOffline() : void;
     GetPowerOutput() : number;
@@ -2509,8 +2509,8 @@ class BuildingClass
     m_SupportingPrisms : number;
     m_HasExtraPowerBonus : boolean;
     m_HasExtraPowerDrain : boolean;
-    m_Overpowerers : DynamicVectorClass<InfantryClass >;
-    m_Occupants : DynamicVectorClass<InfantryClass >;
+    m_Overpowerers : DynamicVectorClass<InfantryClass>;
+    m_Occupants : DynamicVectorClass<InfantryClass>;
     m_FiringOccupantIndex : number;
     m_Audio7 : any;
     m_Audio8 : any;
@@ -2549,6 +2549,9 @@ class BuildingClass
     m_PrismTargetCoords : CoordStruct;
     m_DelayBeforeFiring : number;
     m_BunkerState : number;
+}
+class FoggedObjectClass
+{
 }
 class BuildingTypeClass
     extends TechnoTypeClass
@@ -2772,7 +2775,7 @@ class BuildingTypeClass
     m_CrateBeneathIsMoney : boolean;
     m_TheaterSpecificID : string;
     m_NumberOfDocks : number;
-    m_DockingOffsets : VectorClass<Vector3D<int>>;
+    m_DockingOffsets : VectorClass<Vector3D>;
 }
 class BuildingAnimStruct
 {
@@ -2917,7 +2920,7 @@ class FactoryClass
     static s_AbsID : AbstractType;
     static s_Array : any;
     m_Production : StageClass;
-    m_QueuedObjects : DynamicVectorClass<TechnoTypeClass >;
+    m_QueuedObjects : DynamicVectorClass<TechnoTypeClass>;
     m_Object : TechnoClass;
     m_OnHold : boolean;
     m_IsDifferent : boolean;
@@ -2998,7 +3001,7 @@ class FootClass
     UnPanic() : void;
     PlayIdleAnim(nIdleAnimNumber_0 : number) : void;
     vt_entry_524() : number;
-    TryNearestDockBuilding(bList_0 : TypeList<BuildingTypeClass >, dwUnk2_1 : number, dwUnk3_2 : number) : BuildingClass;
+    TryNearestDockBuilding(bList_0 : TypeList<BuildingTypeClass>, dwUnk2_1 : number, dwUnk3_2 : number) : BuildingClass;
     FindCloserDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : number, dwUnk3_2 : number, pDistance_3 : number) : BuildingClass;
     FindNearestDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : number, dwUnk3_2 : number) : BuildingClass;
     vt_entry_534(dwUnk_0 : number, dwUnk2_1 : number) : void;
@@ -3088,9 +3091,9 @@ class FootClass
     m_unknown_bool_6B8 : boolean;
     m_MoveSoundAudioController : any;
     m___MoveSoundAudioController : string;
-    m_unknown_abstract_array_588 : DynamicVectorClass<AbstractClass >;
+    m_unknown_abstract_array_588 : DynamicVectorClass<AbstractClass>;
     m___unknown_abstract_array_588 : string;
-    m_NavQueue : DynamicVectorClass<AbstractClass >;
+    m_NavQueue : DynamicVectorClass<AbstractClass>;
     m___NavQueue : string;
     m_PathDelayTimer : CDTimerClass;
     m___PathDelayTimer : string;
@@ -3112,7 +3115,7 @@ class TeamClass
     GetClassID(pClassID_0 : any | any) : number;
     Load(pStm_0 : any | any) : number;
     Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
-    GetTaskForceMissingMemberTypes(dest_0 : DynamicVectorClass<TechnoTypeClass >) : void;
+    GetTaskForceMissingMemberTypes(dest_0 : DynamicVectorClass<TechnoTypeClass>) : void;
     LiberateMember(pFoot_0 : FootClass, idx_1 : number, count_2 : number) : void;
     AddMember(pFoot_0 : FootClass, bForce_1 : boolean) : boolean;
     AssignMissionTarget(pTarget_0 : AbstractClass) : void;
@@ -3614,9 +3617,9 @@ class HouseTypeClass
     m_BuildtimeBuildingsMult : number;
     m_BuildtimeDefensesMult : number;
     m_IncomeMult : number;
-    m_VeteranInfantry : TypeList<InfantryTypeClass >;
-    m_VeteranUnits : TypeList<UnitTypeClass >;
-    m_VeteranAircraft : TypeList<AircraftTypeClass >;
+    m_VeteranInfantry : TypeList<InfantryTypeClass>;
+    m_VeteranUnits : TypeList<UnitTypeClass>;
+    m_VeteranAircraft : TypeList<AircraftTypeClass>;
     m_Suffix : string;
     m_Prefix : number;
     m_Multiplay : boolean;
@@ -4017,7 +4020,7 @@ class TiberiumClass
     m_NumFrames : number;
     m_NumImages : number;
     m_NumSlopes : number;
-    m_Debris : TypeList<AnimTypeClass >;
+    m_Debris : TypeList<AnimTypeClass>;
     m___Debris : string;
     m_SpreadLogic : TiberiumLogic;
     m___SpreadLogic : string;
@@ -4399,7 +4402,7 @@ class CaptureManagerClass
     GetOriginalOwner(Unit_0 : TechnoClass) : HouseClass;
     static s_AbsID : AbstractType;
     static s_Array : any;
-    m_ControlNodes : DynamicVectorClass<ControlNode >;
+    m_ControlNodes : DynamicVectorClass<ControlNode>;
     m_MaxControlNodes : number;
     m_InfiniteMindControl : boolean;
     m_OverloadDeathSoundPlayed : boolean;
@@ -4439,7 +4442,7 @@ class SpawnManagerClass
     m_SpawnCount : number;
     m_RegenRate : number;
     m_ReloadRate : number;
-    m_SpawnedNodes : DynamicVectorClass<SpawnControl >;
+    m_SpawnedNodes : DynamicVectorClass<SpawnControl>;
     m_UpdateTimer : CDTimerClass;
     m_SpawnTimer : CDTimerClass;
     m_Target : AbstractClass;
@@ -4478,7 +4481,7 @@ class SlaveManagerClass
     m_SlaveCount : number;
     m_RegenRate : number;
     m_ReloadRate : number;
-    m_SlaveNodes : DynamicVectorClass<SlaveControl >;
+    m_SlaveNodes : DynamicVectorClass<SlaveControl>;
     m_RespawnTimer : CDTimerClass;
     m_State : SlaveManagerStatus;
     m_LastScanFrame : number;
@@ -4512,7 +4515,7 @@ class ParticleSystemClass
     m_TimeToDie : boolean;
     m_unknown_bool_F9 : boolean;
     m_OwnerHouse : HouseClass;
-    m_Particles : DynamicVectorClass<ParticleClass >;
+    m_Particles : DynamicVectorClass<ParticleClass>;
     m___Particles : string;
 }
 class ParticleSystemTypeClass
@@ -4617,7 +4620,7 @@ class ParticleTypeClass
     m_MinZVelocity : number;
     m_ZVelocityRange : number;
     m_ColorSpeed : number;
-    m_ColorList : TypeList<RGBClass >;
+    m_ColorList : TypeList<RGBClass>;
     m_StartColor1 : ColorStruct;
     m_StartColor2 : ColorStruct;
     m_MaxDC : number;
@@ -4660,7 +4663,7 @@ class WarheadTypeClass
     m_Verses : number;
     m_ProneDamage : number;
     m_DeformTreshold : number;
-    m_AnimList : TypeList<AnimTypeClass >;
+    m_AnimList : TypeList<AnimTypeClass>;
     m_InfDeath : InfDeath;
     m_CellSpread : number;
     m_CellInset : number;
@@ -4711,8 +4714,8 @@ class WarheadTypeClass
     m_ShakeXhi : number;
     m_ShakeYlo : number;
     m_ShakeYhi : number;
-    m_DebrisTypes : TypeList<VoxelAnimTypeClass >;
-    m_DebrisMaximums : TypeList<int>;
+    m_DebrisTypes : TypeList<VoxelAnimTypeClass>;
+    m_DebrisMaximums : TypeList<number>;
     m_MaxDebris : number;
     m_MinDebris : number;
 }
@@ -4803,7 +4806,7 @@ class WaveClass
     m_LaserEC : number;
     m_Owner : TechnoClass;
     m_Facing : FacingClass;
-    m_Cells : DynamicVectorClass<CellClass >;
+    m_Cells : DynamicVectorClass<CellClass>;
     m_ColorData : number;
 }
 class TransitionTimer
@@ -4890,7 +4893,7 @@ class PlanningTokenClass
 {
     static s_Array : any;
     m_OwnerUnit : TechnoClass;
-    m_PlanningNodes : DynamicVectorClass<PlanningNodeClass >;
+    m_PlanningNodes : DynamicVectorClass<PlanningNodeClass>;
     m_field_1C : boolean;
     m_field_1D : boolean;
     m_field_8C : number;
@@ -4907,10 +4910,10 @@ class PlanningNodeClass
     static s_Unknown2 : any;
     static s_Unknown3 : any;
     static s_PlanningModeActive : any;
-    m_PlanningMembers : DynamicVectorClass<PlanningMemberClass >;
+    m_PlanningMembers : DynamicVectorClass<PlanningMemberClass>;
     m_field_18 : number;
     m_field_1C : boolean;
-    m_PlanningBranches : DynamicVectorClass<PlanningBranchClass >;
+    m_PlanningBranches : DynamicVectorClass<PlanningBranchClass>;
 }
 class PlanningMemberClass
 {
@@ -4936,8 +4939,8 @@ class ColorScheme
     static FindIndex(pID_0 : string, ShadeCount_1 : number) : number;
     static FindByName(pID_0 : string, BaseColor_1 : ColorStruct, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number) : ColorScheme;
     static GetNumberOfSchemes() : number;
-    static GeneratePalette(name_0 : string) : DynamicVectorClass<ColorScheme >;
-    static GetPaletteSchemesFromIterator(it_0 : any) : DynamicVectorClass<ColorScheme >;
+    static GeneratePalette(name_0 : string) : DynamicVectorClass<ColorScheme>;
+    static GetPaletteSchemesFromIterator(it_0 : any) : DynamicVectorClass<ColorScheme>;
     static s_Array : any;
     m_ArrayIndex : number;
     m_Colors : BytePalette;
@@ -5115,9 +5118,9 @@ class BaseClass
     m_Owner : HouseClass;
     m_BaseNodes : DynamicVectorClass<BaseNodeClass>;
     m___BaseNodes : string;
-    m_Cells_24 : DynamicVectorClass<Vector2D<short>>;
+    m_Cells_24 : DynamicVectorClass<Vector2D>;
     m___Cells_24 : string;
-    m_Cells_38 : DynamicVectorClass<Vector2D<short>>;
+    m_Cells_38 : DynamicVectorClass<Vector2D>;
     m___Cells_38 : string;
 }
 class BaseNodeClass
@@ -5321,7 +5324,7 @@ class RulesClass
     m_DropPodPuff : AnimTypeClass;
     m_WaypointAnimationSpeed : number;
     m_BarrelExplode : AnimTypeClass;
-    m_BarrelDebris : TypeList<VoxelAnimTypeClass >;
+    m_BarrelDebris : TypeList<VoxelAnimTypeClass>;
     m_BarrelParticle : ParticleSystemTypeClass;
     m_RadarEventColorSpeed : number;
     m_RadarEventMinRadius : number;
@@ -5354,10 +5357,10 @@ class RulesClass
     m_WoodCrateImg : OverlayTypeClass;
     m_CrateImg : OverlayTypeClass;
     m_WaterCrateImg : OverlayTypeClass;
-    m_DropPod : TypeList<AnimTypeClass >;
-    m_DeadBodies : TypeList<AnimTypeClass >;
-    m_MetallicDebris : TypeList<AnimTypeClass >;
-    m_BridgeExplosions : TypeList<AnimTypeClass >;
+    m_DropPod : TypeList<AnimTypeClass>;
+    m_DeadBodies : TypeList<AnimTypeClass>;
+    m_MetallicDebris : TypeList<AnimTypeClass>;
+    m_BridgeExplosions : TypeList<AnimTypeClass>;
     m_DigSound : number;
     m_CreateUnitSound : number;
     m_CreateInfantrySound : number;
@@ -5433,9 +5436,9 @@ class RulesClass
     m_Dig : AnimTypeClass;
     m_IonBlast : AnimTypeClass;
     m_IonBeam : AnimTypeClass;
-    m_DamageFireTypes : TypeList<AnimTypeClass >;
-    m_WeatherConClouds : TypeList<AnimTypeClass >;
-    m_WeatherConBolts : TypeList<AnimTypeClass >;
+    m_DamageFireTypes : TypeList<AnimTypeClass>;
+    m_WeatherConClouds : TypeList<AnimTypeClass>;
+    m_WeatherConBolts : TypeList<AnimTypeClass>;
     m_WeatherConBoltExplosion : AnimTypeClass;
     m_DominatorWarhead : WarheadTypeClass;
     m_DominatorFirstAnim : AnimTypeClass;
@@ -5461,12 +5464,12 @@ class RulesClass
     m_ForceShieldInvokeAnim : AnimTypeClass;
     m_WeaponNullifyAnim : AnimTypeClass;
     m_AtmosphereEntry : AnimTypeClass;
-    m_PrerequisitePower : TypeList<int>;
-    m_PrerequisiteFactory : TypeList<int>;
-    m_PrerequisiteBarracks : TypeList<int>;
-    m_PrerequisiteRadar : TypeList<int>;
-    m_PrerequisiteTech : TypeList<int>;
-    m_PrerequisiteProc : TypeList<int>;
+    m_PrerequisitePower : TypeList<number>;
+    m_PrerequisiteFactory : TypeList<number>;
+    m_PrerequisiteBarracks : TypeList<number>;
+    m_PrerequisiteRadar : TypeList<number>;
+    m_PrerequisiteTech : TypeList<number>;
+    m_PrerequisiteProc : TypeList<number>;
     m_PrerequisiteProcAlternate : UnitTypeClass;
     m_GateUp : number;
     m_GateDown : number;
@@ -5477,9 +5480,9 @@ class RulesClass
     m_Acceleration : number;
     m_WobblesPerSecond : number;
     m_WobbleDeviation : number;
-    m_RadarEventSuppressionDistances : TypeList<int>;
-    m_RadarEventVisibilityDurations : TypeList<int>;
-    m_RadarEventDurations : TypeList<int>;
+    m_RadarEventSuppressionDistances : TypeList<number>;
+    m_RadarEventVisibilityDurations : TypeList<number>;
+    m_RadarEventDurations : TypeList<number>;
     m_IonCannonDamage : number;
     m_RailgunDamageRadius : number;
     m_PrismType : BuildingTypeClass;
@@ -5520,7 +5523,7 @@ class RulesClass
     m_HoverBrake : number;
     m_HoverDampen : number;
     m_PlacementDelay : number;
-    m_ExplosiveVoxelDebris : TypeList<VoxelAnimTypeClass >;
+    m_ExplosiveVoxelDebris : TypeList<VoxelAnimTypeClass>;
     m_TireVoxelDebris : VoxelAnimTypeClass;
     m_ScrapVoxelDebris : VoxelAnimTypeClass;
     m_BridgeVoxelMax : number;
@@ -5529,7 +5532,7 @@ class RulesClass
     m_ShipSinkingWeight : number;
     m_IceCrackingWeight : number;
     m_IceBreakingWeight : number;
-    m_IceCrackSounds : TypeList<int>;
+    m_IceCrackSounds : TypeList<number>;
     m_CliffBackImpassability : number;
     m_VeteranRatio : number;
     m_VeteranCombat : number;
@@ -5549,7 +5552,7 @@ class RulesClass
     m_PlayerJoined : number;
     m_MessageCharTyped : number;
     m_Construction : number;
-    m_CreditTicks : TypeList<int>;
+    m_CreditTicks : TypeList<number>;
     m_BuildingDieSound : number;
     m_BuildingSlam : number;
     m_RadarOn : number;
@@ -5569,7 +5572,7 @@ class RulesClass
     m_ScatterSound : number;
     m_DeploySound : number;
     m_StormSound : number;
-    m_LightningSounds : TypeList<int>;
+    m_LightningSounds : TypeList<number>;
     m_ShellButtonSlideSound : number;
     m_WallBuildSpeedCoefficient : number;
     m_ChargeToDrainRatio : number;
@@ -5589,60 +5592,60 @@ class RulesClass
     m_ParachuteMaxFallRate : number;
     m_NoParachuteMaxFallRate : number;
     m_BuildingDrop : number;
-    m_Scorches : TypeList<SmudgeTypeClass >;
-    m_Scorches1 : TypeList<SmudgeTypeClass >;
-    m_Scorches2 : TypeList<SmudgeTypeClass >;
-    m_Scorches3 : TypeList<SmudgeTypeClass >;
-    m_Scorches4 : TypeList<SmudgeTypeClass >;
-    m_RepairBay : TypeList<BuildingTypeClass >;
+    m_Scorches : TypeList<SmudgeTypeClass>;
+    m_Scorches1 : TypeList<SmudgeTypeClass>;
+    m_Scorches2 : TypeList<SmudgeTypeClass>;
+    m_Scorches3 : TypeList<SmudgeTypeClass>;
+    m_Scorches4 : TypeList<SmudgeTypeClass>;
+    m_RepairBay : TypeList<BuildingTypeClass>;
     m_GDIGateOne : BuildingTypeClass;
     m_GDIGateTwo : BuildingTypeClass;
     m_NodGateOne : BuildingTypeClass;
     m_NodGateTwo : BuildingTypeClass;
     m_WallTower : BuildingTypeClass;
-    m_Shipyard : TypeList<BuildingTypeClass >;
+    m_Shipyard : TypeList<BuildingTypeClass>;
     m_GDIPowerPlant : BuildingTypeClass;
     m_NodRegularPower : BuildingTypeClass;
     m_NodAdvancedPower : BuildingTypeClass;
     m_ThirdPowerPlant : BuildingTypeClass;
-    m_BuildConst : TypeList<BuildingTypeClass >;
-    m_BuildPower : TypeList<BuildingTypeClass >;
-    m_BuildRefinery : TypeList<BuildingTypeClass >;
-    m_BuildBarracks : TypeList<BuildingTypeClass >;
-    m_BuildTech : TypeList<BuildingTypeClass >;
-    m_BuildWeapons : TypeList<BuildingTypeClass >;
-    m_AlliedBaseDefenses : TypeList<BuildingTypeClass >;
-    m_SovietBaseDefenses : TypeList<BuildingTypeClass >;
-    m_ThirdBaseDefenses : TypeList<BuildingTypeClass >;
-    m_AIForcePredictionFudge : TypeList<int>;
-    m_BuildDefense : TypeList<BuildingTypeClass >;
-    m_BuildPDefense : TypeList<BuildingTypeClass >;
-    m_BuildAA : TypeList<BuildingTypeClass >;
-    m_BuildHelipad : TypeList<BuildingTypeClass >;
-    m_BuildRadar : TypeList<BuildingTypeClass >;
-    m_ConcreteWalls : TypeList<BuildingTypeClass >;
-    m_NSGates : TypeList<BuildingTypeClass >;
-    m_EWGates : TypeList<BuildingTypeClass >;
-    m_BuildNavalYard : TypeList<BuildingTypeClass >;
-    m_BuildDummy : TypeList<BuildingTypeClass >;
-    m_NeutralTechBuildings : TypeList<BuildingTypeClass >;
+    m_BuildConst : TypeList<BuildingTypeClass>;
+    m_BuildPower : TypeList<BuildingTypeClass>;
+    m_BuildRefinery : TypeList<BuildingTypeClass>;
+    m_BuildBarracks : TypeList<BuildingTypeClass>;
+    m_BuildTech : TypeList<BuildingTypeClass>;
+    m_BuildWeapons : TypeList<BuildingTypeClass>;
+    m_AlliedBaseDefenses : TypeList<BuildingTypeClass>;
+    m_SovietBaseDefenses : TypeList<BuildingTypeClass>;
+    m_ThirdBaseDefenses : TypeList<BuildingTypeClass>;
+    m_AIForcePredictionFudge : TypeList<number>;
+    m_BuildDefense : TypeList<BuildingTypeClass>;
+    m_BuildPDefense : TypeList<BuildingTypeClass>;
+    m_BuildAA : TypeList<BuildingTypeClass>;
+    m_BuildHelipad : TypeList<BuildingTypeClass>;
+    m_BuildRadar : TypeList<BuildingTypeClass>;
+    m_ConcreteWalls : TypeList<BuildingTypeClass>;
+    m_NSGates : TypeList<BuildingTypeClass>;
+    m_EWGates : TypeList<BuildingTypeClass>;
+    m_BuildNavalYard : TypeList<BuildingTypeClass>;
+    m_BuildDummy : TypeList<BuildingTypeClass>;
+    m_NeutralTechBuildings : TypeList<BuildingTypeClass>;
     m_GDIWallDefense : number;
     m_GDIWallDefenseCoefficient : number;
     m_NodBaseDefenseCoefficient : number;
     m_GDIBaseDefenseCoefficient : number;
     m_ComputerBaseDefenseResponse : number;
     m_MaximumBaseDefenseValue : number;
-    m_BaseUnit : TypeList<UnitTypeClass >;
-    m_HarvesterUnit : TypeList<UnitTypeClass >;
-    m_PadAircraft : TypeList<AircraftTypeClass >;
-    m_OnFire : TypeList<AnimTypeClass >;
-    m_TreeFire : TypeList<AnimTypeClass >;
+    m_BaseUnit : TypeList<UnitTypeClass>;
+    m_HarvesterUnit : TypeList<UnitTypeClass>;
+    m_PadAircraft : TypeList<AircraftTypeClass>;
+    m_OnFire : TypeList<AnimTypeClass>;
+    m_TreeFire : TypeList<AnimTypeClass>;
     m_Smoke : AnimTypeClass;
     m_Smoke_ : AnimTypeClass;
     m_MoveFlash : AnimTypeClass;
     m_BombParachute : AnimTypeClass;
     m_Parachute : AnimTypeClass;
-    m_SplashList : TypeList<AnimTypeClass >;
+    m_SplashList : TypeList<AnimTypeClass>;
     m_SmallFire : AnimTypeClass;
     m_LargeFire : AnimTypeClass;
     m_Paratrooper : InfantryTypeClass;
@@ -5653,18 +5656,18 @@ class RulesClass
     m_ChronoTrigger : boolean;
     m_ChronoMinimumDelay : number;
     m_ChronoRangeMinimum : number;
-    m_AmerParaDropInf : TypeList<InfantryTypeClass >;
-    m_AmerParaDropNum : TypeList<int>;
-    m_AllyParaDropInf : TypeList<InfantryTypeClass >;
-    m_AllyParaDropNum : TypeList<int>;
-    m_SovParaDropInf : TypeList<InfantryTypeClass >;
-    m_SovParaDropNum : TypeList<int>;
-    m_YuriParaDropInf : TypeList<InfantryTypeClass >;
-    m_YuriParaDropNum : TypeList<int>;
-    m_AnimToInfantry : TypeList<InfantryTypeClass >;
-    m_SecretInfantry : TypeList<InfantryTypeClass >;
-    m_SecretUnits : TypeList<UnitTypeClass >;
-    m_SecretBuildings : TypeList<BuildingTypeClass >;
+    m_AmerParaDropInf : TypeList<InfantryTypeClass>;
+    m_AmerParaDropNum : TypeList<number>;
+    m_AllyParaDropInf : TypeList<InfantryTypeClass>;
+    m_AllyParaDropNum : TypeList<number>;
+    m_SovParaDropInf : TypeList<InfantryTypeClass>;
+    m_SovParaDropNum : TypeList<number>;
+    m_YuriParaDropInf : TypeList<InfantryTypeClass>;
+    m_YuriParaDropNum : TypeList<number>;
+    m_AnimToInfantry : TypeList<InfantryTypeClass>;
+    m_SecretInfantry : TypeList<InfantryTypeClass>;
+    m_SecretUnits : TypeList<UnitTypeClass>;
+    m_SecretBuildings : TypeList<BuildingTypeClass>;
     m_SecretSum : number;
     m_AlliedDisguise : InfantryTypeClass;
     m_SovietDisguise : InfantryTypeClass;
@@ -5676,10 +5679,10 @@ class RulesClass
     m_AISafeDistance : number;
     m_HarvesterTooFarDistance : number;
     m_ChronoHarvTooFarDistance : number;
-    m_AlliedBaseDefenseCounts : TypeList<int>;
-    m_SovietBaseDefenseCounts : TypeList<int>;
-    m_ThirdBaseDefenseCounts : TypeList<int>;
-    m_AIPickWallDefensePercent : TypeList<int>;
+    m_AlliedBaseDefenseCounts : TypeList<number>;
+    m_SovietBaseDefenseCounts : TypeList<number>;
+    m_ThirdBaseDefenseCounts : TypeList<number>;
+    m_AIPickWallDefensePercent : TypeList<number>;
     m_AIRestrictReplaceTime : number;
     m_ThreatPerOccupant : number;
     m_ApproachTargetResetMultiplier : number;
@@ -5688,21 +5691,21 @@ class RulesClass
     m_GuardAreaTargetingDelay : number;
     m_NormalTargetingDelay : number;
     m_AINavalYardAdjacency : number;
-    m_DisabledDisguiseDetectionPercent : TypeList<int>;
-    m_AIAutoDeployFrameDelay : TypeList<int>;
+    m_DisabledDisguiseDetectionPercent : TypeList<number>;
+    m_AIAutoDeployFrameDelay : TypeList<number>;
     m_MaximumBuildingPlacementFailures : number;
-    m_AICaptureNormal : TypeList<int>;
-    m_AICaptureWounded : TypeList<int>;
-    m_AICaptureLowPower : TypeList<int>;
-    m_AICaptureLowMoney : TypeList<int>;
+    m_AICaptureNormal : TypeList<number>;
+    m_AICaptureWounded : TypeList<number>;
+    m_AICaptureLowPower : TypeList<number>;
+    m_AICaptureLowMoney : TypeList<number>;
     m_AICaptureLowMoneyMark : number;
     m_AICaptureWoundedMark : number;
-    m_AISuperDefenseProbability : TypeList<int>;
+    m_AISuperDefenseProbability : TypeList<number>;
     m_AISuperDefenseFrames : number;
     m_AISuperDefenseDistance : number;
-    m_OverloadCount : TypeList<int>;
-    m_OverloadDamage : TypeList<int>;
-    m_OverloadFrames : TypeList<int>;
+    m_OverloadCount : TypeList<number>;
+    m_OverloadDamage : TypeList<number>;
+    m_OverloadFrames : TypeList<number>;
     m_PurifierBonus : number;
     m_OccupyDamageMultiplier : number;
     m_OccupyROFMultiplier : number;
@@ -5751,7 +5754,7 @@ class RulesClass
     m_PsychicRevealRadius : number;
     m_IonCannonWarhead : WarheadTypeClass;
     m_VeinholeTypeClass : TerrainTypeClass;
-    m_DefaultMirageDisguises : TypeList<TerrainTypeClass >;
+    m_DefaultMirageDisguises : TypeList<TerrainTypeClass>;
     m_InfantryBlinkDisguiseTime : number;
     m_DefaultLargeGreySmokeSystem : ParticleSystemTypeClass;
     m_DefaultSmallGreySmokeSystem : ParticleSystemTypeClass;
@@ -5801,33 +5804,33 @@ class RulesClass
     m_TreeStrength : number;
     m_UnitCrateType : UnitTypeClass;
     m_PatrolScan : number;
-    m_TeamDelays : TypeList<int>;
-    m_AIHateDelays : TypeList<int>;
+    m_TeamDelays : TypeList<number>;
+    m_AIHateDelays : TypeList<number>;
     m_DissolveUnfilledTeamDelay : number;
-    m_AIIonCannonConYardValue : TypeList<int>;
-    m_AIIonCannonWarFactoryValue : TypeList<int>;
-    m_AIIonCannonPowerValue : TypeList<int>;
-    m_AIIonCannonTechCenterValue : TypeList<int>;
-    m_AIIonCannonEngineerValue : TypeList<int>;
-    m_AIIonCannonThiefValue : TypeList<int>;
-    m_AIIonCannonHarvesterValue : TypeList<int>;
-    m_AIIonCannonMCVValue : TypeList<int>;
-    m_AIIonCannonAPCValue : TypeList<int>;
-    m_AIIonCannonBaseDefenseValue : TypeList<int>;
-    m_AIIonCannonPlugValue : TypeList<int>;
-    m_AIIonCannonHelipadValue : TypeList<int>;
-    m_AIIonCannonTempleValue : TypeList<int>;
+    m_AIIonCannonConYardValue : TypeList<number>;
+    m_AIIonCannonWarFactoryValue : TypeList<number>;
+    m_AIIonCannonPowerValue : TypeList<number>;
+    m_AIIonCannonTechCenterValue : TypeList<number>;
+    m_AIIonCannonEngineerValue : TypeList<number>;
+    m_AIIonCannonThiefValue : TypeList<number>;
+    m_AIIonCannonHarvesterValue : TypeList<number>;
+    m_AIIonCannonMCVValue : TypeList<number>;
+    m_AIIonCannonAPCValue : TypeList<number>;
+    m_AIIonCannonBaseDefenseValue : TypeList<number>;
+    m_AIIonCannonPlugValue : TypeList<number>;
+    m_AIIonCannonHelipadValue : TypeList<number>;
+    m_AIIonCannonTempleValue : TypeList<number>;
     m_AIAlternateProductionCreditCutoff : number;
-    m_MultiplayerAICM : TypeList<int>;
-    m_AIVirtualPurifiers : TypeList<int>;
-    m_AISlaveMinerNumber : TypeList<int>;
-    m_HarvestersPerRefinery : TypeList<int>;
-    m_AIExtraRefineries : TypeList<int>;
-    m_MinimumAIDefensiveTeams : TypeList<int>;
-    m_MaximumAIDefensiveTeams : TypeList<int>;
-    m_TotalAITeamCap : TypeList<int>;
+    m_MultiplayerAICM : TypeList<number>;
+    m_AIVirtualPurifiers : TypeList<number>;
+    m_AISlaveMinerNumber : TypeList<number>;
+    m_HarvestersPerRefinery : TypeList<number>;
+    m_AIExtraRefineries : TypeList<number>;
+    m_MinimumAIDefensiveTeams : TypeList<number>;
+    m_MaximumAIDefensiveTeams : TypeList<number>;
+    m_TotalAITeamCap : TypeList<number>;
     m_AIUseTurbineUpgradeProbability : number;
-    m_FillEarliestTeamProbability : TypeList<int>;
+    m_FillEarliestTeamProbability : TypeList<number>;
     m_CloakDelay : number;
     m_GameSpeedBias : number;
     m_BaseBias : number;
@@ -6251,9 +6254,9 @@ class ScenarioClass
     m_unknown_timer_34C0 : CDTimerClass;
     m_CampaignIndex : number;
     m_StartingDropships : number;
-    m_AllowableUnits : TypeList<TechnoTypeClass >;
-    m_AllowableUnitMaximums : TypeList<int>;
-    m_DropshipUnitCounts : TypeList<int>;
+    m_AllowableUnits : TypeList<TechnoTypeClass>;
+    m_AllowableUnitMaximums : TypeList<number>;
+    m_DropshipUnitCounts : TypeList<number>;
     m_AmbientOriginal : number;
     m_AmbientCurrent : number;
     m_AmbientTarget : number;
@@ -6482,7 +6485,7 @@ class Crate
     m_Location : CellStruct;
 }
 class LayerClass
-    extends DynamicVectorClass<ObjectClass >
+    extends DynamicVectorClass<ObjectClass>
 {
     AddObject(pObject_0 : ObjectClass, sorted_1 : boolean) : boolean;
     RemoveAll() : void;
@@ -6539,7 +6542,7 @@ class MapClass
     PickCellOnEdge(buffer_0 : CellStruct, Edge_1 : Edge, CurrentLocation_2 : CellStruct, Fallback_3 : CellStruct, SpeedType_4 : SpeedType, ValidateReachability_5 : boolean, MovZone_6 : MovementZone) : CellStruct;
     PickCellOnEdge(Edge_0 : Edge, CurrentLocation_1 : CellStruct, Fallback_2 : CellStruct, SpeedType_3 : SpeedType, ValidateReachability_4 : boolean, MovZone_5 : MovementZone) : CellStruct;
     Update_Pathfinding_1() : void;
-    Update_Pathfinding_2(where_0 : DynamicVectorClass<Vector2D<short>>) : void;
+    Update_Pathfinding_2(where_0 : DynamicVectorClass<Vector2D>) : void;
     NearByLocation(outBuffer_0 : CellStruct, position_1 : CellStruct, SpeedType_2 : SpeedType, a5_3 : number, MovementZone_4 : MovementZone, alt_5 : boolean, SpaceSizeX_6 : number, SpaceSizeY_7 : number, disallowOverlay_8 : boolean, a11_9 : boolean, requireBurrowable_10 : boolean, allowBridge_11 : boolean, closeTo_12 : CellStruct, a15_13 : boolean, buildable_14 : boolean) : CellStruct;
     NearByLocation(position_0 : CellStruct, SpeedType_1 : SpeedType, a5_2 : number, MovementZone_3 : MovementZone, alt_4 : boolean, SpaceSizeX_5 : number, SpaceSizeY_6 : number, disallowOverlay_7 : boolean, a11_8 : boolean, requireBurrowable_9 : boolean, allowBridge_10 : boolean, closeTo_11 : CellStruct, a15_12 : boolean, buildable_13 : boolean) : CellStruct;
     AddContentAt(coords_0 : CellStruct, Content_1 : TechnoClass) : void;
@@ -6584,7 +6587,7 @@ class MapClass
     m_unknown_pointer_14 : any;
     m_MovementZones : void;
     m_somecount_4C : number;
-    m_ZoneConnections : DynamicVectorClass<ZoneConnectionClass>;
+    m_ZoneConnections : DynamicVectorClass<any>;
     m_LevelAndPassability : any;
     m_ValidMapCellCount : number;
     m_LevelAndPassabilityStruct2pointer_70 : any;
@@ -6592,8 +6595,8 @@ class MapClass
     m_unknown_78 : number;
     m_unknown_7C : number;
     m_unknown_80 : any;
-    m_SubzoneTracking : DynamicVectorClass<SubzoneTrackingStruct>;
-    m_CellStructs1 : DynamicVectorClass<Vector2D<short>>;
+    m_SubzoneTracking : DynamicVectorClass<any>;
+    m_CellStructs1 : DynamicVectorClass<Vector2D>;
     m_MapRect : RectangleStruct;
     m_VisibleRect : RectangleStruct;
     m_CellIterator_NextX : number;
@@ -6604,14 +6607,14 @@ class MapClass
     m_ZoneIterator_Y : number;
     m_MapCoordBounds : LTRBStruct;
     m_TotalValue : number;
-    m_Cells : VectorClass<CellClass >;
+    m_Cells : VectorClass<CellClass>;
     m_MaxLevel : number;
     m_MaxWidth : number;
     m_MaxHeight : number;
     m_MaxNumCells : number;
     m_Crates : Crate;
     m_Redraws : number;
-    m_TaggedCells : DynamicVectorClass<Vector2D<short>>;
+    m_TaggedCells : DynamicVectorClass<Vector2D>;
 }
 class DisplayClass
     extends MapClass
@@ -6701,7 +6704,7 @@ class RadarClass
     m_unknown_rect_120C : RectangleStruct;
     m_unknown_121C : number;
     m_unknown_1220 : number;
-    m_unknown_cells_1124 : DynamicVectorClass<Vector2D<short>>;
+    m_unknown_cells_1124 : DynamicVectorClass<Vector2D>;
     m_unknown_123C : number;
     m_unknown_1240 : number;
     m_unknown_1244 : number;
@@ -6710,9 +6713,9 @@ class RadarClass
     m_unknown_1250 : number;
     m_unknown_1254 : number;
     m_unknown_1258 : any;
-    m_unknown_points_125C : DynamicVectorClass<Vector2D<int>>;
+    m_unknown_points_125C : DynamicVectorClass<Vector2D>;
     m_unknown_1274 : number;
-    m_FoundationTypePixels : DynamicVectorClass<Vector2D<int>>;
+    m_FoundationTypePixels : DynamicVectorClass<Vector2D>;
     m_RadarSizeFactor : number;
     m_unknown_int_148C : number;
     m_unknown_1490 : number;
@@ -6930,7 +6933,7 @@ class ThemeClass
     m_IsScoreRepeat : boolean;
     m_IsFading : boolean;
     m_IsScoreShuffle : boolean;
-    m_Themes : DynamicVectorClass<ThemeControl >;
+    m_Themes : DynamicVectorClass<ThemeControl>;
     m_Stream : any;
 }
 enum DirType {

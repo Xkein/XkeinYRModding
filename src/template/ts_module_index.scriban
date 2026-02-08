@@ -74,10 +74,33 @@
         end
         for generic_type in generic_types
             if string.starts_with($unwrap_name, generic_type)
-                if string.ends_with($unwrap_name, "*>")
-                    ret string.replace($unwrap_name, "*>", ">")
+                if $unwrap.template_kind == 3 # CppTemplateKind.TemplateSpecializedClass
+                    $mapped_template_name = string.slice($unwrap_name, 0, string.index_of($unwrap_name, "<"))
+                    $mapped_template_name += "<"
+                    for template_specialized_argument in $unwrap.template_specialized_arguments
+                        if template_specialized_argument.arg_kind == 0 # CppTemplateArgumentKind.AsType
+                            $mapped_template_name += get_ts_type(template_specialized_argument.arg_as_type)
+                        else
+                            $mapped_template_name += template_specialized_argument.arg_string
+                        end
+                    end
+                    $mapped_template_name += ">"
+                    ret $mapped_template_name
+                else if $unwrap.template_kind == 1 || $unwrap.template_kind == 2 # TemplateKind == CppTemplateKind.TemplateClass || TemplateKind == CppTemplateKind.PartialTemplateClass
+                    $mapped_template_name = string.slice($unwrap_name, 0, string.index_of($unwrap_name, "<"))
+                    $mapped_template_name += "<"
+                    for template_parameter in $unwrap.template_parameters
+                        $mapped_template_name += get_ts_type(template_parameter)
+                    end
+                    $mapped_template_name += ">"
+                    ret $mapped_template_name
                 else
-                    ret $unwrap_name
+                    ret $unwrap_name + "-ttt-" + $unwrap.type_kind
+                    if string.ends_with($unwrap_name, "*>")
+                        ret string.replace($unwrap_name, "*>", ">")
+                    else
+                        ret $unwrap_name
+                    end
                 end
             end
         end
