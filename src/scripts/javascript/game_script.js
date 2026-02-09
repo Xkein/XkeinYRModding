@@ -3,6 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GetScriptableComponent = GetScriptableComponent;
 exports.CreateScriptableComponent = CreateScriptableComponent;
 exports.GetAllGetScriptableComponents = GetAllGetScriptableComponents;
+exports.getYrObjectBlackboard = getYrObjectBlackboard;
+exports.getCustomVariable = getCustomVariable;
+exports.setCustomVariable = setCustomVariable;
+exports.saveCustomVariables = saveCustomVariables;
+exports.loadCustomVariables = loadCustomVariables;
 const YrExtCore_1 = require("YrExtCore");
 const ini_helper_1 = require("./ini_helper");
 const game_event_1 = require("./game_event");
@@ -65,9 +70,10 @@ function GetScriptableComponent(klass, yrObject) {
     return components[componentName];
 }
 function CreateScriptableComponent(klass, yrObject) {
-    let components = yrObject.__components;
+    let owner = yrObject;
+    let components = owner.__components;
     if (!components) {
-        components = yrObject.__components = new Map();
+        components = owner.__components = new Map();
     }
     let componentName = klass.name;
     let component = new klass();
@@ -75,7 +81,48 @@ function CreateScriptableComponent(klass, yrObject) {
     return component;
 }
 function GetAllGetScriptableComponents(yrObject) {
-    return yrObject.__components ?? emptyComponents;
+    let owner = yrObject;
+    return owner.__components ?? emptyComponents;
+}
+function getYrObjectBlackboard(yrObject) {
+    return yrObject;
+}
+function getCustomVariable(blackboard, name) {
+    if (blackboard.__variables) {
+        return blackboard.__variables[name];
+    }
+    return undefined;
+}
+function setCustomVariable(blackboard, name, value) {
+    if (!blackboard.__variables) {
+        blackboard.__variables = new Map();
+    }
+    blackboard.__variables[name] = value;
+    return value;
+}
+function saveCustomVariables(blackboard) {
+    if (blackboard.__variables) {
+        serialization_1.JsSerialization.SaveNext(blackboard.__variables.size);
+        for (const [name, value] of blackboard.__variables) {
+            serialization_1.JsSerialization.SaveNext(name);
+            serialization_1.JsSerialization.SaveNext(value);
+        }
+    }
+    else {
+        serialization_1.JsSerialization.SaveNext(0);
+    }
+}
+function loadCustomVariables(blackboard) {
+    let variableCount = serialization_1.JsSerialization.LoadNext();
+    if (variableCount > 0) {
+        let variables = new Map();
+        blackboard.__variables = variables;
+        for (let index = 0; index < variableCount; index++) {
+            let name = serialization_1.JsSerialization.LoadNext();
+            let value = serialization_1.JsSerialization.LoadNext();
+            variables[name] = value;
+        }
+    }
 }
 let iniReaderXkein = new YrExtCore_1.IniReader("XkeinExt.ini");
 let initScriptName = ini_helper_1.IniHelper.ReadString(iniReaderXkein, "Scripting", "InitScript");
@@ -160,12 +207,14 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSaveGameEndStream
             if (scriptable.script.onSaveInst) {
                 scriptable.script.onSaveInst(yrObject);
             }
+            // serialize components
             let components = GetAllGetScriptableComponents(yrObject);
             serialization_1.JsSerialization.SaveNext(components.size);
             for (const [name, component] of components) {
                 serialization_1.JsSerialization.SaveNext(name);
                 serialization_1.JsSerialization.SaveNext(component);
             }
+            saveCustomVariables(getYrObjectBlackboard(yrObject));
         }
     }
 });
@@ -178,16 +227,19 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrLoadGameEndStream
             if (scriptable.script.onLoadInst) {
                 scriptable.script.onLoadInst(yrObject);
             }
+            // serialize components
             let size = serialization_1.JsSerialization.LoadNext();
             if (size > 0) {
+                let owner = yrObject;
                 let components = new Map();
-                yrObject.__components = components;
+                owner.__components = components;
                 for (let index = 0; index < size; index++) {
                     let name = serialization_1.JsSerialization.LoadNext();
                     let component = serialization_1.JsSerialization.LoadNext();
                     components[name] = component;
                 }
             }
+            loadCustomVariables(getYrObjectBlackboard(yrObject));
         }
     }
 });

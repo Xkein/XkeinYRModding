@@ -95,25 +95,53 @@ export function GetAllGetScriptableComponents(yrObject: AbstractClass): Map<stri
     return owner.__components ?? emptyComponents;
 }
 
-interface GameObjectBlackboard {
+export interface GameObjectBlackboard {
     __variables: Map<string, any>;
 }
 
-export function getCustomVariable(yrObject: AbstractClass, name: string): any {
-    let blackboard = yrObject as any as GameObjectBlackboard;
+export function getYrObjectBlackboard(yrObject: AbstractClass): GameObjectBlackboard {
+    return yrObject as any as GameObjectBlackboard;
+}
+
+export function getCustomVariable(blackboard: GameObjectBlackboard, name: string): any {
     if (blackboard.__variables) {
         return blackboard.__variables[name];
     }
     return undefined;
 }
 
-export function setCustomVariable(yrObject: AbstractClass, name: string, value: any) {
-    let blackboard = yrObject as any as GameObjectBlackboard;
+export function setCustomVariable(blackboard: GameObjectBlackboard, name: string, value: any) {
     if (!blackboard.__variables) {
         blackboard.__variables = new Map();
     }
     blackboard.__variables[name] = value;
     return value
+}
+
+export function saveCustomVariables(blackboard: GameObjectBlackboard) {
+    if (blackboard.__variables) {
+        JsSerialization.SaveNext(blackboard.__variables.size);
+        for (const [name, value] of blackboard.__variables) {
+            JsSerialization.SaveNext(name);
+            JsSerialization.SaveNext(value);
+        }
+    }
+    else {
+        JsSerialization.SaveNext(0);
+    }
+}
+
+export function loadCustomVariables(blackboard: GameObjectBlackboard) {
+    let variableCount = JsSerialization.LoadNext();
+    if (variableCount > 0) {
+        let variables = new Map();
+        blackboard.__variables = variables;
+        for (let index = 0; index < variableCount; index++) {
+            let name = JsSerialization.LoadNext();
+            let value = JsSerialization.LoadNext();
+            variables[name] = value;
+        }
+    }
 }
 
 let iniReaderXkein = new IniReader("XkeinExt.ini");
@@ -219,15 +247,8 @@ gameEvents.registerHookEventHandler(YrSaveGameEndStreamEvent, (E) => {
                 JsSerialization.SaveNext(name);
                 JsSerialization.SaveNext(component);
             }
-            // serialize blackboard
-            let blackboard = yrObject as any as GameObjectBlackboard;
-            if (blackboard.__variables) {
-                JsSerialization.SaveNext(blackboard.__variables.size);
-                for (const [name, value] of blackboard.__variables) {
-                    JsSerialization.SaveNext(name);
-                    JsSerialization.SaveNext(value);
-                }
-            }
+            
+            saveCustomVariables(getYrObjectBlackboard(yrObject));
         }
     }
 });
@@ -253,18 +274,8 @@ gameEvents.registerHookEventHandler(YrLoadGameEndStreamEvent, (E) => {
                     components[name] = component;
                 }
             }
-            // serialize blackboard
-            let variableCount = JsSerialization.LoadNext();
-            if (variableCount > 0) {
-                let blackboard = yrObject as any as GameObjectBlackboard;
-                let variables = new Map();
-                blackboard.__variables = variables;
-                for (let index = 0; index < variableCount; index++) {
-                    let name = JsSerialization.LoadNext();
-                    let value = JsSerialization.LoadNext();
-                    variables[name] = value;
-                }
-            }
+
+            loadCustomVariables(getYrObjectBlackboard(yrObject));
         }
     }
 });
