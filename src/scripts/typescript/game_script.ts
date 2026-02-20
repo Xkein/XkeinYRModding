@@ -81,6 +81,14 @@ class GameScriptable {
     }
 }
 
+export function IsInstanceOfScriptable(scriptable: IScriptable, instance: any): boolean {
+    let gameScriptable: GameScriptable = (scriptable as any).scriptable;
+    if (gameScriptable) {
+        return gameScriptable.insts.has(instance);
+    }
+    return false;
+}
+
 const emptyComponents = new Map();
 const emptyScriptables = [];
 

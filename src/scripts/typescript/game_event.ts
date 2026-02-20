@@ -94,6 +94,10 @@ export class OnDtorEvent extends OnCtorEvent {}
 
 const YrHookDelegates: Map<string, Delegate<(E: any) => void>> = new Map();
 
+interface IEventToken {
+    releaseActions: (() => void)[];
+}
+
 export const gameEvents = {
     game: new GameEvents(),
     physics: new PhysicsEvents(),
@@ -119,7 +123,35 @@ export const gameEvents = {
     unregisterHookEventHandler<T>(hookEventType: {new(): T}, handler: (E: T) => void) : void {
         let delegate = YrHookDelegates.get(getCppTypeName(hookEventType));
         delegate?.remove(handler);
-    }
+    },
+
+    allocToken() : any {
+        return {
+            releaseActions: []
+        };
+    },
+
+    releaseToken(token: any) {
+        if (token && token.releaseActions) {
+            for (const action of (token as IEventToken).releaseActions) {
+                action();
+            }
+        }
+    },
+
+    registerTokenHookEventHandler<T>(token: any, hookEventType: {new(): T}, handler: (E: T) => void) : void {
+        this.registerHookEventHandler(hookEventType, handler);
+        (token as IEventToken).releaseActions.push(() => {
+            this.unregisterHookEventHandler(hookEventType, handler);
+        });
+    },
+
+    registerTokenDelegateHandler<T extends (...args: any[]) => any>(token: any, delegate: Delegate<T>, handler: T) : void {
+        delegate.add(handler);
+        (token as IEventToken).releaseActions.push(() => {
+            delegate.remove(handler);
+        });
+    },
 }
 
 function bind_js_event(type, eventName) {

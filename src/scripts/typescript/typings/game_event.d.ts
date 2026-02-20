@@ -48,4 +48,10 @@ export declare const gameEvents: {
     unregisterHookEventHandler<T>(hookEventType: {
         new (): T;
     }, handler: (E: T) => void): void;
+    allocToken(): any;
+    releaseToken(token: any): void;
+    registerTokenHookEventHandler<T>(token: any, hookEventType: {
+        new (): T;
+    }, handler: (E: T) => void): void;
+    registerTokenDelegateHandler<T extends (...args: any[]) => any>(token: any, delegate: Delegate<T>, handler: T): void;
 };

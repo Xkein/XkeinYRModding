@@ -109,7 +109,31 @@ exports.gameEvents = {
     unregisterHookEventHandler(hookEventType, handler) {
         let delegate = YrHookDelegates.get(getCppTypeName(hookEventType));
         delegate?.remove(handler);
-    }
+    },
+    allocToken() {
+        return {
+            releaseActions: []
+        };
+    },
+    releaseToken(token) {
+        if (token && token.releaseActions) {
+            for (const action of token.releaseActions) {
+                action();
+            }
+        }
+    },
+    registerTokenHookEventHandler(token, hookEventType, handler) {
+        this.registerHookEventHandler(hookEventType, handler);
+        token.releaseActions.push(() => {
+            this.unregisterHookEventHandler(hookEventType, handler);
+        });
+    },
+    registerTokenDelegateHandler(token, delegate, handler) {
+        delegate.add(handler);
+        token.releaseActions.push(() => {
+            delegate.remove(handler);
+        });
+    },
 };
 function bind_js_event(type, eventName) {
     XkeinExt_1.JsEvents[`s_${type}`][`m_${eventName}`] = (...args) => { return exports.gameEvents[type][eventName].invoke(...args); };

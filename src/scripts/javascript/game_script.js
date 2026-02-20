@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.IsInstanceOfScriptable = IsInstanceOfScriptable;
 exports.GetScriptableComponent = GetScriptableComponent;
 exports.CreateScriptableComponent = CreateScriptableComponent;
 exports.GetAllGetScriptableComponents = GetAllGetScriptableComponents;
@@ -77,6 +78,13 @@ class GameScriptable {
     removeInst(inst) {
         this.insts.delete(inst);
     }
+}
+function IsInstanceOfScriptable(scriptable, instance) {
+    let gameScriptable = scriptable.scriptable;
+    if (gameScriptable) {
+        return gameScriptable.insts.has(instance);
+    }
+    return false;
 }
 const emptyComponents = new Map();
 const emptyScriptables = [];

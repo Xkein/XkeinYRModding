@@ -9,6 +9,7 @@ export interface IScriptable {
     onSave?(): void;
     onLoad?(): void;
 }
+export declare function IsInstanceOfScriptable(scriptable: IScriptable, instance: any): boolean;
 export declare function GetScriptableComponent<T>(klass: {
     new (): T;
 }, yrObject: AbstractClass): T | undefined;
