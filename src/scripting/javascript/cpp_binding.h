@@ -111,15 +111,15 @@ namespace PUERTS_NAMESPACE                                                      
     {                                                                                             \
         static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, PTR value)           \
         {                                                                                         \
-            return API::GetUndefined(context);                                                    \
+            return Converter<void*>::toScript(context, (void*)value);                             \
         }                                                                                         \
         static PTR toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)       \
         {                                                                                         \
-            return nullptr;                                                                       \
+            return (PTR)Converter<void*>::toCpp(context, value);                                \
         }                                                                                         \
         static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)     \
         {                                                                                         \
-            return true;                                                                          \
+            return Converter<void*>::accept(context, value);                                      \
         }                                                                                         \
     };                                                                                            \
     }                                                                                             \
@@ -231,11 +231,36 @@ struct JsFinalizeBuilder<T, typename std::enable_if_t<std::is_convertible_v<T*, 
 };                                                                                                   \
 }
 
+template<typename T>
+struct ReferenceJsWrapper {
+    T value;
+};
+
 namespace PUERTS_NAMESPACE
 {
 
     namespace v8_impl
     {
+        // template<typename T>
+        // struct Converter<ReferenceJsWrapper<T>>
+        // {
+        //     static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, ReferenceJsWrapper<T> const& value)
+        //     {
+        //         return DataTransfer::FindOrAddCData(                                     
+        //             context->GetIsolate(), context, DynamicTypeId<ReferenceJsWrapper<T>>::get(&value), new ReferenceJsWrapper<T>(value), false);
+        //     }
+
+        //     static ReferenceJsWrapper<T> toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+        //     {
+        //         return *DataTransfer::GetPointerFast<ReferenceJsWrapper<T>>(value.As<v8::Object>());
+        //     }
+
+        //     static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+        //     {
+        //         return DataTransfer::IsInstanceOf(context->GetIsolate(), StaticTypeId<ReferenceJsWrapper<T>>::get(), value);
+        //     }
+        // };
+
         template<typename T>
         struct Converter<std::optional<T>>
         {

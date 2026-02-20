@@ -1,5 +1,7 @@
 const global = this;
 
+require("utilities")
+
 // load cpp types
 require("yrlazyload")
 const YRpp = require("YRpp")
@@ -7,10 +9,6 @@ const YrExtCore = require("YrExtCore")
 const gainput = require("gainput")
 const wwise = require("wwise")
 const XkeinExt = require("XkeinExt")
-
-global.getCppTypeName = function (type) {
-    return type.__ClassName;
-}
 
 require("game_event")
 require("serialization")

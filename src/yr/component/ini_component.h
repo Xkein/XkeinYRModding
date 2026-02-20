@@ -1,10 +1,12 @@
 #pragma once
-#ifndef __HEADER_TOOL__
 #include "core/reflection/reflection.h"
 #include "runtime/ecs/entt.h"
 #include "yr/api/yr_entity.h"
 #include "yr/parse/ini_reader.h"
 #include <entt/meta/factory.hpp>
+
+class AbstractTypeClass;
+
 using namespace entt::literals;
 namespace detail
 {
@@ -14,10 +16,12 @@ namespace detail
     };
 }
 
-struct IniComponentLoader
+CLASS(BindJs)
+class IniComponentLoader
 {
+public:
     template<typename T>
-    using LoadingFunc = void(*)(IniReader& reader, T* loadingObj);
+    using LoadingFunc = std::function<void(IniReader& reader, T* loadingObj)>;
 
     /// @brief Called when loading game types or loading a savegame.
     /// @note To reduce the size of savegames, we load components again when loading a savegame.
@@ -30,6 +34,9 @@ struct IniComponentLoader
     }
     template<typename T>
     YREXTCORE_API static void RegisterLoadingFunc(LoadingFunc<T> loadingFunc);
+    
+    FUNCTION()
+    YREXTCORE_API static void RegisterAbstractTypeLoadingFunc(AbstractType targetType, std::function<void(IniReader* reader, AbstractTypeClass* loadingObj)> loadingFunc);
 
     template<typename T>
     static bool Load(IniReader& parser, const char* pSection, const char* pKey, T& value)
@@ -115,4 +122,3 @@ struct IniComponentLoader
 private:
     YREXTCORE_API static void RegisterLoadAllCallback(void* id, std::function<void(IniReader&)> load, std::function<void()> clear);
 };
-#endif

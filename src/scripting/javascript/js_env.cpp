@@ -147,6 +147,8 @@ JsEnv::JsEnv() : ExtensionMethodsMapInited(false), InspectorChannel(nullptr), In
     MethodBindingHelper<&JsEnv::RegisterTickHandler>::Bind(Isolate, Context, Global, "__tgjsRegisterTickHandler", This);
     
     MethodBindingHelper<&JsEnv::ConvertCppType>::Bind(Isolate, Context, Global, "convertCPPType", This);
+    
+    MethodBindingHelper<&JsEnv::IsValidCppObject>::Bind(Isolate, Context, Global, "$isValidCppObject", This);
 
     CppObjectMapper.Initialize(Isolate, Context);
     Isolate->SetData(MAPPER_ISOLATE_DATA_POS, static_cast<PUERTS_NAMESPACE::ICppObjectMapper*>(&CppObjectMapper));
@@ -979,6 +981,9 @@ void JsEnv::LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
     CppObjectMapper.LoadCppType(Info);
     {
         v8::Isolate* Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+        v8::Locker Locker(Isolate);
+#endif
         v8::Isolate::Scope IsolateScope(Isolate);
         v8::HandleScope HandleScope(Isolate);
         v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
@@ -992,8 +997,10 @@ void JsEnv::LoadCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
         v8::Local<v8::Function> func = ret.As<v8::Function>();
         PString TypeName = *(v8::String::Utf8Value(Isolate, Info[0]));
         JSClassDefinition* ClassDef = const_cast<JSClassDefinition*>(FindCppTypeClassByName(TypeName));
-        func->Set(Context, FV8Utils::V8String(Isolate, "__ClassDefinition"), v8::External::New(Isolate, ClassDef));
-        func->Set(Context, FV8Utils::V8String(Isolate, "__ClassName"), FV8Utils::V8String(Isolate, ClassDef->ScriptName));
+        if (ClassDef) {
+            func->Set(Context, FV8Utils::V8String(Isolate, "__ClassDefinition"), v8::External::New(Isolate, ClassDef));
+            func->Set(Context, FV8Utils::V8String(Isolate, "__ClassName"), FV8Utils::V8String(Isolate, ClassDef->ScriptName));
+        }
     }
 }
 
@@ -1269,6 +1276,9 @@ v8::Local<v8::Value> JsEnv::FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Contex
 void JsEnv::ConvertCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
 {
     v8::Isolate* Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
     v8::Isolate::Scope IsolateScope(Isolate);
     v8::HandleScope HandleScope(Isolate);
     v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
@@ -1299,14 +1309,49 @@ void JsEnv::ConvertCppType(const v8::FunctionCallbackInfo<v8::Value>& Info)
     }
 }
 
+
+void JsEnv::IsValidCppObject(const v8::FunctionCallbackInfo<v8::Value>& Info)
+{
+    v8::Isolate*           Isolate = Info.GetIsolate();
+#ifdef THREAD_SAFE
+    v8::Locker Locker(Isolate);
+#endif
+    v8::Isolate::Scope     IsolateScope(Isolate);
+    v8::HandleScope        HandleScope(Isolate);
+    v8::Local<v8::Context> Context = Isolate->GetCurrentContext();
+    v8::Context::Scope     ContextScope(Context);
+
+    v8::Local<v8::Object> obj = Info[0].As<v8::Object>();
+
+    void* Ptr = DataTransfer::GetPointerFast<void>(obj);
+    
+    Info.GetReturnValue().Set(v8::Boolean::New(Isolate, Ptr != nullptr));
+}
+
 void JsEnv::Unbind(AbstractClass* YrObject)
 {
     if (!YrObject)
         return;
+    const bool ResetPointer = true;
 
     auto PersistentValuePtr = ObjectMap.find(YrObject);
     if (PersistentValuePtr != ObjectMap.end()) // create and link
     {
+        if (ResetPointer)
+        {
+            auto Isolate = MainIsolate;
+#ifdef THREAD_SAFE
+            v8::Locker Locker(Isolate);
+#endif
+            v8::Isolate::Scope IsolateScope(Isolate);
+            v8::HandleScope    HandleScope(Isolate);
+            auto               Context = DefaultContext.Get(Isolate);
+            v8::Context::Scope ContextScope(Context);
+
+            auto JsObject = PersistentValuePtr->second.Get(Isolate).As<v8::Object>();
+            DataTransfer::SetPointer(Isolate, JsObject, nullptr, 0);
+            DataTransfer::SetPointer(Isolate, JsObject, nullptr, 1);
+        }
         auto JsRegistration = const_cast<JSClassDefinition*>(FindClassByID(GetYrJsTypeID(YrObject->WhatAmI())));
         CppObjectMapper.UnBindCppObject(MainIsolate, JsRegistration, YrObject);
         ObjectMap.erase(PersistentValuePtr);

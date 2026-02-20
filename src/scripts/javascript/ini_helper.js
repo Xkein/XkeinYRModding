@@ -6,19 +6,38 @@ exports.IniField = IniField;
 exports.GetIniComponent = GetIniComponent;
 const YrExtCore_1 = require("YrExtCore");
 require("reflect-metadata");
-const game_event_1 = require("./game_event");
 class IniHelper {
     static ReadString(iniReader, section, key) {
         if (iniReader.ReadString(section, key) > 0) {
             return iniReader.value().trim();
         }
-        return null;
     }
     static ReadBool(iniReader, section, key) {
-        if (iniReader.ReadString(section, key) > 0) {
-            return iniReader.value().trim();
+        let str = IniHelper.ReadString(iniReader, section, key);
+        if (str) {
+            switch (str[0].toUpperCase()) {
+                case "1":
+                case "T":
+                case "Y":
+                    return true;
+                case "0":
+                case "F":
+                case "N":
+                    return false;
+            }
         }
-        return "";
+    }
+    static ReadInteger(iniReader, section, key) {
+        let str = IniHelper.ReadString(iniReader, section, key);
+        if (str) {
+            return Number.parseInt(str);
+        }
+    }
+    static ReadFloat(iniReader, section, key) {
+        let str = IniHelper.ReadString(iniReader, section, key);
+        if (str) {
+            return Number.parseFloat(str);
+        }
     }
     static ReadStringList(iniReader, section, key) {
         let str = IniHelper.ReadString(iniReader, section, key);
@@ -29,18 +48,17 @@ class IniHelper {
             }
             return list;
         }
-        return null;
     }
 }
 exports.IniHelper = IniHelper;
 global.IniHelper = IniHelper;
 class JsIniManager {
     static components;
-    static RegisterIniComponent(klass, componentTargets) {
-        const onLoadIni = (yrObjectType, pIni) => {
-            if (!klass.__iniFields)
+    static RegisterIniComponent(klass, componentTargets, callbacks) {
+        const onLoadIni = (iniReader, yrObjectType) => {
+            if (!klass.prototype.__iniFields)
                 return;
-            if (componentTargets.indexOf(yrObjectType.WhatAmI()) >= 0) {
+            if (componentTargets.indexOf(yrObjectType.WhatAmI()) < 0) {
                 return;
             }
             let iniComponentName = klass.name;
@@ -48,8 +66,8 @@ class JsIniManager {
             if (!iniComponent) {
                 yrObjectType[iniComponentName] = iniComponent = new klass();
             }
-            let iniReader = new YrExtCore_1.IniReader(pIni);
-            for (const iniField of klass.__iniFields) {
+            callbacks?.beforeLoad?.(iniReader, yrObjectType, iniComponent);
+            for (const iniField of klass.prototype.__iniFields) {
                 let iniValue = iniField.readMethod(iniReader, yrObjectType.m_ID, iniField.iniKey);
                 if (iniValue !== null && iniValue !== undefined) {
                     if (!iniComponent) {
@@ -58,19 +76,11 @@ class JsIniManager {
                     iniComponent[iniField.field] = iniValue;
                 }
             }
+            callbacks?.afterLoad?.(iniReader, yrObjectType, iniComponent);
         };
-        game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrTechnoTypeLoadIniEvent, (E) => {
-            onLoadIni(E.m_pTechnoType, E.m_pIni);
-        });
-        game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrBulletTypeLoadIniEvent, (E) => {
-            onLoadIni(E.m_pBulletType, E.m_pIni);
-        });
-        game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSuperWeaponTypeLoadIniEvent, (E) => {
-            onLoadIni(E.m_pSuperWeaponType, E.m_pIni);
-        });
-        game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrHouseTypeLoadIniEvent, (E) => {
-            onLoadIni(E.m_pHouseType, E.m_pIni);
-        });
+        for (const target of componentTargets) {
+            YrExtCore_1.IniComponentLoader.RegisterAbstractTypeLoadingFunc(target, onLoadIni);
+        }
     }
     static RegisterIniField(klass, field, iniKey, readMethod) {
         if (!klass.__iniFields) {
@@ -84,9 +94,9 @@ class JsIniManager {
         klass.__iniFields.push(iniField);
     }
 }
-function IniComponent(componentTargets) {
+function IniComponent(componentTargets, callbacks) {
     return function (target) {
-        JsIniManager.RegisterIniComponent(target, componentTargets);
+        JsIniManager.RegisterIniComponent(target, componentTargets, callbacks);
     };
 }
 function IniField(iniKey, readMethod) {

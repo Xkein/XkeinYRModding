@@ -49,6 +49,23 @@ struct SerializeContext
     uint counter;
 };
 
+ENUM(BindJs)
+enum class ESerializationStep : unsigned int {
+    SaveBegin_Epilogue,
+    SaveBeginStream_Epilogue,
+    SaveEndStream_Prologue,
+    SaveEndStream_Epilogue,
+    SaveEnd_Prologue,
+    SaveEnd_Epilogue,
+    
+    LoadBegin_Epilogue,
+    LoadBeginStream_Epilogue,
+    LoadEndStream_Prologue,
+    LoadEndStream_Epilogue,
+    LoadEnd_Prologue,
+    LoadEnd_Epilogue,
+};
+
 CLASS(BindJs)
 class Serialization
 {
@@ -67,6 +84,9 @@ public:
     YREXTCORE_API static std::string LoadKey(const char* key);
     FUNCTION()
     YREXTCORE_API static void SaveKey(const char* key, std::string val);
+
+    FUNCTION()
+    YREXTCORE_API static void RegisterStepHandler(ESerializationStep step, std::function<void()> handler);
 
     /// @brief Serialize data when saving/loading a game.
     template<typename Type>

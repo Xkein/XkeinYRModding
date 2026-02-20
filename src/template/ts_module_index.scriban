@@ -55,23 +55,32 @@
     func get_ts_type(type)
         $type_name = type.full_name
         for any_type in any_types
+            # force use "any" type
             if string.contains($type_name, any_type)
                 ret "any"
             end
         end
         $mapped_type = type_map[$type_name]
+        # has mapped name
         if $mapped_type
             ret $mapped_type
         end
         $unwrap = httype.unwrap_type(type)
         $unwrap_name = $unwrap.full_name
+        # is string
         if $unwrap_name == "char" && is_array_type(type)
             ret "string"
         end
         $mapped_type = type_map[$unwrap_name]
+        # has mapped name
         if $mapped_type
             ret $mapped_type
         end
+        # special template class
+        if string.starts_with($unwrap_name, "constant_ptr<") || string.starts_with($unwrap_name, "reference<")
+            ret get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type)
+        end
+        # template class
         for generic_type in generic_types
             if string.starts_with($unwrap_name, generic_type)
                 if $unwrap.template_kind == 3 # CppTemplateKind.TemplateSpecializedClass

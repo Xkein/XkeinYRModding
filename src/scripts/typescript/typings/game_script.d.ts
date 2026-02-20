@@ -1,4 +1,14 @@
+import { IniReader } from "YrExtCore";
 import { AbstractClass } from "YRpp";
+export interface IScriptable {
+    onAddInst?(yrObject: any): void;
+    onRemoveInst?(yrObject: any): void;
+    onLoadType?(yrObjectType: any, iniReader: IniReader): void;
+    onLoadInst?(yrObject: any): void;
+    onSaveInst?(yrObject: any): void;
+    onSave?(): void;
+    onLoad?(): void;
+}
 export declare function GetScriptableComponent<T>(klass: {
     new (): T;
 }, yrObject: AbstractClass): T | undefined;

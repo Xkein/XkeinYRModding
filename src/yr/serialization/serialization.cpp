@@ -9,6 +9,8 @@ static SerializeContext gContext;
 static std::map<void(*)(entt::meta_any), std::vector<entt::meta_any>> gDeferredProcessDataList;
 static std::fstream gFileStream;
 static std::map<void(*)(ENTITY_SNAPSHOT&), void(*)(ENTITY_SNAPSHOT_LOADER&)> gSnapshots;
+static std::map<ESerializationStep, std::vector<std::function<void()>>> gStepHandlers;
+
 Serialization::SerializationArchive Serialization::gArchive;
 
 struct SerHeaderInfo {
@@ -86,6 +88,16 @@ YREXTCORE_API std::string Serialization::LoadKey(const char* key)
 YREXTCORE_API void Serialization::SaveKey(const char* key, std::string val)
 {
     Serialize(cereal::make_nvp(key, val));
+}
+
+YREXTCORE_API void Serialization::RegisterStepHandler(ESerializationStep step, std::function<void()> handler)
+{
+    gStepHandlers[step].emplace_back(handler);
+}
+void CallStepHandlers(ESerializationStep step) {
+    for (auto&& handler : gStepHandlers[step]) {
+        handler();
+    }
 }
 
 void Serialization::RegisterSnapshotInternal(entt::meta_type type, void(*snapshotSave)(ENTITY_SNAPSHOT&), void(*snapshotLoad)(ENTITY_SNAPSHOT_LOADER&))
@@ -173,35 +185,49 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrSaveGameBeginEvent)
     }
     gLogger->info("saving game to {}", gContext.archivePath);
     gContext.outputArchive = new cereal::JSONOutputArchive(gFileStream);
+
+    CallStepHandlers(ESerializationStep::SaveBegin_Epilogue);
 }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSaveGameBeginStreamEvent)
 {
     if (!gContext.outputArchive) {
         return;
     }
-    Serialization::Serialize(gSerHeaderInfo);
+    Serialization::Serialize(cereal::make_nvp("SerHeaderInfo", gSerHeaderInfo));
 
     gContext.snapshot = new ENTITY_SNAPSHOT(*gEntt);
+    
+    CallStepHandlers(ESerializationStep::SaveBeginStream_Epilogue);
 }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSaveGameEndStreamEvent)
 {
     if (!gContext.outputArchive) {
         return;
     }
+    
+    CallStepHandlers(ESerializationStep::SaveEndStream_Prologue);
+
     for (auto&& [snapshotSave, snapshotLoad] : gSnapshots)
     {
         snapshotSave(*gContext.snapshot);
     }
 
     gContext.outputArchive->serializeDeferments();
+    
+    CallStepHandlers(ESerializationStep::SaveEndStream_Epilogue);
 }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSaveGameEndEvent)
 {
+    CallStepHandlers(ESerializationStep::SaveEnd_Prologue);
+
     for (auto&& [processFunc, dataList] : gDeferredProcessDataList) {
         for (auto&& data : dataList) {
             processFunc(data);
         }
     }
+
+    CallStepHandlers(ESerializationStep::SaveEnd_Epilogue);
+
     ResetContext();
 }
 
@@ -217,6 +243,8 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameBeginEvent)
     }
     gLogger->info("loading game from {}", gContext.archivePath);
     gContext.inputArchive = new cereal::JSONInputArchive(gFileStream);
+    
+    CallStepHandlers(ESerializationStep::LoadBegin_Epilogue);
 }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameBeginStreamEvent)
 {
@@ -224,7 +252,7 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameBeginStreamEvent)
         return;
     }
     SerHeaderInfo info;
-    Serialization::Serialize(info);
+    Serialization::Serialize(cereal::make_nvp("SerHeaderInfo", info));
     if (info.version != gSerHeaderInfo.version) {
         gLogger->error("skip loading game {}, version mismatch: current version {}, savegame version {}", gContext.savegameName, gSerHeaderInfo.version, info.version);
         ResetContext();
@@ -242,28 +270,41 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameBeginStreamEvent)
         }
     }
     gContext.snapshotLoader = new ENTITY_SNAPSHOT_LOADER(*gEntt);
+
+    CallStepHandlers(ESerializationStep::LoadBeginStream_Epilogue);
 }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameEndStreamEvent)
 {
     if (!gContext.inputArchive) {
         return;
     }
+
+    CallStepHandlers(ESerializationStep::LoadEndStream_Prologue);
+
     for (auto&& [snapshotSave, snapshotLoad] : gSnapshots) {
         snapshotLoad(*gContext.snapshotLoader);
     }
 
     gContext.inputArchive->serializeDeferments();
+
+    CallStepHandlers(ESerializationStep::LoadEndStream_Epilogue);
 }
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLoadGameEndEvent)
 {
     if (!gContext.inputArchive) {
         return;
     }
+
+    CallStepHandlers(ESerializationStep::LoadEnd_Prologue);
+
     for (auto&& [processFunc, dataList] : gDeferredProcessDataList) {
         for (auto&& data : dataList) {
             processFunc(data);
         }
     }
     SimulateIniLoading();
+
+    CallStepHandlers(ESerializationStep::LoadEnd_Epilogue);
+
     ResetContext();
 }

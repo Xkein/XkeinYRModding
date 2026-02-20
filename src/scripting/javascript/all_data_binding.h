@@ -34,6 +34,9 @@ MuteFunctionPtr(std::remove_pointer_t<gainput::FilterFunc_T>);
 
 #include "yr/parse/ini_reader.h"
 UsingCppType(IniReader);
+UsingReferenceConverter(IniReader);
+#include "yr/component/ini_component.h"
+UsingCppType(IniComponentLoader);
 
 #include "yr/serialization/serialization.h"
 UsingCppType(Serialization);

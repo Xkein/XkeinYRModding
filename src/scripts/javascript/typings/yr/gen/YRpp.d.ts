@@ -312,7 +312,7 @@ class TechnoClass
     GetRealFacing() : DirStruct;
     BaseIsAttacked(pEnemy_0 : TechnoClass) : void;
     static s_AbsDerivateID : AbstractFlags;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TechnoClass>;
     m_Transporter : TechnoClass;
     m_LastFireBulletFrame : number;
     m_CurrentTurretNumber : number;
@@ -689,9 +689,9 @@ class HouseClass
     GetWeedStoragePercentage() : number;
     AISupers() : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
-    static s_CurrentPlayer : any;
-    static s_Observer : any;
+    static s_Array : DynamicVectorClass<HouseClass>;
+    static s_CurrentPlayer : HouseClass;
+    static s_Observer : HouseClass;
     m_ArrayIndex : number;
     m_Type : HouseTypeClass;
     m_CountResourceGatherers : number;
@@ -1055,7 +1055,7 @@ class AbstractClass
     // skip operator new
     // skip operator delete
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<AbstractClass>;
     static s_TargetIndex : any;
     m_UniqueID : number;
     m_AbstractFlags : AbstractFlags;
@@ -1185,7 +1185,7 @@ class ObjectClass
     GetRenderCoords() : CoordStruct;
     GetFLH(idxWeapon_0 : number, base_1 : CoordStruct) : CoordStruct;
     static s_AbsDerivateID : AbstractFlags;
-    static s_CurrentObjects : any;
+    static s_CurrentObjects : DynamicVectorClass<ObjectClass>;
     m_unknown_24 : number;
     m_unknown_28 : number;
     m_FallRate : number;
@@ -1237,7 +1237,7 @@ class AnimClass
     Start() : void;
     Middle() : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<AnimClass>;
     m_Type : AnimTypeClass;
     m_OwnerObject : ObjectClass;
     m_unknown_D0 : number;
@@ -1298,7 +1298,7 @@ class AnimTypeClass
     LoadImageA() : any;
     Load2DArt() : void;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<AnimTypeClass>;
     m_ArrayIndex : number;
     m_MiddleFrameIndex : number;
     m_MiddleFrameWidth : number;
@@ -1444,7 +1444,7 @@ class AbstractTypeClass
     SaveToINI(pINI_0 : CCINIClass) : boolean;
     get_ID() : string;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<AbstractTypeClass>;
     m_ID : string;
     m_UINameLabel : string;
     m_UIName : number;
@@ -1460,14 +1460,14 @@ class CCINIClass
     ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number, szBufferSize_3 : any) : number;
     ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
     GetCRC() : number;
-    static s_RulesHash : any;
-    static s_ArtHash : any;
-    static s_AIHash : any;
-    static s_INI_Rules : any;
-    static s_INI_AI : any;
-    static s_INI_Art : any;
-    static s_INI_UIMD : any;
-    static s_INI_RA2MD : any;
+    static s_RulesHash : number;
+    static s_ArtHash : number;
+    static s_AIHash : number;
+    static s_INI_Rules : CCINIClass;
+    static s_INI_AI : CCINIClass;
+    static s_INI_Art : CCINIClass;
+    static s_INI_UIMD : CCINIClass;
+    static s_INI_RA2MD : CCINIClass;
     m_Digested : boolean;
     m_Digest : number;
 }
@@ -1580,7 +1580,7 @@ class TechnoTypeClass
     InForbiddenHouses(bitHouseType_0 : number) : boolean;
     GetWeapon(index_0 : any, elite_1 : boolean) : WeaponStruct;
     GetWeapon(index_0 : any, elite_1 : boolean) : WeaponStruct;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TechnoTypeClass>;
     static s_MaxWeapons : any;
     m_WalkRate : number;
     m_IdleRate : number;
@@ -1933,7 +1933,7 @@ class WeaponTypeClass
     CalculateSpeed() : void;
     AllowedThreats() : ThreatType;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<WeaponTypeClass>;
     m_AmbientDamage : number;
     m_Burst : number;
     m_Projectile : BulletTypeClass;
@@ -2017,7 +2017,7 @@ class BulletTypeClass
     SetScaledSpawnDelay(delay_0 : number) : void;
     CreateBullet(Target_0 : AbstractClass, Owner_1 : TechnoClass, Damage_2 : number, WH_3 : WarheadTypeClass, Speed_4 : number, Bright_5 : boolean) : BulletClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<BulletTypeClass>;
     m_Airburst : boolean;
     m_Floater : boolean;
     m_SubjectToCliffs : boolean;
@@ -2084,8 +2084,8 @@ class BulletClass
     NukeMaker() : void;
     GetTargetCoords() : CoordStruct;
     static s_AbsID : AbstractType;
-    static s_Array : any;
-    static s_ScalableBullets : any;
+    static s_Array : DynamicVectorClass<BulletClass>;
+    static s_ScalableBullets : DynamicVectorClass<BulletClass>;
     m_Type : BulletTypeClass;
     m_Owner : TechnoClass;
     m_unknown_B4 : boolean;
@@ -2200,7 +2200,7 @@ class InfantryTypeClass
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<InfantryTypeClass>;
     m_ArrayIndex : number;
     m_Pip : PipIndex;
     m_OccupyPip : PipIndex;
@@ -2474,7 +2474,7 @@ class BuildingClass
     GetAnimState(slot_0 : BuildingAnimSlot) : boolean;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<BuildingClass>;
     m_Type : BuildingTypeClass;
     m_Factory : FactoryClass;
     m_C4Timer : CDTimerClass;
@@ -2577,7 +2577,7 @@ class BuildingTypeClass
     GetBuildingAnim(slot_0 : BuildingAnimSlot) : BuildingAnimStruct;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<BuildingTypeClass>;
     m_ArrayIndex : number;
     m_FoundationData : CellStruct;
     m_Buildup : any;
@@ -2806,7 +2806,7 @@ class OverlayTypeClass
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     Draw(pClientCoords_0 : Point2D, pClipRect_1 : RectangleStruct, nFrame_2 : number) : void;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<OverlayTypeClass>;
     m_ArrayIndex : number;
     m_LandType : LandType;
     m_CellAnim : AnimTypeClass;
@@ -2846,7 +2846,7 @@ class UnitTypeClass
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<UnitTypeClass>;
     m_ArrayIndex : number;
     m_MovementRestrictedTo : LandType;
     m_HalfDamageSmokeLocation : CoordStruct;
@@ -2918,7 +2918,7 @@ class FactoryClass
     IsQueued(pType_0 : TechnoTypeClass) : boolean;
     static FindByOwnerAndProduct(pHouse_0 : HouseClass, pItem_1 : TechnoTypeClass) : FactoryClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<FactoryClass>;
     m_Production : StageClass;
     m_QueuedObjects : DynamicVectorClass<TechnoTypeClass>;
     m_Object : TechnoClass;
@@ -2957,7 +2957,7 @@ class InfantryClass
     PlayAnim(index_0 : Sequence, force_1 : boolean, randomStartFrame_2 : boolean) : boolean;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<InfantryClass>;
     m_Type : InfantryTypeClass;
     m_SequenceAnim : Sequence;
     m_unknown_Timer_6C8 : CDTimerClass;
@@ -3028,7 +3028,7 @@ class FootClass
     MoveToTiberium(radius_0 : number, scanClose_1 : boolean) : boolean;
     MoveToWeed(radius_0 : number) : boolean;
     static s_AbsDerivateID : AbstractFlags;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<FootClass>;
     m_PlanningPathIdx : number;
     m_WaypointNearbyAccessibleCellDelta : CellStruct;
     m_WaypointCell : CellStruct;
@@ -3122,7 +3122,7 @@ class TeamClass
     WhatAmI() : AbstractType;
     Size() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TeamClass>;
     m_Type : TeamTypeClass;
     m_CurrentScript : ScriptClass;
     m_Owner : HouseClass;
@@ -3182,7 +3182,7 @@ class TeamTypeClass
     static ProcessAllTaskforces() : void;
     GetHouse() : HouseClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TeamTypeClass>;
     m_ArrayIndex : number;
     m_Group : number;
     m_VeteranLevel : number;
@@ -3256,7 +3256,7 @@ class TagClass
     RemoveTrigger(pTrigger_0 : TriggerClass) : boolean;
     ContainsTrigger(pTrigger_0 : TriggerClass) : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TagClass>;
     m_Type : TagTypeClass;
     m_FirstTrigger : TriggerClass;
     m_InstanceCount : number;
@@ -3292,7 +3292,7 @@ class TagTypeClass
     RemoveTrigger(pTrigger_0 : TriggerTypeClass) : boolean;
     ContainsTrigger(pTrigger_0 : TriggerTypeClass) : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TagTypeClass>;
     m_ArrayIndex : number;
     m_Persistence : TriggerPersistence;
     m_FirstTrigger : TriggerTypeClass;
@@ -3326,7 +3326,7 @@ class TriggerTypeClass
     RemoveAction(pAction_0 : TActionClass) : boolean;
     RemoveEvent(pEvent_0 : TEventClass) : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TriggerTypeClass>;
     m_ArrayIndex : number;
     m_Difficulty : boolean;
     m_Enabled : boolean;
@@ -3486,7 +3486,7 @@ class TActionClass
     FlashBuildingsOfType(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
     FindHouseByIndex(pTrigger_0 : TriggerClass, idxHouse_1 : number) : HouseClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TActionClass>;
     m_ArrayIndex : number;
     m_NextAction : TActionClass;
     m_ActionKind : TriggerAction;
@@ -3536,7 +3536,7 @@ class TriggerClass
     RegisterEvent(event_0 : TriggerEvent, pObject_1 : ObjectClass, forceFire_2 : boolean, persistent_3 : boolean, pSource_4 : TechnoClass) : boolean;
     FireActions(pObj_0 : ObjectClass, location_1 : CellStruct) : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TriggerClass>;
     m_Type : TriggerTypeClass;
     m_NextTrigger : TriggerClass;
     m_House : HouseClass;
@@ -3561,7 +3561,7 @@ class TEventClass
     GetStateB() : boolean;
     HasOccured(eventKind_0 : number, pHouse_1 : HouseClass, Object_2 : ObjectClass, ActivationFrame_3 : CDTimerClass, isRepeating_4 : boolean) : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TEventClass>;
     m_ArrayIndex : number;
     m_NextEvent : TEventClass;
     m_EventKind : TriggerEvent;
@@ -3585,7 +3585,7 @@ class HouseTypeClass
     FindParentCountryIndex() : number;
     static FindIndexOfName(name_0 : string) : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<HouseTypeClass>;
     m_ParentCountry : any;
     m_ArrayIndex : number;
     m_ArrayIndex2 : number;
@@ -3640,7 +3640,7 @@ class AircraftTypeClass
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<AircraftTypeClass>;
     m_ArrayIndex : number;
     m_Carryall : boolean;
     m_Trailer : AnimTypeClass;
@@ -3667,7 +3667,7 @@ class ScriptTypeClass
     Size() : number;
     static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<ScriptTypeClass>;
     m_ArrayIndex : number;
     m_IsGlobal : boolean;
     m_ActionsCount : number;
@@ -3690,7 +3690,7 @@ class TaskForceClass
     WhatAmI() : AbstractType;
     Size() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TaskForceClass>;
     m_Group : number;
     m_CountEntries : number;
     m_IsGlobal : boolean;
@@ -3737,7 +3737,7 @@ class ParasiteClass
     TryInfect(pTarget_0 : FootClass) : void;
     CanExistOnVictimCell() : boolean;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<ParasiteClass>;
     m_Owner : FootClass;
     m_Victim : FootClass;
     m_SuppressionTimer : CDTimerClass;
@@ -3758,7 +3758,7 @@ class BuildingLightClass
     Size() : number;
     SetBehaviour(mode_0 : SpotlightBehaviour) : void;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<BuildingLightClass>;
     m_Speed : number;
     m_field_B8 : CoordStruct;
     m_field_C4 : CoordStruct;
@@ -3783,7 +3783,7 @@ class LightSourceClass
     ChangeLevels(nIntensity_0 : number, Tint_1 : TintStruct, mode_2 : number) : void;
     static UpdateLightConverts(value_0 : number) : void;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<LightSourceClass>;
     m_LightIntensity : number;
     m_LightTint : TintStruct;
     m_DetailLevel : number;
@@ -3832,7 +3832,7 @@ class UnitClass
     AStarAttempt(cell1_0 : CellStruct, cell2_1 : CellStruct) : boolean;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<UnitClass>;
     m_unknown_int_6C0 : number;
     m_Type : UnitTypeClass;
     m_FollowerCar : UnitClass;
@@ -3900,7 +3900,7 @@ class EBolt
     Fire(P1_0 : CoordStruct, P2_1 : CoordStruct, arg18_2 : number) : void;
     // skip operator new
     // skip operator delete
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<EBolt>;
     m_Point1 : CoordStruct;
     m_Point2 : CoordStruct;
     m_unknown_18 : number;
@@ -3931,7 +3931,7 @@ class AircraftClass
     FindFireLocation(pTarget_0 : AbstractClass) : AbstractClass;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<AircraftClass>;
     m_Type : AircraftTypeClass;
     m_ShouldLoseAmmo : boolean;
     m_HasPassengers : boolean;
@@ -3954,7 +3954,7 @@ class TerrainClass
     WhatAmI() : AbstractType;
     Size() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TerrainClass>;
     m_Animation : StageClass;
     m_Type : TerrainTypeClass;
     m_IsBurning : boolean;
@@ -3976,7 +3976,7 @@ class TerrainTypeClass
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TerrainTypeClass>;
     m_ArrayIndex : number;
     m_Foundation : number;
     m_RadarColor : ColorStruct;
@@ -4007,7 +4007,7 @@ class TiberiumClass
     static FindIndex(idxOverlayType_0 : number) : number;
     static Find(idxOverlayType_0 : number) : TiberiumClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TiberiumClass>;
     m_ArrayIndex : number;
     m_Spread : number;
     m_SpreadPercentage : number;
@@ -4061,7 +4061,7 @@ class RadSiteClass
     SetSpread(nCells_0 : number) : void;
     GetEffectPercentage() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<RadSiteClass>;
     m_LightSource : LightSourceClass;
     m_BaseCell : CellStruct;
     m_Spread : number;
@@ -4085,7 +4085,7 @@ class LightConvertClass
     constructor(palette1_0 : BytePalette, palette2_1 : BytePalette, pSurface_2 : Surface, color_R_3 : number, color_G_4 : number, color_B_5 : number, skipBlitters_6 : boolean, pBuffer_7 : number, shadeCount_8 : any);
     UpdateColors(red_0 : number, green_1 : number, blue_2 : number, tinted_3 : boolean) : void;
     static InitLightConvert(red_0 : number, green_1 : number, blue_2 : number) : LightConvertClass;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<LightConvertClass>;
     m_UsedPalette1 : RGBClass;
     m_UsedPalette2 : RGBClass;
     m_IndexesToIgnore : number;
@@ -4100,7 +4100,7 @@ class ConvertClass
     static CreateFromFile(pFilename_0 : string, pPalette_1 : BytePalette, pDestination_2 : ConvertClass) : void;
     SelectPlainBlitter(flags_0 : BlitterFlags) : any;
     SelectRLEBlitter(flags_0 : BlitterFlags) : any;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<ConvertClass>;
     m_BytesPerPixel : number;
     m_Blitters : any;
     m_RLEBlitters : any;
@@ -4121,16 +4121,16 @@ class DSurface
     DrawTextA(pText_0 : number, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : TextPrintType) : void;
     DrawTextA(pText_0 : number, pLoction_1 : Point2D, Color_2 : number) : void;
     DrawTextA(pText_0 : number, X_1 : number, Y_2 : number, Color_3 : number) : void;
-    static s_Tile : any;
-    static s_Sidebar : any;
-    static s_Primary : any;
-    static s_Hidden : any;
-    static s_Alternate : any;
-    static s_Temp : any;
-    static s_Composite : any;
-    static s_SidebarBounds : any;
-    static s_ViewBounds : any;
-    static s_WindowBounds : any;
+    static s_Tile : DSurface;
+    static s_Sidebar : DSurface;
+    static s_Primary : DSurface;
+    static s_Hidden : DSurface;
+    static s_Alternate : DSurface;
+    static s_Temp : DSurface;
+    static s_Composite : DSurface;
+    static s_SidebarBounds : RectangleStruct;
+    static s_ViewBounds : RectangleStruct;
+    static s_WindowBounds : RectangleStruct;
     m_Buffer : void;
     m_IsAllocated : boolean;
     m_IsInVideoRam : boolean;
@@ -4154,13 +4154,13 @@ class RGBClass
     Adjust(ratio_0 : number, rgb_1 : RGBClass) : void;
     Difference(rgb_0 : RGBClass) : number;
     ToInt() : number;
-    static s_White : any;
-    static s_RedShiftLeft : any;
-    static s_RedShiftRight : any;
-    static s_GreenShiftLeft : any;
-    static s_GreenShiftRight : any;
-    static s_BlueShiftLeft : any;
-    static s_BlueShiftRight : any;
+    static s_White : RGBClass;
+    static s_RedShiftLeft : number;
+    static s_RedShiftRight : number;
+    static s_GreenShiftLeft : number;
+    static s_GreenShiftRight : number;
+    static s_BlueShiftLeft : number;
+    static s_BlueShiftRight : number;
     m_Red : number;
     m_Green : number;
     m_Blue : number;
@@ -4244,7 +4244,7 @@ class TemporalClass
     Detach() : void;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<TemporalClass>;
     m_Owner : TechnoClass;
     m_Target : TechnoClass;
     m_LifeTimer : CDTimerClass;
@@ -4286,8 +4286,8 @@ class SuperClass
     ShouldFlashTab() : boolean;
     static s_AbsID : AbstractType;
     static s_AbsVTable : number;
-    static s_Array : any;
-    static s_ShowTimers : any;
+    static s_Array : DynamicVectorClass<SuperClass>;
+    static s_ShowTimers : DynamicVectorClass<SuperClass>;
     m_CustomChargeTime : number;
     m_Type : SuperWeaponTypeClass;
     m_Owner : HouseClass;
@@ -4322,7 +4322,7 @@ class SuperWeaponTypeClass
     MouseOverObject(cell_0 : CellStruct, pObjBelowMouse_1 : ObjectClass) : Action;
     static FindFirstOfAction(Action_0 : Action) : SuperWeaponTypeClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<SuperWeaponTypeClass>;
     m_ArrayIndex : number;
     m_WeaponType : WeaponTypeClass;
     m_RechargeVoice : number;
@@ -4401,7 +4401,7 @@ class CaptureManagerClass
     DecideUnitFate(Unit_0 : TechnoClass) : void;
     GetOriginalOwner(Unit_0 : TechnoClass) : HouseClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<CaptureManagerClass>;
     m_ControlNodes : DynamicVectorClass<ControlNode>;
     m_MaxControlNodes : number;
     m_InfiniteMindControl : boolean;
@@ -4436,7 +4436,7 @@ class SpawnManagerClass
     CountLaunchingSpawns() : number;
     UnlinkPointer() : void;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<SpawnManagerClass>;
     m_Owner : TechnoClass;
     m_SpawnType : AircraftTypeClass;
     m_SpawnCount : number;
@@ -4475,7 +4475,7 @@ class SlaveManagerClass
     SuspendWork() : void;
     ResumeWork() : void;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<SlaveManagerClass>;
     m_Owner : TechnoClass;
     m_SlaveType : InfantryTypeClass;
     m_SlaveCount : number;
@@ -4502,7 +4502,7 @@ class ParticleSystemClass
     WhatAmI() : AbstractType;
     Size() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<ParticleSystemClass>;
     m_Type : ParticleSystemTypeClass;
     m_SpawnDistanceToOwner : CoordStruct;
     m_TargetCoords : CoordStruct;
@@ -4533,7 +4533,7 @@ class ParticleSystemTypeClass
     SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<ParticleSystemTypeClass>;
     m_HoldsWhat : number;
     m_Spawns : boolean;
     m_SpawnFrames : number;
@@ -4569,7 +4569,7 @@ class ParticleClass
     Size() : number;
     vt_entry_1E8() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<ParticleClass>;
     m_Type : ParticleTypeClass;
     m_unknown_B0 : number;
     m_unknown_B1 : number;
@@ -4613,7 +4613,7 @@ class ParticleTypeClass
     SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<ParticleTypeClass>;
     m_NextParticleOffset : CoordStruct;
     m_XVelocity : number;
     m_YVelocity : number;
@@ -4658,7 +4658,7 @@ class WarheadTypeClass
     WhatAmI() : AbstractType;
     Size() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<WarheadTypeClass>;
     m_Deform : number;
     m_Verses : number;
     m_ProneDamage : number;
@@ -4731,7 +4731,7 @@ class VoxelAnimTypeClass
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
     CreateObject(owner_0 : HouseClass | any) : ObjectClass;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<VoxelAnimTypeClass>;
     m_Normalized : boolean;
     m_Translucent : boolean;
     m_SourceShared : boolean;
@@ -4771,7 +4771,7 @@ class WaveClass
     Update_Wave() : void;
     DamageArea(location_0 : CoordStruct) : void;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<WaveClass>;
     m_Target : AbstractClass;
     m_Type : WaveType;
     m_LimboCoords : CoordStruct;
@@ -4851,7 +4851,7 @@ class RadBeam
     SetColor(color_0 : ColorStruct) : void;
     SetCoordsSource(loc_0 : CoordStruct) : void;
     SetCoordsTarget(loc_0 : CoordStruct) : void;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<RadBeam>;
     m_unknown_0 : number;
     m_Owner : TechnoClass;
     m_unknown_8 : number;
@@ -4891,7 +4891,7 @@ class RadBeam
 }
 class PlanningTokenClass
 {
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<PlanningTokenClass>;
     m_OwnerUnit : TechnoClass;
     m_PlanningNodes : DynamicVectorClass<PlanningNodeClass>;
     m_field_1C : boolean;
@@ -4906,10 +4906,10 @@ class PlanningTokenClass
 }
 class PlanningNodeClass
 {
-    static s_Unknown1 : any;
-    static s_Unknown2 : any;
-    static s_Unknown3 : any;
-    static s_PlanningModeActive : any;
+    static s_Unknown1 : DynamicVectorClass<PlanningNodeClass>;
+    static s_Unknown2 : DynamicVectorClass<PlanningNodeClass>;
+    static s_Unknown3 : DynamicVectorClass<PlanningNodeClass>;
+    static s_PlanningModeActive : boolean;
     m_PlanningMembers : DynamicVectorClass<PlanningMemberClass>;
     m_field_18 : number;
     m_field_1C : boolean;
@@ -4941,7 +4941,7 @@ class ColorScheme
     static GetNumberOfSchemes() : number;
     static GeneratePalette(name_0 : string) : DynamicVectorClass<ColorScheme>;
     static GetPaletteSchemesFromIterator(it_0 : any) : DynamicVectorClass<ColorScheme>;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<ColorScheme>;
     m_ArrayIndex : number;
     m_Colors : BytePalette;
     m_ID : string;
@@ -5023,7 +5023,7 @@ class LineTrail
     static DeleteAll() : void;
     // skip operator new
     // skip operator delete
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<LineTrail>;
     m_Color : ColorStruct;
     m_Owner : ObjectClass;
     m_Decrement : number;
@@ -5139,7 +5139,7 @@ class Randomizer
     RandomDouble() : number;
     // skip operator()
     // skip operator()
-    static s_Global : any;
+    static s_Global : Randomizer;
     m_unknown_00 : boolean;
     m_Next1 : number;
     m_Next2 : number;
@@ -5220,7 +5220,7 @@ class SmudgeTypeClass
     DrawIt(Point_0 : Point2D, Rect_1 : RectangleStruct, SmudgeData_2 : number, Height_3 : number, MapCoords_4 : CellStruct) : void;
     static LoadFromIniList(idxTheatre_0 : number) : void;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<SmudgeTypeClass>;
     m_ArrayIndex : number;
     m_Width : number;
     m_Height : number;
@@ -5303,7 +5303,7 @@ class RulesClass
     Read_Movies(pINI_0 : CCINIClass) : void;
     Read_AdvancedCommandBar(pINI_0 : CCINIClass) : void;
     PointerGotInvalid(pInvalid_0 : AbstractClass, removed_1 : boolean) : void;
-    static s_Instance : any;
+    static s_Instance : RulesClass;
     m_DetailMinFrameRateNormal : number;
     m_DetailMinFrameRateMovie : number;
     m_DetailBufferZoneWidth : number;
@@ -6165,9 +6165,9 @@ class ScenarioClass
     IsDefinedWaypoint(idx_0 : number) : boolean;
     GetWaypointCoords(dest_0 : CellStruct, idx_1 : number) : CellStruct;
     GetWaypointCoords(idx_0 : number) : CellStruct;
-    static s_Instance : any;
-    static s_NewINIFormat : any;
-    static s_LastTheater : any;
+    static s_Instance : ScenarioClass;
+    static s_NewINIFormat : number;
+    static s_LastTheater : TheaterType;
     m_SpecialFlags : ScenarioFlags;
     m_NextScenario : string;
     m_AltNextScenario : string;
@@ -6302,7 +6302,7 @@ class OverlayClass
     Size() : number;
     static GetTiberiumType(overlayTypeIndex_0 : number) : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<OverlayClass>;
     m_Type : OverlayTypeClass;
 }
 class SmudgeClass
@@ -6315,7 +6315,7 @@ class SmudgeClass
     WhatAmI() : AbstractType;
     Size() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<SmudgeClass>;
     m_Type : SmudgeTypeClass;
 }
 class VoxelAnimClass
@@ -6327,7 +6327,7 @@ class VoxelAnimClass
     WhatAmI() : AbstractType;
     Size() : number;
     static s_AbsID : AbstractType;
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<VoxelAnimClass>;
     m_unknown_int_100 : number;
     m_Type : VoxelAnimTypeClass;
     m_AttachedSystem : ParticleSystemClass;
@@ -6474,7 +6474,7 @@ class GScreenClass
     RestoreCursor() : boolean;
     UpdateCursorMinimapState(miniMap_0 : boolean) : void;
     Render() : void;
-    static s_Instance : any;
+    static s_Instance : GScreenClass;
     m_ScreenShakeX : number;
     m_ScreenShakeY : number;
     m_Bitfield : number;
@@ -6501,7 +6501,7 @@ class LogicClass
     PointerGotInvalid(pInvalid_0 : AbstractClass, removed_1 : boolean) : void;
     RemoveObject(pObject_0 : ObjectClass) : void;
     Update() : void;
-    static s_Instance : any;
+    static s_Instance : LogicClass;
 }
 class MapClass
     extends GScreenClass
@@ -6578,11 +6578,11 @@ class MapClass
     RecalculateZones(cell_0 : CellStruct) : void;
     ResetZones(cell_0 : CellStruct) : void;
     RecalculateSubZones(cell_0 : CellStruct) : void;
-    static s_Instance : any;
-    static s_InvalidCell : any;
+    static s_Instance : MapClass;
+    static s_InvalidCell : CellClass;
     static s_MaxCells : number;
-    static s_ObjectsInLayers : any;
-    static s_MovementAdjustArray : any;
+    static s_ObjectsInLayers : LayerClass;
+    static s_MovementAdjustArray : number;
     m_unknown_10 : number;
     m_unknown_pointer_14 : any;
     m_MovementZones : void;
@@ -6647,7 +6647,7 @@ class DisplayClass
     MarkFoundation(BaseCell_0 : CellStruct, Mark_1 : boolean) : void;
     Submit(pObject_0 : ObjectClass) : void;
     Remove(pObject_0 : ObjectClass) : void;
-    static s_Instance : any;
+    static s_Instance : DisplayClass;
     m_CurrentFoundation_CenterCell : CellStruct;
     m_CurrentFoundation_TopLeftOffset : CellStruct;
     m_CurrentFoundation_Data : CellStruct;
@@ -6691,7 +6691,7 @@ class RadarClass
     vt_entry_CC(out_pUnk_0 : void, pPoint_1 : Point2D) : void;
     vt_entry_D0(dwUnk_0 : number) : void;
     Init_For_House() : void;
-    static s_Instance : any;
+    static s_Instance : RadarClass;
     m_unknown_11E8 : number;
     m_unknown_11EC : number;
     m_unknown_11F0 : number;
@@ -6748,7 +6748,7 @@ class RadarClass
 class PowerClass
     extends RadarClass
 {
-    static s_Instance : any;
+    static s_Instance : PowerClass;
     m_PowerNeedRedraw : boolean;
     m_unknown_timer_1510 : CDTimerClass;
     m_unknown_151C : number;
@@ -6806,8 +6806,8 @@ class SidebarClass
     static GetObjectTabIdx(abs_0 : AbstractType, idxType_1 : number, unused_2 : number) : number;
     static GetObjectTabIdx(abs_0 : AbstractType, buildCat_1 : BuildCat, isNaval_2 : boolean) : number;
     Scroll(up_0 : boolean, column_1 : number) : boolean;
-    static s_Instance : any;
-    static s_TooltipBuffer : any;
+    static s_Instance : SidebarClass;
+    static s_TooltipBuffer : number;
     m_Tabs : StripClass;
     m_unknown_5394 : number;
     m_unknown_5398 : number;
@@ -6847,7 +6847,7 @@ class TabClass
     extends SidebarClass
 {
     Activate(control_0 : number) : void;
-    static s_Instance : any;
+    static s_Instance : TabClass;
     m_TabData : TabDataClass;
     m_unknown_timer_552C : CDTimerClass;
     m_InsufficientFundsBlinkTimer : CDTimerClass;
@@ -6858,7 +6858,7 @@ class TabClass
 class ScrollClass
     extends TabClass
 {
-    static s_Instance : any;
+    static s_Instance : ScrollClass;
     m_unknown_int_5548 : number;
     m_unknown_byte_554C : number;
     m_unknown_int_5550 : number;
@@ -6875,7 +6875,7 @@ class MouseClass
     RestoreCursor() : boolean;
     UpdateCursorMinimapState(miniMap_0 : boolean | any) : void;
     GetLastMouseCursor() : MouseCursorType;
-    static s_Instance : any;
+    static s_Instance : MouseClass;
     m_MouseCursorIsMini : boolean;
     m_MouseCursorIndex : MouseCursorType;
     m_MouseCursorLastIndex : MouseCursorType;
@@ -6889,7 +6889,7 @@ class SpotlightClass
     static DrawAll() : void;
     // skip operator new
     // skip operator delete
-    static s_Array : any;
+    static s_Array : DynamicVectorClass<SpotlightClass>;
     m_Coords : CoordStruct;
     m_MovementRadius : number;
     m_Size : number;
@@ -6924,8 +6924,8 @@ class ThemeClass
     Suspend() : void;
     AI() : void;
     Scan() : void;
-    static s_Instance : any;
-    static s_ScoresPresen : any;
+    static s_Instance : ThemeClass;
+    static s_ScoresPresen : boolean;
     m_CurrentTheme : number;
     m_LastTheme : number;
     m_QueuedTheme : number;

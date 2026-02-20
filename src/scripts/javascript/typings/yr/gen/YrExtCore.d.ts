@@ -2,6 +2,20 @@
 declare module "YrExtCore" {
 import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D } from "YRpp";
 import { AKRESULT } from "Wwise";
+class IniReader
+{
+    constructor(pIni_0 : CCINIClass);
+    constructor(filename_0 : string);
+    GetIni() : CCINIClass;
+    value() : string;
+    max_size() : number;
+    empty() : boolean;
+    ReadString(pSection_0 : string, pKey_1 : string) : number;
+}
+class IniComponentLoader
+{
+    static RegisterAbstractTypeLoadingFunc(targetType_0 : AbstractType, loadingFunc_1 : any) : void;
+}
 class YrHookOverrideReturn_void_
 {
     OverrideReturn() : void;
@@ -347,7 +361,7 @@ class YrInputBlocker
 class YrGadgetInputEvent
 {
     m_pGadget : GadgetClass;
-    m_pKey : number;
+    m_pKey : DWORD;
     m_mouseX : number;
     m_mouseY : number;
     m_forceRedraw : boolean;
@@ -356,12 +370,12 @@ class YrGadgetInputEvent
 }
 class YrUserInterfaceInputEvent
 {
-    m_pKey : number;
+    m_pKey : DWORD;
     m_pMouseCoords : Vector2D;
 }
 class YrKeyboardInputEvent
 {
-    m_pKey : number;
+    m_pKey : DWORD;
 }
 class YrDecideActionEvent
     extends YrHookOverrideReturn_Action_
@@ -844,16 +858,6 @@ class YrAfterCreateWindoweEvent
 class YrAfterSetCooperativeLevelEvent
 {
 }
-class IniReader
-{
-    constructor(pIni_0 : CCINIClass);
-    constructor(filename_0 : string);
-    GetIni() : CCINIClass;
-    value() : string;
-    max_size() : number;
-    empty() : boolean;
-    ReadString(pSection_0 : string, pKey_1 : string) : number;
-}
 class Serialization
 {
     static IsSerializing() : boolean;
@@ -862,5 +866,20 @@ class Serialization
     static GetArchivePath(savegameName_0 : string, extension_1 : string) : string;
     static LoadKey(key_0 : string) : string;
     static SaveKey(key_0 : string, val_1 : string) : void;
+    static RegisterStepHandler(step_0 : ESerializationStep, handler_1 : any) : void;
+}
+enum ESerializationStep {
+    SaveBegin_Epilogue = 0,
+    SaveBeginStream_Epilogue = 1,
+    SaveEndStream_Prologue = 2,
+    SaveEndStream_Epilogue = 3,
+    SaveEnd_Prologue = 4,
+    SaveEnd_Epilogue = 5,
+    LoadBegin_Epilogue = 6,
+    LoadBeginStream_Epilogue = 7,
+    LoadEndStream_Prologue = 8,
+    LoadEndStream_Epilogue = 9,
+    LoadEnd_Prologue = 10,
+    LoadEnd_Epilogue = 11,
 }
 }

@@ -1,12 +1,12 @@
 #include "yr/component/ini_component.h"
-
-class TerrainTypeClass;
-class BulletTypeClass;
-class AnimTypeClass;
-class HouseTypeClass;
-class SuperWeaponTypeClass;
-class WeaponTypeClass;
-class WarheadTypeClass;
+#include <TechnoTypeClass.h>
+#include <TerrainTypeClass.h>
+#include <BulletTypeClass.h>
+#include <AnimTypeClass.h>
+#include <HouseTypeClass.h>
+#include <SuperWeaponTypeClass.h>
+#include <WeaponTypeClass.h>
+#include <WarheadTypeClass.h>
 struct ThemeControl;
 
 static std::map<void*, std::function<void(IniReader&)>> gLoadAllCallbacks;
@@ -55,7 +55,53 @@ IMPL_ON_LOADING_AND_REGISTER_FUNC(WeaponTypeClass);
 IMPL_ON_LOADING_AND_REGISTER_FUNC(WarheadTypeClass);
 IMPL_ON_LOADING_AND_REGISTER_FUNC(ThemeControl);
 
+YREXTCORE_API void IniComponentLoader::RegisterAbstractTypeLoadingFunc(AbstractType targetType, std::function<void(IniReader* reader, AbstractTypeClass* loadingObj)> loadingFunc)
+{
+    switch (targetType)
+    {
+    case AbstractType::UnitType:
+    case AbstractType::InfantryType:
+    case AbstractType::BuildingType:
+    case AbstractType::AircraftType:
+        IniComponentLoader::RegisterLoadingFunc<TechnoTypeClass>(
+            [loadingFunc = std::move(loadingFunc)](IniReader& reader, auto type) { loadingFunc(&reader, type); });
+        break;
+    case AbstractType::TerrainType:
+        IniComponentLoader::RegisterLoadingFunc<TerrainTypeClass>(
+            [loadingFunc = std::move(loadingFunc)](IniReader& reader, auto type) { loadingFunc(&reader, type); });
+        break;
+    case AbstractType::BulletType:
+        IniComponentLoader::RegisterLoadingFunc<BulletTypeClass>(
+            [loadingFunc = std::move(loadingFunc)](IniReader& reader, auto type) { loadingFunc(&reader, type); });
+        break;
+    case AbstractType::AnimType:
+        IniComponentLoader::RegisterLoadingFunc<AnimTypeClass>(
+            [loadingFunc = std::move(loadingFunc)](IniReader& reader, auto type) { loadingFunc(&reader, type); });
+        break;
+    case AbstractType::HouseType:
+        IniComponentLoader::RegisterLoadingFunc<HouseTypeClass>(
+            [loadingFunc = std::move(loadingFunc)](IniReader& reader, auto type) { loadingFunc(&reader, type); });
+        break;
+    case AbstractType::SuperWeaponType:
+        IniComponentLoader::RegisterLoadingFunc<SuperWeaponTypeClass>(
+            [loadingFunc = std::move(loadingFunc)](IniReader& reader, auto type) { loadingFunc(&reader, type); });
+        break;
+    case AbstractType::WeaponType:
+        IniComponentLoader::RegisterLoadingFunc<WeaponTypeClass>(
+            [loadingFunc = std::move(loadingFunc)](IniReader& reader, auto type) { loadingFunc(&reader, type); });
+        break;
+    case AbstractType::WarheadType:
+        IniComponentLoader::RegisterLoadingFunc<WarheadTypeClass>(
+            [loadingFunc = std::move(loadingFunc)](IniReader& reader, auto type) { loadingFunc(&reader, type); });
+        break;
+    default:
+        gLogger->error("cannot register ini loading func for abstract type {}", static_cast<unsigned int>(targetType));
+        break;
+    }
+}
+
 #include "yr/yr_all_events.h"
+#include "ini_component.h"
 DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeDataEvent)
 {
     IniReader reader {E->pIni};

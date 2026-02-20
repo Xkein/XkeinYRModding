@@ -1,4 +1,6 @@
 
+exports.IniReader = puerts.loadCPPType("IniReader")
+exports.IniComponentLoader = puerts.loadCPPType("IniComponentLoader")
 exports.YrHookOverrideReturn_void_ = puerts.loadCPPType("YrHookOverrideReturn<void>")
 exports.YrHookOverride = puerts.loadCPPType("YrHookOverride")
 exports.YrHookEventSystem = puerts.loadCPPType("YrHookEventSystem")
@@ -175,5 +177,20 @@ exports.YrBootEvent = puerts.loadCPPType("YrBootEvent")
 exports.YrTerminateEvent = puerts.loadCPPType("YrTerminateEvent")
 exports.YrAfterCreateWindoweEvent = puerts.loadCPPType("YrAfterCreateWindoweEvent")
 exports.YrAfterSetCooperativeLevelEvent = puerts.loadCPPType("YrAfterSetCooperativeLevelEvent")
-exports.IniReader = puerts.loadCPPType("IniReader")
 exports.Serialization = puerts.loadCPPType("Serialization")
+exports.ESerializationStep = (function () {
+    let ESerializationStep = {}
+    ESerializationStep[ESerializationStep["SaveBegin_Epilogue"] = 0] = "SaveBegin_Epilogue";
+    ESerializationStep[ESerializationStep["SaveBeginStream_Epilogue"] = 1] = "SaveBeginStream_Epilogue";
+    ESerializationStep[ESerializationStep["SaveEndStream_Prologue"] = 2] = "SaveEndStream_Prologue";
+    ESerializationStep[ESerializationStep["SaveEndStream_Epilogue"] = 3] = "SaveEndStream_Epilogue";
+    ESerializationStep[ESerializationStep["SaveEnd_Prologue"] = 4] = "SaveEnd_Prologue";
+    ESerializationStep[ESerializationStep["SaveEnd_Epilogue"] = 5] = "SaveEnd_Epilogue";
+    ESerializationStep[ESerializationStep["LoadBegin_Epilogue"] = 6] = "LoadBegin_Epilogue";
+    ESerializationStep[ESerializationStep["LoadBeginStream_Epilogue"] = 7] = "LoadBeginStream_Epilogue";
+    ESerializationStep[ESerializationStep["LoadEndStream_Prologue"] = 8] = "LoadEndStream_Prologue";
+    ESerializationStep[ESerializationStep["LoadEndStream_Epilogue"] = 9] = "LoadEndStream_Epilogue";
+    ESerializationStep[ESerializationStep["LoadEnd_Prologue"] = 10] = "LoadEnd_Prologue";
+    ESerializationStep[ESerializationStep["LoadEnd_Epilogue"] = 11] = "LoadEnd_Epilogue";
+    return ESerializationStep;
+})();
