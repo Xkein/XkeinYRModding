@@ -1,59 +1,12 @@
 {{- include 'include/meta.scriban'
     init_extra_vars(this)
     include 'include/yrpp.scriban'
-    include 'include/js_ts.scriban'
     is_yrpp = module_name == "YRpp"
     is_yr_ext_core = module_name == "YrExtCore"
     func need_codegen(htType)
         ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
     end
-    type_map = {}
-    type_map["void"] = "void"
-    type_map["char"] = "number"
-    type_map["wchar"] = "number"
-    type_map["wchar_t"] = "number"
-    type_map["unsigned char"] = "number"
-    type_map["short"] = "number"
-    type_map["unsigned short"] = "number"
-    type_map["int"] = "number"
-    type_map["unsigned int"] = "number"
-    type_map["long"] = "number"
-    type_map["unsigned long"] = "number"
-    type_map["long long"] = "number"
-    type_map["unsigned long long"] = "number"
-    type_map["float"] = "number"
-    type_map["double"] = "number"
-    type_map["long double"] = "number"
-    type_map["bool"] = "boolean"
-    type_map["char *"] = "string"
-    type_map["char const *"] = "string"
-    any_types = []
-    if is_yrpp 
-        any_types = array.concat(any_types, ["IndexClass"])
-        yr_types = get_yr_types()
-    end
-    func get_ts_type(type)
-        $type_name = type.full_name
-        for any_type in any_types
-            if string.contains($type_name, any_type)
-                ret "any"
-            end
-        end
-        $mapped_type = type_map[$type_name]
-        if $mapped_type
-            ret $mapped_type
-        end
-        $unwrap = httype.unwrap_type(type)
-        $unwrap_name = $unwrap.full_name
-        if $unwrap_name == "char" && is_array_type(type)
-            ret "string"
-        end
-        $mapped_type = type_map[$unwrap_name]
-        if $mapped_type
-            ret $mapped_type
-        end
-        ret $unwrap_name
-    end
+    include 'include/js_ts.scriban'
     func should_skip_visibility_ex(htType, htElement)
         if is_yrpp
             case htElement.element.visibility
@@ -93,7 +46,7 @@
 -}}
 
 import { type IBaklavaViewModel } from "baklavajs";
-import { ClassBuilder } from "./class_builder";
+import { ClassBuilder, EnumBuilder } from "./class_builder";
 
 export function setup_{{module_name}}(viewModel: IBaklavaViewModel) {
 {{- for klass in module_classes }}
@@ -127,6 +80,15 @@ export function setup_{{module_name}}(viewModel: IBaklavaViewModel) {
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- for enum in module_enums ; if need_codegen(enum) || is_yrpp }}
+    let {{enum.name}}Builder = new EnumBuilder("{{enum.name}}");
+    {{- for enum_item in enum.constants }}
+    {{enum.name}}Builder.addConstant({name: "{{enum_item.name}}", value: {{enum_item.value}}});
+    {{- end}}
+    {{enum.name}}Builder.build(viewModel, "{{module_name}}");
+{{- end; end }}
+
 {{- for klass in module_classes ; if need_codegen(klass) }}
     {{- if is_yr_ext_core && get_meta_tag(klass.meta, "HookEvent") }}
     {{klass.identifier}}Builder.isHookEvent = true;

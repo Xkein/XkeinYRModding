@@ -1,4 +1,4 @@
-{{
+{{ include 'include/yrpp.scriban'
     js_operator_map = {}
     js_operator_map['operator=='] = "op_Equality"
     js_operator_map['operator!='] = "op_Inequality"
@@ -27,5 +27,124 @@
             ret js_operator_map[name] ?? ""
         end
         ret name
+    end
+    
+    type_map = {}
+    type_map["void"] = "void"
+    type_map["char"] = "number"
+    type_map["wchar"] = "number"
+    type_map["wchar_t"] = "number"
+    type_map["unsigned char"] = "number"
+    type_map["short"] = "number"
+    type_map["unsigned short"] = "number"
+    type_map["int"] = "number"
+    type_map["unsigned int"] = "number"
+    type_map["long"] = "number"
+    type_map["unsigned long"] = "number"
+    type_map["long long"] = "number"
+    type_map["unsigned long long"] = "number"
+    type_map["float"] = "number"
+    type_map["double"] = "number"
+    type_map["long double"] = "number"
+    type_map["bool"] = "boolean"
+    type_map["char *"] = "string"
+    type_map["char const *"] = "string"
+    type_map["std::basic_string<char, std::char_traits<char>, std::allocator<char>>"] = "string"
+    # yr structs
+    type_map["Vector2D<int>"] = "Vector2D"
+    type_map["Vector2D<short>"] = "Vector2D"
+    type_map["Vector3D<int>"] = "Vector3D"
+    type_map["Vector3D<double>"] = "Vector3D"
+    type_map["Vector3D<float>"] = "Vector3D"
+
+    generic_types = ["VectorClass<", "DynamicVectorClass<", "TypeList<"]
+
+    any_types = []
+    if is_yrpp 
+        any_types = array.concat(any_types, ["IndexClass"])
+        yr_types = get_yr_types()
+    end
+    
+    for klass in module_classes
+        if need_codegen(klass)
+            type_map[klass.full_name] = klass.identifier
+        end
+    end
+    for enum in module_enums
+        if need_codegen(enum) || is_yrpp
+            type_map[enum.name] = enum.name
+        end
+    end
+    func get_ts_type(type)
+        $type_name = type.full_name
+        for any_type in any_types
+            # force use "any" type
+            if string.contains($type_name, any_type)
+                ret "any"
+            end
+        end
+        $mapped_type = type_map[$type_name]
+        # has mapped name
+        if $mapped_type
+            ret $mapped_type
+        end
+        $unwrap = httype.unwrap_type(type)
+        $unwrap_name = $unwrap.full_name
+        # is string
+        if $unwrap_name == "char" && is_array_type(type)
+            ret "string"
+        end
+        $mapped_type = type_map[$unwrap_name]
+        # has mapped name
+        if $mapped_type
+            ret $mapped_type
+        end
+        # special template class
+        if string.starts_with($unwrap_name, "constant_ptr<") || string.starts_with($unwrap_name, "reference<")
+            ret get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type)
+        end
+        # template class
+        for generic_type in generic_types
+            if string.starts_with($unwrap_name, generic_type)
+                if $unwrap.template_kind == 3 # CppTemplateKind.TemplateSpecializedClass
+                    $mapped_template_name = string.slice($unwrap_name, 0, string.index_of($unwrap_name, "<"))
+                    $mapped_template_name += "<"
+                    for template_specialized_argument in $unwrap.template_specialized_arguments
+                        if template_specialized_argument.arg_kind == 0 # CppTemplateArgumentKind.AsType
+                            $mapped_template_name += get_ts_type(template_specialized_argument.arg_as_type)
+                        else
+                            $mapped_template_name += template_specialized_argument.arg_string
+                        end
+                    end
+                    $mapped_template_name += ">"
+                    ret $mapped_template_name
+                else if $unwrap.template_kind == 1 || $unwrap.template_kind == 2 # TemplateKind == CppTemplateKind.TemplateClass || TemplateKind == CppTemplateKind.PartialTemplateClass
+                    $mapped_template_name = string.slice($unwrap_name, 0, string.index_of($unwrap_name, "<"))
+                    $mapped_template_name += "<"
+                    for template_parameter in $unwrap.template_parameters
+                        $mapped_template_name += get_ts_type(template_parameter)
+                    end
+                    $mapped_template_name += ">"
+                    ret $mapped_template_name
+                else
+                    ret $unwrap_name + "-ttt-" + $unwrap.type_kind
+                    if string.ends_with($unwrap_name, "*>")
+                        ret string.replace($unwrap_name, "*>", ">")
+                    else
+                        ret $unwrap_name
+                    end
+                end
+            end
+        end
+        if $unwrap_name | string.contains ">" # template
+            ret "any"
+        end
+        if $unwrap_name | string.contains "::"
+            ret "any"
+        end
+        if is_yrpp && !array.contains(yr_types, $unwrap_name)
+            ret "any"
+        end
+        ret $unwrap_name
     end
 }}
