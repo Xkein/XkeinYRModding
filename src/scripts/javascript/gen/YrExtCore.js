@@ -178,6 +178,8 @@ exports.YrTerminateEvent = puerts.loadCPPType("YrTerminateEvent")
 exports.YrAfterCreateWindoweEvent = puerts.loadCPPType("YrAfterCreateWindoweEvent")
 exports.YrAfterSetCooperativeLevelEvent = puerts.loadCPPType("YrAfterSetCooperativeLevelEvent")
 exports.Serialization = puerts.loadCPPType("Serialization")
+
+exports.YrExtCore = puerts.loadCPPType("YrExtCore")
 exports.ESerializationStep = (function () {
     let ESerializationStep = {}
     ESerializationStep[ESerializationStep["SaveBegin_Epilogue"] = 0] = "SaveBegin_Epilogue";

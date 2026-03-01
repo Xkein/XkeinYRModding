@@ -1,5 +1,7 @@
 
 exports.gainput__InputMap = puerts.loadCPPType("gainput::InputMap")
+
+exports.gainput = puerts.loadCPPType("gainput")
 exports.Key = (function () {
     let Key = {}
     Key[Key["KeyEscape"] = 0] = "KeyEscape";

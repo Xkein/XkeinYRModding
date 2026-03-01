@@ -1,4 +1,9 @@
 {{ include 'include/yrpp.scriban'
+
+    func need_codegen(htType)
+        ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
+    end
+    
     js_operator_map = {}
     js_operator_map['operator=='] = "op_Equality"
     js_operator_map['operator!='] = "op_Inequality"

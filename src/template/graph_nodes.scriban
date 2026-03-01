@@ -3,9 +3,6 @@
     include 'include/yrpp.scriban'
     is_yrpp = module_name == "YRpp"
     is_yr_ext_core = module_name == "YrExtCore"
-    func need_codegen(htType)
-        ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
-    end
     include 'include/js_ts.scriban'
     func should_skip_visibility_ex(htType, htElement)
         if is_yrpp

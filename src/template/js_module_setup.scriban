@@ -1,15 +1,15 @@
 {{- include 'include/meta.scriban'
     init_extra_vars(this)
     is_yrpp = module_name == "YRpp"
-    func need_codegen(htType)
-        ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
-    end
+    include 'include/js_ts.scriban'
 -}}
 
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
 exports.{{klass.identifier}} = puerts.loadCPPType("{{klass.full_name}}")
 {{- end; end }}
+
+exports.{{this.module_name}} = puerts.loadCPPType("{{this.module_name}}")
 
 {{- for enum in module_enums }}
 {{- if need_codegen(enum) || is_yrpp }}

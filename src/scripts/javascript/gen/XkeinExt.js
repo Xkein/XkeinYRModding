@@ -13,6 +13,8 @@ exports.JsGameEvents = puerts.loadCPPType("JsGameEvents")
 exports.JsPhysicsEvents = puerts.loadCPPType("JsPhysicsEvents")
 exports.JsEvents = puerts.loadCPPType("JsEvents")
 exports.Input = puerts.loadCPPType("Input")
+
+exports.XkeinExt = puerts.loadCPPType("XkeinExt")
 exports.EPhysicShapeType = (function () {
     let EPhysicShapeType = {}
     EPhysicShapeType[EPhysicShapeType["Auto"] = 0] = "Auto";

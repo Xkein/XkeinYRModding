@@ -4466,7 +4466,7 @@ class SlaveManagerClass
     WhatAmI() : AbstractType;
     Size() : number;
     SetOwner(NewOwner_0 : TechnoClass) : void;
-    CreateSlave(Node_0 : SlaveControl) : void;
+    CreateSlave(Node_0 : SlaveManagerClass__SlaveControl) : void;
     LostSlave(Slave_0 : InfantryClass) : void;
     Deploy2() : void;
     Killed(Killer_0 : TechnoClass, ForcedOwnerHouse_1 : HouseClass) : void;
@@ -4481,16 +4481,10 @@ class SlaveManagerClass
     m_SlaveCount : number;
     m_RegenRate : number;
     m_ReloadRate : number;
-    m_SlaveNodes : DynamicVectorClass<SlaveControl>;
+    m_SlaveNodes : DynamicVectorClass<SlaveManagerClass__SlaveControl>;
     m_RespawnTimer : CDTimerClass;
     m_State : SlaveManagerStatus;
     m_LastScanFrame : number;
-}
-class SlaveControl
-{
-    m_Slave : InfantryClass;
-    m_State : SlaveControlStatus;
-    m_RespawnTimer : CDTimerClass;
 }
 class ParticleSystemClass
     extends ObjectClass
@@ -5203,6 +5197,62 @@ class GadgetClass
     m_IsSticky : boolean;
     m_Disabled : boolean;
     m_Flags : GadgetFlag;
+}
+class Game
+{
+    static F2I64(val_0 : number) : number;
+    static F2I(val_0 : number) : number;
+    static RaiseError(err_0 : number) : void;
+    static SetProgress(progress_0 : number) : void;
+    static CallBack() : void;
+    static GetResource(ID_0 : number, Type_1 : number) : number;
+    static CenterWindowIn(Child_0 : any, Parent_1 : any) : void;
+    static sub_53E420(hWindow_0 : any) : void;
+    static sub_53E3C0(hWindow_0 : any) : void;
+    static OnWindowMoving(Rect_0 : any) : void;
+    static PlanningManager_WM_RBUTTONUP_63AB00(XY_0 : Point2D) : void;
+    static Save_Sides(pStm_0 : any, pVector_1 : DynamicVectorClass<any>) : number;
+    static StreamerThreadFlush() : void;
+    static UICommands_TypeSelect_7327D0(iniName_0 : string) : void;
+    static IsTypeSelecting() : boolean;
+    static GetFloaterGravity() : number;
+    static MainLoop() : void;
+    static KeyboardProcess(input_0 : number) : void;
+    static AudioGetTime() : any;
+    static InitRandom() : void;
+    static ShowSpecialDialog() : void;
+    static DestroyVoxelCaches() : void;
+    static InitUIStuff() : void;
+    static DrawRadialIndicator(drawLine_0 : boolean, adjustColor_1 : boolean, pCoord_2 : CoordStruct, color_3 : ColorStruct, lineMultiplier_4 : number, unknown1_5 : boolean, unknown2_6 : boolean) : void;
+    static PlayMovie(movieName_0 : string, queue_theme_1 : number, use_hidden_surface1_2 : number, stretch_movie_3 : number, use_hidden_surface2_4 : number, set_state_1_5 : number) : void;
+    static ComputeFrameCRC() : void;
+    static LogFrameCRC(frameIndex_0 : number) : void;
+    static s_Savegame_Magic : number;
+    static s_COMClasses : DynamicVectorClass<number>;
+    static s_hWnd : any;
+    static s_hInstance : any;
+    static s_bVPLRead : boolean;
+    static s_bVideoBackBuffer : boolean;
+    static s_bAllowVRAMSidebar : boolean;
+    static s_RecordingFlag : RecordFlag;
+    static s_RecordFile : any;
+    static s_bDrawShadow : boolean;
+    static s_bAllowDirect3D : boolean;
+    static s_bDirect3DIsUseable : boolean;
+    static s_IsActive : boolean;
+    static s_IsFocused : boolean;
+    static s_SpecialDialog : number;
+    static s_PCXInitialized : boolean;
+    static s_Seed : number;
+    static s_TechLevel : number;
+    static s_PlayerCount : number;
+    static s_PlayerColor : number;
+    static s_ObserverMode : boolean;
+    static s_ScenarioName : number;
+    static s_DontSetExceptionHandler : boolean;
+    static s_EnableMPSyncDebug : boolean;
+    static s_VoxelLightSource : Vector3D;
+    static s_VoxelShadowLightSource : Vector3D;
 }
 class SmudgeTypeClass
     extends ObjectTypeClass
@@ -6935,6 +6985,23 @@ class ThemeClass
     m_IsScoreShuffle : boolean;
     m_Themes : DynamicVectorClass<ThemeControl>;
     m_Stream : any;
+}
+class SlaveManagerClass__SlaveControl
+{
+    m_Slave : InfantryClass;
+    m_State : SlaveControlStatus;
+    m_RespawnTimer : CDTimerClass;
+}
+
+class YRpp {
+    static s_Unsorted__CurrentFrame : number;
+    static s_Unsorted__CellHeight : number;
+    static s_Unsorted__LevelHeight : number;
+    static s_Unsorted__LeptonsPerCell : number;
+    static s_Unsorted__CellWidthInPixels : number;
+    static s_Unsorted__CellHeightInPixels : number;
+    static s_Unsorted__CurrentSWType : number;
+    static s_Unsorted__IKnowWhatImDoing : number;
 }
 enum DirType {
     North = 0,

@@ -29,6 +29,9 @@ class gainput__InputMap
     RemoveListener(listenerId_0 : any) : void;
     ReorderListeners() : void;
 }
+
+class gainput {
+}
 enum Key {
     KeyEscape = 0,
     KeyF1 = 1,

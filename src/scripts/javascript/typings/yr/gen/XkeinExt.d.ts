@@ -115,6 +115,9 @@ class Input
     static s_gJoystickId : number;
     static s_gTouchId : number;
 }
+
+class XkeinExt {
+}
 enum EPhysicShapeType {
     Auto = 0,
     Sphere = 1,

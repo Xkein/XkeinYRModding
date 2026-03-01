@@ -188,6 +188,11 @@ namespace PUERTS_NAMESPACE                                                      
     }                                                                                                      \
 }
 
+#define UsingNamespace(NS) \
+class __NS__ {}; \
+UsingCppType(__NS__);
+
+
 // to pass compile but not use function pointer
 #define MuteFunctionPtr(CLS)                                                                       \
 namespace PUERTS_NAMESPACE                                                                         \
@@ -913,6 +918,7 @@ static void RegisterCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterA
 }
 
 UsingCppType(HWND);
+UsingCppType(HINSTANCE);
 
 #else
 #define UsingArray

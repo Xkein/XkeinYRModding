@@ -5,7 +5,8 @@
     inject_tags_list = {}
     if module_name == "YRpp"
         $gen_types = get_yr_game_types()
-        inject_tags_list["BindJs"] = $gen_types
+        $gen_fields_and_functions = get_yr_fields_and_functions()
+        inject_tags_list["BindJs"] = array.concat($gen_fields_and_functions, $gen_types)
         inject_tags_list["AllPublicVisible"] = $gen_types
     else if module_name == "Wwise"
         $gen_types = ["AKRESULT"]
@@ -21,6 +22,14 @@
         for key in object.keys(inject_tags_list)
             if array.contains(inject_tags_list[key], klass.unique_name)
                 htmeta.set_meta_tag(klass, key);
+            end
+        end
+    end
+
+    for element in array.concat(this.properties, this.functions)
+        for key in object.keys(inject_tags_list)
+            if array.contains(inject_tags_list[key], element.full_name)
+                htmeta.set_meta_tag(element, key);
             end
         end
     end

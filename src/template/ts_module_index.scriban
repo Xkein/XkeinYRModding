@@ -2,9 +2,6 @@
     init_extra_vars(this)
     include 'include/yrpp.scriban'
     is_yrpp = module_name == "YRpp"
-    func need_codegen(htType)
-        ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
-    end
     include 'include/js_ts.scriban'
     func should_skip_visibility_ex(htType, htElement)
         if is_yrpp
@@ -57,6 +54,7 @@ import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClas
 import { AKRESULT } from "Wwise";
 {{- end }}
 {{- end }}
+
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
 {{ klass.is_interface ? "interface" : "class" }} {{klass.identifier}}
@@ -90,6 +88,16 @@ $base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
 }
 {{- end }}
 {{- end }}
+
+class {{this.module_name}} {
+{{- for property in this.properties ; $cpp_field = property.cpp_field
+    if !need_codegen(property)
+        continue
+    end}}
+    {{ $'static s_{property.identifier} : {get_ts_type(property.cpp_field.type)};'}}
+{{- end}}
+}
+
 {{- for enum in module_enums }}
 {{- if need_codegen(enum) || is_yrpp }}
 enum {{enum.name}} {

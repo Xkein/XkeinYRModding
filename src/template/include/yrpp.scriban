@@ -93,6 +93,8 @@ func get_yr_game_types()
         "LightConvertClass",
         "IsometricTileClass",
         "IsometricTileTypeClass",
+        "Game",
+        "Unsorted",
         "Surface",
         "XSurface",
         "DSurface",
@@ -121,7 +123,7 @@ func get_yr_game_types()
         "RandomStruct",
         "LTRBStruct",
         "SpawnControl",
-        "SlaveControl",
+        "SlaveManagerClass::SlaveControl",
         "StageClass",
         "BaseClass",
         "BaseNodeClass",
@@ -170,6 +172,17 @@ func get_yr_types()
         "Matrix3D", "DirStruct", "RectangleStruct", "ColorStruct", "CounterClass"]
     $result = array.concat($types, $handwrite_types)
     ret $result
+end
+
+func get_yr_fields_and_functions()
+    ret ["Unsorted::CurrentSWType",
+    "Unsorted::CurrentFrame",
+    "Unsorted::CellHeight",
+    "Unsorted::LevelHeight",
+    "Unsorted::LeptonsPerCell",
+    "Unsorted::CellWidthInPixels",
+    "Unsorted::CellHeightInPixels",
+    "Unsorted::IKnowWhatImDoing"]
 end
 
 func get_yr_derived_classes(klass)

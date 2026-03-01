@@ -1,4 +1,6 @@
 
+
+exports.Wwise = puerts.loadCPPType("Wwise")
 exports.AKRESULT = (function () {
     let AKRESULT = {}
     AKRESULT[AKRESULT["AK_NotImplemented"] = 0] = "AK_NotImplemented";

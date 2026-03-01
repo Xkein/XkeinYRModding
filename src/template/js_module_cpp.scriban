@@ -1,8 +1,5 @@
 {{- include 'include/meta.scriban'
     init_extra_vars(this)
-    func need_codegen(htType)
-        ret get_meta_tag(htType.meta, "BindJs") && !htType.is_template_class
-    end
     is_yrpp = module_name == "YRpp"
     is_yr_ext_core = module_name == "YrExtCore"
     include 'include/js_ts.scriban'
@@ -182,10 +179,26 @@ end }}
 {{ end }}
 
 // ==== class registrations end
+class module_{{this.module_name}} {};
+UsingNamedCppType(module_{{this.module_name}}, {{this.module_name}});
 
 void __JsRegister_{{module_name}}() {
-{{- for klass in module_classes }}
-{{- if need_codegen(klass) }}
+{{- for klass in module_classes ; if need_codegen(klass) }}
     __JsRegister_{{klass.identifier}}();
 {{- end; end }}
+
+{{- $module_builder = $'auto builder = PUERTS_NAMESPACE::DefineClass<module_{this.module_name}>();'
+for property in this.properties ; $cpp_field = property.cpp_field
+    if !need_codegen(property)
+        continue
+    end
+    if property.is_const || property.is_constexpr || property.is_array
+        $module_builder = append_line($module_builder, $'builder.Variable("s_{property.identifier}", MakeReadonlyVariable(std::addressof({property.full_name})));')
+    else
+        $module_builder = append_line($module_builder, $'builder.Variable("s_{property.identifier}", MakeVariable(std::addressof({property.full_name})));')
+    end
+end 
+    $module_builder = append_line($module_builder, 'RegisterCheck(builder);')
+-}}
+{{$module_builder}}
 }
