@@ -1,4 +1,5 @@
 #include "yr/patch/patch.h"
+#include "yr/extcore_config.h"
 #include "runtime/logger/logger.h"
 #include "runtime/platform/platform.h"
 #include "yr/debug_util.h"
@@ -305,6 +306,8 @@ void ApplySyringePatch(syringe_patch_data* data)
 
 void ApplyModulePatch(HANDLE hInstance)
 {
+    std::vector<std::string> enableHookCategory  = gYrExtConfig->rawData["enable_hook_category"];
+
     char moduleName[MAX_PATH] {};
     GetModuleFileName((HMODULE)hInstance, moduleName, sizeof(moduleName));
     gLogger->info("Applying patchs: module = {}", moduleName);
@@ -324,6 +327,14 @@ void ApplyModulePatch(HANDLE hInstance)
                 syringe_patch_data* curPatch = &data[idx];
                 if (curPatch->hookFunc == nullptr || curPatch->hookAddr == 0)
                     continue;
+                // check category
+                if (curPatch->category != nullptr) {
+                    if (std::find_if(enableHookCategory.begin(), enableHookCategory.end(), [=](std::string const& category) {
+                        return category == curPatch->category;
+                    }) == enableHookCategory.end()) {
+                        continue;
+                    }
+                }
                 ApplySyringePatch(curPatch);
                 patchCount++;
             }
@@ -367,6 +378,7 @@ void ApplyModulePatch(HANDLE hInstance)
     std::ifstream injFile(std::string(moduleName) + ".inj");
     if (injFile.is_open())
     {
+        gLogger->info("found real syringe inj file, converting to our syringe patch pattern.");
         std::string line;
         while(std::getline(injFile, line)) {
             size_t commentIdx = line.find(';');

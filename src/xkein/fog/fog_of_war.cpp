@@ -14,6 +14,8 @@
 #include <TerrainClass.h>
 #include <SmudgeTypeClass.h>
 
+#define HOOK_FOG_CATEGORY "fog"
+
 DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeDataEvent)
 {
     IniReader reader {E->pIni};
@@ -23,7 +25,7 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeDataEvent)
 	}
 }
 
-SYRINGE_PATCH(0x586683, Fog_CellClass_DiscoverTechno, 5) {
+SYRINGE_PATCH_WITH_CATEGORY(0x586683, Fog_CellClass_DiscoverTechno, 5, HOOK_FOG_CATEGORY) {
 	GET(CellClass* const, pCell, ESI);
 	GET(TechnoClass* const, pTechno, EAX);
 	GET_STACK(HouseClass* const, pHouse, 0x20);
@@ -49,7 +51,7 @@ bool IsTechnoLocalVisible(TechnoClass* pTechno)
 		|| RulesClass::Instance->AllyReveal && pTechno->Owner->IsAlliedWith(HouseClass::CurrentPlayer);
 }
 
-SYRINGE_PATCH(0x4ADFF0, Fog_MapClass_RevealShroud, 5)
+SYRINGE_PATCH_WITH_CATEGORY(0x4ADFF0, Fog_MapClass_RevealShroud, 5, HOOK_FOG_CATEGORY)
 {
 	GET_STACK(bool, bIgnoreBuilding, 0x4);
 	GET_STACK(bool, bRevealByHeight, 0x8);
@@ -71,7 +73,7 @@ SYRINGE_PATCH(0x4ADFF0, Fog_MapClass_RevealShroud, 5)
 	return 0x4AE0A5;
 }
 
-SYRINGE_PATCH(0x5F4B3E, Fog_ObjectClass_DrawIfVisible, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x5F4B3E, Fog_ObjectClass_DrawIfVisible, 6, HOOK_FOG_CATEGORY)
 {
 	GET(ObjectClass* const, pThis, ESI);
 	GET(const AbstractType, whatAmI, EAX);
@@ -112,7 +114,7 @@ SYRINGE_PATCH(0x5F4B3E, Fog_ObjectClass_DrawIfVisible, 6)
 }
 
 
-SYRINGE_PATCH(0x71CC8C, Fog_TerrainClass_DrawIfVisible, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x71CC8C, Fog_TerrainClass_DrawIfVisible, 6, HOOK_FOG_CATEGORY)
 {
 	GET(TerrainClass* const, pThis, EDI);
 	GET_STACK(RectangleStruct* const, pUnkRect, STACK_OFFSET(0x28, 0x4));
@@ -126,14 +128,14 @@ SYRINGE_PATCH(0x71CC8C, Fog_TerrainClass_DrawIfVisible, 6)
 	return 0x71CC9A;
 }
 
-SYRINGE_PATCH(0x5865E2, Fog_IsLocationFogged, 5)
+SYRINGE_PATCH_WITH_CATEGORY(0x5865E2, Fog_IsLocationFogged, 5, HOOK_FOG_CATEGORY)
 {
 	GET_STACK(CoordStruct const*, pCoords, 0x4);
 	R->AL(FogSystem::IsLocationFogged(*pCoords));
 	return 0;
 }
 
-SYRINGE_PATCH(0x577EBF, Fog_MapClass_Reveal, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x577EBF, Fog_MapClass_Reveal, 6, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pCell, EAX);
 
@@ -148,7 +150,7 @@ SYRINGE_PATCH(0x577EBF, Fog_MapClass_Reveal, 6)
 }
 
 
-SYRINGE_PATCH(0x70076E, Fog_TechnoClass_GetCursorOverCell_OverFog, 5)
+SYRINGE_PATCH_WITH_CATEGORY(0x70076E, Fog_TechnoClass_GetCursorOverCell_OverFog, 5, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pCell, EBP);
 
@@ -173,7 +175,7 @@ SYRINGE_PATCH(0x70076E, Fog_TechnoClass_GetCursorOverCell_OverFog, 5)
 	return 0x700800;
 }
 
-SYRINGE_PATCH(0x51F97C, Fog_InfantryClass_MouseOverCell_OverFog, 5)
+SYRINGE_PATCH_WITH_CATEGORY(0x51F97C, Fog_InfantryClass_MouseOverCell_OverFog, 5, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pCell, EAX);
 
@@ -196,7 +198,7 @@ SYRINGE_PATCH(0x51F97C, Fog_InfantryClass_MouseOverCell_OverFog, 5)
 	return 0x51F9F4;
 }
 
-SYRINGE_PATCH(0x6B8E7A, Fog_ScenarioClass_LoadSpecialFlags, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x6B8E7A, Fog_ScenarioClass_LoadSpecialFlags, 6, HOOK_FOG_CATEGORY)
 {
 	GET(ScenarioClass* const, pScenario, ESI);
 	bool fogOfWar = R->AL();
@@ -208,7 +210,7 @@ SYRINGE_PATCH(0x6B8E7A, Fog_ScenarioClass_LoadSpecialFlags, 6)
 	return 0x6B8E8B;
 }
 
-SYRINGE_PATCH(0x686C03, Fog_SetScenarioFlags_FogOfWar, 5) {
+SYRINGE_PATCH_WITH_CATEGORY(0x686C03, Fog_SetScenarioFlags_FogOfWar, 5, HOOK_FOG_CATEGORY) {
 	GET(ScenarioFlags, SpecialFlags, EAX);
 	SpecialFlags.CTFMode = false; // and ah, 0EFh
 	SpecialFlags.FogOfWar = RulesClass::Instance->FogOfWar || GameModeOptionsClass::Instance->FogOfWar;
@@ -217,7 +219,7 @@ SYRINGE_PATCH(0x686C03, Fog_SetScenarioFlags_FogOfWar, 5) {
 	return 0x686C0E;
 }
 
-SYRINGE_PATCH(0x4ACE3C, Fog_MapClass_TryReshroudCell_SetCopyFlag, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x4ACE3C, Fog_MapClass_TryReshroudCell_SetCopyFlag, 6, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pCell, EAX);
 	auto flags = pCell->AltFlags;
@@ -237,7 +239,7 @@ SYRINGE_PATCH(0x4ACE3C, Fog_MapClass_TryReshroudCell_SetCopyFlag, 6)
 	return 0x4ACE57;
 }
 
-SYRINGE_PATCH(0x4A9CA0, Fog_MapClass_RevealFogShroud, 7)
+SYRINGE_PATCH_WITH_CATEGORY(0x4A9CA0, Fog_MapClass_RevealFogShroud, 7, HOOK_FOG_CATEGORY)
 {
 	GET(MapClass* const, pThis, ECX);
 	GET_STACK(CellStruct* const, pCellStruct, 0x4);
@@ -250,14 +252,14 @@ SYRINGE_PATCH(0x4A9CA0, Fog_MapClass_RevealFogShroud, 7)
 }
 //#undef CellMember_NeedRegetOcclusion
 
-SYRINGE_PATCH(0x486BF0, Fog_CellClass_CleanFog, 9)
+SYRINGE_PATCH_WITH_CATEGORY(0x486BF0, Fog_CellClass_CleanFog, 9, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pThis, ECX);
 	FogSystem::CleanFog(pThis);
 	return 0x486C4C;
 }
 
-// SYRINGE_PATCH(0x4ACC50, Fog_MapClass_TryFogCell, 5)
+// SYRINGE_PATCH_WITH_CATEGORY(0x4ACC50, Fog_MapClass_TryFogCell, 5, HOOK_FOG_CATEGORY)
 // {
 // 	GET_STACK(CellStruct* const, pCellStruct, 0x4);
 
@@ -269,21 +271,21 @@ SYRINGE_PATCH(0x486BF0, Fog_CellClass_CleanFog, 9)
 // 	return 0x4ACD8E;
 // }
 
-SYRINGE_PATCH(0x486A70, Fog_CellClass_FogCell, 5)
+SYRINGE_PATCH_WITH_CATEGORY(0x486A70, Fog_CellClass_FogCell, 5, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pThis, ECX);
 	FogSystem::FogCell(pThis);
 	return 0x486BE6;
 }
 
-SYRINGE_PATCH(0x486C50, Fog_CellClass_ClearFoggedObjects, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x486C50, Fog_CellClass_ClearFoggedObjects, 6, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pThis, ECX);
 	FogSystem::ClearFoggedObjects(pThis);
 	return 0x486D8A;
 }
 
-SYRINGE_PATCH(0x4FC1FF, Fog_HouseClass_AcceptDefeat_CleanShroudFog, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x4FC1FF, Fog_HouseClass_AcceptDefeat_CleanShroudFog, 6, HOOK_FOG_CATEGORY)
 {
 	GET(HouseClass* const, pHouse, ESI);
 	// instead of MapClass::Instance->sub_577F30(pHouse);
@@ -292,13 +294,13 @@ SYRINGE_PATCH(0x4FC1FF, Fog_HouseClass_AcceptDefeat_CleanShroudFog, 6)
 	return 0x4FC214;
 }
 
-SYRINGE_PATCH(0x6F5190, Fog_TechnoClass_DrawExtras_CheckFog, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x6F5190, Fog_TechnoClass_DrawExtras_CheckFog, 6, HOOK_FOG_CATEGORY)
 {
 	GET(TechnoClass* const, pThis, ECX);
 	return FogSystem::IsLocationFogged(pThis->GetCoords()) ? 0x6F5EEC : 0;
 }
 
-SYRINGE_PATCH(0x6D3470, Fog_TacticalClass_DrawFoggedObject, 8)
+SYRINGE_PATCH_WITH_CATEGORY(0x6D3470, Fog_TacticalClass_DrawFoggedObject, 8, HOOK_FOG_CATEGORY)
 {
 	GET_STACK(RectangleStruct* const, pRedrawRect, STACK_OFFSET(0, 0x4));
 	GET_STACK(RectangleStruct* const, pRedrawRect2, STACK_OFFSET(0, 0x8));
@@ -309,7 +311,7 @@ SYRINGE_PATCH(0x6D3470, Fog_TacticalClass_DrawFoggedObject, 8)
 	return 0x6D3650;
 }
 
-SYRINGE_PATCH(0x440B8D, Fog_BuildingClass_Put_CheckFog, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x440B8D, Fog_BuildingClass_Put_CheckFog, 6, HOOK_FOG_CATEGORY)
 {
 	GET(BuildingClass* const, pBuilding, ESI);
 
@@ -320,7 +322,7 @@ SYRINGE_PATCH(0x440B8D, Fog_BuildingClass_Put_CheckFog, 6)
 	return 0x440C08;
 }
 
-SYRINGE_PATCH(0x48049E, Fog_CellClass_DrawTileAndSmudge_CheckFog, 6)
+SYRINGE_PATCH_WITH_CATEGORY(0x48049E, Fog_CellClass_DrawTileAndSmudge_CheckFog, 6, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pCell, ESI);
 
@@ -331,7 +333,7 @@ SYRINGE_PATCH(0x48049E, Fog_CellClass_DrawTileAndSmudge_CheckFog, 6)
 	return 0x4804FB;
 }
 
-SYRINGE_PATCH(0x6D6EDA, Fog_TacticalClass_Overlay_CheckFog1, 0xA)
+SYRINGE_PATCH_WITH_CATEGORY(0x6D6EDA, Fog_TacticalClass_Overlay_CheckFog1, 0xA, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pCell, EAX);
 
@@ -342,7 +344,7 @@ SYRINGE_PATCH(0x6D6EDA, Fog_TacticalClass_Overlay_CheckFog1, 0xA)
 	return 0x6D7006;
 }
 
-SYRINGE_PATCH(0x6D70BC, Fog_TacticalClass_Overlay_CheckFog2, 0xA)
+SYRINGE_PATCH_WITH_CATEGORY(0x6D70BC, Fog_TacticalClass_Overlay_CheckFog2, 0xA, HOOK_FOG_CATEGORY)
 {
 	GET(CellClass* const, pCell, EAX);
 
@@ -353,7 +355,7 @@ SYRINGE_PATCH(0x6D70BC, Fog_TacticalClass_Overlay_CheckFog2, 0xA)
 	return 0x6D71A4;
 }
 
-// SYRINGE_PATCH(0x6F8E1F, Fog_TechnoClass_SelectAutoTarget_CheckFog, 6)
+// SYRINGE_PATCH_WITH_CATEGORY(0x6F8E1F, Fog_TechnoClass_SelectAutoTarget_CheckFog, 6, HOOK_FOG_CATEGORY)
 // {
 // 	GET(TechnoTypeClass* const, pType, EAX);
 // 	//GET(TechnoClass* const, pType, ESI);

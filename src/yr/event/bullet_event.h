@@ -97,3 +97,13 @@ public:
     PROPERTY()
     CoordStruct const* pCoords;
 };
+
+CLASS(HookEvent, BindJs)
+class YrBulletSetTargetEvent : public YrHookOverrideReturn<void>
+{
+public:
+    PROPERTY()
+    BulletClass* pBullet;
+    PROPERTY()
+    AbstractClass* pTarget;
+};

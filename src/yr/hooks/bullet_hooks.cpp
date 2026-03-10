@@ -60,6 +60,12 @@ BROADCAST_HOOK_EVENT(0x4690B0, 0x6, YrBulletDetonateEvent)
     E->pBullet = R->ECX<BulletClass*>();
     E->pCoords = R->Stack<CoordStruct const*>(0x4);
 }
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrBulletSetTargetEvent, 0x46B5A0, 0x46B5AA)
+BROADCAST_HOOK_EVENT(0x46B5A0, 0xA, YrBulletSetTargetEvent)
+{
+    E->pBullet = R->ECX<BulletClass*>();
+    E->pTarget = R->Stack<AbstractClass*>(0x4);
+}
 
 BROADCAST_HOOK_EVENT(0x46BDD9, 0x5, YrBulletTypeCtorEvent)
 {

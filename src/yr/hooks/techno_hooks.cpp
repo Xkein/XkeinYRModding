@@ -209,3 +209,37 @@ BROADCAST_HOOK_EVENT(0x740FD0, 0x5, YrTechnoGetFireErrorEvent)
     E->ignoreRange = R->Stack<bool>(0xC);
 }
 // END hooks for TechnoClass::GetFireError ===================================
+
+// BEGIN hooks for TechnoClass::SetTarget ===================================
+// TechnoClass::SetTarget
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoSetTargetEvent, 0x6FCDB0, 0x6FCF92)
+BROADCAST_HOOK_EVENT(0x6FCDB0, 0x5, YrTechnoSetTargetEvent)
+{
+    E->pTechno      = R->ECX<TechnoClass*>();
+    E->pTarget      = R->Stack<AbstractClass*>(0x4);
+}
+IMPL_HOOK_BROADCAST(YrTechnoSetTargetEvent, 0x6FCDB0)
+{
+    switch (E->pTechno->WhatAmI())
+    {
+        case AbstractType::Building:
+        case AbstractType::Infantry:
+            return 0;
+    }
+    return Broadcast_Impl_Default<YrTechnoSetTargetEvent, 0x6FCDB0>(hookEvent, R, E);
+}
+// BuildingClass::SetTarget
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoSetTargetEvent, 0x443B90, 0x443C5C)
+BROADCAST_HOOK_EVENT(0x443B90, 0xB, YrTechnoSetTargetEvent)
+{
+    E->pTechno      = R->ECX<TechnoClass*>();
+    E->pTarget      = R->Stack<AbstractClass*>(0x4);
+}
+// InfantryClass::SetTarget
+IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrTechnoSetTargetEvent, 0x51B1F0, 0x51B348)
+BROADCAST_HOOK_EVENT(0x51B1F0, 0x5, YrTechnoSetTargetEvent)
+{
+    E->pTechno      = R->ECX<TechnoClass*>();
+    E->pTarget      = R->Stack<AbstractClass*>(0x4);
+}
+// END hooks for TechnoClass::SetTarget ===================================

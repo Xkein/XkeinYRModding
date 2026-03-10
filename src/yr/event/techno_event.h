@@ -100,3 +100,13 @@ public:
     PROPERTY()
     bool ignoreRange;
 };
+
+CLASS(HookEvent, BindJs)
+class YrTechnoSetTargetEvent : public YrHookOverrideReturn<void>
+{
+public:
+    PROPERTY()
+    TechnoClass* pTechno;
+    PROPERTY()
+    AbstractClass* pTarget;
+};

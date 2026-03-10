@@ -2,6 +2,9 @@
     "extensions": [
         "XkeinExt"
     ],
+    "enable_hook_category": [
+        
+    ],
     "assets_dir": "assets",
     "plugins_dir": "plugins",
     "log_level": 2,
@@ -24,5 +27,9 @@
         "js_terminal": "KeyF9",
         "imgui_demo": "KeyF10",
         "object_inspector": "KeyF11"
-    }
+    },
+
+    "node_editor_version": "0",
+
+    "end_place_holder": 0
 }

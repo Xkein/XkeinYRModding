@@ -166,6 +166,12 @@ class YrBulletDetonateEvent
     m_pBullet : BulletClass;
     m_pCoords : Vector3D;
 }
+class YrBulletSetTargetEvent
+    extends YrHookOverrideReturn_void_
+{
+    m_pBullet : BulletClass;
+    m_pTarget : AbstractClass;
+}
 class YrBulletTypeCtorEvent
 {
     m_pBulletType : BulletTypeClass;
@@ -619,6 +625,12 @@ class YrTechnoGetFireErrorEvent
 class YrHookOverrideReturn_FireError_
 {
     OverrideReturn(val_0 : FireError) : void;
+}
+class YrTechnoSetTargetEvent
+    extends YrHookOverrideReturn_void_
+{
+    m_pTechno : TechnoClass;
+    m_pTarget : AbstractClass;
 }
 class YrTechnoTypeCtorEvent
 {
