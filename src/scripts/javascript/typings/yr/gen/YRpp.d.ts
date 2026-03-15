@@ -1,5 +1,6 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YRpp" {
+import { $Ref } from "puerts";
 class BytePalette
 {
     // skip operator[]

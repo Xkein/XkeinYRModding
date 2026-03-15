@@ -1,5 +1,6 @@
 #pragma once
 #ifndef __HEADER_TOOL__
+#include "core/tool/ref_wrapper.h"
 #include <ScriptBackend.hpp>
 #include <DataTransfer.h>
 #include <PuertsNamespaceDef.h>
@@ -236,35 +237,34 @@ struct JsFinalizeBuilder<T, typename std::enable_if_t<std::is_convertible_v<T*, 
 };                                                                                                   \
 }
 
-template<typename T>
-struct ReferenceJsWrapper {
-    T value;
-};
-
 namespace PUERTS_NAMESPACE
 {
 
     namespace v8_impl
     {
-        // template<typename T>
-        // struct Converter<ReferenceJsWrapper<T>>
-        // {
-        //     static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, ReferenceJsWrapper<T> const& value)
-        //     {
-        //         return DataTransfer::FindOrAddCData(                                     
-        //             context->GetIsolate(), context, DynamicTypeId<ReferenceJsWrapper<T>>::get(&value), new ReferenceJsWrapper<T>(value), false);
-        //     }
+        template<typename T>
+        struct Converter<ref_wrapper<T>>
+        {
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, ref_wrapper<T> const& value)
+            {
+                auto Inner = Converter<T>::toScript(context, value.get());
+                auto Result = v8::Object::New(context->GetIsolate());
+                auto ReturnVal = Result->Set(context, 0, Inner);
+                return Result;
+            }
 
-        //     static ReferenceJsWrapper<T> toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
-        //     {
-        //         return *DataTransfer::GetPointerFast<ReferenceJsWrapper<T>>(value.As<v8::Object>());
-        //     }
+            static T toCpp(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                auto unrefValue = DataTransfer::UnRef(context->GetIsolate(), value);
+                return Converter<T>::toCpp(context, unrefValue);
+            }
 
-        //     static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
-        //     {
-        //         return DataTransfer::IsInstanceOf(context->GetIsolate(), StaticTypeId<ReferenceJsWrapper<T>>::get(), value);
-        //     }
-        // };
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                // is it correct? maybe check more detail later
+                return value.As<v8::Object>()->IsObject();
+            }
+        };
 
         template<typename T>
         struct Converter<std::optional<T>>
@@ -348,6 +348,15 @@ namespace PUERTS_NAMESPACE
         };
     } // namespace v8_impl
     
+    template<typename T>
+    struct ScriptTypeName<ref_wrapper<T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("ref_wrapper<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
     template<typename T>
     struct ScriptTypeName<std::optional<T>>
     {

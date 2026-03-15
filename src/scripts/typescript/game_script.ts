@@ -57,7 +57,7 @@ export interface IScriptable {
 class GameScriptable {
     insts: Set<any>;
     name: string;
-    script: any;
+    scriptable: any;
     constructor(name: string) {
         this.insts = new Set();
         this.name = name;
@@ -67,8 +67,8 @@ class GameScriptable {
             if (typeof scriptModule.script !== 'function') {
                 throw new Error("export script must be class! script name = " + name);
             }
-            this.script = new scriptModule.script();
-            this.script.scriptable = this;
+            this.scriptable = new scriptModule.script();
+            this.scriptable._gameScriptable_ = this;
         }
     }
 
@@ -82,11 +82,20 @@ class GameScriptable {
 }
 
 export function IsInstanceOfScriptable(scriptable: IScriptable, instance: any): boolean {
-    let gameScriptable: GameScriptable = (scriptable as any).scriptable;
+    let gameScriptable: GameScriptable = (scriptable as any)._gameScriptable_;
     if (gameScriptable) {
         return gameScriptable.insts.has(instance);
     }
     return false;
+}
+
+const emptySet = new Set();
+export function GetScriptableInstances(scriptable: IScriptable): ReadonlySet<any> {
+    let gameScriptable: GameScriptable = (scriptable as any)._gameScriptable_;
+    if (gameScriptable) {
+        return gameScriptable.insts;
+    }
+    return emptySet;
 }
 
 const emptyComponents = new Map();
@@ -211,7 +220,7 @@ gameEvents.registerHookEventHandler(YrRulesLoadAfterTypeDataEvent, (E) => {
     AbstractType.BulletType, AbstractType.SuperWeaponType, AbstractType.HouseType], {
         afterLoad(iniReader, yrObjectType, iniComponent: ScriptableConfig) {
             for (const scriptable of iniComponent.scriptables.values()) {
-                scriptable.script?.onLoadType?.(yrObjectType, iniReader);
+                scriptable.scriptable?.onLoadType?.(yrObjectType, iniReader);
             }
         },
     }
@@ -233,7 +242,7 @@ function get_scriptables(yrObject: IScriptableInstance) {
 let scriptable_add = (yrObject: IScriptableInstance) => {
     let scriptables = get_scriptables(yrObject);
     for (const scriptable of scriptables) {
-        scriptable.script?.onAddInst?.(yrObject);
+        scriptable.scriptable?.onAddInst?.(yrObject);
     
         scriptable.addInst(yrObject);
     }
@@ -242,7 +251,7 @@ let scriptable_add = (yrObject: IScriptableInstance) => {
 let scriptable_remove = (yrObject: IScriptableInstance) => {
     let scriptables = get_scriptables(yrObject);
     for (const scriptable of scriptables) {
-        scriptable.script?.onRemoveInst?.(yrObject);
+        scriptable.scriptable?.onRemoveInst?.(yrObject);
     
         scriptable.removeInst(yrObject);
     }
@@ -272,7 +281,7 @@ let scriptable_save = function (yrObject: AbstractClass) {
     JsSerialization.SaveNext(scriptables.length);
     for (const scriptable of scriptables) {
         JsSerialization.SaveNext(scriptable.name);
-        scriptable.script?.onSaveInst?.(yrObject);
+        scriptable.scriptable?.onSaveInst?.(yrObject);
     }
     
     // serialize components
@@ -293,7 +302,7 @@ let scriptable_load = function (yrObject: AbstractClass) {
         let scriptName = JsSerialization.LoadNext();
         let scriptable = gameScripts.getOrCreate(scriptName);
         scriptable.addInst(yrObject);
-        scriptable.script?.onLoadInst?.(yrObject);
+        scriptable.scriptable?.onLoadInst?.(yrObject);
     }
 
     // serialize components
@@ -332,7 +341,7 @@ gameEvents.registerHookEventHandler(YrSaveGameBeginStreamEvent, (E) => {
 gameEvents.registerHookEventHandler(YrSaveGameEndStreamEvent, (E) => {
     for (const scriptable of gameScripts.scriptables.values()) {
         JsSerialization.SaveNext(scriptable.name);
-        scriptable.script?.onSave?.();
+        scriptable.scriptable?.onSave?.();
     }
 });
 
@@ -349,6 +358,6 @@ gameEvents.registerHookEventHandler(YrLoadGameEndStreamEvent, (E) => {
     for (let index = 0; index < loadingScriptableCount; index++) {
         let scriptName = JsSerialization.LoadNext();
         let scriptable = gameScripts.getOrCreate(scriptName);
-        scriptable.script?.onLoad?.();
+        scriptable.scriptable?.onLoad?.();
     }
 });

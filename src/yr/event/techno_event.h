@@ -110,3 +110,13 @@ public:
     PROPERTY()
     AbstractClass* pTarget;
 };
+
+CLASS(HookEvent, BindJs)
+class YrTechnoDestroyedEvent
+{
+public:
+    PROPERTY()
+    TechnoClass* pTechno;
+    PROPERTY()
+    ObjectClass* killer;
+};

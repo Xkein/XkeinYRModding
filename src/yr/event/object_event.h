@@ -3,6 +3,7 @@
 #include "yr/yr_event.h"
 #include <GeneralDefinitions.h>
 #include <optional>
+#include "core/tool/ref_wrapper.h"
 
 class ObjectClass;
 class WarheadTypeClass;
@@ -15,7 +16,7 @@ public:
     PROPERTY()
     ObjectClass*      pObject;
     PROPERTY()
-    int*              pDamage;
+    ref_wrapper<int>  pDamage;
     PROPERTY()
     int               DistanceFromEpicenter;
     PROPERTY()

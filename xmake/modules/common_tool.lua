@@ -44,6 +44,7 @@ function get_default_templates()
             ["ts_module_index.scriban"] = root_dir.."/src/scripts/javascript/typings/yr/gen/{0}.d.ts",
             ["js_module_setup.scriban"] = root_dir.."/src/scripts/javascript/gen/{0}.js",
             ["js_module_cpp.scriban"] =  codegen_dir.."/XkeinExt/codegen/{1}/{0}.js_module.cpp",
+            ["graph_nodes.scriban"] =  root_dir.."/tools/XkeinYRNodeEditor/src/editor/nodes_{0}.gen.ts",
         },
         inject_meta = {
             ["inject_meta.scriban"] = "inject_meta.log",

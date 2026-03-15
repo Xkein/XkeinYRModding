@@ -127,6 +127,7 @@ exports.YrTechnoSelectWeaponEvent = puerts.loadCPPType("YrTechnoSelectWeaponEven
 exports.YrTechnoGetFireErrorEvent = puerts.loadCPPType("YrTechnoGetFireErrorEvent")
 exports.YrHookOverrideReturn_FireError_ = puerts.loadCPPType("YrHookOverrideReturn<FireError>")
 exports.YrTechnoSetTargetEvent = puerts.loadCPPType("YrTechnoSetTargetEvent")
+exports.YrTechnoDestroyedEvent = puerts.loadCPPType("YrTechnoDestroyedEvent")
 exports.YrTechnoTypeCtorEvent = puerts.loadCPPType("YrTechnoTypeCtorEvent")
 exports.YrTechnoTypeDtorEvent = puerts.loadCPPType("YrTechnoTypeDtorEvent")
 exports.YrTechnoTypeLoadIniEvent = puerts.loadCPPType("YrTechnoTypeLoadIniEvent")

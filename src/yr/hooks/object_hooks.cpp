@@ -8,7 +8,7 @@ IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x5F5390, 0x5F5465
 BROADCAST_HOOK_EVENT(0x5F5390, 0x5, YrObjectReceiveDamageEvent)
 {
     E->pObject                = R->ECX<ObjectClass*>();
-    E->pDamage                = R->Stack<int*>(0x4);
+    E->pDamage.set(R->Stack<int*>(0x4));
     E->DistanceFromEpicenter  = R->Stack<int>(0x8);
     E->pWH                    = R->Stack<WarheadTypeClass*>(0xC);
     E->Attacker               = R->Stack<ObjectClass*>(0x10);
@@ -35,7 +35,7 @@ IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x4165C0, 0x416609
 BROADCAST_HOOK_EVENT(0x4165C0, 0x7, YrObjectReceiveDamageEvent)
 {
     E->pObject                = R->ECX<ObjectClass*>();
-    E->pDamage                = R->Stack<int*>(0x4);
+    E->pDamage.set(R->Stack<int*>(0x4));
     E->DistanceFromEpicenter  = R->Stack<int>(0x8);
     E->pWH                    = R->Stack<WarheadTypeClass*>(0xC);
     E->Attacker               = R->Stack<ObjectClass*>(0x10);
@@ -48,7 +48,7 @@ IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x442230, 0x4423A0
 BROADCAST_HOOK_EVENT(0x442230, 0x6, YrObjectReceiveDamageEvent)
 {
     E->pObject                = R->ECX<ObjectClass*>();
-    E->pDamage                = R->Stack<int*>(0x4);
+    E->pDamage.set(R->Stack<int*>(0x4));
     E->DistanceFromEpicenter  = R->Stack<int>(0x8);
     E->pWH                    = R->Stack<WarheadTypeClass*>(0xC);
     E->Attacker               = R->Stack<ObjectClass*>(0x10);
@@ -61,7 +61,7 @@ IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x517FA0, 0x518058
 BROADCAST_HOOK_EVENT(0x517FA0, 0x6, YrObjectReceiveDamageEvent)
 {
     E->pObject                = R->ECX<ObjectClass*>();
-    E->pDamage                = R->Stack<int*>(0x4);
+    E->pDamage.set(R->Stack<int*>(0x4));
     E->DistanceFromEpicenter  = R->Stack<int>(0x8);
     E->pWH                    = R->Stack<WarheadTypeClass*>(0xC);
     E->Attacker               = R->Stack<ObjectClass*>(0x10);
@@ -74,7 +74,7 @@ IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x737C90, 0x737D2E
 BROADCAST_HOOK_EVENT(0x737C90, 0x5, YrObjectReceiveDamageEvent)
 {
     E->pObject                = R->ECX<ObjectClass*>();
-    E->pDamage                = R->Stack<int*>(0x4);
+    E->pDamage.set(R->Stack<int*>(0x4));
     E->DistanceFromEpicenter  = R->Stack<int>(0x8);
     E->pWH                    = R->Stack<WarheadTypeClass*>(0xC);
     E->Attacker               = R->Stack<ObjectClass*>(0x10);
@@ -87,7 +87,7 @@ IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x71B920, 0x71B940
 BROADCAST_HOOK_EVENT(0x71B920, 0x7, YrObjectReceiveDamageEvent)
 {
     E->pObject                = R->ECX<ObjectClass*>();
-    E->pDamage                = R->Stack<int*>(0x4);
+    E->pDamage.set(R->Stack<int*>(0x4));
     E->DistanceFromEpicenter  = R->Stack<int>(0x8);
     E->pWH                    = R->Stack<WarheadTypeClass*>(0xC);
     E->Attacker               = R->Stack<ObjectClass*>(0x10);
@@ -100,7 +100,7 @@ IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(YrObjectReceiveDamageEvent, 0x74D5D0, 0x74D63D
 BROADCAST_HOOK_EVENT(0x74D5D0, 0x8, YrObjectReceiveDamageEvent)
 {
     E->pObject                = R->ECX<ObjectClass*>();
-    E->pDamage                = R->Stack<int*>(0x4);
+    E->pDamage.set(R->Stack<int*>(0x4));
     E->DistanceFromEpicenter  = R->Stack<int>(0x8);
     E->pWH                    = R->Stack<WarheadTypeClass*>(0xC);
     E->Attacker               = R->Stack<ObjectClass*>(0x10);

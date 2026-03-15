@@ -243,3 +243,18 @@ BROADCAST_HOOK_EVENT(0x51B1F0, 0x5, YrTechnoSetTargetEvent)
     E->pTarget      = R->Stack<AbstractClass*>(0x4);
 }
 // END hooks for TechnoClass::SetTarget ===================================
+
+// BEGIN hooks for TechnoClass::SetTarget ===================================
+// BuildingClass::Destroyed
+BROADCAST_HOOK_EVENT(0x44D760, 0x7, YrTechnoDestroyedEvent)
+{
+    E->pTechno = R->ECX<TechnoClass*>();
+    E->killer  = R->Stack<ObjectClass*>(0x4);
+}
+// FootClass::Destroyed
+BROADCAST_HOOK_EVENT(0x4D98C0, 0xA, YrTechnoDestroyedEvent)
+{
+    E->pTechno = R->ECX<TechnoClass*>();
+    E->killer  = R->Stack<ObjectClass*>(0x4);
+}
+// END hooks for TechnoClass::Destroyed ===================================
