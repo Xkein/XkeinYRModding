@@ -886,6 +886,10 @@ class Serialization
     static SaveKey(key_0 : string, val_1 : string) : void;
     static RegisterStepHandler(step_0 : ESerializationStep, handler_1 : any) : void;
 }
+class YrHelper
+{
+    static GetPassengersOwner(passengers_0 : PassengersClass) : TechnoClass;
+}
 
 class YrExtCore {
 }

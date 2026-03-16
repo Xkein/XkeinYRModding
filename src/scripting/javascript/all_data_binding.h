@@ -37,7 +37,8 @@ UsingCppType(IniReader);
 UsingReferenceConverter(IniReader);
 #include "yr/component/ini_component.h"
 UsingCppType(IniComponentLoader);
-
+#include "yr/tool/yr_helper.h"
+UsingCppType(YrHelper);
 #include "yr/serialization/serialization.h"
 UsingCppType(Serialization);
 
