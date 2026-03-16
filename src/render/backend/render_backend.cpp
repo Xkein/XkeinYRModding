@@ -21,7 +21,6 @@
 #include <VoxelAnimClass.h>
 #include <WaveClass.h>
 
-#include <msgpack.hpp>
 #include <vector>
 #include <zmq.hpp>
 
@@ -45,8 +44,6 @@ struct RenderSyncTransformPack
     float roty;
     float rotz;
     float rotw;
-    
-    MSGPACK_DEFINE(id, posx, posy, posz, rotx, roty, rotz, rotw);
 };
 
 struct RenderSyncFramePack
@@ -54,8 +51,6 @@ struct RenderSyncFramePack
     std::vector<int>                     newObjects;
     std::vector<int>                     removedObjects;
     std::vector<RenderSyncTransformPack> transforms;
-    
-    MSGPACK_DEFINE(newObjects, removedObjects, transforms);
 
     bool IsEmpty() const
     {
