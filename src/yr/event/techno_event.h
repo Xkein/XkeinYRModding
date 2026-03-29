@@ -120,3 +120,24 @@ public:
     PROPERTY()
     ObjectClass* killer;
 };
+
+CLASS(HookEvent, BindJs)
+class YrTechnoAddPassengerEvent
+{
+public:
+    PROPERTY()
+    TechnoClass* pTechno;
+    PROPERTY()
+    FootClass* passenger;
+};
+
+CLASS(HookEvent, BindJs)
+class YrTechnoRemovePassengerEvent
+{
+public:
+    PROPERTY()
+    TechnoClass* pTechno;
+    PROPERTY()
+    FootClass* passenger;
+};
+

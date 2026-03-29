@@ -32,6 +32,11 @@ UsingCppType(gainput::MappedInputListener);
 UsingCppType(gainput::DeviceButtonSpec);
 MuteFunctionPtr(std::remove_pointer_t<gainput::FilterFunc_T>);
 
+#include "xkein/tool/tools.h"
+UsingCppType(XkeinTools);
+UsingCppType(QueryVolume);
+UsingCppType(QuerySphere);
+
 #include "yr/parse/ini_reader.h"
 UsingCppType(IniReader);
 UsingReferenceConverter(IniReader);
@@ -41,6 +46,10 @@ UsingCppType(IniComponentLoader);
 UsingCppType(YrHelper);
 #include "yr/serialization/serialization.h"
 UsingCppType(Serialization);
+#include "yr/network/net_pack.h"
+UsingCppType(EventPack<byte[EventPackMaxDataSize]>);
+UsingCppType(VariantEventPack);
+UsingCppType(NetPackDispatch);
 
 #include "yr/event/input_event.h"
 UsingCppType(YrInputBlocker);
@@ -176,6 +185,8 @@ UsingCppType(YrTechnoSelectWeaponEvent);
 UsingCppType(YrTechnoGetFireErrorEvent);
 UsingCppType(YrTechnoSetTargetEvent);
 UsingCppType(YrTechnoDestroyedEvent);
+UsingCppType(YrTechnoAddPassengerEvent);
+UsingCppType(YrTechnoRemovePassengerEvent);
 UsingCppType(YrTechnoTypeCtorEvent);
 UsingCppType(YrTechnoTypeDtorEvent);
 UsingCppType(YrTechnoTypeLoadIniEvent);

@@ -52,6 +52,8 @@ function get_default_templates()
         depends = {
             ["include/common.scriban"] = "not use to generate!",
             ["include/meta.scriban"] = "not use to generate!",
+            ["include/yrpp.scriban"] = "not use to generate!",
+            ["include/js_ts.scriban"] = "not use to generate!",
         }
     }
 end

@@ -1,7 +1,7 @@
 /// <reference path = "../index.d.ts"/>
 declare module "XkeinExt" {
 import { $Ref } from "puerts";
-import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType, FootClass, PassengersClass } from "YRpp";
 import { AKRESULT } from "Wwise";
 class WwiseSoundBankRef
 {
@@ -116,6 +116,27 @@ class Input
     static s_gJoystickId : number;
     static s_gTouchId : number;
 }
+class QueryVolume
+{
+    m_type : QueryType;
+    m_flags : QueryFlags;
+}
+class QuerySphere
+    extends QueryVolume
+{
+    m_location : Vector3D;
+    m_radius : number;
+}
+class XkeinTools
+{
+    static FindFirstTarget(query_0 : QueryVolume) : ObjectClass;
+    static ForeachTarget(query_0 : QueryVolume, func_1 : any) : void;
+    static IsQueryTarget(query_0 : QueryVolume, target_1 : ObjectClass) : boolean;
+    static FireWeaponToTarget(weapon_0 : WeaponTypeClass, owner_1 : TechnoClass, target_2 : AbstractClass) : BulletClass;
+    static FireWeaponToPosition(weapon_0 : WeaponTypeClass, owner_1 : TechnoClass, targetPos_2 : Vector3D) : BulletClass;
+    static LaunchWeaponToTarget(weapon_0 : WeaponTypeClass, owner_1 : TechnoClass, launchPos_2 : Vector3D, target_3 : AbstractClass) : BulletClass;
+    static LaunchWeaponToPosition(weapon_0 : WeaponTypeClass, owner_1 : TechnoClass, launchPos_2 : Vector3D, targetPos_3 : Vector3D) : BulletClass;
+}
 
 class XkeinExt {
 }
@@ -125,5 +146,20 @@ enum EPhysicShapeType {
     Box = 2,
     Capsule = 3,
     Cylinder = 4,
+}
+enum QueryFlags {
+    Infantry = 2,
+    Unit = 4,
+    Building = 8,
+    Aircraft = 16,
+    Terrain = 32,
+    Bullet = 64,
+    Techno = 30,
+    Object = 126,
+    NonTechnoObject = 96,
+    All = 126,
+}
+enum QueryType {
+    Sphere = 0,
 }
 }

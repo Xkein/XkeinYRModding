@@ -1,7 +1,7 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YrExtCore" {
 import { $Ref } from "puerts";
-import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType } from "YRpp";
+import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType, FootClass, PassengersClass } from "YRpp";
 import { AKRESULT } from "Wwise";
 class IniReader
 {
@@ -638,6 +638,16 @@ class YrTechnoDestroyedEvent
     m_pTechno : TechnoClass;
     m_killer : ObjectClass;
 }
+class YrTechnoAddPassengerEvent
+{
+    m_pTechno : TechnoClass;
+    m_passenger : FootClass;
+}
+class YrTechnoRemovePassengerEvent
+{
+    m_pTechno : TechnoClass;
+    m_passenger : FootClass;
+}
 class YrTechnoTypeCtorEvent
 {
     m_pTechnoType : TechnoTypeClass;
@@ -875,6 +885,27 @@ class YrAfterCreateWindoweEvent
 }
 class YrAfterSetCooperativeLevelEvent
 {
+}
+class VariantEventPack
+    extends EventPack_unsignedchar_99__
+{
+    constructor(customType_0 : CustomEventType);
+    SetData(data_0 : void, size_1 : number) : boolean;
+    GetData() : void;
+}
+class EventPack_unsignedchar_99__
+{
+    m_Type : EventTypeExt;
+    m_IsExecuted : boolean;
+    m_HouseIndex : number;
+    m_Frame : number;
+    m_CustomType : CustomEventType;
+    m_Size : number;
+}
+class NetPackDispatch
+{
+    static RegisterVariantEvent(type_0 : CustomEventType, eventName_1 : string, execute_2 : any) : void;
+    static AddVariantEvent(eventPack_0 : VariantEventPack) : void;
 }
 class Serialization
 {

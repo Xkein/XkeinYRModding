@@ -1,5 +1,6 @@
 #pragma once
 #include "runtime/platform/platform.h"
+#include "core/reflection/reflection.h"
 #include <cstddef>
 #include <type_traits>
 
@@ -42,13 +43,23 @@ public:
 	static bool IsValidType(EventTypeExt type);
 };
 
+static constexpr int EventPackMaxDataSize = sizeof(EventPackRaw) - offsetof(EventPackRaw, Custom.Data);
+
+
+CLASS(BindJs)
 template<typename T>
 struct EventPack {
+	PROPERTY()
 	EventTypeExt Type {EventTypeExt::CustomEvent};
+	PROPERTY()
 	bool IsExecuted; // always set to 0 in Extract_Compressed_Events
+	PROPERTY()
 	char HouseIndex; // value from FRAMEINFO pack in Extract_Compressed_Events
+	PROPERTY()
 	uint32 Frame; // as above 
-    CustomEventType CustomType;
+	PROPERTY()
+    CustomEventType CustomType {0};
+	PROPERTY()
     uint8 Size {sizeof(T)};
     T Data;
 

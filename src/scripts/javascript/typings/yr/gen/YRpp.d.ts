@@ -1470,7 +1470,7 @@ class CCINIClass
     static s_INI_UIMD : CCINIClass;
     static s_INI_RA2MD : CCINIClass;
     m_Digested : boolean;
-    m_Digest : number;
+    m_Digest : ArrayBuffer;
 }
 class INIClass
 {

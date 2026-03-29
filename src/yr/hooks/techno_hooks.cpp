@@ -1,6 +1,7 @@
 #include "yr/event/techno_event.h"
 #include "yr/event/techno_type_event.h"
 #include "yr/yr_hook.h"
+#include "yr/tool/yr_helper.h"
 
 #include <FootClass.h>
 #include <TechnoClass.h>
@@ -258,3 +259,17 @@ BROADCAST_HOOK_EVENT(0x4D98C0, 0xA, YrTechnoDestroyedEvent)
     E->killer  = R->Stack<ObjectClass*>(0x4);
 }
 // END hooks for TechnoClass::Destroyed ===================================
+
+BROADCAST_HOOK_EVENT(0x4733A0, 0x5, YrTechnoAddPassengerEvent)
+{
+    PassengersClass* passengers = R->ECX<PassengersClass*>();
+    E->pTechno   = YrHelper::GetPassengersOwner(passengers);
+    E->passenger = R->Stack<FootClass*>(0x4);
+}
+
+BROADCAST_HOOK_EVENT(0x473438, 0x6, YrTechnoRemovePassengerEvent)
+{
+    PassengersClass* passengers = R->ECX<PassengersClass*>();
+    E->pTechno   = YrHelper::GetPassengersOwner(passengers);
+    E->passenger = R->EAX<FootClass*>();
+}
