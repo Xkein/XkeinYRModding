@@ -1,7 +1,7 @@
 /// <reference path = "../index.d.ts"/>
 declare module "YrExtCore" {
 import { $Ref } from "puerts";
-import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType, FootClass, PassengersClass } from "YRpp";
+import { CDTimerClass, AbstractClass, AbstractTypeClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType, FootClass, PassengersClass } from "YRpp";
 import { AKRESULT } from "Wwise";
 class IniReader
 {
@@ -15,7 +15,7 @@ class IniReader
 }
 class IniComponentLoader
 {
-    static RegisterAbstractTypeLoadingFunc(targetType_0 : AbstractType, loadingFunc_1 : any) : void;
+    static RegisterAbstractTypeLoadingFunc(targetType_0 : AbstractType, loadingFunc_1 : (_0 : IniReader, _1 : AbstractTypeClass) => void) : void;
 }
 class YrHookOverrideReturn_void_
 {
@@ -904,7 +904,7 @@ class EventPack_unsignedchar_99__
 }
 class NetPackDispatch
 {
-    static RegisterVariantEvent(type_0 : CustomEventType, eventName_1 : string, execute_2 : any) : void;
+    static RegisterVariantEvent(type_0 : CustomEventType, eventName_1 : string, execute_2 : (_0 : VariantEventPack) => void) : void;
     static AddVariantEvent(eventPack_0 : VariantEventPack) : void;
 }
 class Serialization
@@ -915,7 +915,7 @@ class Serialization
     static GetArchivePath(savegameName_0 : string, extension_1 : string) : string;
     static LoadKey(key_0 : string) : string;
     static SaveKey(key_0 : string, val_1 : string) : void;
-    static RegisterStepHandler(step_0 : ESerializationStep, handler_1 : any) : void;
+    static RegisterStepHandler(step_0 : ESerializationStep, handler_1 : () => void) : void;
 }
 class YrHelper
 {

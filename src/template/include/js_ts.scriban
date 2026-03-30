@@ -109,11 +109,18 @@
         if $mapped_type
             ret $mapped_type
         end
+        # get function type
+        if type.type_kind == 5 # CppTypeKind.Function
+            ret "(" + ((type.parameters | array.each do; ret $"{$0.name} : {get_ts_type($0.type)}"; end) | array.join ", ") + ") => " + get_ts_type(type.return_type)
+        end
         # special template class
         if string.starts_with($unwrap_name, "ref_wrapper<")
             ret "$Ref<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ">"
         end
         if string.starts_with($unwrap_name, "constant_ptr<") || string.starts_with($unwrap_name, "reference<")
+            ret get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type)
+        end
+        if string.starts_with($unwrap_name, "std::function<")
             ret get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type)
         end
         # template class

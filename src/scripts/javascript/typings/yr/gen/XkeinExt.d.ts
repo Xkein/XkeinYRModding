@@ -1,7 +1,7 @@
 /// <reference path = "../index.d.ts"/>
 declare module "XkeinExt" {
 import { $Ref } from "puerts";
-import { CDTimerClass, AbstractClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType, FootClass, PassengersClass } from "YRpp";
+import { CDTimerClass, AbstractClass, AbstractTypeClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType, FootClass, PassengersClass } from "YRpp";
 import { AKRESULT } from "Wwise";
 class WwiseSoundBankRef
 {
@@ -55,48 +55,48 @@ class JsCppHelper
 }
 class JsEventOnCtor
 {
-    m_unit : any;
-    m_infantry : any;
-    m_building : any;
-    m_aircraft : any;
-    m_bullet : any;
-    m_superWeapon : any;
-    m_house : any;
-    m_unitType : any;
-    m_infantryType : any;
-    m_buildingType : any;
-    m_aircraftType : any;
-    m_bulletType : any;
-    m_superWeaponType : any;
-    m_houseType : any;
+    m_unit : (_0 : UnitClass, _1 : any) => void;
+    m_infantry : (_0 : InfantryClass, _1 : any) => void;
+    m_building : (_0 : BuildingClass, _1 : any) => void;
+    m_aircraft : (_0 : AircraftClass, _1 : any) => void;
+    m_bullet : (_0 : BulletClass, _1 : any) => void;
+    m_superWeapon : (_0 : SuperClass, _1 : any) => void;
+    m_house : (_0 : HouseClass, _1 : any) => void;
+    m_unitType : (_0 : UnitTypeClass, _1 : any) => void;
+    m_infantryType : (_0 : InfantryTypeClass, _1 : any) => void;
+    m_buildingType : (_0 : BuildingTypeClass, _1 : any) => void;
+    m_aircraftType : (_0 : AircraftTypeClass, _1 : any) => void;
+    m_bulletType : (_0 : BulletTypeClass, _1 : any) => void;
+    m_superWeaponType : (_0 : SuperWeaponTypeClass, _1 : any) => void;
+    m_houseType : (_0 : HouseTypeClass, _1 : any) => void;
 }
 class JsEventOnDtor
 {
-    m_unit : any;
-    m_infantry : any;
-    m_building : any;
-    m_aircraft : any;
-    m_bullet : any;
-    m_superWeapon : any;
-    m_house : any;
-    m_unitType : any;
-    m_infantryType : any;
-    m_buildingType : any;
-    m_aircraftType : any;
-    m_bulletType : any;
-    m_superWeaponType : any;
-    m_houseType : any;
+    m_unit : (_0 : UnitClass, _1 : any) => void;
+    m_infantry : (_0 : InfantryClass, _1 : any) => void;
+    m_building : (_0 : BuildingClass, _1 : any) => void;
+    m_aircraft : (_0 : AircraftClass, _1 : any) => void;
+    m_bullet : (_0 : BulletClass, _1 : any) => void;
+    m_superWeapon : (_0 : SuperClass, _1 : any) => void;
+    m_house : (_0 : HouseClass, _1 : any) => void;
+    m_unitType : (_0 : UnitTypeClass, _1 : any) => void;
+    m_infantryType : (_0 : InfantryTypeClass, _1 : any) => void;
+    m_buildingType : (_0 : BuildingTypeClass, _1 : any) => void;
+    m_aircraftType : (_0 : AircraftTypeClass, _1 : any) => void;
+    m_bulletType : (_0 : BulletTypeClass, _1 : any) => void;
+    m_superWeaponType : (_0 : SuperWeaponTypeClass, _1 : any) => void;
+    m_houseType : (_0 : HouseTypeClass, _1 : any) => void;
 }
 class JsGameEvents
 {
-    m_onBeginUpdate : any;
-    m_onEndUpdate : any;
+    m_onBeginUpdate : () => void;
+    m_onEndUpdate : () => void;
 }
 class JsPhysicsEvents
 {
-    m_onCollisionEnter : any;
-    m_onCollisionPersist : any;
-    m_onCollisionExit : any;
+    m_onCollisionEnter : (_0 : PhysicsCollisionAddAndPersistResult) => void;
+    m_onCollisionPersist : (_0 : PhysicsCollisionAddAndPersistResult) => void;
+    m_onCollisionExit : (_0 : PhysicsCollisionRemoveResult) => void;
 }
 class JsEvents
 {
@@ -130,7 +130,7 @@ class QuerySphere
 class XkeinTools
 {
     static FindFirstTarget(query_0 : QueryVolume) : ObjectClass;
-    static ForeachTarget(query_0 : QueryVolume, func_1 : any) : void;
+    static ForeachTarget(query_0 : QueryVolume, func_1 : (_0 : ObjectClass) => boolean) : void;
     static IsQueryTarget(query_0 : QueryVolume, target_1 : ObjectClass) : boolean;
     static FireWeaponToTarget(weapon_0 : WeaponTypeClass, owner_1 : TechnoClass, target_2 : AbstractClass) : BulletClass;
     static FireWeaponToPosition(weapon_0 : WeaponTypeClass, owner_1 : TechnoClass, targetPos_2 : Vector3D) : BulletClass;
