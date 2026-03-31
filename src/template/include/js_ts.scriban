@@ -57,6 +57,7 @@
     type_map["std::basic_string<char, std::char_traits<char>, std::allocator<char>>"] = "string"
     type_map["uint8"] = "number"
     type_map["uint32"] = "number"
+    type_map["entt::entity"] = "entt_entity"
     # yr structs
     type_map["Vector2D<int>"] = "Vector2D"
     type_map["Vector2D<short>"] = "Vector2D"

@@ -15,15 +15,27 @@
             ret should_skip_visibility(htType, htElement)
         end
     end
+    func get_comment(element, extra_info = "")
+        $comment = element.comment ?? ""
+        if !string.empty(extra_info)
+            if !string.empty($comment)
+                $comment += "\n"
+            end
+            $comment += extra_info
+        end
+        ret (string.split($comment, "\n") | array.each do; ret "// " + $0; end) | array.join "\n"
+    end
     func gen_property(property)
-        ret (property.is_static ? 'static s_' : 'm_') + $'{property.name} : {get_ts_type(property.cpp_field.type)};'
+        $result = get_comment(property.cpp_field, property.cpp_field) + "\n"
+        $result += (property.is_static ? 'static s_' : 'm_') + $'{property.name} : {get_ts_type(property.cpp_field.type)};'
+        ret $result
     end
     func gen_method(function, cppFunction)
         $js_function_name = get_js_function_name(function.name)
         if string.empty($js_function_name)
             ret "// skip " + function.name
         end
-        $result = ""
+        $result = get_comment(function.cpp_function, function.cpp_function) + "\n"
         if function.is_static
             $result += "static "
         end
@@ -58,6 +70,7 @@ import { AKRESULT } from "Wwise";
 
 {{- for klass in module_classes }}
 {{- if need_codegen(klass) }}
+{{ get_comment(klass.cpp_class, klass.full_name) }}
 {{ klass.is_interface ? "interface" : "class" }} {{klass.identifier}}
 {{- if array.size(klass.base_classes) > 0 && klass.base_classes[0].klass && !klass.base_classes[0].klass.is_interface
 $base_name = get_ts_type(klass.base_classes[0].cpp_base_type.type)}}
@@ -101,8 +114,10 @@ class {{this.module_name}} {
 
 {{- for enum in module_enums }}
 {{- if need_codegen(enum) || is_yrpp }}
+{{ get_comment(enum.cpp_enum, enum.full_name) }}
 enum {{enum.name}} {
     {{- for enum_item in enum.constants }}
+    {{ get_comment(enum_item.cpp_enum_item, enum_item.cpp_enum_item) }}
     {{enum_item.name}} = {{enum_item.value}},
     {{- end}}
 }
