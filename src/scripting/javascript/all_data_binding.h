@@ -47,7 +47,7 @@ UsingCppType(YrHelper);
 #include "yr/serialization/serialization.h"
 UsingCppType(Serialization);
 #include "yr/network/net_pack.h"
-UsingCppType(EventPack<byte[EventPackMaxDataSize]>);
+UsingCppType(EventPack<unsigned char[99]>); // EventPack<byte[EventPackMaxDataSize]>
 UsingCppType(VariantEventPack);
 UsingCppType(NetPackDispatch);
 
