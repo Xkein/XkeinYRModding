@@ -1,5 +1,5 @@
 import { JsEvents, PhysicsCollisionAddAndPersistResult, PhysicsCollisionRemoveResult } from "XkeinExt";
-import { YrHookEventSystem } from "YrExtCore";
+import { YrExtCore, YrHookEventSystem } from "YrExtCore";
 import { UnitClass, InfantryClass, BuildingClass, AircraftClass, BulletClass, SuperClass, HouseClass, UnitTypeClass, InfantryTypeClass, BuildingTypeClass, AircraftTypeClass, BulletTypeClass, SuperWeaponTypeClass, HouseTypeClass } from "YRpp";
 
 export class Delegate<T extends (...args: any[]) => any>
@@ -29,6 +29,7 @@ export class Delegate<T extends (...args: any[]) => any>
             }
         } catch (error) {
             console.error(error.stack);
+            console.error("cpp stacktrace:" + YrExtCore.GetStackTrace());
         }
     }
 }

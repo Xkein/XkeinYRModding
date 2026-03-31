@@ -1,6 +1,7 @@
 #pragma once
 
 #include "runtime/logger/logger.h"
+#include "core/reflection/reflection.h"
 #include <string>
 #include <functional>
 #include <Windows.h>
@@ -8,6 +9,7 @@
 YREXTCORE_API std::string DumpStackTrace(EXCEPTION_POINTERS* info);
 YREXTCORE_API std::string FormatSystemErrorCode(DWORD errorCode);
 YREXTCORE_API LONG WINAPI ExceptionFilterGetInfo(EXCEPTION_POINTERS* info, std::string*& stackTrace);
+FUNCTION(BindJs)
 YREXTCORE_API std::string GetStackTrace();
 YREXTCORE_API void LogStackTrace(spdlog::level::level_enum level);
 

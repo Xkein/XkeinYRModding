@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IsInstanceOfScriptable = IsInstanceOfScriptable;
+exports.GetScriptableInstances = GetScriptableInstances;
 exports.GetScriptableComponent = GetScriptableComponent;
 exports.CreateScriptableComponent = CreateScriptableComponent;
 exports.GetAllGetScriptableComponents = GetAllGetScriptableComponents;
@@ -59,7 +60,7 @@ const gameScripts = new GameScripts();
 class GameScriptable {
     insts;
     name;
-    script;
+    scriptable;
     constructor(name) {
         this.insts = new Set();
         this.name = name;
@@ -68,8 +69,8 @@ class GameScriptable {
             if (typeof scriptModule.script !== 'function') {
                 throw new Error("export script must be class! script name = " + name);
             }
-            this.script = new scriptModule.script();
-            this.script.scriptable = this;
+            this.scriptable = new scriptModule.script();
+            this.scriptable._gameScriptable_ = this;
         }
     }
     addInst(inst) {
@@ -80,11 +81,19 @@ class GameScriptable {
     }
 }
 function IsInstanceOfScriptable(scriptable, instance) {
-    let gameScriptable = scriptable.scriptable;
+    let gameScriptable = scriptable._gameScriptable_;
     if (gameScriptable) {
         return gameScriptable.insts.has(instance);
     }
     return false;
+}
+const emptySet = new Set();
+function GetScriptableInstances(scriptable) {
+    let gameScriptable = scriptable._gameScriptable_;
+    if (gameScriptable) {
+        return gameScriptable.insts;
+    }
+    return emptySet;
 }
 const emptyComponents = new Map();
 const emptyScriptables = [];
@@ -193,7 +202,7 @@ ScriptableConfig = __decorate([
         YRpp_1.AbstractType.BulletType, YRpp_1.AbstractType.SuperWeaponType, YRpp_1.AbstractType.HouseType], {
         afterLoad(iniReader, yrObjectType, iniComponent) {
             for (const scriptable of iniComponent.scriptables.values()) {
-                scriptable.script?.onLoadType?.(yrObjectType, iniReader);
+                scriptable.scriptable?.onLoadType?.(yrObjectType, iniReader);
             }
         },
     })
@@ -205,14 +214,14 @@ function get_scriptables(yrObject) {
 let scriptable_add = (yrObject) => {
     let scriptables = get_scriptables(yrObject);
     for (const scriptable of scriptables) {
-        scriptable.script?.onAddInst?.(yrObject);
+        scriptable.scriptable?.onAddInst?.(yrObject);
         scriptable.addInst(yrObject);
     }
 };
 let scriptable_remove = (yrObject) => {
     let scriptables = get_scriptables(yrObject);
     for (const scriptable of scriptables) {
-        scriptable.script?.onRemoveInst?.(yrObject);
+        scriptable.scriptable?.onRemoveInst?.(yrObject);
         scriptable.removeInst(yrObject);
     }
 };
@@ -238,7 +247,7 @@ let scriptable_save = function (yrObject) {
     serialization_1.JsSerialization.SaveNext(scriptables.length);
     for (const scriptable of scriptables) {
         serialization_1.JsSerialization.SaveNext(scriptable.name);
-        scriptable.script?.onSaveInst?.(yrObject);
+        scriptable.scriptable?.onSaveInst?.(yrObject);
     }
     // serialize components
     let components = GetAllGetScriptableComponents(yrObject);
@@ -256,7 +265,7 @@ let scriptable_load = function (yrObject) {
         let scriptName = serialization_1.JsSerialization.LoadNext();
         let scriptable = gameScripts.getOrCreate(scriptName);
         scriptable.addInst(yrObject);
-        scriptable.script?.onLoadInst?.(yrObject);
+        scriptable.scriptable?.onLoadInst?.(yrObject);
     }
     // serialize components
     let componentCount = serialization_1.JsSerialization.LoadNext();
@@ -290,7 +299,7 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSaveGameBeginStre
 game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrSaveGameEndStreamEvent, (E) => {
     for (const scriptable of gameScripts.scriptables.values()) {
         serialization_1.JsSerialization.SaveNext(scriptable.name);
-        scriptable.script?.onSave?.();
+        scriptable.scriptable?.onSave?.();
     }
 });
 let loadingScriptableCount = 0;
@@ -305,6 +314,6 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrLoadGameEndStream
     for (let index = 0; index < loadingScriptableCount; index++) {
         let scriptName = serialization_1.JsSerialization.LoadNext();
         let scriptable = gameScripts.getOrCreate(scriptName);
-        scriptable.script?.onLoad?.();
+        scriptable.scriptable?.onLoad?.();
     }
 });

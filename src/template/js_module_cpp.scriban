@@ -197,6 +197,15 @@ for property in this.properties ; $cpp_field = property.cpp_field
     else
         $module_builder = append_line($module_builder, $'builder.Variable("s_{property.identifier}", MakeVariable(std::addressof({property.full_name})));')
     end
+end
+for function in this.functions ; $cpp_function = function.cpp_function
+    if !need_codegen(function)
+        continue
+    end
+    if function.is_overload || function.cpp_function.is_function_template
+        continue
+    end
+    $module_builder = append_line($module_builder, $'MakeFunctionCheck<&{function.full_name}>(builder, "{function.identifier}");')
 end 
     $module_builder = append_line($module_builder, 'RegisterCheck(builder);')
 -}}

@@ -1463,7 +1463,10 @@ class YrHelper
 }
 
 class YrExtCore {
+    // int const EventPackMaxDataSize = sizeof(EventPackRaw)-offsetof(EventPackRaw,Custom.Data)
     static s_EventPackMaxDataSize : number;
+    // std::basic_string<char, std::char_traits<char>, std::allocator<char>> GetStackTrace()
+    static GetStackTrace() : string;
 }
 // ESerializationStep
 enum ESerializationStep {

@@ -10,6 +10,7 @@ export interface IScriptable {
     onLoad?(): void;
 }
 export declare function IsInstanceOfScriptable(scriptable: IScriptable, instance: any): boolean;
+export declare function GetScriptableInstances(scriptable: IScriptable): ReadonlySet<any>;
 export declare function GetScriptableComponent<T>(klass: {
     new (): T;
 }, yrObject: AbstractClass): T | undefined;

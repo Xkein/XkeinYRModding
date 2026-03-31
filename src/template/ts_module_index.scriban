@@ -108,8 +108,22 @@ class {{this.module_name}} {
     if !need_codegen(property)
         continue
     end}}
+    {{ get_comment(property.cpp_field, property.cpp_field) }}
     {{ $'static s_{property.identifier} : {get_ts_type(property.cpp_field.type)};'}}
 {{- end}}
+{{- for function in this.functions ; $cpp_function = function.cpp_function
+    if !need_codegen(function)
+        continue
+    end
+    if function.is_overload || function.cpp_function.is_function_template
+        continue
+    end
+    param_idx = 0
+    $params = array.each($cpp_function.parameters, do; ret ($'{$0.name+"_"+(param_idx++)} : {get_ts_type($0.type)}'); end) | array.join ", "
+    }}
+    {{ get_comment(function.cpp_function, function.cpp_function) }}
+    {{ $'static {function.identifier}({$params}) : {get_ts_type($cpp_function.return_type)};' }}
+{{- end }}
 }
 
 {{- for enum in module_enums }}

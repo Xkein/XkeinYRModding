@@ -4913,10 +4913,6 @@ class MissionClass
     m_CurrentMissionStartTime : number;
     // public int MissionAccumulateTime
     m_MissionAccumulateTime : number;
-    // public CDTimerClass UpdateTimer
-    m_UpdateTimer : CDTimerClass;
-    // public char[12] __UpdateTimer
-    m___UpdateTimer : string;
 }
 // forward declarations
 // InfantryTypeClass
@@ -15873,13 +15869,29 @@ class SlaveManagerClass__SlaveControl
 }
 
 class YRpp {
+    // static reference<int, 11070852, 0> const CurrentFrame = 0xA8ED84
     static s_Unsorted__CurrentFrame : number;
+    // The length of a cell in its isometric projection
+    // If an object's Height is above this value it's considered as in-air
+    // int const CellHeight = 208
     static s_Unsorted__CellHeight : number;
+    // The height in the middle of a cell, which is therefore CellHeight/2
+    // see ABC5E8, AC13C8
+    // int const LevelHeight = 104
     static s_Unsorted__LevelHeight : number;
+    // Leptons per cell.
+    // int const LeptonsPerCell = 256
     static s_Unsorted__LeptonsPerCell : number;
+    // Cell width in pixels.
+    // int const CellWidthInPixels = 60
     static s_Unsorted__CellWidthInPixels : number;
+    // Cell height in pixels.
+    // int const CellHeightInPixels = 30
     static s_Unsorted__CellHeightInPixels : number;
+    // static reference<int, 8915360, 0> const CurrentSWType = 0x8809A0
     static s_Unsorted__CurrentSWType : number;
+    // h2ik
+    // static reference<int, 11069356, 0> const IKnowWhatImDoing = 0xA8E7AC
     static s_Unsorted__IKnowWhatImDoing : number;
 }
 // DirType
