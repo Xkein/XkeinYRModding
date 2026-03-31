@@ -1463,6 +1463,7 @@ class YrHelper
 }
 
 class YrExtCore {
+    static s_EventPackMaxDataSize : number;
 }
 // ESerializationStep
 enum ESerializationStep {

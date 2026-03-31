@@ -43,7 +43,8 @@ public:
 	static bool IsValidType(EventTypeExt type);
 };
 
-static constexpr int EventPackMaxDataSize = sizeof(EventPackRaw) - offsetof(EventPackRaw, Custom.Data);
+PROPERTY(BindJs)
+constexpr int EventPackMaxDataSize = sizeof(EventPackRaw) - offsetof(EventPackRaw, Custom.Data);
 
 
 CLASS(BindJs)

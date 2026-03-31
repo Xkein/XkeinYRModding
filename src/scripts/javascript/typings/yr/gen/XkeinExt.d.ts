@@ -214,6 +214,8 @@ class QueryVolume
 class QuerySphere
     extends QueryVolume
 {
+    // public QuerySphere(Vector3D<int> location, float radius, QueryFlags flags = QueryFlags::Techno)
+    constructor(location_0 : Vector3D, radius_1 : number, flags_2 : QueryFlags);
     // public Vector3D<int> location
     m_location : Vector3D;
     // public float radius
@@ -278,7 +280,7 @@ enum QueryFlags {
 }
 // QueryType
 enum QueryType {
-    // Sphere = 0
+    // Sphere = 
     Sphere = 0,
 }
 }

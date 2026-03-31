@@ -19,13 +19,14 @@ enum QueryFlags : unsigned int {
 
 ENUM(BindJs)
 enum class QueryType : unsigned int {
-    Sphere = 0
+    Sphere,
 };
 
 CLASS(BindJs)
 class QueryVolume {
-public:
+protected:
     QueryVolume(QueryType type, QueryFlags flags) : type(type), flags(flags) {}
+public:
     PROPERTY()
     QueryType type;
     PROPERTY()
@@ -35,6 +36,7 @@ public:
 CLASS(BindJs)
 class QuerySphere : public QueryVolume {
 public:
+    FUNCTION()
     QuerySphere(CoordStruct location, float radius, QueryFlags flags = QueryFlags::Techno) : QueryVolume(QueryType::Sphere, flags), location(location), radius(radius)
     { }
     PROPERTY()
