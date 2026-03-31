@@ -113,7 +113,7 @@ interface ILocomotion
 {
     // Links object to locomotor.
     // public virtual long Link_To_Object(void * pointer) = 0
-    Link_To_Object(pointer_0 : void) : number;
+    Link_To_Object(pointer_0 : ArrayBuffer) : number;
     // Sees if object is moving.
     // public virtual bool Is_Moving() = 0
     Is_Moving() : boolean;
@@ -372,7 +372,7 @@ class TechnoClass
     // public virtual bool vt_entry_320() const
     vt_entry_320() : boolean;
     // public virtual bool IsRadarVisible(int * pOutDetection) const
-    IsRadarVisible(pOutDetection_0 : number) : boolean;
+    IsRadarVisible(pOutDetection_0 : ArrayBuffer) : boolean;
     // public virtual bool IsSensorVisibleToPlayer() const
     IsSensorVisibleToPlayer() : boolean;
     // public virtual bool IsSensorVisibleToHouse(HouseClass * House) const
@@ -616,10 +616,10 @@ class TechnoClass
     UpdateThreatInCell(Cell_0 : CellClass) : void;
     // slave of the next one
     // public bool CanAutoTargetObject(ThreatType targetFlags, int canTargetWhatAmI, int wantedDistance, TechnoClass * pTarget, int * pThreatPosed, unsigned long dwUnk, CoordStruct * pSourceCoords) const
-    CanAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : number, wantedDistance_2 : number, pTarget_3 : TechnoClass, pThreatPosed_4 : number, dwUnk_5 : number, pSourceCoords_6 : CoordStruct) : boolean;
+    CanAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : number, wantedDistance_2 : number, pTarget_3 : TechnoClass, pThreatPosed_4 : ArrayBuffer, dwUnk_5 : number, pSourceCoords_6 : CoordStruct) : boolean;
     // called by AITeam Attack Target Type and autoscan
     // public bool TryAutoTargetObject(ThreatType targetFlags, int canTargetWhatAmI, CellStruct * pCoords, unsigned long dwUnk1, unsigned long * dwUnk2, int * pThreatPosed, unsigned long dwUnk3)
-    TryAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : number, pCoords_2 : CellStruct, dwUnk1_3 : number, dwUnk2_4 : number, pThreatPosed_5 : number, dwUnk3_6 : number) : boolean;
+    TryAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : number, pCoords_2 : CellStruct, dwUnk1_3 : number, dwUnk2_4 : ArrayBuffer, pThreatPosed_5 : ArrayBuffer, dwUnk3_6 : number) : boolean;
     // public void Reactivate()
     Reactivate() : void;
     // public void Deactivate()
@@ -1229,7 +1229,7 @@ class HouseClass
     // public virtual long ID_Number() const
     ID_Number() : number;
     // public virtual wchar_t * Name() const
-    Name() : number;
+    Name() : ArrayBuffer;
     // public virtual IApplication * Get_Application()
     Get_Application() : any;
     // public virtual long Available_Money() const
@@ -1252,7 +1252,7 @@ class HouseClass
     All_To_Hunt() : number;
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
     // public virtual unsigned long AddRef()
     AddRef() : number;
     // public virtual unsigned long Release()
@@ -2322,7 +2322,7 @@ class AbstractClass
     static GetRTTIName(abs_0 : AbstractType) : string;
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
     // public virtual unsigned long AddRef()
     AddRef() : number;
     // public virtual unsigned long Release()
@@ -2487,7 +2487,7 @@ class ObjectClass
     // public virtual unsigned long GetTypeOwners() const
     GetTypeOwners() : number;
     // public virtual wchar_t const * GetUIName() const
-    GetUIName() : number;
+    GetUIName() : ArrayBuffer;
     // public virtual bool CanBeRepaired() const
     CanBeRepaired() : boolean;
     // public virtual bool CanBeSold() const
@@ -2604,7 +2604,7 @@ class ObjectClass
     // public virtual int GetWeaponRange(int idxWeapon) const
     GetWeaponRange(idxWeapon_0 : number) : number;
     // public virtual DamageState ReceiveDamage(int * pDamage, int DistanceFromEpicenter, WarheadTypeClass * pWH, ObjectClass * Attacker, bool IgnoreDefenses, bool PreventPassengerEscape, HouseClass * pAttackingHouse)
-    ReceiveDamage(pDamage_0 : number, DistanceFromEpicenter_1 : number, pWH_2 : WarheadTypeClass, Attacker_3 : ObjectClass, IgnoreDefenses_4 : boolean, PreventPassengerEscape_5 : boolean, pAttackingHouse_6 : HouseClass) : DamageState;
+    ReceiveDamage(pDamage_0 : ArrayBuffer, DistanceFromEpicenter_1 : number, pWH_2 : WarheadTypeClass, Attacker_3 : ObjectClass, IgnoreDefenses_4 : boolean, PreventPassengerEscape_5 : boolean, pAttackingHouse_6 : HouseClass) : DamageState;
     // public virtual void Destroy()
     Destroy() : void;
     // public virtual void Scatter(CoordStruct const& crd, bool ignoreMission, bool ignoreDestination)
@@ -3324,7 +3324,7 @@ class AbstractTypeClass
     // public char[32] UINameLabel
     m_UINameLabel : string;
     // public wchar_t const * UIName
-    m_UIName : number;
+    m_UIName : ArrayBuffer;
     // public char[49] Name
     m_Name : string;
 }
@@ -3347,7 +3347,7 @@ class CCINIClass
     WriteCCFile(pCCFile_0 : any, bDigest_1 : boolean) : void;
     // Copies the string table entry pointed to by the INI value into pBuffer.
     // public int ReadStringtableEntry(char const * pSection, char const * pKey, wchar_t * pBuffer, size_t szBufferSize)
-    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number, szBufferSize_3 : any) : number;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : ArrayBuffer, szBufferSize_3 : any) : number;
     // public int ReadStringtableEntry(char const * pSection, char const * pKey, wchar_t[-1]& pBuffer = Size)
     ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
     // public unsigned long GetCRC()
@@ -3403,10 +3403,10 @@ class INIClass
     WriteString(pSection_0 : string, pKey_1 : string, pString_2 : string) : boolean;
     // Reads an escaped Unicode string. Returns the string's length.
     // public int ReadUnicodeString(char const * pSection, char const * pKey, wchar_t const * pDefault, wchar_t * pBuffer, size_t szBufferSize)
-    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number, szBufferSize_4 : any) : number;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : ArrayBuffer, pBuffer_3 : ArrayBuffer, szBufferSize_4 : any) : number;
     // Writes an escaped Unicode string.
     // public bool WriteUnicodeString(char const * pSection, char const * pKey, wchar_t const * pString)
-    WriteUnicodeString(pSection_0 : string, pKey_1 : string, pString_2 : number) : boolean;
+    WriteUnicodeString(pSection_0 : string, pKey_1 : string, pString_2 : ArrayBuffer) : boolean;
     // Reads an boolean value.
     // public bool ReadBool(char const * pSection, char const * pKey, bool bDefault)
     ReadBool(pSection_0 : string, pKey_1 : string, bDefault_2 : boolean) : boolean;
@@ -3439,27 +3439,27 @@ class INIClass
     WriteRate(pSection_0 : string, pKey_1 : string, nValue_2 : number) : boolean;
     // Reads two integer values.
     // public int * Read2Integers(int * pBuffer, char const * pSection, char const * pKey, int * pDefault)
-    Read2Integers(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
+    Read2Integers(pBuffer_0 : ArrayBuffer, pSection_1 : string, pKey_2 : string, pDefault_3 : ArrayBuffer) : ArrayBuffer;
     // public Point2D * ReadPoint2D(Point2D& ret, char const * pSection, char const * pKey, Point2D& defValue)
     ReadPoint2D(ret_0 : Point2D, pSection_1 : string, pKey_2 : string, defValue_3 : Point2D) : Point2D;
     // public void GetPoint2D(char const * pSection, char const * pKey, Point2D& value)
     GetPoint2D(pSection_0 : string, pKey_1 : string, value_2 : Point2D) : void;
     // Writes two integer values.
     // public bool Write2Integers(char const * pSection, char const * pKey, int * pValues)
-    Write2Integers(pSection_0 : string, pKey_1 : string, pValues_2 : number) : boolean;
+    Write2Integers(pSection_0 : string, pKey_1 : string, pValues_2 : ArrayBuffer) : boolean;
     // Reads three integer values.
     // public int * Read3Integers(int * pBuffer, char const * pSection, char const * pKey, int * pDefault)
-    Read3Integers(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
+    Read3Integers(pBuffer_0 : ArrayBuffer, pSection_1 : string, pKey_2 : string, pDefault_3 : ArrayBuffer) : ArrayBuffer;
     // public CoordStruct * ReadPoint3D(CoordStruct& ret, char const * pSection, char const * pKey, CoordStruct& defValue)
     ReadPoint3D(ret_0 : CoordStruct, pSection_1 : string, pKey_2 : string, defValue_3 : CoordStruct) : CoordStruct;
     // public void GetPoint3D(char const * pSection, char const * pKey, CoordStruct& value)
     GetPoint3D(pSection_0 : string, pKey_1 : string, value_2 : CoordStruct) : void;
     // Reads three byte values.
     // public unsigned char * Read3Bytes(unsigned char * pBuffer, char const * pSection, char const * pKey, unsigned char * pDefault)
-    Read3Bytes(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
+    Read3Bytes(pBuffer_0 : ArrayBuffer, pSection_1 : string, pKey_2 : string, pDefault_3 : ArrayBuffer) : ArrayBuffer;
     // Writes three byte values.
     // public bool Write3Bytes(char const * pSection, char const * pKey, unsigned char * pValues)
-    Write3Bytes(pSection_0 : string, pKey_1 : string, pValues_2 : number) : boolean;
+    Write3Bytes(pSection_0 : string, pKey_1 : string, pValues_2 : ArrayBuffer) : boolean;
     // Tests whether the given section and key exists. If key is NULL, only the section will be looked for.
     // public bool Exists(char const * pSection, char const * pKey)
     Exists(pSection_0 : string, pKey_1 : string) : boolean;
@@ -3554,12 +3554,12 @@ class INIClass
     // OverlayPack, OverlayDataPack, IsoMapPack5
     // Those uses 1=xxxx, 2=xxxx, 3=xxxx .etc.
     // public size_t ReadUUBlock(char const * const pSection, void * pBuffer, size_t length)
-    ReadUUBlock(pSection_0 : number, pBuffer_1 : void, length_2 : any) : any;
+    ReadUUBlock(pSection_0 : number, pBuffer_1 : ArrayBuffer, length_2 : any) : any;
     // public bool WriteUUBlock(char const * const pSection, void * pBuffer, size_t length)
-    WriteUUBlock(pSection_0 : number, pBuffer_1 : void, length_2 : any) : boolean;
+    WriteUUBlock(pSection_0 : number, pBuffer_1 : ArrayBuffer, length_2 : any) : boolean;
     // 18 bytes
     // public unsigned char * ReadAbilities(unsigned char * pBuffer, char const * pSection, char const * pKey, unsigned char * pDefault)
-    ReadAbilities(pBuffer_0 : number, pSection_1 : string, pKey_2 : string, pDefault_3 : number) : number;
+    ReadAbilities(pBuffer_0 : ArrayBuffer, pSection_1 : string, pKey_2 : string, pDefault_3 : ArrayBuffer) : ArrayBuffer;
     // public TechnoTypeClass * GetTechnoType(char const * pSection, char const * pKey)
     GetTechnoType(pSection_0 : string, pKey_1 : string) : TechnoTypeClass;
     // safer and more convenient overload for string reading
@@ -3569,7 +3569,7 @@ class INIClass
     GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
     // safer and more convenient overload for escaped unicode string reading
     // public int ReadUnicodeString(char const * pSection, char const * pKey, wchar_t const * pDefault, wchar_t[-1]& pBuffer = Size)
-    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : number, pBuffer_3 : number) : number;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : ArrayBuffer, pBuffer_3 : number) : number;
     // fsldargh who the fuck decided to pass structures by value here
     // public static TypeList<int> * GetPrerequisites(TypeList<int> * pBuffer, INIClass * pINI, char const * pSection, char const * pKey, TypeList<int> Defaults)
     static GetPrerequisites(pBuffer_0 : TypeList<number>, pINI_1 : INIClass, pSection_2 : string, pKey_3 : string, Defaults_4 : TypeList<number>) : TypeList<number>;
@@ -5120,14 +5120,14 @@ class CellClass
     // public void CollectCrate(FootClass * pCollector)
     CollectCrate(pCollector_0 : FootClass) : void;
     // public void ProcessColourComponents(int * arg0, int * pIntensity, int * pAmbient, int * a5, int * a6, int * tintR, int * tintG, int * tintB)
-    ProcessColourComponents(arg0_0 : number, pIntensity_1 : number, pAmbient_2 : number, a5_3 : number, a6_4 : number, tintR_5 : number, tintG_6 : number, tintB_7 : number) : void;
+    ProcessColourComponents(arg0_0 : ArrayBuffer, pIntensity_1 : ArrayBuffer, pAmbient_2 : ArrayBuffer, a5_3 : ArrayBuffer, a6_4 : ArrayBuffer, tintR_5 : ArrayBuffer, tintG_6 : ArrayBuffer, tintB_7 : ArrayBuffer) : void;
     // public TubeClass * GetTunnel()
     GetTunnel() : any;
     // public RectangleStruct * GetContainingRect(RectangleStruct * dest) const
     GetContainingRect(dest_0 : RectangleStruct) : RectangleStruct;
     // don't laugh, it returns the uiname of contained tiberium... which nobody ever sets
     // public wchar_t const * GetUIName() const
-    GetUIName() : number;
+    GetUIName() : ArrayBuffer;
     // returns whether a cell behaves as if it contained overlay (for gates and wall towers)
     // public bool ConnectsToOverlay(int idxOverlay = -1, int direction = -1) const
     ConnectsToOverlay(idxOverlay_0 : number, direction_1 : number) : boolean;
@@ -6746,7 +6746,7 @@ class FootClass
     // public virtual BuildingClass * TryNearestDockBuilding(TypeList<BuildingTypeClass *> * bList, unsigned long dwUnk2, unsigned long dwUnk3) const
     TryNearestDockBuilding(bList_0 : TypeList<BuildingTypeClass>, dwUnk2_1 : number, dwUnk3_2 : number) : BuildingClass;
     // public virtual BuildingClass * FindCloserDockBuilding(BuildingTypeClass * bType, unsigned long dwUnk2, unsigned long dwUnk3, int * pDistance) const
-    FindCloserDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : number, dwUnk3_2 : number, pDistance_3 : number) : BuildingClass;
+    FindCloserDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : number, dwUnk3_2 : number, pDistance_3 : ArrayBuffer) : BuildingClass;
     // public virtual BuildingClass * FindNearestDockBuilding(BuildingTypeClass * bType, unsigned long dwUnk2, unsigned long dwUnk3) const
     FindNearestDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : number, dwUnk3_2 : number) : BuildingClass;
     // public virtual void vt_entry_534(unsigned long dwUnk, unsigned long dwUnk2)
@@ -8028,7 +8028,7 @@ class TEventClass
     GetStateB() : boolean;
     // main brain
     // public bool HasOccured(int eventKind, HouseClass * pHouse, ObjectClass * Object, CDTimerClass * ActivationFrame, bool * isRepeating) const
-    HasOccured(eventKind_0 : number, pHouse_1 : HouseClass, Object_2 : ObjectClass, ActivationFrame_3 : CDTimerClass, isRepeating_4 : boolean) : boolean;
+    HasOccured(eventKind_0 : number, pHouse_1 : HouseClass, Object_2 : ObjectClass, ActivationFrame_3 : CDTimerClass, isRepeating_4 : ArrayBuffer) : boolean;
     // public static AbstractType const AbsID = AbstractType::Event
     static s_AbsID : AbstractType;
     // Static
@@ -8729,9 +8729,9 @@ class Surface
     // public virtual bool PlotLine(RectangleStruct * pRect, Point2D * pStart, Point2D * pEnd, bool (*)(int *) * fpDrawCallback)
     PlotLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, fpDrawCallback_3 : any) : boolean;
     // public virtual bool DrawDashedLine(Point2D * pStart, Point2D * pEnd, int nColor, bool * Pattern, int nOffset)
-    DrawDashedLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number) : boolean;
+    DrawDashedLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : ArrayBuffer, nOffset_4 : number) : boolean;
     // public virtual bool DrawDashedLine_(Point2D * pStart, Point2D * pEnd, int nColor, bool * Pattern, int nOffset, bool bUkn)
-    DrawDashedLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : boolean, nOffset_4 : number, bUkn_5 : boolean) : boolean;
+    DrawDashedLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : ArrayBuffer, nOffset_4 : number, bUkn_5 : boolean) : boolean;
     // public virtual bool DrawLine_(Point2D * pStart, Point2D * pEnd, int nColor, bool bUnk)
     DrawLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, bUnk_3 : boolean) : boolean;
     // public virtual bool DrawRectEx(RectangleStruct * pClipRect, RectangleStruct * pDrawRect, int nColor)
@@ -8739,7 +8739,7 @@ class Surface
     // public virtual bool DrawRect(RectangleStruct * pDrawRect, unsigned long dwColor)
     DrawRect(pDrawRect_0 : RectangleStruct, dwColor_1 : number) : boolean;
     // public virtual void * Lock(int X, int Y)
-    Lock(X_0 : number, Y_1 : number) : void;
+    Lock(X_0 : number, Y_1 : number) : ArrayBuffer;
     // public virtual bool Unlock()
     Unlock() : boolean;
     // public virtual bool CanLock(unsigned long dwUkn1 = 0, unsigned long dwUkn2 = 0)
@@ -8838,7 +8838,7 @@ class AircraftClass
     Is_Locked() : number;
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
     // public virtual unsigned long AddRef()
     AddRef() : number;
     // public virtual unsigned long Release()
@@ -9101,7 +9101,7 @@ class TiberiumLogic
     // public PriorityQueueClass<PriorityQueueClassNode, std::less<PriorityQueueClassNode>> * Queue
     m_Queue : any;
     // public bool * CellIndexesWithTiberium
-    m_CellIndexesWithTiberium : boolean;
+    m_CellIndexesWithTiberium : ArrayBuffer;
     // public PriorityQueueClassNode * Nodes
     m_Nodes : any;
     // public CDTimerClass Timer
@@ -9228,7 +9228,7 @@ class LightConvertClass
 {
     // Constructor
     // public LightConvertClass(BytePalette * palette1, BytePalette * palette2, Surface * pSurface, int color_R, int color_G, int color_B, bool skipBlitters, unsigned char * pBuffer, size_t shadeCount)
-    constructor(palette1_0 : BytePalette, palette2_1 : BytePalette, pSurface_2 : Surface, color_R_3 : number, color_G_4 : number, color_B_5 : number, skipBlitters_6 : boolean, pBuffer_7 : number, shadeCount_8 : any);
+    constructor(palette1_0 : BytePalette, palette2_1 : BytePalette, pSurface_2 : Surface, color_R_3 : number, color_G_4 : number, color_B_5 : number, skipBlitters_6 : boolean, pBuffer_7 : ArrayBuffer, shadeCount_8 : any);
     // public virtual void UpdateColors(int red, int green, int blue, bool tinted)
     UpdateColors(red_0 : number, green_1 : number, blue_2 : number, tinted_3 : boolean) : void;
     // public static LightConvertClass * InitLightConvert(int red, int green, int blue)
@@ -9244,7 +9244,7 @@ class LightConvertClass
     // public RGBClass * UsedPalette2
     m_UsedPalette2 : RGBClass;
     // public unsigned char * IndexesToIgnore
-    m_IndexesToIgnore : number;
+    m_IndexesToIgnore : ArrayBuffer;
     // public int RefCount
     m_RefCount : number;
     // public TintStruct Color1
@@ -9284,13 +9284,13 @@ class ConvertClass
     m_ShadeCount : number;
     // new(ShadeCount* 8* BytesPerPixel) - gets filled with palette values on CTOR
     // public void * FullColorData
-    m_FullColorData : void;
+    m_FullColorData : ArrayBuffer;
     // points to the middle of FullColorData above
     // public void * PaletteData
-    m_PaletteData : void;
+    m_PaletteData : ArrayBuffer;
     // if(BytesPerPixel == 1) { ByteColorData = new byte[0x100]; }
     // public void * ByteColorData
-    m_ByteColorData : void;
+    m_ByteColorData : ArrayBuffer;
     // set right before drawing
     // public unsigned long CurrentZRemap
     m_CurrentZRemap : number;
@@ -9318,11 +9318,11 @@ class DSurface
     // public void DrawSHP(ConvertClass * Palette, SHPStruct * SHP, int FrameIndex, Point2D const * const Position, RectangleStruct const * const Bounds, BlitterFlags Flags, int Remap, int ZAdjust, ZGradient ZGradientDescIndex, int Brightness, int TintColor, SHPStruct * ZShape, int ZShapeFrame, int XOffset, int YOffset)
     DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : number, Position_3 : Point2D, Bounds_4 : RectangleStruct, Flags_5 : BlitterFlags, Remap_6 : number, ZAdjust_7 : number, ZGradientDescIndex_8 : ZGradient, Brightness_9 : number, TintColor_10 : number, ZShape_11 : any, ZShapeFrame_12 : number, XOffset_13 : number, YOffset_14 : number) : void;
     // public void DrawTextA(wchar_t const * pText, RectangleStruct * pBounds, Point2D * pLocation, unsigned long ForeColor, unsigned long BackColor, TextPrintType Flag)
-    DrawTextA(pText_0 : number, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : TextPrintType) : void;
+    DrawTextA(pText_0 : ArrayBuffer, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : TextPrintType) : void;
     // public void DrawTextA(wchar_t const * pText, Point2D * pLoction, unsigned long Color)
-    DrawTextA(pText_0 : number, pLoction_1 : Point2D, Color_2 : number) : void;
+    DrawTextA(pText_0 : ArrayBuffer, pLoction_1 : Point2D, Color_2 : number) : void;
     // public void DrawTextA(wchar_t const * pText, int X, int Y, unsigned long Color)
-    DrawTextA(pText_0 : number, X_1 : number, Y_2 : number, Color_3 : number) : void;
+    DrawTextA(pText_0 : ArrayBuffer, X_1 : number, Y_2 : number, Color_3 : number) : void;
     // public static reference<DSurface *, 8942332, 0> const Tile = 0x8872FCu
     static s_Tile : DSurface;
     // public static reference<DSurface *, 8942336, 0> const Sidebar = 0x887300u
@@ -9344,7 +9344,7 @@ class DSurface
     // public static reference<RectangleStruct, 8941488, 0> const WindowBounds = 0x886FB0u
     static s_WindowBounds : RectangleStruct;
     // public void * Buffer
-    m_Buffer : void;
+    m_Buffer : ArrayBuffer;
     // public bool IsAllocated
     m_IsAllocated : boolean;
     // public bool IsInVideoRam
@@ -9575,7 +9575,7 @@ class TemporalClass
     // public CDTimerClass LifeTimer
     m_LifeTimer : CDTimerClass;
     // public void * unknown_pointer_38
-    m_unknown_pointer_38 : void;
+    m_unknown_pointer_38 : ArrayBuffer;
     // public SuperClass * SourceSW
     m_SourceSW : SuperClass;
     // public TemporalClass * NextTemporal
@@ -9646,7 +9646,7 @@ class SuperClass
     // public void ResetRechargeTime()
     ResetRechargeTime() : void;
     // public wchar_t const * NameReadiness() const
-    NameReadiness() : number;
+    NameReadiness() : ArrayBuffer;
     // public bool ShouldDrawProgress() const
     ShouldDrawProgress() : boolean;
     // public bool ShouldFlashTab() const
@@ -9916,7 +9916,7 @@ class CaptureManagerClass
     // public bool IsControllingSomething() const
     IsControllingSomething() : boolean;
     // public bool IsOverloading(bool * wasDamageApplied) const
-    IsOverloading(wasDamageApplied_0 : boolean) : boolean;
+    IsOverloading(wasDamageApplied_0 : ArrayBuffer) : boolean;
     // public void HandleOverload()
     HandleOverload() : void;
     // public bool NeedsToDrawLinks() const
@@ -11370,7 +11370,7 @@ class UnitTrackerClass
     // public int GetUnitCount()
     GetUnitCount() : number;
     // public int const * GetArray()
-    GetArray() : number;
+    GetArray() : ArrayBuffer;
     // public void ClearUnitCount()
     ClearUnitCount() : void;
     // public void ToNetworkFormat()
@@ -11587,7 +11587,7 @@ class GadgetClass
     // public virtual void MarkRedraw()
     MarkRedraw() : void;
     // public virtual void PeerToPeer(unsigned int Flags, unsigned long * pKey, GadgetClass * pSendTo)
-    PeerToPeer(Flags_0 : number, pKey_1 : number, pSendTo_2 : GadgetClass) : void;
+    PeerToPeer(Flags_0 : number, pKey_1 : ArrayBuffer, pSendTo_2 : GadgetClass) : void;
     // public virtual void SetFocus()
     SetFocus() : void;
     // public virtual void KillFocus()
@@ -11611,9 +11611,9 @@ class GadgetClass
     // public virtual void StickyProcess(GadgetFlag Flags)
     StickyProcess(Flags_0 : GadgetFlag) : void;
     // public virtual bool Action(GadgetFlag Flags, unsigned long * pKey, KeyModifier Modifier)
-    Action(Flags_0 : GadgetFlag, pKey_1 : number, Modifier_2 : KeyModifier) : boolean;
+    Action(Flags_0 : GadgetFlag, pKey_1 : ArrayBuffer, Modifier_2 : KeyModifier) : boolean;
     // public virtual bool Clicked(unsigned long * pKey, GadgetFlag Flags, int X, int Y, KeyModifier Modifier)
-    Clicked(pKey_0 : number, Flags_1 : GadgetFlag, X_2 : number, Y_3 : number, Modifier_4 : KeyModifier) : boolean;
+    Clicked(pKey_0 : ArrayBuffer, Flags_1 : GadgetFlag, X_2 : number, Y_3 : number, Modifier_4 : KeyModifier) : boolean;
     // skip operator=
     // public GadgetClass * ExtractGadgetAt(int X, int Y)
     ExtractGadgetAt(X_0 : number, Y_1 : number) : GadgetClass;
@@ -13438,7 +13438,7 @@ class LocomotionClass
     constructor();
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
     // public virtual unsigned long AddRef()
     AddRef() : number;
     // public virtual unsigned long Release()
@@ -13462,7 +13462,7 @@ class LocomotionClass
     // virtual ULONG __stdcall AddRef() { JMP_STD(0x4D0520); }
     // virtual ULONG __stdcall Release() { JMP_STD(0x4D0530); }
     // public virtual long Link_To_Object(void * pointer)
-    Link_To_Object(pointer_0 : void | any) : number;
+    Link_To_Object(pointer_0 : ArrayBuffer | any) : number;
     // Sees if object is moving.
     // public virtual bool Is_Moving()
     Is_Moving() : boolean;
@@ -13736,13 +13736,13 @@ class ScenarioClass
     // public static void UpdateHashPalLighting(int R, int G, int B, bool tint)
     static UpdateHashPalLighting(R_0 : number, G_1 : number, B_2 : number, tint_3 : boolean) : void;
     // public static void ScenarioLighting(int * r, int * g, int * b)
-    static ScenarioLighting(r_0 : number, g_1 : number, b_2 : number) : void;
+    static ScenarioLighting(r_0 : ArrayBuffer, g_1 : ArrayBuffer, b_2 : ArrayBuffer) : void;
     // this calls UpdateCellLighting() from above and does other good stuff
     // initializers call it with -1, -1, -1, 0 , map retint actions use current tint * 10, 0
     // public static void RecalcLighting(int R, int G, int B, bool tint)
     static RecalcLighting(R_0 : number, G_1 : number, B_2 : number, tint_3 : boolean) : void;
     // public static bool SaveGame(char const * FileName, wchar_t const * Description, bool BarGraph = false)
-    static SaveGame(FileName_0 : string, Description_1 : number, BarGraph_2 : boolean) : boolean;
+    static SaveGame(FileName_0 : string, Description_1 : ArrayBuffer, BarGraph_2 : boolean) : boolean;
     // public static bool LoadGame(char const * FileName)
     static LoadGame(FileName_0 : string) : boolean;
     // public static bool StartScenario(char const * FileName, bool Briefing, int CampaignIndex)
@@ -13828,7 +13828,7 @@ class ScenarioClass
     // public CDTimerClass MissionTimer
     m_MissionTimer : CDTimerClass;
     // public wchar_t * MissionTimerTextCSF
-    m_MissionTimerTextCSF : number;
+    m_MissionTimerTextCSF : ArrayBuffer;
     // public char[32] MissionTimerText
     m_MissionTimerText : string;
     // public CDTimerClass ShroudRegrowTimer
@@ -14173,7 +14173,7 @@ class FlyLocomotionClass
     constructor();
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
     // public virtual unsigned long AddRef()
     AddRef() : number;
     // public virtual unsigned long Release()
@@ -14267,7 +14267,7 @@ class RocketLocomotionClass
     constructor();
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
     // public virtual unsigned long AddRef()
     AddRef() : number;
     // public virtual unsigned long Release()
@@ -14347,7 +14347,7 @@ class TeleportLocomotionClass
     constructor();
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
     // public virtual unsigned long AddRef()
     AddRef() : number;
     // public virtual unsigned long Release()
@@ -14478,7 +14478,7 @@ class GScreenClass
     static DoBlit(mouseCaptured_0 : boolean, surface_1 : DSurface, rect_2 : RectangleStruct) : void;
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : void | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
     // public virtual unsigned long AddRef()
     AddRef() : number;
     // public virtual unsigned long Release()
@@ -14960,7 +14960,7 @@ class DisplayClass
 {
     // WIP: DisplayClass::TacticalClass goes HERE
     // public bool ProcessClickCoords(Point2D * src, CellStruct * XYdst, CoordStruct * XYZdst, ObjectClass * * Target, unsigned char * a5, unsigned char * a6)
-    ProcessClickCoords(src_0 : Point2D, XYdst_1 : CellStruct, XYZdst_2 : CoordStruct, Target_3 : ObjectClass, a5_4 : number, a6_5 : number) : boolean;
+    ProcessClickCoords(src_0 : Point2D, XYdst_1 : CellStruct, XYZdst_2 : CoordStruct, Target_3 : ObjectClass, a5_4 : ArrayBuffer, a6_5 : ArrayBuffer) : boolean;
     // the foundation for placement with green/red
     // public void SetActiveFoundation(CellStruct const * Coords)
     SetActiveFoundation(Coords_0 : CellStruct) : void;
@@ -14974,7 +14974,7 @@ class DisplayClass
     // public virtual void LoadFromINI(CCINIClass * pINI)
     LoadFromINI(pINI_0 : CCINIClass) : void;
     // public virtual wchar_t const * GetToolTip(unsigned int nDlgID)
-    GetToolTip(nDlgID_0 : number) : number;
+    GetToolTip(nDlgID_0 : number) : ArrayBuffer;
     // public virtual void CloseWindow()
     CloseWindow() : void;
     // public virtual void ClearDragBand()
@@ -15155,7 +15155,7 @@ class RadarClass
     // public virtual void DisposeOfArt()
     DisposeOfArt() : void;
     // public virtual void * vt_entry_CC(void * out_pUnk, Point2D * pPoint)
-    vt_entry_CC(out_pUnk_0 : void, pPoint_1 : Point2D) : void;
+    vt_entry_CC(out_pUnk_0 : ArrayBuffer, pPoint_1 : Point2D) : ArrayBuffer;
     // public virtual void vt_entry_D0(unsigned long dwUnk)
     vt_entry_D0(dwUnk_0 : number) : void;
     // public virtual void Init_For_House()
@@ -15811,7 +15811,7 @@ class ThemeClass
     // public char const * GetFilename(unsigned int index) const
     GetFilename(index_0 : number) : string;
     // public wchar_t const * GetUIName(unsigned int index) const
-    GetUIName(index_0 : number) : number;
+    GetUIName(index_0 : number) : ArrayBuffer;
     // public int GetLength(unsigned int index) const
     GetLength(index_0 : number) : number;
     // public bool IsAvailable(int index) const

@@ -77,6 +77,14 @@ func array_contains_any_of(list, anyList)
 end
 
 func is_array_type(cppType)
-    ret cppType.type_kind == 3
+    ret cppType.type_kind == 3 # CppTypeKind.Array
+end
+
+func is_function_type(cppType)
+    ret cppType.type_kind == 5 # CppTypeKind.Function
+end
+
+func is_primitive_pointer(cppType)
+    ret cppType.type_kind == 1 && httype.unwrap_type(cppType).type_kind == 0 # CppTypeKind.Pointer && CppTypeKind.Primitive
 end
 }}

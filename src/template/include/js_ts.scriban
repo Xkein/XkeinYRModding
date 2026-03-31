@@ -105,13 +105,16 @@
         if $unwrap_name == "unsigned char" && is_array_type(type)
             ret "ArrayBuffer"
         end
+        if is_primitive_pointer(type)
+            ret "ArrayBuffer"
+        end
         $mapped_type = type_map[$unwrap_name]
         # has mapped name
         if $mapped_type
             ret $mapped_type
         end
         # get function type
-        if type.type_kind == 5 # CppTypeKind.Function
+        if is_function_type(type)
             ret "(" + ((type.parameters | array.each do; ret $"{$0.name} : {get_ts_type($0.type)}"; end) | array.join ", ") + ") => " + get_ts_type(type.return_type)
         end
         # special template class

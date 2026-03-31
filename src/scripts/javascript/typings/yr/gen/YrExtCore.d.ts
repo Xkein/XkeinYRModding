@@ -1406,9 +1406,9 @@ class VariantEventPack
     // public VariantEventPack(CustomEventType customType)
     constructor(customType_0 : CustomEventType);
     // public bool SetData(void * data, uint8 size)
-    SetData(data_0 : void, size_1 : number) : boolean;
+    SetData(data_0 : ArrayBuffer, size_1 : number) : boolean;
     // public void * GetData()
-    GetData() : void;
+    GetData() : ArrayBuffer;
 }
 // EventPack<unsigned char[99]>
 class EventPack_unsignedchar_99__

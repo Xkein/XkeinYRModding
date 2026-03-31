@@ -55,7 +55,7 @@ class gainput__InputMap
     // @param filterUserData Optional user data pointer that is passed to filterFunc.
     // @return true if the mapping was created.
     // public bool MapFloat(UserButtonId userButton, DeviceId device, DeviceButtonId deviceButton, float min = 0.0f, float max = 1.0f, FilterFunc_T filterFunc = 0, void * filterUserData = 0)
-    MapFloat(userButton_0 : any, device_1 : any, deviceButton_2 : any, min_3 : number, max_4 : number, filterFunc_5 : any, filterUserData_6 : void) : boolean;
+    MapFloat(userButton_0 : any, device_1 : any, deviceButton_2 : any, min_3 : number, max_4 : number, filterFunc_5 : any, filterUserData_6 : ArrayBuffer) : boolean;
     // Removes all mappings for the given user button.
     // public void Unmap(UserButtonId userButton)
     Unmap(userButton_0 : any) : void;
