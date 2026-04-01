@@ -229,6 +229,8 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectReceiveDama
 });
 game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectUnlimboCheckedEvent, (E) => {
     let yrObject = E.m_pObject;
+    if (!yrObject.m_Type)
+        return;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.createEvent) {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.createEvent, yrObject.audioComponent.m_akGameObjId);
@@ -236,6 +238,8 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectUnlimboChec
 });
 game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectLimboCheckedEvent, (E) => {
     let yrObject = E.m_pObject;
+    if (!yrObject.m_Type)
+        return;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.removeEvent) {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.removeEvent, yrObject.audioComponent.m_akGameObjId);

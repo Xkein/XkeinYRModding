@@ -9,5 +9,11 @@ struct JsCppHelper final
 {
     FUNCTION()
     static entt::entity GetEntityByYrObject(AbstractClass* pObject);
+    FUNCTION()
+    static uint32 GetPointerValue(AbstractClass* pObject);
+    FUNCTION()
+    static uint32 GetPointerValue(void* ptr);
+    FUNCTION()
+    static void* GetArrayBuffer(uint32 address);
 };
 

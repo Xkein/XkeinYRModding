@@ -15,3 +15,5 @@ require("serialization")
 require("ini_helper")
 require("game_audio")
 require("game_script")
+
+require("main_end")

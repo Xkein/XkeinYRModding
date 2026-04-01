@@ -178,7 +178,7 @@ export function loadCustomVariables(blackboard: GameObjectBlackboard) {
     }
 }
 
-function loadScripts(iniReader: IniReader, section: string, key: string) {
+export function loadScripts(iniReader: IniReader, section: string, key: string) {
     let scriptNames = IniHelper.ReadStringList(iniReader, section, key);
     if (scriptNames) {
         let scriptables: GameScriptable[] = [];
@@ -190,7 +190,7 @@ function loadScripts(iniReader: IniReader, section: string, key: string) {
     }
 }
 
-function loadSectionScripts(iniReader: IniReader, section: string, action?: (scriptable: GameScriptable) => void) {
+export function loadSectionScripts(iniReader: IniReader, section: string, action?: (scriptable: GameScriptable) => void) {
     let ini = iniReader.GetIni();
     let count = ini.GetKeyCount(section);
     for (let index = 0; index < count; index++) {
@@ -203,11 +203,6 @@ function loadSectionScripts(iniReader: IniReader, section: string, action?: (scr
         }
     }
 }
-
-let iniReaderXkein = new IniReader("XkeinExt.ini");
-loadSectionScripts(iniReaderXkein, "JsScriptList", (scriptable) => {
-    console.log(`load init script: ${scriptable.name}`);
-});
 
 gameEvents.registerHookEventHandler(YrRulesLoadAfterTypeDataEvent, (E) => {
     loadSectionScripts(new IniReader(E.m_pIni), "JsScriptList", (scriptable) => {

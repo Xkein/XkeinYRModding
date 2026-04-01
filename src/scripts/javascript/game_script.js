@@ -19,6 +19,8 @@ exports.getCustomVariable = getCustomVariable;
 exports.setCustomVariable = setCustomVariable;
 exports.saveCustomVariables = saveCustomVariables;
 exports.loadCustomVariables = loadCustomVariables;
+exports.loadScripts = loadScripts;
+exports.loadSectionScripts = loadSectionScripts;
 const YrExtCore_1 = require("YrExtCore");
 const ini_helper_1 = require("./ini_helper");
 const YRpp_1 = require("YRpp");
@@ -181,10 +183,6 @@ function loadSectionScripts(iniReader, section, action) {
         }
     }
 }
-let iniReaderXkein = new YrExtCore_1.IniReader("XkeinExt.ini");
-loadSectionScripts(iniReaderXkein, "JsScriptList", (scriptable) => {
-    console.log(`load init script: ${scriptable.name}`);
-});
 game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrRulesLoadAfterTypeDataEvent, (E) => {
     loadSectionScripts(new YrExtCore_1.IniReader(E.m_pIni), "JsScriptList", (scriptable) => {
         console.log(`load map script: ${scriptable.name}`);

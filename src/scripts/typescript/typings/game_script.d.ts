@@ -9,6 +9,14 @@ export interface IScriptable {
     onSave?(): void;
     onLoad?(): void;
 }
+declare class GameScriptable {
+    insts: Set<any>;
+    name: string;
+    scriptable: any;
+    constructor(name: string);
+    addInst(inst: any): void;
+    removeInst(inst: any): void;
+}
 export declare function IsInstanceOfScriptable(scriptable: IScriptable, instance: any): boolean;
 export declare function GetScriptableInstances(scriptable: IScriptable): ReadonlySet<any>;
 export declare function GetScriptableComponent<T>(klass: {
@@ -26,3 +34,6 @@ export declare function getCustomVariable(blackboard: GameObjectBlackboard, name
 export declare function setCustomVariable(blackboard: GameObjectBlackboard, name: string, value: any): any;
 export declare function saveCustomVariables(blackboard: GameObjectBlackboard): void;
 export declare function loadCustomVariables(blackboard: GameObjectBlackboard): void;
+export declare function loadScripts(iniReader: IniReader, section: string, key: string): GameScriptable[] | undefined;
+export declare function loadSectionScripts(iniReader: IniReader, section: string, action?: (scriptable: GameScriptable) => void): void;
+export {};

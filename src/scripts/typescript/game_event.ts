@@ -29,7 +29,7 @@ export class Delegate<T extends (...args: any[]) => any>
             }
         } catch (error) {
             console.error(error.stack);
-            console.error("cpp stacktrace:" + YrExtCore.GetStackTrace());
+            // console.error("cpp stacktrace:" + YrExtCore.GetStackTrace());
         }
     }
 }

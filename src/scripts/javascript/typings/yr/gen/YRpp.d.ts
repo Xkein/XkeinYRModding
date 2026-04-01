@@ -4913,6 +4913,10 @@ class MissionClass
     m_CurrentMissionStartTime : number;
     // public int MissionAccumulateTime
     m_MissionAccumulateTime : number;
+    // public CDTimerClass UpdateTimer
+    m_UpdateTimer : CDTimerClass;
+    // public char[12] __UpdateTimer
+    m___UpdateTimer : string;
 }
 // forward declarations
 // InfantryTypeClass

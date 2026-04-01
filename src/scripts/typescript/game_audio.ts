@@ -229,6 +229,8 @@ gameEvents.registerHookEventHandler(YrObjectReceiveDamageEvent, (E) => {
     
 gameEvents.registerHookEventHandler(YrObjectUnlimboCheckedEvent, (E) => {
     let yrObject: ObjectClass | any = E.m_pObject;
+    if (!yrObject.m_Type)
+        return;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.createEvent) {
         AudioSystem.PostEvent(audioConfig.createEvent, yrObject.audioComponent.m_akGameObjId);
@@ -236,6 +238,8 @@ gameEvents.registerHookEventHandler(YrObjectUnlimboCheckedEvent, (E) => {
 });
 gameEvents.registerHookEventHandler(YrObjectLimboCheckedEvent, (E) => {
     let yrObject: ObjectClass | any = E.m_pObject;
+    if (!yrObject.m_Type)
+        return;
     let audioConfig = yrObject.m_Type.audioConfig;
     if (audioConfig && audioConfig.removeEvent) {
         AudioSystem.PostEvent(audioConfig.removeEvent, yrObject.audioComponent.m_akGameObjId);

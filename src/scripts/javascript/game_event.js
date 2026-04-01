@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.gameEvents = exports.OnDtorEvent = exports.OnCtorEvent = exports.PhysicsEvents = exports.GameEvents = exports.Delegate = void 0;
 const XkeinExt_1 = require("XkeinExt");
-const YrExtCore_1 = require("YrExtCore");
 class Delegate {
     handlers;
     constructor() {
@@ -26,7 +25,7 @@ class Delegate {
         }
         catch (error) {
             console.error(error.stack);
-            console.error("cpp stacktrace:" + YrExtCore_1.YrExtCore.GetStackTrace());
+            // console.error("cpp stacktrace:" + YrExtCore.GetStackTrace());
         }
     }
 }

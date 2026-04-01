@@ -86,6 +86,12 @@ class JsCppHelper
 {
     // public static entity GetEntityByYrObject(AbstractClass * pObject)
     static GetEntityByYrObject(pObject_0 : AbstractClass) : entt_entity;
+    // public static uint32 GetPointerValue(AbstractClass * pObject)
+    static GetPointerValue(pObject_0 : AbstractClass) : number;
+    // public static uint32 GetPointerValue(void * ptr)
+    static GetPointerValue(ptr_0 : ArrayBuffer) : number;
+    // public static void * GetArrayBuffer(uint32 address)
+    static GetArrayBuffer(address_0 : number) : ArrayBuffer;
 }
 // JsEventOnCtor
 class JsEventOnCtor
