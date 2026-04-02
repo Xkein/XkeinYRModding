@@ -7,6 +7,7 @@
 #pragma section(SYRINGE_PATCH_SECTION_NAME, read)
 
 namespace SyringePatchData { };
+#pragma pack(push, 16)
 __declspec(align(16)) struct syringe_patch_data {
     unsigned int hookAddr;
     unsigned int hookSize;
@@ -14,6 +15,7 @@ __declspec(align(16)) struct syringe_patch_data {
     const char* category;
     bool unsafe;
 };
+#pragma pack(pop)
 
 #define decl_patch_data(hook, funcname, size, category, unsafe) \
 namespace SyringePatchData { \

@@ -302,6 +302,8 @@ void ApplySyringePatch(syringe_patch_data* data)
     FlushInstructionCache(GetCurrentProcess(), hookAddress, hookSize);
 
     gPatchBucket[data->hookAddr].push_back(data);
+
+    // gLogger->info("apply patch at {} with hook function {}", (void*)data->hookAddr, data->hookFunc);
 }
 
 void ApplyModulePatch(HANDLE hInstance)
@@ -319,24 +321,57 @@ void ApplyModulePatch(HANDLE hInstance)
 
         if (strncmp(SYRINGE_PATCH_SECTION_NAME, (char*)sct_hdr->Name, 8) == 0)
         {
-            auto data = (syringe_patch_data*)((DWORD)hInstance + sct_hdr->VirtualAddress);
-            auto size = sct_hdr->Misc.VirtualSize / sizeof(syringe_patch_data);
+            // 1. Calculate the absolute memory boundaries of the section
+            BYTE* sectionStart = (BYTE*)hInstance + sct_hdr->VirtualAddress;
+            BYTE* sectionEnd = sectionStart + sct_hdr->Misc.VirtualSize;
 
-            for (size_t idx = 0; idx < size; idx++)
+            BYTE* currentPos = sectionStart;
+
+            // 2. Iterate through the section memory
+            // Ensure there is at least enough space for one full struct
+            while (currentPos + sizeof(syringe_patch_data) <= sectionEnd) 
             {
-                syringe_patch_data* curPatch = &data[idx];
-                if (curPatch->hookFunc == nullptr || curPatch->hookAddr == 0)
-                    continue;
-                // check category
-                if (curPatch->category != nullptr) {
-                    if (std::find_if(enableHookCategory.begin(), enableHookCategory.end(), [=](std::string const& category) {
-                        return category == curPatch->category;
-                    }) == enableHookCategory.end()) {
-                        continue;
+                syringe_patch_data* curPatch = (syringe_patch_data*)currentPos;
+
+                // 3. Validation: hookAddr will never be 0 in a valid entry.
+                // If it's non-zero, we've found the start of a data structure.
+                if (curPatch->hookAddr != 0 && curPatch->hookFunc != nullptr) 
+                {
+                    bool shouldApply = true;
+                    
+                    if (curPatch->category != nullptr) {
+                        // Construct string for safe comparison with the category list
+                        std::string catStr(curPatch->category);
+                        auto it = std::find(enableHookCategory.begin(), enableHookCategory.end(), catStr);
+                        
+                        if (it == enableHookCategory.end()) {
+                            shouldApply = false;
+                        }
                     }
+
+                    if (shouldApply) {
+                        ApplySyringePatch(curPatch); 
+                        patchCount++;
+                    }
+
+                    // Advance the pointer by the full size of the struct
+                    currentPos += sizeof(syringe_patch_data);
                 }
-                ApplySyringePatch(curPatch);
-                patchCount++;
+                else 
+                {
+                    // 4. If hookAddr is 0, we are hitting alignment padding.
+                    // Advance by the smallest alignment unit (4 bytes for unsigned int)
+                    currentPos += 4;
+                }
+
+                // 5. Gap Scanning: Skip consecutive null/padding bytes until the next header or end of section
+                while (currentPos + sizeof(syringe_patch_data) <= sectionEnd) {
+                    // Peek at the first 4 bytes; if they are non-zero, it's likely the next hookAddr
+                    if (*(unsigned int*)currentPos != 0) {
+                        break; // Found potential data, return to the outer loop to process
+                    }
+                    currentPos += 4; // Keep searching through the padding
+                }
             }
         }
         else if (std::string_view(moduleName).contains("YrExtCore")) {

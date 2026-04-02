@@ -26,7 +26,7 @@ __IMPLEMENT_YR_HOOK_EVENT({{klass.full_name}})
 {{- end }}
 
 {{- for enum in module_enums}}
-    {{- if need_codegen(enum) }}
+    {{- if need_codegen(enum) || is_yrpp }}
 {{-         if enum.source_file }}
 #include "{{enum.source_file}}"
 {{-         end }}
@@ -282,7 +282,7 @@ void {{get_gen_type_name(klass.identifier)}}__Unregister()
 // ==== enum registrations begin
 
 {{  for enum in module_enums
-    if !need_codegen(enum)
+    if !need_codegen(enum) && !is_yrpp
         continue
     end }}
 void {{get_gen_type_name(enum.name)}}__Register()
@@ -303,18 +303,28 @@ void {{get_gen_type_name(enum.name)}}__Unregister()
 void {{gen_type_name}}::Register()
 {
     sync_meta_ctx();
-{{for klass in array.concat(module_classes, module_enums)
+{{for klass in module_classes
     if need_codegen(klass) }}
     {{get_gen_type_name(klass.identifier ?? klass.name)}}__Register();
+    {{-end
+end }}
+{{for enum in module_enums
+    if need_codegen(enum) || is_yrpp }}
+    {{get_gen_type_name(enum.identifier ?? enum.name)}}__Register();
     {{-end
 end }}
 }
 void {{gen_type_name}}::Unregister()
 {
     sync_meta_ctx();
-{{for klass in array.concat(module_classes, module_enums)
-    if need_codegen(klass) }}
+{{for klass in module_classes
+    if need_codegen(klass)  }}
     {{get_gen_type_name(klass.identifier ?? klass.name)}}__Unregister();
+    {{-end
+end }}
+{{for enum in module_enums
+    if need_codegen(enum) || is_yrpp }}
+    {{get_gen_type_name(enum.identifier ?? enum.name)}}__Unregister();
     {{-end
 end }}
 }

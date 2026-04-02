@@ -91,9 +91,10 @@ void JsEvents::Shutdown()
 #include "yr/yr_all_events.h"
 #include "yr/api/yr_entity.h"
 #include <SuperClass.h>
-
+#include "core/reflection/reflection.h"
 DEFINE_YR_HOOK_EVENT_LISTENER(YrPointerExpireEvent)
 {
+    // gLogger->warn("PointerExpireEvent: {}", Reflection::GetEnumValueName(E->pAbstract->WhatAmI()));
     if (gJsEnv)
     {
         // Limbo will also raise PointerExpire

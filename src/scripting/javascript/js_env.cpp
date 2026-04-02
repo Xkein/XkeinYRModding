@@ -1262,7 +1262,13 @@ v8::Local<v8::Value> JsEnv::FindOrAdd(v8::Isolate* Isolate, v8::Local<v8::Contex
     auto PersistentValuePtr = ObjectMap.find(YrObject);
     if (PersistentValuePtr == ObjectMap.end()) // create and link
     {
-        const void*          TypeId = GetYrJsTypeID(YrObject->WhatAmI());
+        AbstractType         WhatAmI;
+        WhatAmI = YrObject->WhatAmI();
+        // GuardExecute([&]() {WhatAmI = YrObject->WhatAmI(); },
+        //     [](std::string stackTrace) {
+        //     gLogger->error(stackTrace);
+        // });
+        const void*          TypeId = GetYrJsTypeID(WhatAmI);
         v8::Local<v8::Value> Result = DataTransfer::FindOrAddCData(Isolate, Context, TypeId, YrObject, true);
         ObjectMap.emplace(YrObject, v8::Global<v8::Value>(Isolate, Result));
         return Result;
