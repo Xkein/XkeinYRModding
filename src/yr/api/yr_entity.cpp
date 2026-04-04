@@ -28,6 +28,7 @@
 #include <unordered_map>
 #include "runtime/logger/logger.h"
 #include "yr/serialization/serialization.h"
+#include <tracy/Tracy.hpp>
 
 template<typename T>
 using ExtMap = std::unordered_map<T*, entt::entity>;

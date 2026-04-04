@@ -19,7 +19,9 @@ void HelldiverComponent::CreateHelldiverComponent(entt::registry& reg, entt::ent
     HelldiverTypeComponent* const pType = GetYrComponent<HelldiverTypeComponent>(pYrType);
     if (!pType)
         return;
-        
+    
+    if (pType->stratagems.empty())
+        return;
     HelldiverComponent& com = reg.emplace<HelldiverComponent>(entity);
     com.type = pType;
     com.owner = reinterpret_cast<TechnoClass*>(pYrObject);

@@ -11,6 +11,7 @@
 #include "input/input.h"
 #include "xkein/fog/fog_data.h"
 #include <GameClasses.h>
+#include <tracy/Tracy.hpp>
 
 Engine* gEngine = nullptr;
 
@@ -122,12 +123,14 @@ static void JsUpdate()
 void Engine::OnBeginUpdate()
 {
     //gConsole->info("Engine::OnBeginUpdate()");
+    ZoneScopedN("Engine Begin Update");
     CalDeltaTime();
 
     Input::Tick();
     
     if (gJsEnv)
     {
+        ZoneScopedN("Engine Invoke Js Begin Update");
         gJsEnv->mutex.lock();
         INVOKE_JS_EVENT(JsEvents::game.onBeginUpdate);
     }
@@ -137,10 +140,12 @@ void Engine::OnBeginUpdate()
 
 void Engine::OnEndUpdate()
 {
+    ZoneScopedN("Engine End Update");
     JsUpdate();
 
     if (gJsEnv)
     {
+        ZoneScopedN("Engine Invoke Js End Update");
         INVOKE_JS_EVENT(JsEvents::game.onEndUpdate);
         gJsEnv->mutex.unlock();
     }
@@ -153,6 +158,7 @@ void Engine::OnEndUpdate()
 
 void Engine::OnUIUpdate()
 {
+    ZoneScopedN("Engine UI Update");
     Input::Tick();
 
     JsUpdate();

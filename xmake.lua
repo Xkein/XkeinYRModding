@@ -14,7 +14,7 @@ add_rules("CoreRule")
 target("Core")
     set_kind("static")
     set_languages("cxxlatest")
-    add_deps("entt", "json")
+    add_deps("entt", "json", "tracy")
     add_packages("boost", "utfcpp", "efsw", "spdlog", "cereal", { public = true })
     add_headerfiles("src/core/**.h", "src/core/**.hpp")
     add_files("src/core/**.cpp")
@@ -30,6 +30,9 @@ target("YrExtCore")
     add_rules("codegen-cpp")
     add_deps("Core", "YRpp")
     add_packages("asmjit", "zydis", { public = true })
+    if has_config("enable_hook_try_except") then
+        add_defines("ENABLE_HOOK_TRY_EXCEPT")
+    end
     -- export symbols
     add_files("src/core/**.cpp", "src/runtime/**.cpp")
     add_headerfiles("src/yr/**.h")
@@ -113,6 +116,10 @@ target("make_artifacts")
             [build_dir.."/XkeinExt.dll"] = output_dir.."/plugins/XkeinExt.dll",
             [os.getenv("NODEJS_PATH").."/lib/Win32/libnode.dll"] = output_dir.."/plugins/libnode.dll",
         }
+        
+        if has_config("enable_tracy") then
+            copy_pairs[build_dir.."/tracy.dll"] = output_dir.."/tracy.dll"
+        end
 
         local function get_copy_files(dir, pattern, out_dir)
             local files = os.files(path.join(dir, pattern))

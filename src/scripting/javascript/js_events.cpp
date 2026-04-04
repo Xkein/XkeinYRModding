@@ -3,6 +3,7 @@
 #include "scripting/javascript/all_data_binding.h"
 #include "scripting/javascript/js_env.h"
 #include "physics/physics.h"
+#include <tracy/Tracy.hpp>
 
 JsGameEvents            JsEvents::game;
 JsPhysicsEvents         JsEvents::physics;
@@ -13,6 +14,7 @@ struct EnttInvoker
 {
     static auto Invoke(TFunc* behavior, entt::registry& reg, entt::entity entity)
     {
+        ZoneScopedN(entt::type_name<EnttInvoker>::value().data());
         TTarget* pYrObject = reg.get<YrEntityComponent<TTarget>>(entity).yrObject;
         if (!pYrObject) {
             // when we are loading a game...
@@ -27,6 +29,7 @@ struct EnttInvokerDtor
 {
     static auto Invoke(TFunc* behavior, entt::registry& reg, entt::entity entity)
     {
+        ZoneScopedN(entt::type_name<EnttInvokerDtor>::value().data());
         TTarget* pYrObject = reg.get<YrEntityComponent<TTarget>>(entity).yrObject;
         INVOKE_JS_EVENT(*behavior, pYrObject, entity);
         gJsEnv->Unbind(pYrObject);

@@ -2,6 +2,8 @@
 #include "yr_hook.h"
 #include "runtime/logger/logger.h"
 #include "debug_util.h"
+#include <tracy/Tracy.hpp>
+#include <tracy/TracyC.h>
 
 // is there a bette solution?
 class StdFunctionHelper : std::function<HookEventListenerFuncType>
@@ -103,9 +105,9 @@ YrHookMeta YrHookEvent::GetHookMeta(HookEventListenerHandle handle)
 DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
 {
     YrHookEvent_Impl* const impl = _impl;
-    if (impl->_disable)
-        return 0;
-    impl->_callTimes++;
+    //if (impl->_disable)
+    //    return 0;
+    //impl->_callTimes++;
 
     YrHookContext context {
         .R             = R,
@@ -113,13 +115,19 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
         .hookEvent     = this,
     };
 
+#ifdef ENABLE_HOOK_TRY_EXCEPT
     std::string* stackTrace = nullptr;
-    int idx = 0;
+    int          idx        = 0;
+#endif // ENABLE_HOOK_TRY_EXCEPT
     for (const HookEventListener& listener : impl->_listeners)
     {
+        TracyCZoneN(zone, "Invoke HookEventListener", 1);
+#ifdef ENABLE_HOOK_TRY_EXCEPT
         __try
         {
+#endif // ENABLE_HOOK_TRY_EXCEPT
             listener(&context, E);
+#ifdef ENABLE_HOOK_TRY_EXCEPT
         }
         __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
         {
@@ -128,7 +136,7 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
                 YrHookInfo& info = impl->_infos[idx];
                 YrHookMeta& meta = info.meta;
                 ++info.errors;
-                gLogger->error("hook {} encounter error! ({} times)!", (void*)context.GetHookAddress() ,info.errors);
+                gLogger->error("hook {} encounter error! ({} times)!", (void*)context.GetHookAddress(), info.errors);
                 gLogger->error("stack trace : {}", *stackTrace);
             }
             else
@@ -142,6 +150,8 @@ DWORD YrHookEvent::Broadcast(REGISTERS* R, void* E)
             stackTrace = nullptr;
         }
         idx++;
+#endif // ENABLE_HOOK_TRY_EXCEPT
+        TracyCZoneEnd(zone);
     }
 
     return context.returnAddress;

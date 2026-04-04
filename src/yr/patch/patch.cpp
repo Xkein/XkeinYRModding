@@ -176,9 +176,12 @@ typedef DWORD __cdecl SyringePatchFunc (REGISTERS*);
 inline DWORD CallSyringePatch(syringe_patch_data* data, REGISTERS *R)
 {
     std::string* stackTrace = nullptr;
+#ifdef ENABLE_HOOK_TRY_EXCEPT
     __try
     {
+#endif // ENABLE_HOOK_TRY_EXCEPT
         return reinterpret_cast<SyringePatchFunc*>(data->hookFunc)(R);
+#ifdef ENABLE_HOOK_TRY_EXCEPT
     }
     __except (ExceptionFilterGetInfo(GetExceptionInformation(), stackTrace))
     {
@@ -186,6 +189,7 @@ inline DWORD CallSyringePatch(syringe_patch_data* data, REGISTERS *R)
         gLogger->error("stack trace : {}", *stackTrace);
         gLogger->flush();
     }
+#endif // ENABLE_HOOK_TRY_EXCEPT
     return 0;
 }
 DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)

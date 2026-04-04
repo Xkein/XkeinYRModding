@@ -7,6 +7,7 @@
 #include "runtime/logger/logger.h"
 #include <thread>
 #include "yr/debug_util.h"
+#include <tracy/Tracy.hpp>
 
 using namespace std::chrono_literals;
 
@@ -96,6 +97,7 @@ void YrExtUIModule::UIMainThread()
         return;
     if (!ImGui::GetCurrentContext())
         return;
+    ZoneScopedN("UI Module Tick");
     ImGui::GetIO().MouseDrawCursor = true;
     if (YrImGui::gWindows.size() > 0)
     {

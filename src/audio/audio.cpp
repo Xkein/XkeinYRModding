@@ -12,6 +12,7 @@
 #include <HouseClass.h>
 #include <AK/SoundEngine/Common/AkQueryParameters.h>
 #include <chrono>
+#include <tracy/Tracy.hpp>
 
 XKEINEXT_API std::shared_ptr<WwiseSettings> AudioSystem::gWwiseSettings;
 static AkGameObjectID                       gNextId;
@@ -211,6 +212,8 @@ void AudioSystem::Tick()
 {
     if (!gInited)
         return;
+
+    ZoneScopedN("Audio Tick");
 
     // update all AudioComponent
     for (auto&& [entity, audioCom] : gEntt->view<AudioComponent>().each())

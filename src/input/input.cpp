@@ -1,5 +1,6 @@
 #include "input/input.h"
 #include "runtime/logger/logger.h"
+#include <tracy/Tracy.hpp>
 
 gainput::InputManager* Input::gManager = nullptr;
 gainput::InputMap*     Input::gMap;
@@ -33,6 +34,7 @@ void Input::Tick()
 {
     if (!gManager)
         return;
+    ZoneScopedN("Input Tick");
     gManager->Update();
 }
 

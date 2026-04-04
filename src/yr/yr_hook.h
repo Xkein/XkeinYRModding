@@ -8,7 +8,7 @@
         return YrHookEventSystem::Broadcast<HookEvent, HookAddress>(R); \
     } \
     template<> \
-    inline void YrHookEvent::InitHookInfo_Impl<HookEvent, HookAddress>(REGISTERS* const R, HookEvent* const E)
+    FORCEINLINE void YrHookEvent::InitHookInfo_Impl<HookEvent, HookAddress>(REGISTERS* const R, HookEvent* const E)
 
 #define BROADCAST_HOOK_EVENT_AGAIN(HookAddress, Size, HookEvent, BroadAddress) \
     SYRINGE_PATCH_UNSAFE(HookAddress, HookEvent##_B_##BroadAddress, Size) { \
@@ -18,13 +18,13 @@
 #define IMPL_HOOK_OVERRIDE_RETURN_ADDRESS(HookEvent, HookAddress, ReturnAddress) \
 namespace detail { \
     template<> \
-    inline DWORD get_hook_override_return_address<HookEvent, HookAddress>() { \
+    FORCEINLINE DWORD get_hook_override_return_address<HookEvent, HookAddress>() { \
         return ReturnAddress; \
     } \
 }
 
 #define IMPL_HOOK_BROADCAST(HookEvent, HookAddress) \
-    template<> DWORD YrHookEventSystem::Broadcast_Impl<HookEvent, HookAddress>(YrHookEvent* hookEvent, REGISTERS* R, HookEvent* E)
+    template<> FORCEINLINE DWORD YrHookEventSystem::Broadcast_Impl<HookEvent, HookAddress>(YrHookEvent* hookEvent, REGISTERS* R, HookEvent* E)
 
 struct YrHookContext final
 {

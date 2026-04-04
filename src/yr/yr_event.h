@@ -7,6 +7,7 @@
 #include <functional>
 #include <vector>
 #include <Syringe.h>
+#include <tracy/Tracy.hpp>
 
 struct YrHookContext;
 typedef unsigned long DWORD;
@@ -55,13 +56,13 @@ private:
     DWORD Broadcast(REGISTERS* R, void* E);
 
     template<class T, DWORD hookAddress>
-    inline void InitHookInfo(REGISTERS* R, T* E)
+    FORCEINLINE void InitHookInfo(REGISTERS* R, T* E)
     {
         InitHookInfo_Impl<T, hookAddress>(R, E);
     }
 
     template<class T, DWORD hookAddress>
-    void InitHookInfo_Impl(REGISTERS* R, T* E);
+    FORCEINLINE void InitHookInfo_Impl(REGISTERS* R, T* E);
 
 private:
     class YrHookEvent_Impl* _impl;
@@ -70,7 +71,7 @@ private:
 // used by header tool
 #define __IMPLEMENT_YR_HOOK_EVENT(HookEventType) \
     template<> \
-    inline YREXTCORE_API YrHookEvent* YrHookEventSystem::GetEvent_Impl<HookEventType>() { \
+    FORCEINLINE YREXTCORE_API YrHookEvent* YrHookEventSystem::GetEvent_Impl<HookEventType>() { \
         static YrHookEvent gHookEvent; \
         return &gHookEvent; \
     } \
@@ -146,12 +147,12 @@ class YrHookEventSystem final
 {
 public:
     template<class T>
-    inline static YrHookEvent* GetEvent()
+    FORCEINLINE static YrHookEvent* GetEvent()
     {
 #ifdef YREXTCORE_IMPL
-    return YrHookEventSystem::AHookEvent<T>;
+        return YrHookEventSystem::AHookEvent<T>;
 #else
-    return GetEvent(entt::type_id<T>().name().data());
+        return GetEvent(entt::type_name<T>::value().data());
 #endif
     }
 
@@ -197,8 +198,9 @@ public:
     }
 
     template<class TEvent, DWORD HookAddress>
-    inline static DWORD Broadcast(REGISTERS* R)
+    FORCEINLINE static DWORD Broadcast(REGISTERS* R)
     {
+        ZoneScopedN(entt::type_name<TEvent>::value().data());
         static YrHookEvent* hookEvent = GetEvent<TEvent>();
         TEvent              e;
         hookEvent->InitHookInfo<TEvent, HookAddress>(R, &e);
@@ -212,13 +214,13 @@ private:
     static YrHookEvent* GetEvent_Impl();
 
     template<class TEvent, DWORD HookAddress>
-    inline static DWORD Broadcast_Impl(YrHookEvent* hookEvent, REGISTERS* R, TEvent* E)
+    FORCEINLINE static DWORD Broadcast_Impl(YrHookEvent* hookEvent, REGISTERS* R, TEvent* E)
     {
         return Broadcast_Impl_Default<TEvent, HookAddress>(hookEvent, R, E);
     }
     
     template<class TEvent, DWORD HookAddress>
-    inline static DWORD Broadcast_Impl_Default(YrHookEvent* hookEvent, REGISTERS* R, TEvent* E)
+    FORCEINLINE static DWORD Broadcast_Impl_Default(YrHookEvent* hookEvent, REGISTERS* R, TEvent* E)
     {
         auto retAddr = hookEvent->Broadcast(R, E);
         if constexpr (detail::hook_event_override_return<TEvent>) {

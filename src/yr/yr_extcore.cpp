@@ -13,6 +13,7 @@ void LoadExtensions();
 #include "runtime/ecs/entt.h"
 #include "yr/reflection/yr_reflection.h"
 #include "yr/api/yr_entity.h"
+#include <tracy/Tracy.hpp>
 
 struct MetaRegistration
 {
@@ -173,6 +174,9 @@ void OnAppOpen()
         assert(false);
     }
     breakOnExit = gYrExtConfig->rawData.value("break_on_exit", false);
+#if TRACY_ENABLE
+    tracy::StartupProfiler();
+#endif // TRACY_ENABLE
     InitLogger();
     MetaRegistration::Register();
     yr_entity::Init();
@@ -202,6 +206,9 @@ void OnAppExit()
         };
         UninitPatch();
         MetaRegistration::Unregister();
+#if TRACY_ENABLE
+        tracy::ShutdownProfiler();
+#endif // TRACY_ENABLE
         delete gYrExtConfig;
         gYrExtConfig = nullptr;
         gLogger->flush();

@@ -13,6 +13,7 @@
 #include <Jolt/Physics/PhysicsScene.h>
 #include <Jolt/RegisterTypes.h>
 #include <stdarg.h>
+#include <tracy/Tracy.hpp>
 
 // #define TRACE_COLLISION
 
@@ -431,6 +432,7 @@ void Physics::BeginTick()
 {
     if (!gPhysicsSystem)
         return;
+    ZoneScopedN("Physics Begin Tick");
     auto view = gEntt->view<PhysicsComponent>();
     // PrePhysicsUpdate
     // set yr transform to physics world

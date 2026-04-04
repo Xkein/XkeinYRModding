@@ -12,6 +12,7 @@
 #include "runtime/platform/path.h"
 #include "core/assertion_macro.h"
 #include "scripting/javascript/js_events.h"
+#include <tracy/Tracy.hpp>
 
 #define CHECK_V8_ARGS(...)
 
@@ -523,6 +524,7 @@ void JsEnv::WaitDebugger(double timeout)
 
 void JsEnv::LogicTick()
 {
+    ZoneScopedN("Js Engine Logic Tick");
     BackendEnv->LogicTick();
     
 #ifdef THREAD_SAFE
