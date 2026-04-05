@@ -28,3 +28,6 @@
 [submodule "3rdparty/gainput"]
 	path = 3rdparty/gainput
 	url = https://github.com/jkuhlmann/gainput.git
+[submodule "3rdparty/tracy"]
+	path = 3rdparty/tracy
+	url = https://github.com/wolfpld/tracy.git
