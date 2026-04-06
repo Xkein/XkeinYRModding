@@ -183,6 +183,7 @@ void OnAppOpen()
     InitPatch();
     LoadExtensions();
     ApplyModulePatch(GetModuleHandle("YrExtCore.dll"));
+    ApplyDeferredPatches();
     
     SetConsoleCtrlHandler(CtrlHandler, true);
     atexit(OnAppExit);

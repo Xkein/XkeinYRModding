@@ -6,3 +6,4 @@ void UninitPatch();
 
 void ApplyModulePatch(HANDLE hInstance);
 void RemoveModulePatch(HANDLE hInstance);
+void ApplyDeferredPatches();

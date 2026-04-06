@@ -46,11 +46,22 @@ public:
     }
 };
 
+struct RuntimePatchInfo
+{
+    syringe_patch_data* patchData;
+    const char* module;
+    bool applied;
+
+    RuntimePatchInfo(syringe_patch_data* patchData, const char* module)
+        : patchData(patchData), module(module), applied(false) {}
+};
+
 asmjit::JitRuntime* gJitRuntime;
 JitErrorHandler     gJitErrorHandler;
 JitLogger           gJitLogger;
-std::map<uint, std::vector<syringe_patch_data*>> gPatchBucket;
-std::map<std::string, std::vector<syringe_patch_data*>> gModulePatchMap;
+std::map<uint, std::vector<RuntimePatchInfo*>> gPatchBucket;
+std::vector<std::string> gModules;
+bool gPatchBucketApplied = false;
 
 void InitPatch()
 {
@@ -103,15 +114,7 @@ void CheckHookRace(syringe_patch_data* data, const char* moduleName)
     {
         if(offset != 0 && gPatchBucket.contains(data->hookAddr + offset)) {
             // search what module the conflicting hook belongs to
-            std::string conflictModuleName = std::find_if(gModulePatchMap.begin(), gModulePatchMap.end(),
-                [=](const auto& pair) {
-                    if (pair.first == moduleName) {
-                        return false;
-                    }
-                    return std::any_of(pair.second.begin(), pair.second.end(), [=](syringe_patch_data* patch) {
-                        return patch->hookAddr == data->hookAddr + offset;
-                    });
-                })->first;
+            std::string conflictModuleName = gPatchBucket[data->hookAddr + offset].back()->module;
             gLogger->error("{} hook {}-{} conflict with other hook: {} from module {}",
                 moduleName, (void*)data->hookAddr, data->hookFunc, (void*)(data->hookAddr + offset), conflictModuleName);
             conflictConfirmed = true;
@@ -220,7 +223,12 @@ DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
         gCallingPatchs.pop_back();
     }
     else {
-        gCallingPatchs.erase(std::find(gCallingPatchs.begin(), gCallingPatchs.end(), data));
+        if (auto iter = std::find(gCallingPatchs.begin(), gCallingPatchs.end(), data); iter != gCallingPatchs.end()) {
+            gCallingPatchs.erase(iter);
+        }
+        else {
+            gLogger->error("patch {}-{} is not in calling patch list! why??", (void*)data->hookAddr, data->hookFunc);
+        }
         gLogger->error("patch {}-{} finish but it is not the last calling patch!", (void*)data->hookAddr, data->hookFunc);
         gLogger->error("the last calling patch is {}-{}", (void*)gCallingPatchs.back()->hookAddr, gCallingPatchs.back()->hookFunc);
     }
@@ -236,6 +244,7 @@ DWORD __cdecl CallSyringePatchSafe(syringe_patch_data* data, REGISTERS *R)
 }
 
 #include "yr/yr_hook_diagnostic.h"
+#include "patch.h"
 DebugPatchCallInfo GetDebugPatchCallInfo()
 {
     DebugPatchCallInfo info;
@@ -251,6 +260,20 @@ DebugPatchCallInfo GetDebugPatchCallInfo()
 
 void ApplySyringePatch(syringe_patch_data* data, const char* moduleName)
 {
+    auto& list = gPatchBucket[data->hookAddr];
+    auto iter = std::find_if(list.begin(), list.end(),
+        [=](RuntimePatchInfo* info) {
+            return info->patchData == data;
+        });
+    RuntimePatchInfo* patchInfo = iter != list.end() ? *iter : nullptr;
+    if (patchInfo == nullptr) {
+        patchInfo = new RuntimePatchInfo(data, moduleName);
+        list.insert(list.begin(), patchInfo);
+    }
+
+    if (!gPatchBucketApplied || patchInfo->applied) {
+        return;
+    }
     // check hook race
     CheckHookRace(data, moduleName);
     using namespace asmjit;
@@ -317,8 +340,7 @@ void ApplySyringePatch(syringe_patch_data* data, const char* moduleName)
     VirtualProtect(hookAddress, hookSize, protect_flag, NULL);
     FlushInstructionCache(GetCurrentProcess(), hookAddress, hookSize);
 
-    gPatchBucket[data->hookAddr].push_back(data);
-    gModulePatchMap[moduleName].push_back(data);
+    patchInfo->applied = true;
 
     // gLogger->info("apply patch at {} with hook function {}", (void*)data->hookAddr, data->hookFunc);
 }
@@ -329,7 +351,9 @@ void ApplyModulePatch(HANDLE hInstance)
 
     char moduleName[MAX_PATH] {};
     GetModuleFileName((HMODULE)hInstance, moduleName, sizeof(moduleName));
-    gLogger->info("Applying patchs: module = {}", moduleName);
+    gModules.push_back(moduleName);
+    const char* pModuleName = gModules.back().c_str();
+    gLogger->info("Applying patchs: module = {}", pModuleName);
     auto pHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(((PIMAGE_DOS_HEADER)hInstance)->e_lfanew + (long)hInstance);
     int patchCount = 0;
     for (int i = 0; i < pHeader->FileHeader.NumberOfSections; i++)
@@ -367,7 +391,7 @@ void ApplyModulePatch(HANDLE hInstance)
                     }
 
                     if (shouldApply) {
-                        ApplySyringePatch(curPatch, moduleName);
+                        ApplySyringePatch(curPatch, pModuleName);
                         patchCount++;
                     }
 
@@ -421,7 +445,7 @@ void ApplyModulePatch(HANDLE hInstance)
                     gLogger->info("found entry point hook {}, directly invoking", curHook->hookName);
                     CallSyringePatchSafe(curPatch, nullptr);
                 } else {
-                    ApplySyringePatch(curPatch, moduleName);
+                    ApplySyringePatch(curPatch, pModuleName);
                 }
                 patchCount++;
             }
@@ -466,16 +490,28 @@ void ApplyModulePatch(HANDLE hInstance)
                 gLogger->info("found entry point hook {}, directly invoking", hookName);
                 CallSyringePatchSafe(curPatch, nullptr);
             } else {
-                ApplySyringePatch(curPatch, moduleName);
+                ApplySyringePatch(curPatch, pModuleName);
             }
             patchCount++;
         }
         injFile.close();
     }
-    gLogger->info("Patchs applied: module = {}, count = {}", moduleName, patchCount);
+    gLogger->info("Patchs applied: module = {}, count = {}", pModuleName, patchCount);
 }
 
 void RemoveModulePatch(HANDLE hInstance)
 {
     gLogger->warn("RemoveModulePatch is not implemented yet!");
+}
+
+void ApplyDeferredPatches()
+{
+    gPatchBucketApplied = true;
+    for (auto& [module, patchInfos] : gPatchBucket) {
+        for (auto& patchInfo : patchInfos) {
+            if (!patchInfo->applied) {
+                ApplySyringePatch(patchInfo->patchData, patchInfo->module);
+            }
+        }
+    }
 }
