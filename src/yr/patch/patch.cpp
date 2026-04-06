@@ -50,6 +50,7 @@ asmjit::JitRuntime* gJitRuntime;
 JitErrorHandler     gJitErrorHandler;
 JitLogger           gJitLogger;
 std::map<uint, std::vector<syringe_patch_data*>> gPatchBucket;
+std::map<std::string, std::vector<syringe_patch_data*>> gModulePatchMap;
 
 void InitPatch()
 {
@@ -90,7 +91,7 @@ void EmbedOriginalCode(asmjit::x86::Assembler& assembly, syringe_patch_data* dat
     assembly.embed(originalCode.data(), originalCode.size());
 }
 
-void CheckHookRace(syringe_patch_data* data)
+void CheckHookRace(syringe_patch_data* data, const char* moduleName)
 {
     const size_t frontOffset = 4;
     byte* hookAddress = (byte*)data->hookAddr;
@@ -101,7 +102,18 @@ void CheckHookRace(syringe_patch_data* data)
     for (int offset = -frontOffset; offset < (int)data->hookSize; offset++)
     {
         if(offset != 0 && gPatchBucket.contains(data->hookAddr + offset)) {
-            gLogger->error("hook {}-{} conflict with other hook: {}", (void*)data->hookAddr, data->hookFunc, (void*)(data->hookAddr + offset));
+            // search what module the conflicting hook belongs to
+            std::string conflictModuleName = std::find_if(gModulePatchMap.begin(), gModulePatchMap.end(),
+                [=](const auto& pair) {
+                    if (pair.first == moduleName) {
+                        return false;
+                    }
+                    return std::any_of(pair.second.begin(), pair.second.end(), [=](syringe_patch_data* patch) {
+                        return patch->hookAddr == data->hookAddr + offset;
+                    });
+                })->first;
+            gLogger->error("{} hook {}-{} conflict with other hook: {} from module {}",
+                moduleName, (void*)data->hookAddr, data->hookFunc, (void*)(data->hookAddr + offset), conflictModuleName);
             conflictConfirmed = true;
             continue;
         }
@@ -237,10 +249,10 @@ DebugPatchCallInfo GetDebugPatchCallInfo()
     return info;
 }
 
-void ApplySyringePatch(syringe_patch_data* data)
+void ApplySyringePatch(syringe_patch_data* data, const char* moduleName)
 {
     // check hook race
-    CheckHookRace(data);
+    CheckHookRace(data, moduleName);
     using namespace asmjit;
     CodeHolder code;
     InitCodeHolder(code);
@@ -306,6 +318,7 @@ void ApplySyringePatch(syringe_patch_data* data)
     FlushInstructionCache(GetCurrentProcess(), hookAddress, hookSize);
 
     gPatchBucket[data->hookAddr].push_back(data);
+    gModulePatchMap[moduleName].push_back(data);
 
     // gLogger->info("apply patch at {} with hook function {}", (void*)data->hookAddr, data->hookFunc);
 }
@@ -354,7 +367,7 @@ void ApplyModulePatch(HANDLE hInstance)
                     }
 
                     if (shouldApply) {
-                        ApplySyringePatch(curPatch); 
+                        ApplySyringePatch(curPatch, moduleName);
                         patchCount++;
                     }
 
@@ -408,7 +421,7 @@ void ApplyModulePatch(HANDLE hInstance)
                     gLogger->info("found entry point hook {}, directly invoking", curHook->hookName);
                     CallSyringePatchSafe(curPatch, nullptr);
                 } else {
-                    ApplySyringePatch(curPatch);
+                    ApplySyringePatch(curPatch, moduleName);
                 }
                 patchCount++;
             }
@@ -453,7 +466,7 @@ void ApplyModulePatch(HANDLE hInstance)
                 gLogger->info("found entry point hook {}, directly invoking", hookName);
                 CallSyringePatchSafe(curPatch, nullptr);
             } else {
-                ApplySyringePatch(curPatch);
+                ApplySyringePatch(curPatch, moduleName);
             }
             patchCount++;
         }
