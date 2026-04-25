@@ -7,10 +7,61 @@
 #include <SuperWeaponTypeClass.h>
 #include <WeaponTypeClass.h>
 #include <WarheadTypeClass.h>
+#include <boost/algorithm/string.hpp>
 struct ThemeControl;
 
+static thread_local CCINIClass* gCurrentLoadingIni = nullptr;
 static std::map<void*, std::function<void(IniReader&)>> gLoadAllCallbacks;
 static std::map<void*, std::function<void()>> gClearCallbacks;
+static std::map<void*, std::function<void(IniReader&)>> gGlobalLoadCallbacks;
+static std::map<void*, std::function<void()>> gGlobalClearCallbacks;
+static std::map<entt::id_type, std::map<std::string, std::function<void*(const char*)>>> gPolymorphicAutoLoadFactories;
+
+CCINIClass* IniComponentLoader::SetCurrentLoadingIni(CCINIClass* pIni)
+{
+    CCINIClass* previous = gCurrentLoadingIni;
+    gCurrentLoadingIni = pIni;
+    return previous;
+}
+
+void IniComponentLoader::RegisterPolymorphicAutoLoadFactory(
+    entt::id_type baseType,
+    std::string_view derivedTypeName,
+    std::function<void*(const char* name)> factory)
+{
+    gPolymorphicAutoLoadFactories[baseType][std::string(derivedTypeName)] = std::move(factory);
+}
+
+void* detail::TryFindPolymorphicAutoLoad(const entt::type_info& baseType, const char* sectionName)
+{
+    if (!gCurrentLoadingIni || !sectionName || !*sectionName)
+    {
+        return nullptr;
+    }
+
+    IniReader reader { gCurrentLoadingIni };
+    if (!reader.ReadString(sectionName, "$Type"))
+    {
+        return nullptr;
+    }
+    const std::string typeName = boost::trim_copy(std::string(reader.value()));
+
+    auto factoryGroup = gPolymorphicAutoLoadFactories.find(baseType.hash());
+    if (factoryGroup == gPolymorphicAutoLoadFactories.end())
+    {
+        return nullptr;
+    }
+
+    auto factory = factoryGroup->second.find(typeName);
+    if (factory == factoryGroup->second.end())
+    {
+        gLogger->error("could not parse {}[{}]: unsupported $Type {}", baseType.name(), sectionName, typeName);
+        return nullptr;
+    }
+
+    return factory->second(sectionName);
+}
+
 void IniComponentLoader::RegisterLoadAllCallback(void* id, std::function<void(IniReader&)> load, std::function<void()> clear)
 {
     if (gLoadAllCallbacks.contains(id))
@@ -18,6 +69,15 @@ void IniComponentLoader::RegisterLoadAllCallback(void* id, std::function<void(In
     
     gLoadAllCallbacks[id] = load;
     gClearCallbacks[id] = clear;
+}
+
+void IniComponentLoader::RegisterGlobalLoadCallback(void* id, std::function<void(IniReader&)> load, std::function<void()> clear)
+{
+    if (gGlobalLoadCallbacks.contains(id))
+        return;
+
+    gGlobalLoadCallbacks[id] = load;
+    gGlobalClearCallbacks[id] = clear;
 }
 
 template<typename T>
@@ -105,6 +165,10 @@ YREXTCORE_API void IniComponentLoader::RegisterAbstractTypeLoadingFunc(AbstractT
 DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeDataEvent)
 {
     IniReader reader {E->pIni};
+    for (auto&& [id, callback] : gGlobalLoadCallbacks)
+    {
+        callback(reader);
+    }
     for (auto&& [id, callback] : gLoadAllCallbacks)
     {
         callback(reader);
@@ -114,6 +178,10 @@ DEFINE_YR_HOOK_EVENT_LISTENER(YrRulesLoadAfterTypeDataEvent)
 DEFINE_YR_HOOK_EVENT_LISTENER(YrSceneExitEvent)
 {
     for (auto&& [id, callback] : gClearCallbacks)
+    {
+        callback();
+    }
+    for (auto&& [id, callback] : gGlobalClearCallbacks)
     {
         callback();
     }

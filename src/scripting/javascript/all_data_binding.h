@@ -1,6 +1,40 @@
 #pragma once
 #include "scripting/javascript/yr_data_bindings.h"
 #ifndef __HEADER_TOOL__
+#include "xkein/GameplayAbilities/ability_system_component.h"
+UsingCppType(ActiveGameplayEffectHandle);
+UsingCppType(ActiveGameplayEffectsContainer);
+UsingCppType(AttributeSet);
+UsingCppType(AttributeMetaData);
+UsingCppType(AbilityTriggerData);
+UsingCppType(AbilitySystemComponent);
+UsingCppType(AbilitySystemComponentType);
+UsingCppType(GameplayAbility);
+UsingCppType(GameplayAttribute);
+UsingCppType(GameplayAttributeData);
+UsingCppType(GameplayAbilityTargetData);
+UsingCppType(GameplayAbilityTargetDataHandle);
+UsingCppType(GameplayAbilitySpecDef);
+UsingCppType(GameplayEventData);
+UsingCppType(GameplayEffectComponent);
+UsingCppType(GameplayCueNotify_Static);
+UsingCppType(GameplayCueNotify_Actor);
+UsingCppType(GameplayTag);
+UsingCppType(GameplayTagContainer);
+UsingCppType(GameplayAbilitySpec);
+UsingCppType(GameplayAbilitySpecHandle);
+UsingCppType(GameplayAbilityActorInfo);
+UsingCppType(GameplayAbilityActivationInfo);
+
+UsingStdVector(AttributeSet);
+UsingStdVector(AttributeSet*);
+UsingStdVector(AbilityTriggerData);
+UsingStdVector(GameplayTag);
+UsingStdVector(GameplayTag*);
+UsingStdVector(GameplayAttribute);
+UsingStdVector(GameplayAbility);
+UsingStdVector(GameplayAbilitySpec);
+
 #include "scripting/javascript/js_events.h"
 UsingCppTypeWithRefCache(JsGameEvents);
 UsingCppTypeWithRefCache(JsPhysicsEvents);

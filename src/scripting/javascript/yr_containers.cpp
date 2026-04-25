@@ -242,6 +242,14 @@ void RegisterIndexClass()
         .Register();
 }
 
+template<typename CLS>
+void RegisterStdVector()
+{
+    auto builder = PUERTS_NAMESPACE::DefineClass<std::vector<CLS>>();
+    builder.Register();
+}
+
+
 #define REGISTER_DYNAMIC_VECTOR_CLASS(CLS) \
     RegisterVectorClass<CLS>(); \
     RegisterDynamicVectorClass<CLS>();

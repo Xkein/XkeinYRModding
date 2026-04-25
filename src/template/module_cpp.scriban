@@ -89,6 +89,7 @@ component_target_list = get_derived_classes_by_list(get_meta_list(klass.meta, "C
 has_component_target = array.size(component_target_list) > 0
 is_ini_component = get_meta_tag(klass.meta, "IniComponent")
 is_ini_auto_load = get_meta_tag(klass.meta, "IniAutoLoad")
+ini_section = get_meta_value(klass.meta, "IniSection")
 component_target_to_techno = array_contains_any_of(component_target_list, ["AircraftTypeClass", "BuildingTypeClass", "InfantryTypeClass", "UnitTypeClass"])
 component_target_to_terrain = array.contains(component_target_list, "TerrainTypeClass")
 component_target_to_bullet = array.contains(component_target_list, "BulletTypeClass")
@@ -236,9 +237,17 @@ end }}
 {{ if is_ini_component}}
     IniComponentLoader::RegisterLoader<{{klass.full_name}}, &LoadIni_{{klass.identifier}}>(factory);
 {{- end}}
+{{ if is_ini_component && ini_section }}
+    IniComponentLoader::RegisterGlobalIniComponent<{{klass.full_name}}>(factory, "{{ini_section}}");
+{{- end}}
 {{ if is_ini_auto_load}}
     IniComponentLoader::RegisterAutoLoad<{{klass.full_name}}>(factory);
 {{- end}}
+{{ if is_ini_auto_load }}
+{{- for base in klass.base_classes }}
+    IniComponentLoader::RegisterPolymorphicAutoLoad<{{base.full_display_name}}, {{klass.full_name}}>();
+{{- end }}
+{{- end }}
 {{- if is_ini_component && component_target_to_techno }}
     IniComponentLoader::RegisterLoadingComponent<TechnoTypeClass, {{klass.full_name}}>();
 {{- end }}

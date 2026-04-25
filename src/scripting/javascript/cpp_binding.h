@@ -193,6 +193,7 @@ namespace PUERTS_NAMESPACE                                                      
 class __NS__ {}; \
 UsingCppType(__NS__);
 
+#define UsingStdVector(CLS) UsingContainer(std::vector<CLS>)
 
 // to pass compile but not use function pointer
 #define MuteFunctionPtr(CLS)                                                                       \
@@ -305,6 +306,20 @@ namespace PUERTS_NAMESPACE
                 return value->IsString();
             }
         };
+        
+        template<>
+        struct Converter<std::string_view>
+        {
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const std::string_view& value)
+            {
+                return Converter<const char*>::toScript(context, value.data());
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return value->IsString();
+            }
+        };
 
         template<>
         struct Converter<LARGE_INTEGER>
@@ -367,6 +382,24 @@ namespace PUERTS_NAMESPACE
     };
     
     template<>
+    struct ScriptTypeName<std::string_view>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("std::string_view");
+        }
+    };
+    
+    template<typename T>
+    struct ScriptTypeName<std::vector<T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("std::vector<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
+    template<>
     struct ScriptTypeName<LARGE_INTEGER>
     {
         static constexpr auto value()
@@ -386,12 +419,15 @@ namespace PUERTS_NAMESPACE
 } // namespace PUERTS_NAMESPACE
 
 template<auto Data, typename T, typename API, typename RegisterAPI>
-void MakePropertyCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
+FORCEINLINE void MakePropertyCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
 {
     if constexpr (std::is_member_object_pointer_v<decltype(Data)>)
     {
         using data_type = std::invoke_result_t<decltype(Data), T&>;
-        if constexpr (std::is_move_assignable_v<data_type> && !std::is_same_v<data_type, const char*&>)
+        constexpr bool is_readonly = !std::is_move_assignable_v<data_type>
+            || std::is_same_v<data_type, std::string_view&>
+            || std::is_same_v<data_type, const char*&>;
+        if constexpr (!is_readonly)
         {
             builder.Property(name, MakeProperty(Data));
         }
@@ -834,13 +870,13 @@ namespace PUERTS_NAMESPACE
 }
 
 template<auto Candidate, typename T, typename API, typename RegisterAPI>
-void MakeMethodCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
+FORCEINLINE void MakeMethodCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
 {
     builder.Method(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
 }
 
 template<auto Candidate, typename T, typename API, typename RegisterAPI>
-void MakeFunctionCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
+FORCEINLINE void MakeFunctionCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, RegisterAPI>& builder, const char* name)
 {
     builder.Function(name, MakeFunction(static_cast<remove_noexcept_t<decltype(Candidate)>>(Candidate)));
 }
