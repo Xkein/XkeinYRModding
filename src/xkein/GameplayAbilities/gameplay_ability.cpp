@@ -11,8 +11,36 @@ GameplayAbilitySpec::GameplayAbilitySpec(GameplayAbility* InAbility, int32 InLev
 // GameplayAbility lifecycle methods
 // ============================================================
 
-bool GameplayAbility::CanActivateAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
-    const GameplayTagContainer* SourceTags, const GameplayTagContainer* TargetTags, GameplayTagContainer* OptionalRelevantTags) const
+static GameplayAbilitySpec* FindAbilitySpec(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo)
+{
+    if (!ActorInfo || !ActorInfo->AbilitySystemCom)
+    {
+        return nullptr;
+    }
+
+    auto& Abilities = ActorInfo->AbilitySystemCom->ActivatableAbilities;
+    for (auto& Spec : Abilities)
+    {
+        if (Spec.Handle == Handle)
+        {
+            return &Spec;
+        }
+    }
+
+    return nullptr;
+}
+
+void GameplayAbility::InitFromDefine(GameplayAbilityDefine* AbilityDefine)
+{
+    this->Define = AbilityDefine;
+    
+}
+
+bool GameplayAbility::CanActivateAbility(const GameplayAbilitySpecHandle Handle,
+                                         const GameplayAbilityActorInfo* ActorInfo,
+                                         const GameplayTagContainer*     SourceTags,
+                                         const GameplayTagContainer*     TargetTags,
+                                         GameplayTagContainer*           OptionalRelevantTags) const
 {
     if (!ActorInfo || !ActorInfo->AbilitySystemCom)
     {
@@ -27,19 +55,46 @@ bool GameplayAbility::CanActivateAbility(const GameplayAbilitySpecHandle Handle,
     
     // Check source tags against required/blocked tags
     // Note: full implementation would check against ASC's owned tags
+    if (OnK2CanActivateAbility)
+    {
+        GameplayAbilityActorInfo ActorInfoValue = *ActorInfo;
+        if (!OnK2CanActivateAbility(ActorInfoValue, Handle, OptionalRelevantTags))
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 
 void GameplayAbility::ActivateAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, const GameplayEventData* TriggerEventData)
 {
-    // Base implementation: empty. Subclasses override this to implement specific ability logic.
+    if (TriggerEventData && OnK2ActivateAbilityFromEvent)
+    {
+        OnK2ActivateAbilityFromEvent(*TriggerEventData);
+        return;
+    }
+
+    if (OnK2ActivateAbility)
+    {
+        OnK2ActivateAbility();
+    }
 }
 
 void GameplayAbility::PreActivate(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded* OnGameplayAbilityEndedDelegate,
     const GameplayEventData* TriggerEventData)
 {
+    CurrentActorInfo = ActorInfo;
+    CurrentSpecHandle = Handle;
+    CurrentActivationInfo = ActivationInfo;
+    bHasCurrentEventData = TriggerEventData != nullptr;
+    if (TriggerEventData)
+    {
+        CurrentEventData = *TriggerEventData;
+    }
+
     // Call the derived implementation
     ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
@@ -72,8 +127,67 @@ bool GameplayAbility::CommitAbility(const GameplayAbilitySpecHandle Handle, cons
     {
         return false;
     }
-    
+
+    ApplyCooldown(Handle, ActorInfo, ActivationInfo);
+    ApplyCost(Handle, ActorInfo, ActivationInfo);
+    if (OnK2CommitExecute)
+    {
+        OnK2CommitExecute();
+    }
+
     return true;
+}
+
+void GameplayAbility::K2_CancelAbility()
+{
+    CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+}
+
+bool GameplayAbility::K2_CommitAbility()
+{
+    return CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, nullptr);
+}
+
+bool GameplayAbility::K2_CommitAbilityCooldown()
+{
+    if (!CheckCooldown(CurrentSpecHandle, CurrentActorInfo, nullptr))
+    {
+        return false;
+    }
+
+    ApplyCooldown(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+    return true;
+}
+
+bool GameplayAbility::K2_CommitAbilityCost()
+{
+    if (!CheckCost(CurrentSpecHandle, CurrentActorInfo, nullptr))
+    {
+        return false;
+    }
+
+    ApplyCost(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+    return true;
+}
+
+bool GameplayAbility::K2_CheckAbilityCooldown()
+{
+    return CheckCooldown(CurrentSpecHandle, CurrentActorInfo, nullptr);
+}
+
+bool GameplayAbility::K2_CheckAbilityCost()
+{
+    return CheckCost(CurrentSpecHandle, CurrentActorInfo, nullptr);
+}
+
+void GameplayAbility::K2_EndAbility()
+{
+    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+}
+
+void GameplayAbility::K2_EndAbilityLocally()
+{
+    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
 }
 
 bool GameplayAbility::CheckCooldown(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo, 
@@ -115,29 +229,36 @@ void GameplayAbility::ApplyCost(const GameplayAbilitySpecHandle Handle, const Ga
 void GameplayAbility::CancelAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
+    if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
+    {
+        Spec->OnGameplayAbilityCancelled.publish();
+    }
     EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility, true);
 }
 
 void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-    // Trigger the ended delegate if the ASC and spec exist
-    if (ActorInfo && ActorInfo->AbilitySystemCom)
+    if (OnK2OnEndAbility)
     {
-        auto& Abilities = ActorInfo->AbilitySystemCom->ActivatableAbilities;
-        for (auto& Spec : Abilities)
+        OnK2OnEndAbility(bWasCancelled);
+    }
+
+    // Trigger the ended delegate if the ASC and spec exist
+    if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
+    {
+        Spec->OnGameplayAbilityEnded.publish(Spec);
+        
+        // If marked for removal after activation, remove it now
+        if (Spec->RemoveAfterActivation)
         {
-            if (Spec.Handle == Handle)
-            {
-                Spec.OnGameplayAbilityEnded.publish(&Spec);
-                
-                // If marked for removal after activation, remove it now
-                if (Spec.RemoveAfterActivation)
-                {
-                    // Mark for removal - actual removal happens in Tick to avoid iterator invalidation
-                }
-                break;
-            }
+            // Mark for removal - actual removal happens in Tick to avoid iterator invalidation
         }
     }
+
+    CurrentActorInfo = nullptr;
+    CurrentSpecHandle = GameplayAbilitySpecHandle();
+    CurrentActivationInfo = GameplayAbilityActivationInfo();
+    bHasCurrentEventData = false;
+    CurrentEventData = GameplayEventData();
 }

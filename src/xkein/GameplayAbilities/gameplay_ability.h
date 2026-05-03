@@ -6,6 +6,7 @@
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec_handle.h"
+#include <functional>
 
 class GameplayAbility;
 class AbilitySystemComponent;
@@ -168,46 +169,89 @@ struct AbilityTriggerData
 	EGameplayAbilityTriggerSource TriggerSource;
 };
 
+
 /** Abilities define custom gameplay logic that can be activated by players or external game logic */
 CLASS(BindJs, IniComponent, IniAutoLoad)
-class GameplayAbility
+class GameplayAbilityDefine
 {
-    public:
-	/** Triggers to determine if this ability should execute in response to an event */
-	PROPERTY()
-	std::vector<AbilityTriggerData> AbilityTriggers;
+	// set by GameplayAbilitySystem
+	uint Id;
+	
 
 	/** Tags that this ability has (used for categorization and queries) */
 	PROPERTY()
 	GameplayTagContainer AbilityTags;
+	
+	/** How the ability is instanced when executed. This limits what an ability can do in its implementation. */
+	PROPERTY()
+	EGameplayAbilityInstancingPolicy InstancingPolicy;
+	
+	/** if true, and trying to activate an already active instanced ability, end it and re-trigger it. */
+	PROPERTY()
+	bool bRetriggerInstancedAbility;
+	
+	/** This GameplayEffect represents the cost (mana, stamina, etc) of the ability. It will be applied when the ability is committed. */
+	PROPERTY()
+	GameplayEffect* CostGameplayEffectClass;
 
-	/** If any of these tags are present on the target, the ability cannot be activated */
+	/** Triggers to determine if this ability should execute in response to an event */
+	PROPERTY()
+	std::vector<AbilityTriggerData> AbilityTriggers;
+	
+	/** This GameplayEffect represents the cooldown. It will be applied when the ability is committed and the ability cannot be used again until it is expired. */
+	PROPERTY()
+	GameplayEffect* CooldownGameplayEffectClass;
+	
+	// ----------------------------------------------------------------------------------------------------------------
+	//	Ability exclusion / canceling
+	// ----------------------------------------------------------------------------------------------------------------
+
+	/** Abilities with these tags are cancelled when this ability is executed */
+	PROPERTY()
+	GameplayTagContainer CancelAbilitiesWithTag;
+
+	/** Abilities with these tags are blocked while this ability is active */
+	PROPERTY()
+	GameplayTagContainer BlockAbilitiesWithTag;
+
+	/** Tags to apply to activating owner while this ability is active. These are replicated if ReplicateActivationOwnedTags is enabled in AbilitySystemGlobals. */
+	PROPERTY()
+	GameplayTagContainer ActivationOwnedTags;
+
+	/** This ability can only be activated if the activating actor/component has all of these tags */
+	PROPERTY()
+	GameplayTagContainer ActivationRequiredTags;
+
+	/** This ability is blocked if the activating actor/component has any of these tags */
 	PROPERTY()
 	GameplayTagContainer ActivationBlockedTags;
 
-	/** If the source (owner) has any of these tags, the ability cannot be activated */
+	/** This ability can only be activated if the source actor/component has all of these tags */
 	PROPERTY()
 	GameplayTagContainer SourceRequiredTags;
 
-	/** If the source (owner) does NOT have all of these tags, the ability cannot be activated */
+	/** This ability is blocked if the source actor/component has any of these tags */
 	PROPERTY()
 	GameplayTagContainer SourceBlockedTags;
 
-	/** If the target has any of these tags, the ability cannot be activated */
+	/** This ability can only be activated if the target actor/component has all of these tags */
 	PROPERTY()
 	GameplayTagContainer TargetRequiredTags;
 
-	/** If the target does NOT have all of these tags, the ability cannot be activated */
+	/** This ability is blocked if the target actor/component has any of these tags */
 	PROPERTY()
 	GameplayTagContainer TargetBlockedTags;
+};
 
-	/** How this ability is instigated when executed */
+/** Abilities define custom gameplay logic that can be activated by players or external game logic */
+CLASS(BindJs)
+class GameplayAbility
+{
+    public:
 	PROPERTY()
-	EGameplayAbilityInstancingPolicy InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	
-	/** How this ability is executed in a networked context */
-	PROPERTY()
-	EGameplayAbilityNetExecutionPolicy NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalOnly;
+	GameplayAbilityDefine* Define;
+
+	virtual void InitFromDefine(GameplayAbilityDefine* AbilityDefine);
     
 	/** Returns true if this ability can be activated right now. Has no side effects */
 	virtual bool CanActivateAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
@@ -229,6 +273,30 @@ class GameplayAbility
 
 	virtual bool CommitAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
         const GameplayAbilityActivationInfo ActivationInfo, GameplayTagContainer* OptionalRelevantTags = nullptr);
+
+    FUNCTION()
+    virtual void K2_CancelAbility();
+
+    FUNCTION()
+    virtual bool K2_CommitAbility();
+
+    FUNCTION()
+    virtual bool K2_CommitAbilityCooldown();
+
+    FUNCTION()
+    virtual bool K2_CommitAbilityCost();
+
+    FUNCTION()
+    virtual bool K2_CheckAbilityCooldown();
+
+    FUNCTION()
+    virtual bool K2_CheckAbilityCost();
+
+    FUNCTION()
+    virtual void K2_EndAbility();
+
+    FUNCTION()
+    virtual void K2_EndAbilityLocally();
 
 	/** Returns the cooldown gameplay effect to apply when this ability is committed */
 	virtual GameplayEffect* GetCooldownGameplayEffect() const { return nullptr; }
@@ -282,8 +350,42 @@ class GameplayAbility
 	}
 
 protected:
-	/** Cached actor info for the current activation */
+	// -------------------------------------
+	//	Protected properties
+	// -------------------------------------
+
+	/** This is information specific to this instance of the ability. E.g, whether it is predicting, authoring, confirmed, etc. */
+	GameplayAbilityActivationInfo CurrentActivationInfo;
+
+	/** Information specific to this instance of the ability, if it was activated by an event */
+	GameplayEventData CurrentEventData;
+
+	/** 
+	 *  This is shared, cached information about the thing using us
+	 *	 E.g, Actor*, MovementComponent*, AnimInstance, etc.
+	 *	 This is hopefully allocated once per actor and shared by many abilities.
+	 *	 The actual struct may be overridden per game to include game specific data.
+	 *	 (E.g, child classes may want to cast to FMyGameAbilityActorInfo)
+	 */
 	const GameplayAbilityActorInfo* CurrentActorInfo = nullptr;
+	/** For instanced abilities */
+    GameplayAbilitySpecHandle CurrentSpecHandle;
+
+public:
+    PROPERTY()
+    std::function<bool(GameplayAbilityActorInfo, GameplayAbilitySpecHandle, GameplayTagContainer*)> OnK2CanActivateAbility;
+
+    PROPERTY()
+    std::function<void()> OnK2ActivateAbility;
+
+    PROPERTY()
+    std::function<void(const GameplayEventData&)> OnK2ActivateAbilityFromEvent;
+
+    PROPERTY()
+    std::function<void()> OnK2CommitExecute;
+
+    PROPERTY()
+    std::function<void(bool)> OnK2OnEndAbility;
 
 };
 

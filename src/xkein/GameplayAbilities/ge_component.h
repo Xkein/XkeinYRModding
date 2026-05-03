@@ -32,6 +32,11 @@ public:
         ActiveGameplayEffectsContainer& Container,
         ActiveGameplayEffect& Effect) const {}
 
+    /** Called right before the active gameplay effect is removed (Duration/Infinite). */
+    virtual void OnActiveGameplayEffectRemoved(
+        ActiveGameplayEffectsContainer& Container,
+        ActiveGameplayEffect& Effect) const {}
+
     /**
      * Called when an instant GE executes.
      */

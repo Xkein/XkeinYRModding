@@ -35,7 +35,7 @@ public:
     static void OnLoading(CCINIClass* pIni, T* loadingObj);
 
     template<typename T>
-    static T* GetGlobalIniComponent();
+    FORCEINLINE static T* GetGlobalIniComponent();
 
     template<typename T, typename TCom>
     static void RegisterLoadingComponent();

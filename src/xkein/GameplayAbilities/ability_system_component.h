@@ -5,6 +5,9 @@
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_cue.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
+#include "xkein/GameplayAbilities/gameplay_tag_count_container.h"
+
+class AbilitySystemComponent;
 
 struct ActiveGameplayEffectsContainer
 {
@@ -15,7 +18,7 @@ struct ActiveGameplayEffectsContainer
 	const ActiveGameplayEffect* GetActiveGameplayEffect(const ActiveGameplayEffectHandle Handle) const;
     
     /** Add a new gameplay effect spec to the container. Returns the active effect handle */
-	ActiveGameplayEffectHandle Add(GameplayEffectSpec& Spec);
+	ActiveGameplayEffectHandle Add(AbilitySystemComponent* OwningASC, GameplayEffectSpec& Spec);
     
     /** Remove an active effect by handle */
 	void Remove(ActiveGameplayEffectHandle Handle);
@@ -57,9 +60,11 @@ struct AbilitySystemComponentType final
 	PROPERTY(IniField = "ASC.Attributes")
 	std::vector<AttributeSetDefine*> Attributes;
 	PROPERTY(IniField = "ASC.DefaultAbilities")
-	std::vector<GameplayAbility*> DefaultAbilities;
+	std::vector<GameplayAbilityDefine*> DefaultAbilities;
 	PROPERTY(IniField = "ASC.StartupTags")
     std::vector<GameplayTag> StartupTags;
+	PROPERTY(IniField = "ASC.StartupEffects")
+    std::vector<GameplayEffect> StartupEffects;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(AbilitySystemComponentType);
 
@@ -74,6 +79,11 @@ public:
 	/** The actor that is the physical representation used for abilities. Can be NULL */
     PROPERTY()
     entt::entity Avatar;
+	PROPERTY()
+	AbilitySystemComponentType* Type;
+
+	void InitializeFromType(AbilitySystemComponentType* InType);
+
 	/**
 	 *	The abilities we can activate. 
 	 *		-This will include CDOs for non instanced abilities and per-execution instanced abilities. 
@@ -108,10 +118,38 @@ public:
 
 	/** Notify that a tag count has changed, triggers registered events */
 	void NotifyTagCountChanged(const GameplayTag& Tag, int32 NewCount);
+
+	// ============================================================
+	// Gameplay tag operations (UE: TagCountContainer + explicit tags)
+	// ============================================================
+
+	/** Add a loose gameplay tag (not backed by a GE). Updates parent tags count too. */
+	void AddLooseGameplayTag(const GameplayTag& Tag, int32 Count = 1);
+
+	/** Remove a loose gameplay tag (not backed by a GE). Updates parent tags count too. */
+	void RemoveLooseGameplayTag(const GameplayTag& Tag, int32 Count = 1);
+
+	/** Returns count for this tag (includes loose + GE granted, and includes parent propagation). */
+	int32 GetGameplayTagCount(const GameplayTag& Tag) const;
+
+	/** Returns explicit owned tags (no parent expansion), like UE's GetOwnedGameplayTags(). */
+	const GameplayTagContainer& GetOwnedGameplayTags() const { return GameplayTagCountContainer.GetExplicitGameplayTags(); }
 	
 	// /** Allow events to be registered for specific gameplay tags being added or removed */
 	// FOnGameplayEffectTagCountChanged& RegisterGameplayTagEvent(GameplayTag Tag, EGameplayTagEventType EventType = EGameplayTagEventType::NewOrRemoved);
     
+	/** Full list of all instance-per-execution gameplay abilities associated with this component */
+	const std::vector<GameplayAbility*>& GetReplicatedInstancedAbilities() const { return AllReplicatedInstancedAbilities; }
+
+	/** Add a gameplay ability associated to this component */
+	void AddReplicatedInstancedAbility(GameplayAbility* Ability);
+
+	/** Remove a gameplay ability associated to this component */
+	void RemoveReplicatedInstancedAbility(GameplayAbility* Ability);
+
+	/** Unregister all the gameplay abilities of this component */
+	void RemoveAllReplicatedInstancedAbilities();
+
 	/**
 	 *	GameplayAbilities
 	 *	
@@ -237,4 +275,9 @@ public:
 protected:
 	/** Map of tag to event delegate for tag count changes */
 	std::map<GameplayTag, FOnGameplayTagCountChanged> GameplayTagEventMap;
+
+	/** Equivalent to UE's FGameplayTagCountContainer. */
+	GameplayTagCountContainer GameplayTagCountContainer;
+
+	std::vector<GameplayAbility*> AllReplicatedInstancedAbilities;
 };

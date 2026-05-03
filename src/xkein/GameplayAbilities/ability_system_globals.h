@@ -12,6 +12,20 @@ struct AbilitySystemGlobals
     std::vector<AttributeSetDefine*> DefaultAttributeSets;
 };
 
+CLASS(BindJs)
+class GameplayAbilitySystem
+{
+public:
+    static void Tick();
+
+    FUNCTION()
+    static void RegisterAbilityCreator(std::string name, std::function<GameplayAbility*(AbilitySystemComponent* component)> creator);
+
+    static uint GetAbilityId(std::string_view name);
+
+    static GameplayAbility* CreateAbility(uint id, AbilitySystemComponent* component);
+};
+
 #ifndef __HEADER_TOOL__
 namespace detail
 {

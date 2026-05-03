@@ -1,18 +1,67 @@
 #include "ability_system_component.h"
 #include "xkein/GameplayAbilities/ge_component.h"
 #include <core/tool/container.h>
+#include <core/string/string_tool.h>
 #include <map>
 #include <algorithm>
+#include <string>
+
+void AbilitySystemComponent::InitializeFromType(AbilitySystemComponentType* InType)
+{
+    Type = InType;
+
+    if (!Type)
+    {
+        return;
+    }
+
+    // Spawn attribute sets first (abilities/effects may query attributes)
+    for (auto* Define : Type->Attributes)
+    {
+        if (!Define) continue;
+
+        AttributeSet NewSet;
+        for (const auto& Attr : Define->Attributes)
+        {
+            NewSet.AddAttributeData(&Attr, 0.0f);
+        }
+        SpawnedAttributes.push_back(std::move(NewSet));
+    }
+
+    // Startup tags (loose)
+    for (const auto& Tag : Type->StartupTags)
+    {
+        AddLooseGameplayTag(Tag, 1);
+    }
+
+    for (const auto& Ability : Type->DefaultAbilities)
+    {
+        this->GiveAbility(GameplayAbilitySpec(Ability));
+    }
+
+    // Startup effects applied to self
+    if (!Type->StartupEffects.empty())
+    {
+        GameplayEffectContext Ctx;
+        Ctx.Instigator = Owner;
+        Ctx.AbilityLevel = 1;
+        Ctx.InstigatorAbilitySystemComponent = this;
+
+        for (auto& Effect : Type->StartupEffects)
+        {
+            ApplyGameplayEffectToSelf(&Effect, Ctx);
+        }
+    }
+}
 
 FOnGameplayTagCountChanged& AbilitySystemComponent::RegisterGameplayTagEvent(const GameplayTag& Tag)
 {
     return GameplayTagEventMap[Tag];
 }
 
-int32 AbilitySystemComponent::HandleGameplayEvent(const GameplayTag& EventTag, const GameplayEventData* Payload)
+int32 AbilitySystemComponent::HandleGameplayEvent(const GameplayTag& EventTag, [[maybe_unused]] const GameplayEventData* Payload)
 {
     int32 NumActivated = 0;
-    (void)Payload;
 
     // Find abilities triggered by this event
     auto It = GameplayEventTriggeredAbilities.find(EventTag);
@@ -37,6 +86,66 @@ void AbilitySystemComponent::NotifyTagCountChanged(const GameplayTag& Tag, int32
     {
         It->second.publish(Tag, NewCount);
     }
+
+    // Trigger abilities bound to owned tag changes when tag becomes present
+    if (NewCount > 0)
+    {
+        auto It2 = OwnedTagTriggeredAbilities.find(Tag);
+        if (It2 != OwnedTagTriggeredAbilities.end())
+        {
+            for (const auto& Handle : It2->second)
+            {
+                TryActivateAbility(Handle, true);
+            }
+        }
+    }
+}
+
+static std::vector<GameplayTag> BuildParentTagsInclusive_ForEvents(const GameplayTag& Tag)
+{
+    std::vector<GameplayTag> Out;
+    if (!Tag.IsValid()) return Out;
+
+    std::string Full(Tag.TagName);
+    size_t Pos = 0;
+    while (true)
+    {
+        size_t Dot = Full.find('.', Pos);
+        std::string_view View = (Dot == std::string::npos) ? std::string_view(Full) : std::string_view(Full.data(), Dot);
+
+        GameplayTag Parent;
+        Parent.TagName = get_pool_string_view(View);
+        Out.push_back(Parent);
+
+        if (Dot == std::string::npos) break;
+        Pos = Dot + 1;
+    }
+    return Out;
+}
+
+void AbilitySystemComponent::AddLooseGameplayTag(const GameplayTag& Tag, int32 Count)
+{
+    if (Count <= 0) return;
+    GameplayTagCountContainer.UpdateTagCount(Tag, Count);
+    for (const auto& Parent : BuildParentTagsInclusive_ForEvents(Tag))
+    {
+        NotifyTagCountChanged(Parent, GameplayTagCountContainer.GetTagCount(Parent));
+    }
+}
+
+void AbilitySystemComponent::RemoveLooseGameplayTag(const GameplayTag& Tag, int32 Count)
+{
+    if (Count <= 0) return;
+    GameplayTagCountContainer.UpdateTagCount(Tag, -Count);
+    for (const auto& Parent : BuildParentTagsInclusive_ForEvents(Tag))
+    {
+        NotifyTagCountChanged(Parent, GameplayTagCountContainer.GetTagCount(Parent));
+    }
+}
+
+int32 AbilitySystemComponent::GetGameplayTagCount(const GameplayTag& Tag) const
+{
+    return GameplayTagCountContainer.GetTagCount(Tag);
 }
 
 GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbilitySpec& AbilitySpec)
@@ -260,7 +369,7 @@ void AbilitySystemComponent::OnRemoveAbility(GameplayAbilitySpec& Spec)
     if (Spec.Ability == nullptr) return;
     
     // Remove from trigger maps
-    for (const AbilityTriggerData& TriggerData : Spec.Ability->AbilityTriggers)
+    for (const AbilityTriggerData& TriggerData : Spec.Ability->Define->AbilityTriggers)
     {
         GameplayTag EventTag = TriggerData.TriggerTag;
         
@@ -465,6 +574,20 @@ static void NotifyComponentsAdded(GameplayEffect* Effect, ActiveGameplayEffectsC
     }
 }
 
+static void NotifyComponentsRemoved(GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
+    ActiveGameplayEffect& ActiveEffect)
+{
+    if (!Effect) return;
+
+    for (auto* Component : Effect->GEComponents)
+    {
+        if (Component)
+        {
+            Component->OnActiveGameplayEffectRemoved(Container, ActiveEffect);
+        }
+    }
+}
+
 /** Notify all GE Components that the effect was executed (instant) */
 static void NotifyComponentsExecuted(GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
     GameplayEffectSpec& Spec)
@@ -537,7 +660,7 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
     case EGameplayEffectDurationType::HasDuration:
     {
         // Add as active effect
-        ActiveGameplayEffectHandle Handle = Target->ActiveGameplayEffects.Add(Spec);
+        ActiveGameplayEffectHandle Handle = Target->ActiveGameplayEffects.Add(Target, Spec);
         
         // Apply modifiers to current value for duration effects
         ExecuteInstantEffect(Target, Spec);
@@ -738,11 +861,11 @@ const ActiveGameplayEffect* ActiveGameplayEffectsContainer::GetActiveGameplayEff
     return nullptr;
 }
 
-ActiveGameplayEffectHandle ActiveGameplayEffectsContainer::Add(GameplayEffectSpec& Spec)
+ActiveGameplayEffectHandle ActiveGameplayEffectsContainer::Add(AbilitySystemComponent* OwningASC, GameplayEffectSpec& Spec)
 {
     auto* NewEffect = new ActiveGameplayEffect();
     NewEffect->Spec = Spec;
-    NewEffect->Handle = ActiveGameplayEffectHandle::GenerateNewHandle(nullptr);
+    NewEffect->Handle = ActiveGameplayEffectHandle::GenerateNewHandle(OwningASC);
     Effects.push_back(NewEffect);
     return NewEffect->Handle;
 }
@@ -753,6 +876,10 @@ void ActiveGameplayEffectsContainer::Remove(ActiveGameplayEffectHandle Handle)
         [&Handle](ActiveGameplayEffect* Effect) {
             if (Effect && Effect->Handle == Handle)
             {
+                if (Effect->Spec.Def)
+                {
+                    NotifyComponentsRemoved(const_cast<GameplayEffect*>(Effect->Spec.Def), *this, *Effect);
+                }
                 delete Effect;
                 return true;
             }
@@ -930,28 +1057,3 @@ void ActiveGameplayEffectsContainer::ApplyStackingLogic(GameplayEffectSpec& Spec
     }
 }
 
-static float GetDeltaTime()
-{
-    // Get frame delta time from the game
-    // In YR, this can be derived from the event context
-    // For now, use a fixed step since we don't have direct access to frame time here
-    return 1.0f / 60.0f; // ~16ms per frame at 60fps
-}
-
-static void Tick()
-{
-    float DeltaTime = GetDeltaTime();
-    
-    // update all ability system components
-    for (auto&& [entity, asc] : gEntt->view<AbilitySystemComponent>().each())
-    {
-        asc.ActiveGameplayEffects.Tick(DeltaTime);
-    }
-}
-
-#include "yr/yr_all_events.h"
-
-DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent)
-{
-    Tick();
-}

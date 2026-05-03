@@ -17,4 +17,8 @@ public:
     void OnActiveGameplayEffectAdded(
         ActiveGameplayEffectsContainer& Container,
         ActiveGameplayEffect& Effect) const override;
+
+    void OnActiveGameplayEffectRemoved(
+        ActiveGameplayEffectsContainer& Container,
+        ActiveGameplayEffect& Effect) const override;
 };
