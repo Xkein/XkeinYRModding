@@ -55,12 +55,12 @@ GameplayAttributeData& AttributeSet::AddAttributeData(const GameplayAttribute* A
     return It->second;
 }
 
-const GameplayAttribute* AttributeSet::FindAttribute(std::string_view AttributeName, std::string_view AttributeOwner) const
+const GameplayAttribute* AttributeSet::FindAttribute(StringName AttributeName, StringName AttributeOwner) const
 {
     for (const auto& [Attribute, Data] : AttributeDataMap)
     {
         if (Attribute->AttributeName != AttributeName) continue;
-        if (!AttributeOwner.empty() && Attribute->AttributeOwner != AttributeOwner) continue;
+        if (!AttributeOwner.IsEmpty() && Attribute->AttributeOwner != AttributeOwner) continue;
         return Attribute;
     }
     return nullptr;

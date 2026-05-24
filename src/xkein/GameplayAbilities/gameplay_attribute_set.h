@@ -1,7 +1,7 @@
 #pragma once
 #include "core/reflection/reflection.h"
+#include "core/string/string_name.h"
 #include "yr/serialization/serialization.h"
-#include "yr/parse/parser.h"
  
 /** Place in an AttributeSet to create an attribute that can be accesed using FGameplayAttribute. It is strongly encouraged to use this instead of raw float attributes */
 
@@ -64,9 +64,9 @@ struct GameplayAttribute
     GameplayAttribute();
 
     PROPERTY()
-    std::string_view AttributeName;
+    StringName AttributeName;
     PROPERTY()
-    std::string_view AttributeOwner;
+    StringName AttributeOwner;
 
     /** Get current value from the given attribute set (name lookup) */
     float GetNumericValue(const AttributeSet* Set) const;
@@ -100,7 +100,7 @@ public:
     GameplayAttributeData& AddAttributeData(const GameplayAttribute* Attribute, float BaseValue = 0.0f);
 
     /** Resolve an attribute descriptor in this set by name/owner. */
-    const GameplayAttribute* FindAttribute(std::string_view AttributeName, std::string_view AttributeOwner = {}) const;
+    const GameplayAttribute* FindAttribute(StringName AttributeName, StringName AttributeOwner = {}) const;
 
 private:
     /** Actual attribute data storage (attribute ptr -> data) */

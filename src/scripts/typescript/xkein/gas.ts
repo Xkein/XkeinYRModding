@@ -1,10 +1,10 @@
-import { GameplayAbilityCreator, ScriptFunctionRegister } from "XkeinExt";
+import { AbilitySystemComponent, GameplayAbility, GameplayAbilityCreator, ScriptFunctionRegister } from "XkeinExt";
 import { StringName } from "YrExtCore";
 
 function gasLoader(name: StringName) {
     const m = require(name.c_str());
     if (m && m.creator) {
-        return new GameplayAbilityCreator(m.creator);
+        return new GameplayAbilityCreator(m.creator as (com: AbilitySystemComponent) => GameplayAbility);
     }
 }
 

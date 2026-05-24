@@ -273,7 +273,7 @@ struct SetByCallerFloat
 };
 
 /** Struct representing the magnitude of a gameplay effect modifier, potentially calculated in numerous different ways */
-CLASS()
+CLASS(IniComponent, IniAutoLoad)
 struct GameplayEffectModifierMagnitude final
 {
 	/** Type of calculation to perform to derive the magnitude */
@@ -398,6 +398,10 @@ struct GameplayEffect final
 	/** Array of modifiers that will affect the target of this effect */
 	PROPERTY()
 	std::vector<GameplayModifierInfo> Modifiers;
+
+	/** Array of executions that will affect the target of this effect */
+	PROPERTY()
+	std::vector<GameplayEffectExecutionDefinition> Executions;
 
 	/** 
 	 * Gameplay Effect Components that define additional behaviors
