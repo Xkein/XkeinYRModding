@@ -11,3 +11,6 @@ build/
 /vsxmake2026
 
 node_modules/
+.codegraph/
+.omo/
+.sisyphus/

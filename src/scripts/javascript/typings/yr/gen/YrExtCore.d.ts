@@ -3,6 +3,19 @@ declare module "YrExtCore" {
 import { $Ref } from "puerts";
 import { CDTimerClass, AbstractClass, AbstractTypeClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType, FootClass, PassengersClass } from "YRpp";
 import { AKRESULT } from "Wwise";
+// StringName
+class StringName
+{
+    // public StringName(char const * Str)
+    constructor(Str_0 : string);
+    // public char const * c_str() const
+    c_str() : string;
+    // public unsigned int GetId() const
+    GetId() : number;
+    // High-performance check for empty/uninitialized state
+    // public bool IsEmpty() const
+    IsEmpty() : boolean;
+}
 // IniReader
 class IniReader
 {
@@ -26,7 +39,7 @@ class IniReader
 class IniComponentLoader
 {
     // public static void RegisterAbstractTypeLoadingFunc(AbstractType targetType, std::function<void (*)(IniReader * _0, AbstractTypeClass * _1)> loadingFunc)
-    static RegisterAbstractTypeLoadingFunc(targetType_0 : AbstractType, loadingFunc_1 : (_0 : IniReader, _1 : AbstractTypeClass) => void) : void;
+    static RegisterAbstractTypeLoadingFunc(targetType_0 : AbstractType, loadingFunc_1 : (_0 : IniReader, _1 : AbstractTypeClass) => void| undefined) : void;
 }
 // YrHookOverrideReturn<void>
 class YrHookOverrideReturn_void_
@@ -1433,7 +1446,7 @@ class EventPack_unsignedchar_99__
 class NetPackDispatch
 {
     // public static void RegisterVariantEvent(CustomEventType type, std::basic_string<char, std::char_traits<char>, std::allocator<char>> eventName, std::function<void (*)(VariantEventPack * _0)> execute)
-    static RegisterVariantEvent(type_0 : CustomEventType, eventName_1 : string, execute_2 : (_0 : VariantEventPack) => void) : void;
+    static RegisterVariantEvent(type_0 : CustomEventType, eventName_1 : string, execute_2 : (_0 : VariantEventPack) => void| undefined) : void;
     // public static void AddVariantEvent(VariantEventPack& eventPack)
     static AddVariantEvent(eventPack_0 : VariantEventPack) : void;
 }
@@ -1453,7 +1466,7 @@ class Serialization
     // public static void SaveKey(char const * key, std::basic_string<char, std::char_traits<char>, std::allocator<char>> val)
     static SaveKey(key_0 : string, val_1 : string) : void;
     // public static void RegisterStepHandler(ESerializationStep step, std::function<void (*)()> handler)
-    static RegisterStepHandler(step_0 : ESerializationStep, handler_1 : () => void) : void;
+    static RegisterStepHandler(step_0 : ESerializationStep, handler_1 : () => void| undefined) : void;
 }
 // YrHelper
 class YrHelper

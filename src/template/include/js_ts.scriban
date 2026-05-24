@@ -115,7 +115,7 @@
         end
         # get function type
         if is_function_type(type)
-            ret "(" + ((type.parameters | array.each do; ret $"{$0.name} : {get_ts_type($0.type)}"; end) | array.join ", ") + ") => " + get_ts_type(type.return_type)
+            ret "(" + ((type.parameters | array.each do; ret $"{$0.name} : {get_ts_type($0.type)}"; end) | array.join ", ") + ") => " + get_ts_type(type.return_type) + "| undefined"
         end
         # special template class
         if string.starts_with($unwrap_name, "ref_wrapper<")
@@ -126,6 +126,9 @@
         end
         if string.starts_with($unwrap_name, "std::function<")
             ret get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type)
+        end
+        if string.starts_with($unwrap_name, "ScriptFunction<")
+            ret httype.unwrap_class($unwrap).identifier
         end
         # template class
         for generic_type in generic_types

@@ -2,17 +2,46 @@
 exports.WwiseSoundBankRef = puerts.loadCPPType("WwiseSoundBankRef")
 exports.AudioSystem = puerts.loadCPPType("AudioSystem")
 exports.AudioComponent = puerts.loadCPPType("AudioComponent")
+exports.Input = puerts.loadCPPType("Input")
 exports.PhysicsTypeComponent = puerts.loadCPPType("PhysicsTypeComponent")
 exports.PhysicsComponent = puerts.loadCPPType("PhysicsComponent")
 exports.PhysicsCollisionAddAndPersistResult = puerts.loadCPPType("PhysicsCollisionAddAndPersistResult")
 exports.PhysicsCollisionRemoveResult = puerts.loadCPPType("PhysicsCollisionRemoveResult")
+exports.ScriptFunctionBase = puerts.loadCPPType("ScriptFunctionBase")
+exports.ScriptFunctionRegister = puerts.loadCPPType("ScriptFunctionRegister")
 exports.JsCppHelper = puerts.loadCPPType("JsCppHelper")
 exports.JsEventOnCtor = puerts.loadCPPType("JsEventOnCtor")
 exports.JsEventOnDtor = puerts.loadCPPType("JsEventOnDtor")
 exports.JsGameEvents = puerts.loadCPPType("JsGameEvents")
 exports.JsPhysicsEvents = puerts.loadCPPType("JsPhysicsEvents")
 exports.JsEvents = puerts.loadCPPType("JsEvents")
-exports.Input = puerts.loadCPPType("Input")
+exports.GameplayTag = puerts.loadCPPType("GameplayTag")
+exports.GameplayTagContainer = puerts.loadCPPType("GameplayTagContainer")
+exports.GameplayAttributeData = puerts.loadCPPType("GameplayAttributeData")
+exports.AttributeSet = puerts.loadCPPType("AttributeSet")
+exports.GameplayAttribute = puerts.loadCPPType("GameplayAttribute")
+exports.AttributeSetDefine = puerts.loadCPPType("AttributeSetDefine")
+exports.AttributeMetaData = puerts.loadCPPType("AttributeMetaData")
+exports.GameplayAbilitySpecHandle = puerts.loadCPPType("GameplayAbilitySpecHandle")
+exports.AbilitySystemComponent = puerts.loadCPPType("AbilitySystemComponent")
+exports.ActiveGameplayEffectHandle = puerts.loadCPPType("ActiveGameplayEffectHandle")
+exports.AbilitySystemComponentType = puerts.loadCPPType("AbilitySystemComponentType")
+exports.GameplayAbilityDefine = puerts.loadCPPType("GameplayAbilityDefine")
+exports.GameplayAbility = puerts.loadCPPType("GameplayAbility")
+exports.GameplayAbilityActorInfo = puerts.loadCPPType("GameplayAbilityActorInfo")
+exports.GameplayAbilityActivationInfo = puerts.loadCPPType("GameplayAbilityActivationInfo")
+exports.GameplayEventData = puerts.loadCPPType("GameplayEventData")
+exports.GameplayAbilityTargetDataHandle = puerts.loadCPPType("GameplayAbilityTargetDataHandle")
+exports.GameplayAbilityTargetData = puerts.loadCPPType("GameplayAbilityTargetData")
+exports.GameplayAbilitySpec = puerts.loadCPPType("GameplayAbilitySpec")
+exports.GameplayEffectComponent = puerts.loadCPPType("GameplayEffectComponent")
+exports.ActiveGameplayEffectsContainer = puerts.loadCPPType("ActiveGameplayEffectsContainer")
+exports.GameplayAbilitySpecDef = puerts.loadCPPType("GameplayAbilitySpecDef")
+exports.GameplayCueNotify_Static = puerts.loadCPPType("GameplayCueNotify_Static")
+exports.GameplayCueNotify_Actor = puerts.loadCPPType("GameplayCueNotify_Actor")
+exports.GameplayAbilityCreator = puerts.loadCPPType("GameplayAbilityCreator")
+exports.ScriptFunction_GameplayAbility__AbilitySystemComponent__0__ = puerts.loadCPPType("ScriptFunction<GameplayAbility * (AbilitySystemComponent * _0)>")
+exports.GameplayAbilitySystem = puerts.loadCPPType("GameplayAbilitySystem")
 exports.QueryVolume = puerts.loadCPPType("QueryVolume")
 exports.QuerySphere = puerts.loadCPPType("QuerySphere")
 exports.XkeinTools = puerts.loadCPPType("XkeinTools")
@@ -26,6 +55,43 @@ exports.EPhysicShapeType = (function () {
     EPhysicShapeType[EPhysicShapeType["Capsule"] = 3] = "Capsule";
     EPhysicShapeType[EPhysicShapeType["Cylinder"] = 4] = "Cylinder";
     return EPhysicShapeType;
+})();
+exports.EGameplayAbilityInstancingPolicy = (function () {
+    let EGameplayAbilityInstancingPolicy = {}
+    EGameplayAbilityInstancingPolicy[EGameplayAbilityInstancingPolicy["InstancedPerActor"] = 0] = "InstancedPerActor";
+    EGameplayAbilityInstancingPolicy[EGameplayAbilityInstancingPolicy["InstancedPerExecution"] = 1] = "InstancedPerExecution";
+    return EGameplayAbilityInstancingPolicy;
+})();
+exports.EGameplayAbilityActivationMode = (function () {
+    let EGameplayAbilityActivationMode = {}
+    EGameplayAbilityActivationMode[EGameplayAbilityActivationMode["Authority"] = 0] = "Authority";
+    EGameplayAbilityActivationMode[EGameplayAbilityActivationMode["NonAuthority"] = 1] = "NonAuthority";
+    EGameplayAbilityActivationMode[EGameplayAbilityActivationMode["Predicting"] = 2] = "Predicting";
+    EGameplayAbilityActivationMode[EGameplayAbilityActivationMode["Confirmed"] = 3] = "Confirmed";
+    EGameplayAbilityActivationMode[EGameplayAbilityActivationMode["Rejected"] = 4] = "Rejected";
+    return EGameplayAbilityActivationMode;
+})();
+exports.EGameplayAbilityTriggerSource = (function () {
+    let EGameplayAbilityTriggerSource = {}
+    EGameplayAbilityTriggerSource[EGameplayAbilityTriggerSource["GameplayEvent"] = 0] = "GameplayEvent";
+    EGameplayAbilityTriggerSource[EGameplayAbilityTriggerSource["OwnedTagAdded"] = 1] = "OwnedTagAdded";
+    EGameplayAbilityTriggerSource[EGameplayAbilityTriggerSource["OwnedTagPresent"] = 2] = "OwnedTagPresent";
+    return EGameplayAbilityTriggerSource;
+})();
+exports.EGameplayEffectGrantedAbilityRemovePolicy = (function () {
+    let EGameplayEffectGrantedAbilityRemovePolicy = {}
+    EGameplayEffectGrantedAbilityRemovePolicy[EGameplayEffectGrantedAbilityRemovePolicy["CancelAbilityImmediately"] = 0] = "CancelAbilityImmediately";
+    EGameplayEffectGrantedAbilityRemovePolicy[EGameplayEffectGrantedAbilityRemovePolicy["RemoveAbilityOnEnd"] = 1] = "RemoveAbilityOnEnd";
+    EGameplayEffectGrantedAbilityRemovePolicy[EGameplayEffectGrantedAbilityRemovePolicy["DoNothing"] = 2] = "DoNothing";
+    return EGameplayEffectGrantedAbilityRemovePolicy;
+})();
+exports.EGameplayAbilityNetExecutionPolicy = (function () {
+    let EGameplayAbilityNetExecutionPolicy = {}
+    EGameplayAbilityNetExecutionPolicy[EGameplayAbilityNetExecutionPolicy["LocalOnly"] = 0] = "LocalOnly";
+    EGameplayAbilityNetExecutionPolicy[EGameplayAbilityNetExecutionPolicy["ServerOnly"] = 1] = "ServerOnly";
+    EGameplayAbilityNetExecutionPolicy[EGameplayAbilityNetExecutionPolicy["LocalPredicted"] = 2] = "LocalPredicted";
+    EGameplayAbilityNetExecutionPolicy[EGameplayAbilityNetExecutionPolicy["ServerInitiated"] = 3] = "ServerInitiated";
+    return EGameplayAbilityNetExecutionPolicy;
 })();
 exports.QueryFlags = (function () {
     let QueryFlags = {}

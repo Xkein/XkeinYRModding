@@ -137,21 +137,21 @@ FORCEINLINE auto register_member(entt::meta_factory<Type>& factory, const entt::
     using data_type = std::invoke_result_t<decltype(Data), Type&>;
     if constexpr (std::is_move_assignable_v<data_type>)
     {
-        return factory.data<Data, entt::as_ref_t>(id);
+        return factory.template data<Data, entt::as_ref_t>(id);
     }
     else
     {
         if constexpr (std::is_copy_assignable_v<data_type>)
         {
-            return factory.data<nullptr, Data, entt::as_ref_t>(id);
+            return factory.template data<nullptr, Data, entt::as_ref_t>(id);
         }
         else if constexpr (std::is_array_v<std::remove_reference_t<data_type>>)
         {
-            return factory.data<nullptr, meta_getter_array_klass<Data, Type>, entt::as_ref_t>(id);
+            return factory.template data<nullptr, meta_getter_array_klass<Data, Type>, entt::as_ref_t>(id);
         }
         else
         {
-            return factory.data<nullptr, Data, entt::as_ref_t>(id);
+            return factory.template data<nullptr, Data, entt::as_ref_t>(id);
         }
     }
 
@@ -164,14 +164,14 @@ FORCEINLINE auto register_field(entt::meta_factory<Type>& factory, const entt::i
     static_assert(!std::is_member_object_pointer_v<decltype(Data)>, "unexpected member object!");
     using data_type = std::remove_pointer_t<decltype(Data)>;
     if constexpr (is_constexpr_var<Data>) {
-        return factory.data<Data, entt::as_cref_t>(id);
+        return factory.template data<Data, entt::as_cref_t>(id);
     }
     else if constexpr (std::is_array_v<std::remove_reference_t<data_type>>)
     {
-        return factory.data<Data, entt::as_ref_t>(id);
+        return factory.template data<Data, entt::as_ref_t>(id);
     }
     else {
-        return factory.data<Data, entt::as_ref_t>(id);
+        return factory.template data<Data, entt::as_ref_t>(id);
     }
 }
 

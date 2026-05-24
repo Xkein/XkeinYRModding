@@ -3,46 +3,75 @@
 #include <string>
 #include <string_view>
 #include <utility>
-#include <boost/flyweight.hpp>
+#include <memory>
+#include <unordered_map>
+#include <mutex>
+#include <functional>
+
+// Internal pool implementation to manage shared string instances safely.
+// It uses reference counting to automatically release strings when no longer in use.
+class StringNamePool {
+public:
+    CORE_API static std::shared_ptr<const std::string> Intern(const std::string& Str);
+
+    // Cached empty string to avoid mutex locks for default constructors
+    CORE_API static std::shared_ptr<const std::string> GetEmpty();
+};
 
 CLASS(BindJs)
 class StringName {
 private:
-    using FlyString = boost::flyweight<std::string>;
-
-    // Declaration order matters: NameStr must be initialized before Id
-    FlyString NameStr;
+    // Holds a reference-counted pointer to the interned string
+    std::shared_ptr<const std::string> NameStr;
     size_t Id;
 
     // Centralizes initialization to cache the hash ID immediately
-    explicit StringName(FlyString FS) 
-        : NameStr(std::move(FS)), Id(std::hash<FlyString>{}(NameStr)) {}
+    explicit StringName(std::shared_ptr<const std::string> SP) 
+        : NameStr(std::move(SP)), Id(std::hash<std::string>{}(*NameStr)) {}
 
 public:
-    StringName() : StringName(FlyString()) {}
+    StringName() : StringName(StringNamePool::GetEmpty()) {}
+    
     FUNCTION()
-    StringName(const char* Str) : StringName(FlyString(Str)) {}
-    StringName(std::string_view Str) : StringName(FlyString(std::string(Str))) {}
-    StringName(const std::string& Str) : StringName(FlyString(Str)) {}
-    StringName(std::string&& Str) : StringName(FlyString(std::move(Str))) {}
+    StringName(const char* Str) : StringName(Str ? StringNamePool::Intern(Str) : StringNamePool::GetEmpty()) {}
+    
+    StringName(std::string_view Str) : StringName(StringNamePool::Intern(std::string(Str))) {}
+    StringName(const std::string& Str) : StringName(StringNamePool::Intern(Str)) {}
+    StringName(std::string&& Str) : StringName(StringNamePool::Intern(Str)) {}
 
-    // Default operations work perfectly as Id is a trivial scalar type
+    // Copy operations
     StringName(const StringName& Other) = default;
-    StringName(StringName&& Other) noexcept = default;
     StringName& operator=(const StringName& Other) = default;
-    StringName& operator=(StringName&& Other) noexcept = default;
+
+    // Move operations: We restore the moved-from object to a safe empty state 
+    // to prevent nullptr crashes if accessed later.
+    StringName(StringName&& Other) noexcept 
+        : NameStr(std::move(Other.NameStr)), Id(Other.Id) {
+        Other.NameStr = StringNamePool::GetEmpty();
+        Other.Id = std::hash<std::string>{}(*Other.NameStr);
+    }
+
+    StringName& operator=(StringName&& Other) noexcept {
+        if (this != &Other) {
+            NameStr = std::move(Other.NameStr);
+            Id = Other.Id;
+            Other.NameStr = StringNamePool::GetEmpty();
+            Other.Id = std::hash<std::string>{}(*Other.NameStr);
+        }
+        return *this;
+    }
 
     operator std::string_view() const {
-        return NameStr.get(); 
+        return *NameStr; 
     }
 
     operator const char*() const {
-        return NameStr.get().c_str();
+        return NameStr->c_str();
     }
 
     FUNCTION()
     const char* c_str() const {
-        return NameStr.get().c_str();
+        return NameStr->c_str();
     }
 
     FUNCTION()
@@ -53,16 +82,17 @@ public:
     // High-performance check for empty/uninitialized state
     FUNCTION()
     bool IsEmpty() const noexcept {
-        static const size_t EmptyId = StringName().GetId();
-        return Id == EmptyId;
+        // Extremely fast and safe inline check
+        return NameStr->empty();
     }
 
-    // Always compare using flyweight pointers to prevent hash collision bugs
+    // Shared pointer instances pointing to the same interned string will have identical memory addresses.
+    // This allows for O(1) pointer comparison just like boost::flyweight.
     bool operator==(const StringName& Other) const {
-        return NameStr == Other.NameStr;
+        return NameStr.get() == Other.NameStr.get();
     }
     bool operator!=(const StringName& Other) const {
-        return NameStr != Other.NameStr;
+        return NameStr.get() != Other.NameStr.get();
     }
 
     bool operator==(std::string_view Other) const {

@@ -17,6 +17,7 @@ CLASS(BindJs)
 template<typename TFunc>
 struct ScriptFunction : public ScriptFunctionBase, public std::function<TFunc>
 {
+    FUNCTION()
     ScriptFunction(std::function<TFunc> func) : std::function<TFunc>(std::move(func)) {}
 
 };

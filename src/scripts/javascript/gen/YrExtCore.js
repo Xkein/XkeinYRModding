@@ -1,4 +1,5 @@
 
+exports.StringName = puerts.loadCPPType("StringName")
 exports.IniReader = puerts.loadCPPType("IniReader")
 exports.IniComponentLoader = puerts.loadCPPType("IniComponentLoader")
 exports.YrHookOverrideReturn_void_ = puerts.loadCPPType("YrHookOverrideReturn<void>")
