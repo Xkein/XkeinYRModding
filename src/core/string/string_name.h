@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <string_view>
 #include <utility>
@@ -42,6 +43,12 @@ public:
 
     size_t GetId() const noexcept {
         return Id;
+    }
+    
+    // High-performance check for empty/uninitialized state
+    bool IsEmpty() const noexcept {
+        static const size_t EmptyId = StringName().GetId();
+        return Id == EmptyId;
     }
 
     // Always compare using flyweight pointers to prevent hash collision bugs
