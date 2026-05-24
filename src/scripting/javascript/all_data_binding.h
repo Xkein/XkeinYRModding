@@ -12,6 +12,8 @@ UsingCppType(AbilityTriggerData);
 UsingCppType(AbilitySystemComponent);
 UsingCppType(AbilitySystemComponentType);
 UsingCppType(GameplayAbility);
+UsingCppType(GameplayAbilityCreator);
+UsingCppType(ScriptFunction<GameplayAbility*(AbilitySystemComponent*)>);
 UsingCppType(GameplayAbilityDefine);
 UsingCppType(GameplayAbilitySystem);
 UsingCppType(GameplayAttribute);

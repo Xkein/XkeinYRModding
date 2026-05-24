@@ -2,6 +2,7 @@
 #include "core/reflection/reflection.h"
 #include "yr/parse/parser.h"
 #include "yr/component/ini_component.h"
+#include "scripting/common/script_function.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 
@@ -11,7 +12,6 @@ struct AbilitySystemGlobals
     PROPERTY()
     std::vector<AttributeSetDefine*> DefaultAttributeSets;
 };
-
 
 CLASS(BindJs)
 struct GameplayAbilityCreator : public ScriptFunction<GameplayAbility*(AbilitySystemComponent* component)>
