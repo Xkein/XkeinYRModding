@@ -4,6 +4,7 @@
 #include "yr/component/ini_component.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
+#include "scripting/common/script_function_parser.h"
 
 CLASS(IniComponent, IniSection = "GAS")
 struct AbilitySystemGlobals

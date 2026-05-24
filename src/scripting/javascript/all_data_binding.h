@@ -53,6 +53,13 @@ UsingCppTypeWithRefCache(JsEvents);
 #include "scripting/javascript/js_cpp_helper.h"
 UsingCppTypeWithRefCache(JsCppHelper);
 
+#include "scripting/common/script_function.h"
+UsingCppType(ScriptFunctionBase);
+UsingCppType(ScriptFunctionRegister);
+
+#include "core/string/string_name.h"
+UsingCppType(StringName);
+
 #include "audio/audio.h"
 UsingCppType(WwiseSoundBankRef);
 #include "audio/audio_component.h"
