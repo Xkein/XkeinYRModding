@@ -2,20 +2,25 @@
 #include "scripting/javascript/yr_data_bindings.h"
 #ifndef __HEADER_TOOL__
 #include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/GameplayAbilities/ability_system_globals.h"
 UsingCppType(ActiveGameplayEffectHandle);
 UsingCppType(ActiveGameplayEffectsContainer);
 UsingCppType(AttributeSet);
+UsingCppType(AttributeSetDefine);
 UsingCppType(AttributeMetaData);
 UsingCppType(AbilityTriggerData);
 UsingCppType(AbilitySystemComponent);
 UsingCppType(AbilitySystemComponentType);
 UsingCppType(GameplayAbility);
+UsingCppType(GameplayAbilityDefine);
+UsingCppType(GameplayAbilitySystem);
 UsingCppType(GameplayAttribute);
 UsingCppType(GameplayAttributeData);
 UsingCppType(GameplayAbilityTargetData);
 UsingCppType(GameplayAbilityTargetDataHandle);
 UsingCppType(GameplayAbilitySpecDef);
 UsingCppType(GameplayEventData);
+UsingCppType(GameplayEffect);
 UsingCppType(GameplayEffectComponent);
 UsingCppType(GameplayCueNotify_Static);
 UsingCppType(GameplayCueNotify_Actor);
@@ -28,12 +33,16 @@ UsingCppType(GameplayAbilityActivationInfo);
 
 UsingStdVector(AttributeSet);
 UsingStdVector(AttributeSet*);
+UsingStdVector(AttributeSetDefine*);
 UsingStdVector(AbilityTriggerData);
 UsingStdVector(GameplayTag);
 UsingStdVector(GameplayTag*);
 UsingStdVector(GameplayAttribute);
 UsingStdVector(GameplayAbility);
+UsingStdVector(GameplayAbility*);
+UsingStdVector(GameplayAbilityDefine*);
 UsingStdVector(GameplayAbilitySpec);
+UsingStdVector(GameplayEffect);
 
 #include "scripting/javascript/js_events.h"
 UsingCppTypeWithRefCache(JsGameEvents);

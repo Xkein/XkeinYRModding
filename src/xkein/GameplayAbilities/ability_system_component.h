@@ -9,6 +9,7 @@
 
 class AbilitySystemComponent;
 
+CLASS(BindJs)
 struct ActiveGameplayEffectsContainer
 {
     /** Find an active effect by handle */
@@ -174,6 +175,10 @@ public:
 	 */
     FUNCTION()
 	GameplayAbilitySpecHandle GiveAbility(const GameplayAbilitySpec& AbilitySpec);
+	
+	/** Grants an ability based on its definition */
+    FUNCTION()
+	GameplayAbilitySpecHandle GiveAbility(const GameplayAbilityDefine* AbilityDefine);
     
 	/** Will be called from GiveAbility or from OnRep. Initializes events (triggers and inputs) with the given ability */
 	virtual void OnGiveAbility(GameplayAbilitySpec& AbilitySpec);
@@ -280,4 +285,6 @@ protected:
 	GameplayTagCountContainer GameplayTagCountContainer;
 
 	std::vector<GameplayAbility*> AllReplicatedInstancedAbilities;
+
+	std::vector<GameplayAbility*> AllSelfCreatedAbilities;
 };

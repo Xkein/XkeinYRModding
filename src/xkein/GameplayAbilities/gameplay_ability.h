@@ -16,7 +16,7 @@ struct ActiveGameplayEffectHandle;
 /** Delegate for when an ability ends */
 using FOnGameplayAbilityEnded = TDelegate<void(GameplayAbilitySpec*)>;
 
-ENUM()
+ENUM(BindJs)
 enum EGameplayAbilityTriggerSource : int
 {
 	// Triggered from a gameplay event, will come with payload
@@ -30,7 +30,7 @@ enum EGameplayAbilityTriggerSource : int
 };
 
 /** Describes how a GameplayAbility will be instanced when executed */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayAbilityInstancingPolicy : uint8
 {
 	/** This ability can only be instanced once per actor. Every execution will use the same instance */
@@ -41,7 +41,7 @@ enum class EGameplayAbilityInstancingPolicy : uint8
 };
 
 /** Describes where a GameplayAbility executes relative to authority */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayAbilityNetExecutionPolicy : uint8
 {
 	/** Runs only on the local player controller/client */
@@ -175,8 +175,10 @@ CLASS(BindJs, IniComponent, IniAutoLoad)
 class GameplayAbilityDefine
 {
 	// set by GameplayAbilitySystem
-	uint Id;
+	uint AbilityId;
 	
+public:
+	inline uint GetAbilityId() const { return AbilityId; }
 
 	/** Tags that this ability has (used for categorization and queries) */
 	PROPERTY()

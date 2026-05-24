@@ -1,5 +1,6 @@
 #include "ability_system_component.h"
 #include "xkein/GameplayAbilities/ge_component.h"
+#include "xkein/GameplayAbilities/ability_system_globals.h"
 #include <core/tool/container.h>
 #include <core/string/string_tool.h>
 #include <map>
@@ -18,8 +19,6 @@ void AbilitySystemComponent::InitializeFromType(AbilitySystemComponentType* InTy
     // Spawn attribute sets first (abilities/effects may query attributes)
     for (auto* Define : Type->Attributes)
     {
-        if (!Define) continue;
-
         AttributeSet NewSet;
         for (const auto& Attr : Define->Attributes)
         {
@@ -36,7 +35,7 @@ void AbilitySystemComponent::InitializeFromType(AbilitySystemComponentType* InTy
 
     for (const auto& Ability : Type->DefaultAbilities)
     {
-        this->GiveAbility(GameplayAbilitySpec(Ability));
+        this->GiveAbility(Ability);
     }
 
     // Startup effects applied to self
@@ -169,6 +168,13 @@ GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbil
     return OwnedSpec.Handle;
 }
 
+GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbilityDefine* AbilityDefine)
+{
+    GameplayAbility* Ability = GameplayAbilitySystem::CreateAbility(AbilityDefine->GetAbilityId(), this);
+    this->AllSelfCreatedAbilities.push_back(Ability);
+    return this->GiveAbility(GameplayAbilitySpec(Ability));
+}
+
 void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 {
     if (Spec.Ability == nullptr) {
@@ -198,33 +204,36 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
     }
 
     
-	for (const AbilityTriggerData& TriggerData : Spec.Ability->AbilityTriggers)
+	if (Spec.Ability->Define)
 	{
-		GameplayTag EventTag = TriggerData.TriggerTag;
-
-		auto& TriggeredAbilityMap = (TriggerData.TriggerSource == EGameplayAbilityTriggerSource::GameplayEvent) ? GameplayEventTriggeredAbilities : OwnedTagTriggeredAbilities;
-
-		if (TriggeredAbilityMap.contains(EventTag))
+		for (const AbilityTriggerData& TriggerData : Spec.Ability->Define->AbilityTriggers)
 		{
-            std_vector_add_unique(TriggeredAbilityMap[EventTag], Spec.Handle); // Fixme: is this right? Do we want to trigger the ability directly of the spec?
-		}
-		else
-		{
-			std::vector<GameplayAbilitySpecHandle> Triggers;
-			Triggers.push_back(Spec.Handle);
-            TriggeredAbilityMap[EventTag] = Triggers;
-		}
+			GameplayTag EventTag = TriggerData.TriggerTag;
 
-		// if (TriggerData.TriggerSource != EGameplayAbilityTriggerSource::GameplayEvent)
-		// {
-		// 	FOnGameplayEffectTagCountChanged& CountChangedEvent = RegisterGameplayTagEvent(EventTag);
-		// 	// Add a change callback if it isn't on it already
+			auto& TriggeredAbilityMap = (TriggerData.TriggerSource == EGameplayAbilityTriggerSource::GameplayEvent) ? GameplayEventTriggeredAbilities : OwnedTagTriggeredAbilities;
 
-		// 	if (!CountChangedEvent.IsBoundToObject(this))
-		// 	{
-		// 		MonitoredTagChangedDelegateHandle = CountChangedEvent.AddUObject(this, &UAbilitySystemComponent::MonitoredTagChanged);
-		// 	}
-		// }
+			if (TriggeredAbilityMap.contains(EventTag))
+			{
+				std_vector_add_unique(TriggeredAbilityMap[EventTag], Spec.Handle); // Fixme: is this right? Do we want to trigger the ability directly of the spec?
+			}
+			else
+			{
+				std::vector<GameplayAbilitySpecHandle> Triggers;
+				Triggers.push_back(Spec.Handle);
+				TriggeredAbilityMap[EventTag] = Triggers;
+			}
+
+			// if (TriggerData.TriggerSource != EGameplayAbilityTriggerSource::GameplayEvent)
+			// {
+			// 	FOnGameplayEffectTagCountChanged& CountChangedEvent = RegisterGameplayTagEvent(EventTag);
+			// 	// Add a change callback if it isn't on it already
+
+			// 	if (!CountChangedEvent.IsBoundToObject(this))
+			// 	{
+			// 		MonitoredTagChangedDelegateHandle = CountChangedEvent.AddUObject(this, &UAbilitySystemComponent::MonitoredTagChanged);
+			// 	}
+			// }
+		}
 	}
 }
 
@@ -369,21 +378,24 @@ void AbilitySystemComponent::OnRemoveAbility(GameplayAbilitySpec& Spec)
     if (Spec.Ability == nullptr) return;
     
     // Remove from trigger maps
-    for (const AbilityTriggerData& TriggerData : Spec.Ability->Define->AbilityTriggers)
+    if (Spec.Ability->Define)
     {
-        GameplayTag EventTag = TriggerData.TriggerTag;
-        
-        auto& TriggeredAbilityMap = (TriggerData.TriggerSource == EGameplayAbilityTriggerSource::GameplayEvent) 
-            ? GameplayEventTriggeredAbilities : OwnedTagTriggeredAbilities;
-        
-        auto It = TriggeredAbilityMap.find(EventTag);
-        if (It != TriggeredAbilityMap.end())
+        for (const AbilityTriggerData& TriggerData : Spec.Ability->Define->AbilityTriggers)
         {
-            std::vector<GameplayAbilitySpecHandle>& Handles = It->second;
-            Handles.erase(std::remove(Handles.begin(), Handles.end(), Spec.Handle), Handles.end());
-            if (Handles.empty())
+            GameplayTag EventTag = TriggerData.TriggerTag;
+            
+            auto& TriggeredAbilityMap = (TriggerData.TriggerSource == EGameplayAbilityTriggerSource::GameplayEvent) 
+                ? GameplayEventTriggeredAbilities : OwnedTagTriggeredAbilities;
+            
+            auto It = TriggeredAbilityMap.find(EventTag);
+            if (It != TriggeredAbilityMap.end())
             {
-                TriggeredAbilityMap.erase(It);
+                std::vector<GameplayAbilitySpecHandle>& Handles = It->second;
+                Handles.erase(std::remove(Handles.begin(), Handles.end(), Spec.Handle), Handles.end());
+                if (Handles.empty())
+                {
+                    TriggeredAbilityMap.erase(It);
+                }
             }
         }
     }
@@ -574,7 +586,7 @@ static void NotifyComponentsAdded(GameplayEffect* Effect, ActiveGameplayEffectsC
     }
 }
 
-static void NotifyComponentsRemoved(GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
+static void NotifyComponentsRemoved(const GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
     ActiveGameplayEffect& ActiveEffect)
 {
     if (!Effect) return;
@@ -589,7 +601,7 @@ static void NotifyComponentsRemoved(GameplayEffect* Effect, ActiveGameplayEffect
 }
 
 /** Notify all GE Components that the effect was executed (instant) */
-static void NotifyComponentsExecuted(GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
+static void NotifyComponentsExecuted(const GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
     GameplayEffectSpec& Spec)
 {
     if (!Effect) return;
@@ -873,12 +885,12 @@ ActiveGameplayEffectHandle ActiveGameplayEffectsContainer::Add(AbilitySystemComp
 void ActiveGameplayEffectsContainer::Remove(ActiveGameplayEffectHandle Handle)
 {
     auto It = std::remove_if(Effects.begin(), Effects.end(), 
-        [&Handle](ActiveGameplayEffect* Effect) {
+        [&Handle, this](ActiveGameplayEffect* Effect) {
             if (Effect && Effect->Handle == Handle)
             {
                 if (Effect->Spec.Def)
                 {
-                    NotifyComponentsRemoved(const_cast<GameplayEffect*>(Effect->Spec.Def), *this, *Effect);
+                    NotifyComponentsRemoved(Effect->Spec.Def, *this, *Effect);
                 }
                 delete Effect;
                 return true;

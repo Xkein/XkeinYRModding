@@ -9,7 +9,7 @@
 class GameplayAbility;
 
 /** Describes the status of activating this ability, this is updated as prediction is handled */
-ENUM()
+ENUM(BindJs)
 enum EGameplayAbilityActivationMode : int
 {
     /** We are the authority activating this ability */
@@ -29,7 +29,7 @@ enum EGameplayAbilityActivationMode : int
 };
 
 /** Describes what happens when a granting GameplayEffect is removed */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectGrantedAbilityRemovePolicy : uint8
 {
 	/** Active abilities are immediately canceled and the ability is removed */

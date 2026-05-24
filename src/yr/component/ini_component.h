@@ -46,7 +46,7 @@ public:
     YREXTCORE_API static void RegisterAbstractTypeLoadingFunc(AbstractType targetType, std::function<void(IniReader* reader, AbstractTypeClass* loadingObj)> loadingFunc);
 
     template<typename T>
-    static bool Load(IniReader& parser, const char* pSection, const char* pKey, T& value);
+    inline static bool Load(IniReader& parser, const char* pSection, const char* pKey, T& value);
 
     template<typename Type, bool (*Func)(Type&, IniReader&, const char*)>
     static void RegisterLoader(entt::meta_factory<Type>& factory);

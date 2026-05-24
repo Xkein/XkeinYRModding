@@ -47,8 +47,13 @@ bool GameplayAbility::CanActivateAbility(const GameplayAbilitySpecHandle Handle,
         return false;
     }
 
+    if (!Define)
+    {
+        return false;
+    }
+
     // Check blocked tags on the actor
-    if (AbilityTags.HasAny(ActivationBlockedTags))
+    if (Define->AbilityTags.HasAny(Define->ActivationBlockedTags))
     {
         return false;
     }
@@ -89,7 +94,6 @@ void GameplayAbility::PreActivate(const GameplayAbilitySpecHandle Handle, const 
     CurrentActorInfo = ActorInfo;
     CurrentSpecHandle = Handle;
     CurrentActivationInfo = ActivationInfo;
-    bHasCurrentEventData = TriggerEventData != nullptr;
     if (TriggerEventData)
     {
         CurrentEventData = *TriggerEventData;
@@ -259,6 +263,5 @@ void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const G
     CurrentActorInfo = nullptr;
     CurrentSpecHandle = GameplayAbilitySpecHandle();
     CurrentActivationInfo = GameplayAbilityActivationInfo();
-    bHasCurrentEventData = false;
     CurrentEventData = GameplayEventData();
 }

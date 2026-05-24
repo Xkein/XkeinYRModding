@@ -4,7 +4,7 @@
 
 class AbilitySystemComponent;
 
-CLASS()
+CLASS(BindJs)
 struct ActiveGameplayEffectHandle
 {
 	ActiveGameplayEffectHandle()

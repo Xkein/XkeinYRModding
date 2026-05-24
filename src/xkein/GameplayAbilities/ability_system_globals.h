@@ -101,7 +101,7 @@ namespace detail
 }
 
 template<>
-bool IniComponentLoader::Load(IniReader& parser, const char* pSection, const char* pKey, AttributeSetDefine& value)
+inline bool IniComponentLoader::Load(IniReader& parser, const char* pSection, const char* pKey, AttributeSetDefine& value)
 {
     std::vector<std::string_view> attributes;
     if (!parser.Read(pSection, pKey, attributes))
