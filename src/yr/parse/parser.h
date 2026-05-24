@@ -2,6 +2,7 @@
 #ifndef __HEADER_TOOL__
 #include "runtime/logger/logger.h"
 #include "core/reflection/reflection.h"
+#include "core/string/string_name.h"
 #include "yr/debug_util.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -155,6 +156,16 @@ namespace detail
         static bool Read(std::string_view str, std::string_view& result)
         {
             result = get_pool_string_view(str);
+            return true;
+        }
+    };
+
+    template<>
+    struct Parser<StringName>
+    {
+        static bool Read(std::string_view str, StringName& result)
+        {
+            result = StringName(str);
             return true;
         }
     };

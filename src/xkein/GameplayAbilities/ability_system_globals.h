@@ -4,7 +4,6 @@
 #include "yr/component/ini_component.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
-#include "scripting/common/script_function_parser.h"
 
 CLASS(IniComponent, IniSection = "GAS")
 struct AbilitySystemGlobals
@@ -13,18 +12,20 @@ struct AbilitySystemGlobals
     std::vector<AttributeSetDefine*> DefaultAttributeSets;
 };
 
+
+CLASS(BindJs)
+struct GameplayAbilityCreator : public ScriptFunction<GameplayAbility*(AbilitySystemComponent* component)>
+{
+    using ScriptFunction::ScriptFunction;
+};
+
 CLASS(BindJs)
 class GameplayAbilitySystem
 {
 public:
     static void Tick();
 
-    FUNCTION()
-    static void RegisterAbilityCreator(std::string name, std::function<GameplayAbility*(AbilitySystemComponent* component)> creator);
-
-    static uint GetAbilityId(std::string_view name);
-
-    static GameplayAbility* CreateAbility(uint id, AbilitySystemComponent* component);
+    static GameplayAbility* CreateAbility(const StringName& name, AbilitySystemComponent* component);
 };
 
 #ifndef __HEADER_TOOL__

@@ -1,6 +1,7 @@
 #pragma once
 #include "core/reflection/reflection.h"
 #include "core/tool/delegate.h"
+#include "core/string/string_name.h"
 #include "yr/component/component.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
@@ -174,11 +175,10 @@ struct AbilityTriggerData
 CLASS(BindJs, IniComponent, IniAutoLoad)
 class GameplayAbilityDefine
 {
-	// set by GameplayAbilitySystem
-	uint AbilityId;
 	
 public:
-	inline uint GetAbilityId() const { return AbilityId; }
+	PROPERTY()
+	StringName AbilityCreator;
 
 	/** Tags that this ability has (used for categorization and queries) */
 	PROPERTY()

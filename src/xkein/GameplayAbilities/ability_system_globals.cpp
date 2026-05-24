@@ -4,12 +4,6 @@
 #include <unordered_map>
 #include <vector>
 
-namespace
-{
-std::vector<std::function<GameplayAbility*(AbilitySystemComponent*)>> GAbilityCreators;
-std::unordered_map<std::string_view, uint> GAbilityNameToId;
-}
-
 void GameplayAbilitySystem::Tick()
 {
     float DeltaTime = 1;
@@ -21,32 +15,13 @@ void GameplayAbilitySystem::Tick()
     }
 }
 
-void GameplayAbilitySystem::RegisterAbilityCreator(std::string name, std::function<GameplayAbility*(AbilitySystemComponent* component)> creator)
+GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, AbilitySystemComponent* component)
 {
-	const auto it = GAbilityNameToId.find(std::string_view(name));
-	if (it != GAbilityNameToId.end())
-	{
-		GAbilityCreators[it->second - 1u] = std::move(creator);
-		return;
-	}
-	GAbilityCreators.push_back(std::move(creator));
-	const uint id = static_cast<uint>(GAbilityCreators.size());
-	GAbilityNameToId.emplace(std::string_view(name), id);
-}
-
-uint GameplayAbilitySystem::GetAbilityId(std::string_view name)
-{
-	const auto it = GAbilityNameToId.find(name);
-	return it != GAbilityNameToId.end() ? it->second : 0u;
-}
-
-GameplayAbility* GameplayAbilitySystem::CreateAbility(uint id, AbilitySystemComponent* component)
-{
-	if (id == 0u || id > static_cast<uint>(GAbilityCreators.size()))
-	{
+	GameplayAbilityCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayAbilityCreator>(name);
+	if (!creatorFunc) {
 		return nullptr;
 	}
-	return GAbilityCreators[id - 1u](component);
+	return (*creatorFunc)(component);
 }
 
 #include "yr/yr_all_events.h"

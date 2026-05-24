@@ -1,9 +1,11 @@
 #pragma once
+#include "core/reflection/reflection.h"
 #include <string>
 #include <string_view>
 #include <utility>
 #include <boost/flyweight.hpp>
 
+CLASS(BindJs)
 class StringName {
 private:
     using FlyString = boost::flyweight<std::string>;
@@ -18,6 +20,7 @@ private:
 
 public:
     StringName() : StringName(FlyString()) {}
+    FUNCTION()
     StringName(const char* Str) : StringName(FlyString(Str)) {}
     StringName(std::string_view Str) : StringName(FlyString(std::string(Str))) {}
     StringName(const std::string& Str) : StringName(FlyString(Str)) {}
@@ -37,15 +40,18 @@ public:
         return NameStr.get().c_str();
     }
 
+    FUNCTION()
     const char* c_str() const {
         return NameStr.get().c_str();
     }
 
+    FUNCTION()
     size_t GetId() const noexcept {
         return Id;
     }
     
     // High-performance check for empty/uninitialized state
+    FUNCTION()
     bool IsEmpty() const noexcept {
         static const size_t EmptyId = StringName().GetId();
         return Id == EmptyId;

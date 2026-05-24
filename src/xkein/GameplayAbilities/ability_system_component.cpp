@@ -170,7 +170,7 @@ GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbil
 
 GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbilityDefine* AbilityDefine)
 {
-    GameplayAbility* Ability = GameplayAbilitySystem::CreateAbility(AbilityDefine->GetAbilityId(), this);
+    GameplayAbility* Ability = GameplayAbilitySystem::CreateAbility(AbilityDefine->AbilityCreator, this);
     this->AllSelfCreatedAbilities.push_back(Ability);
     return this->GiveAbility(GameplayAbilitySpec(Ability));
 }

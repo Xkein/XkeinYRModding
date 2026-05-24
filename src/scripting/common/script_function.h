@@ -17,10 +17,10 @@ CLASS(BindJs)
 template<typename TFunc>
 struct ScriptFunction : public ScriptFunctionBase, public std::function<TFunc>
 {
-
+    ScriptFunction(std::function<TFunc> func) : std::function<TFunc>(std::move(func)) {}
 
 };
-
+                        
 CLASS(BindJs)
 class ScriptFunctionRegister
 {
@@ -30,5 +30,18 @@ public:
     static void RegisterFunction(const StringName& name, ScriptFunctionBase* func);
     
     FUNCTION()
+    static void RegisterLoader(std::function<ScriptFunctionBase*(const StringName& name)> loader);
+    
+    FUNCTION()
     static ScriptFunctionBase* GetFunction(const StringName& name);
+
+    template<typename TScriptFunction>
+    static TScriptFunction* GetFunctionAs(const StringName& name)
+    {
+        if (ScriptFunctionBase* baseFunc = GetFunction(name); baseFunc)
+        {
+            return static_cast<TScriptFunction*>(baseFunc);
+        }
+        return nullptr;
+    }
 };
