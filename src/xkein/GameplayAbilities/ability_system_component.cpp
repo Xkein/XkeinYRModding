@@ -2,6 +2,7 @@
 #include "xkein/GameplayAbilities/ge_component.h"
 #include "xkein/GameplayAbilities/ability_system_globals.h"
 #include <core/tool/container.h>
+#include "core/string/string_name.h"
 #include <core/string/string_tool.h>
 #include <map>
 #include <algorithm>
@@ -105,15 +106,15 @@ static std::vector<GameplayTag> BuildParentTagsInclusive_ForEvents(const Gamepla
     std::vector<GameplayTag> Out;
     if (!Tag.IsValid()) return Out;
 
-    std::string Full(Tag.TagName);
+    std::string_view Full = Tag.TagName;
     size_t Pos = 0;
     while (true)
     {
         size_t Dot = Full.find('.', Pos);
-        std::string_view View = (Dot == std::string::npos) ? std::string_view(Full) : std::string_view(Full.data(), Dot);
+        std::string_view View = (Dot == std::string::npos) ? Full : Full.substr(0, Dot);
 
         GameplayTag Parent;
-        Parent.TagName = get_pool_string_view(View);
+        Parent.TagName = StringName(View);
         Out.push_back(Parent);
 
         if (Dot == std::string::npos) break;
@@ -765,17 +766,17 @@ float AbilitySystemComponent::GetNumericAttribute(const GameplayAttribute& Attri
 
 void AbilitySystemComponent::ExecuteGameplayCue(const GameplayTag& CueTag, const GameplayCueParameters& Params)
 {
-    gLogger->info("ExecuteGameplayCue: {}", CueTag.TagName);
+    gLogger->info("ExecuteGameplayCue: {}", CueTag.TagName.c_str());
 }
 
 void AbilitySystemComponent::AddGameplayCue(const GameplayTag& CueTag, const GameplayCueParameters& Params)
 {
-    gLogger->info("AddGameplayCue: {}", CueTag.TagName);
+    gLogger->info("AddGameplayCue: {}", CueTag.TagName.c_str());
 }
 
 void AbilitySystemComponent::RemoveGameplayCue(const GameplayTag& CueTag)
 {
-    gLogger->info("RemoveGameplayCue: {}", CueTag.TagName);
+    gLogger->info("RemoveGameplayCue: {}", CueTag.TagName.c_str());
 }
 
 std::vector<ActiveGameplayEffectHandle> AbilitySystemComponent::GetActiveEffects(const GameplayTagContainer& Tags) const

@@ -228,9 +228,9 @@ class JsEvents
 // GameplayTag
 class GameplayTag
 {
-    // Tag name
-    // public std::basic_string_view<char, std::char_traits<char>> TagName
-    m_TagName : any;
+    // Tag name - using StringName for pooled string storage and O(1) pointer-based comparison
+    // public StringName TagName
+    m_TagName : StringName;
 }
 // GameplayTagContainer
 class GameplayTagContainer
@@ -255,10 +255,10 @@ class AttributeSet
 // GameplayAttribute
 class GameplayAttribute
 {
-    // public std::basic_string_view<char, std::char_traits<char>> AttributeName
-    m_AttributeName : any;
-    // public std::basic_string_view<char, std::char_traits<char>> AttributeOwner
-    m_AttributeOwner : any;
+    // public StringName AttributeName
+    m_AttributeName : StringName;
+    // public StringName AttributeOwner
+    m_AttributeOwner : StringName;
 }
 // AttributeSetDefine
 class AttributeSetDefine

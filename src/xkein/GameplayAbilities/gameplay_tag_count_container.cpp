@@ -1,4 +1,5 @@
 #include "gameplay_tag_count_container.h"
+#include "core/string/string_name.h"
 #include <core/string/string_tool.h>
 #include <string>
 
@@ -7,15 +8,15 @@ static std::vector<GameplayTag> BuildParentTagsInclusive(const GameplayTag& Tag)
     std::vector<GameplayTag> Out;
     if (!Tag.IsValid()) return Out;
 
-    std::string Full(Tag.TagName);
+    std::string_view Full = Tag.TagName;
     size_t Pos = 0;
     while (true)
     {
         size_t Dot = Full.find('.', Pos);
-        std::string_view View = (Dot == std::string::npos) ? std::string_view(Full) : std::string_view(Full.data(), Dot);
+        std::string_view View = (Dot == std::string::npos) ? Full : Full.substr(0, Dot);
 
         GameplayTag Parent;
-        Parent.TagName = get_pool_string_view(View);
+        Parent.TagName = StringName(View);
         Out.push_back(Parent);
 
         if (Dot == std::string::npos) break;

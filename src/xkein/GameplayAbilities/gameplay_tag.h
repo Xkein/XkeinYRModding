@@ -1,6 +1,7 @@
 #pragma once
 #include "core/reflection/reflection.h"
 #include "core/tool/delegate.h"
+#include "core/string/string_name.h"
 #include "yr/serialization/serialization.h"
 #include <entt/signal/sigh.hpp>
 
@@ -9,11 +10,11 @@ struct GameplayTag
 {
     bool IsValid() const
 	{
-		return !TagName.empty();
+		return !TagName.IsEmpty();
 	}
 
     bool operator==(const GameplayTag& Other) const { return TagName == Other.TagName; }
-    bool operator<(const GameplayTag& Other) const { return TagName < Other.TagName; }
+    bool operator<(const GameplayTag& Other) const { return std::string_view(TagName) < std::string_view(Other.TagName); }
 
     /**
      * Check if this tag matches TagToCheck, considering parent hierarchy.
@@ -26,10 +27,12 @@ struct GameplayTag
             return false;
         if (TagName == TagToCheck.TagName)
             return true;
-        std::string prefix(TagToCheck.TagName);
+        std::string_view ThisView = TagName;
+        std::string_view CheckView = TagToCheck.TagName;
+        std::string prefix(CheckView);
         prefix += ".";
-        if (TagName.size() > prefix.size())
-            return TagName.substr(0, prefix.size()) == prefix;
+        if (ThisView.size() > prefix.size())
+            return ThisView.substr(0, prefix.size()) == prefix;
         return false;
     }
 
@@ -47,23 +50,25 @@ struct GameplayTag
         if (TagName == TagToCheck.TagName)
         {
             int32 depth = 1;
-            for (char c : std::string(TagName)) if (c == '.') depth++;
+            for (char c : std::string_view(TagName)) if (c == '.') depth++;
             return depth;
         }
-        std::string prefix(TagToCheck.TagName);
+        std::string_view ThisView = TagName;
+        std::string_view CheckView = TagToCheck.TagName;
+        std::string prefix(CheckView);
         prefix += ".";
-        if (TagName.size() > prefix.size() && TagName.substr(0, prefix.size()) == prefix)
+        if (ThisView.size() > prefix.size() && ThisView.substr(0, prefix.size()) == prefix)
         {
             int32 depth = 1;
-            for (char c : std::string(TagToCheck.TagName)) if (c == '.') depth++;
+            for (char c : CheckView) if (c == '.') depth++;
             return depth;
         }
         return 0;
     }
 
-    // Tag name
+    // Tag name - using StringName for pooled string storage and O(1) pointer-based comparison
     PROPERTY()
-    std::string_view TagName;
+    StringName TagName;
 };
 
 CLASS(BindJs)
