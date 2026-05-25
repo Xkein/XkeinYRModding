@@ -38,6 +38,10 @@ func get_function_ptr_type(htFunction, htClass)
     ret $func_type
 end
 
+func get_format_type_name(cppType)
+    ret cppType.full_name | string.replace "(*)(" "("
+end
+
 func get_cpp_primitives()
     ret [
         "signed char",

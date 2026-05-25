@@ -185,7 +185,7 @@ void {{get_gen_type_name(klass.identifier)}}__Register()
         if klass.is_abstract
             continue
         end}}
-    factory.ctor<{{(function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "}}>();
+    factory.ctor<{{(function.cpp_function.parameters | array.each do; ret get_format_type_name($0.type); end) | array.join ", "}}>();
 {{-     continue
     end
     $class_full_name = klass.full_name

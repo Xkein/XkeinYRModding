@@ -55,7 +55,7 @@ void __JsRegister_{{klass.identifier}}() {
         end
         if function.is_constructor
             if !htClass.is_abstract
-                $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+                $arg_types = (function.cpp_function.parameters | array.each do; ret get_format_type_name($0.type); end) | array.join ", "
                 if !string.contains($arg_types, "char const *")
                     $klass = append_line($klass, $'builder.Constructor<{$arg_types}>();')
                 end
@@ -83,7 +83,7 @@ void __JsRegister_{{klass.identifier}}() {
             $func_type = get_function_ptr_type(function, htClass)
             if !should_skip_visibility(htClass, function) && !function.cpp_function.is_function_template
                 if function.is_constructor
-                    $arg_types = (function.cpp_function.parameters | array.each do; ret $0.type.full_name; end) | array.join ", "
+                    $arg_types = (function.cpp_function.parameters | array.each do; ret get_format_type_name($0.type); end) | array.join ", "
                     if string.empty($arg_types)
                         $ctor_list = append_line($ctor_list, $'MakeConstructor({htClass.full_name}),')
                     else
@@ -112,7 +112,7 @@ void __JsRegister_{{klass.identifier}}() {
                 $klass = append_line($klass, $'));')
             else
                 if !string.contains($ctor_list, "char const *")
-                    $decay = $ctor_list | string.remove_first $'MakeConstructor({htClass.full_name}' | string.remove_first ',' | string.remove_first ')'
+                    $decay = $ctor_list | string.remove_first $'MakeConstructor({htClass.full_name}' | string.remove_first ',' | string.remove_last ')'
                     $klass = append_line($klass, $'builder.Constructor<{$decay}>();')
                 end
             end
