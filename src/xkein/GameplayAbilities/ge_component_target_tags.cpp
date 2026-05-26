@@ -25,7 +25,8 @@ void TargetTagsGEComponent::OnActiveGameplayEffectAdded(
 
 void TargetTagsGEComponent::OnActiveGameplayEffectRemoved(
     ActiveGameplayEffectsContainer& Container,
-    ActiveGameplayEffect& Effect) const
+    ActiveGameplayEffect& Effect,
+    const FGameplayEffectRemovalInfo& RemovalInfo) const
 {
     AbilitySystemComponent* TargetASC = Effect.Handle.GetOwningAbilitySystemComponent();
     if (!TargetASC)

@@ -149,8 +149,8 @@ struct GameplayTagRequirements
 	GameplayTagContainer IgnoreTags;
 
 	/** Build up a more complex query that can't be expressed with RequireTags/IgnoreTags alone */
-	// PROPERTY()
-	// GameplayTagQuery TagQuery;
+	PROPERTY()
+	GameplayTagQuery TagQuery;
 
 	/** True if all required tags and no ignore tags found */
 	bool	RequirementsMet(const GameplayTagContainer& Container) const;
@@ -197,4 +197,72 @@ struct FInheritedTagContainer
 
     void AddTag(const GameplayTag& TagToAdd) { Added.AddTag(TagToAdd); }
     void RemoveTag(const GameplayTag& TagToRemove) { Removed.AddTag(TagToRemove); }
+};
+
+/** Type of expression node in a GameplayTagQuery expression tree */
+ENUM()
+enum EGameplayTagQueryExprType : int
+{
+    /** True if any of the referenced tags match */
+    AnyTagsMatch,
+
+    /** True if all of the referenced tags match */
+    AllTagsMatch,
+
+    /** True if none of the referenced tags match */
+    NoTagsMatch,
+
+    /** True if any of the referenced child expressions match */
+    AnyExprMatch,
+
+    /** True if all of the referenced child expressions match */
+    AllExprMatch,
+
+    /** True if none of the referenced child expressions match */
+    NoExprMatch
+};
+
+/**
+ * A single node in the GameplayTagQuery expression tree.
+ * Leaf nodes (AnyTagsMatch, AllTagsMatch, NoTagsMatch) index into TagTokens.
+ * Composite nodes (AnyExprMatch, AllExprMatch, NoExprMatch) index into child expressions.
+ */
+struct FGameplayTagQueryExpression
+{
+    EGameplayTagQueryExprType ExprType;
+    int32 StartIndex = 0;
+    int32 Count = 0;
+};
+
+/**
+ * Expression tree for complex tag queries.
+ * Supports AND/OR/NOT logic that cannot be expressed with RequireTags/IgnoreTags alone.
+ * Node types index into TagTokens (leaf) or Expressions (composite) via StartIndex + Count.
+ */
+STRUCT()
+struct GameplayTagQuery
+{
+    /** Evaluate this query against the given tag container */
+    bool Matches(const GameplayTagContainer& Container) const;
+
+    /** True if this query has no expressions (vacuously matches everything) */
+    bool IsEmpty() const
+    {
+        return Expressions.empty();
+    }
+
+    /** Build a query that matches when ANY of InTags is present */
+    static GameplayTagQuery MakeQuery_MatchAnyTagsMatch(const GameplayTagContainer& InTags);
+
+    /** Build a query that matches when ALL of InTags are present */
+    static GameplayTagQuery MakeQuery_MatchAllTagsMatch(const GameplayTagContainer& InTags);
+
+private:
+    bool EvaluateExpression(int32 ExprIndex, const GameplayTagContainer& Container) const;
+
+    /** Pool of all tags referenced by expression nodes */
+    std::vector<GameplayTag> TagTokens;
+
+    /** Expression nodes forming the tree. First node is the root. */
+    std::vector<FGameplayTagQueryExpression> Expressions;
 };

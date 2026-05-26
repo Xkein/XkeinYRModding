@@ -5,16 +5,65 @@
 #include "scripting/common/script_function.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
+#include "xkein/GameplayAbilities/gameplay_cue.h"
+#include <cstring>
+#include <unordered_map>
 
 CLASS(IniComponent, IniSection = "GAS")
 struct AbilitySystemGlobals
 {
     PROPERTY()
     std::vector<AttributeSetDefine*> DefaultAttributeSets;
+
+    /** Curve tables loaded from [CurveTable.XXX] INI sections, keyed by table name.
+     *  Each curve maps ability level (int32) → value (float).
+     *  Uses unordered_map since StringName has std::hash but no operator<. */
+    std::unordered_map<StringName, std::map<int32, float>> CurveTables;
+
+    void AfterLoadIni(IniReader& parser, const char* pSection, const char* pKey)
+    {
+        CCINIClass* pIni = parser.GetIni();
+        if (!pIni) return;
+
+        for (auto* pSec = pIni->Sections.First(); pSec && pSec->IsValid(); pSec = pSec->Next())
+        {
+            const char* sectionName = pSec->Name;
+            if (!sectionName) continue;
+
+            // Match sections starting with "CurveTable."
+            if (strncmp(sectionName, "CurveTable.", 11) != 0) continue;
+
+            StringName tableName(sectionName + 11); // skip "CurveTable." prefix
+            if (tableName.IsEmpty()) continue;
+
+            std::map<int32, float> curve;
+            int keyCount = pIni->GetKeyCount(sectionName);
+            for (int i = 0; i < keyCount; i++)
+            {
+                const char* keyName = pIni->GetKeyName(sectionName, i);
+                if (!keyName) continue;
+
+                int32 level = atoi(keyName);
+                float value = static_cast<float>(pIni->ReadDouble(sectionName, keyName, 0.0));
+                curve[level] = value;
+            }
+
+            if (!curve.empty())
+            {
+                CurveTables[tableName] = std::move(curve);
+            }
+        }
+    }
 };
 
 CLASS(BindJs)
 struct GameplayAbilityCreator : public ScriptFunction<GameplayAbility*(AbilitySystemComponent* component)>
+{
+    using ScriptFunction::ScriptFunction;
+};
+
+CLASS(BindJs)
+struct AttributeSetCreator : public ScriptFunction<AttributeSet*(AbilitySystemComponent* component)>
 {
     using ScriptFunction::ScriptFunction;
 };
@@ -26,6 +75,16 @@ public:
     static void Tick();
 
     static GameplayAbility* CreateAbility(const StringName& name, AbilitySystemComponent* component);
+    static AttributeSet* CreateAttributeSet(const StringName& name, AbilitySystemComponent* component);
+
+    /** Access the global GameplayCueManager singleton */
+    static struct GameplayCueManager* GetCueManager();
+
+    /** Create a static cue notify instance by factory name */
+    static GameplayCueNotify_Static* CreateCueStatic(const StringName& name);
+
+    /** Create an actor-based cue notify instance by factory name */
+    static GameplayCueNotify_Actor* CreateCueActor(const StringName& name);
 };
 
 #ifndef __HEADER_TOOL__
@@ -96,6 +155,39 @@ namespace detail
                     result = tag;
                     return true;
                 }
+            }
+            return false;
+        }
+    };
+
+    // Parser for FScalableFloat: supports simple float format for backward compatibility
+    // with existing INI keys that use bare float values (e.g. Period=2.0)
+    template<>
+    struct Parser<FScalableFloat>
+    {
+        static bool Read(std::string_view str, FScalableFloat& result)
+        {
+            float value = 0.0f;
+            if (::Parser<float>::Read(str, value))
+            {
+                result.Value = value;
+                return true;
+            }
+            return false;
+        }
+    };
+
+    // Parser for GameplayTagQuery: comma-separated tag list creates an AnyTagsMatch query
+    template<>
+    struct Parser<GameplayTagQuery>
+    {
+        static bool Read(std::string_view str, GameplayTagQuery& result)
+        {
+            GameplayTagContainer tempContainer;
+            if (::Parser<GameplayTagContainer>::Read(str, tempContainer))
+            {
+                result = GameplayTagQuery::MakeQuery_MatchAnyTagsMatch(tempContainer);
+                return true;
             }
             return false;
         }

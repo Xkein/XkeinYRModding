@@ -86,77 +86,6 @@ struct GameplayAbilityActorInfo
 };
 
 
-CLASS(BindJs)
-struct GameplayAbilityTargetData
-{
-
-};
-
-CLASS(BindJs)
-struct GameplayAbilityTargetDataHandle
-{
-    GameplayAbilityTargetData* FirstData;
-    std::vector<GameplayAbilityTargetData*> Data;
-    
-	/** Resets handle to have no targets */
-	void Clear()
-	{
-		Data.clear();
-	}
-
-	/** Returns number of target data, not number of actors/targets as target data may contain multiple actors */
-	int32 Num() const
-	{
-		return FirstData ? std::max(1, (int32)Data.size()) : 0;
-	}
-};
-
-
-/** Metadata for a tag-based Gameplay Event, that can activate other abilities or run ability-specific logic */
-CLASS(BindJs)
-struct GameplayEventData
-{
-	/** Tag of the event that triggered this */
-	PROPERTY()
-	GameplayTag EventTag;
-
-	/** The instigator of the event */
-	PROPERTY()
-	entt::entity Instigator;
-
-	/** The target of the event */
-	PROPERTY()
-	entt::entity Target;
-
-	/** An optional ability-specific object to be passed though the event */
-	PROPERTY()
-	entt::entity OptionalObject;
-
-	/** A second optional ability-specific object to be passed though the event */
-	PROPERTY()
-	entt::entity OptionalObject2;
-
-	/** Polymorphic context information */
-	// PROPERTY()
-	// GameplayEffectContextHandle ContextHandle;
-
-	/** Tags that the instigator has */
-	PROPERTY()
-	GameplayTagContainer InstigatorTags;
-
-	/** Tags that the target has */
-	PROPERTY()
-	GameplayTagContainer TargetTags;
-
-	/** The magnitude of the triggering event */
-	PROPERTY()
-	float EventMagnitude;
-
-	/** The polymorphic target information for the event */
-	PROPERTY()
-	GameplayAbilityTargetDataHandle TargetData;
-};
-
 /** Structure that defines how an ability will be triggered by external events */
 CLASS()
 struct AbilityTriggerData
@@ -350,6 +279,24 @@ class GameplayAbility
 	{
 		return CurrentActorInfo ? CurrentActorInfo->AbilitySystemCom : nullptr;
 	}
+
+	/** Returns true if this ability can be canceled. Default implementation returns true. */
+	virtual bool CanBeCanceled() const;
+
+	/** Called from outside to end the ability, replicates to the other side */
+	virtual void ExternalEndAbility();
+
+	/** Called from outside to cancel the ability, replicates to the other side */
+	virtual void ExternalCancelAbility();
+
+	/** Check if this ability satisfies the tag requirements based on the given ASC */
+	virtual bool DoesAbilitySatisfyTagRequirements(const AbilitySystemComponent& ASC) const;
+
+	/** Send a gameplay event to the owning ASC, which may trigger other abilities */
+	virtual void SendGameplayEvent(const GameplayTag& EventTag, const GameplayEventData& Payload) const;
+
+	/** Get the level of the ability spec referenced by Handle */
+	virtual int32 GetAbilityLevel(const GameplayAbilitySpecHandle Handle) const;
 
 protected:
 	// -------------------------------------

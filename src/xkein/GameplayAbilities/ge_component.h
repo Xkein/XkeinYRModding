@@ -1,9 +1,11 @@
 #pragma once
 #include "core/reflection/reflection.h"
+#include "xkein/GameplayAbilities/gameplay_effect_types.h"
 
 struct ActiveGameplayEffectsContainer;
 struct ActiveGameplayEffect;
 struct GameplayEffectSpec;
+class AbilitySystemComponent;
 
 /**
  * Base class for GameplayEffect components.
@@ -35,7 +37,8 @@ public:
     /** Called right before the active gameplay effect is removed (Duration/Infinite). */
     virtual void OnActiveGameplayEffectRemoved(
         ActiveGameplayEffectsContainer& Container,
-        ActiveGameplayEffect& Effect) const {}
+        ActiveGameplayEffect& Effect,
+        const FGameplayEffectRemovalInfo& RemovalInfo) const {}
 
     /**
      * Called when an instant GE executes.
@@ -49,5 +52,6 @@ public:
      */
     virtual void OnGameplayEffectApplied(
         ActiveGameplayEffectsContainer& Container,
-        GameplayEffectSpec& Spec) const {}
+        GameplayEffectSpec& Spec,
+        AbilitySystemComponent& OwningASC) const {}
 };

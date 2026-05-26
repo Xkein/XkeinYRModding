@@ -1,4 +1,5 @@
 #include "gameplay_effect.h"
+#include "ability_system_globals.h"
 #include <map>
 
 class AbilitySystemComponent;
@@ -94,4 +95,87 @@ bool GameplayModifierInfo::operator==(const GameplayModifierInfo& Other) const
 bool GameplayModifierInfo::operator!=(const GameplayModifierInfo& Other) const
 {
     return !(*this == Other);
+}
+
+// ============================================================
+// FScalableFloat
+// ============================================================
+
+float FScalableFloat::GetValueAtLevel(int32 Level) const
+{
+    // If no curve table is specified, return the base value
+    if (Curve.CurveTableName.IsEmpty() || Curve.RowName.IsEmpty())
+    {
+        return Value;
+    }
+
+    auto* globals = IniComponentLoader::GetGlobalIniComponent<AbilitySystemGlobals>();
+    if (!globals)
+    {
+        return Value;
+    }
+
+    auto tableIt = globals->CurveTables.find(Curve.CurveTableName);
+    if (tableIt == globals->CurveTables.end())
+    {
+        return Value;
+    }
+
+    const auto& curve = tableIt->second;
+    if (curve.empty())
+    {
+        return Value;
+    }
+
+    // Find the first entry with level >= requested Level
+    auto it = curve.lower_bound(Level);
+
+    // If Level is at or below the first defined level, clamp to first value
+    if (it == curve.begin())
+    {
+        return it->second;
+    }
+
+    // If Level is above all defined levels, clamp to last value
+    if (it == curve.end())
+    {
+        return curve.rbegin()->second;
+    }
+
+    // Linear interpolation between the two surrounding level points
+    auto prevIt = it;
+    --prevIt;
+
+    int32 lowerLevel = prevIt->first;
+    float lowerValue = prevIt->second;
+    int32 upperLevel = it->first;
+    float upperValue = it->second;
+
+    if (upperLevel == lowerLevel)
+    {
+        return lowerValue;
+    }
+
+    float t = static_cast<float>(Level - lowerLevel) / static_cast<float>(upperLevel - lowerLevel);
+    return lowerValue + (upperValue - lowerValue) * t;
+}
+
+// ============================================================
+// GameplayEffectContext
+// ============================================================
+
+GameplayEffectContext GameplayEffectContext::Duplicate() const
+{
+    GameplayEffectContext NewContext;
+    NewContext.Instigator = Instigator;
+    NewContext.EffectCauser = EffectCauser;
+    NewContext.AbilityCDO = AbilityCDO;
+    NewContext.AbilityInstanceNotReplicated = AbilityInstanceNotReplicated;
+    NewContext.AbilityLevel = AbilityLevel;
+    NewContext.SourceObject = SourceObject;
+    NewContext.InstigatorAbilitySystemComponent = InstigatorAbilitySystemComponent;
+    NewContext.Actors = Actors;
+    NewContext.WorldOrigin = WorldOrigin;
+    NewContext.bHasWorldOrigin = bHasWorldOrigin;
+    return NewContext;
 }

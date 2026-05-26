@@ -20,14 +20,24 @@ void GameplayAttribute::SetNumericValueBase(AttributeSet* Set, float NewBaseValu
 {
     if (!Set) return;
     auto* Data = Set->FindAttributeData(this);
-    if (Data) Data->SetBaseValue(NewBaseValue);
+    if (!Data) return;
+    float OldValue = Data->GetBaseValue();
+    Set->PreAttributeBaseChange(*this, NewBaseValue);
+    Set->PreAttributeChange(*this, NewBaseValue);
+    Data->SetBaseValue(NewBaseValue);
+    Set->PostAttributeChange(*this, OldValue, NewBaseValue);
+    Set->PostAttributeBaseChange(*this, OldValue, NewBaseValue);
 }
 
 void GameplayAttribute::SetNumericValue(AttributeSet* Set, float NewValue) const
 {
     if (!Set) return;
     auto* Data = Set->FindAttributeData(this);
-    if (Data) Data->SetCurrentValue(NewValue);
+    if (!Data) return;
+    float OldValue = Data->GetCurrentValue();
+    Set->PreAttributeChange(*this, NewValue);
+    Data->SetCurrentValue(NewValue);
+    Set->PostAttributeChange(*this, OldValue, NewValue);
 }
 
 GameplayAttributeData* AttributeSet::FindAttributeData(const GameplayAttribute* Attribute)

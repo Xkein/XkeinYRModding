@@ -2,6 +2,7 @@
 #include "xkein/GameplayAbilities/ability_system_component.h"
 
 GameplayAbilitySpec::GameplayAbilitySpec(GameplayAbility* InAbility, int32 InLevel)
+    : ActiveCount(0)
 {
     Ability = InAbility;
     Level = InLevel;
@@ -52,8 +53,9 @@ bool GameplayAbility::CanActivateAbility(const GameplayAbilitySpecHandle Handle,
         return false;
     }
 
-    // Check blocked tags on the actor
-    if (Define->AbilityTags.HasAny(Define->ActivationBlockedTags))
+    // Check blocked tags on the actor — any blocked tag on the owning ASC prevents activation
+    if (!Define->ActivationBlockedTags.IsEmpty() &&
+        ActorInfo->AbilitySystemCom->GetOwnedGameplayTags().HasAny(Define->ActivationBlockedTags))
     {
         return false;
     }
@@ -251,6 +253,10 @@ void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const G
     // Trigger the ended delegate if the ASC and spec exist
     if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
     {
+        if (Spec->ActiveCount > 0)
+        {
+            Spec->ActiveCount--;
+        }
         Spec->OnGameplayAbilityEnded.publish(Spec);
         
         // If marked for removal after activation, remove it now
@@ -264,4 +270,92 @@ void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const G
     CurrentSpecHandle = GameplayAbilitySpecHandle();
     CurrentActivationInfo = GameplayAbilityActivationInfo();
     CurrentEventData = GameplayEventData();
+}
+
+// ============================================================
+// Wave 2 Task 11 - New virtual methods
+// ============================================================
+
+bool GameplayAbility::CanBeCanceled() const
+{
+    return true;
+}
+
+void GameplayAbility::ExternalEndAbility()
+{
+    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+}
+
+void GameplayAbility::ExternalCancelAbility()
+{
+    CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+}
+
+bool GameplayAbility::DoesAbilitySatisfyTagRequirements(const AbilitySystemComponent& ASC) const
+{
+    if (!Define)
+    {
+        return false;
+    }
+
+    const GameplayTagContainer& OwnerTags = ASC.GetOwnedGameplayTags();
+
+    // ActivationRequiredTags: ASC must have all of these
+    if (Define->ActivationRequiredTags.IsValid() && !OwnerTags.HasAll(Define->ActivationRequiredTags))
+    {
+        return false;
+    }
+
+    // ActivationBlockedTags: ASC must have none of these
+    if (Define->ActivationBlockedTags.IsValid() && OwnerTags.HasAny(Define->ActivationBlockedTags))
+    {
+        return false;
+    }
+
+    // SourceRequiredTags: ASC must have all of these
+    if (Define->SourceRequiredTags.IsValid() && !OwnerTags.HasAll(Define->SourceRequiredTags))
+    {
+        return false;
+    }
+
+    // SourceBlockedTags: ASC must have none of these
+    if (Define->SourceBlockedTags.IsValid() && OwnerTags.HasAny(Define->SourceBlockedTags))
+    {
+        return false;
+    }
+
+    // TargetRequiredTags: ASC must have all of these
+    if (Define->TargetRequiredTags.IsValid() && !OwnerTags.HasAll(Define->TargetRequiredTags))
+    {
+        return false;
+    }
+
+    // TargetBlockedTags: ASC must have none of these
+    if (Define->TargetBlockedTags.IsValid() && OwnerTags.HasAny(Define->TargetBlockedTags))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void GameplayAbility::SendGameplayEvent(const GameplayTag& EventTag, const GameplayEventData& Payload) const
+{
+    AbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+    if (!ASC)
+    {
+        return;
+    }
+
+    ASC->HandleGameplayEvent(EventTag, &Payload);
+}
+
+int32 GameplayAbility::GetAbilityLevel(const GameplayAbilitySpecHandle Handle) const
+{
+    if (const GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, CurrentActorInfo))
+    {
+        return Spec->Level;
+    }
+
+    return 0;
 }

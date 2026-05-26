@@ -5,3 +5,6 @@
 
 template<typename TFunc>
 using TDelegate = entt::sigh<TFunc>;
+
+template<typename TFunc>
+using TMulticastDelegate = entt::sigh<TFunc>;

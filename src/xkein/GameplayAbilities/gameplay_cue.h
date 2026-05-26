@@ -1,6 +1,18 @@
 #pragma once
 #include "core/reflection/reflection.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
+#include "xkein/GameplayAbilities/gameplay_effect.h"
+#include "YRpp/GeneralStructures.h"
+
+/** Event type for gameplay cues */
+ENUM()
+enum EGameplayCueEvent : int
+{
+    OnActive,     // Cue activated (persistent effects begin)
+    WhileActive,  // Cue is active (per-frame for persistent)
+    Executed,     // One-shot execution (instant effects)
+    Removed       // Cue removed (persistent effects end)
+};
 
 /** Simple gameplay cue parameters */
 CLASS()
@@ -14,6 +26,18 @@ struct GameplayCueParameters
 
     PROPERTY()
     GameplayTagContainer AggregatedTargetTags;
+
+    PROPERTY()
+    CoordStruct Location;
+
+    PROPERTY()
+    CoordStruct Normal;
+
+    PROPERTY()
+    GameplayEffectContextHandle EffectContext;
+
+    PROPERTY()
+    float RawMagnitude = 0.0f;
 };
 
 /** Base class for gameplay cue notifies (simplified) */

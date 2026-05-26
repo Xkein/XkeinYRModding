@@ -7,7 +7,37 @@
 #include "xkein/GameplayAbilities/active_gameplay_effect_handle.h"
 #include <map>
 
-#define FScalableFloat float
+/** Handle to a specific row in a curve table, used for level-scaled float lookups */
+struct CurveTableRowHandle
+{
+    StringName CurveTableName;
+    StringName RowName;
+};
+
+/**
+ * Float that can optionally be scaled by a curve table.
+ * When no curve is set, GetValueAtLevel() returns the base Value.
+ * When a curve is set, GetValueAtLevel() linearly interpolates from the specified curve table.
+ */
+struct FScalableFloat
+{
+    float Value = 0.0f;
+    CurveTableRowHandle Curve;
+
+    FScalableFloat() = default;
+    FScalableFloat(float InValue) : Value(InValue) {}
+
+    /** Implicit conversion to float for backward compatibility with existing code */
+    operator float() const { return Value; }
+
+    /**
+     * Get the value at a specific ability level.
+     * If no curve table is set, returns the base Value.
+     * Otherwise, looks up the CurveTableName/RowName in AbilitySystemGlobals
+     * and linearly interpolates between defined level points.
+     */
+    float GetValueAtLevel(int32 Level) const;
+};
 
 class AbilitySystemComponent;
 class GameplayEffectComponent;
@@ -504,6 +534,8 @@ struct GameplayEffectContext
 
 	PROPERTY()
 	uint8 bHasWorldOrigin:1;
+
+	GameplayEffectContext Duplicate() const;
 };
 
 struct GameplayEffectContextHandle
@@ -560,7 +592,7 @@ struct GameplayEffectSpec
 CLASS()
 struct ActiveGameplayEffect
 {
-	ActiveGameplayEffect() : StartWorldTime(0.0f), StackCount(1), bIsInhibited(false) {}
+	ActiveGameplayEffect() : StartWorldTime(0.0f), StackCount(1), bIsInhibited(false), LastPeriodExecuteTime(0.0f) {}
 
 	/** Globally unique ID for identify this active gameplay effect. Can be used to look up owner. Not networked. */
 	ActiveGameplayEffectHandle Handle;
@@ -579,6 +611,9 @@ struct ActiveGameplayEffect
 	/** True if this effect is inhibited (temporarily disabled) */
 	PROPERTY()
 	bool bIsInhibited;
+
+	/** World time when the last period was executed (for periodic effects) */
+	float LastPeriodExecuteTime;
 	
 	/** Handles of Gameplay Abilities that were granted to the target by this Active Gameplay Effect */
 	PROPERTY()

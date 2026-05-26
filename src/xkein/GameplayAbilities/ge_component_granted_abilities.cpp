@@ -21,7 +21,7 @@ void GrantedAbilitiesGEComponent::OnActiveGameplayEffectAdded(
             continue;
         }
 
-        GameplayAbilitySpec Spec(Config.Ability, Config.Level);
+        GameplayAbilitySpec Spec(Config.Ability, Config.LevelScalableFloat.GetValueAtLevel(1));
         Spec.GameplayEffectHandle = Effect.Handle;
         ASC->GiveAbility(Spec);
         gLogger->info("GrantedAbilitiesGEComponent: granted ability");
