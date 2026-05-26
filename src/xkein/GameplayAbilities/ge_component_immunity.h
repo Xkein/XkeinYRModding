@@ -25,5 +25,6 @@ public:
     /** Remove the application query when the immunity effect is removed */
     void OnActiveGameplayEffectRemoved(
         ActiveGameplayEffectsContainer& Container,
-        ActiveGameplayEffect& Effect) const override;
+        ActiveGameplayEffect& Effect,
+        const FGameplayEffectRemovalInfo& RemovalInfo) const override;
 };

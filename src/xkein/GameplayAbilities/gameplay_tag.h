@@ -129,35 +129,17 @@ struct GameplayTagContainer
 		return !GameplayTags.empty();
 	}
 
+    bool IsEmpty() const
+    {
+        return GameplayTags.empty();
+    }
+
     PROPERTY()
 	std::vector<GameplayTag> GameplayTags;
 };
 
 /** Delegate for tag change events */
 using FOnGameplayTagCountChanged = TDelegate<void(const GameplayTag&, int32 NewCount)>;
-
-/** Encapsulate require and ignore tags */
-CLASS()
-struct GameplayTagRequirements
-{
-	/** All of these tags must be present */
-	PROPERTY()
-	GameplayTagContainer RequireTags;
-
-	/** None of these tags may be present */
-	PROPERTY()
-	GameplayTagContainer IgnoreTags;
-
-	/** Build up a more complex query that can't be expressed with RequireTags/IgnoreTags alone */
-	PROPERTY()
-	GameplayTagQuery TagQuery;
-
-	/** True if all required tags and no ignore tags found */
-	bool	RequirementsMet(const GameplayTagContainer& Container) const;
-
-	/** True if neither RequireTags or IgnoreTags has any tags */
-	bool	IsEmpty() const;
-};
 
 /**
  * Structure for inheritable tag containers.
@@ -265,4 +247,27 @@ private:
 
     /** Expression nodes forming the tree. First node is the root. */
     std::vector<FGameplayTagQueryExpression> Expressions;
+};
+
+/** Encapsulate require and ignore tags */
+CLASS()
+struct GameplayTagRequirements
+{
+	/** All of these tags must be present */
+	PROPERTY()
+	GameplayTagContainer RequireTags;
+
+	/** None of these tags may be present */
+	PROPERTY()
+	GameplayTagContainer IgnoreTags;
+
+	/** Build up a more complex query that can't be expressed with RequireTags/IgnoreTags alone */
+	PROPERTY()
+	GameplayTagQuery TagQuery;
+
+	/** True if all required tags and no ignore tags found */
+	bool	RequirementsMet(const GameplayTagContainer& Container) const;
+
+	/** True if neither RequireTags or IgnoreTags has any tags */
+	bool	IsEmpty() const;
 };

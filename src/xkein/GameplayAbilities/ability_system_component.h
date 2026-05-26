@@ -6,6 +6,7 @@
 #include "xkein/GameplayAbilities/gameplay_ability.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_cue.h"
+#include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
 #include "xkein/GameplayAbilities/gameplay_tag_count_container.h"
 #include "xkein/GameplayAbilities/gameplay_effect_query.h"
@@ -54,14 +55,6 @@ using FOnActiveGameplayEffectInhibitionChanged = TMulticastDelegate<void(ActiveG
 /** Delegate for generic gameplay events (tag-based with payload) */
 using FGameplayEventMulticastDelegate = TMulticastDelegate<void(const GameplayTag&, const GameplayEventData*)>;
 
-/** Handle for delegate registrations, used to disconnect later */
-struct FDelegateHandle
-{
-    int32 Id = 0;
-    bool IsValid() const { return Id != 0; }
-    bool operator==(const FDelegateHandle& Other) const { return Id == Other.Id; }
-};
-
 /** Entry for a filtered tag count callback (EventType-aware) */
 struct FTagCountCallbackEntry
 {
@@ -93,57 +86,6 @@ struct FActiveGameplayEffectEvents
 
 	/** Called when this active effect's inhibition state changes (bInhibited) */
 	FOnActiveGameplayEffectInhibitionChanged OnInhibitionChanged;
-};
-
-CLASS(BindJs)
-struct ActiveGameplayEffectsContainer
-{
-    /** Back-pointer to the owning AbilitySystemComponent */
-    AbilitySystemComponent* Owner = nullptr;
-
-    /** Find an active effect by handle */
-	ActiveGameplayEffect* GetActiveGameplayEffect(const ActiveGameplayEffectHandle Handle);
-    
-    /** Get active effect by handle (const version) */
-	const ActiveGameplayEffect* GetActiveGameplayEffect(const ActiveGameplayEffectHandle Handle) const;
-    
-    /** Add a new gameplay effect spec to the container. Returns the active effect handle */
-	ActiveGameplayEffectHandle Add(AbilitySystemComponent* OwningASC, GameplayEffectSpec& Spec);
-    
-    /** Remove an active effect by handle. bPrematureRemoval=true means forced removal, false means natural expiry */
-    void Remove(ActiveGameplayEffectHandle Handle, bool bPrematureRemoval = true);
-    
-    /** Remove all active effects */
-	void RemoveAll();
-    
-    /** Tick all active effects (update durations, period timers) */
-	void Tick(float DeltaTime);
-    
-    /** Get all active effects */
-	std::vector<ActiveGameplayEffect*>& GetAllActiveEffects() { return Effects; }
-	const std::vector<ActiveGameplayEffect*>& GetAllActiveEffects() const { return Effects; }
-    
-    /** Check if the container is empty */
-	bool IsEmpty() const { return Effects.empty(); }
-    
-    /** Get number of active effects */
-	int32 Num() const { return (int32)Effects.size(); }
-
-    /** Find an existing active effect that a spec can stack with */
-    ActiveGameplayEffect* FindStackableActiveGameplayEffect(const GameplayEffectSpec& Spec);
-
-    /** Handle overflow when a stack exceeds its limit */
-    bool HandleActiveGameplayEffectStackOverflow(ActiveGameplayEffect& ActiveStackableGE, const GameplayEffectSpec& OverflowingSpec);
-
-    /** Apply stacking logic when adding a new effect */
-    void ApplyStackingLogic(GameplayEffectSpec& Spec, ActiveGameplayEffectHandle& OutHandle);
-
-    /** Set whether an active gameplay effect is inhibited (temporarily disabled) */
-    void SetActiveGameplayEffectInhibit(ActiveGameplayEffectHandle Handle, bool bInhibit);
-
-private:
-    /** Internal storage of active effects */
-	std::vector<ActiveGameplayEffect*> Effects;
 };
 
 
@@ -246,7 +188,7 @@ public:
 	int32 GetGameplayTagCount(const GameplayTag& Tag) const;
 
 	/** Returns explicit owned tags (no parent expansion), like UE's GetOwnedGameplayTags(). */
-	const GameplayTagContainer& GetOwnedGameplayTags() const { return GameplayTagCountContainer.GetExplicitGameplayTags(); }
+	const GameplayTagContainer& GetOwnedGameplayTags() const { return TagCountContainer.GetExplicitGameplayTags(); }
 
 	// /** Allow events to be registered for specific gameplay tags being added or removed */
 	// FOnGameplayEffectTagCountChanged& RegisterGameplayTagEvent(GameplayTag Tag, EGameplayTagEventType EventType = EGameplayTagEventType::NewOrRemoved);
@@ -730,7 +672,7 @@ protected:
 	std::map<FDelegateHandle, std::vector<GameplayTag>> GameplayEventCallbackHandleMap;
 
 	/** Equivalent to UE's FGameplayTagCountContainer. */
-	GameplayTagCountContainer GameplayTagCountContainer;
+	GameplayTagCountContainer TagCountContainer;
 
 	/** Tags that block ability activation on this ASC */
 	GameplayTagCountContainer BlockedAbilityTags;

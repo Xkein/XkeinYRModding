@@ -3,6 +3,22 @@
 #ifndef __HEADER_TOOL__
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include "xkein/GameplayAbilities/ability_system_globals.h"
+#include "xkein/GameplayAbilities/gameplay_effect_execution_calculation.h"
+#include "xkein/GameplayAbilities/gameplay_mod_magnitude_calculation.h"
+#include "xkein/GameplayAbilities/ability_task_repeat.h"
+#include "xkein/GameplayAbilities/ability_task_spawn_actor.h"
+#include "xkein/GameplayAbilities/ability_task_wait_attribute_change.h"
+#include "xkein/GameplayAbilities/ability_task_wait_delay.h"
+#include "xkein/GameplayAbilities/ability_task_wait_gameplay_effect_applied.h"
+#include "xkein/GameplayAbilities/ability_task_wait_gameplay_event.h"
+#include "xkein/GameplayAbilities/ability_task_wait_gameplay_tag.h"
+#include "xkein/GameplayAbilities/ability_task_wait_gameplay_effect_removed.h"
+#include "xkein/GameplayAbilities/ability_task_wait_input.h"
+#include "xkein/GameplayAbilities/ability_task_wait_target_data.h"
+#include "xkein/GameplayAbilities/gameplay_cue_manager.h"
+#include "xkein/GameplayAbilities/gameplay_ability_target_actor.h"
+#include "xkein/GameplayAbilities/gameplay_ability_world_reticle.h"
+
 UsingCppType(ActiveGameplayEffectHandle);
 UsingCppType(ActiveGameplayEffectsContainer);
 UsingCppType(AttributeSet);
@@ -12,8 +28,6 @@ UsingCppType(AbilityTriggerData);
 UsingCppType(AbilitySystemComponent);
 UsingCppType(AbilitySystemComponentType);
 UsingCppType(GameplayAbility);
-UsingCppType(GameplayAbilityCreator);
-UsingCppType(ScriptFunction<GameplayAbility*(AbilitySystemComponent*)>);
 UsingCppType(GameplayAbilityDefine);
 UsingCppType(GameplayAbilitySystem);
 UsingCppType(GameplayAttribute);
@@ -45,6 +59,49 @@ UsingStdVector(GameplayAbility*);
 UsingStdVector(GameplayAbilityDefine*);
 UsingStdVector(GameplayAbilitySpec);
 UsingStdVector(GameplayEffect);
+
+UsingCppType(GameplayAbilityTargetData_SingleTargetHit);
+UsingCppType(GameplayAbilityTargetData_ActorArray);
+UsingCppType(GameplayAbilityTargetData_LocationInfo);
+UsingCppType(AbilityTask_Repeat);
+UsingCppType(AbilityTask_SpawnActor);
+UsingCppType(AbilityTask_WaitAttributeChange);
+UsingCppType(AbilityTask_WaitDelay);
+UsingCppType(AbilityTask_WaitGameplayEffectApplied);
+UsingCppType(AbilityTask_WaitGameplayEvent);
+UsingCppType(AbilityTask_WaitGameplayTag);
+UsingCppType(AbilityTask_WaitGameplayEffectRemoved);
+UsingCppType(AbilityTask_WaitInput);
+UsingCppType(AbilityTask_WaitTargetData);
+UsingCppType(GameplayAbilityTargetActor);
+UsingCppType(GameplayAbilityTargetActor_LineTrace);
+UsingCppType(GameplayAbilityTargetActor_Radius);
+UsingCppType(GameplayAbilityTargetActor_GroundTrace);
+UsingCppType(GameplayAbilityTargetActor_ActorPlacement);
+UsingCppType(GameplayAbilityWorldReticle);
+UsingCppType(GameplayCueStaticCreator);
+UsingCppType(GameplayCueActorCreator);
+UsingCppType(AbilityTask);
+UsingCppType(TaskCreator);
+UsingCppType(GameplayAbilityCreator);
+UsingCppType(AttributeSetCreator);
+UsingCppType(GameplayEffectSpec);
+UsingCppType(FGameplayEffectQuery);
+UsingCppType(FScalableFloat);
+UsingCppType(GameplayEffectCalculation);
+UsingCppType(GameplayEffectExecutionCalculation);
+UsingCppType(GameplayModMagnitudeCalculation);
+UsingCppType(GameplayEffectAttributeCaptureDefinition);
+UsingCppType(FGameplayEffectCustomExecutionParameters);
+UsingCppType(FGameplayEffectCustomExecutionOutput);
+UsingCppType(ScriptFunction<GameplayAbility*(AbilitySystemComponent*)>);
+UsingCppType(ScriptFunction<AttributeSet *(AbilitySystemComponent *)>);
+UsingCppType(ScriptFunction<AbilityTask *(GameplayAbility *,AbilitySystemComponent *)>);
+UsingCppType(ScriptFunction<GameplayCueNotify_Static *(void)>);
+UsingCppType(ScriptFunction<GameplayCueNotify_Actor *(void)>);
+
+UsingStdVector(GameplayEffectAttributeCaptureDefinition);
+UsingStdVector(entt::entity);
 
 #include "scripting/javascript/js_events.h"
 UsingCppTypeWithRefCache(JsGameEvents);

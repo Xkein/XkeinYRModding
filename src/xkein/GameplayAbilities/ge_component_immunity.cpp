@@ -48,7 +48,8 @@ void ImmunityGEComponent::OnActiveGameplayEffectAdded(
 
 void ImmunityGEComponent::OnActiveGameplayEffectRemoved(
     ActiveGameplayEffectsContainer& Container,
-    ActiveGameplayEffect& Effect) const
+    ActiveGameplayEffect& Effect,
+    const FGameplayEffectRemovalInfo& RemovalInfo) const
 {
     AbilitySystemComponent* ASC = Effect.Handle.GetOwningAbilitySystemComponent();
     if (!ASC)

@@ -2,7 +2,7 @@
 #include "core/reflection/reflection.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
-#include "YRpp/GeneralStructures.h"
+#include <GeneralStructures.h>
 
 /** Event type for gameplay cues */
 ENUM()

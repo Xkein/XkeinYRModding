@@ -239,7 +239,7 @@ public:
     FScopedAbilityListLock(const FScopedAbilityListLock&) = delete;
     FScopedAbilityListLock& operator=(const FScopedAbilityListLock&) = delete;
 
-private:
+protected:
     AbilitySystemComponent& ASC;
 };
 

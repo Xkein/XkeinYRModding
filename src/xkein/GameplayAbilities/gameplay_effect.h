@@ -584,7 +584,7 @@ struct GameplayEffectSpec
 	/** Get the period of this effect */
 	float GetPeriod() const
 	{
-		return Def ? Def->Period : 0.0f;
+		return Def ? Def->Period : FScalableFloat(0.0f);
 	}
 };
 
@@ -634,5 +634,57 @@ struct ActiveGameplayEffect
 		if (Duration < 0.0f) return -1.0f;
 		return Duration + StartWorldTime;
 	}
+};
+
+
+CLASS(BindJs)
+struct ActiveGameplayEffectsContainer
+{
+    /** Back-pointer to the owning AbilitySystemComponent */
+    AbilitySystemComponent* Owner = nullptr;
+
+    /** Find an active effect by handle */
+	ActiveGameplayEffect* GetActiveGameplayEffect(const ActiveGameplayEffectHandle Handle);
+    
+    /** Get active effect by handle (const version) */
+	const ActiveGameplayEffect* GetActiveGameplayEffect(const ActiveGameplayEffectHandle Handle) const;
+    
+    /** Add a new gameplay effect spec to the container. Returns the active effect handle */
+	ActiveGameplayEffectHandle Add(AbilitySystemComponent* OwningASC, GameplayEffectSpec& Spec);
+    
+    /** Remove an active effect by handle. bPrematureRemoval=true means forced removal, false means natural expiry */
+    void Remove(ActiveGameplayEffectHandle Handle, bool bPrematureRemoval = true);
+    
+    /** Remove all active effects */
+	void RemoveAll();
+    
+    /** Tick all active effects (update durations, period timers) */
+	void Tick(float DeltaTime);
+    
+    /** Get all active effects */
+	std::vector<ActiveGameplayEffect*>& GetAllActiveEffects() { return Effects; }
+	const std::vector<ActiveGameplayEffect*>& GetAllActiveEffects() const { return Effects; }
+    
+    /** Check if the container is empty */
+	bool IsEmpty() const { return Effects.empty(); }
+    
+    /** Get number of active effects */
+	int32 Num() const { return (int32)Effects.size(); }
+
+    /** Find an existing active effect that a spec can stack with */
+    ActiveGameplayEffect* FindStackableActiveGameplayEffect(const GameplayEffectSpec& Spec);
+
+    /** Handle overflow when a stack exceeds its limit */
+    bool HandleActiveGameplayEffectStackOverflow(ActiveGameplayEffect& ActiveStackableGE, const GameplayEffectSpec& OverflowingSpec);
+
+    /** Apply stacking logic when adding a new effect */
+    void ApplyStackingLogic(GameplayEffectSpec& Spec, ActiveGameplayEffectHandle& OutHandle);
+
+    /** Set whether an active gameplay effect is inhibited (temporarily disabled) */
+    void SetActiveGameplayEffectInhibit(ActiveGameplayEffectHandle Handle, bool bInhibit);
+
+private:
+    /** Internal storage of active effects */
+	std::vector<ActiveGameplayEffect*> Effects;
 };
 

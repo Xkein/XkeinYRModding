@@ -326,26 +326,26 @@ static std::vector<GameplayTag> BuildParentTagsInclusive_ForEvents(const Gamepla
 void AbilitySystemComponent::AddLooseGameplayTag(const GameplayTag& Tag, int32 Count)
 {
     if (Count <= 0) return;
-    GameplayTagCountContainer.UpdateTagCount(Tag, Count);
+    TagCountContainer.UpdateTagCount(Tag, Count);
     for (const auto& Parent : BuildParentTagsInclusive_ForEvents(Tag))
     {
-        NotifyTagCountChanged(Parent, GameplayTagCountContainer.GetTagCount(Parent));
+        NotifyTagCountChanged(Parent, TagCountContainer.GetTagCount(Parent));
     }
 }
 
 void AbilitySystemComponent::RemoveLooseGameplayTag(const GameplayTag& Tag, int32 Count)
 {
     if (Count <= 0) return;
-    GameplayTagCountContainer.UpdateTagCount(Tag, -Count);
+    TagCountContainer.UpdateTagCount(Tag, -Count);
     for (const auto& Parent : BuildParentTagsInclusive_ForEvents(Tag))
     {
-        NotifyTagCountChanged(Parent, GameplayTagCountContainer.GetTagCount(Parent));
+        NotifyTagCountChanged(Parent, TagCountContainer.GetTagCount(Parent));
     }
 }
 
 int32 AbilitySystemComponent::GetGameplayTagCount(const GameplayTag& Tag) const
 {
-    return GameplayTagCountContainer.GetTagCount(Tag);
+    return TagCountContainer.GetTagCount(Tag);
 }
 
 
