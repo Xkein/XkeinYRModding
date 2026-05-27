@@ -28,11 +28,14 @@ public:
         const GameplayEffectSpec& Spec) const { return true; }
 
     /**
-     * Called after the GE is added as an active effect (Duration/Infinite types).
+     * Called when a Gameplay Effect is Added to the ActiveGameplayEffectsContainer.
+     * GE's are added to that container when they have duration (or are predicting locally).
+     * Return true if the effect should remain active, or false to inhibit.
+     * Note: Inhibit does not remove the effect (it remains added but dormant, waiting to uninhibit).
      */
-    virtual void OnActiveGameplayEffectAdded(
+    virtual bool OnActiveGameplayEffectAdded(
         ActiveGameplayEffectsContainer& Container,
-        ActiveGameplayEffect& Effect) const {}
+        ActiveGameplayEffect& Effect) const { return true; }
 
     /** Called right before the active gameplay effect is removed (Duration/Infinite). */
     virtual void OnActiveGameplayEffectRemoved(

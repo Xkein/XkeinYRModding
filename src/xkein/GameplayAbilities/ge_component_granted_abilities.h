@@ -14,7 +14,7 @@ public:
     PROPERTY()
     std::vector<GameplayAbilitySpecDef> GrantAbilityConfigs;
 
-    void OnActiveGameplayEffectAdded(
+    bool OnActiveGameplayEffectAdded(
         ActiveGameplayEffectsContainer& Container,
         ActiveGameplayEffect& Effect) const override;
 };

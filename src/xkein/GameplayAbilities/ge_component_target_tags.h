@@ -14,7 +14,7 @@ public:
     PROPERTY()
     GameplayTagContainer GrantedTags;
 
-    void OnActiveGameplayEffectAdded(
+    bool OnActiveGameplayEffectAdded(
         ActiveGameplayEffectsContainer& Container,
         ActiveGameplayEffect& Effect) const override;
 

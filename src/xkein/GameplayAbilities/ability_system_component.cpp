@@ -1,5 +1,4 @@
 #include "ability_system_component.h"
-#include "xkein/GameplayAbilities/ge_component.h"
 #include "xkein/GameplayAbilities/ability_system_globals.h"
 #include "xkein/GameplayAbilities/gameplay_cue_manager.h"
 #include <core/tool/container.h>
@@ -886,86 +885,6 @@ static void ExecuteInstantEffect(AbilitySystemComponent* Target, const GameplayE
     }
 }
 
-/** Check if all GE Components allow the effect to be applied */
-static bool CanApplyWithComponents(GameplayEffect* Effect, const GameplayEffectSpec& Spec, 
-    const ActiveGameplayEffectsContainer& Container)
-{
-    if (!Effect) return true;
-    
-    for (auto* Component : Effect->GEComponents)
-    {
-        if (Component && !Component->CanGameplayEffectApply(Container, Spec))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-/** Notify all GE Components that the effect was added */
-static void NotifyComponentsAdded(GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
-    ActiveGameplayEffect& ActiveEffect)
-{
-    if (!Effect) return;
-    
-    for (auto* Component : Effect->GEComponents)
-    {
-        if (Component)
-        {
-            Component->OnActiveGameplayEffectAdded(Container, ActiveEffect);
-        }
-    }
-}
-
-static void NotifyComponentsRemoved(const GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
-    ActiveGameplayEffect& ActiveEffect, bool bPrematureRemoval)
-{
-    if (!Effect) return;
-
-    FGameplayEffectRemovalInfo RemovalInfo;
-    RemovalInfo.bPrematureRemoval = bPrematureRemoval;
-    RemovalInfo.StackCount = ActiveEffect.StackCount;
-    RemovalInfo.EffectContext = ActiveEffect.Spec.EffectContext;
-
-    for (auto* Component : Effect->GEComponents)
-    {
-        if (Component)
-        {
-            Component->OnActiveGameplayEffectRemoved(Container, ActiveEffect, RemovalInfo);
-        }
-    }
-}
-
-/** Notify all GE Components that the effect was executed (instant) */
-static void NotifyComponentsExecuted(const GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
-    GameplayEffectSpec& Spec)
-{
-    if (!Effect) return;
-    
-    for (auto* Component : Effect->GEComponents)
-    {
-        if (Component)
-        {
-            Component->OnGameplayEffectExecuted(Container, Spec);
-        }
-    }
-}
-
-/** Notify all GE Components that the effect was applied */
-static void NotifyComponentsApplied(GameplayEffect* Effect, ActiveGameplayEffectsContainer& Container,
-    GameplayEffectSpec& Spec, AbilitySystemComponent* OwningASC)
-{
-    if (!Effect) return;
-    
-    for (auto* Component : Effect->GEComponents)
-    {
-        if (Component)
-        {
-            Component->OnGameplayEffectApplied(Container, Spec, *OwningASC);
-        }
-    }
-}
-
 ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
     GameplayEffect* Effect, AbilitySystemComponent* Target, const GameplayEffectContext& Context)
 {
@@ -990,7 +909,7 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
     }
 
     // Step 1: Component pre-apply check
-    if (!CanApplyWithComponents(Effect, Spec, Target->ActiveGameplayEffects))
+    if (!Effect->CanApply(Target->ActiveGameplayEffects, Spec))
     {
         return ActiveGameplayEffectHandle();
     }
@@ -1004,10 +923,10 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
         ExecuteInstantEffect(Target, Spec);
         
         // Notify components of execution
-        NotifyComponentsExecuted(Effect, Target->ActiveGameplayEffects, Spec);
+        Effect->OnExecuted(Target->ActiveGameplayEffects, Spec);
         
         // Notify components of application
-        NotifyComponentsApplied(Effect, Target->ActiveGameplayEffects, Spec, Target);
+        Effect->OnApplied(Target->ActiveGameplayEffects, Spec, *Target);
         
         // Broadcast application delegate
         Target->OnGameplayEffectAppliedDelegateToTarget.publish(Target, Spec, ActiveGameplayEffectHandle(-1));
@@ -1024,15 +943,16 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
         // Apply modifiers to current value for duration effects
         ExecuteInstantEffect(Target, Spec);
         
-        // Notify components that the effect was added (tag granting, ability granting, etc.)
+        // Call InternalOnActiveGameplayEffectAdded which invokes OnAddedToActiveContainer
+        // and sets inhibit state based on the return value
         ActiveGameplayEffect* ActiveGE = Target->ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
         if (ActiveGE)
         {
-            NotifyComponentsAdded(Effect, Target->ActiveGameplayEffects, *ActiveGE);
+            Target->ActiveGameplayEffects.InternalOnActiveGameplayEffectAdded(*ActiveGE);
         }
         
         // Notify components of application
-        NotifyComponentsApplied(Effect, Target->ActiveGameplayEffects, Spec, Target);
+        Effect->OnApplied(Target->ActiveGameplayEffects, Spec, *Target);
         
         // Broadcast application delegate
         Target->OnGameplayEffectAppliedDelegateToTarget.publish(Target, Spec, Handle);
@@ -1466,7 +1386,11 @@ void ActiveGameplayEffectsContainer::Remove(ActiveGameplayEffectHandle Handle, b
             {
                 if (Effect->Spec.Def)
                 {
-                    NotifyComponentsRemoved(Effect->Spec.Def, *this, *Effect, bPrematureRemoval);
+                    FGameplayEffectRemovalInfo RemovalInfo;
+                    RemovalInfo.bPrematureRemoval = bPrematureRemoval;
+                    RemovalInfo.StackCount = Effect->StackCount;
+                    RemovalInfo.EffectContext = Effect->Spec.EffectContext;
+                    Effect->Spec.Def->OnRemovedFromActiveContainer(*this, *Effect, RemovalInfo);
                 }
                 delete Effect;
                 return true;
@@ -1746,6 +1670,22 @@ FScopedTargetListLock::FScopedTargetListLock(AbilitySystemComponent& InASC)
 FScopedTargetListLock::~FScopedTargetListLock()
 {
     ASC.TargetListLockCount--;
+}
+
+// ============================================================
+// ActiveGameplayEffectsContainer::InternalOnActiveGameplayEffectAdded
+// ============================================================
+
+void ActiveGameplayEffectsContainer::InternalOnActiveGameplayEffectAdded(ActiveGameplayEffect& Effect)
+{
+    const GameplayEffect* EffectDef = Effect.Spec.Def;
+    if (!EffectDef) return;
+
+    bool bShouldBeActive = EffectDef->OnAddedToActiveContainer(*this, Effect);
+
+    // Effect starts inhibited, then we toggle based on the component results
+    Effect.bIsInhibited = true;
+    SetActiveGameplayEffectInhibit(Effect.Handle, !bShouldBeActive);
 }
 
 // ============================================================

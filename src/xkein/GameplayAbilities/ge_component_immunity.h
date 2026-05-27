@@ -18,7 +18,7 @@ public:
     std::vector<FGameplayEffectQuery> ImmunityQueries;
 
     /** Register an application query on the ASC to check for immunity */
-    void OnActiveGameplayEffectAdded(
+    bool OnActiveGameplayEffectAdded(
         ActiveGameplayEffectsContainer& Container,
         ActiveGameplayEffect& Effect) const override;
 

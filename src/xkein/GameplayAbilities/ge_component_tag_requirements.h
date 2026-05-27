@@ -24,7 +24,7 @@ public:
         const ActiveGameplayEffectsContainer& Container,
         const GameplayEffectSpec& Spec) const override;
 
-    void OnActiveGameplayEffectAdded(
+    bool OnActiveGameplayEffectAdded(
         ActiveGameplayEffectsContainer& Container,
         ActiveGameplayEffect& Effect) const override;
 };

@@ -7,6 +7,10 @@
 #include "xkein/GameplayAbilities/active_gameplay_effect_handle.h"
 #include <map>
 
+struct FGameplayEffectRemovalInfo;
+struct ActiveGameplayEffect;
+struct ActiveGameplayEffectsContainer;
+
 /** Handle to a specific row in a curve table, used for level-scaled float lookups */
 struct CurveTableRowHandle
 {
@@ -487,6 +491,37 @@ struct GameplayEffect final
 	/** If true, GameplayCues will only be triggered for the first instance in a stacking GameplayEffect. */
 	PROPERTY()
 	bool bSuppressStackingCues;
+
+	/**
+	 * Can the GameplayEffectSpec apply to the passed-in ASC?
+	 * All Components must return true, or a single one can return false to prohibit the application.
+	 */
+	bool CanApply(const ActiveGameplayEffectsContainer& ActiveGEContainer, const GameplayEffectSpec& GESpec) const;
+
+	/**
+	 * Called when this GE is added to the ActiveGameplayEffectsContainer.
+	 * Iterates all GEComponents and calls their OnActiveGameplayEffectAdded.
+	 * Returns true if the effect should be active, false to inhibit.
+	 */
+	bool OnAddedToActiveContainer(ActiveGameplayEffectsContainer& ActiveGEContainer, ActiveGameplayEffect& ActiveGE) const;
+
+	/**
+	 * Called when this GE is removed from the ActiveGameplayEffectsContainer.
+	 * Iterates all GEComponents and calls their OnActiveGameplayEffectRemoved.
+	 */
+	void OnRemovedFromActiveContainer(ActiveGameplayEffectsContainer& ActiveGEContainer, ActiveGameplayEffect& ActiveGE, const FGameplayEffectRemovalInfo& RemovalInfo) const;
+
+	/**
+	 * Called when this GE is executed (instant effects, periodic ticks).
+	 * Iterates all GEComponents and calls their OnGameplayEffectExecuted.
+	 */
+	void OnExecuted(ActiveGameplayEffectsContainer& ActiveGEContainer, GameplayEffectSpec& Spec) const;
+
+	/**
+	 * Called when this GE is applied (both instant and duration).
+	 * Iterates all GEComponents and calls their OnGameplayEffectApplied.
+	 */
+	void OnApplied(ActiveGameplayEffectsContainer& ActiveGEContainer, GameplayEffectSpec& Spec, AbilitySystemComponent& OwningASC) const;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(GameplayEffect);
 
@@ -682,6 +717,12 @@ struct ActiveGameplayEffectsContainer
 
     /** Set whether an active gameplay effect is inhibited (temporarily disabled) */
     void SetActiveGameplayEffectInhibit(ActiveGameplayEffectHandle Handle, bool bInhibit);
+
+    /**
+     * Called anytime a new ActiveGameplayEffect is added.
+     * Calls GameplayEffect::OnAddedToActiveContainer and sets inhibit state accordingly.
+     */
+    void InternalOnActiveGameplayEffectAdded(ActiveGameplayEffect& Effect);
 
 private:
     /** Internal storage of active effects */

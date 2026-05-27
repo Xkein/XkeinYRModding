@@ -5,8 +5,7 @@ bool TagRequirementsGEComponent::CanGameplayEffectApply(
     const ActiveGameplayEffectsContainer& Container,
     const GameplayEffectSpec& Spec) const
 {
-    (void)Container;
-
+    
     // Check application tag requirements against captured target tags.
     if (!Spec.CapturedTargetTags.HasAll(ApplicationTagRequirements.RequireTags))
     {
@@ -22,13 +21,11 @@ bool TagRequirementsGEComponent::CanGameplayEffectApply(
     return true;
 }
 
-void TagRequirementsGEComponent::OnActiveGameplayEffectAdded(
+bool TagRequirementsGEComponent::OnActiveGameplayEffectAdded(
     ActiveGameplayEffectsContainer& Container,
     ActiveGameplayEffect& Effect) const
 {
-    (void)Container;
-    (void)Effect;
-
     // Ongoing/removal checks are evaluated by the active effect container update path.
     gLogger->info("TagRequirementsGEComponent: registered tag requirements for active effect");
+    return true;
 }

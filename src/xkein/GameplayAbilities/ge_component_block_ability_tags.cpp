@@ -2,7 +2,7 @@
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 
-void BlockAbilityTagsGEComponent::OnActiveGameplayEffectAdded(
+bool BlockAbilityTagsGEComponent::OnActiveGameplayEffectAdded(
     ActiveGameplayEffectsContainer& Container,
     ActiveGameplayEffect& Effect) const
 {
@@ -10,13 +10,14 @@ void BlockAbilityTagsGEComponent::OnActiveGameplayEffectAdded(
     if (!ASC)
     {
         gLogger->error("BlockAbilityTagsGEComponent::OnActiveGameplayEffectAdded: no owning ASC");
-        return;
+        return true;
     }
 
     const GameplayTagContainer& CombinedTags = InheritableBlockedAbilityTagsContainer.CombinedTags;
     ASC->BlockAbilitiesWithTags(CombinedTags);
 
     gLogger->info("BlockAbilityTagsGEComponent: blocked {} ability tags", CombinedTags.GameplayTags.size());
+    return true;
 }
 
 void BlockAbilityTagsGEComponent::OnActiveGameplayEffectRemoved(

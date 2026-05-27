@@ -3,7 +3,7 @@
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include <algorithm>
 
-void ImmunityGEComponent::OnActiveGameplayEffectAdded(
+bool ImmunityGEComponent::OnActiveGameplayEffectAdded(
     ActiveGameplayEffectsContainer& Container,
     ActiveGameplayEffect& Effect) const
 {
@@ -11,7 +11,7 @@ void ImmunityGEComponent::OnActiveGameplayEffectAdded(
     if (!ASC)
     {
         gLogger->error("ImmunityGEComponent: no owning ASC for active effect handle");
-        return;
+        return true;
     }
 
     // Capture queries by value — the component pointer is const and may not outlive the callback
@@ -44,6 +44,7 @@ void ImmunityGEComponent::OnActiveGameplayEffectAdded(
     ASC->GameplayEffectApplicationQueries.push_back({ EffectHandle, CheckFn });
 
     gLogger->info("ImmunityGEComponent: registered {} immunity queries for active effect", Queries.size());
+    return true;
 }
 
 void ImmunityGEComponent::OnActiveGameplayEffectRemoved(

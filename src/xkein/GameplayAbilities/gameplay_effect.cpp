@@ -1,5 +1,7 @@
 #include "gameplay_effect.h"
 #include "ability_system_globals.h"
+#include "xkein/GameplayAbilities/ge_component.h"
+#include "xkein/GameplayAbilities/gameplay_effect_types.h"
 #include <map>
 
 class AbilitySystemComponent;
@@ -178,4 +180,66 @@ GameplayEffectContext GameplayEffectContext::Duplicate() const
     NewContext.WorldOrigin = WorldOrigin;
     NewContext.bHasWorldOrigin = bHasWorldOrigin;
     return NewContext;
+}
+
+// ============================================================
+// GameplayEffect lifecycle methods (iterate GEComponents)
+// ============================================================
+
+bool GameplayEffect::CanApply(const ActiveGameplayEffectsContainer& ActiveGEContainer, const GameplayEffectSpec& GESpec) const
+{
+    for (auto* Component : GEComponents)
+    {
+        if (Component && !Component->CanGameplayEffectApply(ActiveGEContainer, GESpec))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool GameplayEffect::OnAddedToActiveContainer(ActiveGameplayEffectsContainer& ActiveGEContainer, ActiveGameplayEffect& ActiveGE) const
+{
+    bool bShouldBeActive = true;
+    for (auto* Component : GEComponents)
+    {
+        if (Component)
+        {
+            bShouldBeActive = Component->OnActiveGameplayEffectAdded(ActiveGEContainer, ActiveGE) && bShouldBeActive;
+        }
+    }
+    return bShouldBeActive;
+}
+
+void GameplayEffect::OnRemovedFromActiveContainer(ActiveGameplayEffectsContainer& ActiveGEContainer, ActiveGameplayEffect& ActiveGE, const FGameplayEffectRemovalInfo& RemovalInfo) const
+{
+    for (auto* Component : GEComponents)
+    {
+        if (Component)
+        {
+            Component->OnActiveGameplayEffectRemoved(ActiveGEContainer, ActiveGE, RemovalInfo);
+        }
+    }
+}
+
+void GameplayEffect::OnExecuted(ActiveGameplayEffectsContainer& ActiveGEContainer, GameplayEffectSpec& Spec) const
+{
+    for (auto* Component : GEComponents)
+    {
+        if (Component)
+        {
+            Component->OnGameplayEffectExecuted(ActiveGEContainer, Spec);
+        }
+    }
+}
+
+void GameplayEffect::OnApplied(ActiveGameplayEffectsContainer& ActiveGEContainer, GameplayEffectSpec& Spec, AbilitySystemComponent& OwningASC) const
+{
+    for (auto* Component : GEComponents)
+    {
+        if (Component)
+        {
+            Component->OnGameplayEffectApplied(ActiveGEContainer, Spec, OwningASC);
+        }
+    }
 }

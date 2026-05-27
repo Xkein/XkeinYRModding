@@ -2,7 +2,7 @@
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 
-void TargetTagsGEComponent::OnActiveGameplayEffectAdded(
+bool TargetTagsGEComponent::OnActiveGameplayEffectAdded(
     ActiveGameplayEffectsContainer& Container,
     ActiveGameplayEffect& Effect) const
 {
@@ -10,7 +10,7 @@ void TargetTagsGEComponent::OnActiveGameplayEffectAdded(
     if (!TargetASC)
     {
         gLogger->error("TargetTagsGEComponent: no owning ASC for active effect handle");
-        return;
+        return true;
     }
 
     // Grant tags to target (explicit tags) for lifetime of this effect
@@ -21,6 +21,7 @@ void TargetTagsGEComponent::OnActiveGameplayEffectAdded(
     }
 
     gLogger->info("TargetTagsGEComponent: granted {} tags to active effect", GrantedTags.GameplayTags.size());
+    return true;
 }
 
 void TargetTagsGEComponent::OnActiveGameplayEffectRemoved(

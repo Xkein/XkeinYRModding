@@ -1,17 +1,15 @@
 #include "ge_component_granted_abilities.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 
-void GrantedAbilitiesGEComponent::OnActiveGameplayEffectAdded(
+bool GrantedAbilitiesGEComponent::OnActiveGameplayEffectAdded(
     ActiveGameplayEffectsContainer& Container,
     ActiveGameplayEffect& Effect) const
 {
-    (void)Container;
-
     // Resolve owning ASC from active effect handle global map.
     AbilitySystemComponent* ASC = Effect.Handle.GetOwningAbilitySystemComponent();
     if (!ASC)
     {
-        return;
+        return true;
     }
 
     for (const auto& Config : GrantAbilityConfigs)
@@ -26,4 +24,5 @@ void GrantedAbilitiesGEComponent::OnActiveGameplayEffectAdded(
         ASC->GiveAbility(Spec);
         gLogger->info("GrantedAbilitiesGEComponent: granted ability");
     }
+    return true;
 }
