@@ -94,11 +94,11 @@ UsingCppType(GameplayModMagnitudeCalculation);
 UsingCppType(GameplayEffectAttributeCaptureDefinition);
 UsingCppType(FGameplayEffectCustomExecutionParameters);
 UsingCppType(FGameplayEffectCustomExecutionOutput);
-UsingCppType(ScriptFunction<GameplayAbility*(AbilitySystemComponent*)>);
-UsingCppType(ScriptFunction<AttributeSet *(AbilitySystemComponent *)>);
-UsingCppType(ScriptFunction<AbilityTask *(GameplayAbility *,AbilitySystemComponent *)>);
-UsingCppType(ScriptFunction<GameplayCueNotify_Static *(void)>);
-UsingCppType(ScriptFunction<GameplayCueNotify_Actor *(void)>);
+UsingCppType(ScriptFunction<GameplayAbility * (AbilitySystemComponent * _0)>);
+UsingCppType(ScriptFunction<AttributeSet * (AbilitySystemComponent * _0)>);
+UsingCppType(ScriptFunction<AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1)>);
+UsingCppType(ScriptFunction<GameplayCueNotify_Static * ()>);
+UsingCppType(ScriptFunction<GameplayCueNotify_Actor * ()>);
 
 UsingStdVector(GameplayEffectAttributeCaptureDefinition);
 UsingStdVector(entt::entity);
