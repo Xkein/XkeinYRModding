@@ -23,6 +23,7 @@ struct CurveTableRowHandle
  * When no curve is set, GetValueAtLevel() returns the base Value.
  * When a curve is set, GetValueAtLevel() linearly interpolates from the specified curve table.
  */
+CLASS(BindJs)
 struct FScalableFloat
 {
     float Value = 0.0f;
@@ -52,7 +53,7 @@ struct GameplayEffectContext;
 struct GameplayEffectContextHandle;
 
 /** Gameplay effect duration policies */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectDurationType : uint8
 {
 	/** This effect applies instantly */
@@ -64,7 +65,7 @@ enum class EGameplayEffectDurationType : uint8
 };
 
 /** Enumeration for ways a single GameplayEffect asset can stack. */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectStackingType : uint8
 {
 	/** No stacking. Multiple applications of this GameplayEffect are treated as separate instances. */
@@ -76,7 +77,7 @@ enum class EGameplayEffectStackingType : uint8
 };
 
 /** Enumeration of policies for dealing with duration of a gameplay effect while stacking */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectStackingDurationPolicy : uint8
 {
 	/** The duration of the effect will be refreshed from any successful stack application */
@@ -87,7 +88,7 @@ enum class EGameplayEffectStackingDurationPolicy : uint8
 };
 
 /** Enumeration of policies for dealing with the period of a gameplay effect while stacking */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectStackingPeriodPolicy : uint8
 {
 	/** Any progress toward the next tick of a periodic effect is discarded upon any successful stack application */
@@ -98,7 +99,7 @@ enum class EGameplayEffectStackingPeriodPolicy : uint8
 };
 
 /** Enumeration of policies for dealing gameplay effect stacks that expire (in duration based effects). */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectStackingExpirationPolicy : uint8
 {
 	/** The entire stack is cleared when the active gameplay effect expires  */
@@ -112,7 +113,7 @@ enum class EGameplayEffectStackingExpirationPolicy : uint8
 };
 
 /** Enumeration of policies for dealing with the period of a gameplay effect when inhibition is removed */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectPeriodInhibitionRemovedPolicy : uint8
 {
 	/** Does not reset. The period timing will continue as if the inhibition hadn't occurred. */
@@ -126,7 +127,7 @@ enum class EGameplayEffectPeriodInhibitionRemovedPolicy : uint8
 };
 
 /** Enumeration outlining the possible gameplay effect magnitude calculation policies. */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectMagnitudeCalculation : uint8
 {
 	/** Use a simple, scalable float for the calculation. */
@@ -140,7 +141,7 @@ enum class EGameplayEffectMagnitudeCalculation : uint8
 };
 
 /** Enumeration outlining the possible attribute based float calculation policies. */
-ENUM()
+ENUM(BindJs)
 enum class EAttributeBasedFloatCalculationType : uint8
 {
 	/** Use the final evaluated magnitude of the attribute. */
@@ -154,7 +155,7 @@ enum class EAttributeBasedFloatCalculationType : uint8
 };
 
 /** Enumeration for options of where to capture gameplay attributes from for gameplay effects. */
-ENUM()
+ENUM(BindJs)
 enum class EGameplayEffectAttributeCaptureSource : uint8
 {
 	/** Source (caster) of the gameplay effect. */
@@ -203,7 +204,7 @@ enum EGameplayModOpType : int
 };
 
 /** Struct defining gameplay attribute capture options for gameplay effects */
-CLASS()
+CLASS(BindJs)
 struct GameplayEffectAttributeCaptureDefinition final
 {
 	/** Gameplay attribute to capture */
@@ -215,7 +216,7 @@ struct GameplayEffectAttributeCaptureDefinition final
 	EGameplayEffectAttributeCaptureSource AttributeSource;
 };
 
-CLASS()
+CLASS(BindJs)
 struct CustomCalculationBasedFloat final
 {
 	// PROPERTY()
@@ -238,7 +239,7 @@ struct CustomCalculationBasedFloat final
  * Struct representing a float whose magnitude is dictated by a backing attribute and a calculation policy, follows basic form of:
  * (Coefficient * (PreMultiplyAdditiveValue + [Eval'd Attribute Value According to Policy])) + PostMultiplyAdditiveValue
  */
-CLASS()
+CLASS(BindJs)
 struct AttributeBasedFloat final
 {
 	/** Constructor */
@@ -292,7 +293,7 @@ struct AttributeBasedFloat final
 };
 
 /** Struct for holding SetBytCaller data */
-CLASS()
+CLASS(BindJs)
 struct SetByCallerFloat
 {
 
@@ -307,7 +308,7 @@ struct SetByCallerFloat
 };
 
 /** Struct representing the magnitude of a gameplay effect modifier, potentially calculated in numerous different ways */
-CLASS(IniComponent, IniAutoLoad)
+CLASS(BindJs, IniComponent, IniAutoLoad)
 struct GameplayEffectModifierMagnitude final
 {
 	/** Type of calculation to perform to derive the magnitude */
@@ -410,7 +411,7 @@ struct GameplayEffectCue final
  *	The GameplayEffect definition. This is the data asset defined in the editor that drives everything.
  *  This is only blueprintable to allow for templating gameplay effects. Gameplay effects should NOT contain blueprint graphs.
  */
-CLASS(IniComponent, IniAutoLoad, AutoSavegame, Swizzleable)
+CLASS(BindJs, IniComponent, IniAutoLoad, AutoSavegame, Swizzleable)
 struct GameplayEffect final
 {
     PROPERTY()
@@ -578,7 +579,7 @@ struct GameplayEffectContextHandle
 	GameplayEffectContext* Data;
 };
 
-CLASS()
+CLASS(BindJs)
 struct GameplayEffectSpec
 {
 	/** The gameplay effect definition this spec was created from */

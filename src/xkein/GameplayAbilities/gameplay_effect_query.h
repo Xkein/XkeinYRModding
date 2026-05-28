@@ -12,6 +12,7 @@ struct GameplayTagQuery;
  * All match fields are optional — empty/default fields are skipped.
  * Multiple non-empty criteria combine with AND logic.
  */
+CLASS(BindJs)
 struct FGameplayEffectQuery
 {
     /** Match by specific GameplayEffect definition. nullptr matches all. */

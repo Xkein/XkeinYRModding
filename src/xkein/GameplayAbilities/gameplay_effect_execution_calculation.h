@@ -16,6 +16,7 @@ class AbilitySystemComponent;
  *
  * All pointers are non-owning — the lifetime is managed externally.
  */
+CLASS(BindJs)
 struct FGameplayEffectCustomExecutionParameters
 {
 	/** The gameplay effect spec being executed (non-owning) */
@@ -43,6 +44,7 @@ struct FGameplayEffectCustomExecutionParameters
  * and flags indicating whether conditional GEs, stack counts, or gameplay cues
  * were handled manually by the execution.
  */
+CLASS(BindJs)
 struct FGameplayEffectCustomExecutionOutput
 {
 	/** Modifiers computed by this execution to apply to the target's attributes */
