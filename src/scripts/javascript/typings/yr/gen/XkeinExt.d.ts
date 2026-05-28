@@ -278,7 +278,7 @@ class AbilitySystemComponent
     // public std::vector<GameplayAbilitySpec, std::allocator<GameplayAbilitySpec>> ActivatableAbilities
     m_ActivatableAbilities : any;
     // List of attribute sets
-    // public std::vector<AttributeSet, std::allocator<AttributeSet>> SpawnedAttributes
+    // public std::vector<AttributeSet *, std::allocator<AttributeSet *>> SpawnedAttributes
     m_SpawnedAttributes : any;
     // Contains all of the gameplay effects that are currently active on this component
     // public ActiveGameplayEffectsContainer ActiveGameplayEffects
@@ -347,6 +347,8 @@ class AbilitySystemComponentType
 // AttributeSetDefine
 class AttributeSetDefine
 {
+    // public StringName AttributeSetCreator
+    m_AttributeSetCreator : StringName;
     // public std::vector<GameplayAttribute, std::allocator<GameplayAttribute>> Attributes
     m_Attributes : any;
 }
@@ -794,27 +796,27 @@ class GameplayCueNotify_Actor
 }
 // GameplayAbilityCreator
 class GameplayAbilityCreator
-    extends ScriptFunction_GameplayAbility__AbilitySystemComponent__0__
+    extends ScriptFunction_GameplayAbility__GameplayAbilityDefine__0_AbilitySystemComponent__1__
 {
 }
-// ScriptFunction<GameplayAbility * (AbilitySystemComponent * _0)>
-class ScriptFunction_GameplayAbility__AbilitySystemComponent__0__
+// ScriptFunction<GameplayAbility * (GameplayAbilityDefine * _0, AbilitySystemComponent * _1)>
+class ScriptFunction_GameplayAbility__GameplayAbilityDefine__0_AbilitySystemComponent__1__
     extends ScriptFunctionBase
 {
-    // public ScriptFunction(std::function<GameplayAbility * (*)(AbilitySystemComponent * _0)> func)
-    constructor(func_0 : (_0 : AbilitySystemComponent) => GameplayAbility| undefined);
+    // public ScriptFunction(std::function<GameplayAbility * (*)(GameplayAbilityDefine * _0, AbilitySystemComponent * _1)> func)
+    constructor(func_0 : (_0 : GameplayAbilityDefine, _1 : AbilitySystemComponent) => GameplayAbility| undefined);
 }
 // AttributeSetCreator
 class AttributeSetCreator
-    extends ScriptFunction_AttributeSet__AbilitySystemComponent__0__
+    extends ScriptFunction_AttributeSet__AttributeSetDefine__0_AbilitySystemComponent__1__
 {
 }
-// ScriptFunction<AttributeSet * (AbilitySystemComponent * _0)>
-class ScriptFunction_AttributeSet__AbilitySystemComponent__0__
+// ScriptFunction<AttributeSet * (AttributeSetDefine * _0, AbilitySystemComponent * _1)>
+class ScriptFunction_AttributeSet__AttributeSetDefine__0_AbilitySystemComponent__1__
     extends ScriptFunctionBase
 {
-    // public ScriptFunction(std::function<AttributeSet * (*)(AbilitySystemComponent * _0)> func)
-    constructor(func_0 : (_0 : AbilitySystemComponent) => AttributeSet| undefined);
+    // public ScriptFunction(std::function<AttributeSet * (*)(AttributeSetDefine * _0, AbilitySystemComponent * _1)> func)
+    constructor(func_0 : (_0 : AttributeSetDefine, _1 : AbilitySystemComponent) => AttributeSet| undefined);
 }
 // GameplayAbilitySystem
 class GameplayAbilitySystem

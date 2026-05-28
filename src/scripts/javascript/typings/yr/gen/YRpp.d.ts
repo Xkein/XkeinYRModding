@@ -3585,6 +3585,12 @@ class INIClass
     m_Sections : any;
     // public char[28] __Sections
     m___Sections : string;
+    // <CRCValue
+    // of the Name, Pointer to the section>
+    // public IndexType SectionIndex
+    m_SectionIndex : any;
+    // public char[20] __SectionIndex
+    m___SectionIndex : string;
 }
 // forward declarations
 // TechnoTypeClass

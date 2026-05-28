@@ -3,6 +3,7 @@
 #include "yr/parse/parser.h"
 #include "yr/component/ini_component.h"
 #include "scripting/common/script_function.h"
+#include "xkein/GameplayAbilities/gameplay_ability.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_cue.h"
@@ -57,13 +58,13 @@ struct AbilitySystemGlobals
 };
 
 CLASS(BindJs)
-struct GameplayAbilityCreator : public ScriptFunction<GameplayAbility*(AbilitySystemComponent* component)>
+struct GameplayAbilityCreator : public ScriptFunction<GameplayAbility*(GameplayAbilityDefine* define, AbilitySystemComponent* component)>
 {
     using ScriptFunction::ScriptFunction;
 };
 
 CLASS(BindJs)
-struct AttributeSetCreator : public ScriptFunction<AttributeSet*(AbilitySystemComponent* component)>
+struct AttributeSetCreator : public ScriptFunction<AttributeSet*(AttributeSetDefine* define, AbilitySystemComponent* component)>
 {
     using ScriptFunction::ScriptFunction;
 };
@@ -74,8 +75,8 @@ class GameplayAbilitySystem
 public:
     static void Tick();
 
-    static GameplayAbility* CreateAbility(const StringName& name, AbilitySystemComponent* component);
-    static AttributeSet* CreateAttributeSet(const StringName& name, AbilitySystemComponent* component);
+    static GameplayAbility* CreateAbility(const StringName& name, GameplayAbilityDefine* define, AbilitySystemComponent* component);
+    static AttributeSet* CreateAttributeSet(const StringName& name, AttributeSetDefine* define, AbilitySystemComponent* component);
 
     /** Access the global GameplayCueManager singleton */
     static struct GameplayCueManager* GetCueManager();

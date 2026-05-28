@@ -86,6 +86,8 @@ CLASS(BindJs, IniAutoLoad)
 struct AttributeSetDefine
 {
     PROPERTY()
+	StringName AttributeSetCreator;
+    PROPERTY()
     std::vector<GameplayAttribute> Attributes;
 };
 

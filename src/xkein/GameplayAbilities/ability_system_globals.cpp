@@ -16,22 +16,22 @@ void GameplayAbilitySystem::Tick()
     }
 }
 
-GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, AbilitySystemComponent* component)
+GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, GameplayAbilityDefine* define, AbilitySystemComponent* component)
 {
 	GameplayAbilityCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayAbilityCreator>(name);
 	if (!creatorFunc) {
 		return nullptr;
 	}
-	return (*creatorFunc)(component);
+	return (*creatorFunc)(define, component);
 }
 
-AttributeSet* GameplayAbilitySystem::CreateAttributeSet(const StringName& name, AbilitySystemComponent* component)
+AttributeSet* GameplayAbilitySystem::CreateAttributeSet(const StringName& name, AttributeSetDefine* define, AbilitySystemComponent* component)
 {
 	AttributeSetCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<AttributeSetCreator>(name);
 	if (!creatorFunc) {
 		return nullptr;
 	}
-	return (*creatorFunc)(component);
+	return (*creatorFunc)(define, component);
 }
 
 GameplayCueManager* GameplayAbilitySystem::GetCueManager()

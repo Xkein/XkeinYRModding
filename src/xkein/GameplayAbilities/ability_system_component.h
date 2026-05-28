@@ -131,7 +131,7 @@ public:
 	void RegisterTask(AbilityTask* Task);
 
 	/** Create and register an attribute set via the factory system */
-	AttributeSet* AddAttributeSet(const StringName& name);
+	AttributeSet* AddAttributeSet(AttributeSetDefine* define);
 
 	/**
 	 *	The abilities we can activate. 
@@ -153,7 +153,7 @@ public:
     
 	/** List of attribute sets */
 	PROPERTY()
-	std::vector<AttributeSet>	SpawnedAttributes;
+	std::vector<AttributeSet*>	SpawnedAttributes;
     
 	/** Contains all of the gameplay effects that are currently active on this component */
 	PROPERTY()
@@ -348,10 +348,10 @@ public:
 	void RemoveAllSpawnedAttributes();
 
 	/** Set the spawned attribute set list */
-	void SetSpawnedAttributes(const std::vector<AttributeSet>& InAttributes);
+	void SetSpawnedAttributes(const std::vector<AttributeSet*>& InAttributes);
 
 	/** Get the spawned attribute set list */
-	const std::vector<AttributeSet>& GetSpawnedAttributes() const { return SpawnedAttributes; }
+	const std::vector<AttributeSet*>& GetSpawnedAttributes() const { return SpawnedAttributes; }
 
 	/** Returns true if any spawned attribute set contains the given attribute */
 	bool HasAttributeSetForAttribute(const GameplayAttribute& Attribute) const;

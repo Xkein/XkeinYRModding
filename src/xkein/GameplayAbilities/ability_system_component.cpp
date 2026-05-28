@@ -29,12 +29,11 @@ void AbilitySystemComponent::InitializeFromType(AbilitySystemComponentType* InTy
 	// Spawn attribute sets first (abilities/effects may query attributes)
     for (auto* Define : Type->Attributes)
     {
-        AttributeSet NewSet;
-        for (const auto& Attr : Define->Attributes)
+        AttributeSet* set = GameplayAbilitySystem::CreateAttributeSet(Define->AttributeSetCreator, Define, this);
+        if (set)
         {
-            NewSet.AddAttributeData(&Attr, 0.0f);
+            SpawnedAttributes.push_back(set);
         }
-        SpawnedAttributes.push_back(std::move(NewSet));
     }
 
     // Startup tags (loose)
@@ -118,13 +117,13 @@ void AbilitySystemComponent::RegisterTask(AbilityTask* Task)
 	}
 }
 
-AttributeSet* AbilitySystemComponent::AddAttributeSet(const StringName& name)
+AttributeSet* AbilitySystemComponent::AddAttributeSet(AttributeSetDefine* define)
 {
-    AttributeSet* set = GameplayAbilitySystem::CreateAttributeSet(name, this);
+    AttributeSet* set = GameplayAbilitySystem::CreateAttributeSet(define->AttributeSetCreator, define, this);
     if (set)
     {
-        SpawnedAttributes.push_back(std::move(*set));
-        return &SpawnedAttributes.back();
+        SpawnedAttributes.push_back(set);
+        return SpawnedAttributes.back();
     }
     return nullptr;
 }
@@ -372,7 +371,7 @@ GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbil
 
 GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbilityDefine* AbilityDefine)
 {
-    GameplayAbility* Ability = GameplayAbilitySystem::CreateAbility(AbilityDefine->AbilityCreator, this);
+    GameplayAbility* Ability = GameplayAbilitySystem::CreateAbility(AbilityDefine->AbilityCreator, const_cast<GameplayAbilityDefine*>(AbilityDefine), this);
     this->AllSelfCreatedAbilities.push_back(Ability);
     return this->GiveAbility(GameplayAbilitySpec(Ability));
 }
@@ -867,20 +866,20 @@ static void ExecuteInstantEffect(AbilitySystemComponent* Target, const GameplayE
         EvalData.IsValid = true;
         
         // Apply to matching attribute sets on the target
-        for (auto& AttrSet : Target->SpawnedAttributes)
+        for (auto* AttrSet : Target->SpawnedAttributes)
         {
             // Only process attribute sets that actually contain this attribute
-            if (!AttrSet.FindAttributeData(&Modifier.Attribute))
+            if (!AttrSet->FindAttributeData(&Modifier.Attribute))
                 continue;
             
             FGameplayEffectModCallbackData CallbackData(Spec, EvalData, Target);
             
-            if (!AttrSet.PreGameplayEffectExecute(CallbackData))
+            if (!AttrSet->PreGameplayEffectExecute(CallbackData))
                 continue;
             
-            ApplyModifierToAttribute(&AttrSet, Modifier.Attribute, Magnitude, Modifier.ModifierOp);
+            ApplyModifierToAttribute(AttrSet, Modifier.Attribute, Magnitude, Modifier.ModifierOp);
             
-            AttrSet.PostGameplayEffectExecute(CallbackData);
+            AttrSet->PostGameplayEffectExecute(CallbackData);
         }
     }
 }
@@ -1093,28 +1092,28 @@ void AbilitySystemComponent::ApplyModToAttribute(const GameplayAttribute& Attrib
     // Placeholder spec for in-place modifier hooks (no actual GE backing this)
     GameplayEffectSpec PlaceholderSpec;
 
-    for (auto& AttrSet : SpawnedAttributes)
+    for (auto* AttrSet : SpawnedAttributes)
     {
         // Only process attribute sets that actually contain this attribute
-        if (!AttrSet.FindAttributeData(&Attribute))
+        if (!AttrSet->FindAttributeData(&Attribute))
             continue;
 
         FGameplayEffectModCallbackData CallbackData(PlaceholderSpec, EvalData, this);
 
-        if (!AttrSet.PreGameplayEffectExecute(CallbackData))
+        if (!AttrSet->PreGameplayEffectExecute(CallbackData))
             continue;
 
-        ::ApplyModifierToAttribute(&AttrSet, Attribute, ModifierMagnitude, ModifierOp);
+        ::ApplyModifierToAttribute(AttrSet, Attribute, ModifierMagnitude, ModifierOp);
 
-        AttrSet.PostGameplayEffectExecute(CallbackData);
+        AttrSet->PostGameplayEffectExecute(CallbackData);
     }
 }
 
 float AbilitySystemComponent::GetNumericAttribute(const GameplayAttribute& Attribute) const
 {
-    for (const auto& AttrSet : SpawnedAttributes)
+    for (const auto* AttrSet : SpawnedAttributes)
     {
-        const auto* Data = AttrSet.FindAttributeData(&Attribute);
+        const auto* Data = AttrSet->FindAttributeData(&Attribute);
         if (Data)
         {
             return Data->GetCurrentValue();
@@ -1757,7 +1756,7 @@ FOnActiveGameplayEffectInhibitionChanged* AbilitySystemComponent::OnGameplayEffe
 void AbilitySystemComponent::AddSpawnedAttribute(AttributeSet* AttrSet)
 {
 	if (!AttrSet) return;
-	SpawnedAttributes.push_back(std::move(*AttrSet));
+	SpawnedAttributes.push_back(AttrSet);
 	// Wire OnAttributeAggregatorCreated — for frame-sync, aggregators are computed on-the-fly,
 	// so this is a no-op beyond adding to the list.
 }
@@ -1767,7 +1766,7 @@ void AbilitySystemComponent::RemoveSpawnedAttribute(AttributeSet* AttrSet)
 	if (!AttrSet) return;
 	SpawnedAttributes.erase(
 		std::remove_if(SpawnedAttributes.begin(), SpawnedAttributes.end(),
-			[AttrSet](const AttributeSet& AS) { return &AS == AttrSet; }),
+			[AttrSet](AttributeSet* AS) { return AS == AttrSet; }),
 		SpawnedAttributes.end());
 }
 
@@ -1776,16 +1775,16 @@ void AbilitySystemComponent::RemoveAllSpawnedAttributes()
 	SpawnedAttributes.clear();
 }
 
-void AbilitySystemComponent::SetSpawnedAttributes(const std::vector<AttributeSet>& InAttributes)
+void AbilitySystemComponent::SetSpawnedAttributes(const std::vector<AttributeSet*>& InAttributes)
 {
 	SpawnedAttributes = InAttributes;
 }
 
 bool AbilitySystemComponent::HasAttributeSetForAttribute(const GameplayAttribute& Attribute) const
 {
-	for (const auto& AttrSet : SpawnedAttributes)
+	for (const auto* AttrSet : SpawnedAttributes)
 	{
-		if (AttrSet.FindAttributeData(&Attribute))
+		if (AttrSet->FindAttributeData(&Attribute))
 			return true;
 	}
 	return false;
@@ -1793,25 +1792,24 @@ bool AbilitySystemComponent::HasAttributeSetForAttribute(const GameplayAttribute
 
 const AttributeSet* AbilitySystemComponent::GetAttributeSet(const StringName& AttributeOwner) const
 {
-	for (const auto& AttrSet : SpawnedAttributes)
+	for (const auto* AttrSet : SpawnedAttributes)
 	{
-		const GameplayAttribute* Found = AttrSet.FindAttribute(StringName(), AttributeOwner);
+		const GameplayAttribute* Found = AttrSet->FindAttribute(StringName(), AttributeOwner);
 		if (Found)
-			return &AttrSet;
+			return AttrSet;
 	}
 	return nullptr;
 }
 
 void AbilitySystemComponent::GetAllAttributes(std::vector<GameplayAttribute>& OutAttributes) const
 {
-	for (const auto& AttrSet : SpawnedAttributes)
+	for (const auto* AttrSet : SpawnedAttributes)
 	{
-		for (const auto& [Attr, _] : AttrSet.GetAttributeDataMap())
+		for (const auto& [Attr, _] : AttrSet->GetAttributeDataMap())
 		{
 			OutAttributes.push_back(*Attr);
 		}
 	}
-	// Deduplicate by name + owner
 	std::sort(OutAttributes.begin(), OutAttributes.end(),
 		[](const GameplayAttribute& A, const GameplayAttribute& B) {
 			auto AOwner = std::string_view(A.AttributeOwner);
@@ -1831,9 +1829,9 @@ void AbilitySystemComponent::GetAllAttributes(std::vector<GameplayAttribute>& Ou
 float AbilitySystemComponent::GetGameplayAttributeValue(GameplayAttribute Attribute, bool& bFound) const
 {
 	bFound = false;
-	for (const auto& AttrSet : SpawnedAttributes)
+	for (const auto* AttrSet : SpawnedAttributes)
 	{
-		const auto* Data = AttrSet.FindAttributeData(&Attribute);
+		const auto* Data = AttrSet->FindAttributeData(&Attribute);
 		if (Data)
 		{
 			bFound = true;
@@ -1845,24 +1843,24 @@ float AbilitySystemComponent::GetGameplayAttributeValue(GameplayAttribute Attrib
 
 void AbilitySystemComponent::SetNumericAttributeBase(GameplayAttribute Attribute, float NewBaseValue)
 {
-	for (auto& AttrSet : SpawnedAttributes)
+	for (auto* AttrSet : SpawnedAttributes)
 	{
-		GameplayAttributeData* Data = AttrSet.FindAttributeData(&Attribute);
+		GameplayAttributeData* Data = AttrSet->FindAttributeData(&Attribute);
 		if (Data)
 		{
 			float OldValue = Data->GetBaseValue();
-			AttrSet.PreAttributeBaseChange(Attribute, NewBaseValue);
+			AttrSet->PreAttributeBaseChange(Attribute, NewBaseValue);
 			Data->SetBaseValue(NewBaseValue);
-			AttrSet.PostAttributeBaseChange(Attribute, OldValue, NewBaseValue);
+			AttrSet->PostAttributeBaseChange(Attribute, OldValue, NewBaseValue);
 		}
 	}
 }
 
 float AbilitySystemComponent::GetNumericAttributeBase(GameplayAttribute Attribute) const
 {
-	for (const auto& AttrSet : SpawnedAttributes)
+	for (const auto* AttrSet : SpawnedAttributes)
 	{
-		const auto* Data = AttrSet.FindAttributeData(&Attribute);
+		const auto* Data = AttrSet->FindAttributeData(&Attribute);
 		if (Data)
 			return Data->GetBaseValue();
 	}
@@ -1871,7 +1869,7 @@ float AbilitySystemComponent::GetNumericAttributeBase(GameplayAttribute Attribut
 
 float AbilitySystemComponent::GetNumericAttributeChecked(GameplayAttribute Attribute) const
 {
-	// Same as GetNumericAttribute but checked access — falls back to 0.0f if not found
+    // Same as GetNumericAttribute but checked access — falls back to 0.0f if not found
 	return GetNumericAttribute(Attribute);
 }
 
@@ -1881,10 +1879,10 @@ float AbilitySystemComponent::GetFilteredAttributeValue(GameplayAttribute Attrib
 	float BaseValue = 0.0f;
 	bool bFoundBase = false;
 
-	// Find base value first
-	for (const auto& AttrSet : SpawnedAttributes)
+    // Find base value first
+	for (const auto* AttrSet : SpawnedAttributes)
 	{
-		const auto* Data = AttrSet.FindAttributeData(&Attribute);
+		const auto* Data = AttrSet->FindAttributeData(&Attribute);
 		if (Data)
 		{
 			BaseValue = Data->GetBaseValue();
