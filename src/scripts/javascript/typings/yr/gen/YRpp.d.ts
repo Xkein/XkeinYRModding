@@ -16,7 +16,7 @@ class TintStruct
     // public TintStruct()
     constructor();
     // public TintStruct(int r, int g, int b)
-    constructor(r_0 : number, g_1 : number, b_2 : number);
+    constructor(r_0 : int, g_1 : int, b_2 : int);
     // public bool operator==(TintStruct const rhs) const
     op_Equality(rhs_0 : TintStruct) : boolean;
     // public bool operator!=(TintStruct const rhs) const
@@ -24,32 +24,32 @@ class TintStruct
     // public bool operator<(TintStruct const rhs) const
     op_LessThan(rhs_0 : TintStruct) : boolean;
     // public int Red
-    m_Red : number;
+    m_Red : int;
     // public int Green
-    m_Green : number;
+    m_Green : int;
     // public int Blue
-    m_Blue : number;
+    m_Blue : int;
 }
 // Random number range
 // RandomStruct
 class RandomStruct
 {
     // public int Min
-    m_Min : number;
+    m_Min : int;
     // public int Max
-    m_Max : number;
+    m_Max : int;
 }
 // LTRBStruct
 class LTRBStruct
 {
     // public int Left
-    m_Left : number;
+    m_Left : int;
     // public int Top
-    m_Top : number;
+    m_Top : int;
     // public int Right
-    m_Right : number;
+    m_Right : int;
     // public int Bottom
-    m_Bottom : number;
+    m_Bottom : int;
 }
 // Timer that counts down towards zero at specified rate, counted in frames.
 // RateTimer
@@ -58,11 +58,11 @@ class RateTimer
     // public RateTimer()
     constructor();
     // public RateTimer(int rate)
-    constructor(rate_0 : number);
+    constructor(rate_0 : int);
     // public void Start(int rate)
-    Start(rate_0 : number) : void;
+    Start(rate_0 : int) : void;
     // public int Rate
-    m_Rate : number;
+    m_Rate : int;
 }
 // FacingClass
 class FacingClass
@@ -72,7 +72,7 @@ class FacingClass
     // public FacingClass(noinit_t const&)
     constructor(_0 : any);
     // public FacingClass(int rate)
-    constructor(rate_0 : number);
+    constructor(rate_0 : int);
     // public FacingClass(DirStruct const& facing)
     constructor(facing_0 : DirStruct);
     // public FacingClass(DirType dir)
@@ -97,7 +97,7 @@ class FacingClass
     // public DirStruct Difference() const
     Difference() : DirStruct;
     // public void SetROT(int rate)
-    SetROT(rate_0 : number) : void;
+    SetROT(rate_0 : int) : void;
     // public DirStruct DesiredFacing
     m_DesiredFacing : DirStruct;
     // The starting direction from which to calcuate the rotation.
@@ -113,7 +113,7 @@ interface ILocomotion
 {
     // Links object to locomotor.
     // public virtual long Link_To_Object(void * pointer) = 0
-    Link_To_Object(pointer_0 : ArrayBuffer) : number;
+    Link_To_Object(pointer_0 : ArrayBuffer) : long;
     // Sees if object is moving.
     // public virtual bool Is_Moving() = 0
     Is_Moving() : boolean;
@@ -146,7 +146,7 @@ interface ILocomotion
     Visual_Character(raw_0 : boolean) : VisualType;
     // Z adjust control value.
     // public virtual int Z_Adjust() = 0
-    Z_Adjust() : number;
+    Z_Adjust() : int;
     // Z gradient control value.
     // public virtual ZGradient Z_Gradient() = 0
     Z_Gradient() : ZGradient;
@@ -188,7 +188,7 @@ interface ILocomotion
     Shove(dir_0 : DirStruct) : boolean;
     // Force drive track -- special case only.
     // public virtual void Force_Track(int track, CoordStruct coord) = 0
-    Force_Track(track_0 : number, coord_1 : CoordStruct) : void;
+    Force_Track(track_0 : int, coord_1 : CoordStruct) : void;
     // What display layer is it located in.
     // public virtual Layer In_Which_Layer() = 0
     In_Which_Layer() : Layer;
@@ -197,22 +197,22 @@ interface ILocomotion
     Force_Immediate_Destination(coord_0 : CoordStruct) : void;
     // Force a voxel unit to a given slope. Used in cratering.
     // public virtual void Force_New_Slope(int ramp) = 0
-    Force_New_Slope(ramp_0 : number) : void;
+    Force_New_Slope(ramp_0 : int) : void;
     // Is it actually moving across the ground this very second?
     // public virtual bool Is_Moving_Now() = 0
     Is_Moving_Now() : boolean;
     // Actual current speed of object expressed as leptons per game frame.
     // public virtual int Apparent_Speed() = 0
-    Apparent_Speed() : number;
+    Apparent_Speed() : int;
     // Special drawing feedback code (locomotor specific meaning)
     // public virtual int Drawing_Code() = 0
-    Drawing_Code() : number;
+    Drawing_Code() : int;
     // Queries if any locomotor specific state prevents the object from firing.
     // public virtual FireError Can_Fire() = 0
     Can_Fire() : FireError;
     // Queries the general state of the locomotor.
     // public virtual int Get_Status() = 0
-    Get_Status() : number;
+    Get_Status() : int;
     // Forces a hunter seeker droid to find a target.
     // public virtual void Acquire_Hunter_Seeker_Target() = 0
     Acquire_Hunter_Seeker_Target() : void;
@@ -246,13 +246,13 @@ interface ILocomotion
     Unlock() : void;
     // Queries internal variables.
     // public virtual int Get_Track_Number() = 0
-    Get_Track_Number() : number;
+    Get_Track_Number() : int;
     // Queries internal variables.
     // public virtual int Get_Track_Index() = 0
-    Get_Track_Index() : number;
+    Get_Track_Index() : int;
     // Queries internal variables.
     // public virtual int Get_Speed_Accum() = 0
-    Get_Speed_Accum() : number;
+    Get_Speed_Accum() : int;
 }
 // 'Piggyback' one locomotor onto another.
 // IPiggyback
@@ -260,16 +260,16 @@ interface IPiggyback
 {
     // Piggybacks a locomotor onto this one.
     // public virtual long Begin_Piggyback(ILocomotion * pointer) = 0
-    Begin_Piggyback(pointer_0 : ILocomotion) : number;
+    Begin_Piggyback(pointer_0 : ILocomotion) : long;
     // End piggyback process and restore locomotor interface pointer.
     // public virtual long End_Piggyback(ILocomotion * * pointer) = 0
-    End_Piggyback(pointer_0 : ILocomotion) : number;
+    End_Piggyback(pointer_0 : ILocomotion) : long;
     // Determines when should the piggybacking be ended (done automatically in FootClass::AI).
     // public virtual bool Is_Ok_To_End() = 0
     Is_Ok_To_End() : boolean;
     // Fetches piggybacked locomotor class ID.
     // public virtual long Piggyback_CLSID(_GUID * classid) = 0
-    Piggyback_CLSID(classid_0 : any) : number;
+    Piggyback_CLSID(classid_0 : any) : long;
     // Is it currently piggybacking another locomotor?
     // public virtual bool Is_Piggybacking() = 0
     Is_Piggybacking() : boolean;
@@ -284,9 +284,9 @@ class TechnoClass
     constructor(pOwner_0 : HouseClass);
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // ObjectClass
     // public virtual bool Limbo()
     Limbo() : boolean;
@@ -316,35 +316,35 @@ class TechnoClass
     // public virtual bool vt_entry_2B0() const
     vt_entry_2B0() : boolean;
     // public virtual double GetStoragePercentage() const
-    GetStoragePercentage() : number;
+    GetStoragePercentage() : double;
     // public virtual int GetPipFillLevel() const
-    GetPipFillLevel() : number;
+    GetPipFillLevel() : int;
     // public virtual int GetRefund() const
-    GetRefund() : number;
+    GetRefund() : int;
     // public virtual int GetThreatValue() const
-    GetThreatValue() : number;
+    GetThreatValue() : int;
     // public virtual bool IsInSameZoneAs(AbstractClass * pTarget)
     IsInSameZoneAs(pTarget_0 : AbstractClass) : boolean;
     // public virtual unsigned long vt_entry_2C8(unsigned long dwUnk, unsigned long dwUnk2)
-    vt_entry_2C8(dwUnk_0 : number, dwUnk2_1 : number) : number;
+    vt_entry_2C8(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long) : unsigned_long;
     // public virtual bool IsInSameZoneAsCoords(CoordStruct const& coord)
     IsInSameZoneAsCoords(coord_0 : CoordStruct) : boolean;
     // public virtual int GetCrewCount() const
-    GetCrewCount() : number;
+    GetCrewCount() : int;
     // public virtual int GetAntiAirValue() const
-    GetAntiAirValue() : number;
+    GetAntiAirValue() : int;
     // public virtual int GetAntiArmorValue() const
-    GetAntiArmorValue() : number;
+    GetAntiArmorValue() : int;
     // public virtual int GetAntiInfantryValue() const
-    GetAntiInfantryValue() : number;
+    GetAntiInfantryValue() : int;
     // public virtual void GotHijacked()
     GotHijacked() : void;
     // public virtual int SelectWeapon(AbstractClass * pTarget) const
-    SelectWeapon(pTarget_0 : AbstractClass) : number;
+    SelectWeapon(pTarget_0 : AbstractClass) : int;
     // public virtual int SelectNavalTargeting(AbstractClass * pTarget) const
-    SelectNavalTargeting(pTarget_0 : AbstractClass) : number;
+    SelectNavalTargeting(pTarget_0 : AbstractClass) : int;
     // public virtual int GetZAdjustment() const
-    GetZAdjustment() : number;
+    GetZAdjustment() : int;
     // public virtual ZGradient GetZGradient() const
     GetZGradient() : ZGradient;
     // public virtual CellStruct GetLastFlightMapCoords() const
@@ -352,11 +352,11 @@ class TechnoClass
     // public virtual void SetLastFlightMapCoords(CellStruct coord)
     SetLastFlightMapCoords(coord_0 : CellStruct) : void;
     // public virtual CellStruct * vt_entry_2FC(CellStruct * Buffer, unsigned long dwUnk2, unsigned long dwUnk3) const
-    vt_entry_2FC(Buffer_0 : CellStruct, dwUnk2_1 : number, dwUnk3_2 : number) : CellStruct;
+    vt_entry_2FC(Buffer_0 : CellStruct, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long) : CellStruct;
     // public virtual CoordStruct * vt_entry_300(CoordStruct * Buffer, unsigned long dwUnk2) const
-    vt_entry_300(Buffer_0 : CoordStruct, dwUnk2_1 : number) : CoordStruct;
+    vt_entry_300(Buffer_0 : CoordStruct, dwUnk2_1 : unsigned_long) : CoordStruct;
     // public virtual unsigned long vt_entry_304(unsigned long dwUnk, unsigned long dwUnk2) const
-    vt_entry_304(dwUnk_0 : number, dwUnk2_1 : number) : number;
+    vt_entry_304(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long) : unsigned_long;
     // public virtual DirStruct * GetRealFacing(DirStruct * pBuffer) const
     GetRealFacing(pBuffer_0 : DirStruct) : DirStruct;
     // public virtual InfantryTypeClass * GetCrew() const
@@ -366,9 +366,9 @@ class TechnoClass
     // public virtual bool CanDeploySlashUnload() const
     CanDeploySlashUnload() : boolean;
     // public virtual int GetROF(int nWeapon) const
-    GetROF(nWeapon_0 : number) : number;
+    GetROF(nWeapon_0 : int) : int;
     // public virtual int GetGuardRange(int dwUnk) const
-    GetGuardRange(dwUnk_0 : number) : number;
+    GetGuardRange(dwUnk_0 : int) : int;
     // public virtual bool vt_entry_320() const
     vt_entry_320() : boolean;
     // public virtual bool IsRadarVisible(int * pOutDetection) const
@@ -382,7 +382,7 @@ class TechnoClass
     // public virtual void ProceedToNextPlanningWaypoint()
     ProceedToNextPlanningWaypoint() : void;
     // public virtual CellStruct * ScanForTiberium(CellStruct *, int range, unsigned long dwUnk3) const
-    ScanForTiberium(_0 : CellStruct, range_1 : number, dwUnk3_2 : number) : CellStruct;
+    ScanForTiberium(_0 : CellStruct, range_1 : int, dwUnk3_2 : unsigned_long) : CellStruct;
     // public virtual bool EnterGrinder()
     EnterGrinder() : boolean;
     // public virtual bool EnterBioReactor()
@@ -396,21 +396,21 @@ class TechnoClass
     // public virtual bool IsPowerOnline() const
     IsPowerOnline() : boolean;
     // public virtual void QueueVoice(int idxVoc)
-    QueueVoice(idxVoc_0 : number) : void;
+    QueueVoice(idxVoc_0 : int) : void;
     // public virtual int VoiceEnter()
-    VoiceEnter() : number;
+    VoiceEnter() : int;
     // public virtual int VoiceHarvest()
-    VoiceHarvest() : number;
+    VoiceHarvest() : int;
     // public virtual int VoiceSelect()
-    VoiceSelect() : number;
+    VoiceSelect() : int;
     // public virtual int VoiceCapture()
-    VoiceCapture() : number;
+    VoiceCapture() : int;
     // public virtual int VoiceMove()
-    VoiceMove() : number;
+    VoiceMove() : int;
     // public virtual int VoiceDeploy()
-    VoiceDeploy() : number;
+    VoiceDeploy() : int;
     // public virtual int VoiceAttack(ObjectClass * pTarget)
-    VoiceAttack(pTarget_0 : ObjectClass) : number;
+    VoiceAttack(pTarget_0 : ObjectClass) : int;
     // public virtual bool ClickedEvent(EventType event)
     ClickedEvent(event_0 : EventType) : boolean;
     // depending on the mission you click, cells/Target are not always needed
@@ -425,7 +425,7 @@ class TechnoClass
     // public virtual void Cheer(bool Force)
     Cheer(Force_0 : boolean) : void;
     // public virtual int GetDefaultSpeed() const
-    GetDefaultSpeed() : number;
+    GetDefaultSpeed() : int;
     // public virtual void DecreaseAmmo()
     DecreaseAmmo() : void;
     // public virtual void AddPassenger(FootClass * pPassenger)
@@ -439,7 +439,7 @@ class TechnoClass
     // public virtual bool TriggersCellInset(AbstractClass * pTarget)
     TriggersCellInset(pTarget_0 : AbstractClass) : boolean;
     // public virtual bool IsCloseEnough(AbstractClass * pTarget, int idxWeapon) const
-    IsCloseEnough(pTarget_0 : AbstractClass, idxWeapon_1 : number) : boolean;
+    IsCloseEnough(pTarget_0 : AbstractClass, idxWeapon_1 : int) : boolean;
     // public virtual bool IsCloseEnoughToAttack(AbstractClass * pTarget) const
     IsCloseEnoughToAttack(pTarget_0 : AbstractClass) : boolean;
     // public virtual bool IsCloseEnoughToAttackCoords(CoordStruct const& Coords) const
@@ -449,45 +449,45 @@ class TechnoClass
     // public virtual void Destroyed(ObjectClass * Killer) = 0
     Destroyed(Killer_0 : ObjectClass) : void;
     // public virtual FireError GetFireErrorWithoutRange(AbstractClass * pTarget, int nWeaponIndex) const
-    GetFireErrorWithoutRange(pTarget_0 : AbstractClass, nWeaponIndex_1 : number) : FireError;
+    GetFireErrorWithoutRange(pTarget_0 : AbstractClass, nWeaponIndex_1 : int) : FireError;
     // public virtual FireError GetFireError(AbstractClass * pTarget, int nWeaponIndex, bool ignoreRange) const
-    GetFireError(pTarget_0 : AbstractClass, nWeaponIndex_1 : number, ignoreRange_2 : boolean) : FireError;
+    GetFireError(pTarget_0 : AbstractClass, nWeaponIndex_1 : int, ignoreRange_2 : boolean) : FireError;
     // public virtual AbstractClass * GreatestThreat(ThreatType threat, CoordStruct * pCoord, bool onlyTargetHouseEnemy)
     GreatestThreat(threat_0 : ThreatType, pCoord_1 : CoordStruct, onlyTargetHouseEnemy_2 : boolean) : AbstractClass;
     // public virtual void SetTarget(AbstractClass * pTarget)
     SetTarget(pTarget_0 : AbstractClass) : void;
     // public virtual BulletClass * Fire(AbstractClass * pTarget, int nWeaponIndex)
-    Fire(pTarget_0 : AbstractClass, nWeaponIndex_1 : number) : BulletClass;
+    Fire(pTarget_0 : AbstractClass, nWeaponIndex_1 : int) : BulletClass;
     // public virtual void Guard()
     Guard() : void;
     // public virtual bool SetOwningHouse(HouseClass * pHouse, bool announce = true)
     SetOwningHouse(pHouse_0 : HouseClass, announce_1 : boolean) : boolean;
     // public virtual void vt_entry_3D8(unsigned long dwUnk, unsigned long dwUnk2, unsigned long dwUnk3)
-    vt_entry_3D8(dwUnk_0 : number, dwUnk2_1 : number, dwUnk3_2 : number) : void;
+    vt_entry_3D8(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long) : void;
     // public virtual bool Crash(ObjectClass * Killer)
     Crash(Killer_0 : ObjectClass) : boolean;
     // public virtual bool IsAreaFire() const
     IsAreaFire() : boolean;
     // public virtual int IsNotSprayAttack() const
-    IsNotSprayAttack() : number;
+    IsNotSprayAttack() : int;
     // public virtual int GetSecondaryWeaponIndex() const
-    GetSecondaryWeaponIndex() : number;
+    GetSecondaryWeaponIndex() : int;
     // public virtual int IsNotSprayAttack2() const
-    IsNotSprayAttack2() : number;
+    IsNotSprayAttack2() : int;
     // public virtual WeaponStruct * GetDeployWeapon() const
     GetDeployWeapon() : WeaponStruct;
     // public virtual WeaponStruct * GetTurretWeapon() const
     GetTurretWeapon() : WeaponStruct;
     // public virtual WeaponStruct * GetWeapon(int nWeaponIndex) const
-    GetWeapon(nWeaponIndex_0 : number) : WeaponStruct;
+    GetWeapon(nWeaponIndex_0 : int) : WeaponStruct;
     // public virtual bool HasTurret() const
     HasTurret() : boolean;
     // public virtual bool CanOccupyFire() const
     CanOccupyFire() : boolean;
     // public virtual int GetOccupyRangeBonus() const
-    GetOccupyRangeBonus() : number;
+    GetOccupyRangeBonus() : int;
     // public virtual int GetOccupantCount() const
-    GetOccupantCount() : number;
+    GetOccupantCount() : int;
     // public virtual void OnFinishRepair()
     OnFinishRepair() : void;
     // public virtual void UpdateCloak(bool bUnk = 1)
@@ -512,17 +512,17 @@ class TechnoClass
     // public virtual bool IsNotWarpingIn() const
     IsNotWarpingIn() : boolean;
     // public virtual bool vt_entry_434(unsigned long dwUnk) const
-    vt_entry_434(dwUnk_0 : number) : boolean;
+    vt_entry_434(dwUnk_0 : unsigned_long) : boolean;
     // public virtual void DrawActionLines(bool Force, unsigned long dwUnk2)
-    DrawActionLines(Force_0 : boolean, dwUnk2_1 : number) : void;
+    DrawActionLines(Force_0 : boolean, dwUnk2_1 : unsigned_long) : void;
     // public virtual unsigned long GetDisguiseFlags(unsigned long existingFlags) const
-    GetDisguiseFlags(existingFlags_0 : number) : number;
+    GetDisguiseFlags(existingFlags_0 : unsigned_long) : unsigned_long;
     // public virtual bool IsClearlyVisibleTo(HouseClass * House) const
     IsClearlyVisibleTo(House_0 : HouseClass) : boolean;
     // public virtual void DrawVoxel(VoxelStruct const& Voxel, unsigned long dwUnk2, short Facing, IndexClass<int, int> const& VoxelIndex, RectangleStruct const& Rect, Point2D const& Location, Matrix3D const& Matrix, int Intensity, unsigned long dwUnk9, unsigned long dwUnk10)
-    DrawVoxel(Voxel_0 : any, dwUnk2_1 : number, Facing_2 : number, VoxelIndex_3 : any, Rect_4 : RectangleStruct, Location_5 : Point2D, Matrix_6 : Matrix3D, Intensity_7 : number, dwUnk9_8 : number, dwUnk10_9 : number) : void;
+    DrawVoxel(Voxel_0 : any, dwUnk2_1 : unsigned_long, Facing_2 : short, VoxelIndex_3 : any, Rect_4 : RectangleStruct, Location_5 : Point2D, Matrix_6 : Matrix3D, Intensity_7 : int, dwUnk9_8 : unsigned_long, dwUnk10_9 : unsigned_long) : void;
     // public virtual void vt_entry_448(unsigned long dwUnk, unsigned long dwUnk2)
-    vt_entry_448(dwUnk_0 : number, dwUnk2_1 : number) : void;
+    vt_entry_448(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long) : void;
     // public virtual void DrawHealthBar(Point2D * pLocation, RectangleStruct * pBounds, bool bUnk3) const
     DrawHealthBar(pLocation_0 : Point2D, pBounds_1 : RectangleStruct, bUnk3_2 : boolean) : void;
     // public virtual void DrawPipScalePips(Point2D * pLocation, Point2D * pOriginalLocation, RectangleStruct * pBounds) const
@@ -536,11 +536,11 @@ class TechnoClass
     // public virtual void Cloak(bool bPlaySound)
     Cloak(bPlaySound_0 : boolean) : void;
     // public virtual unsigned long vt_entry_464(unsigned long dwUnk) const
-    vt_entry_464(dwUnk_0 : number) : number;
+    vt_entry_464(dwUnk_0 : unsigned_long) : unsigned_long;
     // public virtual void UpdateRefinerySmokeSystems()
     UpdateRefinerySmokeSystems() : void;
     // public virtual unsigned long DisguiseAs(AbstractClass * pTarget)
-    DisguiseAs(pTarget_0 : AbstractClass) : number;
+    DisguiseAs(pTarget_0 : AbstractClass) : unsigned_long;
     // public virtual void ClearDisguise()
     ClearDisguise() : void;
     // public virtual bool IsItTimeForIdleActionYet() const
@@ -548,17 +548,17 @@ class TechnoClass
     // public virtual bool UpdateIdleAction()
     UpdateIdleAction() : boolean;
     // public virtual void vt_entry_47C(unsigned long dwUnk)
-    vt_entry_47C(dwUnk_0 : number) : void;
+    vt_entry_47C(dwUnk_0 : unsigned_long) : void;
     // public virtual void SetDestination(AbstractClass * pDest, bool bUnk)
     SetDestination(pDest_0 : AbstractClass, bUnk_1 : boolean) : void;
     // public virtual bool EnterIdleMode(bool initial, bool unused)
     EnterIdleMode(initial_0 : boolean, unused_1 : boolean) : boolean;
     // public virtual void UpdateSight(unsigned long dwUnk, unsigned long dwUnk2, unsigned long dwUnk3, unsigned long dwUnk4, unsigned long dwUnk5)
-    UpdateSight(dwUnk_0 : number, dwUnk2_1 : number, dwUnk3_2 : number, dwUnk4_3 : number, dwUnk5_4 : number) : void;
+    UpdateSight(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long, dwUnk4_3 : unsigned_long, dwUnk5_4 : unsigned_long) : void;
     // public virtual void vt_entry_48C(unsigned long dwUnk, unsigned long dwUnk2, unsigned long dwUnk3, unsigned long dwUnk4)
-    vt_entry_48C(dwUnk_0 : number, dwUnk2_1 : number, dwUnk3_2 : number, dwUnk4_3 : number) : void;
+    vt_entry_48C(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long, dwUnk4_3 : unsigned_long) : void;
     // public virtual bool ForceCreate(CoordStruct& coord, unsigned long dwUnk = 0)
-    ForceCreate(coord_0 : CoordStruct, dwUnk_1 : number) : boolean;
+    ForceCreate(coord_0 : CoordStruct, dwUnk_1 : unsigned_long) : boolean;
     // public virtual void RadarTrackingStart()
     RadarTrackingStart() : void;
     // public virtual void RadarTrackingStop()
@@ -600,13 +600,13 @@ class TechnoClass
     // public char const * get_ID() const
     get_ID() : string;
     // public int TimeToBuild() const
-    TimeToBuild() : number;
+    TimeToBuild() : int;
     // public bool IsMindControlled() const
     IsMindControlled() : boolean;
     // public bool CanBePermaMindControlled() const
     CanBePermaMindControlled() : boolean;
     // public LaserDrawClass * CreateLaser(ObjectClass * pTarget, int idxWeapon, WeaponTypeClass * pWeapon, CoordStruct const& Coords)
-    CreateLaser(pTarget_0 : ObjectClass, idxWeapon_1 : number, pWeapon_2 : WeaponTypeClass, Coords_3 : CoordStruct) : LaserDrawClass;
+    CreateLaser(pTarget_0 : ObjectClass, idxWeapon_1 : int, pWeapon_2 : WeaponTypeClass, Coords_3 : CoordStruct) : LaserDrawClass;
     // Cell->AddThreat(this->Owner, -this->ThreatPosed);
     // this->ThreatPosed = 0;
     // int Threat = this->CalculateThreat(); // this is another gem of a function, to be revealed another time...
@@ -616,10 +616,10 @@ class TechnoClass
     UpdateThreatInCell(Cell_0 : CellClass) : void;
     // slave of the next one
     // public bool CanAutoTargetObject(ThreatType targetFlags, int canTargetWhatAmI, int wantedDistance, TechnoClass * pTarget, int * pThreatPosed, unsigned long dwUnk, CoordStruct * pSourceCoords) const
-    CanAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : number, wantedDistance_2 : number, pTarget_3 : TechnoClass, pThreatPosed_4 : ArrayBuffer, dwUnk_5 : number, pSourceCoords_6 : CoordStruct) : boolean;
+    CanAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : int, wantedDistance_2 : int, pTarget_3 : TechnoClass, pThreatPosed_4 : ArrayBuffer, dwUnk_5 : unsigned_long, pSourceCoords_6 : CoordStruct) : boolean;
     // called by AITeam Attack Target Type and autoscan
     // public bool TryAutoTargetObject(ThreatType targetFlags, int canTargetWhatAmI, CellStruct * pCoords, unsigned long dwUnk1, unsigned long * dwUnk2, int * pThreatPosed, unsigned long dwUnk3)
-    TryAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : number, pCoords_2 : CellStruct, dwUnk1_3 : number, dwUnk2_4 : ArrayBuffer, pThreatPosed_5 : ArrayBuffer, dwUnk3_6 : number) : boolean;
+    TryAutoTargetObject(targetFlags_0 : ThreatType, canTargetWhatAmI_1 : int, pCoords_2 : CellStruct, dwUnk1_3 : unsigned_long, dwUnk2_4 : ArrayBuffer, pThreatPosed_5 : ArrayBuffer, dwUnk3_6 : unsigned_long) : boolean;
     // public void Reactivate()
     Reactivate() : void;
     // public void Deactivate()
@@ -637,17 +637,17 @@ class TechnoClass
     MarkPassengersAsExited() : void;
     // for gattlings
     // public void SetCurrentWeaponStage(int idx)
-    SetCurrentWeaponStage(idx_0 : number) : void;
+    SetCurrentWeaponStage(idx_0 : int) : void;
     // public void SetArchiveTarget(AbstractClass * pTarget)
     SetArchiveTarget(pTarget_0 : AbstractClass) : void;
     // public void DrawVoxelShadow(VoxelStruct * vxl, int shadow_index, VoxelIndexKey vxl_index_key, IndexClass<ShadowVoxelIndexKey, VoxelCacheStruct *> * shadow_cache, RectangleStruct * bound, Point2D * a3, Matrix3D * matrix, bool again, Surface * surface, Point2D shadow_point)
-    DrawVoxelShadow(vxl_0 : any, shadow_index_1 : number, vxl_index_key_2 : any, shadow_cache_3 : any, bound_4 : RectangleStruct, a3_5 : Point2D, matrix_6 : Matrix3D, again_7 : boolean, surface_8 : Surface, shadow_point_9 : Point2D) : void;
+    DrawVoxelShadow(vxl_0 : any, shadow_index_1 : int, vxl_index_key_2 : any, shadow_cache_3 : any, bound_4 : RectangleStruct, a3_5 : Point2D, matrix_6 : Matrix3D, again_7 : boolean, surface_8 : Surface, shadow_point_9 : Point2D) : void;
     // public void DrawObject(SHPStruct * pSHP, int nFrame, Point2D * pLocation, RectangleStruct * pBounds, int, int, int nZAdjust, ZGradient eZGradientDescIdx, int, int nBrightness, int TintColor, SHPStruct * pZShape, int nZFrame, int nZOffsetX, int nZOffsetY, int)
-    DrawObject(pSHP_0 : any, nFrame_1 : number, pLocation_2 : Point2D, pBounds_3 : RectangleStruct, _4 : number, _5 : number, nZAdjust_6 : number, eZGradientDescIdx_7 : ZGradient, _8 : number, nBrightness_9 : number, TintColor_10 : number, pZShape_11 : any, nZFrame_12 : number, nZOffsetX_13 : number, nZOffsetY_14 : number, _15 : number) : void;
+    DrawObject(pSHP_0 : any, nFrame_1 : int, pLocation_2 : Point2D, pBounds_3 : RectangleStruct, _4 : int, _5 : int, nZAdjust_6 : int, eZGradientDescIdx_7 : ZGradient, _8 : int, nBrightness_9 : int, TintColor_10 : int, pZShape_11 : any, nZFrame_12 : int, nZOffsetX_13 : int, nZOffsetY_14 : int, _15 : int) : void;
     // public int sub_70DE00(int State)
-    sub_70DE00(State_0 : number) : number;
+    sub_70DE00(State_0 : int) : int;
     // public int ClearPlanningTokens(EventClass * pEvent)
-    ClearPlanningTokens(pEvent_0 : EventClass) : number;
+    ClearPlanningTokens(pEvent_0 : EventClass) : int;
     // public void SetTargetForPassengers(AbstractClass * pTarget)
     SetTargetForPassengers(pTarget_0 : AbstractClass) : void;
     // public void KillPassengers(TechnoClass * pSource)
@@ -656,7 +656,7 @@ class TechnoClass
     // public HouseClass * GetOriginalOwner() const
     GetOriginalOwner() : HouseClass;
     // public void FireDeathWeapon(int additionalDamage)
-    FireDeathWeapon(additionalDamage_0 : number) : void;
+    FireDeathWeapon(additionalDamage_0 : int) : void;
     // public bool HasAbility(Ability ability) const
     HasAbility(ability_0 : Ability) : boolean;
     // public void ClearSidebarTabObject() const
@@ -664,21 +664,21 @@ class TechnoClass
     // public LightConvertClass * GetDrawer() const
     GetDrawer() : LightConvertClass;
     // public int GetEffectTintIntensity(int currentIntensity)
-    GetEffectTintIntensity(currentIntensity_0 : number) : number;
+    GetEffectTintIntensity(currentIntensity_0 : int) : int;
     // public int GetInvulnerabilityTintIntensity(int currentIntensity)
-    GetInvulnerabilityTintIntensity(currentIntensity_0 : number) : number;
+    GetInvulnerabilityTintIntensity(currentIntensity_0 : int) : int;
     // public int GetAirstrikeTintIntensity(int currentIntensity)
-    GetAirstrikeTintIntensity(currentIntensity_0 : number) : number;
+    GetAirstrikeTintIntensity(currentIntensity_0 : int) : int;
     // public int CombatDamage(int nWeaponIndex) const
-    CombatDamage(nWeaponIndex_0 : number) : number;
+    CombatDamage(nWeaponIndex_0 : int) : int;
     // public WeaponStruct * GetPrimaryWeapon() const
     GetPrimaryWeapon() : WeaponStruct;
     // public bool TryNextPlanningTokenNode()
     TryNextPlanningTokenNode() : boolean;
     // public int GetIonCannonValue(AIDifficulty difficulty) const
-    GetIonCannonValue(difficulty_0 : AIDifficulty) : number;
+    GetIonCannonValue(difficulty_0 : AIDifficulty) : int;
     // public int GetIonCannonValue(AIDifficulty difficulty, int maxHealth) const
-    GetIonCannonValue(difficulty_0 : AIDifficulty, maxHealth_1 : number) : number;
+    GetIonCannonValue(difficulty_0 : AIDifficulty, maxHealth_1 : int) : int;
     // public DirStruct TurretFacing() const
     TurretFacing() : DirStruct;
     // public DirStruct GetRealFacing() const
@@ -694,12 +694,12 @@ class TechnoClass
     // public TechnoClass * Transporter
     m_Transporter : TechnoClass;
     // public int LastFireBulletFrame
-    m_LastFireBulletFrame : number;
+    m_LastFireBulletFrame : int;
     // for IFV/gattling/charge turrets
     // public int CurrentTurretNumber
-    m_CurrentTurretNumber : number;
+    m_CurrentTurretNumber : int;
     // public int unknown_int_128
-    m_unknown_int_128 : number;
+    m_unknown_int_128 : int;
     // public AnimClass * BehindAnim
     m_BehindAnim : AnimClass;
     // public AnimClass * DeployAnim
@@ -708,35 +708,35 @@ class TechnoClass
     m_InAir : boolean;
     // for IFV/gattling
     // public int CurrentWeaponNumber
-    m_CurrentWeaponNumber : number;
+    m_CurrentWeaponNumber : int;
     // only used for promotion detection
     // public Rank CurrentRanking
     m_CurrentRanking : Rank;
     // public int CurrentGattlingStage
-    m_CurrentGattlingStage : number;
+    m_CurrentGattlingStage : int;
     // sum of RateUps and RateDowns
     // public int GattlingValue
-    m_GattlingValue : number;
+    m_GattlingValue : int;
     // public int TurretAnimFrame
-    m_TurretAnimFrame : number;
+    m_TurretAnimFrame : int;
     // only set in ctor
     // public HouseClass * InitialOwner
     m_InitialOwner : HouseClass;
     // public unsigned long align_154
-    m_align_154 : number;
+    m_align_154 : unsigned_long;
     // public double ArmorMultiplier
-    m_ArmorMultiplier : number;
+    m_ArmorMultiplier : double;
     // public double FirepowerMultiplier
-    m_FirepowerMultiplier : number;
+    m_FirepowerMultiplier : double;
     // ^
     // public int IronTintStage
-    m_IronTintStage : number;
+    m_IronTintStage : int;
     // ^
     // public unsigned long AirstrikeTintStage
-    m_AirstrikeTintStage : number;
+    m_AirstrikeTintStage : unsigned_long;
     // 0 or 1, NOT a bool - is this under ForceShield as opposed to IC?
     // public int ForceShielded
-    m_ForceShielded : number;
+    m_ForceShielded : int;
     // Robot Tanks without power for instance
     // public bool Deactivated
     m_Deactivated : boolean;
@@ -751,14 +751,14 @@ class TechnoClass
     // public bool Disguised
     m_Disguised : boolean;
     // public unsigned long DisguiseCreationFrame
-    m_DisguiseCreationFrame : number;
+    m_DisguiseCreationFrame : unsigned_long;
     // public bool UnlimboingInfantry
     m_UnlimboingInfantry : boolean;
     // public Point2D RadarPosition
     m_RadarPosition : Point2D;
     // 0-9, assigned by CTRL+Number, these kinds // also set by aimd TeamType->Group !
     // public int Group
-    m_Group : number;
+    m_Group : int;
     // Set when told to guard a unit or such, or to distinguish undeploy and selling. Also used by rally points as well as harvesters for remembering ore fields etc.
     // public AbstractClass * ArchiveTarget
     m_ArchiveTarget : AbstractClass;
@@ -768,15 +768,15 @@ class TechnoClass
     m_CloakState : CloakState;
     // don't ask! set to 0 in CTOR, never modified, only used as ((this->Fetch_ID) + this->WarpFactor) % 400 for something in cloak ripple
     // public float WarpFactor
-    m_WarpFactor : number;
+    m_WarpFactor : float;
     // public bool unknown_bool_250
     m_unknown_bool_250 : boolean;
     // public CoordStruct LastSightCoords
     m_LastSightCoords : CoordStruct;
     // public int LastSightRange
-    m_LastSightRange : number;
+    m_LastSightRange : int;
     // public int LastSightHeight
-    m_LastSightHeight : number;
+    m_LastSightHeight : int;
     // GapGenerator, when SuperGapRadiusInCells != GapRadiusInCells, you can deploy the gap to boost radius
     // public bool GapSuperCharged
     m_GapSuperCharged : boolean;
@@ -784,7 +784,7 @@ class TechnoClass
     // public bool GeneratingGap
     m_GeneratingGap : boolean;
     // public int GapRadius
-    m_GapRadius : number;
+    m_GapRadius : int;
     // is being warped by CLEG
     // public bool BeingWarpedOut
     m_BeingWarpedOut : boolean;
@@ -794,7 +794,7 @@ class TechnoClass
     // public bool unknown_bool_272
     m_unknown_bool_272 : boolean;
     // public unsigned char unused_273
-    m_unused_273 : number;
+    m_unused_273 : unsigned_char;
     // CLEG attacking Power Plant : CLEG's this
     // public TemporalClass * TemporalImUsing
     m_TemporalImUsing : TemporalClass;
@@ -805,10 +805,10 @@ class TechnoClass
     // public bool IsImmobilized
     m_IsImmobilized : boolean;
     // public unsigned long unknown_280
-    m_unknown_280 : number;
+    m_unknown_280 : unsigned_long;
     // countdown after chronosphere warps things around
     // public int ChronoLockRemaining
-    m_ChronoLockRemaining : number;
+    m_ChronoLockRemaining : int;
     // teleport loco and chsphere set this
     // public CoordStruct ChronoDestCoords
     m_ChronoDestCoords : CoordStruct;
@@ -818,10 +818,10 @@ class TechnoClass
     // public bool Berzerk
     m_Berzerk : boolean;
     // public unsigned long BerzerkDurationLeft
-    m_BerzerkDurationLeft : number;
+    m_BerzerkDurationLeft : unsigned_long;
     // hardcoded array of xyz offsets for sprayattack, 0 - 7, see 6FE0AD
     // public unsigned long SprayOffsetIndex
-    m_SprayOffsetIndex : number;
+    m_SprayOffsetIndex : unsigned_long;
     // DeployedCrushable fiddles this, otherwise all 0
     // public bool Uncrushable
     m_Uncrushable : boolean;
@@ -872,15 +872,15 @@ class TechnoClass
     m_BunkerLinkedItem : TechnoClass;
     // not exactly, and it doesn't affect the drawing, only internal state of a dropship
     // public float PitchAngle
-    m_PitchAngle : number;
+    m_PitchAngle : float;
     // Set to same duration (frames) as RearmTimer when weapon is fired. Only used by IsChargeTurret to calculate timespan during which to display turret animation.
     // public int ChargeTurretDelay
-    m_ChargeTurretDelay : number;
+    m_ChargeTurretDelay : int;
     // public int Ammo
-    m_Ammo : number;
+    m_Ammo : int;
     // set to actual cost when this gets queued in factory, updated only in building's 42C
     // public int Value
-    m_Value : number;
+    m_Value : int;
     // public ParticleSystemClass * FireParticleSystem
     m_FireParticleSystem : ParticleSystemClass;
     // public ParticleSystemClass * SparkParticleSystem
@@ -902,27 +902,27 @@ class TechnoClass
     m_Wave : WaveClass;
     // in this frame, in radians - if abs() exceeds pi/2, it dies
     // public float AngleRotatedSideways
-    m_AngleRotatedSideways : number;
+    m_AngleRotatedSideways : float;
     // same
     // public float AngleRotatedForwards
-    m_AngleRotatedForwards : number;
+    m_AngleRotatedForwards : float;
     // left to right - positive pushes left side up
     // public float RockingSidewaysPerFrame
-    m_RockingSidewaysPerFrame : number;
+    m_RockingSidewaysPerFrame : float;
     // back to front - positive pushes ass up
     // public float RockingForwardsPerFrame
-    m_RockingForwardsPerFrame : number;
+    m_RockingForwardsPerFrame : float;
     // mutant hijacker
     // public int HijackerInfantryType
-    m_HijackerInfantryType : number;
+    m_HijackerInfantryType : int;
     // public unsigned long unknown_34C
-    m_unknown_34C : number;
+    m_unknown_34C : unsigned_long;
     // public int CurrentBurstIndex
-    m_CurrentBurstIndex : number;
+    m_CurrentBurstIndex : int;
     // public short unknown_short_3C8
-    m_unknown_short_3C8 : number;
+    m_unknown_short_3C8 : short;
     // public unsigned short unknown_3CA
-    m_unknown_3CA : number;
+    m_unknown_3CA : unsigned_short;
     // is this techno contained in OwningPlayer->Owned... counts?
     // public bool CountedAsOwned
     m_CountedAsOwned : boolean;
@@ -969,7 +969,7 @@ class TechnoClass
     m_unknown_bool_41F : boolean;
     // used for LeptonsPerSightIncrease
     // public char SightIncrease
-    m_SightIncrease : number;
+    m_SightIncrease : char;
     // these two are like Lenny and Carl, weird purpose and never seen separate
     // public bool RecruitableA
     m_RecruitableA : boolean;
@@ -1009,38 +1009,38 @@ class TechnoClass
     // public bool unknown_bool_43A
     m_unknown_bool_43A : boolean;
     // public unsigned long unknown_43C
-    m_unknown_43C : number;
+    m_unknown_43C : unsigned_long;
     // Turret is moving?
     // public int unknown_BOOL_49C
-    m_unknown_BOOL_49C : number;
+    m_unknown_BOOL_49C : int;
     // public int TurretIsRotating
-    m_TurretIsRotating : number;
+    m_TurretIsRotating : int;
     // public bool unknown_bool_4B8
     m_unknown_bool_4B8 : boolean;
     // public unsigned long unknown_4BC
-    m_unknown_4BC : number;
+    m_unknown_4BC : unsigned_long;
     // public bool unknown_bool_4D4
     m_unknown_bool_4D4 : boolean;
     // public unsigned long unknown_4D8
-    m_unknown_4D8 : number;
+    m_unknown_4D8 : unsigned_long;
     // public unsigned long QueuedVoiceIndex
-    m_QueuedVoiceIndex : number;
+    m_QueuedVoiceIndex : unsigned_long;
     // public unsigned long unknown_4F4
-    m_unknown_4F4 : number;
+    m_unknown_4F4 : unsigned_long;
     // public bool unknown_bool_4F8
     m_unknown_bool_4F8 : boolean;
     // gets initialized with the current Frame, but this is NOT a TimerStruct!
     // public unsigned long unknown_4FC
-    m_unknown_4FC : number;
+    m_unknown_4FC : unsigned_long;
     // public TechnoClass * QueueUpToEnter
     m_QueueUpToEnter : TechnoClass;
     // public unsigned long EMPLockRemaining
-    m_EMPLockRemaining : number;
+    m_EMPLockRemaining : unsigned_long;
     // calculated to include cargo etc
     // public unsigned long ThreatPosed
-    m_ThreatPosed : number;
+    m_ThreatPosed : unsigned_long;
     // public unsigned long ShouldLoseTargetNow
-    m_ShouldLoseTargetNow : number;
+    m_ShouldLoseTargetNow : unsigned_long;
     // public RadBeam * FiringRadBeam
     m_FiringRadBeam : RadBeam;
     // public PlanningTokenClass * PlanningToken
@@ -1174,7 +1174,7 @@ class TechnoClass
     // public char[32] __BarrelRecoil
     m___BarrelRecoil : string;
     // public DynamicVectorClass<int> CurrentTargetThreatValues
-    m_CurrentTargetThreatValues : DynamicVectorClass<number>;
+    m_CurrentTargetThreatValues : DynamicVectorClass<int>;
     // public char[24] __CurrentTargetThreatValues
     m___CurrentTargetThreatValues : string;
     // public DynamicVectorClass<AbstractClass *> CurrentTargets
@@ -1213,65 +1213,65 @@ class HouseClass
     constructor(pCountry_0 : HouseTypeClass);
     // IConnectionPointContainer
     // public virtual long EnumConnectionPoints(IEnumConnectionPoints * * ppEnum)
-    EnumConnectionPoints(ppEnum_0 : any | any) : number;
+    EnumConnectionPoints(ppEnum_0 : any | any) : long;
     // public virtual long FindConnectionPoint(_GUID * riid, IConnectionPoint * * ppCP)
-    FindConnectionPoint(riid_0 : any | any, ppCP_1 : any | any) : number;
+    FindConnectionPoint(riid_0 : any | any, ppCP_1 : any | any) : long;
     // IPublicHouse
     // public virtual long Apparent_Category_Quantity(Category category) const
-    Apparent_Category_Quantity(category_0 : Category | any) : number;
+    Apparent_Category_Quantity(category_0 : Category | any) : long;
     // public virtual long Apparent_Category_Power(Category category) const
-    Apparent_Category_Power(category_0 : Category | any) : number;
+    Apparent_Category_Power(category_0 : Category | any) : long;
     // public virtual CellStruct Apparent_Base_Center() const
     Apparent_Base_Center() : CellStruct;
     // public virtual bool Is_Powered() const
     Is_Powered() : boolean;
     // IHouse
     // public virtual long ID_Number() const
-    ID_Number() : number;
+    ID_Number() : long;
     // public virtual wchar_t * Name() const
     Name() : ArrayBuffer;
     // public virtual IApplication * Get_Application()
     Get_Application() : any;
     // public virtual long Available_Money() const
-    Available_Money() : number;
+    Available_Money() : long;
     // public virtual long Available_Storage() const
-    Available_Storage() : number;
+    Available_Storage() : long;
     // public virtual long Power_Output() const
-    Power_Output() : number;
+    Power_Output() : long;
     // public virtual long Power_Drain() const
-    Power_Drain() : number;
+    Power_Drain() : long;
     // public virtual long Category_Quantity(Category category) const
-    Category_Quantity(category_0 : Category | any) : number;
+    Category_Quantity(category_0 : Category | any) : long;
     // public virtual long Category_Power(Category category) const
-    Category_Power(category_0 : Category | any) : number;
+    Category_Power(category_0 : Category | any) : long;
     // public virtual CellStruct Base_Center() const
     Base_Center() : CellStruct;
     // public virtual long Fire_Sale() const
-    Fire_Sale() : number;
+    Fire_Sale() : long;
     // public virtual long All_To_Hunt()
-    All_To_Hunt() : number;
+    All_To_Hunt() : long;
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : long;
     // public virtual unsigned long AddRef()
-    AddRef() : number;
+    AddRef() : unsigned_long;
     // public virtual unsigned long Release()
-    Release() : number;
+    Release() : unsigned_long;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public bool IsAlliedWith(int idxHouse) const
-    IsAlliedWith(idxHouse_0 : number) : boolean;
+    IsAlliedWith(idxHouse_0 : int) : boolean;
     // public bool IsAlliedWith(HouseClass const * pHouse) const
     IsAlliedWith(pHouse_0 : HouseClass) : boolean;
     // public bool IsAlliedWith(ObjectClass const * pObject) const
@@ -1279,7 +1279,7 @@ class HouseClass
     // public bool IsAlliedWith(AbstractClass const * pAbstract) const
     IsAlliedWith(pAbstract_0 : AbstractClass) : boolean;
     // public void MakeAlly(int iHouse, bool bAnnounce)
-    MakeAlly(iHouse_0 : number, bAnnounce_1 : boolean) : void;
+    MakeAlly(iHouse_0 : int, bAnnounce_1 : boolean) : void;
     // public void MakeAlly(HouseClass * pWho, bool bAnnounce)
     MakeAlly(pWho_0 : HouseClass, bAnnounce_1 : boolean) : void;
     // public void MakeEnemy(HouseClass * pWho, bool bAnnounce)
@@ -1287,7 +1287,7 @@ class HouseClass
     // public void AdjustThreats()
     AdjustThreats() : void;
     // public void UpdateAngerNodes(int nScoreAdd, HouseClass * pHouse)
-    UpdateAngerNodes(nScoreAdd_0 : number, pHouse_1 : HouseClass) : void;
+    UpdateAngerNodes(nScoreAdd_0 : int, pHouse_1 : HouseClass) : void;
     // public void AllyAIHouses()
     AllyAIHouses() : void;
     // no explosions, just poooof
@@ -1309,9 +1309,9 @@ class HouseClass
     // public void RespawnStartingForces()
     RespawnStartingForces() : void;
     // public unsigned char Win(bool bSavourSomething)
-    Win(bSavourSomething_0 : boolean) : number;
+    Win(bSavourSomething_0 : boolean) : unsigned_char;
     // public unsigned char Lose(bool bSavourSomething)
-    Lose(bSavourSomething_0 : boolean) : number;
+    Lose(bSavourSomething_0 : boolean) : unsigned_char;
     // public void RegisterJustBuilt(TechnoClass * pTechno)
     RegisterJustBuilt(pTechno_0 : TechnoClass) : void;
     // public bool CanAlly(HouseClass * pOther) const
@@ -1326,23 +1326,23 @@ class HouseClass
     // public bool DoInfantrySelfHeal() const
     DoInfantrySelfHeal() : boolean;
     // public int GetInfSelfHealStep() const
-    GetInfSelfHealStep() : number;
+    GetInfSelfHealStep() : int;
     // public bool DoUnitsSelfHeal() const
     DoUnitsSelfHeal() : boolean;
     // public int GetUnitSelfHealStep() const
-    GetUnitSelfHealStep() : number;
+    GetUnitSelfHealStep() : int;
     // public void UpdatePower()
     UpdatePower() : void;
     // public void CreatePowerOutage(int duration)
-    CreatePowerOutage(duration_0 : number) : void;
+    CreatePowerOutage(duration_0 : int) : void;
     // public double GetPowerPercentage() const
-    GetPowerPercentage() : number;
+    GetPowerPercentage() : double;
     // public bool HasFullPower() const
     HasFullPower() : boolean;
     // public bool HasLowPower() const
     HasLowPower() : boolean;
     // public void CreateRadarOutage(int duration)
-    CreateRadarOutage(duration_0 : number) : void;
+    CreateRadarOutage(duration_0 : int) : void;
     // won't work if has spysat
     // public void ReshroudMap()
     ReshroudMap() : void;
@@ -1351,35 +1351,35 @@ class HouseClass
     // public void BuildingUnderAttack(BuildingClass * pBld)
     BuildingUnderAttack(pBld_0 : BuildingClass) : void;
     // public void TakeMoney(int amount)
-    TakeMoney(amount_0 : number) : void;
+    TakeMoney(amount_0 : int) : void;
     // public void GiveMoney(int amount)
-    GiveMoney(amount_0 : number) : void;
+    GiveMoney(amount_0 : int) : void;
     // public bool CanTransactMoney(int amount) const
-    CanTransactMoney(amount_0 : number) : boolean;
+    CanTransactMoney(amount_0 : int) : boolean;
     // public void TransactMoney(int amount)
-    TransactMoney(amount_0 : number) : void;
+    TransactMoney(amount_0 : int) : void;
     // public void GiveTiberium(float amount, int type)
-    GiveTiberium(amount_0 : number, type_1 : number) : void;
+    GiveTiberium(amount_0 : float, type_1 : int) : void;
     // public void UpdateAllSilos(int prevStorage, int prevTotalStorage)
-    UpdateAllSilos(prevStorage_0 : number, prevTotalStorage_1 : number) : void;
+    UpdateAllSilos(prevStorage_0 : int, prevTotalStorage_1 : int) : void;
     // public double GetStoragePercentage()
-    GetStoragePercentage() : number;
+    GetStoragePercentage() : double;
     // no LostThreatNode() , this gets called also when node building dies! BUG
     // public void AcquiredThreatNode()
     AcquiredThreatNode() : void;
     // these are for mostly for map actions - HouseClass* foo = IsMP() ? Find_YesMP() : Find_NoMP();
     // public static bool Index_IsMP(int idx)
-    static Index_IsMP(idx_0 : number) : boolean;
+    static Index_IsMP(idx_0 : int) : boolean;
     // public static HouseClass * FindByCountryIndex(int HouseType)
-    static FindByCountryIndex(HouseType_0 : number) : HouseClass;
+    static FindByCountryIndex(HouseType_0 : int) : HouseClass;
     // public static HouseClass * FindByIndex(int idxHouse)
-    static FindByIndex(idxHouse_0 : number) : HouseClass;
+    static FindByIndex(idxHouse_0 : int) : HouseClass;
     // public static int FindIndexByName(char const * name)
-    static FindIndexByName(name_0 : string) : number;
+    static FindIndexByName(name_0 : string) : int;
     // public static int GetPlayerAtFromString(char const * name)
-    static GetPlayerAtFromString(name_0 : string) : number;
+    static GetPlayerAtFromString(name_0 : string) : int;
     // public static HouseClass * FindByPlayerAt(int at)
-    static FindByPlayerAt(at_0 : number) : HouseClass;
+    static FindByPlayerAt(at_0 : int) : HouseClass;
     // gets the first house of a type with this name
     // public static HouseClass * FindByCountryName(char const * name)
     static FindByCountryName(name_0 : string) : HouseClass;
@@ -1391,7 +1391,7 @@ class HouseClass
     static FindSpecial() : HouseClass;
     // gets the first house of a side with this name
     // public static HouseClass * FindBySideIndex(int index)
-    static FindBySideIndex(index_0 : number) : HouseClass;
+    static FindBySideIndex(index_0 : int) : HouseClass;
     // gets the first house of a type with this name
     // public static HouseClass * FindBySideName(char const * name)
     static FindBySideName(name_0 : string) : HouseClass;
@@ -1401,14 +1401,14 @@ class HouseClass
     // public static void LoadFromINIList(CCINIClass * pINI)
     static LoadFromINIList(pINI_0 : CCINIClass) : void;
     // public int GetSpawnPosition()
-    GetSpawnPosition() : number;
+    GetSpawnPosition() : int;
     // public WaypointClass * GetPlanningWaypointAt(CellStruct * coords)
     GetPlanningWaypointAt(coords_0 : CellStruct) : WaypointClass;
     // public bool GetPlanningWaypointProperties(WaypointClass * wpt, int& idxPath, unsigned char& idxWP)
-    GetPlanningWaypointProperties(wpt_0 : WaypointClass, idxPath_1 : number, idxWP_2 : number) : boolean;
+    GetPlanningWaypointProperties(wpt_0 : WaypointClass, idxPath_1 : int, idxWP_2 : unsigned_char) : boolean;
     // calls WaypointPathClass::WaypointPathClass() if needed
     // public void EnsurePlanningPathExists(int idx)
-    EnsurePlanningPathExists(idx_0 : number) : void;
+    EnsurePlanningPathExists(idx_0 : int) : void;
     // call after the availability of a factory has changed.
     // public void Update_FactoriesQueues(AbstractType factoryOf, bool isNaval, BuildCat buildCat) const
     Update_FactoriesQueues(factoryOf_0 : AbstractType, isNaval_1 : boolean, buildCat_2 : BuildCat) : void;
@@ -1421,7 +1421,7 @@ class HouseClass
     FirstBuildableFromArray(items_0 : DynamicVectorClass<BuildingTypeClass>) : BuildingTypeClass;
     // are all prereqs for Techno listed in vectorBuildings[0..vectorLength]. Yes, the length is needed (the vector is used for breadth-first search)
     // public bool AllPrerequisitesAvailable(TechnoTypeClass const * pItem, DynamicVectorClass<BuildingTypeClass *> const& vectorBuildings, int vectorLength)
-    AllPrerequisitesAvailable(pItem_0 : TechnoTypeClass, vectorBuildings_1 : DynamicVectorClass<BuildingTypeClass>, vectorLength_2 : number) : boolean;
+    AllPrerequisitesAvailable(pItem_0 : TechnoTypeClass, vectorBuildings_1 : DynamicVectorClass<BuildingTypeClass>, vectorLength_2 : int) : boolean;
     // Whether any human player controls this house.
     // public bool IsControlledByHuman() const
     IsControlledByHuman() : boolean;
@@ -1430,14 +1430,14 @@ class HouseClass
     IsControlledByCurrentPlayer() : boolean;
     // Target ought to be Object, I imagine, but cell doesn't work then
     // public void SendSpyPlanes(int AircraftTypeIdx, int AircraftAmount, Mission SetMission, AbstractClass * Target, ObjectClass * Destination)
-    SendSpyPlanes(AircraftTypeIdx_0 : number, AircraftAmount_1 : number, SetMission_2 : Mission, Target_3 : AbstractClass, Destination_4 : ObjectClass) : void;
+    SendSpyPlanes(AircraftTypeIdx_0 : int, AircraftAmount_1 : int, SetMission_2 : Mission, Target_3 : AbstractClass, Destination_4 : ObjectClass) : void;
     // registering in prereq counters (all technoes get logged, but only buildings get checked on validation... wtf)
     // public void RegisterGain(TechnoClass * pTechno, bool ownerChange)
     RegisterGain(pTechno_0 : TechnoClass, ownerChange_1 : boolean) : void;
     // public void RegisterLoss(TechnoClass * pTechno, bool keepTiberium)
     RegisterLoss(pTechno_0 : TechnoClass, keepTiberium_1 : boolean) : void;
     // public BuildingClass * FindBuildingOfType(int idx, int sector = -1) const
-    FindBuildingOfType(idx_0 : number, sector_1 : number) : BuildingClass;
+    FindBuildingOfType(idx_0 : int, sector_1 : int) : BuildingClass;
     // public AnimClass * PsiWarn(CellClass * pTarget, BulletClass * Bullet, char * AnimName)
     PsiWarn(pTarget_0 : CellClass, Bullet_1 : BulletClass, AnimName_2 : string) : AnimClass;
     // public bool Fire_LightningStorm(SuperClass * pSuper)
@@ -1453,42 +1453,42 @@ class HouseClass
     // public char const * get_ID() const
     get_ID() : string;
     // public int FindSuperWeaponIndex(SuperWeaponType type) const
-    FindSuperWeaponIndex(type_0 : SuperWeaponType) : number;
+    FindSuperWeaponIndex(type_0 : SuperWeaponType) : int;
     // public SuperClass * FindSuperWeapon(SuperWeaponType type) const
     FindSuperWeapon(type_0 : SuperWeaponType) : SuperClass;
     // Count owned now
     // public int CountOwnedNow(TechnoTypeClass const * pItem) const
-    CountOwnedNow(pItem_0 : TechnoTypeClass) : number;
+    CountOwnedNow(pItem_0 : TechnoTypeClass) : int;
     // public int CountOwnedNow(BuildingTypeClass const * const pItem) const
-    CountOwnedNow(pItem_0 : BuildingTypeClass) : number;
+    CountOwnedNow(pItem_0 : BuildingTypeClass) : int;
     // public int CountOwnedNow(AircraftTypeClass const * const pItem) const
-    CountOwnedNow(pItem_0 : AircraftTypeClass) : number;
+    CountOwnedNow(pItem_0 : AircraftTypeClass) : int;
     // public int CountOwnedNow(InfantryTypeClass const * const pItem) const
-    CountOwnedNow(pItem_0 : InfantryTypeClass) : number;
+    CountOwnedNow(pItem_0 : InfantryTypeClass) : int;
     // public int CountOwnedNow(UnitTypeClass const * const pItem) const
-    CountOwnedNow(pItem_0 : UnitTypeClass) : number;
+    CountOwnedNow(pItem_0 : UnitTypeClass) : int;
     // Count owned and present
     // public int CountOwnedAndPresent(TechnoTypeClass const * pItem) const
-    CountOwnedAndPresent(pItem_0 : TechnoTypeClass) : number;
+    CountOwnedAndPresent(pItem_0 : TechnoTypeClass) : int;
     // public int CountOwnedAndPresent(BuildingTypeClass const * const pItem) const
-    CountOwnedAndPresent(pItem_0 : BuildingTypeClass) : number;
+    CountOwnedAndPresent(pItem_0 : BuildingTypeClass) : int;
     // public int CountOwnedAndPresent(AircraftTypeClass const * const pItem) const
-    CountOwnedAndPresent(pItem_0 : AircraftTypeClass) : number;
+    CountOwnedAndPresent(pItem_0 : AircraftTypeClass) : int;
     // public int CountOwnedAndPresent(InfantryTypeClass const * const pItem) const
-    CountOwnedAndPresent(pItem_0 : InfantryTypeClass) : number;
+    CountOwnedAndPresent(pItem_0 : InfantryTypeClass) : int;
     // public int CountOwnedAndPresent(UnitTypeClass const * const pItem) const
-    CountOwnedAndPresent(pItem_0 : UnitTypeClass) : number;
+    CountOwnedAndPresent(pItem_0 : UnitTypeClass) : int;
     // Count owned ever
     // public int CountOwnedEver(TechnoTypeClass const * pItem) const
-    CountOwnedEver(pItem_0 : TechnoTypeClass) : number;
+    CountOwnedEver(pItem_0 : TechnoTypeClass) : int;
     // public int CountOwnedEver(BuildingTypeClass const * const pItem) const
-    CountOwnedEver(pItem_0 : BuildingTypeClass) : number;
+    CountOwnedEver(pItem_0 : BuildingTypeClass) : int;
     // public int CountOwnedEver(AircraftTypeClass const * const pItem) const
-    CountOwnedEver(pItem_0 : AircraftTypeClass) : number;
+    CountOwnedEver(pItem_0 : AircraftTypeClass) : int;
     // public int CountOwnedEver(InfantryTypeClass const * const pItem) const
-    CountOwnedEver(pItem_0 : InfantryTypeClass) : number;
+    CountOwnedEver(pItem_0 : InfantryTypeClass) : int;
     // public int CountOwnedEver(UnitTypeClass const * const pItem) const
-    CountOwnedEver(pItem_0 : UnitTypeClass) : number;
+    CountOwnedEver(pItem_0 : UnitTypeClass) : int;
     // public bool HasFromSecretLab(TechnoTypeClass const * const pItem) const
     HasFromSecretLab(pItem_0 : TechnoTypeClass) : boolean;
     // public bool HasAllStolenTech(TechnoTypeClass const * const pItem) const
@@ -1498,7 +1498,7 @@ class HouseClass
     // public bool CanExpectToBuild(TechnoTypeClass const * pItem) const
     CanExpectToBuild(pItem_0 : TechnoTypeClass) : boolean;
     // public bool CanExpectToBuild(TechnoTypeClass const * pItem, int idxParent) const
-    CanExpectToBuild(pItem_0 : TechnoTypeClass, idxParent_1 : number) : boolean;
+    CanExpectToBuild(pItem_0 : TechnoTypeClass, idxParent_1 : int) : boolean;
     // public bool InOwners(TechnoTypeClass const * const pItem) const
     InOwners(pItem_0 : TechnoTypeClass) : boolean;
     // public bool InRequiredHouses(TechnoTypeClass const * const pItem) const
@@ -1508,13 +1508,13 @@ class HouseClass
     // public CanBuildResult CanBuild(TechnoTypeClass const * pItem, bool buildLimitOnly, bool allowIfInProduction) const
     CanBuild(pItem_0 : TechnoTypeClass, buildLimitOnly_1 : boolean, allowIfInProduction_2 : boolean) : CanBuildResult;
     // public int AI_BaseConstructionUpdate()
-    AI_BaseConstructionUpdate() : number;
+    AI_BaseConstructionUpdate() : int;
     // public int AI_VehicleConstructionUpdate()
-    AI_VehicleConstructionUpdate() : number;
+    AI_VehicleConstructionUpdate() : int;
     // public void AI_TryFireSW()
     AI_TryFireSW() : void;
     // public bool Fire_SW(int idx, CellStruct const& coords)
-    Fire_SW(idx_0 : number, coords_1 : CellStruct) : boolean;
+    Fire_SW(idx_0 : int, coords_1 : CellStruct) : boolean;
     // public CellStruct * PickTargetByType(CellStruct& outBuffer, QuarryType targetType) const
     PickTargetByType(outBuffer_0 : CellStruct, targetType_1 : QuarryType) : CellStruct;
     // public CellStruct PickTargetByType(QuarryType targetType) const
@@ -1526,11 +1526,11 @@ class HouseClass
     // public bool IsIonCannonEligibleTarget(TechnoClass const * pTechno) const
     IsIonCannonEligibleTarget(pTechno_0 : TechnoClass) : boolean;
     // public void UpdateFlagCoords(UnitClass * NewCarrier, unsigned long dwUnk)
-    UpdateFlagCoords(NewCarrier_0 : UnitClass, dwUnk_1 : number) : void;
+    UpdateFlagCoords(NewCarrier_0 : UnitClass, dwUnk_1 : unsigned_long) : void;
     // public void DroppedFlag(CellStruct * Where, UnitClass * Who)
     DroppedFlag(Where_0 : CellStruct, Who_1 : UnitClass) : void;
     // public char PickedUpFlag(UnitClass * Who, unsigned long dwUnk)
-    PickedUpFlag(Who_0 : UnitClass, dwUnk_1 : number) : number;
+    PickedUpFlag(Who_0 : UnitClass, dwUnk_1 : unsigned_long) : char;
     // public FactoryClass * GetPrimaryFactory(AbstractType absID, bool naval, BuildCat buildCat) const
     GetPrimaryFactory(absID_0 : AbstractType, naval_1 : boolean, buildCat_2 : BuildCat) : FactoryClass;
     // public void SetPrimaryFactory(FactoryClass * pFactory, AbstractType absID, bool naval, BuildCat buildCat)
@@ -1538,7 +1538,7 @@ class HouseClass
     // public CellStruct const& GetBaseCenter() const
     GetBaseCenter() : CellStruct;
     // public unsigned int GetAIDifficultyIndex() const
-    GetAIDifficultyIndex() : number;
+    GetAIDifficultyIndex() : unsigned_int;
     // At the moment, this function is really just a more intuitively named mask for
     // this->Type->MultiplayPassive, but it might be expanded into something more
     // complicated later.
@@ -1559,7 +1559,7 @@ class HouseClass
     // public static bool IsCurrentPlayerObserver()
     static IsCurrentPlayerObserver() : boolean;
     // public int CalculateCostMultipliers()
-    CalculateCostMultipliers() : number;
+    CalculateCostMultipliers() : int;
     // public void ForceEnd()
     ForceEnd() : void;
     // public void RemoveTracking(TechnoClass * pTechno)
@@ -1567,7 +1567,7 @@ class HouseClass
     // public void AddTracking(TechnoClass * pTechno)
     AddTracking(pTechno_0 : TechnoClass) : void;
     // public double GetWeedStoragePercentage()
-    GetWeedStoragePercentage() : number;
+    GetWeedStoragePercentage() : double;
     // public bool AISupers()
     AISupers() : boolean;
     // public static AbstractType const AbsID = AbstractType::House
@@ -1585,59 +1585,59 @@ class HouseClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public HouseTypeClass * Type
     m_Type : HouseTypeClass;
     // public int CountResourceGatherers
-    m_CountResourceGatherers : number;
+    m_CountResourceGatherers : int;
     // public int CountResourceDestinations
-    m_CountResourceDestinations : number;
+    m_CountResourceDestinations : int;
     // public int CountWarfactories
-    m_CountWarfactories : number;
+    m_CountWarfactories : int;
     // public int InfantrySelfHeal
-    m_InfantrySelfHeal : number;
+    m_InfantrySelfHeal : int;
     // public int UnitsSelfHeal
-    m_UnitsSelfHeal : number;
+    m_UnitsSelfHeal : int;
     // be advised that it's reverse, Hard == 0 and Easy == 2. I'm sure Westwood has a good reason for this. Yep.
     // public AIDifficulty AIDifficulty
     m_AIDifficulty : AIDifficulty;
     // used
     // public double FirepowerMultiplier
-    m_FirepowerMultiplier : number;
+    m_FirepowerMultiplier : double;
     // unused ...
     // public double GroundspeedMultiplier
-    m_GroundspeedMultiplier : number;
+    m_GroundspeedMultiplier : double;
     // public double AirspeedMultiplier
-    m_AirspeedMultiplier : number;
+    m_AirspeedMultiplier : double;
     // public double ArmorMultiplier
-    m_ArmorMultiplier : number;
+    m_ArmorMultiplier : double;
     // public double ROFMultiplier
-    m_ROFMultiplier : number;
+    m_ROFMultiplier : double;
     // public double CostMultiplier
-    m_CostMultiplier : number;
+    m_CostMultiplier : double;
     // ... unused ends
     // public double BuildTimeMultiplier
-    m_BuildTimeMultiplier : number;
+    m_BuildTimeMultiplier : double;
     // public double RepairDelay
-    m_RepairDelay : number;
+    m_RepairDelay : double;
     // public double BuildDelay
-    m_BuildDelay : number;
+    m_BuildDelay : double;
     // public int IQLevel
-    m_IQLevel : number;
+    m_IQLevel : int;
     // public int TechLevel
-    m_TechLevel : number;
+    m_TechLevel : int;
     // ask question, receive brain damage
     // public IndexBitfield<HouseClass *> AltAllies
     m_AltAllies : any;
     // not sure how these are used // actual credits = this * 100
     // public int StartingCredits
-    m_StartingCredits : number;
+    m_StartingCredits : int;
     // public Edge StartingEdge
     m_StartingEdge : Edge;
     // public unsigned long AIState_1E4
-    m_AIState_1E4 : number;
+    m_AIState_1E4 : unsigned_long;
     // public int SideIndex
-    m_SideIndex : number;
+    m_SideIndex : int;
     // Is controlled by a human player.
     // public bool IsHumanPlayer
     m_IsHumanPlayer : boolean;
@@ -1677,19 +1677,19 @@ class HouseClass
     // public bool RecheckTechTree
     m_RecheckTechTree : boolean;
     // public int IPAddress
-    m_IPAddress : number;
+    m_IPAddress : int;
     // public int TournamentTeamID
-    m_TournamentTeamID : number;
+    m_TournamentTeamID : int;
     // public bool LostConnection
     m_LostConnection : boolean;
     // public int SelectedPathIndex
-    m_SelectedPathIndex : number;
+    m_SelectedPathIndex : int;
     // 12 paths for "planning mode"
     // public WaypointPathClass *[12] PlanningPaths
     m_PlanningPaths : WaypointPathClass;
     // ??? exe says so
     // public char Visionary
-    m_Visionary : number;
+    m_Visionary : char;
     // public bool MapIsClear
     m_MapIsClear : boolean;
     // public bool IsTiberiumShort
@@ -1716,20 +1716,20 @@ class HouseClass
     m_IsToLook : boolean;
     // no idea why we got this twice
     // public int IQLevel2
-    m_IQLevel2 : number;
+    m_IQLevel2 : int;
     // public AIMode AIMode
     m_AIMode : AIMode;
     // public int LastBuiltBuildingType
-    m_LastBuiltBuildingType : number;
+    m_LastBuiltBuildingType : int;
     // public int LastBuiltInfantryType
-    m_LastBuiltInfantryType : number;
+    m_LastBuiltInfantryType : int;
     // public int LastBuiltAircraftType
-    m_LastBuiltAircraftType : number;
+    m_LastBuiltAircraftType : int;
     // public int LastBuiltVehicleType
-    m_LastBuiltVehicleType : number;
+    m_LastBuiltVehicleType : int;
     // some ra1 residue map trigger-fu, should die a painful death
     // public int AllowWinBlocks
-    m_AllowWinBlocks : number;
+    m_AllowWinBlocks : int;
     // asswards! whether this player has infiltrated stuff
     // public bool Side2TechInfiltrated
     m_Side2TechInfiltrated : boolean;
@@ -1778,66 +1778,66 @@ class HouseClass
     // )
     // { can build }
     // public unsigned long InfantryAltOwner
-    m_InfantryAltOwner : number;
+    m_InfantryAltOwner : unsigned_long;
     // public unsigned long UnitAltOwner
-    m_UnitAltOwner : number;
+    m_UnitAltOwner : unsigned_long;
     // public unsigned long AircraftAltOwner
-    m_AircraftAltOwner : number;
+    m_AircraftAltOwner : unsigned_long;
     // public unsigned long BuildingAltOwner
-    m_BuildingAltOwner : number;
+    m_BuildingAltOwner : unsigned_long;
     // public int AirportDocks
-    m_AirportDocks : number;
+    m_AirportDocks : int;
     // public int PoweredUnitCenters
-    m_PoweredUnitCenters : number;
+    m_PoweredUnitCenters : int;
     // public int CreditsSpent
-    m_CreditsSpent : number;
+    m_CreditsSpent : int;
     // public int HarvestedCredits
-    m_HarvestedCredits : number;
+    m_HarvestedCredits : int;
     // public int StolenBuildingsCredits
-    m_StolenBuildingsCredits : number;
+    m_StolenBuildingsCredits : int;
     // public int OwnedUnits
-    m_OwnedUnits : number;
+    m_OwnedUnits : int;
     // public int OwnedNavy
-    m_OwnedNavy : number;
+    m_OwnedNavy : int;
     // public int OwnedBuildings
-    m_OwnedBuildings : number;
+    m_OwnedBuildings : int;
     // public int OwnedInfantry
-    m_OwnedInfantry : number;
+    m_OwnedInfantry : int;
     // public int OwnedAircraft
-    m_OwnedAircraft : number;
+    m_OwnedAircraft : int;
     // public int Balance
-    m_Balance : number;
+    m_Balance : int;
     // capacity of all building Storage
     // public int TotalStorage
-    m_TotalStorage : number;
+    m_TotalStorage : int;
     // public unsigned long unknown_324
-    m_unknown_324 : number;
+    m_unknown_324 : unsigned_long;
     // public int NumAirpads
-    m_NumAirpads : number;
+    m_NumAirpads : int;
     // public int NumBarracks
-    m_NumBarracks : number;
+    m_NumBarracks : int;
     // public int NumWarFactories
-    m_NumWarFactories : number;
+    m_NumWarFactories : int;
     // public int NumConYards
-    m_NumConYards : number;
+    m_NumConYards : int;
     // public int NumShipyards
-    m_NumShipyards : number;
+    m_NumShipyards : int;
     // public int NumOrePurifiers
-    m_NumOrePurifiers : number;
+    m_NumOrePurifiers : int;
     // public float CostInfantryMult
-    m_CostInfantryMult : number;
+    m_CostInfantryMult : float;
     // public float CostUnitsMult
-    m_CostUnitsMult : number;
+    m_CostUnitsMult : float;
     // public float CostAircraftMult
-    m_CostAircraftMult : number;
+    m_CostAircraftMult : float;
     // public float CostBuildingsMult
-    m_CostBuildingsMult : number;
+    m_CostBuildingsMult : float;
     // public float CostDefensesMult
-    m_CostDefensesMult : number;
+    m_CostDefensesMult : float;
     // public int PowerOutput
-    m_PowerOutput : number;
+    m_PowerOutput : int;
     // public int PowerDrain
-    m_PowerDrain : number;
+    m_PowerDrain : int;
     // public FactoryClass * Primary_ForAircraft
     m_Primary_ForAircraft : FactoryClass;
     // public FactoryClass * Primary_ForInfantry
@@ -1857,63 +1857,63 @@ class HouseClass
     // public FactoryClass * Primary_ForDefenses
     m_Primary_ForDefenses : FactoryClass;
     // public unsigned char AircraftType_53D0
-    m_AircraftType_53D0 : number;
+    m_AircraftType_53D0 : unsigned_char;
     // public unsigned char InfantryType_53D1
-    m_InfantryType_53D1 : number;
+    m_InfantryType_53D1 : unsigned_char;
     // public unsigned char VehicleType_53D2
-    m_VehicleType_53D2 : number;
+    m_VehicleType_53D2 : unsigned_char;
     // public unsigned char ShipType_53D3
-    m_ShipType_53D3 : number;
+    m_ShipType_53D3 : unsigned_char;
     // public unsigned char BuildingType_53D4
-    m_BuildingType_53D4 : number;
+    m_BuildingType_53D4 : unsigned_char;
     // public unsigned char unknown_53D5
-    m_unknown_53D5 : number;
+    m_unknown_53D5 : unsigned_char;
     // public unsigned char unknown_53D6
-    m_unknown_53D6 : number;
+    m_unknown_53D6 : unsigned_char;
     // public unsigned char unknown_53D7
-    m_unknown_53D7 : number;
+    m_unknown_53D7 : unsigned_char;
     // public unsigned char DefenseType_53D8
-    m_DefenseType_53D8 : number;
+    m_DefenseType_53D8 : unsigned_char;
     // public unsigned char unknown_53D9
-    m_unknown_53D9 : number;
+    m_unknown_53D9 : unsigned_char;
     // public unsigned char unknown_53DA
-    m_unknown_53DA : number;
+    m_unknown_53DA : unsigned_char;
     // public unsigned char unknown_53DB
-    m_unknown_53DB : number;
+    m_unknown_53DB : unsigned_char;
     // public UnitClass * OurFlagCarrier
     m_OurFlagCarrier : UnitClass;
     // public CellStruct OurFlagCoords
     m_OurFlagCoords : CellStruct;
     // 20 Houses only!
     // public int[20] KilledUnitsOfHouses
-    m_KilledUnitsOfHouses : number;
+    m_KilledUnitsOfHouses : int;
     // public int TotalKilledUnits
-    m_TotalKilledUnits : number;
+    m_TotalKilledUnits : int;
     // 20 Houses only!
     // public int[20] KilledBuildingsOfHouses
-    m_KilledBuildingsOfHouses : number;
+    m_KilledBuildingsOfHouses : int;
     // public int TotalKilledBuildings
-    m_TotalKilledBuildings : number;
+    m_TotalKilledBuildings : int;
     // public int WhoLastHurtMe
-    m_WhoLastHurtMe : number;
+    m_WhoLastHurtMe : int;
     // public CellStruct BaseSpawnCell
     m_BaseSpawnCell : CellStruct;
     // set by map action 137 and 138
     // public CellStruct BaseCenter
     m_BaseCenter : CellStruct;
     // public int Radius
-    m_Radius : number;
+    m_Radius : int;
     // public int LATime
-    m_LATime : number;
+    m_LATime : int;
     // public int LAEnemy
-    m_LAEnemy : number;
+    m_LAEnemy : int;
     // public int ToCapture
-    m_ToCapture : number;
+    m_ToCapture : int;
     // this crap is being rewritten to use house indices instead of house types
     // public IndexBitfield<HouseClass *> RadarVisibleTo
     m_RadarVisibleTo : any;
     // public int SiloMoney
-    m_SiloMoney : number;
+    m_SiloMoney : int;
     // Set via map action 35. The preferred object type to attack.
     // public QuarryType PreferredTargetType
     m_PreferredTargetType : QuarryType;
@@ -1928,35 +1928,35 @@ class HouseClass
     m_PreferredDefensiveCell2 : CellStruct;
     // The frame the PreferredDefensiveCell was set. Used to fire the Force Shield.
     // public int PreferredDefensiveCellStartTime
-    m_PreferredDefensiveCellStartTime : number;
+    m_PreferredDefensiveCellStartTime : int;
     // both unused
     // public int InitialAttackDelay
-    m_InitialAttackDelay : number;
+    m_InitialAttackDelay : int;
     // public int EnemyHouseIndex
-    m_EnemyHouseIndex : number;
+    m_EnemyHouseIndex : int;
     // public int ProducingBuildingTypeIndex
-    m_ProducingBuildingTypeIndex : number;
+    m_ProducingBuildingTypeIndex : int;
     // public int ProducingUnitTypeIndex
-    m_ProducingUnitTypeIndex : number;
+    m_ProducingUnitTypeIndex : int;
     // public int ProducingInfantryTypeIndex
-    m_ProducingInfantryTypeIndex : number;
+    m_ProducingInfantryTypeIndex : int;
     // public int ProducingAircraftTypeIndex
-    m_ProducingAircraftTypeIndex : number;
+    m_ProducingAircraftTypeIndex : int;
     // public int RatioAITriggerTeam
-    m_RatioAITriggerTeam : number;
+    m_RatioAITriggerTeam : int;
     // public int RatioTeamAircraft
-    m_RatioTeamAircraft : number;
+    m_RatioTeamAircraft : int;
     // public int RatioTeamInfantry
-    m_RatioTeamInfantry : number;
+    m_RatioTeamInfantry : int;
     // public int RatioTeamBuildings
-    m_RatioTeamBuildings : number;
+    m_RatioTeamBuildings : int;
     // public int BaseDefenseTeamCount
-    m_BaseDefenseTeamCount : number;
+    m_BaseDefenseTeamCount : int;
     // public int CurrentDropshipIndex
-    m_CurrentDropshipIndex : number;
+    m_CurrentDropshipIndex : int;
     // don't ask
     // public unsigned char HasCloakingRanges
-    m_HasCloakingRanges : number;
+    m_HasCloakingRanges : unsigned_char;
     // public ColorStruct Color
     m_Color : ColorStruct;
     // my idb says so
@@ -1985,7 +1985,7 @@ class HouseClass
     m_AIGeneral : any;
     // BLARGH
     // public unsigned int[130][130] ThreatPosedEstimates
-    m_ThreatPosedEstimates : number;
+    m_ThreatPosedEstimates : unsigned_int;
     // this defaults to the owner country's name in SP or 
     // <human
     // player>
@@ -1998,40 +1998,40 @@ class HouseClass
     m_UINameString : string;
     // this contains the CSF string from UIName= above, or a copy of the country's UIName if not defined. Take note that this is shorter than the country's UIName can be...
     // public wchar_t[21] UIName
-    m_UIName : number;
+    m_UIName : wchar_t;
     // public int ColorSchemeIndex
-    m_ColorSchemeIndex : number;
+    m_ColorSchemeIndex : int;
     // public IndexBitfield<HouseClass *> StartingAllies
     m_StartingAllies : any;
     // public unsigned long unknown_16060
-    m_unknown_16060 : number;
+    m_unknown_16060 : unsigned_long;
     // public unsigned long unknown_1607C
-    m_unknown_1607C : number;
+    m_unknown_1607C : unsigned_long;
     // public unsigned long unknown_16080
-    m_unknown_16080 : number;
+    m_unknown_16080 : unsigned_long;
     // public unsigned long unknown_16084
-    m_unknown_16084 : number;
+    m_unknown_16084 : unsigned_long;
     // public double unused_16088
-    m_unused_16088 : number;
+    m_unused_16088 : double;
     // public double unused_16090
-    m_unused_16090 : number;
+    m_unused_16090 : double;
     // public unsigned long padding_16098
-    m_padding_16098 : number;
+    m_padding_16098 : unsigned_long;
     // defaults to 0.33, AIForcePredictionFudge'd later
     // public float PredictionEnemyArmor
-    m_PredictionEnemyArmor : number;
+    m_PredictionEnemyArmor : float;
     // public float PredictionEnemyAir
-    m_PredictionEnemyAir : number;
+    m_PredictionEnemyAir : float;
     // public float PredictionEnemyInfantry
-    m_PredictionEnemyInfantry : number;
+    m_PredictionEnemyInfantry : float;
     // public int TotalOwnedInfantryCost
-    m_TotalOwnedInfantryCost : number;
+    m_TotalOwnedInfantryCost : int;
     // public int TotalOwnedVehicleCost
-    m_TotalOwnedVehicleCost : number;
+    m_TotalOwnedVehicleCost : int;
     // public int TotalOwnedAircraftCost
-    m_TotalOwnedAircraftCost : number;
+    m_TotalOwnedAircraftCost : int;
     // public int PowerSurplus
-    m_PowerSurplus : number;
+    m_PowerSurplus : int;
     // public DynamicVectorClass<TagClass *> RelatedTags
     m_RelatedTags : DynamicVectorClass<TagClass>;
     // public char[24] __RelatedTags
@@ -2281,7 +2281,7 @@ class HouseClass
     // public char[12] __SpeakMaxedDelayTimer
     m___SpeakMaxedDelayTimer : string;
     // public int StartingPoint
-    m_StartingPoint : number;
+    m_StartingPoint : int;
     // Could it really be a CellStruct ? - Saved for backwards compatibility
     // public CellStruct StartingCell
     m_StartingCell : CellStruct;
@@ -2294,23 +2294,23 @@ class HouseClass
 class StorageClass
 {
     // public float GetAmount(int index) const
-    GetAmount(index_0 : number) : number;
+    GetAmount(index_0 : int) : float;
     // public float GetTotalAmount() const
-    GetTotalAmount() : number;
+    GetTotalAmount() : float;
     // public float AddAmount(float amount, int index)
-    AddAmount(amount_0 : number, index_1 : number) : number;
+    AddAmount(amount_0 : float, index_1 : int) : float;
     // public float RemoveAmount(float amount, int index)
-    RemoveAmount(amount_0 : number, index_1 : number) : number;
+    RemoveAmount(amount_0 : float, index_1 : int) : float;
     // public int GetTotalValue() const
-    GetTotalValue() : number;
+    GetTotalValue() : int;
     // public float Tiberium1
-    m_Tiberium1 : number;
+    m_Tiberium1 : float;
     // public float Tiberium2
-    m_Tiberium2 : number;
+    m_Tiberium2 : float;
     // public float Tiberium3
-    m_Tiberium3 : number;
+    m_Tiberium3 : float;
     // public float Tiberium4
-    m_Tiberium4 : number;
+    m_Tiberium4 : float;
 }
 // The AbstractClass is the base class of all game objects.
 // AbstractClass
@@ -2322,33 +2322,33 @@ class AbstractClass
     static GetRTTIName(abs_0 : AbstractType) : string;
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : long;
     // public virtual unsigned long AddRef()
-    AddRef() : number;
+    AddRef() : unsigned_long;
     // public virtual unsigned long Release()
-    Release() : number;
+    Release() : unsigned_long;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID) = 0
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long IsDirty()
-    IsDirty() : number;
+    IsDirty() : long;
     // public virtual long Load(IStream * pStm) = 0
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty) = 0
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // public virtual long GetSizeMax(_ULARGE_INTEGER * pcbSize)
-    GetSizeMax(pcbSize_0 : any | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : long;
     // IRTTITypeInfo
     // public virtual AbstractType What_Am_I() const
     What_Am_I() : AbstractType;
     // public virtual int Fetch_ID() const
-    Fetch_ID() : number;
+    Fetch_ID() : int;
     // public virtual void Create_ID()
     Create_ID() : void;
     // INoticeSink
     // public virtual bool INoticeSink_Unknown(unsigned long dwUnknown)
-    INoticeSink_Unknown(dwUnknown_0 : number | any) : boolean;
+    INoticeSink_Unknown(dwUnknown_0 : unsigned_long | any) : boolean;
     // INoticeSource
     // public virtual void INoticeSource_Unknown()
     INoticeSource_Unknown() : void;
@@ -2360,15 +2360,15 @@ class AbstractClass
     // public virtual AbstractType WhatAmI() const = 0
     WhatAmI() : AbstractType;
     // public virtual int Size() const = 0
-    Size() : number;
+    Size() : int;
     // public virtual void ComputeCRC(CRCEngine& crc) const
     ComputeCRC(crc_0 : any) : void;
     // public virtual int GetOwningHouseIndex() const
-    GetOwningHouseIndex() : number;
+    GetOwningHouseIndex() : int;
     // public virtual HouseClass * GetOwningHouse() const
     GetOwningHouse() : HouseClass;
     // public virtual int GetArrayIndex() const
-    GetArrayIndex() : number;
+    GetArrayIndex() : int;
     // public virtual bool IsDead() const
     IsDead() : boolean;
     // public virtual CoordStruct * GetCoords(CoordStruct * pCrd) const
@@ -2401,9 +2401,9 @@ class AbstractClass
     // public DirStruct GetTargetDirection(AbstractClass * pTarget) const
     GetTargetDirection(pTarget_0 : AbstractClass) : DirStruct;
     // public int DistanceFrom(AbstractClass * that) const
-    DistanceFrom(that_0 : AbstractClass) : number;
+    DistanceFrom(that_0 : AbstractClass) : int;
     // public int DistanceFrom3D(AbstractClass * that) const
-    DistanceFrom3D(that_0 : AbstractClass) : number;
+    DistanceFrom3D(that_0 : AbstractClass) : int;
     // Operators
     // public bool operator<(AbstractClass const& rhs) const
     op_LessThan(rhs_0 : AbstractClass) : boolean;
@@ -2417,14 +2417,14 @@ class AbstractClass
     static s_TargetIndex : any;
     // generated by IRTTIInfo::Create_ID through an amazingly simple sequence of return ++ScenarioClass::Instance->UniqueID;
     // public unsigned long UniqueID
-    m_UniqueID : number;
+    m_UniqueID : unsigned_long;
     // flags, see AbstractFlags enum in GeneralDefinitions.
     // public AbstractFlags AbstractFlags
     m_AbstractFlags : AbstractFlags;
     // public unsigned long unknown_18
-    m_unknown_18 : number;
+    m_unknown_18 : unsigned_long;
     // public long RefCount
-    m_RefCount : number;
+    m_RefCount : long;
     // for IPersistStream.
     // public bool Dirty
     m_Dirty : boolean;
@@ -2436,7 +2436,7 @@ class ObjectClass
 {
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // AbstractClass
     // public virtual bool IsOnFloor() const
     IsOnFloor() : boolean;
@@ -2448,7 +2448,7 @@ class ObjectClass
     // public virtual bool IsSelectable() const
     IsSelectable() : boolean;
     // public virtual VisualType VisualCharacter(short SpecificOwner, HouseClass * WhoIsAsking) const
-    VisualCharacter(SpecificOwner_0 : number, WhoIsAsking_1 : HouseClass) : VisualType;
+    VisualCharacter(SpecificOwner_0 : short, WhoIsAsking_1 : HouseClass) : VisualType;
     // public virtual SHPStruct * GetImage() const
     GetImage() : any;
     // public virtual Action MouseOverCell(CellStruct const * pCell, bool checkFog = false, bool ignoreForce = false) const
@@ -2485,7 +2485,7 @@ class ObjectClass
     // public virtual ObjectTypeClass * GetType() const
     GetType() : ObjectTypeClass;
     // public virtual unsigned long GetTypeOwners() const
-    GetTypeOwners() : number;
+    GetTypeOwners() : unsigned_long;
     // public virtual wchar_t const * GetUIName() const
     GetUIName() : ArrayBuffer;
     // public virtual bool CanBeRepaired() const
@@ -2506,11 +2506,11 @@ class ObjectClass
     // public virtual CoordStruct * GetRenderCoords(CoordStruct * pCrd) const
     GetRenderCoords(pCrd_0 : CoordStruct) : CoordStruct;
     // public virtual CoordStruct * GetFLH(CoordStruct * pDest, int idxWeapon, CoordStruct BaseCoords) const
-    GetFLH(pDest_0 : CoordStruct, idxWeapon_1 : number, BaseCoords_2 : CoordStruct) : CoordStruct;
+    GetFLH(pDest_0 : CoordStruct, idxWeapon_1 : int, BaseCoords_2 : CoordStruct) : CoordStruct;
     // public virtual CoordStruct * GetExitCoords(CoordStruct * pCrd, unsigned long dwUnk) const
-    GetExitCoords(pCrd_0 : CoordStruct, dwUnk_1 : number) : CoordStruct;
+    GetExitCoords(pCrd_0 : CoordStruct, dwUnk_1 : unsigned_long) : CoordStruct;
     // public virtual int GetYSort() const
-    GetYSort() : number;
+    GetYSort() : int;
     // public virtual bool IsOnBridge(TechnoClass * pDocker = nullptr) const
     IsOnBridge(pDocker_0 : TechnoClass) : boolean;
     // public virtual bool IsStandingStill() const
@@ -2552,7 +2552,7 @@ class ObjectClass
     // public virtual KickOutResult KickOutUnit(TechnoClass * pTechno, CellStruct Cell)
     KickOutUnit(pTechno_0 : TechnoClass, Cell_1 : CellStruct) : KickOutResult;
     // public virtual bool DrawIfVisible(RectangleStruct * pBounds, bool EvenIfCloaked, unsigned long dwUnk3) const
-    DrawIfVisible(pBounds_0 : RectangleStruct, EvenIfCloaked_1 : boolean, dwUnk3_2 : number) : boolean;
+    DrawIfVisible(pBounds_0 : RectangleStruct, EvenIfCloaked_1 : boolean, dwUnk3_2 : unsigned_long) : boolean;
     // public virtual CellStruct const * GetFoundationData(bool includeBib = false) const
     GetFoundationData(includeBib_0 : boolean) : CellStruct;
     // public virtual void DrawBehind(Point2D * pLocation, RectangleStruct * pBounds) const
@@ -2566,7 +2566,7 @@ class ObjectClass
     // public virtual void Undiscover()
     Undiscover() : void;
     // public virtual void See(unsigned long dwUnk, unsigned long dwUnk2)
-    See(dwUnk_0 : number, dwUnk2_1 : number) : void;
+    See(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long) : void;
     // public virtual bool Mark(MarkType value)
     Mark(value_0 : MarkType) : boolean;
     // public virtual RectangleStruct * GetDimensions(RectangleStruct * pRect) const
@@ -2574,7 +2574,7 @@ class ObjectClass
     // public virtual RectangleStruct * GetRenderDimensions(RectangleStruct * pRect)
     GetRenderDimensions(pRect_0 : RectangleStruct) : RectangleStruct;
     // public virtual void DrawRadialIndicator(unsigned long dwUnk)
-    DrawRadialIndicator(dwUnk_0 : number) : void;
+    DrawRadialIndicator(dwUnk_0 : unsigned_long) : void;
     // public virtual void MarkForRedraw()
     MarkForRedraw() : void;
     // public virtual bool CanBeSelected() const
@@ -2586,25 +2586,25 @@ class ObjectClass
     // public virtual bool ObjectClickedAction(Action action, ObjectClass * pTarget, bool bUnk)
     ObjectClickedAction(action_0 : Action, pTarget_1 : ObjectClass, bUnk_2 : boolean) : boolean;
     // public virtual void Flash(int Duration)
-    Flash(Duration_0 : number) : void;
+    Flash(Duration_0 : int) : void;
     // public virtual bool Select()
     Select() : boolean;
     // public virtual void Deselect()
     Deselect() : void;
     // public virtual DamageState IronCurtain(int nDuration, HouseClass * pSource, bool ForceShield)
-    IronCurtain(nDuration_0 : number, pSource_1 : HouseClass, ForceShield_2 : boolean) : DamageState;
+    IronCurtain(nDuration_0 : int, pSource_1 : HouseClass, ForceShield_2 : boolean) : DamageState;
     // public virtual void StopAirstrikeTimer()
     StopAirstrikeTimer() : void;
     // public virtual void StartAirstrikeTimer(int Duration)
-    StartAirstrikeTimer(Duration_0 : number) : void;
+    StartAirstrikeTimer(Duration_0 : int) : void;
     // public virtual bool IsIronCurtained() const
     IsIronCurtained() : boolean;
     // public virtual bool IsCloseEnough3D(unsigned long dwUnk, unsigned long dwUnk2) const
-    IsCloseEnough3D(dwUnk_0 : number, dwUnk2_1 : number) : boolean;
+    IsCloseEnough3D(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long) : boolean;
     // public virtual int GetWeaponRange(int idxWeapon) const
-    GetWeaponRange(idxWeapon_0 : number) : number;
+    GetWeaponRange(idxWeapon_0 : int) : int;
     // public virtual DamageState ReceiveDamage(int * pDamage, int DistanceFromEpicenter, WarheadTypeClass * pWH, ObjectClass * Attacker, bool IgnoreDefenses, bool PreventPassengerEscape, HouseClass * pAttackingHouse)
-    ReceiveDamage(pDamage_0 : ArrayBuffer, DistanceFromEpicenter_1 : number, pWH_2 : WarheadTypeClass, Attacker_3 : ObjectClass, IgnoreDefenses_4 : boolean, PreventPassengerEscape_5 : boolean, pAttackingHouse_6 : HouseClass) : DamageState;
+    ReceiveDamage(pDamage_0 : ArrayBuffer, DistanceFromEpicenter_1 : int, pWH_2 : WarheadTypeClass, Attacker_3 : ObjectClass, IgnoreDefenses_4 : boolean, PreventPassengerEscape_5 : boolean, pAttackingHouse_6 : HouseClass) : DamageState;
     // public virtual void Destroy()
     Destroy() : void;
     // public virtual void Scatter(CoordStruct const& crd, bool ignoreMission, bool ignoreDestination)
@@ -2614,7 +2614,7 @@ class ObjectClass
     // public virtual void Extinguish()
     Extinguish() : void;
     // public virtual unsigned long GetPointsValue() const
-    GetPointsValue() : number;
+    GetPointsValue() : unsigned_long;
     // public virtual Mission GetCurrentMission() const
     GetCurrentMission() : Mission;
     // public virtual void RestoreMission(Mission mission)
@@ -2628,17 +2628,17 @@ class ObjectClass
     // public virtual bool DiscoveredBy(HouseClass * pHouse)
     DiscoveredBy(pHouse_0 : HouseClass) : boolean;
     // public virtual void SetRepairState(int state)
-    SetRepairState(state_0 : number) : void;
+    SetRepairState(state_0 : int) : void;
     // public virtual void Sell(unsigned long dwUnk)
-    Sell(dwUnk_0 : number) : void;
+    Sell(dwUnk_0 : unsigned_long) : void;
     // public virtual void AssignPlanningPath(int idxPath, char idxWP)
-    AssignPlanningPath(idxPath_0 : number, idxWP_1 : number) : void;
+    AssignPlanningPath(idxPath_0 : int, idxWP_1 : char) : void;
     // public virtual void MoveToDirection(FacingType facing)
     MoveToDirection(facing_0 : FacingType) : void;
     // public virtual Move IsCellOccupied(CellClass * pDestCell, FacingType facing, int level, CellClass * pSourceCell, bool alt) const
-    IsCellOccupied(pDestCell_0 : CellClass, facing_1 : FacingType, level_2 : number, pSourceCell_3 : CellClass, alt_4 : boolean) : Move;
+    IsCellOccupied(pDestCell_0 : CellClass, facing_1 : FacingType, level_2 : int, pSourceCell_3 : CellClass, alt_4 : boolean) : Move;
     // public virtual unsigned long vt_entry_1B0(unsigned long dwUnk, unsigned long dwUnk2, unsigned long dwUnk3, unsigned long dwUnk4, unsigned long dwUnk5)
-    vt_entry_1B0(dwUnk_0 : number, dwUnk2_1 : number, dwUnk3_2 : number, dwUnk4_3 : number, dwUnk5_4 : number) : number;
+    vt_entry_1B0(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long, dwUnk4_3 : unsigned_long, dwUnk5_4 : unsigned_long) : unsigned_long;
     // public virtual void SetLocation(CoordStruct const& crd)
     SetLocation(crd_0 : CoordStruct) : void;
     // these two work through the object's Location
@@ -2652,11 +2652,11 @@ class ObjectClass
     // public virtual CellClass * GetCellAgain() const
     GetCellAgain() : CellClass;
     // public virtual int GetHeight() const
-    GetHeight() : number;
+    GetHeight() : int;
     // public virtual void SetHeight(unsigned long dwUnk)
-    SetHeight(dwUnk_0 : number) : void;
+    SetHeight(dwUnk_0 : unsigned_long) : void;
     // public virtual int GetZ() const
-    GetZ() : number;
+    GetZ() : int;
     // public virtual bool IsBeingWarpedOut() const
     IsBeingWarpedOut() : boolean;
     // public virtual bool IsWarpingIn() const
@@ -2672,11 +2672,11 @@ class ObjectClass
     // > , but it's not used and ecx is immediately overwritten on entry
     // draws the mind control line when unit is selected
     // public static void DrawALinkTo(int src_X, int src_Y, int src_Z, int dst_X, int dst_Y, int dst_Z, ColorStruct color)
-    static DrawALinkTo(src_X_0 : number, src_Y_1 : number, src_Z_2 : number, dst_X_3 : number, dst_Y_4 : number, dst_Z_5 : number, color_6 : ColorStruct) : void;
+    static DrawALinkTo(src_X_0 : int, src_Y_1 : int, src_Z_2 : int, dst_X_3 : int, dst_Y_4 : int, dst_Z_5 : int, color_6 : ColorStruct) : void;
     // public double GetHealthPercentage() const
-    GetHealthPercentage() : number;
+    GetHealthPercentage() : double;
     // public void SetHealthPercentage(double percentage)
-    SetHealthPercentage(percentage_0 : number) : void;
+    SetHealthPercentage(percentage_0 : double) : void;
     // public bool IsRedHP() const
     IsRedHP() : boolean;
     // public bool IsYellowHP() const
@@ -2692,7 +2692,7 @@ class ObjectClass
     // public void ReplaceTag(TagClass * pTag)
     ReplaceTag(pTag_0 : TagClass) : void;
     // public int GetCellLevel() const
-    GetCellLevel() : number;
+    GetCellLevel() : int;
     // public bool IsCrushable(TechnoClass * pCrusher)
     IsCrushable(pCrusher_0 : TechnoClass) : boolean;
     // public CellStruct GetMapCoords() const
@@ -2705,7 +2705,7 @@ class ObjectClass
     // public CoordStruct GetRenderCoords() const
     GetRenderCoords() : CoordStruct;
     // public CoordStruct GetFLH(int idxWeapon, CoordStruct const& base) const
-    GetFLH(idxWeapon_0 : number, base_1 : CoordStruct) : CoordStruct;
+    GetFLH(idxWeapon_0 : int, base_1 : CoordStruct) : CoordStruct;
     // public static AbstractFlags const AbsDerivateID = AbstractFlags::Object
     static s_AbsDerivateID : AbstractFlags;
     // global arrays
@@ -2715,12 +2715,12 @@ class ObjectClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public unsigned long unknown_24
-    m_unknown_24 : number;
+    m_unknown_24 : unsigned_long;
     // public unsigned long unknown_28
-    m_unknown_28 : number;
+    m_unknown_28 : unsigned_long;
     // how fast is it falling down? only works if FallingDown is set below, and actually positive numbers will move the thing UPWARDS
     // public int FallRate
-    m_FallRate : number;
+    m_FallRate : int;
     // Next Object in the same cell or transport. This is a linked list of Objects.
     // public ObjectClass * NextObject
     m_NextObject : ObjectClass;
@@ -2731,23 +2731,23 @@ class ObjectClass
     // public BombClass * AttachedBomb
     m_AttachedBomb : BombClass;
     // public int CustomSound
-    m_CustomSound : number;
+    m_CustomSound : int;
     // In range of player's bomb seeing units, so should draw it
     // public bool BombVisible
     m_BombVisible : boolean;
     // The current Health.
     // public int Health
-    m_Health : number;
+    m_Health : int;
     // used for auto-targeting threat estimation
     // public int EstimatedHealth
-    m_EstimatedHealth : number;
+    m_EstimatedHealth : int;
     // has this object been placed on the map?
     // public bool IsOnMap
     m_IsOnMap : boolean;
     // public unsigned long unknown_78
-    m_unknown_78 : number;
+    m_unknown_78 : unsigned_long;
     // public unsigned long unknown_7C
-    m_unknown_7C : number;
+    m_unknown_7C : unsigned_long;
     // public bool NeedsRedraw
     m_NeedsRedraw : boolean;
     // act as if it doesn't exist - e.g., post mortem state before being deleted
@@ -2809,26 +2809,26 @@ class AnimClass
     // Constructor
     // TODO fix
     // public AnimClass(AnimTypeClass * pAnimType, CoordStruct const& Location, int LoopDelay = 0, int LoopCount = 1, unsigned long flags = 0x600, int ForceZAdjust = 0, bool reverse = false)
-    constructor(pAnimType_0 : AnimTypeClass, Location_1 : CoordStruct, LoopDelay_2 : number, LoopCount_3 : number, flags_4 : number, ForceZAdjust_5 : number, reverse_6 : boolean);
+    constructor(pAnimType_0 : AnimTypeClass, Location_1 : CoordStruct, LoopDelay_2 : int, LoopCount_3 : int, flags_4 : unsigned_long, ForceZAdjust_5 : int, reverse_6 : boolean);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual void PointerExpired(AbstractClass * pAbstract, bool detachFromAll)
     PointerExpired(pAbstract_0 : AbstractClass | any, detachFromAll_1 : boolean | any) : void;
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectClass
     // AnimClass
     // public virtual int AnimExtras()
-    AnimExtras() : number;
+    AnimExtras() : int;
     // public virtual int GetEnd() const
-    GetEnd() : number;
+    GetEnd() : int;
     // public void SetOwnerObject(ObjectClass * pOwner)
     SetOwnerObject(pOwner_0 : ObjectClass) : void;
     // public void Pause()
@@ -2853,29 +2853,29 @@ class AnimClass
     // public ObjectClass * OwnerObject
     m_OwnerObject : ObjectClass;
     // public unsigned long unknown_D0
-    m_unknown_D0 : number;
+    m_unknown_D0 : unsigned_long;
     // Palette?
     // public LightConvertClass * LightConvert
     m_LightConvert : LightConvertClass;
     // assert( (*ColorScheme::Array)[this->LightConvertIndex] == this->LightConvert ;
     // public int LightConvertIndex
-    m_LightConvertIndex : number;
+    m_LightConvertIndex : int;
     // filename set for destroy anims
     // public char[32] PaletteName
     m_PaletteName : string;
     // public int TintColor
-    m_TintColor : number;
+    m_TintColor : int;
     // public int ZAdjust
-    m_ZAdjust : number;
+    m_ZAdjust : int;
     // same as YSortAdjust from Type
     // public int YSortAdjust
-    m_YSortAdjust : number;
+    m_YSortAdjust : int;
     // the destination the anim tries to reach
     // public CoordStruct FlamingGuyCoords
     m_FlamingGuyCoords : CoordStruct;
     // number of failed attemts to reach water. the random destination generator stops if >= 7
     // public int FlamingGuyRetries
-    m_FlamingGuyRetries : number;
+    m_FlamingGuyRetries : int;
     // whether this anim will invalidate on buildings, and whether it's tintable
     // public bool IsBuildingAnim
     m_IsBuildingAnim : boolean;
@@ -2890,15 +2890,15 @@ class AnimClass
     m_Unpaused : boolean;
     // the animation value when paused
     // public int PausedAnimFrame
-    m_PausedAnimFrame : number;
+    m_PausedAnimFrame : int;
     // anim is forced to be played from end to start
     // public bool Reverse
     m_Reverse : boolean;
     // public unsigned long unknown_124
-    m_unknown_124 : number;
+    m_unknown_124 : unsigned_long;
     // on a scale of 1 - 100
     // public unsigned char TranslucencyLevel
-    m_TranslucencyLevel : number;
+    m_TranslucencyLevel : unsigned_char;
     // or something to that effect, set just before UnInit
     // public bool TimeToDie
     m_TimeToDie : boolean;
@@ -2909,10 +2909,10 @@ class AnimClass
     m_Owner : HouseClass;
     // randomized value, depending on RandomLoopDelay
     // public int LoopDelay
-    m_LoopDelay : number;
+    m_LoopDelay : int;
     // Stores accumulated fractional animation damage and gets added to Type->Damage if at least 1.0 or above. Defaults to 1.0.
     // public double Accum
-    m_Accum : number;
+    m_Accum : double;
     // argument that's 0x600 most of the time
     // public BlitterFlags AnimFlags
     m_AnimFlags : BlitterFlags;
@@ -2921,11 +2921,11 @@ class AnimClass
     m_HasExtras : boolean;
     // defaulted to deleteAfterIterations, when reaches zero, UnInit() is called
     // public unsigned char RemainingIterations
-    m_RemainingIterations : number;
+    m_RemainingIterations : unsigned_char;
     // public unsigned char unknown_196
-    m_unknown_196 : number;
+    m_unknown_196 : unsigned_char;
     // public unsigned char unknown_197
-    m_unknown_197 : number;
+    m_unknown_197 : unsigned_char;
     // Not official name, only set to true on TActionClass-created animations and prevents sounds, damage and TiberiumChainReaction from working.
     // public bool IsInert
     m_IsInert : boolean;
@@ -2979,17 +2979,17 @@ class AnimTypeClass
     static Find(pID_0 : string) : AnimTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // public static AnimTypeClass * FindOrAllocate(char const * id)
     static FindOrAllocate(id_0 : string) : AnimTypeClass;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
@@ -3009,56 +3009,56 @@ class AnimTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public int MiddleFrameIndex
-    m_MiddleFrameIndex : number;
+    m_MiddleFrameIndex : int;
     // public int MiddleFrameWidth
-    m_MiddleFrameWidth : number;
+    m_MiddleFrameWidth : int;
     // public int MiddleFrameHeight
-    m_MiddleFrameHeight : number;
+    m_MiddleFrameHeight : int;
     // public unsigned char unknown_2A4
-    m_unknown_2A4 : number;
+    m_unknown_2A4 : unsigned_char;
     // public double Damage
-    m_Damage : number;
+    m_Damage : double;
     // public int Rate
-    m_Rate : number;
+    m_Rate : int;
     // public int Start
-    m_Start : number;
+    m_Start : int;
     // public int LoopStart
-    m_LoopStart : number;
+    m_LoopStart : int;
     // public int LoopEnd
-    m_LoopEnd : number;
+    m_LoopEnd : int;
     // public int End
-    m_End : number;
+    m_End : int;
     // public int LoopCount
-    m_LoopCount : number;
+    m_LoopCount : int;
     // public AnimTypeClass * Next
     m_Next : AnimTypeClass;
     // index of that ParticleTypeClass
     // public int SpawnsParticle
-    m_SpawnsParticle : number;
+    m_SpawnsParticle : int;
     // public int NumParticles
-    m_NumParticles : number;
+    m_NumParticles : int;
     // public int DetailLevel
-    m_DetailLevel : number;
+    m_DetailLevel : int;
     // public int TranslucencyDetailLevel
-    m_TranslucencyDetailLevel : number;
+    m_TranslucencyDetailLevel : int;
     // public RandomStruct RandomLoopDelay
     m_RandomLoopDelay : RandomStruct;
     // public RandomStruct RandomRate
     m_RandomRate : RandomStruct;
     // public int Translucency
-    m_Translucency : number;
+    m_Translucency : int;
     // public AnimTypeClass * Spawns
     m_Spawns : AnimTypeClass;
     // public int SpawnCount
-    m_SpawnCount : number;
+    m_SpawnCount : int;
     // VocClass index
     // public int Report
-    m_Report : number;
+    m_Report : int;
     // VocClass index
     // public int StopSound
-    m_StopSound : number;
+    m_StopSound : int;
     // public AnimTypeClass * BounceAnim
     m_BounceAnim : AnimTypeClass;
     // public AnimTypeClass * ExpireAnim
@@ -3067,33 +3067,33 @@ class AnimTypeClass
     m_TrailerAnim : AnimTypeClass;
     // MISTYPE BY WESTWOOD!
     // public int TrailerSeperation
-    m_TrailerSeperation : number;
+    m_TrailerSeperation : int;
     // public double Elasticity
-    m_Elasticity : number;
+    m_Elasticity : double;
     // public double MinZVel
-    m_MinZVel : number;
+    m_MinZVel : double;
     // public double unknown_double_320
-    m_unknown_double_320 : number;
+    m_unknown_double_320 : double;
     // public double MaxXYVel
-    m_MaxXYVel : number;
+    m_MaxXYVel : double;
     // public WarheadTypeClass * Warhead
     m_Warhead : WarheadTypeClass;
     // public int DamageRadius
-    m_DamageRadius : number;
+    m_DamageRadius : int;
     // public OverlayTypeClass * TiberiumSpawnType
     m_TiberiumSpawnType : OverlayTypeClass;
     // public int TiberiumSpreadRadius
-    m_TiberiumSpreadRadius : number;
+    m_TiberiumSpreadRadius : int;
     // public int YSortAdjust
-    m_YSortAdjust : number;
+    m_YSortAdjust : int;
     // public int YDrawOffset
-    m_YDrawOffset : number;
+    m_YDrawOffset : int;
     // public int ZAdjust
-    m_ZAdjust : number;
+    m_ZAdjust : int;
     // public int MakeInfantry
-    m_MakeInfantry : number;
+    m_MakeInfantry : int;
     // public int RunningFrames
-    m_RunningFrames : number;
+    m_RunningFrames : int;
     // public bool IsFlamingGuy
     m_IsFlamingGuy : boolean;
     // public bool IsVeins
@@ -3165,28 +3165,28 @@ class ObjectTypeClass
     constructor(pID_0 : string);
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // public virtual long GetSizeMax(_ULARGE_INTEGER * pcbSize)
-    GetSizeMax(pcbSize_0 : any | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : long;
     // ObjectTypeClass
     // public virtual CoordStruct * vt_entry_6C(CoordStruct * pDest, CoordStruct * pSrc) const
     vt_entry_6C(pDest_0 : CoordStruct, pSrc_1 : CoordStruct) : CoordStruct;
     // public virtual unsigned long GetOwners() const
-    GetOwners() : number;
+    GetOwners() : unsigned_long;
     // public virtual int GetPipMax() const
-    GetPipMax() : number;
+    GetPipMax() : int;
     // public virtual void vt_entry_78(unsigned long dwUnk) const
-    vt_entry_78(dwUnk_0 : number) : void;
+    vt_entry_78(dwUnk_0 : unsigned_long) : void;
     // public virtual void Dimension2(CoordStruct * pDest)
     Dimension2(pDest_0 : CoordStruct) : void;
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner) = 0
     SpawnAtMapCoords(pMapCoords_0 : CellStruct, pOwner_1 : HouseClass) : boolean;
     // public virtual int GetActualCost(HouseClass * pHouse) const
-    GetActualCost(pHouse_0 : HouseClass) : number;
+    GetActualCost(pHouse_0 : HouseClass) : int;
     // public virtual int GetBuildSpeed() const
-    GetBuildSpeed() : number;
+    GetBuildSpeed() : int;
     // public virtual ObjectClass * CreateObject(HouseClass * pOwner) = 0
     CreateObject(pOwner_0 : HouseClass) : ObjectClass;
     // public virtual CellStruct * GetFoundationData(bool IncludeBib) const
@@ -3198,9 +3198,9 @@ class ObjectTypeClass
     // public virtual SHPStruct * GetImage() const
     GetImage() : any;
     // public static bool IsBuildCat5(AbstractType abstractID, int idx)
-    static IsBuildCat5(abstractID_0 : AbstractType, idx_1 : number) : boolean;
+    static IsBuildCat5(abstractID_0 : AbstractType, idx_1 : int) : boolean;
     // public static TechnoTypeClass * GetTechnoType(AbstractType abstractID, int idx)
-    static GetTechnoType(abstractID_0 : AbstractType, idx_1 : number) : TechnoTypeClass;
+    static GetTechnoType(abstractID_0 : AbstractType, idx_1 : int) : TechnoTypeClass;
     // public void LoadVoxel()
     LoadVoxel() : void;
     // ===========================================================================
@@ -3209,11 +3209,11 @@ class ObjectTypeClass
     // public ColorStruct RadialColor
     m_RadialColor : ColorStruct;
     // public unsigned char unused_9B
-    m_unused_9B : number;
+    m_unused_9B : unsigned_char;
     // public Armor Armor
     m_Armor : Armor;
     // public int Strength
-    m_Strength : number;
+    m_Strength : int;
     // public SHPStruct * Image
     m_Image : any;
     // public bool ImageAllocated
@@ -3234,13 +3234,13 @@ class ObjectTypeClass
     // public bool NoSpawnAlt
     m_NoSpawnAlt : boolean;
     // public int MaxDimension
-    m_MaxDimension : number;
+    m_MaxDimension : int;
     // index
     // public int CrushSound
-    m_CrushSound : number;
+    m_CrushSound : int;
     // index
     // public int AmbientSound
-    m_AmbientSound : number;
+    m_AmbientSound : int;
     // public char[25] ImageFile
     m_ImageFile : string;
     // public bool AlternateArcticArt
@@ -3284,7 +3284,7 @@ class ObjectTypeClass
     // public ColorStruct LineTrailColor
     m_LineTrailColor : ColorStruct;
     // public int LineTrailColorDecrement
-    m_LineTrailColorDecrement : number;
+    m_LineTrailColorDecrement : int;
     // public IndexClass<MainVoxelIndexKey, VoxelCacheStruct *> VoxelMainCache
     m_VoxelMainCache : any;
     // public IndexClass<TurretWeaponVoxelIndexKey, VoxelCacheStruct *> VoxelTurretWeaponCache
@@ -3347,18 +3347,18 @@ class CCINIClass
     WriteCCFile(pCCFile_0 : any, bDigest_1 : boolean) : void;
     // Copies the string table entry pointed to by the INI value into pBuffer.
     // public int ReadStringtableEntry(char const * pSection, char const * pKey, wchar_t * pBuffer, size_t szBufferSize)
-    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : ArrayBuffer, szBufferSize_3 : any) : number;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : ArrayBuffer, szBufferSize_3 : any) : int;
     // public int ReadStringtableEntry(char const * pSection, char const * pKey, wchar_t[-1]& pBuffer = Size)
-    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
+    ReadStringtableEntry(pSection_0 : string, pKey_1 : string, pBuffer_2 : wchar_t) : int;
     // public unsigned long GetCRC()
-    GetCRC() : number;
+    GetCRC() : unsigned_long;
     // STATIC
     // public static reference<unsigned long, 12025344, 0> const RulesHash = 0xB77E00u
-    static s_RulesHash : number;
+    static s_RulesHash : unsigned_long;
     // public static reference<unsigned long, 12025348, 0> const ArtHash = 0xB77E04u
-    static s_ArtHash : number;
+    static s_ArtHash : unsigned_long;
     // public static reference<unsigned long, 12025352, 0> const AIHash = 0xB77E08u
-    static s_AIHash : number;
+    static s_AIHash : unsigned_long;
     // this is a pointer in the class
     // public static reference<CCINIClass *, 8941640, 0> const INI_Rules = 0x887048u
     static s_INI_Rules : CCINIClass;
@@ -3390,20 +3390,20 @@ class INIClass
     // public INIClass::INISection * GetSection(char const * pSection)
     GetSection(pSection_0 : string) : any;
     // public int GetKeyCount(char const * pSection)
-    GetKeyCount(pSection_0 : string) : number;
+    GetKeyCount(pSection_0 : string) : int;
     // public char const * GetKeyName(char const * pSection, int nKeyIndex)
-    GetKeyName(pSection_0 : string, nKeyIndex_1 : number) : string;
+    GetKeyName(pSection_0 : string, nKeyIndex_1 : int) : string;
     // Reads an ANSI string. Returns the string's length.
     // public int ReadString(char const * pSection, char const * pKey, char const * pDefault, char * pBuffer, size_t szBufferSize)
-    ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : string, szBufferSize_4 : any) : number;
+    ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : string, szBufferSize_4 : any) : int;
     // public int GetString(char const * pSection, char const * pKey, char * pBuffer, size_t szBufferSize)
-    GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : string, szBufferSize_3 : any) : number;
+    GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : string, szBufferSize_3 : any) : int;
     // Writes an ANSI string.
     // public bool WriteString(char const * pSection, char const * pKey, char const * pString)
     WriteString(pSection_0 : string, pKey_1 : string, pString_2 : string) : boolean;
     // Reads an escaped Unicode string. Returns the string's length.
     // public int ReadUnicodeString(char const * pSection, char const * pKey, wchar_t const * pDefault, wchar_t * pBuffer, size_t szBufferSize)
-    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : ArrayBuffer, pBuffer_3 : ArrayBuffer, szBufferSize_4 : any) : number;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : ArrayBuffer, pBuffer_3 : ArrayBuffer, szBufferSize_4 : any) : int;
     // Writes an escaped Unicode string.
     // public bool WriteUnicodeString(char const * pSection, char const * pKey, wchar_t const * pString)
     WriteUnicodeString(pSection_0 : string, pKey_1 : string, pString_2 : ArrayBuffer) : boolean;
@@ -3417,26 +3417,26 @@ class INIClass
     WriteBool(pSection_0 : string, pKey_1 : string, bValue_2 : boolean) : boolean;
     // Reads an integer value.
     // public int ReadInteger(char const * pSection, char const * pKey, int nDefault)
-    ReadInteger(pSection_0 : string, pKey_1 : string, nDefault_2 : number) : number;
+    ReadInteger(pSection_0 : string, pKey_1 : string, nDefault_2 : int) : int;
     // public void GetInteger(char const * pSection, char const * pKey, int& nValue)
-    GetInteger(pSection_0 : string, pKey_1 : string, nValue_2 : number) : void;
+    GetInteger(pSection_0 : string, pKey_1 : string, nValue_2 : int) : void;
     // Writes an integer value.
     // public bool WriteInteger(char const * pSection, char const * pKey, int nValue, bool bHex)
-    WriteInteger(pSection_0 : string, pKey_1 : string, nValue_2 : number, bHex_3 : boolean) : boolean;
+    WriteInteger(pSection_0 : string, pKey_1 : string, nValue_2 : int, bHex_3 : boolean) : boolean;
     // Reads a decimal value.
     // public double ReadDouble(char const * pSection, char const * pKey, double dDefault)
-    ReadDouble(pSection_0 : string, pKey_1 : string, dDefault_2 : number) : number;
+    ReadDouble(pSection_0 : string, pKey_1 : string, dDefault_2 : double) : double;
     // public void GetDouble(char const * pSection, char const * pKey, double& nValue)
-    GetDouble(pSection_0 : string, pKey_1 : string, nValue_2 : number) : void;
+    GetDouble(pSection_0 : string, pKey_1 : string, nValue_2 : double) : void;
     // Writes a decimal value.
     // public bool WriteDouble(char const * pSection, char const * pKey, double dValue)
-    WriteDouble(pSection_0 : string, pKey_1 : string, dValue_2 : number) : boolean;
+    WriteDouble(pSection_0 : string, pKey_1 : string, dValue_2 : double) : boolean;
     // public int ReadRate(char const * pSection, char const * pKey, int nDefault)
-    ReadRate(pSection_0 : string, pKey_1 : string, nDefault_2 : number) : number;
+    ReadRate(pSection_0 : string, pKey_1 : string, nDefault_2 : int) : int;
     // public void GetRate(char const * pSection, char const * pKey, int& nValue)
-    GetRate(pSection_0 : string, pKey_1 : string, nValue_2 : number) : void;
+    GetRate(pSection_0 : string, pKey_1 : string, nValue_2 : int) : void;
     // public bool WriteRate(char const * pSection, char const * pKey, int nValue)
-    WriteRate(pSection_0 : string, pKey_1 : string, nValue_2 : number) : boolean;
+    WriteRate(pSection_0 : string, pKey_1 : string, nValue_2 : int) : boolean;
     // Reads two integer values.
     // public int * Read2Integers(int * pBuffer, char const * pSection, char const * pKey, int * pDefault)
     Read2Integers(pBuffer_0 : ArrayBuffer, pSection_1 : string, pKey_2 : string, pDefault_3 : ArrayBuffer) : ArrayBuffer;
@@ -3464,56 +3464,56 @@ class INIClass
     // public bool Exists(char const * pSection, char const * pKey)
     Exists(pSection_0 : string, pKey_1 : string) : boolean;
     // public int ReadTime(char const * pSection, char const * pKey, int nDefault)
-    ReadTime(pSection_0 : string, pKey_1 : string, nDefault_2 : number) : number;
+    ReadTime(pSection_0 : string, pKey_1 : string, nDefault_2 : int) : int;
     // public bool WriteTime(char const * pSection, char const * pKey, int nValue)
-    WriteTime(pSection_0 : string, pKey_1 : string, nValue_2 : number) : boolean;
+    WriteTime(pSection_0 : string, pKey_1 : string, nValue_2 : int) : boolean;
     // Pip= to idx ( pip strings with index 
     // <
     // pDefault are not even scanned! )
     // public int ReadPip(char const * pSection, char const * pKey, int pDefault)
-    ReadPip(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadPip(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // PipScale= to idx
     // public int ReadPipScale(char const * pSection, char const * pKey, int pDefault)
-    ReadPipScale(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadPipScale(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // Category= to idx
     // public int ReadCategory(char const * pSection, char const * pKey, int pDefault)
-    ReadCategory(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadCategory(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // Color=%s to idx
     // public int ReadColorString(char const * pSection, char const * pKey, int pDefault)
-    ReadColorString(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadColorString(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // Foundation= to idx
     // public int ReadFoundation(char const * pSection, char const * pKey, int pDefault)
-    ReadFoundation(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadFoundation(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // MovementZone= to idx
     // public int ReadMovementZone(char const * pSection, char const * pKey, int pDefault)
-    ReadMovementZone(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadMovementZone(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // SpeedType= to idx
     // public int ReadSpeedType(char const * pSection, char const * pKey, int pDefault)
-    ReadSpeedType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadSpeedType(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // [SW]Action= to idx
     // public int ReadSWAction(char const * pSection, char const * pKey, int pDefault)
-    ReadSWAction(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadSWAction(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // [SW]Type= to idx
     // public int ReadSWType(char const * pSection, char const * pKey, int pDefault)
-    ReadSWType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadSWType(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // EVA Event name to idx
     // public int ReadVoxName(char const * pSection, char const * pKey, int pDefault)
-    ReadVoxName(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadVoxName(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // Factory= to idx
     // public int ReadFactory(char const * pSection, char const * pKey, int pDefault)
-    ReadFactory(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadFactory(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // public int ReadBuildCat(char const * pSection, char const * pKey, int pDefault)
-    ReadBuildCat(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadBuildCat(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // Parses a list of Countries and returns a bitfield, i.e. Owner= or RequiredHouses=
     // public int ReadHouseTypesList(char const * pSection, char const * pKey, int pDefault)
-    ReadHouseTypesList(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadHouseTypesList(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // Parses a list of Houses and returns a bitfield, i.e. Allies= in map
     // public int ReadHousesList(char const * pSection, char const * pKey, int pDefault)
-    ReadHousesList(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadHousesList(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // public int ReadArmorType(char const * pSection, char const * pKey, int pDefault)
-    ReadArmorType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadArmorType(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // public int ReadLandType(char const * pSection, char const * pKey, int pDefault)
-    ReadLandType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadLandType(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // supports MP names (
     // <Player
     // @
@@ -3521,42 +3521,42 @@ class INIClass
     // ALLOCATES if country name is not found
     // returns idx of country it reads
     // public int ReadHouseType(char const * pSection, char const * pKey, int pDefault)
-    ReadHouseType(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadHouseType(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // ALLOCATES if name is not found
     // public int ReadSide(char const * pSection, char const * pKey, int pDefault)
-    ReadSide(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadSide(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // returns index of movie with this filename
     // public int ReadMovie(char const * pSection, char const * pKey, int pDefault)
-    ReadMovie(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadMovie(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // map theater
     // public int ReadTheater(char const * pSection, char const * pKey, int pDefault)
-    ReadTheater(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadTheater(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // public int ReadTheme(char const * pSection, char const * pKey, int pDefault)
-    ReadTheme(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadTheme(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // public int ReadEdge(char const * pSection, char const * pKey, int pDefault)
-    ReadEdge(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadEdge(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // public int ReadPowerup(char const * pSection, char const * pKey, int pDefault)
-    ReadPowerup(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadPowerup(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // [Anim]Layer= to idx
     // public int ReadLayer(char const * pSection, char const * pKey, int pDefault)
-    ReadLayer(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadLayer(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // public int ReadVHPScan(char const * pSection, char const * pKey, int pDefault)
-    ReadVHPScan(pSection_0 : string, pKey_1 : string, pDefault_2 : number) : number;
+    ReadVHPScan(pSection_0 : string, pKey_1 : string, pDefault_2 : int) : int;
     // Color=%d,%d,%d to idx , used to parse [Colors]
     // public ColorStruct * ReadColor(ColorStruct * pBuffer, char const * pSection, char const * pKey, ColorStruct const& defValue)
     ReadColor(pBuffer_0 : ColorStruct, pSection_1 : string, pKey_2 : string, defValue_3 : ColorStruct) : ColorStruct;
     // public ColorStruct ReadColor(char const * const pSection, char const * const pKey, ColorStruct const& defValue)
-    ReadColor(pSection_0 : number, pKey_1 : number, defValue_2 : ColorStruct) : ColorStruct;
+    ReadColor(pSection_0 : char, pKey_1 : char, defValue_2 : ColorStruct) : ColorStruct;
     // public void GetColor(char const * const pSection, char const * const pKey, ColorStruct& value)
-    GetColor(pSection_0 : number, pKey_1 : number, value_2 : ColorStruct) : void;
+    GetColor(pSection_0 : char, pKey_1 : char, value_2 : ColorStruct) : void;
     // public bool WriteColor(char const * const pSection, char const * const pKey, ColorStruct const& color)
-    WriteColor(pSection_0 : number, pKey_1 : number, color_2 : ColorStruct) : boolean;
+    WriteColor(pSection_0 : char, pKey_1 : char, color_2 : ColorStruct) : boolean;
     // OverlayPack, OverlayDataPack, IsoMapPack5
     // Those uses 1=xxxx, 2=xxxx, 3=xxxx .etc.
     // public size_t ReadUUBlock(char const * const pSection, void * pBuffer, size_t length)
-    ReadUUBlock(pSection_0 : number, pBuffer_1 : ArrayBuffer, length_2 : any) : any;
+    ReadUUBlock(pSection_0 : char, pBuffer_1 : ArrayBuffer, length_2 : any) : any;
     // public bool WriteUUBlock(char const * const pSection, void * pBuffer, size_t length)
-    WriteUUBlock(pSection_0 : number, pBuffer_1 : ArrayBuffer, length_2 : any) : boolean;
+    WriteUUBlock(pSection_0 : char, pBuffer_1 : ArrayBuffer, length_2 : any) : boolean;
     // 18 bytes
     // public unsigned char * ReadAbilities(unsigned char * pBuffer, char const * pSection, char const * pKey, unsigned char * pDefault)
     ReadAbilities(pBuffer_0 : ArrayBuffer, pSection_1 : string, pKey_2 : string, pDefault_3 : ArrayBuffer) : ArrayBuffer;
@@ -3564,15 +3564,15 @@ class INIClass
     GetTechnoType(pSection_0 : string, pKey_1 : string) : TechnoTypeClass;
     // safer and more convenient overload for string reading
     // public int ReadString(char const * pSection, char const * pKey, char const * pDefault, char[-1]& pBuffer = Size)
-    ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : number) : number;
+    ReadString(pSection_0 : string, pKey_1 : string, pDefault_2 : string, pBuffer_3 : char) : int;
     // public int GetString(char const * pSection, char const * pKey, char[-1]& pBuffer = Size)
-    GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : number) : number;
+    GetString(pSection_0 : string, pKey_1 : string, pBuffer_2 : char) : int;
     // safer and more convenient overload for escaped unicode string reading
     // public int ReadUnicodeString(char const * pSection, char const * pKey, wchar_t const * pDefault, wchar_t[-1]& pBuffer = Size)
-    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : ArrayBuffer, pBuffer_3 : number) : number;
+    ReadUnicodeString(pSection_0 : string, pKey_1 : string, pDefault_2 : ArrayBuffer, pBuffer_3 : wchar_t) : int;
     // fsldargh who the fuck decided to pass structures by value here
     // public static TypeList<int> * GetPrerequisites(TypeList<int> * pBuffer, INIClass * pINI, char const * pSection, char const * pKey, TypeList<int> Defaults)
-    static GetPrerequisites(pBuffer_0 : TypeList<number>, pINI_1 : INIClass, pSection_2 : string, pKey_3 : string, Defaults_4 : TypeList<number>) : TypeList<number>;
+    static GetPrerequisites(pBuffer_0 : TypeList<int>, pINI_1 : INIClass, pSection_2 : string, pKey_3 : string, Defaults_4 : TypeList<int>) : TypeList<int>;
     // public static bool IsBlank(char const * pValue)
     static IsBlank(pValue_0 : string) : boolean;
     // public char * CurrentSectionName
@@ -3585,12 +3585,6 @@ class INIClass
     m_Sections : any;
     // public char[28] __Sections
     m___Sections : string;
-    // <CRCValue
-    // of the Name, Pointer to the section>
-    // public IndexType SectionIndex
-    m_SectionIndex : any;
-    // public char[20] __SectionIndex
-    m___SectionIndex : string;
 }
 // forward declarations
 // TechnoTypeClass
@@ -3603,14 +3597,14 @@ class TechnoTypeClass
     // public static TechnoTypeClass * Find(char const * pID)
     static Find(pID_0 : string) : TechnoTypeClass;
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // public virtual long GetSizeMax(_ULARGE_INTEGER * pcbSize)
-    GetSizeMax(pcbSize_0 : any | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : long;
     // TechnoTypeClass
     // public virtual bool CanUseWaypoint() const
     CanUseWaypoint() : boolean;
@@ -3619,18 +3613,18 @@ class TechnoTypeClass
     // public virtual bool CanCreateHere(CellStruct const& mapCoords, HouseClass * pOwner) const
     CanCreateHere(mapCoords_0 : CellStruct, pOwner_1 : HouseClass) : boolean;
     // public virtual int GetCost() const
-    GetCost() : number;
+    GetCost() : int;
     // public virtual int GetRepairStepCost() const
-    GetRepairStepCost() : number;
+    GetRepairStepCost() : int;
     // public virtual int GetRepairStep() const
-    GetRepairStep() : number;
+    GetRepairStep() : int;
     // public virtual int GetRefund(HouseClass * pHouse, bool bUnk) const
-    GetRefund(pHouse_0 : HouseClass, bUnk_1 : boolean) : number;
+    GetRefund(pHouse_0 : HouseClass, bUnk_1 : boolean) : int;
     // public virtual int GetFlightLevel() const
-    GetFlightLevel() : number;
+    GetFlightLevel() : int;
     // non-virtual
     // public static TechnoTypeClass * GetByTypeAndIndex(AbstractType abs, int index)
-    static GetByTypeAndIndex(abs_0 : AbstractType, index_1 : number) : TechnoTypeClass;
+    static GetByTypeAndIndex(abs_0 : AbstractType, index_1 : int) : TechnoTypeClass;
     // public bool HasMultipleTurrets() const
     HasMultipleTurrets() : boolean;
     // public CoordStruct * GetParticleSysOffset(CoordStruct * pBuffer) const
@@ -3638,11 +3632,11 @@ class TechnoTypeClass
     // public CoordStruct GetParticleSysOffset() const
     GetParticleSysOffset() : CoordStruct;
     // public bool InOwners(unsigned long const bitHouseType) const
-    InOwners(bitHouseType_0 : number) : boolean;
+    InOwners(bitHouseType_0 : unsigned_long) : boolean;
     // public bool InRequiredHouses(unsigned long const bitHouseType) const
-    InRequiredHouses(bitHouseType_0 : number) : boolean;
+    InRequiredHouses(bitHouseType_0 : unsigned_long) : boolean;
     // public bool InForbiddenHouses(unsigned long const bitHouseType) const
-    InForbiddenHouses(bitHouseType_0 : number) : boolean;
+    InForbiddenHouses(bitHouseType_0 : unsigned_long) : boolean;
     // weapon related
     // public WeaponStruct& GetWeapon(size_t const index, bool const elite)
     GetWeapon(index_0 : any, elite_1 : boolean) : WeaponStruct;
@@ -3656,93 +3650,93 @@ class TechnoTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int WalkRate
-    m_WalkRate : number;
+    m_WalkRate : int;
     // public int IdleRate
-    m_IdleRate : number;
+    m_IdleRate : int;
     // public AbilitiesStruct VeteranAbilities
     m_VeteranAbilities : AbilitiesStruct;
     // public AbilitiesStruct EliteAbilities
     m_EliteAbilities : AbilitiesStruct;
     // public double SpecialThreatValue
-    m_SpecialThreatValue : number;
+    m_SpecialThreatValue : double;
     // public double MyEffectivenessCoefficient
-    m_MyEffectivenessCoefficient : number;
+    m_MyEffectivenessCoefficient : double;
     // public double TargetEffectivenessCoefficient
-    m_TargetEffectivenessCoefficient : number;
+    m_TargetEffectivenessCoefficient : double;
     // public double TargetSpecialThreatCoefficient
-    m_TargetSpecialThreatCoefficient : number;
+    m_TargetSpecialThreatCoefficient : double;
     // public double TargetStrengthCoefficient
-    m_TargetStrengthCoefficient : number;
+    m_TargetStrengthCoefficient : double;
     // public double TargetDistanceCoefficient
-    m_TargetDistanceCoefficient : number;
+    m_TargetDistanceCoefficient : double;
     // public double ThreatAvoidanceCoefficient
-    m_ThreatAvoidanceCoefficient : number;
+    m_ThreatAvoidanceCoefficient : double;
     // public int SlowdownDistance
-    m_SlowdownDistance : number;
+    m_SlowdownDistance : int;
     // public unsigned long align_2FC
-    m_align_2FC : number;
+    m_align_2FC : unsigned_long;
     // public double unknown_double_300
-    m_unknown_double_300 : number;
+    m_unknown_double_300 : double;
     // public double AccelerationFactor
-    m_AccelerationFactor : number;
+    m_AccelerationFactor : double;
     // public int CloakingSpeed
-    m_CloakingSpeed : number;
+    m_CloakingSpeed : int;
     // public TypeList<VoxelAnimTypeClass *> DebrisTypes
     m_DebrisTypes : TypeList<VoxelAnimTypeClass>;
     // public TypeList<int> DebrisMaximums
-    m_DebrisMaximums : TypeList<number>;
+    m_DebrisMaximums : TypeList<int>;
     // public _GUID Locomotor
     m_Locomotor : any;
     // public unsigned long align_35C
-    m_align_35C : number;
+    m_align_35C : unsigned_long;
     // public double VoxelScaleX
-    m_VoxelScaleX : number;
+    m_VoxelScaleX : double;
     // public double VoxelScaleY
-    m_VoxelScaleY : number;
+    m_VoxelScaleY : double;
     // public double Weight
-    m_Weight : number;
+    m_Weight : double;
     // public double PhysicalSize
-    m_PhysicalSize : number;
+    m_PhysicalSize : double;
     // public double Size
-    m_Size : number;
+    m_Size : double;
     // public double SizeLimit
-    m_SizeLimit : number;
+    m_SizeLimit : double;
     // public bool HoverAttack
     m_HoverAttack : boolean;
     // public int VHPScan
-    m_VHPScan : number;
+    m_VHPScan : int;
     // public int unknown_int_398
-    m_unknown_int_398 : number;
+    m_unknown_int_398 : int;
     // public unsigned long align_39C
-    m_align_39C : number;
+    m_align_39C : unsigned_long;
     // public double RollAngle
-    m_RollAngle : number;
+    m_RollAngle : double;
     // public double PitchSpeed
-    m_PitchSpeed : number;
+    m_PitchSpeed : double;
     // public double PitchAngle
-    m_PitchAngle : number;
+    m_PitchAngle : double;
     // public int BuildLimit
-    m_BuildLimit : number;
+    m_BuildLimit : int;
     // public Category Category
     m_Category : Category;
     // public unsigned long unknown_3C0
-    m_unknown_3C0 : number;
+    m_unknown_3C0 : unsigned_long;
     // public unsigned long align_3C4
-    m_align_3C4 : number;
+    m_align_3C4 : unsigned_long;
     // public double DeployTime
-    m_DeployTime : number;
+    m_DeployTime : double;
     // public int FireAngle
-    m_FireAngle : number;
+    m_FireAngle : int;
     // public PipScale PipScale
     m_PipScale : PipScale;
     // public bool PipsDrawForAll
     m_PipsDrawForAll : boolean;
     // public int LeptonMindControlOffset
-    m_LeptonMindControlOffset : number;
+    m_LeptonMindControlOffset : int;
     // public int PixelSelectionBracketDelta
-    m_PixelSelectionBracketDelta : number;
+    m_PixelSelectionBracketDelta : int;
     // public int PipWrap
-    m_PipWrap : number;
+    m_PipWrap : int;
     // public TypeList<BuildingTypeClass *> Dock
     m_Dock : TypeList<BuildingTypeClass>;
     // public BuildingTypeClass * DeploysInto
@@ -3754,109 +3748,109 @@ class TechnoTypeClass
     // public bool PoweredUnit
     m_PoweredUnit : boolean;
     // public TypeList<int> VoiceSelect
-    m_VoiceSelect : TypeList<number>;
+    m_VoiceSelect : TypeList<int>;
     // public TypeList<int> VoiceSelectEnslaved
-    m_VoiceSelectEnslaved : TypeList<number>;
+    m_VoiceSelectEnslaved : TypeList<int>;
     // public TypeList<int> VoiceSelectDeactivated
-    m_VoiceSelectDeactivated : TypeList<number>;
+    m_VoiceSelectDeactivated : TypeList<int>;
     // public TypeList<int> VoiceMove
-    m_VoiceMove : TypeList<number>;
+    m_VoiceMove : TypeList<int>;
     // public TypeList<int> VoiceAttack
-    m_VoiceAttack : TypeList<number>;
+    m_VoiceAttack : TypeList<int>;
     // public TypeList<int> VoiceSpecialAttack
-    m_VoiceSpecialAttack : TypeList<number>;
+    m_VoiceSpecialAttack : TypeList<int>;
     // public TypeList<int> VoiceDie
-    m_VoiceDie : TypeList<number>;
+    m_VoiceDie : TypeList<int>;
     // public TypeList<int> VoiceFeedback
-    m_VoiceFeedback : TypeList<number>;
+    m_VoiceFeedback : TypeList<int>;
     // public TypeList<int> MoveSound
-    m_MoveSound : TypeList<number>;
+    m_MoveSound : TypeList<int>;
     // public TypeList<int> DieSound
-    m_DieSound : TypeList<number>;
+    m_DieSound : TypeList<int>;
     // public int AuxSound1
-    m_AuxSound1 : number;
+    m_AuxSound1 : int;
     // public int AuxSound2
-    m_AuxSound2 : number;
+    m_AuxSound2 : int;
     // public int CreateSound
-    m_CreateSound : number;
+    m_CreateSound : int;
     // public int DamageSound
-    m_DamageSound : number;
+    m_DamageSound : int;
     // public int ImpactWaterSound
-    m_ImpactWaterSound : number;
+    m_ImpactWaterSound : int;
     // public int ImpactLandSound
-    m_ImpactLandSound : number;
+    m_ImpactLandSound : int;
     // public int CrashingSound
-    m_CrashingSound : number;
+    m_CrashingSound : int;
     // public int SinkingSound
-    m_SinkingSound : number;
+    m_SinkingSound : int;
     // public int VoiceFalling
-    m_VoiceFalling : number;
+    m_VoiceFalling : int;
     // public int VoiceCrashing
-    m_VoiceCrashing : number;
+    m_VoiceCrashing : int;
     // public int VoiceSinking
-    m_VoiceSinking : number;
+    m_VoiceSinking : int;
     // public int VoiceEnter
-    m_VoiceEnter : number;
+    m_VoiceEnter : int;
     // public int VoiceCapture
-    m_VoiceCapture : number;
+    m_VoiceCapture : int;
     // public int TurretRotateSound
-    m_TurretRotateSound : number;
+    m_TurretRotateSound : int;
     // public int EnterTransportSound
-    m_EnterTransportSound : number;
+    m_EnterTransportSound : int;
     // public int LeaveTransportSound
-    m_LeaveTransportSound : number;
+    m_LeaveTransportSound : int;
     // public int DeploySound
-    m_DeploySound : number;
+    m_DeploySound : int;
     // public int UndeploySound
-    m_UndeploySound : number;
+    m_UndeploySound : int;
     // public int ChronoInSound
-    m_ChronoInSound : number;
+    m_ChronoInSound : int;
     // public int ChronoOutSound
-    m_ChronoOutSound : number;
+    m_ChronoOutSound : int;
     // public int VoiceHarvest
-    m_VoiceHarvest : number;
+    m_VoiceHarvest : int;
     // public int VoicePrimaryWeaponAttack
-    m_VoicePrimaryWeaponAttack : number;
+    m_VoicePrimaryWeaponAttack : int;
     // public int VoicePrimaryEliteWeaponAttack
-    m_VoicePrimaryEliteWeaponAttack : number;
+    m_VoicePrimaryEliteWeaponAttack : int;
     // public int VoiceSecondaryWeaponAttack
-    m_VoiceSecondaryWeaponAttack : number;
+    m_VoiceSecondaryWeaponAttack : int;
     // public int VoiceSecondaryEliteWeaponAttack
-    m_VoiceSecondaryEliteWeaponAttack : number;
+    m_VoiceSecondaryEliteWeaponAttack : int;
     // public int VoiceDeploy
-    m_VoiceDeploy : number;
+    m_VoiceDeploy : int;
     // public int VoiceUndeploy
-    m_VoiceUndeploy : number;
+    m_VoiceUndeploy : int;
     // public int EnterGrinderSound
-    m_EnterGrinderSound : number;
+    m_EnterGrinderSound : int;
     // public int LeaveGrinderSound
-    m_LeaveGrinderSound : number;
+    m_LeaveGrinderSound : int;
     // public int EnterBioReactorSound
-    m_EnterBioReactorSound : number;
+    m_EnterBioReactorSound : int;
     // public int LeaveBioReactorSound
-    m_LeaveBioReactorSound : number;
+    m_LeaveBioReactorSound : int;
     // public int ActivateSound
-    m_ActivateSound : number;
+    m_ActivateSound : int;
     // public int DeactivateSound
-    m_DeactivateSound : number;
+    m_DeactivateSound : int;
     // public int MindClearedSound
-    m_MindClearedSound : number;
+    m_MindClearedSound : int;
     // public MovementZone MovementZone
     m_MovementZone : MovementZone;
     // public int GuardRange
-    m_GuardRange : number;
+    m_GuardRange : int;
     // public int MinDebris
-    m_MinDebris : number;
+    m_MinDebris : int;
     // public int MaxDebris
-    m_MaxDebris : number;
+    m_MaxDebris : int;
     // public TypeList<AnimTypeClass *> DebrisAnims
     m_DebrisAnims : TypeList<AnimTypeClass>;
     // public int Passengers
-    m_Passengers : number;
+    m_Passengers : int;
     // public bool OpenTopped
     m_OpenTopped : boolean;
     // public int Sight
-    m_Sight : number;
+    m_Sight : int;
     // public bool ResourceGatherer
     m_ResourceGatherer : boolean;
     // public bool ResourceDestination
@@ -3866,61 +3860,61 @@ class TechnoTypeClass
     // public bool Drainable
     m_Drainable : boolean;
     // public int SensorsSight
-    m_SensorsSight : number;
+    m_SensorsSight : int;
     // public int DetectDisguiseRange
-    m_DetectDisguiseRange : number;
+    m_DetectDisguiseRange : int;
     // public int BombSight
-    m_BombSight : number;
+    m_BombSight : int;
     // public int LeadershipRating
-    m_LeadershipRating : number;
+    m_LeadershipRating : int;
     // public NavalTargetingType NavalTargeting
     m_NavalTargeting : NavalTargetingType;
     // public LandTargetingType LandTargeting
     m_LandTargeting : LandTargetingType;
     // public float BuildTimeMultiplier
-    m_BuildTimeMultiplier : number;
+    m_BuildTimeMultiplier : float;
     // public int MindControlRingOffset
-    m_MindControlRingOffset : number;
+    m_MindControlRingOffset : int;
     // public int Cost
-    m_Cost : number;
+    m_Cost : int;
     // public int Soylent
-    m_Soylent : number;
+    m_Soylent : int;
     // public int FlightLevel
-    m_FlightLevel : number;
+    m_FlightLevel : int;
     // public int AirstrikeTeam
-    m_AirstrikeTeam : number;
+    m_AirstrikeTeam : int;
     // public int EliteAirstrikeTeam
-    m_EliteAirstrikeTeam : number;
+    m_EliteAirstrikeTeam : int;
     // public AircraftTypeClass * AirstrikeTeamType
     m_AirstrikeTeamType : AircraftTypeClass;
     // public AircraftTypeClass * EliteAirstrikeTeamType
     m_EliteAirstrikeTeamType : AircraftTypeClass;
     // public int AirstrikeRechargeTime
-    m_AirstrikeRechargeTime : number;
+    m_AirstrikeRechargeTime : int;
     // public int EliteAirstrikeRechargeTime
-    m_EliteAirstrikeRechargeTime : number;
+    m_EliteAirstrikeRechargeTime : int;
     // public int TechLevel
-    m_TechLevel : number;
+    m_TechLevel : int;
     // public TypeList<int> Prerequisite
-    m_Prerequisite : TypeList<number>;
+    m_Prerequisite : TypeList<int>;
     // public TypeList<int> PrerequisiteOverride
-    m_PrerequisiteOverride : TypeList<number>;
+    m_PrerequisiteOverride : TypeList<int>;
     // public int ThreatPosed
-    m_ThreatPosed : number;
+    m_ThreatPosed : int;
     // public int Points
-    m_Points : number;
+    m_Points : int;
     // public int Speed
-    m_Speed : number;
+    m_Speed : int;
     // public SpeedType SpeedType
     m_SpeedType : SpeedType;
     // public int InitialAmmo
-    m_InitialAmmo : number;
+    m_InitialAmmo : int;
     // public int Ammo
-    m_Ammo : number;
+    m_Ammo : int;
     // public int IFVMode
-    m_IFVMode : number;
+    m_IFVMode : int;
     // public int AirRangeBonus
-    m_AirRangeBonus : number;
+    m_AirRangeBonus : int;
     // public bool BerserkFriendly
     m_BerserkFriendly : boolean;
     // public bool SprayAttack
@@ -3934,15 +3928,15 @@ class TechnoTypeClass
     // public bool CloseRange
     m_CloseRange : boolean;
     // public int Reload
-    m_Reload : number;
+    m_Reload : int;
     // public int EmptyReload
-    m_EmptyReload : number;
+    m_EmptyReload : int;
     // public int ReloadIncrement
-    m_ReloadIncrement : number;
+    m_ReloadIncrement : int;
     // public int RadialFireSegments
-    m_RadialFireSegments : number;
+    m_RadialFireSegments : int;
     // public int DeployFireWeapon
-    m_DeployFireWeapon : number;
+    m_DeployFireWeapon : int;
     // public bool DeployFire
     m_DeployFire : boolean;
     // public bool DeployToLand
@@ -3956,7 +3950,7 @@ class TechnoTypeClass
     // public bool DamageReducesReadiness
     m_DamageReducesReadiness : boolean;
     // public int ReadinessReductionMultiplier
-    m_ReadinessReductionMultiplier : number;
+    m_ReadinessReductionMultiplier : int;
     // public UnitTypeClass * UnloadingClass
     m_UnloadingClass : UnitTypeClass;
     // public AnimTypeClass * DeployingAnim
@@ -3966,13 +3960,13 @@ class TechnoTypeClass
     // public bool AttackCursorOnFriendlies
     m_AttackCursorOnFriendlies : boolean;
     // public int UndeployDelay
-    m_UndeployDelay : number;
+    m_UndeployDelay : int;
     // public bool PreventAttackMove
     m_PreventAttackMove : boolean;
     // public unsigned long OwnerFlags
-    m_OwnerFlags : number;
+    m_OwnerFlags : unsigned_long;
     // public int AIBasePlanningSide
-    m_AIBasePlanningSide : number;
+    m_AIBasePlanningSide : int;
     // public bool StupidHunt
     m_StupidHunt : boolean;
     // public bool AllowedToStartInMultiplayer
@@ -3990,16 +3984,16 @@ class TechnoTypeClass
     // public bool AltCameoAllocated
     m_AltCameoAllocated : boolean;
     // public int RotCount
-    m_RotCount : number;
+    m_RotCount : int;
     // public int ROT
-    m_ROT : number;
+    m_ROT : int;
     // public int TurretOffset
-    m_TurretOffset : number;
+    m_TurretOffset : int;
     // public bool CanBeHidden
     m_CanBeHidden : boolean;
     // twice
     // public int Points2
-    m_Points2 : number;
+    m_Points2 : int;
     // public TypeList<AnimTypeClass *> Explosion
     m_Explosion : TypeList<AnimTypeClass>;
     // public TypeList<AnimTypeClass *> DestroyAnim
@@ -4029,9 +4023,9 @@ class TechnoTypeClass
     // public CoordStruct RefinerySmokeOffsetFour
     m_RefinerySmokeOffsetFour : CoordStruct;
     // public int ShadowIndex
-    m_ShadowIndex : number;
+    m_ShadowIndex : int;
     // public int Storage
-    m_Storage : number;
+    m_Storage : int;
     // public bool TurretNotExportedOnGround
     m_TurretNotExportedOnGround : boolean;
     // public bool Gunner
@@ -4039,13 +4033,13 @@ class TechnoTypeClass
     // public bool HasTurretTooltips
     m_HasTurretTooltips : boolean;
     // public int TurretCount
-    m_TurretCount : number;
+    m_TurretCount : int;
     // public int WeaponCount
-    m_WeaponCount : number;
+    m_WeaponCount : int;
     // public bool IsChargeTurret
     m_IsChargeTurret : boolean;
     // public int[18] TurretWeapon
-    m_TurretWeapon : number;
+    m_TurretWeapon : int;
     // public CoordStruct[5] AlternativeFLH
     m_AlternativeFLH : CoordStruct;
     // public WeaponStruct[18] Weapon
@@ -4126,23 +4120,23 @@ class TechnoTypeClass
     // public bool GapGenerator
     m_GapGenerator : boolean;
     // public char GapRadiusInCells
-    m_GapRadiusInCells : number;
+    m_GapRadiusInCells : char;
     // public char SuperGapRadiusInCells
-    m_SuperGapRadiusInCells : number;
+    m_SuperGapRadiusInCells : char;
     // public bool Teleporter
     m_Teleporter : boolean;
     // public bool IsGattling
     m_IsGattling : boolean;
     // public int WeaponStages
-    m_WeaponStages : number;
+    m_WeaponStages : int;
     // public int[6] WeaponStage
-    m_WeaponStage : number;
+    m_WeaponStage : int;
     // public int[6] EliteStage
-    m_EliteStage : number;
+    m_EliteStage : int;
     // public int RateUp
-    m_RateUp : number;
+    m_RateUp : int;
     // public int RateDown
-    m_RateDown : number;
+    m_RateDown : int;
     // public bool SelfHealing
     m_SelfHealing : boolean;
     // public bool Explodes
@@ -4150,7 +4144,7 @@ class TechnoTypeClass
     // public WeaponTypeClass * DeathWeapon
     m_DeathWeapon : WeaponTypeClass;
     // public float DeathWeaponDamageModifier
-    m_DeathWeaponDamageModifier : number;
+    m_DeathWeaponDamageModifier : float;
     // public bool NoAutoFire
     m_NoAutoFire : boolean;
     // public bool TurretSpins
@@ -4216,23 +4210,23 @@ class TechnoTypeClass
     // public InfantryTypeClass * Enslaves
     m_Enslaves : InfantryTypeClass;
     // public int SlavesNumber
-    m_SlavesNumber : number;
+    m_SlavesNumber : int;
     // public int SlaveRegenRate
-    m_SlaveRegenRate : number;
+    m_SlaveRegenRate : int;
     // public int SlaveReloadRate
-    m_SlaveReloadRate : number;
+    m_SlaveReloadRate : int;
     // public int OpenTransportWeapon
-    m_OpenTransportWeapon : number;
+    m_OpenTransportWeapon : int;
     // public bool Spawned
     m_Spawned : boolean;
     // public AircraftTypeClass * Spawns
     m_Spawns : AircraftTypeClass;
     // public int SpawnsNumber
-    m_SpawnsNumber : number;
+    m_SpawnsNumber : int;
     // public int SpawnRegenRate
-    m_SpawnRegenRate : number;
+    m_SpawnRegenRate : int;
     // public int SpawnReloadRate
-    m_SpawnReloadRate : number;
+    m_SpawnReloadRate : int;
     // public bool MissileSpawn
     m_MissileSpawn : boolean;
     // public bool Underwater
@@ -4240,25 +4234,25 @@ class TechnoTypeClass
     // public bool BalloonHover
     m_BalloonHover : boolean;
     // public int SuppressionThreshold
-    m_SuppressionThreshold : number;
+    m_SuppressionThreshold : int;
     // public int JumpjetTurnRate
-    m_JumpjetTurnRate : number;
+    m_JumpjetTurnRate : int;
     // public int JumpjetSpeed
-    m_JumpjetSpeed : number;
+    m_JumpjetSpeed : int;
     // public float JumpjetClimb
-    m_JumpjetClimb : number;
+    m_JumpjetClimb : float;
     // public float JumpjetCrash
-    m_JumpjetCrash : number;
+    m_JumpjetCrash : float;
     // public int JumpjetHeight
-    m_JumpjetHeight : number;
+    m_JumpjetHeight : int;
     // public float JumpjetAccel
-    m_JumpjetAccel : number;
+    m_JumpjetAccel : float;
     // public float JumpjetWobbles
-    m_JumpjetWobbles : number;
+    m_JumpjetWobbles : float;
     // public bool JumpjetNoWobbles
     m_JumpjetNoWobbles : boolean;
     // public int JumpjetDeviation
-    m_JumpjetDeviation : number;
+    m_JumpjetDeviation : int;
     // public bool JumpJet
     m_JumpJet : boolean;
     // public bool Crashable
@@ -4280,11 +4274,11 @@ class TechnoTypeClass
     // public bool RequiresStolenAlliedTech
     m_RequiresStolenAlliedTech : boolean;
     // public unsigned long RequiredHouses
-    m_RequiredHouses : number;
+    m_RequiredHouses : unsigned_long;
     // public unsigned long ForbiddenHouses
-    m_ForbiddenHouses : number;
+    m_ForbiddenHouses : unsigned_long;
     // public unsigned long SecretHouses
-    m_SecretHouses : number;
+    m_SecretHouses : unsigned_long;
     // public bool UseBuffer
     m_UseBuffer : boolean;
     // public CoordStruct SecondSpawnOffset
@@ -4298,20 +4292,20 @@ class TechnoTypeClass
     // public bool DisableShadowCache
     m_DisableShadowCache : boolean;
     // public int ZFudgeCliff
-    m_ZFudgeCliff : number;
+    m_ZFudgeCliff : int;
     // public int ZFudgeColumn
-    m_ZFudgeColumn : number;
+    m_ZFudgeColumn : int;
     // public int ZFudgeTunnel
-    m_ZFudgeTunnel : number;
+    m_ZFudgeTunnel : int;
     // public int ZFudgeBridge
-    m_ZFudgeBridge : number;
+    m_ZFudgeBridge : int;
     // public char[32] PaletteFile
     m_PaletteFile : string;
     // no... idea....
     // public DynamicVectorClass<ColorScheme *> * Palette
     m_Palette : DynamicVectorClass<ColorScheme>;
     // public unsigned long align_DF4
-    m_align_DF4 : number;
+    m_align_DF4 : unsigned_long;
 }
 // WeaponStruct
 class WeaponStruct
@@ -4325,9 +4319,9 @@ class WeaponStruct
     // public CoordStruct FLH
     m_FLH : CoordStruct;
     // public int BarrelLength
-    m_BarrelLength : number;
+    m_BarrelLength : int;
     // public int BarrelThickness
-    m_BarrelThickness : number;
+    m_BarrelThickness : int;
     // public bool TurretLocked
     m_TurretLocked : boolean;
 }
@@ -4344,22 +4338,22 @@ class WeaponTypeClass
     static Find(pID_0 : string) : WeaponTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // public static WeaponTypeClass * FindOrAllocate(char const * id)
     static FindOrAllocate(id_0 : string) : WeaponTypeClass;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // AbstractTypeClass
     // public void CalculateSpeed()
     CalculateSpeed() : void;
@@ -4374,25 +4368,25 @@ class WeaponTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int AmbientDamage
-    m_AmbientDamage : number;
+    m_AmbientDamage : int;
     // public int Burst
-    m_Burst : number;
+    m_Burst : int;
     // public BulletTypeClass * Projectile
     m_Projectile : BulletTypeClass;
     // public int Damage
-    m_Damage : number;
+    m_Damage : int;
     // public int Speed
-    m_Speed : number;
+    m_Speed : int;
     // public WarheadTypeClass * Warhead
     m_Warhead : WarheadTypeClass;
     // public int ROF
-    m_ROF : number;
+    m_ROF : int;
     // int(256 * ini value)
     // public int Range
-    m_Range : number;
+    m_Range : int;
     // int(256 * ini value)
     // public int MinimumRange
-    m_MinimumRange : number;
+    m_MinimumRange : int;
     // public AnimTypeClass * OccupantAnim
     m_OccupantAnim : AnimTypeClass;
     // public AnimTypeClass * AssaultAnim
@@ -4446,7 +4440,7 @@ class WeaponTypeClass
     // public bool DisguiseFireOnly
     m_DisguiseFireOnly : boolean;
     // public int DisguiseFakeBlinkTime
-    m_DisguiseFakeBlinkTime : number;
+    m_DisguiseFakeBlinkTime : int;
     // public bool InfiniteMindControl
     m_InfiniteMindControl : boolean;
     // public bool FireWhileMoving
@@ -4476,7 +4470,7 @@ class WeaponTypeClass
     // public bool IsHouseColor
     m_IsHouseColor : boolean;
     // public char LaserDuration
-    m_LaserDuration : number;
+    m_LaserDuration : char;
     // public bool IonSensitive
     m_IonSensitive : boolean;
     // public bool AreaFire
@@ -4492,17 +4486,17 @@ class WeaponTypeClass
     // public bool IsRadEruption
     m_IsRadEruption : boolean;
     // public int RadLevel
-    m_RadLevel : number;
+    m_RadLevel : int;
     // public bool IsMagBeam
     m_IsMagBeam : boolean;
     // sound indices
     // public TypeList<int> Report
-    m_Report : TypeList<number>;
+    m_Report : TypeList<int>;
     // public char[28] __Report
     m___Report : string;
     // sound indices
     // public TypeList<int> DownReport
-    m_DownReport : TypeList<number>;
+    m_DownReport : TypeList<int>;
     // public char[28] __DownReport
     m___DownReport : string;
     // public TypeList<AnimTypeClass *> Anim
@@ -4523,17 +4517,17 @@ class BulletTypeClass
     static Find(pID_0 : string) : BulletTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // public static BulletTypeClass * FindOrAllocate(char const * id)
     static FindOrAllocate(id_0 : string) : BulletTypeClass;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // AbstractTypeClass
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
@@ -4543,9 +4537,9 @@ class BulletTypeClass
     // public bool Rotates() const
     Rotates() : boolean;
     // public void SetScaledSpawnDelay(int delay)
-    SetScaledSpawnDelay(delay_0 : number) : void;
+    SetScaledSpawnDelay(delay_0 : int) : void;
     // public BulletClass * CreateBullet(AbstractClass * Target, TechnoClass * Owner, int Damage, WarheadTypeClass * WH, int Speed, bool Bright)
-    CreateBullet(Target_0 : AbstractClass, Owner_1 : TechnoClass, Damage_2 : number, WH_3 : WarheadTypeClass, Speed_4 : number, Bright_5 : boolean) : BulletClass;
+    CreateBullet(Target_0 : AbstractClass, Owner_1 : TechnoClass, Damage_2 : int, WH_3 : WarheadTypeClass, Speed_4 : int, Bright_5 : boolean) : BulletClass;
     // public static AbstractType const AbsID = AbstractType::BulletType
     static s_AbsID : AbstractType;
     // Array
@@ -4600,43 +4594,43 @@ class BulletTypeClass
     // public bool FirersPalette
     m_FirersPalette : boolean;
     // public int Cluster
-    m_Cluster : number;
+    m_Cluster : int;
     // public WeaponTypeClass * AirburstWeapon
     m_AirburstWeapon : WeaponTypeClass;
     // public WeaponTypeClass * ShrapnelWeapon
     m_ShrapnelWeapon : WeaponTypeClass;
     // public int ShrapnelCount
-    m_ShrapnelCount : number;
+    m_ShrapnelCount : int;
     // public int DetonationAltitude
-    m_DetonationAltitude : number;
+    m_DetonationAltitude : int;
     // public bool Vertical
     m_Vertical : boolean;
     // public double Elasticity
-    m_Elasticity : number;
+    m_Elasticity : double;
     // public int Acceleration
-    m_Acceleration : number;
+    m_Acceleration : int;
     // public ColorScheme * Color
     m_Color : ColorScheme;
     // public AnimTypeClass * Trailer
     m_Trailer : AnimTypeClass;
     // public int ROT
-    m_ROT : number;
+    m_ROT : int;
     // public int CourseLockDuration
-    m_CourseLockDuration : number;
+    m_CourseLockDuration : int;
     // public int SpawnDelay
-    m_SpawnDelay : number;
+    m_SpawnDelay : int;
     // public int ScaledSpawnDelay
-    m_ScaledSpawnDelay : number;
+    m_ScaledSpawnDelay : int;
     // public bool Scalable
     m_Scalable : boolean;
     // public int Arm
-    m_Arm : number;
+    m_Arm : int;
     // public unsigned char AnimLow
-    m_AnimLow : number;
+    m_AnimLow : unsigned_char;
     // public unsigned char AnimHigh
-    m_AnimHigh : number;
+    m_AnimHigh : unsigned_char;
     // public unsigned char AnimRate
-    m_AnimRate : number;
+    m_AnimRate : unsigned_char;
     // public bool Flat
     m_Flat : boolean;
 }
@@ -4647,18 +4641,18 @@ class BulletClass
 {
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // BulletClass
     // public virtual unsigned char GetAnimFrame() const
-    GetAnimFrame() : number;
+    GetAnimFrame() : unsigned_char;
     // public virtual void SetTarget(AbstractClass * pTarget)
     SetTarget(pTarget_0 : AbstractClass) : void;
     // public virtual bool MoveTo(CoordStruct const& where, Vector3D<double> const& velocity)
@@ -4666,7 +4660,7 @@ class BulletClass
     // non-virtual
     // after CoCreateInstance creates a bullet, this configures it
     // public void Construct(BulletTypeClass * pType, AbstractClass * pTarget, TechnoClass * pOwner, int damage, WarheadTypeClass * pWarhead, int speed, bool bright)
-    Construct(pType_0 : BulletTypeClass, pTarget_1 : AbstractClass, pOwner_2 : TechnoClass, damage_3 : number, pWarhead_4 : WarheadTypeClass, speed_5 : number, bright_6 : boolean) : void;
+    Construct(pType_0 : BulletTypeClass, pTarget_1 : AbstractClass, pOwner_2 : TechnoClass, damage_3 : int, pWarhead_4 : WarheadTypeClass, speed_5 : int, bright_6 : boolean) : void;
     // calls Detonate with the appropriate coords
     // public void Explode(bool destroy = false)
     Explode(destroy_0 : boolean) : void;
@@ -4677,7 +4671,7 @@ class BulletClass
     // public void Shrapnel()
     Shrapnel() : void;
     // public static void ApplyRadiationToCell(CellStruct cell, int radius, int amount)
-    static ApplyRadiationToCell(cell_0 : CellStruct, radius_1 : number, amount_2 : number) : void;
+    static ApplyRadiationToCell(cell_0 : CellStruct, radius_1 : int, amount_2 : int) : void;
     // this bullet will miss and hit the ground instead.
     // if the original target is in air, it will disappear.
     // public void LoseTarget()
@@ -4718,35 +4712,35 @@ class BulletClass
     // public bool Bright
     m_Bright : boolean;
     // public unsigned long unknown_E4
-    m_unknown_E4 : number;
+    m_unknown_E4 : unsigned_long;
     // public Vector3D<double> Velocity
     m_Velocity : Vector3D;
     // public unsigned long unknown_100
-    m_unknown_100 : number;
+    m_unknown_100 : unsigned_long;
     // public bool unknown_104
     m_unknown_104 : boolean;
     // public bool CourseLock
     m_CourseLock : boolean;
     // public int CourseLockCounter
-    m_CourseLockCounter : number;
+    m_CourseLockCounter : int;
     // public AbstractClass * Target
     m_Target : AbstractClass;
     // public int Speed
-    m_Speed : number;
+    m_Speed : int;
     // public int InheritedColor
-    m_InheritedColor : number;
+    m_InheritedColor : int;
     // public unsigned long unknown_118
-    m_unknown_118 : number;
+    m_unknown_118 : unsigned_long;
     // public unsigned long unknown_11C
-    m_unknown_11C : number;
+    m_unknown_11C : unsigned_long;
     // public double unknown_120
-    m_unknown_120 : number;
+    m_unknown_120 : double;
     // public WarheadTypeClass * WH
     m_WH : WarheadTypeClass;
     // public unsigned char AnimFrame
-    m_AnimFrame : number;
+    m_AnimFrame : unsigned_char;
     // public unsigned char AnimRateCounter
-    m_AnimRateCounter : number;
+    m_AnimRateCounter : unsigned_char;
     // public WeaponTypeClass * WeaponType
     m_WeaponType : WeaponTypeClass;
     // public CoordStruct SourceCoords
@@ -4756,13 +4750,13 @@ class BulletClass
     // public CellStruct LastMapCoords
     m_LastMapCoords : CellStruct;
     // public int DamageMultiplier
-    m_DamageMultiplier : number;
+    m_DamageMultiplier : int;
     // public AnimClass * NextAnim
     m_NextAnim : AnimClass;
     // public bool SpawnNextAnim
     m_SpawnNextAnim : boolean;
     // public int Range
-    m_Range : number;
+    m_Range : int;
 }
 // forward declarations
 // RadioClass
@@ -4774,9 +4768,9 @@ class RadioClass
     constructor();
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // these are oogly, westwood themselves admitted it, so it's probably even more of a wtf than the rest
     // public virtual RadioCommand SendToFirstLink(RadioCommand command)
     SendToFirstLink(command_0 : RadioCommand) : RadioCommand;
@@ -4788,13 +4782,13 @@ class RadioClass
     SendToEachLink(command_0 : RadioCommand) : void;
     // get specific link
     // public TechnoClass * const& GetNthLink(int idx = 0) const
-    GetNthLink(idx_0 : number) : TechnoClass;
+    GetNthLink(idx_0 : int) : TechnoClass;
     // whether any link is pLink
     // public bool ContainsLink(TechnoClass const * pLink) const
     ContainsLink(pLink_0 : TechnoClass) : boolean;
     // note: null pointers will always return -1
     // public int FindLinkIndex(TechnoClass const * pLink) const
-    FindLinkIndex(pLink_0 : TechnoClass) : number;
+    FindLinkIndex(pLink_0 : TechnoClass) : int;
     // iow: not full
     // public bool HasFreeLink() const
     HasFreeLink() : boolean;
@@ -4806,7 +4800,7 @@ class RadioClass
     HasAnyLink() : boolean;
     // resizes the vector and nulls the new elements
     // public void SetLinkCount(int count)
-    SetLinkCount(count_0 : number) : void;
+    SetLinkCount(count_0 : int) : void;
     // new command updates these
     // public RadioCommand[3] LastCommands
     m_LastCommands : RadioCommand;
@@ -4840,61 +4834,61 @@ class MissionClass
     // public virtual bool ReadyToNextMission() const
     ReadyToNextMission() : boolean;
     // public virtual int Mission_Sleep()
-    Mission_Sleep() : number;
+    Mission_Sleep() : int;
     // public virtual int Mission_Harmless()
-    Mission_Harmless() : number;
+    Mission_Harmless() : int;
     // public virtual int Mission_Ambush()
-    Mission_Ambush() : number;
+    Mission_Ambush() : int;
     // public virtual int Mission_Attack()
-    Mission_Attack() : number;
+    Mission_Attack() : int;
     // public virtual int Mission_Capture()
-    Mission_Capture() : number;
+    Mission_Capture() : int;
     // public virtual int Mission_Eaten()
-    Mission_Eaten() : number;
+    Mission_Eaten() : int;
     // public virtual int Mission_Guard()
-    Mission_Guard() : number;
+    Mission_Guard() : int;
     // public virtual int Mission_AreaGuard()
-    Mission_AreaGuard() : number;
+    Mission_AreaGuard() : int;
     // public virtual int Mission_Harvest()
-    Mission_Harvest() : number;
+    Mission_Harvest() : int;
     // public virtual int Mission_Hunt()
-    Mission_Hunt() : number;
+    Mission_Hunt() : int;
     // public virtual int Mission_Move()
-    Mission_Move() : number;
+    Mission_Move() : int;
     // public virtual int Mission_Retreat()
-    Mission_Retreat() : number;
+    Mission_Retreat() : int;
     // public virtual int Mission_Return()
-    Mission_Return() : number;
+    Mission_Return() : int;
     // public virtual int Mission_Stop()
-    Mission_Stop() : number;
+    Mission_Stop() : int;
     // public virtual int Mission_Unload()
-    Mission_Unload() : number;
+    Mission_Unload() : int;
     // public virtual int Mission_Enter()
-    Mission_Enter() : number;
+    Mission_Enter() : int;
     // public virtual int Mission_Construction()
-    Mission_Construction() : number;
+    Mission_Construction() : int;
     // public virtual int Mission_Selling()
-    Mission_Selling() : number;
+    Mission_Selling() : int;
     // public virtual int Mission_Repair()
-    Mission_Repair() : number;
+    Mission_Repair() : int;
     // public virtual int Mission_Missile()
-    Mission_Missile() : number;
+    Mission_Missile() : int;
     // public virtual int Mission_Open()
-    Mission_Open() : number;
+    Mission_Open() : int;
     // public virtual int Mission_Rescue()
-    Mission_Rescue() : number;
+    Mission_Rescue() : int;
     // public virtual int Mission_Patrol()
-    Mission_Patrol() : number;
+    Mission_Patrol() : int;
     // public virtual int Mission_ParaDropApproach()
-    Mission_ParaDropApproach() : number;
+    Mission_ParaDropApproach() : int;
     // public virtual int Mission_ParaDropOverfly()
-    Mission_ParaDropOverfly() : number;
+    Mission_ParaDropOverfly() : int;
     // public virtual int Mission_Wait()
-    Mission_Wait() : number;
+    Mission_Wait() : int;
     // public virtual int Mission_SpyPlaneApproach()
-    Mission_SpyPlaneApproach() : number;
+    Mission_SpyPlaneApproach() : int;
     // public virtual int Mission_SpyPlaneOverfly()
-    Mission_SpyPlaneOverfly() : number;
+    Mission_SpyPlaneOverfly() : int;
     // ===========================================================================
     // ===== Properties ==========================================================
     // ===========================================================================
@@ -4907,12 +4901,12 @@ class MissionClass
     // public bool unknown_bool_B8
     m_unknown_bool_B8 : boolean;
     // public int MissionStatus
-    m_MissionStatus : number;
+    m_MissionStatus : int;
     // in frames
     // public int CurrentMissionStartTime
-    m_CurrentMissionStartTime : number;
+    m_CurrentMissionStartTime : int;
     // public int MissionAccumulateTime
-    m_MissionAccumulateTime : number;
+    m_MissionAccumulateTime : int;
     // public CDTimerClass UpdateTimer
     m_UpdateTimer : CDTimerClass;
     // public char[12] __UpdateTimer
@@ -4931,20 +4925,20 @@ class InfantryTypeClass
     static Find(pID_0 : string | any) : InfantryTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string | any) : number;
+    static FindIndex(pID_0 : string | any) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
@@ -4953,7 +4947,7 @@ class InfantryTypeClass
     // public static AbstractType const AbsID = AbstractType::InfantryType
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7EB610
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Array
     // public static constant_ptr<DynamicVectorClass<InfantryTypeClass *>, 11068232> const Array = 0xA8E348u
     static s_Array : DynamicVectorClass<InfantryTypeClass>;
@@ -4961,7 +4955,7 @@ class InfantryTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public PipIndex Pip
     m_Pip : PipIndex;
     // public PipIndex OccupyPip
@@ -4973,23 +4967,23 @@ class InfantryTypeClass
     // public SequenceStruct * Sequence
     m_Sequence : any;
     // public int FireUp
-    m_FireUp : number;
+    m_FireUp : int;
     // public int FireProne
-    m_FireProne : number;
+    m_FireProne : int;
     // public int SecondaryFire
-    m_SecondaryFire : number;
+    m_SecondaryFire : int;
     // public int SecondaryProne
-    m_SecondaryProne : number;
+    m_SecondaryProne : int;
     // public TypeList<AnimTypeClass *> DeadBodies
     m_DeadBodies : TypeList<AnimTypeClass>;
     // public TypeList<AnimTypeClass *> DeathAnims
     m_DeathAnims : TypeList<AnimTypeClass>;
     // public TypeList<int> VoiceComment
-    m_VoiceComment : TypeList<number>;
+    m_VoiceComment : TypeList<int>;
     // public int EnterWaterSound
-    m_EnterWaterSound : number;
+    m_EnterWaterSound : int;
     // public int LeaveWaterSound
-    m_LeaveWaterSound : number;
+    m_LeaveWaterSound : int;
     // public bool Cyborg
     m_Cyborg : boolean;
     // public bool NotHuman
@@ -4998,13 +4992,13 @@ class InfantryTypeClass
     // public bool Ivan
     m_Ivan : boolean;
     // public int DirectionDistance
-    m_DirectionDistance : number;
+    m_DirectionDistance : int;
     // public bool Occupier
     m_Occupier : boolean;
     // public bool Assaulter
     m_Assaulter : boolean;
     // public int HarvestRate
-    m_HarvestRate : number;
+    m_HarvestRate : int;
     // public bool Fearless
     m_Fearless : boolean;
     // public bool Crawls
@@ -5045,17 +5039,17 @@ class CellClass
 {
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // get content objects
     // public TechnoClass * FindTechnoNearestTo(Point2D const& offsetPixel, bool alt, TechnoClass const * pExcludeThis = nullptr) const
     FindTechnoNearestTo(offsetPixel_0 : Point2D, alt_1 : boolean, pExcludeThis_2 : TechnoClass) : TechnoClass;
@@ -5104,7 +5098,7 @@ class CellClass
     // Checks for nearby cliff impassability, calls SetupLAT(), sets up TubeClass if tunnel, cell anim if attached etc.
     // Set cellLevel to -1 if you wish to not change it.
     // public void RecalcAttributes(int cellLevel)
-    RecalcAttributes(cellLevel_0 : number) : void;
+    RecalcAttributes(cellLevel_0 : int) : void;
     // public void BlowUpBridge()
     BlowUpBridge() : void;
     // public bool CanThisExistHere(SpeedType SpeedType, BuildingTypeClass * pObject, HouseClass * pOwner) const
@@ -5116,7 +5110,7 @@ class CellClass
     GetNeighbourCell(facing_0 : FacingType) : CellClass;
     // called whenever anything moves, first to remove threat from source cell, second time to add threat to dest cell
     // public void UpdateThreat(unsigned int SourceHouse, int ThreatLevel)
-    UpdateThreat(SourceHouse_0 : number, ThreatLevel_1 : number) : void;
+    UpdateThreat(SourceHouse_0 : unsigned_int, ThreatLevel_1 : int) : void;
     // public void CollectCrate(FootClass * pCollector)
     CollectCrate(pCollector_0 : FootClass) : void;
     // public void ProcessColourComponents(int * arg0, int * pIntensity, int * pAmbient, int * a5, int * a6, int * tintR, int * tintG, int * tintB)
@@ -5130,26 +5124,26 @@ class CellClass
     GetUIName() : ArrayBuffer;
     // returns whether a cell behaves as if it contained overlay (for gates and wall towers)
     // public bool ConnectsToOverlay(int idxOverlay = -1, int direction = -1) const
-    ConnectsToOverlay(idxOverlay_0 : number, direction_1 : number) : boolean;
+    ConnectsToOverlay(idxOverlay_0 : int, direction_1 : int) : boolean;
     // returns the tiberium's index in OverlayTypes
     // public int GetContainedTiberiumIndex() const
-    GetContainedTiberiumIndex() : number;
+    GetContainedTiberiumIndex() : int;
     // public int GetContainedTiberiumValue() const
-    GetContainedTiberiumValue() : number;
+    GetContainedTiberiumValue() : int;
     // public bool SpreadTiberium(bool forced)
     SpreadTiberium(forced_0 : boolean) : boolean;
     // add or create tiberium of the specified type
     // public bool IncreaseTiberium(int idxTiberium, int amount)
-    IncreaseTiberium(idxTiberium_0 : number, amount_1 : number) : boolean;
+    IncreaseTiberium(idxTiberium_0 : int, amount_1 : int) : boolean;
     // decreases thze tiberium in the cell
     // public void ReduceTiberium(int amount)
-    ReduceTiberium(amount_0 : number) : void;
+    ReduceTiberium(amount_0 : int) : void;
     // public bool CanTiberiumGerminate(TiberiumClass * tib)
     CanTiberiumGerminate(tib_0 : TiberiumClass) : boolean;
     // public void SetMapCoords(CoordStruct const& coords)
     SetMapCoords(coords_0 : CoordStruct) : void;
     // public int GetFloorHeight(Point2D const& subcoords) const
-    GetFloorHeight(subcoords_0 : Point2D) : number;
+    GetFloorHeight(subcoords_0 : Point2D) : int;
     // Factors in cell height from ramps, level etc.
     // public CoordStruct * GetCellCoords(CoordStruct * pOutBuffer) const
     GetCellCoords(pOutBuffer_0 : CoordStruct) : CoordStruct;
@@ -5159,28 +5153,28 @@ class CellClass
     ActivateVeins() : void;
     // cloak generators
     // public bool CloakGen_InclHouse(unsigned int idx) const
-    CloakGen_InclHouse(idx_0 : number) : boolean;
+    CloakGen_InclHouse(idx_0 : unsigned_int) : boolean;
     // public void CloakGen_AddHouse(unsigned int idx)
-    CloakGen_AddHouse(idx_0 : number) : void;
+    CloakGen_AddHouse(idx_0 : unsigned_int) : void;
     // public void CloakGen_RemHouse(unsigned int idx)
-    CloakGen_RemHouse(idx_0 : number) : void;
+    CloakGen_RemHouse(idx_0 : unsigned_int) : void;
     // unused, returns 0 if that house doesn't have cloakgens covering this cell or Player has sensors over this cell
     // public bool DrawObjectsCloaked(int OwnerHouseIdx) const
-    DrawObjectsCloaked(OwnerHouseIdx_0 : number) : boolean;
+    DrawObjectsCloaked(OwnerHouseIdx_0 : int) : boolean;
     // sensors
     // public bool Sensors_InclHouse(unsigned int idx) const
-    Sensors_InclHouse(idx_0 : number) : boolean;
+    Sensors_InclHouse(idx_0 : unsigned_int) : boolean;
     // public void Sensors_AddOfHouse(unsigned int idx)
-    Sensors_AddOfHouse(idx_0 : number) : void;
+    Sensors_AddOfHouse(idx_0 : unsigned_int) : void;
     // public void Sensors_RemOfHouse(unsigned int idx)
-    Sensors_RemOfHouse(idx_0 : number) : void;
+    Sensors_RemOfHouse(idx_0 : unsigned_int) : void;
     // disguise sensors
     // public bool DisguiseSensors_InclHouse(unsigned int idx) const
-    DisguiseSensors_InclHouse(idx_0 : number) : boolean;
+    DisguiseSensors_InclHouse(idx_0 : unsigned_int) : boolean;
     // public void DisguiseSensors_AddOfHouse(unsigned int idx)
-    DisguiseSensors_AddOfHouse(idx_0 : number) : void;
+    DisguiseSensors_AddOfHouse(idx_0 : unsigned_int) : void;
     // public void DisguiseSensors_RemOfHouse(unsigned int idx)
-    DisguiseSensors_RemOfHouse(idx_0 : number) : void;
+    DisguiseSensors_RemOfHouse(idx_0 : unsigned_int) : void;
     // Rad Sites
     // public void SetRadSite(RadSiteClass * pRad)
     SetRadSite(pRad_0 : RadSiteClass) : void;
@@ -5189,11 +5183,11 @@ class CellClass
     // public bool IsRadiated() const
     IsRadiated() : boolean;
     // public int GetRadLevel() const
-    GetRadLevel() : number;
+    GetRadLevel() : int;
     // public void RadLevel_Increase(double amount)
-    RadLevel_Increase(amount_0 : number) : void;
+    RadLevel_Increase(amount_0 : double) : void;
     // public void RadLevel_Decrease(double amount)
-    RadLevel_Decrease(amount_0 : number) : void;
+    RadLevel_Decrease(amount_0 : double) : void;
     // helper
     // public bool ContainsBridge() const
     ContainsBridge() : boolean;
@@ -5203,7 +5197,7 @@ class CellClass
     // public ObjectClass * GetContent() const
     GetContent() : ObjectClass;
     // public int GetLevel() const
-    GetLevel() : number;
+    GetLevel() : int;
     // public bool Tile_Is_Tunnel() const
     Tile_Is_Tunnel() : boolean;
     // public bool Tile_Is_Water() const
@@ -5245,7 +5239,7 @@ class CellClass
     // public bool Tile_Is_DestroyableCliff() const
     Tile_Is_DestroyableCliff() : boolean;
     // public static CoordStruct Cell2Coord(CellStruct const& cell, int z = 0)
-    static Cell2Coord(cell_0 : CellStruct, z_1 : number) : CoordStruct;
+    static Cell2Coord(cell_0 : CellStruct, z_1 : int) : CoordStruct;
     // public static CellStruct Coord2Cell(CoordStruct const& crd)
     static Coord2Cell(crd_0 : CoordStruct) : CellStruct;
     // public CoordStruct FixHeight(CoordStruct crd) const
@@ -5272,23 +5266,23 @@ class CellClass
     // public void UpdateCellLighting()
     UpdateCellLighting() : void;
     // public void CalculateLightSourceLighting(int& nIntensity, int& nAmbient, int& Red1, int& Green1, int& Blue1, int& Red2, int& Green2, int& Blue2)
-    CalculateLightSourceLighting(nIntensity_0 : number, nAmbient_1 : number, Red1_2 : number, Green1_3 : number, Blue1_4 : number, Red2_5 : number, Green2_6 : number, Blue2_7 : number) : void;
+    CalculateLightSourceLighting(nIntensity_0 : int, nAmbient_1 : int, Red1_2 : int, Green1_3 : int, Blue1_4 : int, Red2_5 : int, Green2_6 : int, Blue2_7 : int) : void;
     // public void InitLightConvert(LightConvertClass * pDrawer = nullptr, int nIntensity = 0x10000, int nAmbient = 0, int Red1 = 1000, int Green1 = 1000, int Blue1 = 1000)
-    InitLightConvert(pDrawer_0 : LightConvertClass, nIntensity_1 : number, nAmbient_2 : number, Red1_3 : number, Green1_4 : number, Blue1_5 : number) : void;
+    InitLightConvert(pDrawer_0 : LightConvertClass, nIntensity_1 : int, nAmbient_2 : int, Red1_3 : int, Green1_4 : int, Blue1_5 : int) : void;
     // public void DrawOverlay(Point2D const& Location, RectangleStruct const& Bound)
     DrawOverlay(Location_0 : Point2D, Bound_1 : RectangleStruct) : void;
     // public void DrawOverlayShadow(Point2D const& Location, RectangleStruct const& Bound)
     DrawOverlayShadow(Location_0 : Point2D, Bound_1 : RectangleStruct) : void;
     // public bool IsClearToMove(SpeedType speedType, bool ignoreInfantry, bool ignoreVehicles, int zone, MovementZone movementZone, int level, bool isBridge)
-    IsClearToMove(speedType_0 : SpeedType, ignoreInfantry_1 : boolean, ignoreVehicles_2 : boolean, zone_3 : number, movementZone_4 : MovementZone, level_5 : number, isBridge_6 : boolean) : boolean;
+    IsClearToMove(speedType_0 : SpeedType, ignoreInfantry_1 : boolean, ignoreVehicles_2 : boolean, zone_3 : int, movementZone_4 : MovementZone, level_5 : int, isBridge_6 : boolean) : boolean;
     // public static AbstractType const AbsID = AbstractType::Cell
     static s_AbsID : AbstractType;
     // public static int const BridgeLevels = 4
-    static s_BridgeLevels : number;
+    static s_BridgeLevels : int;
     // the height of a bridge in leptons
     // see ABC5DC, AC13BC
     // public static int const BridgeHeight = BridgeLevels * Unsorted::LevelHeight
-    static s_BridgeHeight : number;
+    static s_BridgeHeight : int;
     // Where on the map does this Cell lie?
     // public CellStruct MapCoords
     m_MapCoords : CellStruct;
@@ -5297,12 +5291,12 @@ class CellClass
     // public CellClass * BridgeOwnerCell
     m_BridgeOwnerCell : CellClass;
     // public unsigned long unknown_30
-    m_unknown_30 : number;
+    m_unknown_30 : unsigned_long;
     // public LightConvertClass * LightConvert
     m_LightConvert : LightConvertClass;
     // What tile is this Cell?
     // public int IsoTileTypeIndex
-    m_IsoTileTypeIndex : number;
+    m_IsoTileTypeIndex : int;
     // The cell tag
     // public TagClass * AttachedTag
     m_AttachedTag : TagClass;
@@ -5311,38 +5305,38 @@ class CellClass
     m_Rubble : BuildingTypeClass;
     // What Overlay lies on this Cell?
     // public int OverlayTypeIndex
-    m_OverlayTypeIndex : number;
+    m_OverlayTypeIndex : int;
     // What Smudge lies on this Cell?
     // public int SmudgeTypeIndex
-    m_SmudgeTypeIndex : number;
+    m_SmudgeTypeIndex : int;
     // public PassabilityType Passability
     m_Passability : PassabilityType;
     // Which House owns the wall placed in this Cell?
     // public int WallOwnerIndex
-    m_WallOwnerIndex : number;
+    m_WallOwnerIndex : int;
     // // Determined by finding the nearest BuildingType and taking its owner
     // public int InfantryOwnerIndex
-    m_InfantryOwnerIndex : number;
+    m_InfantryOwnerIndex : int;
     // public int AltInfantryOwnerIndex
-    m_AltInfantryOwnerIndex : number;
+    m_AltInfantryOwnerIndex : int;
     // public unsigned long unknown_5C
-    m_unknown_5C : number;
+    m_unknown_5C : unsigned_long;
     // public unsigned long unknown_60
-    m_unknown_60 : number;
+    m_unknown_60 : unsigned_long;
     // public unsigned long RedrawFrame
-    m_RedrawFrame : number;
+    m_RedrawFrame : unsigned_long;
     // public RectangleStruct InViewportRect
     m_InViewportRect : RectangleStruct;
     // Is this cell in a cloak generator's radius? One bit per House.
     // public unsigned long CloakedByHouses
-    m_CloakedByHouses : number;
+    m_CloakedByHouses : unsigned_long;
     // &
     // (1 
     // <
     // <
     // HouseX->ArrayIndex) == base spacing dummy for HouseX
     // public unsigned long BaseSpacerOfHouses
-    m_BaseSpacerOfHouses : number;
+    m_BaseSpacerOfHouses : unsigned_long;
     // a jumpjet occupying this cell atm
     // public FootClass * Jumpjet
     m_Jumpjet : FootClass;
@@ -5356,81 +5350,81 @@ class CellClass
     m_LandType : LandType;
     // The level of radiation on this Cell.
     // public double RadLevel
-    m_RadLevel : number;
+    m_RadLevel : double;
     // A pointer to the responsible RadSite.
     // public RadSiteClass * RadSite
     m_RadSite : RadSiteClass;
     // public PixelFXClass * PixelFX
     m_PixelFX : any;
     // public int OccupyHeightsCoveringMe
-    m_OccupyHeightsCoveringMe : number;
+    m_OccupyHeightsCoveringMe : int;
     // public unsigned long Intensity
-    m_Intensity : number;
+    m_Intensity : unsigned_long;
     // public unsigned short Ambient
-    m_Ambient : number;
+    m_Ambient : unsigned_short;
     // public unsigned short Intensity_Normal
-    m_Intensity_Normal : number;
+    m_Intensity_Normal : unsigned_short;
     // public unsigned short Intensity_Terrain
-    m_Intensity_Terrain : number;
+    m_Intensity_Terrain : unsigned_short;
     // public unsigned short Color1_Blue
-    m_Color1_Blue : number;
+    m_Color1_Blue : unsigned_short;
     // ColorStruct      Color2; //110-114
     // public unsigned short Color2_Red
-    m_Color2_Red : number;
+    m_Color2_Red : unsigned_short;
     // public unsigned short Color2_Green
-    m_Color2_Green : number;
+    m_Color2_Green : unsigned_short;
     // public unsigned short Color2_Blue
-    m_Color2_Blue : number;
+    m_Color2_Blue : unsigned_short;
     // !
     // #
     // % Westwood braindamage, can't use > 127! (movsx eax, al)
     // public short TubeIndex
-    m_TubeIndex : number;
+    m_TubeIndex : short;
     // public char unknown_118
-    m_unknown_118 : number;
+    m_unknown_118 : char;
     // public char IsIceGrowthAllowed
-    m_IsIceGrowthAllowed : number;
+    m_IsIceGrowthAllowed : char;
     // public char Height
-    m_Height : number;
+    m_Height : char;
     // public char Level
-    m_Level : number;
+    m_Level : char;
     // this + 2 == cell's slope shape as reflected by PLACE.SHP
     // public unsigned char SlopeIndex
-    m_SlopeIndex : number;
+    m_SlopeIndex : unsigned_char;
     // public unsigned char unknown_11D
-    m_unknown_11D : number;
+    m_unknown_11D : unsigned_char;
     // The crate type on this cell. Also indicates some other weird properties
     // public unsigned char OverlayData
-    m_OverlayData : number;
+    m_OverlayData : unsigned_char;
     // public unsigned char SmudgeData
-    m_SmudgeData : number;
+    m_SmudgeData : unsigned_char;
     // trust me, you don't wanna know... if you do, see 0x7F4194 and cry
     // public char Visibility
-    m_Visibility : number;
+    m_Visibility : char;
     // same value as above: -2: Occluded completely, -1: Visible, 0...48: frame in fog.shp or shroud.shp
     // public char Foggedness
-    m_Foggedness : number;
+    m_Foggedness : char;
     // number of somehow occupied cells next to this
     // public unsigned char BlockedNeighbours
-    m_BlockedNeighbours : number;
+    m_BlockedNeighbours : unsigned_char;
     // SubOccupations - 0x1 Center 0x2 Top(Abandoned) 0x4 Right 0x8 Left 0x10 Down / Terrains
     // 0x20 Units 0x40 Aircrafts 0x80 Buildings
     // public unsigned long OccupationFlags
-    m_OccupationFlags : number;
+    m_OccupationFlags : unsigned_long;
     // public unsigned long AltOccupationFlags
-    m_AltOccupationFlags : number;
+    m_AltOccupationFlags : unsigned_long;
     // related to Flags below
     // public AltCellFlags AltFlags
     m_AltFlags : AltCellFlags;
     // public int ShroudCounter
-    m_ShroudCounter : number;
+    m_ShroudCounter : int;
     // actual count of gapgens in this cell, no idea why they need a second layer
     // public unsigned long GapsCoveringThisCell
-    m_GapsCoveringThisCell : number;
+    m_GapsCoveringThisCell : unsigned_long;
     // public bool VisibilityChanged
     m_VisibilityChanged : boolean;
     // public unsigned long unknown_13C
-    m_unknown_13C : number;
+    m_unknown_13C : unsigned_long;
     // Various settings.
     // public CellFlags Flags
     m_Flags : CellFlags;
@@ -5445,24 +5439,24 @@ class BuildingClass
     constructor(pType_0 : BuildingTypeClass, pOwner_1 : HouseClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectClass
     // MissionClass
     // TechnoClass
     // public virtual void Destroyed(ObjectClass * Killer)
     Destroyed(Killer_0 : ObjectClass | any) : void;
     // public virtual bool ForceCreate(CoordStruct& coord, unsigned long dwUnk = 0)
-    ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : number | any) : boolean;
+    ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : unsigned_long | any) : boolean;
     // BuildingClass
     // public virtual CellStruct FindExitCell(unsigned long dwUnk, unsigned long dwUnk2) const
-    FindExitCell(dwUnk_0 : number, dwUnk2_1 : number) : CellStruct;
+    FindExitCell(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long) : CellStruct;
     // public virtual int DistanceToDockingCoord(ObjectClass * pObj) const
-    DistanceToDockingCoord(pObj_0 : ObjectClass) : number;
+    DistanceToDockingCoord(pObj_0 : ObjectClass) : int;
     // public virtual void Place(bool captured)
     Place(captured_0 : boolean) : void;
     // public virtual void UpdateConstructionOptions()
@@ -5472,7 +5466,7 @@ class BuildingClass
     // public virtual DirStruct FireAngleTo(ObjectClass * pObject) const
     FireAngleTo(pObject_0 : ObjectClass) : DirStruct;
     // public virtual void Destory(unsigned long dwUnused, TechnoClass * pTechno, bool NoSurvivor, CellStruct& cell)
-    Destory(dwUnused_0 : number, pTechno_1 : TechnoClass, NoSurvivor_2 : boolean, cell_3 : CellStruct) : void;
+    Destory(dwUnused_0 : unsigned_long, pTechno_1 : TechnoClass, NoSurvivor_2 : boolean, cell_3 : CellStruct) : void;
     // public virtual bool TogglePrimaryFactory()
     TogglePrimaryFactory() : boolean;
     // public virtual void SensorArrayActivate(CellStruct cell = =CellStruct::Empty)
@@ -5484,12 +5478,12 @@ class BuildingClass
     // public virtual void DisguiseDetectorDeactivate(CellStruct cell = =CellStruct::Empty)
     DisguiseDetectorDeactivate(cell_0 : CellStruct) : void;
     // public virtual int AlwaysZero()
-    AlwaysZero() : number;
+    AlwaysZero() : int;
     // non-vt
     // public void UpdateAnimations()
     UpdateAnimations() : void;
     // public int GetCurrentFrame()
-    GetCurrentFrame() : number;
+    GetCurrentFrame() : int;
     // public bool IsAllFogged() const
     IsAllFogged() : boolean;
     // public void SetRallypoint(CellStruct * pTarget, bool bPlayEVA)
@@ -5502,16 +5496,16 @@ class BuildingClass
     // public void GoOffline()
     GoOffline() : void;
     // public int GetPowerOutput() const
-    GetPowerOutput() : number;
+    GetPowerOutput() : int;
     // public int GetPowerDrain() const
-    GetPowerDrain() : number;
+    GetPowerDrain() : int;
     // Firewall aka FirestormWall
     // depending on what facings of this building
     // are connected to another FWall,
     // returns the index of the image file
     // to draw.
     // public unsigned long GetFWFlags() const
-    GetFWFlags() : number;
+    GetFWFlags() : unsigned_long;
     // public void CreateEndPost(bool arg)
     CreateEndPost(arg_0 : boolean) : void;
     // kick out content
@@ -5530,9 +5524,9 @@ class BuildingClass
     // public void DestroyNthAnim(BuildingAnimSlot Slot)
     DestroyNthAnim(Slot_0 : BuildingAnimSlot) : void;
     // public void PlayNthAnim(BuildingAnimSlot Slot, int effectDelay = 0)
-    PlayNthAnim(Slot_0 : BuildingAnimSlot, effectDelay_1 : number) : void;
+    PlayNthAnim(Slot_0 : BuildingAnimSlot, effectDelay_1 : int) : void;
     // public void PlayAnim(char const * animName, BuildingAnimSlot Slot, bool Damaged, bool Garrisoned, int effectDelay = 0)
-    PlayAnim(animName_0 : string, Slot_1 : BuildingAnimSlot, Damaged_2 : boolean, Garrisoned_3 : boolean, effectDelay_4 : number) : void;
+    PlayAnim(animName_0 : string, Slot_1 : BuildingAnimSlot, Damaged_2 : boolean, Garrisoned_3 : boolean, effectDelay_4 : int) : void;
     // changes between building's damaged and undamaged animations.
     // public void ToggleDamagedAnims(bool isDamaged)
     ToggleDamagedAnims(isDamaged_0 : boolean) : void;
@@ -5550,14 +5544,14 @@ class BuildingClass
     EnableTemporal() : void;
     // returns Type->SuperWeapon, if its AuxBuilding is satisfied
     // public int FirstActiveSWIdx() const
-    FirstActiveSWIdx() : number;
+    FirstActiveSWIdx() : int;
     // public int GetShapeNumber() const
-    GetShapeNumber() : number;
+    GetShapeNumber() : int;
     // public void BeginMode(BStateType bType)
     BeginMode(bType_0 : BStateType) : void;
     // returns Type->SuperWeapon2, if its AuxBuilding is satisfied
     // public int SecondActiveSWIdx() const
-    SecondActiveSWIdx() : number;
+    SecondActiveSWIdx() : int;
     // public void FireLaser(CoordStruct Coords)
     FireLaser(Coords_0 : CoordStruct) : void;
     // public bool IsBeingDrained() const
@@ -5577,10 +5571,10 @@ class BuildingClass
     // public bool IsTraversable() const
     IsTraversable() : boolean;
     // public int DrawInfoTipAndSpiedSelection(Point2D * pLocation, RectangleStruct * pRect) const
-    DrawInfoTipAndSpiedSelection(pLocation_0 : Point2D, pRect_1 : RectangleStruct) : number;
+    DrawInfoTipAndSpiedSelection(pLocation_0 : Point2D, pRect_1 : RectangleStruct) : int;
     // helpers
     // public bool HasSuperWeapon(int index) const
-    HasSuperWeapon(index_0 : number) : boolean;
+    HasSuperWeapon(index_0 : int) : boolean;
     // public TechnoTypeClass * GetSecretProduction() const
     GetSecretProduction() : TechnoTypeClass;
     // public AnimClass *& GetAnim(BuildingAnimSlot slot)
@@ -5594,7 +5588,7 @@ class BuildingClass
     // public static AbstractType const AbsID = AbstractType::Building
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7E3EBC
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Static
     // public static constant_ptr<DynamicVectorClass<BuildingClass *>, 11070272> const Array = 0xA8EB40u
     static s_Array : DynamicVectorClass<BuildingClass>;
@@ -5608,15 +5602,15 @@ class BuildingClass
     // public CDTimerClass C4Timer
     m_C4Timer : CDTimerClass;
     // public int BState
-    m_BState : number;
+    m_BState : int;
     // public int QueueBState
-    m_QueueBState : number;
+    m_QueueBState : int;
     // public unsigned long OwnerCountryIndex
-    m_OwnerCountryIndex : number;
+    m_OwnerCountryIndex : unsigned_long;
     // public InfantryClass * C4AppliedBy
     m_C4AppliedBy : InfantryClass;
     // public unsigned long unknown_544
-    m_unknown_544 : number;
+    m_unknown_544 : unsigned_long;
     // pointer
     // public AnimClass * FirestormAnim
     m_FirestormAnim : AnimClass;
@@ -5641,9 +5635,9 @@ class BuildingClass
     m_Upgrades : BuildingTypeClass;
     // type # of sw being launched
     // public int FiringSWType
-    m_FiringSWType : number;
+    m_FiringSWType : int;
     // public unsigned long unknown_5FC
-    m_unknown_5FC : number;
+    m_unknown_5FC : unsigned_long;
     // public BuildingLightClass * Spotlight
     m_Spotlight : BuildingLightClass;
     // public RateTimer GateTimer
@@ -5653,10 +5647,10 @@ class BuildingClass
     m_LightSource : LightSourceClass;
     // 0-7 for active directionals, 8/12 for offline ones, check ntfnce.shp or whatever
     // public unsigned long LaserFenceFrame
-    m_LaserFenceFrame : number;
+    m_LaserFenceFrame : unsigned_long;
     // anim data for firestorm active animations
     // public unsigned long FirestormWallFrame
-    m_FirestormWallFrame : number;
+    m_FirestormWallFrame : unsigned_long;
     // for hospital, armory, unitrepair etc
     // public StageClass RepairProgress
     m_RepairProgress : StageClass;
@@ -5665,9 +5659,9 @@ class BuildingClass
     // public CoordStruct unknown_coord_64C
     m_unknown_coord_64C : CoordStruct;
     // public int unknown_int_658
-    m_unknown_int_658 : number;
+    m_unknown_int_658 : int;
     // public unsigned long unknown_65C
-    m_unknown_65C : number;
+    m_unknown_65C : unsigned_long;
     // public bool HasPower
     m_HasPower : boolean;
     // public bool IsOverpowered
@@ -5676,7 +5670,7 @@ class BuildingClass
     // public bool RegisteredAsPoweredUnitSource
     m_RegisteredAsPoweredUnitSource : boolean;
     // public unsigned long SupportingPrisms
-    m_SupportingPrisms : number;
+    m_SupportingPrisms : unsigned_long;
     // public bool HasExtraPowerBonus
     m_HasExtraPowerBonus : boolean;
     // public bool HasExtraPowerDrain
@@ -5687,7 +5681,7 @@ class BuildingClass
     m_Occupants : DynamicVectorClass<InfantryClass>;
     // which occupant should get XP, which weapon should be fired (see 6FF074)
     // public int FiringOccupantIndex
-    m_FiringOccupantIndex : number;
+    m_FiringOccupantIndex : int;
     // public AudioController Audio7
     m_Audio7 : any;
     // public AudioController Audio8
@@ -5747,38 +5741,38 @@ class BuildingClass
     m_StuffEnabled : boolean;
     // some fugly buffers
     // public char HasCloakingData
-    m_HasCloakingData : number;
+    m_HasCloakingData : char;
     // from Type->CloakRadiusInCells
     // public unsigned char CloakRadius
-    m_CloakRadius : number;
+    m_CloakRadius : unsigned_char;
     // public char Translucency
-    m_Translucency : number;
+    m_Translucency : char;
     // the old "silo needed" logic
     // public unsigned long StorageFilledSlots
-    m_StorageFilledSlots : number;
+    m_StorageFilledSlots : unsigned_long;
     // randomly assigned secret lab bonus, used if SecretInfantry, SecretUnit, and SecretBuilding are null
     // public TechnoTypeClass * SecretProduction
     m_SecretProduction : TechnoTypeClass;
     // public ColorStruct ColorAdd
     m_ColorAdd : ColorStruct;
     // public int unknown_int_6FC
-    m_unknown_int_6FC : number;
+    m_unknown_int_6FC : int;
     // public short unknown_short_700
-    m_unknown_short_700 : number;
+    m_unknown_short_700 : short;
     // as defined by Type->UpgradesToLevel=
     // public unsigned char UpgradeLevel
-    m_UpgradeLevel : number;
+    m_UpgradeLevel : unsigned_char;
     // public char GateStage
-    m_GateStage : number;
+    m_GateStage : char;
     // public PrismChargeState PrismStage
     m_PrismStage : PrismChargeState;
     // public CoordStruct PrismTargetCoords
     m_PrismTargetCoords : CoordStruct;
     // public unsigned long DelayBeforeFiring
-    m_DelayBeforeFiring : number;
+    m_DelayBeforeFiring : unsigned_long;
     // used in UpdateBunker and friends
     // public int BunkerState
-    m_BunkerState : number;
+    m_BunkerState : int;
 }
 // FoggedObjectClass
 class FoggedObjectClass
@@ -5797,15 +5791,15 @@ class BuildingTypeClass
     static Find(pID_0 : string | any) : BuildingTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string | any) : number;
+    static FindIndex(pID_0 : string | any) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // AbstractTypeClass
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
@@ -5822,14 +5816,14 @@ class BuildingTypeClass
     // public bool IsVehicle() const
     IsVehicle() : boolean;
     // public short GetFoundationWidth() const
-    GetFoundationWidth() : number;
+    GetFoundationWidth() : short;
     // public short GetFoundationHeight(bool bIncludeBib) const
-    GetFoundationHeight(bIncludeBib_0 : boolean) : number;
+    GetFoundationHeight(bIncludeBib_0 : boolean) : short;
     // public bool CanPlaceHere(CellStruct * cell, HouseClass * owner) const
     CanPlaceHere(cell_0 : CellStruct, owner_1 : HouseClass) : boolean;
     // helpers
     // public bool HasSuperWeapon(int index) const
-    HasSuperWeapon(index_0 : number) : boolean;
+    HasSuperWeapon(index_0 : int) : boolean;
     // public bool HasSuperWeapon() const
     HasSuperWeapon() : boolean;
     // public bool CanTogglePower() const
@@ -5841,7 +5835,7 @@ class BuildingTypeClass
     // public static AbstractType const AbsID = AbstractType::BuildingType
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7E4570
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Array
     // public static constant_ptr<DynamicVectorClass<BuildingTypeClass *>, 11025512> const Array = 0xA83C68u
     static s_Array : DynamicVectorClass<BuildingTypeClass>;
@@ -5849,7 +5843,7 @@ class BuildingTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public CellStruct * FoundationData
     m_FoundationData : CellStruct;
     // public SHPStruct * Buildup
@@ -5863,19 +5857,19 @@ class BuildingTypeClass
     // public CoordStruct HalfDamageSmokeLocation2
     m_HalfDamageSmokeLocation2 : CoordStruct;
     // public unsigned long align_E24
-    m_align_E24 : number;
+    m_align_E24 : unsigned_long;
     // public double GateCloseDelay
-    m_GateCloseDelay : number;
+    m_GateCloseDelay : double;
     // public int LightVisibility
-    m_LightVisibility : number;
+    m_LightVisibility : int;
     // public int LightIntensity
-    m_LightIntensity : number;
+    m_LightIntensity : int;
     // public int LightRedTint
-    m_LightRedTint : number;
+    m_LightRedTint : int;
     // public int LightGreenTint
-    m_LightGreenTint : number;
+    m_LightGreenTint : int;
     // public int LightBlueTint
-    m_LightBlueTint : number;
+    m_LightBlueTint : int;
     // public Point2D PrimaryFirePixelOffset
     m_PrimaryFirePixelOffset : Point2D;
     // public Point2D SecondaryFirePixelOffset
@@ -5887,19 +5881,19 @@ class BuildingTypeClass
     // public char[16] BuildupFile
     m_BuildupFile : string;
     // public int BuildupSound
-    m_BuildupSound : number;
+    m_BuildupSound : int;
     // public int PackupSound
-    m_PackupSound : number;
+    m_PackupSound : int;
     // public int CreateUnitSound
-    m_CreateUnitSound : number;
+    m_CreateUnitSound : int;
     // public int UnitEnterSound
-    m_UnitEnterSound : number;
+    m_UnitEnterSound : int;
     // public int UnitExitSound
-    m_UnitExitSound : number;
+    m_UnitExitSound : int;
     // public int WorkingSound
-    m_WorkingSound : number;
+    m_WorkingSound : int;
     // public int NotWorkingSound
-    m_NotWorkingSound : number;
+    m_NotWorkingSound : int;
     // public char[24] PowersUpBuilding
     m_PowersUpBuilding : string;
     // public UnitTypeClass * FreeUnit
@@ -5911,9 +5905,9 @@ class BuildingTypeClass
     // public BuildingTypeClass * SecretBuilding
     m_SecretBuilding : BuildingTypeClass;
     // public int field_EB0
-    m_field_EB0 : number;
+    m_field_EB0 : int;
     // public int Adjacent
-    m_Adjacent : number;
+    m_Adjacent : int;
     // public AbstractType Factory
     m_Factory : AbstractType;
     // public CoordStruct TargetCoordOffset
@@ -5923,33 +5917,33 @@ class BuildingTypeClass
     // public CellStruct * FoundationOutside
     m_FoundationOutside : CellStruct;
     // public int field_ED8
-    m_field_ED8 : number;
+    m_field_ED8 : int;
     // public int DeployFacing
-    m_DeployFacing : number;
+    m_DeployFacing : int;
     // public int PowerBonus
-    m_PowerBonus : number;
+    m_PowerBonus : int;
     // public int PowerDrain
-    m_PowerDrain : number;
+    m_PowerDrain : int;
     // public int ExtraPowerBonus
-    m_ExtraPowerBonus : number;
+    m_ExtraPowerBonus : int;
     // public int ExtraPowerDrain
-    m_ExtraPowerDrain : number;
+    m_ExtraPowerDrain : int;
     // public Foundation Foundation
     m_Foundation : Foundation;
     // public int Height
-    m_Height : number;
+    m_Height : int;
     // public int OccupyHeight
-    m_OccupyHeight : number;
+    m_OccupyHeight : int;
     // public int MidPoint
-    m_MidPoint : number;
+    m_MidPoint : int;
     // public int DoorStages
-    m_DoorStages : number;
+    m_DoorStages : int;
     // public BuildingAnimFrameStruct[6] BuildingAnimFrame
     m_BuildingAnimFrame : BuildingAnimFrameStruct;
     // public BuildingAnimStruct[21] BuildingAnim
     m_BuildingAnim : BuildingAnimStruct;
     // public int Upgrades
-    m_Upgrades : number;
+    m_Upgrades : int;
     // public SHPStruct * DeployingAnim
     m_DeployingAnim : any;
     // public bool DeployingAnimLoaded
@@ -5975,31 +5969,31 @@ class BuildingTypeClass
     // public SHPStruct * SpecialZOverlay
     m_SpecialZOverlay : any;
     // public int SpecialZOverlayZAdjust
-    m_SpecialZOverlayZAdjust : number;
+    m_SpecialZOverlayZAdjust : int;
     // public SHPStruct * BibShape
     m_BibShape : any;
     // public bool BibShapeLoaded
     m_BibShapeLoaded : boolean;
     // public int NormalZAdjust
-    m_NormalZAdjust : number;
+    m_NormalZAdjust : int;
     // public int AntiAirValue
-    m_AntiAirValue : number;
+    m_AntiAirValue : int;
     // public int AntiArmorValue
-    m_AntiArmorValue : number;
+    m_AntiArmorValue : int;
     // public int AntiInfantryValue
-    m_AntiInfantryValue : number;
+    m_AntiInfantryValue : int;
     // public Point2D ZShapePointMove
     m_ZShapePointMove : Point2D;
     // public int unknown_1538
-    m_unknown_1538 : number;
+    m_unknown_1538 : int;
     // public int unknown_153C
-    m_unknown_153C : number;
+    m_unknown_153C : int;
     // public int unknown_1540
-    m_unknown_1540 : number;
+    m_unknown_1540 : int;
     // public int unknown_1544
-    m_unknown_1544 : number;
+    m_unknown_1544 : int;
     // public unsigned short ExtraLight
-    m_ExtraLight : number;
+    m_ExtraLight : unsigned_short;
     // public bool TogglePower
     m_TogglePower : boolean;
     // public bool HasSpotlight
@@ -6019,19 +6013,19 @@ class BuildingTypeClass
     // public bool NeedsEngineer
     m_NeedsEngineer : boolean;
     // public int CaptureEvaEvent
-    m_CaptureEvaEvent : number;
+    m_CaptureEvaEvent : int;
     // public int ProduceCashStartup
-    m_ProduceCashStartup : number;
+    m_ProduceCashStartup : int;
     // public int ProduceCashAmount
-    m_ProduceCashAmount : number;
+    m_ProduceCashAmount : int;
     // public int ProduceCashDelay
-    m_ProduceCashDelay : number;
+    m_ProduceCashDelay : int;
     // public int InfantryGainSelfHeal
-    m_InfantryGainSelfHeal : number;
+    m_InfantryGainSelfHeal : int;
     // public int UnitsGainSelfHeal
-    m_UnitsGainSelfHeal : number;
+    m_UnitsGainSelfHeal : int;
     // public int RefinerySmokeFrames
-    m_RefinerySmokeFrames : number;
+    m_RefinerySmokeFrames : int;
     // public bool Bib
     m_Bib : boolean;
     // public bool Wall
@@ -6059,7 +6053,7 @@ class BuildingTypeClass
     // public bool CanOccupyFire
     m_CanOccupyFire : boolean;
     // public int MaxNumberOccupants
-    m_MaxNumberOccupants : number;
+    m_MaxNumberOccupants : int;
     // public bool ShowOccupantPips
     m_ShowOccupantPips : boolean;
     // public Point2D[10] MuzzleFlash
@@ -6069,7 +6063,7 @@ class BuildingTypeClass
     // public Point2D QueueingCell
     m_QueueingCell : Point2D;
     // public int NumberImpassableRows
-    m_NumberImpassableRows : number;
+    m_NumberImpassableRows : int;
     // public Point2D[8] RemoveOccupy
     m_RemoveOccupy : Point2D;
     // public Point2D[8] AddOccupy
@@ -6159,15 +6153,15 @@ class BuildingTypeClass
     // public bool FactoryPlant
     m_FactoryPlant : boolean;
     // public float InfantryCostBonus
-    m_InfantryCostBonus : number;
+    m_InfantryCostBonus : float;
     // public float UnitsCostBonus
-    m_UnitsCostBonus : number;
+    m_UnitsCostBonus : float;
     // public float AircraftCostBonus
-    m_AircraftCostBonus : number;
+    m_AircraftCostBonus : float;
     // public float BuildingsCostBonus
-    m_BuildingsCostBonus : number;
+    m_BuildingsCostBonus : float;
     // public float DefensesCostBonus
-    m_DefensesCostBonus : number;
+    m_DefensesCostBonus : float;
     // public bool GDIBarracks
     m_GDIBarracks : boolean;
     // public bool NODBarracks
@@ -6175,17 +6169,17 @@ class BuildingTypeClass
     // public bool YuriBarracks
     m_YuriBarracks : boolean;
     // public float ChargedAnimTime
-    m_ChargedAnimTime : number;
+    m_ChargedAnimTime : float;
     // public int DelayedFireDelay
-    m_DelayedFireDelay : number;
+    m_DelayedFireDelay : int;
     // public int SuperWeapon
-    m_SuperWeapon : number;
+    m_SuperWeapon : int;
     // public int SuperWeapon2
-    m_SuperWeapon2 : number;
+    m_SuperWeapon2 : int;
     // public int GateStages
-    m_GateStages : number;
+    m_GateStages : int;
     // public int PowersUpToLevel
-    m_PowersUpToLevel : number;
+    m_PowersUpToLevel : int;
     // public bool DamagedDoor
     m_DamagedDoor : boolean;
     // public bool InvisibleInGame
@@ -6201,13 +6195,13 @@ class BuildingTypeClass
     // public bool IsBaseDefense
     m_IsBaseDefense : boolean;
     // public unsigned char CloakRadiusInCells
-    m_CloakRadiusInCells : number;
+    m_CloakRadiusInCells : unsigned_char;
     // public bool ConcentricRadialIndicator
     m_ConcentricRadialIndicator : boolean;
     // public int PsychicDetectionRadius
-    m_PsychicDetectionRadius : number;
+    m_PsychicDetectionRadius : int;
     // public int BarrelStartPitch
-    m_BarrelStartPitch : number;
+    m_BarrelStartPitch : int;
     // public char[28] VoxelBarrelFile
     m_VoxelBarrelFile : string;
     // public CoordStruct VoxelBarrelOffsetToPitchPivotPoint
@@ -6241,7 +6235,7 @@ class BuildingTypeClass
     // public char[19] TheaterSpecificID
     m_TheaterSpecificID : string;
     // public int NumberOfDocks
-    m_NumberOfDocks : number;
+    m_NumberOfDocks : int;
     // public VectorClass<Vector3D<int>> DockingOffsets
     m_DockingOffsets : VectorClass<Vector3D>;
 }
@@ -6257,9 +6251,9 @@ class BuildingAnimStruct
     // public Point2D Position
     m_Position : Point2D;
     // public int ZAdjust
-    m_ZAdjust : number;
+    m_ZAdjust : int;
     // public int YSort
-    m_YSort : number;
+    m_YSort : int;
     // public bool Powered
     m_Powered : boolean;
     // public bool PoweredLight
@@ -6282,20 +6276,20 @@ class OverlayTypeClass
     static Find(pID_0 : string) : OverlayTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual CoordStruct * vt_entry_6C(CoordStruct * pDest, CoordStruct * pSrc) const
     vt_entry_6C(pDest_0 : CoordStruct | any, pSrc_1 : CoordStruct | any) : CoordStruct;
@@ -6305,7 +6299,7 @@ class OverlayTypeClass
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     // OverlayTypeClass
     // public virtual void Draw(Point2D * pClientCoords, RectangleStruct * pClipRect, int nFrame)
-    Draw(pClientCoords_0 : Point2D, pClipRect_1 : RectangleStruct, nFrame_2 : number) : void;
+    Draw(pClientCoords_0 : Point2D, pClipRect_1 : RectangleStruct, nFrame_2 : int) : void;
     // public static AbstractType const AbsID = AbstractType::OverlayType
     static s_AbsID : AbstractType;
     // Array
@@ -6315,15 +6309,15 @@ class OverlayTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public LandType LandType
     m_LandType : LandType;
     // public AnimTypeClass * CellAnim
     m_CellAnim : AnimTypeClass;
     // public int DamageLevels
-    m_DamageLevels : number;
+    m_DamageLevels : int;
     // public int Strength
-    m_Strength : number;
+    m_Strength : int;
     // public bool Wall
     m_Wall : boolean;
     // public bool Tiberium
@@ -6373,20 +6367,20 @@ class UnitTypeClass
     static Find(pID_0 : string | any) : UnitTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string | any) : number;
+    static FindIndex(pID_0 : string | any) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
@@ -6395,7 +6389,7 @@ class UnitTypeClass
     // public static AbstractType const AbsID = AbstractType::UnitType
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7F6218
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Array
     // public static constant_ptr<DynamicVectorClass<UnitTypeClass *>, 11025632> const Array = 0xA83CE0u
     static s_Array : DynamicVectorClass<UnitTypeClass>;
@@ -6403,7 +6397,7 @@ class UnitTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public LandType MovementRestrictedTo
     m_MovementRestrictedTo : LandType;
     // public CoordStruct HalfDamageSmokeLocation
@@ -6442,41 +6436,41 @@ class UnitTypeClass
     // public bool NonVehicle
     m_NonVehicle : boolean;
     // public int StandingFrames
-    m_StandingFrames : number;
+    m_StandingFrames : int;
     // public int DeathFrames
-    m_DeathFrames : number;
+    m_DeathFrames : int;
     // public int DeathFrameRate
-    m_DeathFrameRate : number;
+    m_DeathFrameRate : int;
     // public int StartStandFrame
-    m_StartStandFrame : number;
+    m_StartStandFrame : int;
     // public int StartWalkFrame
-    m_StartWalkFrame : number;
+    m_StartWalkFrame : int;
     // public int StartFiringFrame
-    m_StartFiringFrame : number;
+    m_StartFiringFrame : int;
     // public int StartDeathFrame
-    m_StartDeathFrame : number;
+    m_StartDeathFrame : int;
     // public int MaxDeathCounter
-    m_MaxDeathCounter : number;
+    m_MaxDeathCounter : int;
     // public int Facings
-    m_Facings : number;
+    m_Facings : int;
     // public int FiringSyncFrame0
-    m_FiringSyncFrame0 : number;
+    m_FiringSyncFrame0 : int;
     // public int FiringSyncFrame1
-    m_FiringSyncFrame1 : number;
+    m_FiringSyncFrame1 : int;
     // public int BurstDelay0
-    m_BurstDelay0 : number;
+    m_BurstDelay0 : int;
     // public int BurstDelay1
-    m_BurstDelay1 : number;
+    m_BurstDelay1 : int;
     // public int BurstDelay2
-    m_BurstDelay2 : number;
+    m_BurstDelay2 : int;
     // public int BurstDelay3
-    m_BurstDelay3 : number;
+    m_BurstDelay3 : int;
     // public SHPStruct * AltImage
     m_AltImage : any;
     // public char WalkFrames
-    m_WalkFrames : number;
+    m_WalkFrames : char;
     // public char FiringFrames
-    m_FiringFrames : number;
+    m_FiringFrames : char;
     // public char[25] AltImageFile
     m_AltImageFile : string;
 }
@@ -6484,11 +6478,11 @@ class UnitTypeClass
 class BuildingAnimFrameStruct
 {
     // public unsigned long dwUnknown
-    m_dwUnknown : number;
+    m_dwUnknown : unsigned_long;
     // public int FrameCount
-    m_FrameCount : number;
+    m_FrameCount : int;
     // public int FrameDuration
-    m_FrameDuration : number;
+    m_FrameDuration : int;
 }
 // The AbstractClass is the base class of all game objects.
 // FactoryClass
@@ -6500,17 +6494,17 @@ class FactoryClass
     constructor();
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // returns whether progress "IsDifferent" and resets the flag
     // public bool HasProgressChanged()
     HasProgressChanged() : boolean;
@@ -6524,16 +6518,16 @@ class FactoryClass
     // public bool Unsuspend(bool manual)
     Unsuspend(manual_0 : boolean) : boolean;
     // public int GetBuildTimeFrames() const
-    GetBuildTimeFrames() : number;
+    GetBuildTimeFrames() : int;
     // public bool AbandonProduction()
     AbandonProduction() : boolean;
     // returns Production.Value
     // public int GetProgress() const
-    GetProgress() : number;
+    GetProgress() : int;
     // public bool IsDone() const
     IsDone() : boolean;
     // public int GetCostPerStep() const
-    GetCostPerStep() : number;
+    GetCostPerStep() : int;
     // checks the progress and updates the state if done
     // public bool CompletedProduction()
     CompletedProduction() : boolean;
@@ -6544,7 +6538,7 @@ class FactoryClass
     RemoveOneFromQueue(pItem_0 : TechnoTypeClass) : boolean;
     // in queue and in production
     // public int CountTotal(TechnoTypeClass const * pType) const
-    CountTotal(pType_0 : TechnoTypeClass) : number;
+    CountTotal(pType_0 : TechnoTypeClass) : int;
     // whether at least one item is queued, not in production
     // public bool IsQueued(TechnoTypeClass const * pType) const
     IsQueued(pType_0 : TechnoTypeClass) : boolean;
@@ -6569,12 +6563,12 @@ class FactoryClass
     m_IsDifferent : boolean;
     // credits house still owes us for building this
     // public int Balance
-    m_Balance : number;
+    m_Balance : int;
     // public int OriginalBalance
-    m_OriginalBalance : number;
+    m_OriginalBalance : int;
     // -1 = none, else Iron Curtain? (was EMPulse in TS)
     // public int SpecialItem
-    m_SpecialItem : number;
+    m_SpecialItem : int;
     // public HouseClass * Owner
     m_Owner : HouseClass;
     // completed production, before next (or waiting to place)
@@ -6590,17 +6584,17 @@ class StageClass
     // public StageClass()
     constructor();
     // public StageClass(int rate)
-    constructor(rate_0 : number);
+    constructor(rate_0 : int);
     // public void Start(int rate)
-    Start(rate_0 : number) : void;
+    Start(rate_0 : int) : void;
     // public void Start(int rate, int step)
-    Start(rate_0 : number, step_1 : number) : void;
+    Start(rate_0 : int, step_1 : int) : void;
     // returns whether the value changed.
     // public bool Update()
     Update() : boolean;
     // the current stage value
     // public int Value
-    m_Value : number;
+    m_Value : int;
     // if the timer expired this frame and the stage value changed
     // public bool HasChanged
     m_HasChanged : boolean;
@@ -6608,10 +6602,10 @@ class StageClass
     m_Timer : CDTimerClass;
     // how many frames it takes to increment the stage value
     // public int Rate
-    m_Rate : number;
+    m_Rate : int;
     // added to the stage value every time the timer expires
     // public int Step
-    m_Step : number;
+    m_Step : int;
 }
 // forward declarations
 // InfantryClass
@@ -6623,18 +6617,18 @@ class InfantryClass
     constructor(pType_0 : InfantryTypeClass, pOwner_1 : HouseClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectClass
     // public virtual Action MouseOverObject(ObjectClass const * pObject, bool ignoreForce = false) const
     MouseOverObject(pObject_0 : ObjectClass | any, ignoreForce_1 : boolean | any) : Action;
     // TechnoClass
     // public virtual FireError GetFireError(AbstractClass * pTarget, int nWeaponIndex, bool ignoreRange) const
-    GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : number | any, ignoreRange_2 : boolean | any) : FireError;
+    GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : int | any, ignoreRange_2 : boolean | any) : FireError;
     // InfantryClass
     // public virtual bool IsDeployed() const
     IsDeployed() : boolean;
@@ -6643,7 +6637,7 @@ class InfantryClass
     // public static AbstractType const AbsID = AbstractType::Infantry
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7EB058
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Static
     // public static constant_ptr<DynamicVectorClass<InfantryClass *>, 11025896> const Array = 0xA83DE8u
     static s_Array : DynamicVectorClass<InfantryClass>;
@@ -6659,7 +6653,7 @@ class InfantryClass
     m_unknown_Timer_6C8 : CDTimerClass;
     // set in ReceiveDamage on panicky units
     // public unsigned long PanicDurationLeft
-    m_PanicDurationLeft : number;
+    m_PanicDurationLeft : unsigned_long;
     // set by script action, not cleared anywhere
     // public bool PermanentBerzerk
     m_PermanentBerzerk : boolean;
@@ -6674,11 +6668,11 @@ class InfantryClass
     // public bool unknown_bool_6DD
     m_unknown_bool_6DD : boolean;
     // public unsigned long unknown_6E0
-    m_unknown_6E0 : number;
+    m_unknown_6E0 : unsigned_long;
     // public bool ShouldDeploy
     m_ShouldDeploy : boolean;
     // public int unknown_int_6E8
-    m_unknown_int_6E8 : number;
+    m_unknown_int_6E8 : int;
 }
 // forward declarations
 // FootClass
@@ -6692,12 +6686,12 @@ class FootClass
     // ObjectClass
     // MissionClass
     // public virtual int Mission_AreaGuard()
-    Mission_AreaGuard() : number;
+    Mission_AreaGuard() : int;
     // TechnoClass
     // public virtual void Destroyed(ObjectClass * Killer)
     Destroyed(Killer_0 : ObjectClass | any) : void;
     // public virtual bool ForceCreate(CoordStruct& coord, unsigned long dwUnk = 0)
-    ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : number | any) : boolean;
+    ForceCreate(coord_0 : CoordStruct | any, dwUnk_1 : unsigned_long | any) : boolean;
     // public virtual AbstractClass * GreatestThreat(ThreatType threat, CoordStruct * pCoord, bool onlyTargetHouseEnemy)
     GreatestThreat(threat_0 : ThreatType | any, pCoord_1 : CoordStruct | any, onlyTargetHouseEnemy_2 : boolean | any) : AbstractClass;
     // FootClass
@@ -6730,9 +6724,9 @@ class FootClass
     // public virtual bool ChronoWarpTo(CoordStruct pDest)
     ChronoWarpTo(pDest_0 : CoordStruct) : boolean;
     // public virtual void Draw_A_SHP(SHPStruct * SHP, int idxFacing, Point2D * Coords, RectangleStruct * Rectangle, unsigned long dwUnk5, unsigned long dwUnk6, unsigned long dwUnk7, ZGradient ZGradient, unsigned long dwUnk9, int extraLight, unsigned long dwUnk11, unsigned long dwUnk12, unsigned long dwUnk13, unsigned long dwUnk14, unsigned long dwUnk15, unsigned long dwUnk16)
-    Draw_A_SHP(SHP_0 : any, idxFacing_1 : number, Coords_2 : Point2D, Rectangle_3 : RectangleStruct, dwUnk5_4 : number, dwUnk6_5 : number, dwUnk7_6 : number, ZGradient_7 : ZGradient, dwUnk9_8 : number, extraLight_9 : number, dwUnk11_10 : number, dwUnk12_11 : number, dwUnk13_12 : number, dwUnk14_13 : number, dwUnk15_14 : number, dwUnk16_15 : number) : void;
+    Draw_A_SHP(SHP_0 : any, idxFacing_1 : int, Coords_2 : Point2D, Rectangle_3 : RectangleStruct, dwUnk5_4 : unsigned_long, dwUnk6_5 : unsigned_long, dwUnk7_6 : unsigned_long, ZGradient_7 : ZGradient, dwUnk9_8 : unsigned_long, extraLight_9 : int, dwUnk11_10 : unsigned_long, dwUnk12_11 : unsigned_long, dwUnk13_12 : unsigned_long, dwUnk14_13 : unsigned_long, dwUnk15_14 : unsigned_long, dwUnk16_15 : unsigned_long) : void;
     // public virtual void Draw_A_VXL(VoxelStruct * VXL, int HVAFrameIndex, int Flags, IndexClass<int, int> * Cache, RectangleStruct * Rectangle, Point2D * CenterPoint, Matrix3D * Matrix, unsigned long dwUnk8, unsigned long DrawFlags, unsigned long dwUnk10)
-    Draw_A_VXL(VXL_0 : any, HVAFrameIndex_1 : number, Flags_2 : number, Cache_3 : any, Rectangle_4 : RectangleStruct, CenterPoint_5 : Point2D, Matrix_6 : Matrix3D, dwUnk8_7 : number, DrawFlags_8 : number, dwUnk10_9 : number) : void;
+    Draw_A_VXL(VXL_0 : any, HVAFrameIndex_1 : int, Flags_2 : int, Cache_3 : any, Rectangle_4 : RectangleStruct, CenterPoint_5 : Point2D, Matrix_6 : Matrix3D, dwUnk8_7 : unsigned_long, DrawFlags_8 : unsigned_long, dwUnk10_9 : unsigned_long) : void;
     // public virtual void GoBerzerk()
     GoBerzerk() : void;
     // public virtual void Panic()
@@ -6740,25 +6734,25 @@ class FootClass
     // public virtual void UnPanic()
     UnPanic() : void;
     // public virtual void PlayIdleAnim(int nIdleAnimNumber)
-    PlayIdleAnim(nIdleAnimNumber_0 : number) : void;
+    PlayIdleAnim(nIdleAnimNumber_0 : int) : void;
     // public virtual unsigned long vt_entry_524()
-    vt_entry_524() : number;
+    vt_entry_524() : unsigned_long;
     // public virtual BuildingClass * TryNearestDockBuilding(TypeList<BuildingTypeClass *> * bList, unsigned long dwUnk2, unsigned long dwUnk3) const
-    TryNearestDockBuilding(bList_0 : TypeList<BuildingTypeClass>, dwUnk2_1 : number, dwUnk3_2 : number) : BuildingClass;
+    TryNearestDockBuilding(bList_0 : TypeList<BuildingTypeClass>, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long) : BuildingClass;
     // public virtual BuildingClass * FindCloserDockBuilding(BuildingTypeClass * bType, unsigned long dwUnk2, unsigned long dwUnk3, int * pDistance) const
-    FindCloserDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : number, dwUnk3_2 : number, pDistance_3 : ArrayBuffer) : BuildingClass;
+    FindCloserDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long, pDistance_3 : ArrayBuffer) : BuildingClass;
     // public virtual BuildingClass * FindNearestDockBuilding(BuildingTypeClass * bType, unsigned long dwUnk2, unsigned long dwUnk3) const
-    FindNearestDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : number, dwUnk3_2 : number) : BuildingClass;
+    FindNearestDockBuilding(bType_0 : BuildingTypeClass, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long) : BuildingClass;
     // public virtual void vt_entry_534(unsigned long dwUnk, unsigned long dwUnk2)
-    vt_entry_534(dwUnk_0 : number, dwUnk2_1 : number) : void;
+    vt_entry_534(dwUnk_0 : unsigned_long, dwUnk2_1 : unsigned_long) : void;
     // public virtual int GetCurrentSpeed() const
-    GetCurrentSpeed() : number;
+    GetCurrentSpeed() : int;
     // public virtual AbstractClass * vt_entry_53C(unsigned long dwUnk)
-    vt_entry_53C(dwUnk_0 : number) : AbstractClass;
+    vt_entry_53C(dwUnk_0 : unsigned_long) : AbstractClass;
     // public virtual void vt_entry_540(unsigned long dwUnk)
-    vt_entry_540(dwUnk_0 : number) : void;
+    vt_entry_540(dwUnk_0 : unsigned_long) : void;
     // public virtual void SetSpeedPercentage(double percentage)
-    SetSpeedPercentage(percentage_0 : number) : void;
+    SetSpeedPercentage(percentage_0 : double) : void;
     // public virtual void vt_entry_548()
     vt_entry_548() : void;
     // public virtual void vt_entry_54C()
@@ -6786,7 +6780,7 @@ class FootClass
     // public void AbortMotion()
     AbortMotion() : void;
     // public bool UpdatePathfinding(CellStruct unkCell, CellStruct unkCell2, int unk3)
-    UpdatePathfinding(unkCell_0 : CellStruct, unkCell2_1 : CellStruct, unk3_2 : number) : boolean;
+    UpdatePathfinding(unkCell_0 : CellStruct, unkCell2_1 : CellStruct, unk3_2 : int) : boolean;
     // Removes the first passenger and updates the Gunner.
     // public FootClass * RemoveFirstPassenger()
     RemoveFirstPassenger() : FootClass;
@@ -6804,17 +6798,17 @@ class FootClass
     ClearNavigationList() : void;
     // searches cell, sets destination, and returns whether unit is on that cell
     // public bool MoveToTiberium(int radius, bool scanClose = false)
-    MoveToTiberium(radius_0 : number, scanClose_1 : boolean) : boolean;
+    MoveToTiberium(radius_0 : int, scanClose_1 : boolean) : boolean;
     // searches cell, sets destination, and returns whether unit is on that cell
     // public bool MoveToWeed(int radius)
-    MoveToWeed(radius_0 : number) : boolean;
+    MoveToWeed(radius_0 : int) : boolean;
     // public static AbstractFlags const AbsDerivateID = AbstractFlags::Foot
     static s_AbsDerivateID : AbstractFlags;
     // public static constant_ptr<DynamicVectorClass<FootClass *>, 9125312> const Array = 0x8B3DC0u
     static s_Array : DynamicVectorClass<FootClass>;
     // which planning path am I following?
     // public int PlanningPathIdx
-    m_PlanningPathIdx : number;
+    m_PlanningPathIdx : int;
     // add to WaypointCell to get Nearby_Cell for this foot
     // public CellStruct WaypointNearbyAccessibleCellDelta
     m_WaypointNearbyAccessibleCellDelta : CellStruct;
@@ -6823,17 +6817,17 @@ class FootClass
     m_WaypointCell : CellStruct;
     // unused?
     // public unsigned long unknown_52C
-    m_unknown_52C : number;
+    m_unknown_52C : unsigned_long;
     // public unsigned long unknown_530
-    m_unknown_530 : number;
+    m_unknown_530 : unsigned_long;
     // public unsigned long unknown_534
-    m_unknown_534 : number;
+    m_unknown_534 : unsigned_long;
     // public int WalkedFramesSoFar
-    m_WalkedFramesSoFar : number;
+    m_WalkedFramesSoFar : int;
     // public bool IsMoveSoundPlaying
     m_IsMoveSoundPlaying : boolean;
     // public int MoveSoundDelay
-    m_MoveSoundDelay : number;
+    m_MoveSoundDelay : int;
     // public CellStruct CurrentMapCoords
     m_CurrentMapCoords : CellStruct;
     // ::UpdatePosition uses this to remove threat from last occupied cell, etc
@@ -6848,9 +6842,9 @@ class FootClass
     // public CoordStruct unknown_coords_568
     m_unknown_coords_568 : CoordStruct;
     // public double SpeedPercentage
-    m_SpeedPercentage : number;
+    m_SpeedPercentage : double;
     // public double SpeedMultiplier
-    m_SpeedMultiplier : number;
+    m_SpeedMultiplier : double;
     // public AbstractClass * unknown_5A0
     m_unknown_5A0 : AbstractClass;
     // possibly other objects as well
@@ -6869,7 +6863,7 @@ class FootClass
     m_MegaTarget : AbstractClass;
     // unused?
     // public unsigned char unknown_5D0
-    m_unknown_5D0 : number;
+    m_unknown_5D0 : unsigned_char;
     // fighting an enemy on the way
     // public bool HaveAttackMoveTarget
     m_HaveAttackMoveTarget : boolean;
@@ -6879,22 +6873,22 @@ class FootClass
     // public FootClass * NextTeamMember
     m_NextTeamMember : FootClass;
     // public unsigned long unknown_5DC
-    m_unknown_5DC : number;
+    m_unknown_5DC : unsigned_long;
     // list of directions to move in next, like tube directions
     // public int[24] PathDirections
-    m_PathDirections : number;
+    m_PathDirections : int;
     // public int unknown_int_64C
-    m_unknown_int_64C : number;
+    m_unknown_int_64C : int;
     // public CoordStruct unknown_point3d_678
     m_unknown_point3d_678 : CoordStruct;
     // I'm in this tunnel
     // public char TubeIndex
-    m_TubeIndex : number;
+    m_TubeIndex : char;
     // public bool unknown_bool_685
     m_unknown_bool_685 : boolean;
     // which waypoint in my planning path am I following?
     // public char WaypointIndex
-    m_WaypointIndex : number;
+    m_WaypointIndex : char;
     // public bool unknown_bool_687
     m_unknown_bool_687 : boolean;
     // public bool unknown_bool_688
@@ -6925,7 +6919,7 @@ class FootClass
     // public FootClass * ParasiteEatingMe
     m_ParasiteEatingMe : FootClass;
     // public int LastBeParasitedStartFrame
-    m_LastBeParasitedStartFrame : number;
+    m_LastBeParasitedStartFrame : int;
     // my parasitic half, nonzero for, eg, terror drone or squiddy
     // public ParasiteClass * ParasiteImUsing
     m_ParasiteImUsing : ParasiteClass;
@@ -7004,21 +6998,21 @@ class TeamClass
 {
     // Constructor
     // public TeamClass(TeamTypeClass * pType, HouseClass * pOwner, int _unknown_44)
-    constructor(pType_0 : TeamTypeClass, pOwner_1 : HouseClass, _unknown_44_2 : number);
+    constructor(pType_0 : TeamTypeClass, pOwner_1 : HouseClass, _unknown_44_2 : int);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // fills dest with all types needed to complete this team. each type is
     // included as often as it is needed.
     // public void GetTaskForceMissingMemberTypes(DynamicVectorClass<TechnoTypeClass *>& dest) const
     GetTaskForceMissingMemberTypes(dest_0 : DynamicVectorClass<TechnoTypeClass>) : void;
     // public void LiberateMember(FootClass * pFoot, int idx = -1, unsigned char count = 0)
-    LiberateMember(pFoot_0 : FootClass, idx_1 : number, count_2 : number) : void;
+    LiberateMember(pFoot_0 : FootClass, idx_1 : int, count_2 : unsigned_char) : void;
     // if bKeepQuantity is false, this will not change the quantity of each techno member
     // public bool AddMember(FootClass * pFoot, bool bForce)
     AddMember(pFoot_0 : FootClass, bForce_1 : boolean) : boolean;
@@ -7028,7 +7022,7 @@ class TeamClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public static AbstractType const AbsID = AbstractType::Team
     static s_AbsID : AbstractType;
     // Static
@@ -7054,13 +7048,13 @@ class TeamClass
     // public AbstractClass * Focus
     m_Focus : AbstractClass;
     // public int unknown_44
-    m_unknown_44 : number;
+    m_unknown_44 : int;
     // public int TotalObjects
-    m_TotalObjects : number;
+    m_TotalObjects : int;
     // public int TotalThreatValue
-    m_TotalThreatValue : number;
+    m_TotalThreatValue : int;
     // public int CreationFrame
-    m_CreationFrame : number;
+    m_CreationFrame : int;
     // public FootClass * FirstUnit
     m_FirstUnit : FootClass;
     // public CDTimerClass GuardAreaTimer
@@ -7107,7 +7101,7 @@ class TeamClass
     m_AchievedGreatSuccess : boolean;
     // counts of each object specified in the Type
     // public int[6] CountObjects
-    m_CountObjects : number;
+    m_CountObjects : int;
 }
 // ---
 // TeamTypeClass
@@ -7122,20 +7116,20 @@ class TeamTypeClass
     static Find(pID_0 : string) : TeamTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public static bool LoadFromINIList(CCINIClass * pINI, bool IsGlobal)
     static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
     // public TeamClass * CreateTeam(HouseClass * pHouse)
@@ -7143,7 +7137,7 @@ class TeamTypeClass
     // public void DestroyAllInstances()
     DestroyAllInstances() : void;
     // public int GetGroup() const
-    GetGroup() : number;
+    GetGroup() : int;
     // public CellStruct * GetWaypoint(CellStruct * buffer) const
     GetWaypoint(buffer_0 : CellStruct) : CellStruct;
     // public CellStruct * GetTransportWaypoint(CellStruct * buffer) const
@@ -7151,7 +7145,7 @@ class TeamTypeClass
     // public bool CanRecruitUnit(FootClass * pUnit, HouseClass * pOwner) const
     CanRecruitUnit(pUnit_0 : FootClass, pOwner_1 : HouseClass) : boolean;
     // public void FlashAllInstances(int Duration)
-    FlashAllInstances(Duration_0 : number) : void;
+    FlashAllInstances(Duration_0 : int) : void;
     // public TeamClass * FindFirstInstance() const
     FindFirstInstance() : TeamClass;
     // public void ProcessTaskForce()
@@ -7169,11 +7163,11 @@ class TeamTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public int Group
-    m_Group : number;
+    m_Group : int;
     // public int VeteranLevel
-    m_VeteranLevel : number;
+    m_VeteranLevel : int;
     // public bool Loadable
     m_Loadable : boolean;
     // public bool Full
@@ -7207,36 +7201,36 @@ class TeamTypeClass
     // public bool OnTransOnly
     m_OnTransOnly : boolean;
     // public int Priority
-    m_Priority : number;
+    m_Priority : int;
     // public int Max
-    m_Max : number;
+    m_Max : int;
     // public int field_BC
-    m_field_BC : number;
+    m_field_BC : int;
     // public int MindControlDecision
-    m_MindControlDecision : number;
+    m_MindControlDecision : int;
     // public HouseClass * Owner
     m_Owner : HouseClass;
     // idx for MP
     // public int idxHouse
-    m_idxHouse : number;
+    m_idxHouse : int;
     // public int TechLevel
-    m_TechLevel : number;
+    m_TechLevel : int;
     // public TagClass * Tag
     m_Tag : TagClass;
     // public int Waypoint
-    m_Waypoint : number;
+    m_Waypoint : int;
     // public int TransportWaypoint
-    m_TransportWaypoint : number;
+    m_TransportWaypoint : int;
     // public int cntInstances
-    m_cntInstances : number;
+    m_cntInstances : int;
     // public ScriptTypeClass * ScriptType
     m_ScriptType : ScriptTypeClass;
     // public TaskForceClass * TaskForce
     m_TaskForce : TaskForceClass;
     // public int IsGlobal
-    m_IsGlobal : number;
+    m_IsGlobal : int;
     // public int field_EC
-    m_field_EC : number;
+    m_field_EC : int;
     // public bool field_F0
     m_field_F0 : boolean;
     // public bool field_F1
@@ -7270,25 +7264,25 @@ class TagClass
     static DeleteAll() : void;
     // notifies all tags in array that a global was updated
     // public static void NotifyGlobalChanged(int idxGlobal)
-    static NotifyGlobalChanged(idxGlobal_0 : number) : void;
+    static NotifyGlobalChanged(idxGlobal_0 : int) : void;
     // notifies all tags in array that a global was updated
     // public static void NotifyLocalChanged(int idxLocal)
-    static NotifyLocalChanged(idxLocal_0 : number) : void;
+    static NotifyLocalChanged(idxLocal_0 : int) : void;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual void PointerExpired(AbstractClass * pAbstract, bool removed)
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public virtual void ComputeCRC(CRCEngine& crc) const
     ComputeCRC(crc_0 : any | any) : void;
     // contains at least one Crosses Horizontal Line event
@@ -7305,10 +7299,10 @@ class TagClass
     HasAllowWinAction() : boolean;
     // called when a global is updated
     // public void GlobalChanged(int idxGlobal)
-    GlobalChanged(idxGlobal_0 : number) : void;
+    GlobalChanged(idxGlobal_0 : int) : void;
     // called when a local is updated
     // public void LocalChanged(int idxLocal)
-    LocalChanged(idxLocal_0 : number) : void;
+    LocalChanged(idxLocal_0 : int) : void;
     // whether there exist no other tag having the same type
     // note: this is not the same as this->InstanceCount
     // public bool IsOnlyInstanceOfType() const
@@ -7345,7 +7339,7 @@ class TagClass
     // public TriggerClass * FirstTrigger
     m_FirstTrigger : TriggerClass;
     // public int InstanceCount
-    m_InstanceCount : number;
+    m_InstanceCount : int;
     // public CellStruct DefaultCoords
     m_DefaultCoords : CellStruct;
     // public bool Destroyed
@@ -7366,26 +7360,26 @@ class TagTypeClass
     static Find(pID_0 : string) : TagTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual void PointerExpired(AbstractClass * pAbstract, bool removed)
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public virtual void ComputeCRC(CRCEngine& crc) const
     ComputeCRC(crc_0 : any | any) : void;
     // AbstractTypeClass
     // public virtual int GetArrayIndex() const
-    GetArrayIndex() : number;
+    GetArrayIndex() : int;
     // public virtual bool LoadFromINI(CCINIClass * pINI)
     LoadFromINI(pINI_0 : CCINIClass | any) : boolean;
     // public virtual bool SaveToINI(CCINIClass * pINI)
@@ -7429,7 +7423,7 @@ class TagTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public TriggerPersistence Persistence
     m_Persistence : TriggerPersistence;
     // public TriggerTypeClass * FirstTrigger
@@ -7448,26 +7442,26 @@ class TriggerTypeClass
     static Find(pID_0 : string) : TriggerTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual void PointerExpired(AbstractClass * pAbstract, bool removed)
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public virtual void ComputeCRC(CRCEngine& crc) const
     ComputeCRC(crc_0 : any | any) : void;
     // AbstractTypeClass
     // public virtual int GetArrayIndex() const
-    GetArrayIndex() : number;
+    GetArrayIndex() : int;
     // public virtual bool LoadFromINI(CCINIClass * pINI)
     LoadFromINI(pINI_0 : CCINIClass | any) : boolean;
     // public virtual bool SaveToINI(CCINIClass * pINI)
@@ -7486,10 +7480,10 @@ class TriggerTypeClass
     HasAllowWinAction() : boolean;
     // contains at least one Global Set or Global Cleared event
     // public bool HasGlobalSetOrClearedEvent(int idxGlobal) const
-    HasGlobalSetOrClearedEvent(idxGlobal_0 : number) : boolean;
+    HasGlobalSetOrClearedEvent(idxGlobal_0 : int) : boolean;
     // contains at least one Local Set or Local Cleared event
     // public bool HasLocalSetOrClearedEvent(int idxLocal) const
-    HasLocalSetOrClearedEvent(idxLocal_0 : number) : boolean;
+    HasLocalSetOrClearedEvent(idxLocal_0 : int) : boolean;
     // contains at least one Crosses Horizontal Line event
     // public bool HasCrossesHorizontalLineEvent() const
     HasCrossesHorizontalLineEvent() : boolean;
@@ -7514,7 +7508,7 @@ class TriggerTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // easy = 0, normal = 1, hard = 2
     // public bool[3] Difficulty
     m_Difficulty : boolean;
@@ -7542,23 +7536,23 @@ class TActionClass
     constructor();
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual void PointerExpired(AbstractClass * pAbstract, bool removed)
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public virtual void ComputeCRC(CRCEngine& crc) const
     ComputeCRC(crc_0 : any | any) : void;
     // public virtual int GetArrayIndex() const
-    GetArrayIndex() : number;
+    GetArrayIndex() : int;
     // you are responsible for doing INI::ReadString and strtok'ing it before calling
     // this func only calls strtok again, doesn't know anything about buffers
     // public void LoadFromINI()
@@ -7569,10 +7563,10 @@ class TActionClass
     PrepareSaveToINI(buffer_0 : string) : void;
     // fuck if I know what's the purpose of this, returns a bitfield of flags for trigger logic
     // public static int GetFlags(int actionKind)
-    static GetFlags(actionKind_0 : number) : number;
+    static GetFlags(actionKind_0 : int) : int;
     // transforms actionKind to a number saying what to parse arguments as (team/tag/trigger id, waypoint, integer, etc)
     // public static int GetMode(int actionKind)
-    static GetMode(actionKind_0 : number) : number;
+    static GetMode(actionKind_0 : int) : int;
     // main brain, returns whether succeeded (mostly, no consistency in results what so ever)
     // trigger fires all actions regardless of result of this
     // public bool Execute(HouseClass * pHouse, ObjectClass * pObject, TriggerClass * pTrigger, CellStruct const& location)
@@ -7841,7 +7835,7 @@ class TActionClass
     FlashBuildingsOfType(pTargetHouse_0 : HouseClass, pSourceObject_1 : ObjectClass, pTrigger_2 : TriggerClass, location_3 : CellStruct) : boolean;
     // WHEEEEEW. End of slave functions.
     // public HouseClass * FindHouseByIndex(TriggerClass * pTrigger, int idxHouse) const
-    FindHouseByIndex(pTrigger_0 : TriggerClass, idxHouse_1 : number) : HouseClass;
+    FindHouseByIndex(pTrigger_0 : TriggerClass, idxHouse_1 : int) : HouseClass;
     // public static AbstractType const AbsID = AbstractType::Action
     static s_AbsID : AbstractType;
     // Static
@@ -7851,7 +7845,7 @@ class TActionClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public TActionClass * NextAction
     m_NextAction : TActionClass;
     // public TriggerAction ActionKind
@@ -7859,10 +7853,10 @@ class TActionClass
     // public TeamTypeClass * TeamType
     m_TeamType : TeamTypeClass;
     // public int Waypoint
-    m_Waypoint : number;
+    m_Waypoint : int;
     // multipurpose
     // public int Value2
-    m_Value2 : number;
+    m_Value2 : int;
     // public TagTypeClass * TagType
     m_TagType : TagTypeClass;
     // public TriggerTypeClass * TriggerType
@@ -7873,18 +7867,18 @@ class TActionClass
     m_Text : string;
     // multipurpose
     // public int Value
-    m_Value : number;
+    m_Value : int;
     // map bounds for use with action 40
     // public RectangleStruct Bounds
     m_Bounds : RectangleStruct;
     // public int Param3
-    m_Param3 : number;
+    m_Param3 : int;
     // public int Param4
-    m_Param4 : number;
+    m_Param4 : int;
     // public int Param5
-    m_Param5 : number;
+    m_Param5 : int;
     // public int Param6
-    m_Param6 : number;
+    m_Param6 : int;
 }
 // forward declarations
 // TriggerClass
@@ -7899,19 +7893,19 @@ class TriggerClass
     static GetInstance(pType_0 : TriggerTypeClass) : TriggerClass;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual void PointerExpired(AbstractClass * pAbstract, bool removed)
     PointerExpired(pAbstract_0 : AbstractClass | any, removed_1 : boolean | any) : void;
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public virtual void ComputeCRC(CRCEngine& crc) const
     ComputeCRC(crc_0 : any | any) : void;
     // contains at least one Crosses Horizontal Line event
@@ -7928,22 +7922,22 @@ class TriggerClass
     HasAllowWinAction() : boolean;
     // contains at least one Global Set or Global Cleared event
     // public bool HasGlobalSetOrClearedEvent(int idxGlobal) const
-    HasGlobalSetOrClearedEvent(idxGlobal_0 : number) : boolean;
+    HasGlobalSetOrClearedEvent(idxGlobal_0 : int) : boolean;
     // called when a global is updated. resets timers
     // public void NotifyGlobalChanged(int idxGlobal)
-    NotifyGlobalChanged(idxGlobal_0 : number) : void;
+    NotifyGlobalChanged(idxGlobal_0 : int) : void;
     // called when a local is updated. resets timers
     // public void NotifyLocalChanged(int idxLocal)
-    NotifyLocalChanged(idxLocal_0 : number) : void;
+    NotifyLocalChanged(idxLocal_0 : int) : void;
     // resets the timers for all Elapsed Time and Random Delay events
     // public void ResetTimers()
     ResetTimers() : void;
     // public void MarkEventAsOccured(int idx)
-    MarkEventAsOccured(idx_0 : number) : void;
+    MarkEventAsOccured(idx_0 : int) : void;
     // public void MarkEventAsNotOccured(int idx)
-    MarkEventAsNotOccured(idx_0 : number) : void;
+    MarkEventAsNotOccured(idx_0 : int) : void;
     // public bool HasEventOccured(int idx) const
-    HasEventOccured(idx_0 : number) : boolean;
+    HasEventOccured(idx_0 : int) : boolean;
     // public void Destroy()
     Destroy() : void;
     // public bool HasBeenDestroyed() const
@@ -7985,7 +7979,7 @@ class TriggerClass
     m_Timer : CDTimerClass;
     // bitfield for 32 events max
     // public unsigned long OccuredEvents
-    m_OccuredEvents : number;
+    m_OccuredEvents : unsigned_long;
     // public bool Enabled
     m_Enabled : boolean;
 }
@@ -7999,17 +7993,17 @@ class TEventClass
     constructor();
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // you are responsible for doing INI::ReadString and strtok'ing it before calling
     // this func only calls strtok again, doesn't know anything about buffers
     // public void LoadFromINI()
@@ -8019,7 +8013,7 @@ class TEventClass
     // public void PrepareSaveToINI(char * buffer) const
     PrepareSaveToINI(buffer_0 : string) : void;
     // public static TriggerAttachType GetAttachType(int eventKind)
-    static GetAttachType(eventKind_0 : number) : TriggerAttachType;
+    static GetAttachType(eventKind_0 : int) : TriggerAttachType;
     // used in TriggerClass::HaveEventsOccured , when trigger is repeating
     // both need to be true to check this event as done
     // public bool GetStateA() const
@@ -8028,7 +8022,7 @@ class TEventClass
     GetStateB() : boolean;
     // main brain
     // public bool HasOccured(int eventKind, HouseClass * pHouse, ObjectClass * Object, CDTimerClass * ActivationFrame, bool * isRepeating) const
-    HasOccured(eventKind_0 : number, pHouse_1 : HouseClass, Object_2 : ObjectClass, ActivationFrame_3 : CDTimerClass, isRepeating_4 : ArrayBuffer) : boolean;
+    HasOccured(eventKind_0 : int, pHouse_1 : HouseClass, Object_2 : ObjectClass, ActivationFrame_3 : CDTimerClass, isRepeating_4 : ArrayBuffer) : boolean;
     // public static AbstractType const AbsID = AbstractType::Event
     static s_AbsID : AbstractType;
     // Static
@@ -8038,7 +8032,7 @@ class TEventClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public TEventClass * NextEvent
     m_NextEvent : TEventClass;
     // public TriggerEvent EventKind
@@ -8047,7 +8041,7 @@ class TEventClass
     // public TeamTypeClass * TeamType
     m_TeamType : TeamTypeClass;
     // public int Value
-    m_Value : number;
+    m_Value : int;
     // public char[28] String
     m_String : string;
     // public HouseClass * House
@@ -8066,27 +8060,27 @@ class HouseTypeClass
     static Find(pID_0 : string) : HouseTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // helpers
     // public HouseTypeClass * FindParentCountry() const
     FindParentCountry() : HouseTypeClass;
     // public int FindParentCountryIndex() const
-    FindParentCountryIndex() : number;
+    FindParentCountryIndex() : int;
     // public static int FindIndexOfName(char const * name)
-    static FindIndexOfName(name_0 : string) : number;
+    static FindIndexOfName(name_0 : string) : int;
     // public static AbstractType const AbsID = AbstractType::HouseType
     static s_AbsID : AbstractType;
     // Array
@@ -8098,68 +8092,68 @@ class HouseTypeClass
     // public FixedString<25, char> ParentCountry
     m_ParentCountry : any;
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // dunno why
     // public int ArrayIndex2
-    m_ArrayIndex2 : number;
+    m_ArrayIndex2 : int;
     // public int SideIndex
-    m_SideIndex : number;
+    m_SideIndex : int;
     // public int ColorSchemeIndex
-    m_ColorSchemeIndex : number;
+    m_ColorSchemeIndex : int;
     // are these unused TS leftovers?
     // public double FirepowerMult
-    m_FirepowerMult : number;
+    m_FirepowerMult : double;
     // public double GroundspeedMult
-    m_GroundspeedMult : number;
+    m_GroundspeedMult : double;
     // public double AirspeedMult
-    m_AirspeedMult : number;
+    m_AirspeedMult : double;
     // public double ArmorMult
-    m_ArmorMult : number;
+    m_ArmorMult : double;
     // public double ROFMult
-    m_ROFMult : number;
+    m_ROFMult : double;
     // public double CostMult
-    m_CostMult : number;
+    m_CostMult : double;
     // public double BuildtimeMult
-    m_BuildtimeMult : number;
+    m_BuildtimeMult : double;
     // ---
     // public float ArmorInfantryMult
-    m_ArmorInfantryMult : number;
+    m_ArmorInfantryMult : float;
     // public float ArmorUnitsMult
-    m_ArmorUnitsMult : number;
+    m_ArmorUnitsMult : float;
     // public float ArmorAircraftMult
-    m_ArmorAircraftMult : number;
+    m_ArmorAircraftMult : float;
     // public float ArmorBuildingsMult
-    m_ArmorBuildingsMult : number;
+    m_ArmorBuildingsMult : float;
     // public float ArmorDefensesMult
-    m_ArmorDefensesMult : number;
+    m_ArmorDefensesMult : float;
     // public float CostInfantryMult
-    m_CostInfantryMult : number;
+    m_CostInfantryMult : float;
     // public float CostUnitsMult
-    m_CostUnitsMult : number;
+    m_CostUnitsMult : float;
     // public float CostAircraftMult
-    m_CostAircraftMult : number;
+    m_CostAircraftMult : float;
     // public float CostBuildingsMult
-    m_CostBuildingsMult : number;
+    m_CostBuildingsMult : float;
     // public float CostDefensesMult
-    m_CostDefensesMult : number;
+    m_CostDefensesMult : float;
     // public float SpeedInfantryMult
-    m_SpeedInfantryMult : number;
+    m_SpeedInfantryMult : float;
     // public float SpeedUnitsMult
-    m_SpeedUnitsMult : number;
+    m_SpeedUnitsMult : float;
     // public float SpeedAircraftMult
-    m_SpeedAircraftMult : number;
+    m_SpeedAircraftMult : float;
     // public float BuildtimeInfantryMult
-    m_BuildtimeInfantryMult : number;
+    m_BuildtimeInfantryMult : float;
     // public float BuildtimeUnitsMult
-    m_BuildtimeUnitsMult : number;
+    m_BuildtimeUnitsMult : float;
     // public float BuildtimeAircraftMult
-    m_BuildtimeAircraftMult : number;
+    m_BuildtimeAircraftMult : float;
     // public float BuildtimeBuildingsMult
-    m_BuildtimeBuildingsMult : number;
+    m_BuildtimeBuildingsMult : float;
     // public float BuildtimeDefensesMult
-    m_BuildtimeDefensesMult : number;
+    m_BuildtimeDefensesMult : float;
     // public float IncomeMult
-    m_IncomeMult : number;
+    m_IncomeMult : float;
     // public TypeList<InfantryTypeClass *> VeteranInfantry
     m_VeteranInfantry : TypeList<InfantryTypeClass>;
     // public TypeList<UnitTypeClass *> VeteranUnits
@@ -8169,7 +8163,7 @@ class HouseTypeClass
     // public char[4] Suffix
     m_Suffix : string;
     // public char Prefix
-    m_Prefix : number;
+    m_Prefix : char;
     // public bool Multiplay
     m_Multiplay : boolean;
     // public bool MultiplayPassive
@@ -8193,15 +8187,15 @@ class AircraftTypeClass
     static Find(pID_0 : string | any) : AircraftTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string | any) : number;
+    static FindIndex(pID_0 : string | any) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
@@ -8210,7 +8204,7 @@ class AircraftTypeClass
     // public static AbstractType const AbsID = AbstractType::AircraftType
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7E2868
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Array
     // public static constant_ptr<DynamicVectorClass<AircraftTypeClass *>, 11055640> const Array = 0xA8B218u
     static s_Array : DynamicVectorClass<AircraftTypeClass>;
@@ -8218,13 +8212,13 @@ class AircraftTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public bool Carryall
     m_Carryall : boolean;
     // public AnimTypeClass * Trailer
     m_Trailer : AnimTypeClass;
     // public int SpawnDelay
-    m_SpawnDelay : number;
+    m_SpawnDelay : int;
     // public bool Rotors
     m_Rotors : boolean;
     // public bool CustomRotor
@@ -8253,22 +8247,22 @@ class ScriptTypeClass
     static Find(pID_0 : string) : ScriptTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // public static ScriptTypeClass * FindOrAllocate(char const * id)
     static FindOrAllocate(id_0 : string) : ScriptTypeClass;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // AbstractTypeClass
     // public static bool LoadFromINIList(CCINIClass * pINI, bool IsGlobal)
     static LoadFromINIList(pINI_0 : CCINIClass, IsGlobal_1 : boolean) : boolean;
@@ -8281,11 +8275,11 @@ class ScriptTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public bool IsGlobal
     m_IsGlobal : boolean;
     // public int ActionsCount
-    m_ActionsCount : number;
+    m_ActionsCount : int;
     // public ScriptActionNode[50] ScriptActions
     m_ScriptActions : ScriptActionNode;
 }
@@ -8293,9 +8287,9 @@ class ScriptTypeClass
 class ScriptActionNode
 {
     // public int Action
-    m_Action : number;
+    m_Action : int;
     // public int Argument
-    m_Argument : number;
+    m_Argument : int;
 }
 // ---
 // TaskForceClass
@@ -8310,20 +8304,20 @@ class TaskForceClass
     static Find(pID_0 : string) : TaskForceClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public static AbstractType const AbsID = AbstractType::TaskForce
     static s_AbsID : AbstractType;
     // Array
@@ -8333,9 +8327,9 @@ class TaskForceClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int Group
-    m_Group : number;
+    m_Group : int;
     // public int CountEntries
-    m_CountEntries : number;
+    m_CountEntries : int;
     // public bool IsGlobal
     m_IsGlobal : boolean;
     // public TaskForceEntryStruct[6] Entries
@@ -8345,7 +8339,7 @@ class TaskForceClass
 class TaskForceEntryStruct
 {
     // public int Amount
-    m_Amount : number;
+    m_Amount : int;
     // public TechnoTypeClass * Type
     m_Type : TechnoTypeClass;
 }
@@ -8359,17 +8353,17 @@ class ScriptClass
     constructor(pType_0 : ScriptTypeClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public ScriptActionNode * GetCurrentAction(ScriptActionNode * buffer) const
     GetCurrentAction(buffer_0 : ScriptActionNode) : ScriptActionNode;
     // public ScriptActionNode * GetNextAction(ScriptActionNode * buffer) const
@@ -8377,7 +8371,7 @@ class ScriptClass
     // public bool ClearMission()
     ClearMission() : boolean;
     // public bool SetMission(int nLine)
-    SetMission(nLine_0 : number) : boolean;
+    SetMission(nLine_0 : int) : boolean;
     // public bool NextMission()
     NextMission() : boolean;
     // public bool HasNextMission() const
@@ -8390,9 +8384,9 @@ class ScriptClass
     // public ScriptTypeClass * Type
     m_Type : ScriptTypeClass;
     // public int field_28
-    m_field_28 : number;
+    m_field_28 : int;
     // public int CurrentMission
-    m_CurrentMission : number;
+    m_CurrentMission : int;
 }
 // The AbstractClass is the base class of all game objects.
 // ParasiteClass
@@ -8404,17 +8398,17 @@ class ParasiteClass
     constructor(pOwner_0 : FootClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non-virtual
     // public void UpdateSquid()
     UpdateSquid() : void;
@@ -8448,9 +8442,9 @@ class ParasiteClass
     // public ParasiteState GrappleState
     m_GrappleState : ParasiteState;
     // public int GrappleAnimFrame
-    m_GrappleAnimFrame : number;
+    m_GrappleAnimFrame : int;
     // public int GrappleAnimDelay
-    m_GrappleAnimDelay : number;
+    m_GrappleAnimDelay : int;
     // public bool GrappleAnimGotInvalid
     m_GrappleAnimGotInvalid : boolean;
 }
@@ -8464,15 +8458,15 @@ class BuildingLightClass
     constructor(pOwner_0 : ObjectClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non-virtual
     // public void SetBehaviour(SpotlightBehaviour mode)
     SetBehaviour(mode_0 : SpotlightBehaviour) : void;
@@ -8485,13 +8479,13 @@ class BuildingLightClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public double Speed
-    m_Speed : number;
+    m_Speed : double;
     // public CoordStruct field_B8
     m_field_B8 : CoordStruct;
     // public CoordStruct field_C4
     m_field_C4 : CoordStruct;
     // public double Acceleration
-    m_Acceleration : number;
+    m_Acceleration : double;
     // public bool Direction
     m_Direction : boolean;
     // public SpotlightBehaviour BehaviourMode
@@ -8508,31 +8502,31 @@ class LightSourceClass
 {
     // Constructor
     // public LightSourceClass(int X, int Y, int Z, int nVisibility, int nIntensity, int Red, int Green, int Blue)
-    constructor(X_0 : number, Y_1 : number, Z_2 : number, nVisibility_3 : number, nIntensity_4 : number, Red_5 : number, Green_6 : number, Blue_7 : number);
+    constructor(X_0 : int, Y_1 : int, Z_2 : int, nVisibility_3 : int, nIntensity_4 : int, Red_5 : int, Green_6 : int, Blue_7 : int);
     // public LightSourceClass(CoordStruct Crd, int nVisibility, int nIntensity, TintStruct Tint)
-    constructor(Crd_0 : CoordStruct, nVisibility_1 : number, nIntensity_2 : number, Tint_3 : TintStruct);
+    constructor(Crd_0 : CoordStruct, nVisibility_1 : int, nIntensity_2 : int, Tint_3 : TintStruct);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non-virtual
     // public void Activate(unsigned long dwZero = 0)
-    Activate(dwZero_0 : number) : void;
+    Activate(dwZero_0 : unsigned_long) : void;
     // public void Deactivate(unsigned long dwZero = 0)
-    Deactivate(dwZero_0 : number) : void;
+    Deactivate(dwZero_0 : unsigned_long) : void;
     // public void ChangeLevels(int nIntensity, TintStruct Tint, char mode)
-    ChangeLevels(nIntensity_0 : number, Tint_1 : TintStruct, mode_2 : number) : void;
+    ChangeLevels(nIntensity_0 : int, Tint_1 : TintStruct, mode_2 : char) : void;
     // public static void UpdateLightConverts(int value)
-    static UpdateLightConverts(value_0 : number) : void;
+    static UpdateLightConverts(value_0 : int) : void;
     // public static AbstractType const AbsID = AbstractType::LightSource
     static s_AbsID : AbstractType;
     // public static constant_ptr<DynamicVectorClass<LightSourceClass *>, 11258384> const Array = 0xABCA10
@@ -8541,15 +8535,15 @@ class LightSourceClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int LightIntensity
-    m_LightIntensity : number;
+    m_LightIntensity : int;
     // public TintStruct LightTint
     m_LightTint : TintStruct;
     // public int DetailLevel
-    m_DetailLevel : number;
+    m_DetailLevel : int;
     // public CoordStruct Location
     m_Location : CoordStruct;
     // public int LightVisibility
-    m_LightVisibility : number;
+    m_LightVisibility : int;
     // public bool Activated
     m_Activated : boolean;
 }
@@ -8563,17 +8557,17 @@ class UnitClass
     constructor(pType_0 : UnitTypeClass, pOwner_1 : HouseClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectClass
     // public virtual Action MouseOverCell(CellStruct const * pCell, bool checkFog = false, bool ignoreForce = false) const
     MouseOverCell(pCell_0 : CellStruct | any, checkFog_1 : boolean | any, ignoreForce_2 : boolean | any) : Action;
@@ -8586,15 +8580,15 @@ class UnitClass
     // ...and so on
     // FIXME other virtual function explicit addresses
     // public virtual FireError GetFireError(AbstractClass * pTarget, int nWeaponIndex, bool ignoreRange) const
-    GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : number | any, ignoreRange_2 : boolean | any) : FireError;
+    GetFireError(pTarget_0 : AbstractClass | any, nWeaponIndex_1 : int | any, ignoreRange_2 : boolean | any) : FireError;
     // UnitClass
     // main drawing functions - Draw() calles one of these, they call parent's Draw_A_smth
     // public virtual void DrawAsVXL(Point2D Coords, RectangleStruct BoundingRect, int Brightness, int Tint)
-    DrawAsVXL(Coords_0 : Point2D, BoundingRect_1 : RectangleStruct, Brightness_2 : number, Tint_3 : number) : void;
+    DrawAsVXL(Coords_0 : Point2D, BoundingRect_1 : RectangleStruct, Brightness_2 : int, Tint_3 : int) : void;
     // public virtual void DrawAsSHP(Point2D Coords, RectangleStruct BoundingRect, int Brightness, int Tint)
-    DrawAsSHP(Coords_0 : Point2D, BoundingRect_1 : RectangleStruct, Brightness_2 : number, Tint_3 : number) : void;
+    DrawAsSHP(Coords_0 : Point2D, BoundingRect_1 : RectangleStruct, Brightness_2 : int, Tint_3 : int) : void;
     // public virtual void DrawObject(Surface * pSurface, Point2D Coords, RectangleStruct CacheRect, int Brightness, int Tint)
-    DrawObject(pSurface_0 : Surface | any, Coords_1 : Point2D | any, CacheRect_2 : RectangleStruct | any, Brightness_3 : number | any, Tint_4 : number | any) : void;
+    DrawObject(pSurface_0 : Surface | any, Coords_1 : Point2D | any, CacheRect_2 : RectangleStruct | any, Brightness_3 : int | any, Tint_4 : int | any) : void;
     // non-virtual
     // public bool IsDeactivated() const
     IsDeactivated() : boolean;
@@ -8623,7 +8617,7 @@ class UnitClass
     // public bool Harvesting()
     Harvesting() : boolean;
     // public bool FlagAttach(int nHouseIdx)
-    FlagAttach(nHouseIdx_0 : number) : boolean;
+    FlagAttach(nHouseIdx_0 : int) : boolean;
     // public bool FlagRemove()
     FlagRemove() : boolean;
     // public void APCCloseDoor()
@@ -8643,7 +8637,7 @@ class UnitClass
     // public static AbstractType const AbsID = AbstractType::Unit
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7F5C70
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Static
     // public static constant_ptr<DynamicVectorClass<UnitClass *>, 9126152> const Array = 0x8B4108u
     static s_Array : DynamicVectorClass<UnitClass>;
@@ -8651,7 +8645,7 @@ class UnitClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int unknown_int_6C0
-    m_unknown_int_6C0 : number;
+    m_unknown_int_6C0 : int;
     // public UnitTypeClass * Type
     m_Type : UnitTypeClass;
     // groovy - link defined in the map's [Units] section, looked up on startup
@@ -8659,7 +8653,7 @@ class UnitClass
     m_FollowerCar : UnitClass;
     // Carrying the flag of this House
     // public int FlagHouseIndex
-    m_FlagHouseIndex : number;
+    m_FlagHouseIndex : int;
     // This vehicle is another vehicle's FollowerCar (such as a train car following train).
     // public bool IsFollowerCar
     m_IsFollowerCar : boolean;
@@ -8670,9 +8664,9 @@ class UnitClass
     // public bool TerrainPalette
     m_TerrainPalette : boolean;
     // public int unknown_int_6D4
-    m_unknown_int_6D4 : number;
+    m_unknown_int_6D4 : int;
     // public int DeathFrameCounter
-    m_DeathFrameCounter : number;
+    m_DeathFrameCounter : int;
     // Unit is the owner of this
     // public EBolt * ElectricBolt
     m_ElectricBolt : EBolt;
@@ -8684,9 +8678,9 @@ class UnitClass
     m_Undeploying : boolean;
     // Set when unloading passengers. Units with TurretCount>0 will not unload the gunner.
     // public int NonPassengerCount
-    m_NonPassengerCount : number;
+    m_NonPassengerCount : int;
     // public wchar_t[256] ToolTipText
-    m_ToolTipText : number;
+    m_ToolTipText : wchar_t;
 }
 // Surface
 class Surface
@@ -8701,63 +8695,63 @@ class Surface
     // public virtual bool CopyFrom(RectangleStruct * pClipRect, RectangleStruct * pClipRect2, Surface * pSrc, RectangleStruct * pDestRect, RectangleStruct * pSrcRect, bool bUnk1, bool bUnk2)
     CopyFrom(pClipRect_0 : RectangleStruct, pClipRect2_1 : RectangleStruct, pSrc_2 : Surface, pDestRect_3 : RectangleStruct, pSrcRect_4 : RectangleStruct, bUnk1_5 : boolean, bUnk2_6 : boolean) : boolean;
     // public virtual bool FillRectEx(RectangleStruct * pClipRect, RectangleStruct * pFillRect, unsigned long nColor)
-    FillRectEx(pClipRect_0 : RectangleStruct, pFillRect_1 : RectangleStruct, nColor_2 : number) : boolean;
+    FillRectEx(pClipRect_0 : RectangleStruct, pFillRect_1 : RectangleStruct, nColor_2 : unsigned_long) : boolean;
     // public virtual bool FillRect(RectangleStruct * pFillRect, unsigned long nColor)
-    FillRect(pFillRect_0 : RectangleStruct, nColor_1 : number) : boolean;
+    FillRect(pFillRect_0 : RectangleStruct, nColor_1 : unsigned_long) : boolean;
     // public virtual bool Fill(unsigned long nColor)
-    Fill(nColor_0 : number) : boolean;
+    Fill(nColor_0 : unsigned_long) : boolean;
     // public virtual bool FillRectTrans(RectangleStruct * pClipRect, ColorStruct * pColor, int nOpacity)
-    FillRectTrans(pClipRect_0 : RectangleStruct, pColor_1 : ColorStruct, nOpacity_2 : number) : boolean;
+    FillRectTrans(pClipRect_0 : RectangleStruct, pColor_1 : ColorStruct, nOpacity_2 : int) : boolean;
     // public virtual bool DrawEllipse(int XOff, int YOff, int CenterX, int CenterY, RectangleStruct Rect, unsigned long nColor)
-    DrawEllipse(XOff_0 : number, YOff_1 : number, CenterX_2 : number, CenterY_3 : number, Rect_4 : RectangleStruct, nColor_5 : number) : boolean;
+    DrawEllipse(XOff_0 : int, YOff_1 : int, CenterX_2 : int, CenterY_3 : int, Rect_4 : RectangleStruct, nColor_5 : unsigned_long) : boolean;
     // public virtual bool SetPixel(Point2D * pPoint, unsigned long nColor)
-    SetPixel(pPoint_0 : Point2D, nColor_1 : number) : boolean;
+    SetPixel(pPoint_0 : Point2D, nColor_1 : unsigned_long) : boolean;
     // public virtual unsigned long GetPixel(Point2D * pPoint)
-    GetPixel(pPoint_0 : Point2D) : number;
+    GetPixel(pPoint_0 : Point2D) : unsigned_long;
     // public virtual bool DrawLineEx(RectangleStruct * pClipRect, Point2D * pStart, Point2D * pEnd, unsigned long nColor)
-    DrawLineEx(pClipRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, nColor_3 : number) : boolean;
+    DrawLineEx(pClipRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, nColor_3 : unsigned_long) : boolean;
     // public virtual bool DrawLine(Point2D * pStart, Point2D * pEnd, unsigned long nColor)
-    DrawLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number) : boolean;
+    DrawLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : unsigned_long) : boolean;
     // public virtual bool DrawLineColor_AZ(RectangleStruct * pRect, Point2D * pStart, Point2D * pEnd, unsigned long nColor, unsigned long dwUnk1, unsigned long dwUnk2, bool bUnk)
-    DrawLineColor_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, nColor_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
+    DrawLineColor_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, nColor_3 : unsigned_long, dwUnk1_4 : unsigned_long, dwUnk2_5 : unsigned_long, bUnk_6 : boolean) : boolean;
     // public virtual bool DrawMultiplyingLine_AZ(RectangleStruct * pRect, Point2D * pStart, Point2D * pEnd, unsigned long dwMultiplier, unsigned long dwUnk1, unsigned long dwUnk2, bool bUnk)
-    DrawMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, dwMultiplier_3 : number, dwUnk1_4 : number, dwUnk2_5 : number, bUnk_6 : boolean) : boolean;
+    DrawMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, dwMultiplier_3 : unsigned_long, dwUnk1_4 : unsigned_long, dwUnk2_5 : unsigned_long, bUnk_6 : boolean) : boolean;
     // public virtual bool DrawSubtractiveLine_AZ(RectangleStruct * pRect, Point2D * pStart, Point2D * pEnd, ColorStruct * pColor, unsigned long dwUnk1, unsigned long dwUnk2, bool bUnk1, bool bUnk2, bool bUkn3, bool bUkn4, float fUkn)
-    DrawSubtractiveLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : ColorStruct, dwUnk1_4 : number, dwUnk2_5 : number, bUnk1_6 : boolean, bUnk2_7 : boolean, bUkn3_8 : boolean, bUkn4_9 : boolean, fUkn_10 : number) : boolean;
+    DrawSubtractiveLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : ColorStruct, dwUnk1_4 : unsigned_long, dwUnk2_5 : unsigned_long, bUnk1_6 : boolean, bUnk2_7 : boolean, bUkn3_8 : boolean, bUkn4_9 : boolean, fUkn_10 : float) : boolean;
     // public virtual bool DrawRGBMultiplyingLine_AZ(RectangleStruct * pRect, Point2D * pStart, Point2D * pEnd, ColorStruct * pColor, float Intensity, unsigned long dwUnk1, unsigned long dwUnk2)
-    DrawRGBMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : ColorStruct, Intensity_4 : number, dwUnk1_5 : number, dwUnk2_6 : number) : boolean;
+    DrawRGBMultiplyingLine_AZ(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pColor_3 : ColorStruct, Intensity_4 : float, dwUnk1_5 : unsigned_long, dwUnk2_6 : unsigned_long) : boolean;
     // public virtual bool PlotLine(RectangleStruct * pRect, Point2D * pStart, Point2D * pEnd, bool (*)(int *) * fpDrawCallback)
     PlotLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, fpDrawCallback_3 : any) : boolean;
     // public virtual bool DrawDashedLine(Point2D * pStart, Point2D * pEnd, int nColor, bool * Pattern, int nOffset)
-    DrawDashedLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : ArrayBuffer, nOffset_4 : number) : boolean;
+    DrawDashedLine(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : int, Pattern_3 : ArrayBuffer, nOffset_4 : int) : boolean;
     // public virtual bool DrawDashedLine_(Point2D * pStart, Point2D * pEnd, int nColor, bool * Pattern, int nOffset, bool bUkn)
-    DrawDashedLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, Pattern_3 : ArrayBuffer, nOffset_4 : number, bUkn_5 : boolean) : boolean;
+    DrawDashedLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : int, Pattern_3 : ArrayBuffer, nOffset_4 : int, bUkn_5 : boolean) : boolean;
     // public virtual bool DrawLine_(Point2D * pStart, Point2D * pEnd, int nColor, bool bUnk)
-    DrawLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : number, bUnk_3 : boolean) : boolean;
+    DrawLine_(pStart_0 : Point2D, pEnd_1 : Point2D, nColor_2 : int, bUnk_3 : boolean) : boolean;
     // public virtual bool DrawRectEx(RectangleStruct * pClipRect, RectangleStruct * pDrawRect, int nColor)
-    DrawRectEx(pClipRect_0 : RectangleStruct, pDrawRect_1 : RectangleStruct, nColor_2 : number) : boolean;
+    DrawRectEx(pClipRect_0 : RectangleStruct, pDrawRect_1 : RectangleStruct, nColor_2 : int) : boolean;
     // public virtual bool DrawRect(RectangleStruct * pDrawRect, unsigned long dwColor)
-    DrawRect(pDrawRect_0 : RectangleStruct, dwColor_1 : number) : boolean;
+    DrawRect(pDrawRect_0 : RectangleStruct, dwColor_1 : unsigned_long) : boolean;
     // public virtual void * Lock(int X, int Y)
-    Lock(X_0 : number, Y_1 : number) : ArrayBuffer;
+    Lock(X_0 : int, Y_1 : int) : ArrayBuffer;
     // public virtual bool Unlock()
     Unlock() : boolean;
     // public virtual bool CanLock(unsigned long dwUkn1 = 0, unsigned long dwUkn2 = 0)
-    CanLock(dwUkn1_0 : number, dwUkn2_1 : number) : boolean;
+    CanLock(dwUkn1_0 : unsigned_long, dwUkn2_1 : unsigned_long) : boolean;
     // public virtual bool vt_entry_68(unsigned long dwUnk1, unsigned long dwUnk2)
-    vt_entry_68(dwUnk1_0 : number, dwUnk2_1 : number) : boolean;
+    vt_entry_68(dwUnk1_0 : unsigned_long, dwUnk2_1 : unsigned_long) : boolean;
     // public virtual bool IsLocked()
     IsLocked() : boolean;
     // public virtual int GetBytesPerPixel()
-    GetBytesPerPixel() : number;
+    GetBytesPerPixel() : int;
     // public virtual int GetPitch()
-    GetPitch() : number;
+    GetPitch() : int;
     // public virtual RectangleStruct * GetRect(RectangleStruct * pRect)
     GetRect(pRect_0 : RectangleStruct) : RectangleStruct;
     // public virtual int GetWidth()
-    GetWidth() : number;
+    GetWidth() : int;
     // public virtual int GetHeight()
-    GetHeight() : number;
+    GetHeight() : int;
     // public virtual bool IsDSurface()
     IsDSurface() : boolean;
     // Helper
@@ -8765,9 +8759,9 @@ class Surface
     GetRect() : RectangleStruct;
     // Properties
     // public int Width
-    m_Width : number;
+    m_Width : int;
     // public int Height
-    m_Height : number;
+    m_Height : int;
 }
 // forward declarations
 // EBolt
@@ -8777,7 +8771,7 @@ class EBolt
     // public EBolt()
     constructor();
     // public void SetOwner(UnitClass * pOwner, int idxWeapon)
-    SetOwner(pOwner_0 : UnitClass, idxWeapon_1 : number) : void;
+    SetOwner(pOwner_0 : UnitClass, idxWeapon_1 : int) : void;
     // public void ClearOwner()
     ClearOwner() : void;
     // public CoordStruct * GetSourceCoords(CoordStruct * outBuffer) const
@@ -8785,7 +8779,7 @@ class EBolt
     // public CoordStruct GetSourceCoords() const
     GetSourceCoords() : CoordStruct;
     // public void Fire(CoordStruct P1, CoordStruct P2, unsigned long arg18)
-    Fire(P1_0 : CoordStruct, P2_1 : CoordStruct, arg18_2 : number) : void;
+    Fire(P1_0 : CoordStruct, P2_1 : CoordStruct, arg18_2 : unsigned_long) : void;
     // skip operator new
     // skip operator delete
     // public static constant_ptr<DynamicVectorClass<EBolt *>, 9047688> const Array = 0x8A0E88u
@@ -8799,19 +8793,19 @@ class EBolt
     m_Point2 : CoordStruct;
     // Duration?
     // public unsigned long unknown_18
-    m_unknown_18 : number;
+    m_unknown_18 : unsigned_long;
     // Random number between 0 and 256
     // public int Random
-    m_Random : number;
+    m_Random : int;
     // ingame this is a UnitClass but needed to circumvent some issues
     // public TechnoClass * Owner
     m_Owner : TechnoClass;
     // which weapon # to use from owner
     // public int WeaponSlot
-    m_WeaponSlot : number;
+    m_WeaponSlot : int;
     // this is >>= 1 each time DrawAll() is called, 0 => dtor (inline). Hi, welcome to dumb ideas.
     // public int Lifetime
-    m_Lifetime : number;
+    m_Lifetime : int;
     // public bool AlternateColor
     m_AlternateColor : boolean;
 }
@@ -8825,43 +8819,43 @@ class AircraftClass
     constructor(pType_0 : AircraftTypeClass, pOwner_1 : HouseClass);
     // IFlyControl
     // public virtual int Landing_Altitude()
-    Landing_Altitude() : number;
+    Landing_Altitude() : int;
     // public virtual int Landing_Direction()
-    Landing_Direction() : number;
+    Landing_Direction() : int;
     // public virtual long Is_Loaded()
-    Is_Loaded() : number;
+    Is_Loaded() : long;
     // public virtual long Is_Strafe()
-    Is_Strafe() : number;
+    Is_Strafe() : long;
     // public virtual long Is_Fighter()
-    Is_Fighter() : number;
+    Is_Fighter() : long;
     // public virtual long Is_Locked()
-    Is_Locked() : number;
+    Is_Locked() : long;
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : long;
     // public virtual unsigned long AddRef()
-    AddRef() : number;
+    AddRef() : unsigned_long;
     // public virtual unsigned long Release()
-    Release() : number;
+    Release() : unsigned_long;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public AbstractClass * FindFireLocation(AbstractClass * pTarget)
     FindFireLocation(pTarget_0 : AbstractClass) : AbstractClass;
     // public static AbstractType const AbsID = AbstractType::Aircraft
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7E22A4
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Static
     // public static constant_ptr<DynamicVectorClass<AircraftClass *>, 11068304> const Array = 0xA8E390u
     static s_Array : DynamicVectorClass<AircraftClass>;
@@ -8889,7 +8883,7 @@ class AircraftClass
     // public bool IsLocked
     m_IsLocked : boolean;
     // public char NumParadropsLeft
-    m_NumParadropsLeft : number;
+    m_NumParadropsLeft : char;
     // public bool IsCarryallNotLanding
     m_IsCarryallNotLanding : boolean;
     // Aircraft finished attack run and/or went idle and is now returning from it
@@ -8906,17 +8900,17 @@ class TerrainClass
     constructor(tt_0 : TerrainTypeClass, coords_1 : CellStruct);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // identification
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public static AbstractType const AbsID = AbstractType::Terrain
     static s_AbsID : AbstractType;
     // global array
@@ -8951,22 +8945,22 @@ class TerrainTypeClass
     static Find(pID_0 : string) : TerrainTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // public static TerrainTypeClass * FindOrAllocate(char const * id)
     static FindOrAllocate(id_0 : string) : TerrainTypeClass;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
@@ -8981,19 +8975,19 @@ class TerrainTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public int Foundation
-    m_Foundation : number;
+    m_Foundation : int;
     // public ColorStruct RadarColor
     m_RadarColor : ColorStruct;
     // public int AnimationRate
-    m_AnimationRate : number;
+    m_AnimationRate : int;
     // public float AnimationProbability
-    m_AnimationProbability : number;
+    m_AnimationProbability : float;
     // public int TemperateOccupationBits
-    m_TemperateOccupationBits : number;
+    m_TemperateOccupationBits : int;
     // public int SnowOccupationBits
-    m_SnowOccupationBits : number;
+    m_SnowOccupationBits : int;
     // public bool WaterBound
     m_WaterBound : boolean;
     // public bool SpawnsTiberium
@@ -9020,30 +9014,30 @@ class TiberiumClass
     static Find(pID_0 : string) : TiberiumClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // public virtual long GetSizeMax(_ULARGE_INTEGER * pcbSize)
-    GetSizeMax(pcbSize_0 : any | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // TiberiumClass
     // public void RegisterForGrowth(CellStruct * cell)
     RegisterForGrowth(cell_0 : CellStruct) : void;
     // Static helpers
     // public static int FindIndex(int idxOverlayType)
-    static FindIndex(idxOverlayType_0 : number) : number;
+    static FindIndex(idxOverlayType_0 : int) : int;
     // public static TiberiumClass * Find(int idxOverlayType)
-    static Find(idxOverlayType_0 : number) : TiberiumClass;
+    static Find(idxOverlayType_0 : int) : TiberiumClass;
     // public static AbstractType const AbsID = AbstractType::Tiberium
     static s_AbsID : AbstractType;
     // Array
@@ -9053,29 +9047,29 @@ class TiberiumClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public int Spread
-    m_Spread : number;
+    m_Spread : int;
     // public double SpreadPercentage
-    m_SpreadPercentage : number;
+    m_SpreadPercentage : double;
     // public int Growth
-    m_Growth : number;
+    m_Growth : int;
     // public double GrowthPercentage
-    m_GrowthPercentage : number;
+    m_GrowthPercentage : double;
     // public int Value
-    m_Value : number;
+    m_Value : int;
     // public int Power
-    m_Power : number;
+    m_Power : int;
     // public int Color
-    m_Color : number;
+    m_Color : int;
     // public OverlayTypeClass * Image
     m_Image : OverlayTypeClass;
     // public int NumFrames
-    m_NumFrames : number;
+    m_NumFrames : int;
     // public int NumImages
-    m_NumImages : number;
+    m_NumImages : int;
     // public int NumSlopes
-    m_NumSlopes : number;
+    m_NumSlopes : int;
     // public TypeList<AnimTypeClass *> Debris
     m_Debris : TypeList<AnimTypeClass>;
     // public char[28] __Debris
@@ -9093,11 +9087,11 @@ class TiberiumClass
 class TiberiumLogic
 {
     // public void Construct(int nCount = PriorityQueueClassNode::SurfaceDataCount())
-    Construct(nCount_0 : number) : void;
+    Construct(nCount_0 : int) : void;
     // public void Destruct()
     Destruct() : void;
     // public int Count
-    m_Count : number;
+    m_Count : int;
     // public PriorityQueueClass<PriorityQueueClassNode, std::less<PriorityQueueClassNode>> * Queue
     m_Queue : any;
     // public bool * CellIndexesWithTiberium
@@ -9116,20 +9110,20 @@ class RadSiteClass
     // public RadSiteClass()
     constructor();
     // public RadSiteClass(CellStruct nBaseCoords, int nSpread, int nRadLevel)
-    constructor(nBaseCoords_0 : CellStruct, nSpread_1 : number, nRadLevel_2 : number);
+    constructor(nBaseCoords_0 : CellStruct, nSpread_1 : int, nRadLevel_2 : int);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // Start irradiating an area. Be sure to set the BaseCell, Spread and RadLevel first!
     // public void Activate()
     Activate() : void;
@@ -9147,16 +9141,16 @@ class RadSiteClass
     DecreaseLight() : void;
     // Add this RadLevel to the current radiation.
     // public void Add(int nRadLevel)
-    Add(nRadLevel_0 : number) : void;
+    Add(nRadLevel_0 : int) : void;
     // Gets the current rad level (corresponds to the RadLevel at BaseCell).
     // public int GetRadLevel()
-    GetRadLevel() : number;
+    GetRadLevel() : int;
     // Gets the rad level applied by this RadSite to a certain cell.
     // public int GetRadLevelAt(CellStruct * pCell)
-    GetRadLevelAt(pCell_0 : CellStruct) : number;
+    GetRadLevelAt(pCell_0 : CellStruct) : int;
     // Sets the rad level and the appropriate duration values.
     // public void SetRadLevel(int nRadLevel)
-    SetRadLevel(nRadLevel_0 : number) : void;
+    SetRadLevel(nRadLevel_0 : int) : void;
     // Sets the center cell. Do not change when RadSite is activated.
     // public void SetBaseCell(CellStruct * pCell)
     SetBaseCell(pCell_0 : CellStruct) : void;
@@ -9165,10 +9159,10 @@ class RadSiteClass
     GetSpread() : void;
     // Sets the spread in cells. Also updates the SpreadInLeptons.
     // public void SetSpread(int nCells)
-    SetSpread(nCells_0 : number) : void;
+    SetSpread(nCells_0 : int) : void;
     // Gets the current strenght of the effect, the ratio between time left and initial duration.
     // public double GetEffectPercentage()
-    GetEffectPercentage() : number;
+    GetEffectPercentage() : double;
     // public static AbstractType const AbsID = AbstractType::RadSite
     static s_AbsID : AbstractType;
     // Static
@@ -9182,34 +9176,34 @@ class RadSiteClass
     m_BaseCell : CellStruct;
     // range in cells
     // public int Spread
-    m_Spread : number;
+    m_Spread : int;
     // range in leptons
     // public int SpreadInLeptons
-    m_SpreadInLeptons : number;
+    m_SpreadInLeptons : int;
     // the radiation level,
     // public int RadLevel
-    m_RadLevel : number;
+    m_RadLevel : int;
     // cell's rad level reduced by (RadLevel/LevelSteps) every time RadLevelTimer elapses
     // public int LevelSteps
-    m_LevelSteps : number;
+    m_LevelSteps : int;
     // the intensity at the beginning
     // public int Intensity
-    m_Intensity : number;
+    m_Intensity : int;
     // RadColor at the current level
     // public TintStruct Tint
     m_Tint : TintStruct;
     // the number of intensity decreases during the duration
     // public int IntensitySteps
-    m_IntensitySteps : number;
+    m_IntensitySteps : int;
     // Intensity decremented by this every time RadLightDelay elapses
     // public int IntensityDecrement
-    m_IntensityDecrement : number;
+    m_IntensityDecrement : int;
     // as currently set up, the rad site will stay for so many frames
     // public int RadDuration
-    m_RadDuration : number;
+    m_RadDuration : int;
     // the remaining frames. divided by RadDuration gives the factor
     // public int RadTimeLeft
-    m_RadTimeLeft : number;
+    m_RadTimeLeft : int;
     // used to count down RadLevelDelay
     // public CDTimerClass RadLevelTimer
     m_RadLevelTimer : CDTimerClass;
@@ -9228,11 +9222,11 @@ class LightConvertClass
 {
     // Constructor
     // public LightConvertClass(BytePalette * palette1, BytePalette * palette2, Surface * pSurface, int color_R, int color_G, int color_B, bool skipBlitters, unsigned char * pBuffer, size_t shadeCount)
-    constructor(palette1_0 : BytePalette, palette2_1 : BytePalette, pSurface_2 : Surface, color_R_3 : number, color_G_4 : number, color_B_5 : number, skipBlitters_6 : boolean, pBuffer_7 : ArrayBuffer, shadeCount_8 : any);
+    constructor(palette1_0 : BytePalette, palette2_1 : BytePalette, pSurface_2 : Surface, color_R_3 : int, color_G_4 : int, color_B_5 : int, skipBlitters_6 : boolean, pBuffer_7 : ArrayBuffer, shadeCount_8 : any);
     // public virtual void UpdateColors(int red, int green, int blue, bool tinted)
-    UpdateColors(red_0 : number, green_1 : number, blue_2 : number, tinted_3 : boolean) : void;
+    UpdateColors(red_0 : int, green_1 : int, blue_2 : int, tinted_3 : boolean) : void;
     // public static LightConvertClass * InitLightConvert(int red, int green, int blue)
-    static InitLightConvert(red_0 : number, green_1 : number, blue_2 : number) : LightConvertClass;
+    static InitLightConvert(red_0 : int, green_1 : int, blue_2 : int) : LightConvertClass;
     // global array
     // public static constant_ptr<DynamicVectorClass<LightConvertClass *>, 8910488> const Array = 0x87F698u
     static s_Array : DynamicVectorClass<LightConvertClass>;
@@ -9246,7 +9240,7 @@ class LightConvertClass
     // public unsigned char * IndexesToIgnore
     m_IndexesToIgnore : ArrayBuffer;
     // public int RefCount
-    m_RefCount : number;
+    m_RefCount : int;
     // public TintStruct Color1
     m_Color1 : TintStruct;
     // public TintStruct Color2
@@ -9275,13 +9269,13 @@ class ConvertClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int BytesPerPixel
-    m_BytesPerPixel : number;
+    m_BytesPerPixel : int;
     // public Blitter *[50] Blitters
     m_Blitters : any;
     // public RLEBlitter *[39] RLEBlitters
     m_RLEBlitters : any;
     // public int ShadeCount
-    m_ShadeCount : number;
+    m_ShadeCount : int;
     // new(ShadeCount* 8* BytesPerPixel) - gets filled with palette values on CTOR
     // public void * FullColorData
     m_FullColorData : ArrayBuffer;
@@ -9293,13 +9287,13 @@ class ConvertClass
     m_ByteColorData : ArrayBuffer;
     // set right before drawing
     // public unsigned long CurrentZRemap
-    m_CurrentZRemap : number;
+    m_CurrentZRemap : unsigned_long;
     // Used by 50 alpha blending
     // public unsigned long HalfTranslucencyMask
-    m_HalfTranslucencyMask : number;
+    m_HalfTranslucencyMask : unsigned_long;
     // Used by 25 and 75 alpha blending
     // public unsigned long QuatTranslucencyMask
-    m_QuatTranslucencyMask : number;
+    m_QuatTranslucencyMask : unsigned_long;
 }
 // static Point2D* __fastcall Simple_Text_Print_Wide(Point2D* RetVal, const wchar_t* Text, Surface* Surface, RectangleStruct* Bounds,
 // Point2D* Location, COLORREF ForeColor, COLORREF BackColor, TextPrintType Flag, bool bUkn)
@@ -9311,18 +9305,18 @@ class DSurface
     extends XSurface
 {
     // public virtual bool DrawGradientLine(RectangleStruct * pRect, Point2D * pStart, Point2D * pEnd, ColorStruct * pStartColor, ColorStruct * pEndColor, float fStep, int nColor)
-    DrawGradientLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pStartColor_3 : ColorStruct, pEndColor_4 : ColorStruct, fStep_5 : number, nColor_6 : number) : boolean;
+    DrawGradientLine(pRect_0 : RectangleStruct, pStart_1 : Point2D, pEnd_2 : Point2D, pStartColor_3 : ColorStruct, pEndColor_4 : ColorStruct, fStep_5 : float, nColor_6 : int) : boolean;
     // public virtual bool CanBlit()
     CanBlit() : boolean;
     // Comments from thomassneddon
     // public void DrawSHP(ConvertClass * Palette, SHPStruct * SHP, int FrameIndex, Point2D const * const Position, RectangleStruct const * const Bounds, BlitterFlags Flags, int Remap, int ZAdjust, ZGradient ZGradientDescIndex, int Brightness, int TintColor, SHPStruct * ZShape, int ZShapeFrame, int XOffset, int YOffset)
-    DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : number, Position_3 : Point2D, Bounds_4 : RectangleStruct, Flags_5 : BlitterFlags, Remap_6 : number, ZAdjust_7 : number, ZGradientDescIndex_8 : ZGradient, Brightness_9 : number, TintColor_10 : number, ZShape_11 : any, ZShapeFrame_12 : number, XOffset_13 : number, YOffset_14 : number) : void;
+    DrawSHP(Palette_0 : ConvertClass, SHP_1 : any, FrameIndex_2 : int, Position_3 : Point2D, Bounds_4 : RectangleStruct, Flags_5 : BlitterFlags, Remap_6 : int, ZAdjust_7 : int, ZGradientDescIndex_8 : ZGradient, Brightness_9 : int, TintColor_10 : int, ZShape_11 : any, ZShapeFrame_12 : int, XOffset_13 : int, YOffset_14 : int) : void;
     // public void DrawTextA(wchar_t const * pText, RectangleStruct * pBounds, Point2D * pLocation, unsigned long ForeColor, unsigned long BackColor, TextPrintType Flag)
-    DrawTextA(pText_0 : ArrayBuffer, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : number, BackColor_4 : number, Flag_5 : TextPrintType) : void;
+    DrawTextA(pText_0 : ArrayBuffer, pBounds_1 : RectangleStruct, pLocation_2 : Point2D, ForeColor_3 : unsigned_long, BackColor_4 : unsigned_long, Flag_5 : TextPrintType) : void;
     // public void DrawTextA(wchar_t const * pText, Point2D * pLoction, unsigned long Color)
-    DrawTextA(pText_0 : ArrayBuffer, pLoction_1 : Point2D, Color_2 : number) : void;
+    DrawTextA(pText_0 : ArrayBuffer, pLoction_1 : Point2D, Color_2 : unsigned_long) : void;
     // public void DrawTextA(wchar_t const * pText, int X, int Y, unsigned long Color)
-    DrawTextA(pText_0 : ArrayBuffer, X_1 : number, Y_2 : number, Color_3 : number) : void;
+    DrawTextA(pText_0 : ArrayBuffer, X_1 : int, Y_2 : int, Color_3 : unsigned_long) : void;
     // public static reference<DSurface *, 8942332, 0> const Tile = 0x8872FCu
     static s_Tile : DSurface;
     // public static reference<DSurface *, 8942336, 0> const Sidebar = 0x887300u
@@ -9359,15 +9353,15 @@ class XSurface
     extends Surface
 {
     // public XSurface(int nWidth = 640, int nHeight = 400)
-    constructor(nWidth_0 : number, nHeight_1 : number);
+    constructor(nWidth_0 : int, nHeight_1 : int);
     // public virtual bool PutPixelClip(Point2D * pPoint, short nUkn, RectangleStruct * pRect)
-    PutPixelClip(pPoint_0 : Point2D, nUkn_1 : number, pRect_2 : RectangleStruct) : boolean;
+    PutPixelClip(pPoint_0 : Point2D, nUkn_1 : short, pRect_2 : RectangleStruct) : boolean;
     // public virtual short GetPixelClip(Point2D * pPoint, RectangleStruct * pRect)
-    GetPixelClip(pPoint_0 : Point2D, pRect_1 : RectangleStruct) : number;
+    GetPixelClip(pPoint_0 : Point2D, pRect_1 : RectangleStruct) : short;
     // public int LockLevel
-    m_LockLevel : number;
+    m_LockLevel : int;
     // public int BytesPerPixel
-    m_BytesPerPixel : number;
+    m_BytesPerPixel : int;
 }
 // RGBClass
 class RGBClass
@@ -9375,35 +9369,35 @@ class RGBClass
     // public RGBClass()
     constructor();
     // public RGBClass(int r, int g, int b)
-    constructor(r_0 : number, g_1 : number, b_2 : number);
+    constructor(r_0 : int, g_1 : int, b_2 : int);
     // public RGBClass(int rgb, bool wordcolor = false)
-    constructor(rgb_0 : number, wordcolor_1 : boolean);
+    constructor(rgb_0 : int, wordcolor_1 : boolean);
     // public void Adjust(int ratio, RGBClass const& rgb)
-    Adjust(ratio_0 : number, rgb_1 : RGBClass) : void;
+    Adjust(ratio_0 : int, rgb_1 : RGBClass) : void;
     // public int Difference(RGBClass const& rgb) const
-    Difference(rgb_0 : RGBClass) : number;
+    Difference(rgb_0 : RGBClass) : int;
     // public int ToInt()
-    ToInt() : number;
+    ToInt() : int;
     // public static reference<RGBClass, 11010592, 0> const White = 0xA80220
     static s_White : RGBClass;
     // public static reference<int, 9047504, 0> const RedShiftLeft = 0x8A0DD0
-    static s_RedShiftLeft : number;
+    static s_RedShiftLeft : int;
     // public static reference<int, 9047508, 0> const RedShiftRight = 0x8A0DD4
-    static s_RedShiftRight : number;
+    static s_RedShiftRight : int;
     // public static reference<int, 9047520, 0> const GreenShiftLeft = 0x8A0DE0
-    static s_GreenShiftLeft : number;
+    static s_GreenShiftLeft : int;
     // public static reference<int, 9047524, 0> const GreenShiftRight = 0x8A0DE4
-    static s_GreenShiftRight : number;
+    static s_GreenShiftRight : int;
     // public static reference<int, 9047512, 0> const BlueShiftLeft = 0x8A0DD8
-    static s_BlueShiftLeft : number;
+    static s_BlueShiftLeft : int;
     // public static reference<int, 9047516, 0> const BlueShiftRight = 0x8A0DDC
-    static s_BlueShiftRight : number;
+    static s_BlueShiftRight : int;
     // public unsigned char Red
-    m_Red : number;
+    m_Red : unsigned_char;
     // public unsigned char Green
-    m_Green : number;
+    m_Green : unsigned_char;
     // public unsigned char Blue
-    m_Blue : number;
+    m_Blue : unsigned_char;
 }
 // EventClass
 class EventClass
@@ -9414,14 +9408,14 @@ class LaserDrawClass
 {
     // Constructor, Destructor
     // public LaserDrawClass(CoordStruct const& source, CoordStruct const& target, ColorStruct const& innerColor, ColorStruct const& outerColor, ColorStruct const& outerSpread, int duration)
-    constructor(source_0 : CoordStruct, target_1 : CoordStruct, innerColor_2 : ColorStruct, outerColor_3 : ColorStruct, outerSpread_4 : ColorStruct, duration_5 : number);
+    constructor(source_0 : CoordStruct, target_1 : CoordStruct, innerColor_2 : ColorStruct, outerColor_3 : ColorStruct, outerSpread_4 : ColorStruct, duration_5 : int);
     // public LaserDrawClass(CoordStruct source, CoordStruct target, int zAdjust, unsigned char unknown, ColorStruct innerColor, ColorStruct outerColor, ColorStruct outerSpread, int duration, bool blinks = false, bool fades = true, float startIntensity = 1.0f, float endIntensity = 0.0f)
-    constructor(source_0 : CoordStruct, target_1 : CoordStruct, zAdjust_2 : number, unknown_3 : number, innerColor_4 : ColorStruct, outerColor_5 : ColorStruct, outerSpread_6 : ColorStruct, duration_7 : number, blinks_8 : boolean, fades_9 : boolean, startIntensity_10 : number, endIntensity_11 : number);
+    constructor(source_0 : CoordStruct, target_1 : CoordStruct, zAdjust_2 : int, unknown_3 : unsigned_char, innerColor_4 : ColorStruct, outerColor_5 : ColorStruct, outerSpread_6 : ColorStruct, duration_7 : int, blinks_8 : boolean, fades_9 : boolean, startIntensity_10 : float, endIntensity_11 : float);
     // skip operator new
     // skip operator delete
     // only respected if IsHouseColor
     // public int Thickness
-    m_Thickness : number;
+    m_Thickness : int;
     // public bool IsHouseColor
     m_IsHouseColor : boolean;
     // this changes the values for InnerColor (false: halve, true: double), HouseColor only
@@ -9432,9 +9426,9 @@ class LaserDrawClass
     // public CoordStruct Target
     m_Target : CoordStruct;
     // public int ZAdjust
-    m_ZAdjust : number;
+    m_ZAdjust : int;
     // public char field_40
-    m_field_40 : number;
+    m_field_40 : char;
     // public ColorStruct InnerColor
     m_InnerColor : ColorStruct;
     // public ColorStruct OuterColor
@@ -9442,7 +9436,7 @@ class LaserDrawClass
     // public ColorStruct OuterSpread
     m_OuterSpread : ColorStruct;
     // public int Duration
-    m_Duration : number;
+    m_Duration : int;
     // public bool Blinks
     m_Blinks : boolean;
     // public bool BlinkState
@@ -9450,9 +9444,9 @@ class LaserDrawClass
     // public bool Fades
     m_Fades : boolean;
     // public float StartIntensity
-    m_StartIntensity : number;
+    m_StartIntensity : float;
     // public float EndIntensity
-    m_EndIntensity : number;
+    m_EndIntensity : float;
     // ===========================================================================
     // ===== Properties ==========================================================
     // ===========================================================================
@@ -9467,7 +9461,7 @@ class FlashData
     // public bool Update()
     Update() : boolean;
     // public int DurationRemaining
-    m_DurationRemaining : number;
+    m_DurationRemaining : int;
     // public bool FlashingNow
     m_FlashingNow : boolean;
 }
@@ -9483,11 +9477,11 @@ class PassengersClass
     // public FootClass * RemoveFirstPassenger()
     RemoveFirstPassenger() : FootClass;
     // public int GetTotalSize() const
-    GetTotalSize() : number;
+    GetTotalSize() : int;
     // public int IndexOf(FootClass * candidate) const
-    IndexOf(candidate_0 : FootClass) : number;
+    IndexOf(candidate_0 : FootClass) : int;
     // public int NumPassengers
-    m_NumPassengers : number;
+    m_NumPassengers : int;
     // public FootClass * FirstPassenger
     m_FirstPassenger : FootClass;
 }
@@ -9497,11 +9491,11 @@ class VeterancyStruct
     // public VeterancyStruct()
     constructor();
     // public VeterancyStruct(double value)
-    constructor(value_0 : number);
+    constructor(value_0 : double);
     // public void Add(int ownerCost, int victimCost)
-    Add(ownerCost_0 : number, victimCost_1 : number) : void;
+    Add(ownerCost_0 : int, victimCost_1 : int) : void;
     // public void Add(double value)
-    Add(value_0 : number) : void;
+    Add(value_0 : double) : void;
     // public Rank GetRemainingLevel() const
     GetRemainingLevel() : Rank;
     // public bool IsNegative() const
@@ -9521,7 +9515,7 @@ class VeterancyStruct
     // public void SetElite(bool yesReally = true)
     SetElite(yesReally_0 : boolean) : void;
     // public float Veterancy
-    m_Veterancy : number;
+    m_Veterancy : float;
 }
 // The AirstrikeClass handles the airstrikes Boris calls in.
 // TemporalClass
@@ -9533,17 +9527,17 @@ class TemporalClass
     constructor(pOwnerUnit_0 : TechnoClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non-virtual
     // public void Fire(TechnoClass * pTarget)
     Fire(pTarget_0 : TechnoClass) : void;
@@ -9551,7 +9545,7 @@ class TemporalClass
     CanWarpTarget(pTarget_0 : TechnoClass) : boolean;
     // hardcoded to accumulate only up to 50 helpers
     // public int GetWarpPerStep(int nHelperCount = 0) const
-    GetWarpPerStep(nHelperCount_0 : number) : number;
+    GetWarpPerStep(nHelperCount_0 : int) : int;
     // public void LetGo()
     LetGo() : void;
     // public void JustLetGo()
@@ -9561,7 +9555,7 @@ class TemporalClass
     // public static AbstractType const AbsID = AbstractType::Temporal
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7F5180
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Static
     // public static constant_ptr<DynamicVectorClass<TemporalClass *>, 11594848> const Array = 0xB0EC60u
     static s_Array : DynamicVectorClass<TemporalClass>;
@@ -9583,9 +9577,9 @@ class TemporalClass
     // public TemporalClass * PrevTemporal
     m_PrevTemporal : TemporalClass;
     // public int WarpRemaining
-    m_WarpRemaining : number;
+    m_WarpRemaining : int;
     // public int WarpPerStep
-    m_WarpPerStep : number;
+    m_WarpPerStep : int;
 }
 // forward declarations
 // SuperClass
@@ -9597,17 +9591,17 @@ class SuperClass
     constructor(pSWType_0 : SuperWeaponTypeClass, pOwner_1 : HouseClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non virtual
     // public void CreateChronoAnim(CoordStruct coords)
     CreateChronoAnim(coords_0 : CoordStruct) : void;
@@ -9626,23 +9620,23 @@ class SuperClass
     // public void Launch(CellStruct const& cell, bool isPlayer)
     Launch(cell_0 : CellStruct, isPlayer_1 : boolean) : void;
     // public char CanFire() const
-    CanFire() : number;
+    CanFire() : char;
     // public void SetReadiness(bool ready)
     SetReadiness(ready_0 : boolean) : void;
     // public char StopPreclickAnim(bool isPlayer)
-    StopPreclickAnim(isPlayer_0 : boolean) : number;
+    StopPreclickAnim(isPlayer_0 : boolean) : char;
     // public char ClickFire(bool isPlayer, CellStruct const& cell)
-    ClickFire(isPlayer_0 : boolean, cell_1 : CellStruct) : number;
+    ClickFire(isPlayer_0 : boolean, cell_1 : CellStruct) : char;
     // public bool HasChargeProgressed(bool isPlayer)
     HasChargeProgressed(isPlayer_0 : boolean) : boolean;
     // public int AnimStage() const
-    AnimStage() : number;
+    AnimStage() : int;
     // public void SetCharge(int percentage)
-    SetCharge(percentage_0 : number) : void;
+    SetCharge(percentage_0 : int) : void;
     // public int GetRechargeTime() const
-    GetRechargeTime() : number;
+    GetRechargeTime() : int;
     // public void SetRechargeTime(int time)
-    SetRechargeTime(time_0 : number) : void;
+    SetRechargeTime(time_0 : int) : void;
     // public void ResetRechargeTime()
     ResetRechargeTime() : void;
     // public wchar_t const * NameReadiness() const
@@ -9654,7 +9648,7 @@ class SuperClass
     // public static AbstractType const AbsID = AbstractType::Super
     static s_AbsID : AbstractType;
     // public static unsigned int const AbsVTable = 0x7F3FE8
-    static s_AbsVTable : number;
+    static s_AbsVTable : unsigned_int;
     // Static
     // public static constant_ptr<DynamicVectorClass<SuperClass *>, 11025592> const Array = 0xA83CB8u
     static s_Array : DynamicVectorClass<SuperClass>;
@@ -9664,7 +9658,7 @@ class SuperClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int CustomChargeTime
-    m_CustomChargeTime : number;
+    m_CustomChargeTime : int;
     // public SuperWeaponTypeClass * Type
     m_Type : SuperWeaponTypeClass;
     // public HouseClass * Owner
@@ -9677,7 +9671,7 @@ class SuperClass
     m_BlinkTimer : any;
     // see 0x6CD14F
     // public int SpecialSoundDuration
-    m_SpecialSoundDuration : number;
+    m_SpecialSoundDuration : int;
     // public CoordStruct SpecialSoundLocation
     m_SpecialSoundLocation : CoordStruct;
     // 0x60
@@ -9702,9 +9696,9 @@ class SuperClass
     m_IsSuspended : boolean;
     // when did it become ready?
     // public int ReadyFrame
-    m_ReadyFrame : number;
+    m_ReadyFrame : int;
     // public int CameoChargeState
-    m_CameoChargeState : number;
+    m_CameoChargeState : int;
     // public ChargeDrainState ChargeDrainState
     m_ChargeDrainState : ChargeDrainState;
 }
@@ -9721,20 +9715,20 @@ class SuperWeaponTypeClass
     static Find(pID_0 : string) : SuperWeaponTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // SuperWeaponTypeClass
     // public virtual Action MouseOverObject(CellStruct const& cell, ObjectClass * pObjBelowMouse) const
     MouseOverObject(cell_0 : CellStruct, pObjBelowMouse_1 : ObjectClass) : Action;
@@ -9750,24 +9744,24 @@ class SuperWeaponTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public WeaponTypeClass * WeaponType
     m_WeaponType : WeaponTypeClass;
     // not read, unused
     // public int RechargeVoice
-    m_RechargeVoice : number;
+    m_RechargeVoice : int;
     // not read, unused
     // public int ChargingVoice
-    m_ChargingVoice : number;
+    m_ChargingVoice : int;
     // not read, unused
     // public int ImpatientVoice
-    m_ImpatientVoice : number;
+    m_ImpatientVoice : int;
     // not read, unused
     // public int SuspendVoice
-    m_SuspendVoice : number;
+    m_SuspendVoice : int;
     // in frames
     // public int RechargeTime
-    m_RechargeTime : number;
+    m_RechargeTime : int;
     // public SuperWeaponType Type
     m_Type : SuperWeaponType;
     // public SHPStruct * SidebarImage
@@ -9775,9 +9769,9 @@ class SuperWeaponTypeClass
     // public Action Action
     m_Action : Action;
     // public int SpecialSound
-    m_SpecialSound : number;
+    m_SpecialSound : int;
     // public int StartSound
-    m_StartSound : number;
+    m_StartSound : int;
     // public BuildingTypeClass * AuxBuilding
     m_AuxBuilding : BuildingTypeClass;
     // public char[24] SidebarImageFile
@@ -9789,7 +9783,7 @@ class SuperWeaponTypeClass
     // public bool DisableableFromShell
     m_DisableableFromShell : boolean;
     // public int FlashSidebarTabFrames
-    m_FlashSidebarTabFrames : number;
+    m_FlashSidebarTabFrames : int;
     // public bool AIDefendAgainst
     m_AIDefendAgainst : boolean;
     // public bool PreClick
@@ -9797,15 +9791,15 @@ class SuperWeaponTypeClass
     // public bool PostClick
     m_PostClick : boolean;
     // public int PreDependent
-    m_PreDependent : number;
+    m_PreDependent : int;
     // public bool ShowTimer
     m_ShowTimer : boolean;
     // public bool ManualControl
     m_ManualControl : boolean;
     // public float Range
-    m_Range : number;
+    m_Range : float;
     // public int LineMultiplier
-    m_LineMultiplier : number;
+    m_LineMultiplier : int;
 }
 // forward declarations
 // AirstrikeClass
@@ -9817,17 +9811,17 @@ class AirstrikeClass
     constructor(pOwner_0 : TechnoClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non-virtual
     // public void StartMission(ObjectClass * pTarget)
     StartMission(pTarget_0 : ObjectClass) : void;
@@ -9835,21 +9829,21 @@ class AirstrikeClass
     static s_AbsID : AbstractType;
     // As in the INI files.
     // public int AirstrikeTeam
-    m_AirstrikeTeam : number;
+    m_AirstrikeTeam : int;
     // As in the INI files.
     // public int EliteAirstrikeTeam
-    m_EliteAirstrikeTeam : number;
+    m_EliteAirstrikeTeam : int;
     // As in the INI files.
     // public int AirstrikeTeamTypeIndex
-    m_AirstrikeTeamTypeIndex : number;
+    m_AirstrikeTeamTypeIndex : int;
     // As in the INI files.
     // public int EliteAirstrikeTeamTypeIndex
-    m_EliteAirstrikeTeamTypeIndex : number;
+    m_EliteAirstrikeTeamTypeIndex : int;
     // public unsigned long unknown_34
-    m_unknown_34 : number;
+    m_unknown_34 : unsigned_long;
     // unused?
     // public unsigned long unknown_38
-    m_unknown_38 : number;
+    m_unknown_38 : unsigned_long;
     // Is the Aircraft on its way?
     // public bool IsOnMission
     m_IsOnMission : boolean;
@@ -9857,13 +9851,13 @@ class AirstrikeClass
     m_unknown_bool_3D : boolean;
     // when was the last time this team was invoked and subsequently dissolved
     // public unsigned long TeamDissolveFrame
-    m_TeamDissolveFrame : number;
+    m_TeamDissolveFrame : unsigned_long;
     // As in the INI files.
     // public int AirstrikeRechargeTime
-    m_AirstrikeRechargeTime : number;
+    m_AirstrikeRechargeTime : int;
     // As in the INI files.
     // public int EliteAirstrikeRechargeTime
-    m_EliteAirstrikeRechargeTime : number;
+    m_EliteAirstrikeRechargeTime : int;
     // The unit that called the Airstrike (usually Boris).
     // public TechnoClass * Owner
     m_Owner : TechnoClass;
@@ -9886,20 +9880,20 @@ class CaptureManagerClass
 {
     // Constructor
     // public CaptureManagerClass(TechnoClass * pOwner, int nMaxControlNodes, bool bInfiniteControl)
-    constructor(pOwner_0 : TechnoClass, nMaxControlNodes_1 : number, bInfiniteControl_2 : boolean);
+    constructor(pOwner_0 : TechnoClass, nMaxControlNodes_1 : int, bInfiniteControl_2 : boolean);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non-virtual
     // public bool CaptureUnit(TechnoClass * pUnit)
     CaptureUnit(pUnit_0 : TechnoClass) : boolean;
@@ -9908,7 +9902,7 @@ class CaptureManagerClass
     // public void FreeAll()
     FreeAll() : void;
     // public int NumControlNodes() const
-    NumControlNodes() : number;
+    NumControlNodes() : int;
     // public bool CanCapture(TechnoClass * Target) const
     CanCapture(Target_0 : TechnoClass) : boolean;
     // public bool CannotControlAnyMore() const
@@ -9938,7 +9932,7 @@ class CaptureManagerClass
     // public DynamicVectorClass<ControlNode *> ControlNodes
     m_ControlNodes : DynamicVectorClass<ControlNode>;
     // public int MaxControlNodes
-    m_MaxControlNodes : number;
+    m_MaxControlNodes : int;
     // public bool InfiniteMindControl
     m_InfiniteMindControl : boolean;
     // Has the mind control death sound played already?
@@ -9946,12 +9940,12 @@ class CaptureManagerClass
     m_OverloadDeathSoundPlayed : boolean;
     // Used to create the red overloading pip by returning true in IsOverloading's wasDamageApplied for 10 frames.
     // public int OverloadPipState
-    m_OverloadPipState : number;
+    m_OverloadPipState : int;
     // public TechnoClass * Owner
     m_Owner : TechnoClass;
     // Decremented every frame. If it reaches zero, OverloadDamage is applied.
     // public int OverloadDamageDelay
-    m_OverloadDamageDelay : number;
+    m_OverloadDamageDelay : int;
 }
 // ControlNode
 class ControlNode
@@ -9974,20 +9968,20 @@ class SpawnManagerClass
 {
     // Constructor
     // public SpawnManagerClass(TechnoClass * pOwner, AircraftTypeClass * pSpawnType, int nMaxNodes, int RegenRate, int ReloadRate)
-    constructor(pOwner_0 : TechnoClass, pSpawnType_1 : AircraftTypeClass, nMaxNodes_2 : number, RegenRate_3 : number, ReloadRate_4 : number);
+    constructor(pOwner_0 : TechnoClass, pSpawnType_1 : AircraftTypeClass, nMaxNodes_2 : int, RegenRate_3 : int, ReloadRate_4 : int);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non-virtual
     // public void KillNodes()
     KillNodes() : void;
@@ -9998,11 +9992,11 @@ class SpawnManagerClass
     // public void ResetTarget()
     ResetTarget() : void;
     // public int CountAliveSpawns() const
-    CountAliveSpawns() : number;
+    CountAliveSpawns() : int;
     // public int CountDockedSpawns() const
-    CountDockedSpawns() : number;
+    CountDockedSpawns() : int;
     // public int CountLaunchingSpawns() const
-    CountLaunchingSpawns() : number;
+    CountLaunchingSpawns() : int;
     // public void UnlinkPointer()
     UnlinkPointer() : void;
     // public static AbstractType const AbsID = AbstractType::SpawnManager
@@ -10018,11 +10012,11 @@ class SpawnManagerClass
     // public AircraftTypeClass * SpawnType
     m_SpawnType : AircraftTypeClass;
     // public int SpawnCount
-    m_SpawnCount : number;
+    m_SpawnCount : int;
     // public int RegenRate
-    m_RegenRate : number;
+    m_RegenRate : int;
     // public int ReloadRate
-    m_ReloadRate : number;
+    m_ReloadRate : int;
     // public DynamicVectorClass<SpawnControl *> SpawnedNodes
     m_SpawnedNodes : DynamicVectorClass<SpawnControl>;
     // public CDTimerClass UpdateTimer
@@ -10046,7 +10040,7 @@ class SpawnControl
     // public CDTimerClass SpawnTimer
     m_SpawnTimer : CDTimerClass;
     // public int IsSpawnMissile
-    m_IsSpawnMissile : number;
+    m_IsSpawnMissile : int;
 }
 // The AbstractClass is the base class of all game objects.
 // SlaveManagerClass
@@ -10055,20 +10049,20 @@ class SlaveManagerClass
 {
     // Constructor
     // public SlaveManagerClass(TechnoClass * pOwner, InfantryTypeClass * pSlave, int num, int RegenRate, int ReloadRate)
-    constructor(pOwner_0 : TechnoClass, pSlave_1 : InfantryTypeClass, num_2 : number, RegenRate_3 : number, ReloadRate_4 : number);
+    constructor(pOwner_0 : TechnoClass, pSlave_1 : InfantryTypeClass, num_2 : int, RegenRate_3 : int, ReloadRate_4 : int);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // non-virtual
     // public void SetOwner(TechnoClass * NewOwner)
     SetOwner(NewOwner_0 : TechnoClass) : void;
@@ -10106,11 +10100,11 @@ class SlaveManagerClass
     // public InfantryTypeClass * SlaveType
     m_SlaveType : InfantryTypeClass;
     // public int SlaveCount
-    m_SlaveCount : number;
+    m_SlaveCount : int;
     // public int RegenRate
-    m_RegenRate : number;
+    m_RegenRate : int;
     // public int ReloadRate
-    m_ReloadRate : number;
+    m_ReloadRate : int;
     // public DynamicVectorClass<SlaveManagerClass::SlaveControl *> SlaveNodes
     m_SlaveNodes : DynamicVectorClass<SlaveManagerClass__SlaveControl>;
     // public CDTimerClass RespawnTimer
@@ -10118,7 +10112,7 @@ class SlaveManagerClass
     // public SlaveManagerStatus State
     m_State : SlaveManagerStatus;
     // public int LastScanFrame
-    m_LastScanFrame : number;
+    m_LastScanFrame : int;
 }
 // forward declarations
 // ParticleSystemClass
@@ -10130,17 +10124,17 @@ class ParticleSystemClass
     constructor(pParticleSystemType_0 : ParticleSystemTypeClass, coords_1 : CoordStruct, pTarget_2 : AbstractClass, pOwner_3 : ObjectClass, targetCoords_4 : CoordStruct, pOwnerHouse_5 : HouseClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public static AbstractType const AbsID = AbstractType::ParticleSystem
     static s_AbsID : AbstractType;
     // Static
@@ -10162,16 +10156,16 @@ class ParticleSystemClass
     m_Target : AbstractClass;
     // from ParSysTypeClass
     // public int SpawnFrames
-    m_SpawnFrames : number;
+    m_SpawnFrames : int;
     // from ParSysTypeClass
     // public int Lifetime
-    m_Lifetime : number;
+    m_Lifetime : int;
     // from ParSysTypeClass
     // public int SparkSpawnFrames
-    m_SparkSpawnFrames : number;
+    m_SparkSpawnFrames : int;
     // defaults to 29
     // public int SpotlightRadius
-    m_SpotlightRadius : number;
+    m_SpotlightRadius : int;
     // public bool TimeToDie
     m_TimeToDie : boolean;
     // public bool unknown_bool_F9
@@ -10196,22 +10190,22 @@ class ParticleSystemTypeClass
     static Find(pID_0 : string) : ParticleSystemTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // public static ParticleSystemTypeClass * FindOrAllocate(char const * id)
     static FindOrAllocate(id_0 : string) : ParticleSystemTypeClass;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * mcoords, HouseClass * owner)
     SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
@@ -10224,45 +10218,45 @@ class ParticleSystemTypeClass
     static s_Array : DynamicVectorClass<ParticleSystemTypeClass>;
     // ParticleType Array index
     // public int HoldsWhat
-    m_HoldsWhat : number;
+    m_HoldsWhat : int;
     // public bool Spawns
     m_Spawns : boolean;
     // public int SpawnFrames
-    m_SpawnFrames : number;
+    m_SpawnFrames : int;
     // public float Slowdown
-    m_Slowdown : number;
+    m_Slowdown : float;
     // public int ParticleCap
-    m_ParticleCap : number;
+    m_ParticleCap : int;
     // public int SpawnRadius
-    m_SpawnRadius : number;
+    m_SpawnRadius : int;
     // public float SpawnCutoff
-    m_SpawnCutoff : number;
+    m_SpawnCutoff : float;
     // public float SpawnTranslucencyCutoff
-    m_SpawnTranslucencyCutoff : number;
+    m_SpawnTranslucencyCutoff : float;
     // public BehavesLike BehavesLike
     m_BehavesLike : BehavesLike;
     // public int Lifetime
-    m_Lifetime : number;
+    m_Lifetime : int;
     // public Vector3D<float> SpawnDirection
     m_SpawnDirection : Vector3D;
     // public double ParticlesPerCoord
-    m_ParticlesPerCoord : number;
+    m_ParticlesPerCoord : double;
     // public double SpiralDeltaPerCoord
-    m_SpiralDeltaPerCoord : number;
+    m_SpiralDeltaPerCoord : double;
     // public double SpiralRadius
-    m_SpiralRadius : number;
+    m_SpiralRadius : double;
     // public double PositionPerturbationCoefficient
-    m_PositionPerturbationCoefficient : number;
+    m_PositionPerturbationCoefficient : double;
     // public double MovementPerturbationCoefficient
-    m_MovementPerturbationCoefficient : number;
+    m_MovementPerturbationCoefficient : double;
     // public double VelocityPerturbationCoefficient
-    m_VelocityPerturbationCoefficient : number;
+    m_VelocityPerturbationCoefficient : double;
     // public double SpawnSparkPercentage
-    m_SpawnSparkPercentage : number;
+    m_SpawnSparkPercentage : double;
     // public int SparkSpawnFrames
-    m_SparkSpawnFrames : number;
+    m_SparkSpawnFrames : int;
     // public int LightSize
-    m_LightSize : number;
+    m_LightSize : int;
     // public ColorStruct LaserColor
     m_LaserColor : ColorStruct;
     // public bool Laser
@@ -10280,20 +10274,20 @@ class ParticleClass
     constructor(pParticleType_0 : ParticleTypeClass, pCrd1_1 : CoordStruct, pCrd2_2 : CoordStruct, pParticleSystem_3 : ParticleSystemClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ParticleClass
     // public virtual int vt_entry_1E8()
-    vt_entry_1E8() : number;
+    vt_entry_1E8() : int;
     // public static AbstractType const AbsID = AbstractType::Particle
     static s_AbsID : AbstractType;
     // Static
@@ -10305,31 +10299,31 @@ class ParticleClass
     // public ParticleTypeClass * Type
     m_Type : ParticleTypeClass;
     // public unsigned char unknown_B0
-    m_unknown_B0 : number;
+    m_unknown_B0 : unsigned_char;
     // public unsigned char unknown_B1
-    m_unknown_B1 : number;
+    m_unknown_B1 : unsigned_char;
     // public unsigned char unknown_B2
-    m_unknown_B2 : number;
+    m_unknown_B2 : unsigned_char;
     // public unsigned long unknown_B4
-    m_unknown_B4 : number;
+    m_unknown_B4 : unsigned_long;
     // public unsigned long unknown_B8
-    m_unknown_B8 : number;
+    m_unknown_B8 : unsigned_long;
     // public unsigned long unknown_BC
-    m_unknown_BC : number;
+    m_unknown_BC : unsigned_long;
     // public CoordStruct Velocity
     m_Velocity : CoordStruct;
     // public unsigned long unknown_CC
-    m_unknown_CC : number;
+    m_unknown_CC : unsigned_long;
     // public double unknown_double_D0
-    m_unknown_double_D0 : number;
+    m_unknown_double_D0 : double;
     // public unsigned long unknown_D8
-    m_unknown_D8 : number;
+    m_unknown_D8 : unsigned_long;
     // public unsigned long unknown_DC
-    m_unknown_DC : number;
+    m_unknown_DC : unsigned_long;
     // public unsigned long unknown_E0
-    m_unknown_E0 : number;
+    m_unknown_E0 : unsigned_long;
     // public float Speed
-    m_Speed : number;
+    m_Speed : float;
     // Crd2 in CTOR
     // public CoordStruct unknown_coords_E8
     m_unknown_coords_E8 : CoordStruct;
@@ -10346,21 +10340,21 @@ class ParticleClass
     // public ParticleSystemClass * ParticleSystem
     m_ParticleSystem : ParticleSystemClass;
     // public unsigned short RemainingEC
-    m_RemainingEC : number;
+    m_RemainingEC : unsigned_short;
     // public unsigned short RemainingDC
-    m_RemainingDC : number;
+    m_RemainingDC : unsigned_short;
     // public unsigned char StateAIAdvance
-    m_StateAIAdvance : number;
+    m_StateAIAdvance : unsigned_char;
     // public unsigned char unknown_12D
-    m_unknown_12D : number;
+    m_unknown_12D : unsigned_char;
     // public unsigned char StartStateAI
-    m_StartStateAI : number;
+    m_StartStateAI : unsigned_char;
     // public unsigned char Translucency
-    m_Translucency : number;
+    m_Translucency : unsigned_char;
     // public unsigned char unknown_130
-    m_unknown_130 : number;
+    m_unknown_130 : unsigned_char;
     // public unsigned char unknown_131
-    m_unknown_131 : number;
+    m_unknown_131 : unsigned_char;
 }
 // ---
 // ParticleTypeClass
@@ -10375,20 +10369,20 @@ class ParticleTypeClass
     static Find(pID_0 : string) : ParticleTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * mcoords, HouseClass * owner)
     SpawnAtMapCoords(mcoords_0 : CellStruct | any, owner_1 : HouseClass | any) : boolean;
@@ -10405,15 +10399,15 @@ class ParticleTypeClass
     // public CoordStruct NextParticleOffset
     m_NextParticleOffset : CoordStruct;
     // public int XVelocity
-    m_XVelocity : number;
+    m_XVelocity : int;
     // public int YVelocity
-    m_YVelocity : number;
+    m_YVelocity : int;
     // public int MinZVelocity
-    m_MinZVelocity : number;
+    m_MinZVelocity : int;
     // public int ZVelocityRange
-    m_ZVelocityRange : number;
+    m_ZVelocityRange : int;
     // public double ColorSpeed
-    m_ColorSpeed : number;
+    m_ColorSpeed : double;
     // public TypeList<RGBClass *> ColorList
     m_ColorList : TypeList<RGBClass>;
     // public ColorStruct StartColor1
@@ -10421,41 +10415,41 @@ class ParticleTypeClass
     // public ColorStruct StartColor2
     m_StartColor2 : ColorStruct;
     // public int MaxDC
-    m_MaxDC : number;
+    m_MaxDC : int;
     // public int MaxEC
-    m_MaxEC : number;
+    m_MaxEC : int;
     // public WarheadTypeClass * Warhead
     m_Warhead : WarheadTypeClass;
     // public int Damage
-    m_Damage : number;
+    m_Damage : int;
     // public int StartFrame
-    m_StartFrame : number;
+    m_StartFrame : int;
     // public int NumLoopFrames
-    m_NumLoopFrames : number;
+    m_NumLoopFrames : int;
     // public int Translucency
-    m_Translucency : number;
+    m_Translucency : int;
     // public int WindEffect
-    m_WindEffect : number;
+    m_WindEffect : int;
     // public float Velocity
-    m_Velocity : number;
+    m_Velocity : float;
     // public float Deacc
-    m_Deacc : number;
+    m_Deacc : float;
     // public int Radius
-    m_Radius : number;
+    m_Radius : int;
     // public bool DeleteOnStateLimit
     m_DeleteOnStateLimit : boolean;
     // public unsigned char EndStateAI
-    m_EndStateAI : number;
+    m_EndStateAI : unsigned_char;
     // public unsigned char StartStateAI
-    m_StartStateAI : number;
+    m_StartStateAI : unsigned_char;
     // public unsigned char StateAIAdvance
-    m_StateAIAdvance : number;
+    m_StateAIAdvance : unsigned_char;
     // public unsigned char FinalDamageState
-    m_FinalDamageState : number;
+    m_FinalDamageState : unsigned_char;
     // public unsigned char Translucent25State
-    m_Translucent25State : number;
+    m_Translucent25State : unsigned_char;
     // public unsigned char Translucent50State
-    m_Translucent50State : number;
+    m_Translucent50State : unsigned_char;
     // public bool Normalized
     m_Normalized : boolean;
     // public ParticleTypeClass * NextParticle
@@ -10476,22 +10470,22 @@ class WarheadTypeClass
     static Find(pID_0 : string) : WarheadTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // public static WarheadTypeClass * FindOrAllocate(char const * id)
     static FindOrAllocate(id_0 : string) : WarheadTypeClass;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public static AbstractType const AbsID = AbstractType::WarheadType
     static s_AbsID : AbstractType;
     // Array
@@ -10501,31 +10495,31 @@ class WarheadTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public double Deform
-    m_Deform : number;
+    m_Deform : double;
     // public double[11] Verses
-    m_Verses : number;
+    m_Verses : double;
     // public double ProneDamage
-    m_ProneDamage : number;
+    m_ProneDamage : double;
     // public int DeformTreshold
-    m_DeformTreshold : number;
+    m_DeformTreshold : int;
     // public TypeList<AnimTypeClass *> AnimList
     m_AnimList : TypeList<AnimTypeClass>;
     // public InfDeath InfDeath
     m_InfDeath : InfDeath;
     // public float CellSpread
-    m_CellSpread : number;
+    m_CellSpread : float;
     // public float CellInset
-    m_CellInset : number;
+    m_CellInset : float;
     // public float PercentAtMax
-    m_PercentAtMax : number;
+    m_PercentAtMax : float;
     // public bool CausesDelayKill
     m_CausesDelayKill : boolean;
     // public int DelayKillFrames
-    m_DelayKillFrames : number;
+    m_DelayKillFrames : int;
     // public float DelayKillAtMax
-    m_DelayKillAtMax : number;
+    m_DelayKillAtMax : float;
     // public float CombatLightSize
-    m_CombatLightSize : number;
+    m_CombatLightSize : float;
     // public ParticleTypeClass * Particle
     m_Particle : ParticleTypeClass;
     // public bool Wall
@@ -10585,7 +10579,7 @@ class WarheadTypeClass
     // public bool BombDisarm
     m_BombDisarm : boolean;
     // public int Paralyzes
-    m_Paralyzes : number;
+    m_Paralyzes : int;
     // public bool Culling
     m_Culling : boolean;
     // public bool MakesDisguise
@@ -10603,21 +10597,21 @@ class WarheadTypeClass
     // public bool Veinhole
     m_Veinhole : boolean;
     // public int ShakeXlo
-    m_ShakeXlo : number;
+    m_ShakeXlo : int;
     // public int ShakeXhi
-    m_ShakeXhi : number;
+    m_ShakeXhi : int;
     // public int ShakeYlo
-    m_ShakeYlo : number;
+    m_ShakeYlo : int;
     // public int ShakeYhi
-    m_ShakeYhi : number;
+    m_ShakeYhi : int;
     // public TypeList<VoxelAnimTypeClass *> DebrisTypes
     m_DebrisTypes : TypeList<VoxelAnimTypeClass>;
     // public TypeList<int> DebrisMaximums
-    m_DebrisMaximums : TypeList<number>;
+    m_DebrisMaximums : TypeList<int>;
     // public int MaxDebris
-    m_MaxDebris : number;
+    m_MaxDebris : int;
     // public int MinDebris
-    m_MinDebris : number;
+    m_MinDebris : int;
 }
 // ---
 // VoxelAnimTypeClass
@@ -10632,15 +10626,15 @@ class VoxelAnimTypeClass
     static Find(pID_0 : string) : VoxelAnimTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
@@ -10661,31 +10655,31 @@ class VoxelAnimTypeClass
     // public bool SourceShared
     m_SourceShared : boolean;
     // public int VoxelIndex
-    m_VoxelIndex : number;
+    m_VoxelIndex : int;
     // public int Duration
-    m_Duration : number;
+    m_Duration : int;
     // public double Elasticity
-    m_Elasticity : number;
+    m_Elasticity : double;
     // public double MinAngularVelocity
-    m_MinAngularVelocity : number;
+    m_MinAngularVelocity : double;
     // public double MaxAngularVelocity
-    m_MaxAngularVelocity : number;
+    m_MaxAngularVelocity : double;
     // public double MinZVel
-    m_MinZVel : number;
+    m_MinZVel : double;
     // public double MaxZVel
-    m_MaxZVel : number;
+    m_MaxZVel : double;
     // public double MaxXYVel
-    m_MaxXYVel : number;
+    m_MaxXYVel : double;
     // public bool IsMeteor
     m_IsMeteor : boolean;
     // public VoxelAnimTypeClass * Spawns
     m_Spawns : VoxelAnimTypeClass;
     // public int SpawnCount
-    m_SpawnCount : number;
+    m_SpawnCount : int;
     // public int StartSound
-    m_StartSound : number;
+    m_StartSound : int;
     // public int StopSound
-    m_StopSound : number;
+    m_StopSound : int;
     // public AnimTypeClass * BounceAnim
     m_BounceAnim : AnimTypeClass;
     // public AnimTypeClass * ExpireAnim
@@ -10693,9 +10687,9 @@ class VoxelAnimTypeClass
     // public AnimTypeClass * TrailerAnim
     m_TrailerAnim : AnimTypeClass;
     // public int Damage
-    m_Damage : number;
+    m_Damage : int;
     // public int DamageRadius
-    m_DamageRadius : number;
+    m_DamageRadius : int;
     // public WarheadTypeClass * Warhead
     m_Warhead : WarheadTypeClass;
     // public ParticleSystemTypeClass * AttachedSystem
@@ -10713,17 +10707,17 @@ class WaveClass
     constructor(From_0 : CoordStruct, To_1 : CoordStruct, Owner_2 : TechnoClass, mode_3 : WaveType, Target_4 : AbstractClass);
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public void Draw_Magnetic(CoordStruct const& xyzFrom, CoordStruct const& xyzTo)
     Draw_Magnetic(xyzFrom_0 : CoordStruct, xyzTo_1 : CoordStruct) : void;
     // public void Draw_NonMagnetic(CoordStruct const& xyzFrom, CoordStruct const& xyzTo)
@@ -10773,39 +10767,39 @@ class WaveClass
     // public bool ShouldEnd
     m_ShouldEnd : boolean;
     // public unsigned char field_12E
-    m_field_12E : number;
+    m_field_12E : unsigned_char;
     // public unsigned char field_12F
-    m_field_12F : number;
+    m_field_12F : unsigned_char;
     // for sonic/magna only
     // public int WaveEC
-    m_WaveEC : number;
+    m_WaveEC : int;
     // public int WaveCount
-    m_WaveCount : number;
+    m_WaveCount : int;
     // public double MatrixScale1
-    m_MatrixScale1 : number;
+    m_MatrixScale1 : double;
     // public double MatrixScale2
-    m_MatrixScale2 : number;
+    m_MatrixScale2 : double;
     // public int PointData_Counter
-    m_PointData_Counter : number;
+    m_PointData_Counter : int;
     // public unsigned long PointData_Pointer
-    m_PointData_Pointer : number;
+    m_PointData_Pointer : unsigned_long;
     // public Point2D[6] SonicPoints
     m_SonicPoints : Point2D;
     // public Point2D[4] MagPoints
     m_MagPoints : Point2D;
     // public int PointData2_X
-    m_PointData2_X : number;
+    m_PointData2_X : int;
     // public int PointData2_Y
-    m_PointData2_Y : number;
+    m_PointData2_Y : int;
     // public unsigned long PointData2_Pointer
-    m_PointData2_Pointer : number;
+    m_PointData2_Pointer : unsigned_long;
     // public int[8] PitchData
-    m_PitchData : number;
+    m_PitchData : int;
     // public int FacingIndex
-    m_FacingIndex : number;
+    m_FacingIndex : int;
     // for lasers only, ctor = 160, per frame -= 6, 32 == dtor
     // public int LaserEC
-    m_LaserEC : number;
+    m_LaserEC : int;
     // public TechnoClass * Owner
     m_Owner : TechnoClass;
     // public FacingClass Facing
@@ -10813,7 +10807,7 @@ class WaveClass
     // public DynamicVectorClass<CellClass *> Cells
     m_Cells : DynamicVectorClass<CellClass>;
     // public int[14] ColorData
-    m_ColorData : number;
+    m_ColorData : int;
 }
 // TransitionTimer
 class TransitionTimer
@@ -10832,24 +10826,24 @@ class TransitionTimer
     // public bool IsTimerFinished()
     IsTimerFinished() : boolean;
     // public void StartTimer11(double time)
-    StartTimer11(time_0 : number) : void;
+    StartTimer11(time_0 : double) : void;
     // public void StartTimer10(double time)
-    StartTimer10(time_0 : number) : void;
+    StartTimer10(time_0 : double) : void;
     // public void Update()
     Update() : void;
     // public double PercentageDone()
-    PercentageDone() : number;
+    PercentageDone() : double;
     // public void SetToDone()
     SetToDone() : void;
     // ===========================================================================
     // ===== Properties ==========================================================
     // ===========================================================================
     // public double Rate1
-    m_Rate1 : number;
+    m_Rate1 : double;
     // public CDTimerClass ActionTimer
     m_ActionTimer : CDTimerClass;
     // public unsigned long Rate2
-    m_Rate2 : number;
+    m_Rate2 : unsigned_long;
     // public bool State1
     m_State1 : boolean;
     // public bool State2
@@ -10865,25 +10859,25 @@ class RecoilData
     // public TurretControl Turret
     m_Turret : TurretControl;
     // public float TravelPerFrame
-    m_TravelPerFrame : number;
+    m_TravelPerFrame : float;
     // public float TravelSoFar
-    m_TravelSoFar : number;
+    m_TravelSoFar : float;
     // public RecoilState State
     m_State : any;
     // public int TravelFramesLeft
-    m_TravelFramesLeft : number;
+    m_TravelFramesLeft : int;
 }
 // TurretControl
 class TurretControl
 {
     // public int Travel
-    m_Travel : number;
+    m_Travel : int;
     // public int CompressFrames
-    m_CompressFrames : number;
+    m_CompressFrames : int;
     // public int RecoverFrames
-    m_RecoverFrames : number;
+    m_RecoverFrames : int;
     // public int HoldFrames
-    m_HoldFrames : number;
+    m_HoldFrames : int;
 }
 // RadBeam
 class RadBeam
@@ -10902,22 +10896,22 @@ class RadBeam
     // ===== Properties ==========================================================
     // ===========================================================================
     // public unsigned long unknown_0
-    m_unknown_0 : number;
+    m_unknown_0 : unsigned_long;
     // public TechnoClass * Owner
     m_Owner : TechnoClass;
     // public unsigned char unknown_8
-    m_unknown_8 : number;
+    m_unknown_8 : unsigned_char;
     // if there's difference in the Y coord of SourceLocation and TargetLocation,
     // they're both converted to screen coords (2D)
     // and the difference of those Y coords is taken as this field
     // public unsigned long unknown_C
-    m_unknown_C : number;
+    m_unknown_C : unsigned_long;
     // public RadBeamType Type
     m_Type : RadBeamType;
     // public unsigned long unknown_14
-    m_unknown_14 : number;
+    m_unknown_14 : unsigned_long;
     // public double unknown_18
-    m_unknown_18 : number;
+    m_unknown_18 : double;
     // public ColorStruct Color
     m_Color : ColorStruct;
     // FLH
@@ -10926,57 +10920,57 @@ class RadBeam
     // public CoordStruct TargetLocation
     m_TargetLocation : CoordStruct;
     // public unsigned long Period
-    m_Period : number;
+    m_Period : unsigned_long;
     // public double Amplitude
-    m_Amplitude : number;
+    m_Amplitude : double;
     // public double unknown_48
-    m_unknown_48 : number;
+    m_unknown_48 : double;
     // public unsigned long unknown_50
-    m_unknown_50 : number;
+    m_unknown_50 : unsigned_long;
     // public unsigned long unknown_54
-    m_unknown_54 : number;
+    m_unknown_54 : unsigned_long;
     // public unsigned char unknown_58
-    m_unknown_58 : number;
+    m_unknown_58 : unsigned_char;
     // public unsigned long unknown_5C
-    m_unknown_5C : number;
+    m_unknown_5C : unsigned_long;
     // public unsigned long unknown_60
-    m_unknown_60 : number;
+    m_unknown_60 : unsigned_long;
     // public unsigned long unknown_64
-    m_unknown_64 : number;
+    m_unknown_64 : unsigned_long;
     // public double unknown_68
-    m_unknown_68 : number;
+    m_unknown_68 : double;
     // public CoordStruct AnotherLocation
     m_AnotherLocation : CoordStruct;
     // public unsigned long unknown_7C
-    m_unknown_7C : number;
+    m_unknown_7C : unsigned_long;
     // public double unknown_80
-    m_unknown_80 : number;
+    m_unknown_80 : double;
     // public unsigned long unknown_88
-    m_unknown_88 : number;
+    m_unknown_88 : unsigned_long;
     // public unsigned long unknown_8C
-    m_unknown_8C : number;
+    m_unknown_8C : unsigned_long;
     // public CoordStruct AndAnotherLocation
     m_AndAnotherLocation : CoordStruct;
     // public unsigned long unknown_9C
-    m_unknown_9C : number;
+    m_unknown_9C : unsigned_long;
     // public unsigned long unknown_A0
-    m_unknown_A0 : number;
+    m_unknown_A0 : unsigned_long;
     // public unsigned long unknown_A4
-    m_unknown_A4 : number;
+    m_unknown_A4 : unsigned_long;
     // public unsigned long unknown_A8
-    m_unknown_A8 : number;
+    m_unknown_A8 : unsigned_long;
     // public unsigned long unknown_AC
-    m_unknown_AC : number;
+    m_unknown_AC : unsigned_long;
     // public unsigned long unknown_B0
-    m_unknown_B0 : number;
+    m_unknown_B0 : unsigned_long;
     // public unsigned long unknown_B4
-    m_unknown_B4 : number;
+    m_unknown_B4 : unsigned_long;
     // public double unknown_B8
-    m_unknown_B8 : number;
+    m_unknown_B8 : double;
     // public unsigned char unknown_C0
-    m_unknown_C0 : number;
+    m_unknown_C0 : unsigned_char;
     // public unsigned long unknown_C4
-    m_unknown_C4 : number;
+    m_unknown_C4 : unsigned_long;
 }
 // PlanningTokenClass
 class PlanningTokenClass
@@ -10995,17 +10989,17 @@ class PlanningTokenClass
     // public bool field_1D
     m_field_1D : boolean;
     // public int field_8C
-    m_field_8C : number;
+    m_field_8C : int;
     // public int ClosedLoopNodeCount
-    m_ClosedLoopNodeCount : number;
+    m_ClosedLoopNodeCount : int;
     // public int StepsToClosedLoop
-    m_StepsToClosedLoop : number;
+    m_StepsToClosedLoop : int;
     // public bool field_98
     m_field_98 : boolean;
     // public bool field_99
     m_field_99 : boolean;
     // public unsigned long[27] unknown_20_88
-    m_unknown_20_88 : number;
+    m_unknown_20_88 : unsigned_long;
     // public char[108] __unknown_20_88
     m___unknown_20_88 : string;
 }
@@ -11026,7 +11020,7 @@ class PlanningNodeClass
     // public DynamicVectorClass<PlanningMemberClass *> PlanningMembers
     m_PlanningMembers : DynamicVectorClass<PlanningMemberClass>;
     // public int field_18
-    m_field_18 : number;
+    m_field_18 : int;
     // public bool field_1C
     m_field_1C : boolean;
     // public DynamicVectorClass<PlanningBranchClass *> PlanningBranches
@@ -11039,11 +11033,11 @@ class PlanningMemberClass
     // public TechnoClass * Owner
     m_Owner : TechnoClass;
     // public unsigned long Packet
-    m_Packet : number;
+    m_Packet : unsigned_long;
     // public int field_8
-    m_field_8 : number;
+    m_field_8 : int;
     // public char field_C
-    m_field_C : number;
+    m_field_C : char;
 }
 // PlanningBranchClass
 class PlanningBranchClass
@@ -11059,23 +11053,23 @@ class BulletData
     // public CoordStruct Location
     m_Location : CoordStruct;
     // public int Distance
-    m_Distance : number;
+    m_Distance : int;
 }
 // ColorScheme
 class ColorScheme
 {
     // Constructor, Destructor
     // public ColorScheme(char const * pID, ColorStruct const& BaseColor, BytePalette const& Pal1, BytePalette const& Pal2, int ShadeCount, bool AddToArray)
-    constructor(pID_0 : string, BaseColor_1 : ColorStruct, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number, AddToArray_5 : boolean);
+    constructor(pID_0 : string, BaseColor_1 : ColorStruct, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : int, AddToArray_5 : boolean);
     // trap! most schemes are duplicated - ShadeCount 1 and ShadeCount 53
     // public static ColorScheme * Find(char const * pID, int ShadeCount = 1)
-    static Find(pID_0 : string, ShadeCount_1 : number) : ColorScheme;
+    static Find(pID_0 : string, ShadeCount_1 : int) : ColorScheme;
     // public static int FindIndex(char const * pID, int ShadeCount = 1)
-    static FindIndex(pID_0 : string, ShadeCount_1 : number) : number;
+    static FindIndex(pID_0 : string, ShadeCount_1 : int) : int;
     // public static ColorScheme * FindByName(char const * pID, ColorStruct const& BaseColor, BytePalette const& Pal1, BytePalette const& Pal2, int ShadeCount)
-    static FindByName(pID_0 : string, BaseColor_1 : ColorStruct, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : number) : ColorScheme;
+    static FindByName(pID_0 : string, BaseColor_1 : ColorStruct, Pal1_2 : BytePalette, Pal2_3 : BytePalette, ShadeCount_4 : int) : ColorScheme;
     // public static int GetNumberOfSchemes()
-    static GetNumberOfSchemes() : number;
+    static GetNumberOfSchemes() : int;
     // public static DynamicVectorClass<ColorScheme *> * GeneratePalette(char * name)
     static GeneratePalette(name_0 : string) : DynamicVectorClass<ColorScheme>;
     // Game uses a hash table to store color scheme vectors for extra palettes, this table can be iterated by calling this function.
@@ -11086,7 +11080,7 @@ class ColorScheme
     static s_Array : DynamicVectorClass<ColorScheme>;
     // this is off by one (always one higher than the actual index). that's because consistency and reason suck.
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public BytePalette Colors
     m_Colors : BytePalette;
     // public char * ID
@@ -11097,9 +11091,9 @@ class ColorScheme
     // public LightConvertClass * LightConvert
     m_LightConvert : LightConvertClass;
     // public int ShadeCount
-    m_ShadeCount : number;
+    m_ShadeCount : int;
     // public int MainShadeIndex
-    m_MainShadeIndex : number;
+    m_MainShadeIndex : int;
 }
 // AbilitiesStruct
 class AbilitiesStruct
@@ -11167,9 +11161,9 @@ class BounceClass
     // public BounceClass()
     constructor();
     // public BounceClass(CoordStruct const& coords, double elasticity, double gravity, double maxVelocity, Vector3D<float> const& velocity, double angularVelocity)
-    constructor(coords_0 : CoordStruct, elasticity_1 : number, gravity_2 : number, maxVelocity_3 : number, velocity_4 : Vector3D, angularVelocity_5 : number);
+    constructor(coords_0 : CoordStruct, elasticity_1 : double, gravity_2 : double, maxVelocity_3 : double, velocity_4 : Vector3D, angularVelocity_5 : double);
     // public void Initialize(CoordStruct const& coords, double elasticity, double gravity, double maxVelocity, Vector3D<float> const& velocity, double angularVelocity)
-    Initialize(coords_0 : CoordStruct, elasticity_1 : number, gravity_2 : number, maxVelocity_3 : number, velocity_4 : Vector3D, angularVelocity_5 : number) : void;
+    Initialize(coords_0 : CoordStruct, elasticity_1 : double, gravity_2 : double, maxVelocity_3 : double, velocity_4 : Vector3D, angularVelocity_5 : double) : void;
     // public CoordStruct * GetCoords(CoordStruct * pBuffer) const
     GetCoords(pBuffer_0 : CoordStruct) : CoordStruct;
     // public CoordStruct GetCoords() const
@@ -11182,13 +11176,13 @@ class BounceClass
     Update() : any;
     // speed multiplier when bouncing off the ground
     // public double Elasticity
-    m_Elasticity : number;
+    m_Elasticity : double;
     // subtracted from the Z coords every frame
     // public double Gravity
-    m_Gravity : number;
+    m_Gravity : double;
     // 0.0 disables check
     // public double MaxVelocity
-    m_MaxVelocity : number;
+    m_MaxVelocity : double;
     // position with precision
     // public Vector3D<float> Coords
     m_Coords : Vector3D;
@@ -11214,25 +11208,25 @@ class BombClass
     constructor();
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public void Detonate()
     Detonate() : void;
     // public void Disarm()
     Disarm() : void;
     // public int IsDeathBomb() const
-    IsDeathBomb() : number;
+    IsDeathBomb() : int;
     // public int GetCurrentFlickerFrame() const
-    GetCurrentFlickerFrame() : number;
+    GetCurrentFlickerFrame() : int;
     // public bool TimeToExplode() const
     TimeToExplode() : boolean;
     // public static AbstractType const AbsID = AbstractType::Bomb
@@ -11247,18 +11241,18 @@ class BombClass
     m_Target : ObjectClass;
     // unused - if so, [General]CanDetonateDeathBomb applies instead of CanDetonateTimeBomb
     // public int DeathBomb
-    m_DeathBomb : number;
+    m_DeathBomb : int;
     // public int PlantingFrame
-    m_PlantingFrame : number;
+    m_PlantingFrame : int;
     // public int DetonationFrame
-    m_DetonationFrame : number;
+    m_DetonationFrame : int;
     // public AudioController Audio
     m_Audio : any;
     // public int TickSound
-    m_TickSound : number;
+    m_TickSound : int;
     // seems so
     // public int ShouldPlayTickingSound
-    m_ShouldPlayTickingSound : number;
+    m_ShouldPlayTickingSound : int;
     // (mostly) set to 0 on plant, 1 on detonation/removal ?
     // public bool Harmless
     m_Harmless : boolean;
@@ -11270,7 +11264,7 @@ class LineTrail
     // public LineTrail()
     constructor();
     // public void SetDecrement(int val)
-    SetDecrement(val_0 : number) : void;
+    SetDecrement(val_0 : int) : void;
     // public static void DeleteAll()
     static DeleteAll() : void;
     // skip operator new
@@ -11285,9 +11279,9 @@ class LineTrail
     // public ObjectClass * Owner
     m_Owner : ObjectClass;
     // public int Decrement
-    m_Decrement : number;
+    m_Decrement : int;
     // public int ActiveSlot
-    m_ActiveSlot : number;
+    m_ActiveSlot : int;
     // public LineTrailNode[32] Trails
     m_Trails : LineTrailNode;
 }
@@ -11297,7 +11291,7 @@ class LineTrailNode
     // public CoordStruct Position
     m_Position : CoordStruct;
     // public int Value
-    m_Value : number;
+    m_Value : int;
 }
 // this refers to the "planning mode" waypoints you place with your mouse, not mapping waypoints
 // WaypointClass
@@ -11310,7 +11304,7 @@ class WaypointClass
     // public CellStruct Coords
     m_Coords : CellStruct;
     // public unsigned long unknown
-    m_unknown : number;
+    m_unknown : unsigned_long;
 }
 // StartingTechnoStruct
 class StartingTechnoStruct
@@ -11327,31 +11321,31 @@ class WaypointPathClass
 {
     // Constructor
     // public WaypointPathClass(int idx)
-    constructor(idx_0 : number);
+    constructor(idx_0 : int);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public WaypointClass * GetWaypoint(int idx) const
-    GetWaypoint(idx_0 : number) : WaypointClass;
+    GetWaypoint(idx_0 : int) : WaypointClass;
     // public WaypointClass * GetWaypointAfter(int idx) const
-    GetWaypointAfter(idx_0 : number) : WaypointClass;
+    GetWaypointAfter(idx_0 : int) : WaypointClass;
     // public bool WaypointExistsAt(WaypointClass * wpt) const
     WaypointExistsAt(wpt_0 : WaypointClass) : boolean;
     // public static AbstractType const AbsID = AbstractType::Waypoint
     static s_AbsID : AbstractType;
     // seems that way
     // public int CurrentWaypointIndex
-    m_CurrentWaypointIndex : number;
+    m_CurrentWaypointIndex : int;
     // actual path waypoints, no *
     // public DynamicVectorClass<WaypointClass> Waypoints
     m_Waypoints : DynamicVectorClass<WaypointClass>;
@@ -11362,13 +11356,13 @@ class UnitTrackerClass
     // public UnitTrackerClass()
     constructor();
     // public void IncrementUnitCount(int nUnit)
-    IncrementUnitCount(nUnit_0 : number) : void;
+    IncrementUnitCount(nUnit_0 : int) : void;
     // public void DecrementUnitCount(int nUnit)
-    DecrementUnitCount(nUnit_0 : number) : void;
+    DecrementUnitCount(nUnit_0 : int) : void;
     // public void PopulateUnitCount(int nCount)
-    PopulateUnitCount(nCount_0 : number) : void;
+    PopulateUnitCount(nCount_0 : int) : void;
     // public int GetUnitCount()
-    GetUnitCount() : number;
+    GetUnitCount() : int;
     // public int const * GetArray()
     GetArray() : ArrayBuffer;
     // public void ClearUnitCount()
@@ -11378,21 +11372,21 @@ class UnitTrackerClass
     // public void ToPCFormat()
     ToPCFormat() : void;
     // public int[512] UnitTotals
-    m_UnitTotals : number;
+    m_UnitTotals : int;
     // public int UnitCount
-    m_UnitCount : number;
+    m_UnitCount : int;
     // public int InNetworkFormat
-    m_InNetworkFormat : number;
+    m_InNetworkFormat : int;
 }
 // ZoneInfoStruct
 class ZoneInfoStruct
 {
     // public int Aircraft
-    m_Aircraft : number;
+    m_Aircraft : int;
     // public int Armor
-    m_Armor : number;
+    m_Armor : int;
     // public int Infantry
-    m_Infantry : number;
+    m_Infantry : int;
 }
 // that's how WW calls it, seems to track levels of how much it hates other houses... typical ww style, with bugs
 // AngerStruct
@@ -11404,7 +11398,7 @@ class AngerStruct
     // public HouseClass * House
     m_House : HouseClass;
     // public int AngerLevel
-    m_AngerLevel : number;
+    m_AngerLevel : int;
 }
 // ScoutStruct
 class ScoutStruct
@@ -11426,13 +11420,13 @@ class DropshipStruct
     // public DropshipStruct(DropshipStruct const& other)
     constructor(other_0 : DropshipStruct);
     // public unsigned char unknown_C
-    m_unknown_C : number;
+    m_unknown_C : unsigned_char;
     // public int Count
-    m_Count : number;
+    m_Count : int;
     // public TechnoTypeClass *[5] Types
     m_Types : TechnoTypeClass;
     // public int TotalCost
-    m_TotalCost : number;
+    m_TotalCost : int;
     // public CDTimerClass Timer
     m_Timer : CDTimerClass;
     // public char[12] __Timer
@@ -11445,16 +11439,16 @@ class BaseClass
     constructor();
     // VTable
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any) : number;
+    Load(pStm_0 : any) : long;
     // public virtual long Save(IStream * pStm)
-    Save(pStm_0 : any) : number;
+    Save(pStm_0 : any) : long;
     // public virtual void ComputeCRC(CRCEngine& crc) const
     ComputeCRC(crc_0 : any) : void;
     // virtual ~BaseClass() { /*???*/ }; // gcc demands a virtual since virtual funcs exist
     // public int FailedToPlaceNode(BaseNodeClass * Node)
-    FailedToPlaceNode(Node_0 : BaseNodeClass) : number;
+    FailedToPlaceNode(Node_0 : BaseNodeClass) : int;
     // public int PercentBuilt
-    m_PercentBuilt : number;
+    m_PercentBuilt : int;
     // public CellStruct Center
     m_Center : CellStruct;
     // public HouseClass * Owner
@@ -11481,26 +11475,26 @@ class BaseNodeClass
     // public bool operator==(BaseNodeClass const& tBaseNode) const
     op_Equality(tBaseNode_0 : BaseNodeClass) : boolean;
     // public int BuildingTypeIndex
-    m_BuildingTypeIndex : number;
+    m_BuildingTypeIndex : int;
     // public CellStruct MapCoords
     m_MapCoords : CellStruct;
     // public bool Placed
     m_Placed : boolean;
     // public int Attempts
-    m_Attempts : number;
+    m_Attempts : int;
 }
 // Randomizer
 class Randomizer
 {
     // public Randomizer(unsigned long dwSeed = *reinterpret_cast<DWORD*>(0xA8ED94))
-    constructor(dwSeed_0 : number);
+    constructor(dwSeed_0 : unsigned_long);
     // public int Random()
-    Random() : number;
+    Random() : int;
     // public int RandomRanged(int nMin, int nMax)
-    RandomRanged(nMin_0 : number, nMax_1 : number) : number;
+    RandomRanged(nMin_0 : int, nMax_1 : int) : int;
     // helper methods
     // public double RandomDouble()
-    RandomDouble() : number;
+    RandomDouble() : double;
     // skip operator()
     // skip operator()
     // for any randomization happening inside a match (odds of a survivor, crate, etc), use the ScenarioClass::Random object instead!
@@ -11512,12 +11506,12 @@ class Randomizer
     m_unknown_00 : boolean;
     // from Table
     // public int Next1
-    m_Next1 : number;
+    m_Next1 : int;
     // from Table
     // public int Next2
-    m_Next2 : number;
+    m_Next2 : int;
     // public unsigned long[250] Table
-    m_Table : number;
+    m_Table : unsigned_long;
 }
 // LinkClass
 class LinkClass
@@ -11557,7 +11551,7 @@ class GadgetClass
 {
     // Constructors
     // public GadgetClass(int nX, int nY, int nWidth, int nHeight, GadgetFlag eFlag, bool bSticky)
-    constructor(nX_0 : number, nY_1 : number, nWidth_2 : number, nHeight_3 : number, eFlag_4 : GadgetFlag, bSticky_5 : boolean);
+    constructor(nX_0 : int, nY_1 : int, nWidth_2 : int, nHeight_3 : int, eFlag_4 : GadgetFlag, bSticky_5 : boolean);
     // public GadgetClass(GadgetClass& another)
     constructor(another_0 : GadgetClass);
     // LinkClass
@@ -11569,13 +11563,13 @@ class GadgetClass
     Remove() : GadgetClass;
     // GadgetClass
     // public virtual unsigned long Input()
-    Input() : number;
+    Input() : unsigned_long;
     // public virtual void DrawAll(bool bForced)
     DrawAll(bForced_0 : boolean) : void;
     // public virtual void DeleteList()
     DeleteList() : void;
     // public virtual GadgetClass * ExtractGadget(unsigned int nID)
-    ExtractGadget(nID_0 : number) : GadgetClass;
+    ExtractGadget(nID_0 : unsigned_int) : GadgetClass;
     // public virtual void MarkListToRedraw()
     MarkListToRedraw() : void;
     // public virtual void Disable()
@@ -11583,11 +11577,11 @@ class GadgetClass
     // public virtual void Enable()
     Enable() : void;
     // public virtual unsigned int const GetID()
-    GetID() : number;
+    GetID() : unsigned_int;
     // public virtual void MarkRedraw()
     MarkRedraw() : void;
     // public virtual void PeerToPeer(unsigned int Flags, unsigned long * pKey, GadgetClass * pSendTo)
-    PeerToPeer(Flags_0 : number, pKey_1 : ArrayBuffer, pSendTo_2 : GadgetClass) : void;
+    PeerToPeer(Flags_0 : unsigned_int, pKey_1 : ArrayBuffer, pSendTo_2 : GadgetClass) : void;
     // public virtual void SetFocus()
     SetFocus() : void;
     // public virtual void KillFocus()
@@ -11599,9 +11593,9 @@ class GadgetClass
     // public virtual bool IsToRedraw()
     IsToRedraw() : boolean;
     // public virtual void SetPosition(int X, int Y)
-    SetPosition(X_0 : number, Y_1 : number) : void;
+    SetPosition(X_0 : int, Y_1 : int) : void;
     // public virtual void SetDimension(int Width, int Height)
-    SetDimension(Width_0 : number, Height_1 : number) : void;
+    SetDimension(Width_0 : int, Height_1 : int) : void;
     // public virtual bool Draw(bool bForced)
     Draw(bForced_0 : boolean) : boolean;
     // public virtual void OnMouseEnter()
@@ -11613,22 +11607,22 @@ class GadgetClass
     // public virtual bool Action(GadgetFlag Flags, unsigned long * pKey, KeyModifier Modifier)
     Action(Flags_0 : GadgetFlag, pKey_1 : ArrayBuffer, Modifier_2 : KeyModifier) : boolean;
     // public virtual bool Clicked(unsigned long * pKey, GadgetFlag Flags, int X, int Y, KeyModifier Modifier)
-    Clicked(pKey_0 : ArrayBuffer, Flags_1 : GadgetFlag, X_2 : number, Y_3 : number, Modifier_4 : KeyModifier) : boolean;
+    Clicked(pKey_0 : ArrayBuffer, Flags_1 : GadgetFlag, X_2 : int, Y_3 : int, Modifier_4 : KeyModifier) : boolean;
     // skip operator=
     // public GadgetClass * ExtractGadgetAt(int X, int Y)
-    ExtractGadgetAt(X_0 : number, Y_1 : number) : GadgetClass;
+    ExtractGadgetAt(X_0 : int, Y_1 : int) : GadgetClass;
     // Statics
     // public static int GetColorScheme()
-    static GetColorScheme() : number;
+    static GetColorScheme() : int;
     // Properties
     // public int X
-    m_X : number;
+    m_X : int;
     // public int Y
-    m_Y : number;
+    m_Y : int;
     // public int Width
-    m_Width : number;
+    m_Width : int;
     // public int Height
-    m_Height : number;
+    m_Height : int;
     // public bool NeedsRedraw
     m_NeedsRedraw : boolean;
     // public bool IsSticky
@@ -11645,20 +11639,20 @@ class Game
     // the game's own rounding function
     // infamous for true'ing (F2I(-5.00) == -4.00)
     // public static long long F2I64(double val)
-    static F2I64(val_0 : number) : number;
+    static F2I64(val_0 : double) : long_long;
     // the game's own rounding function
     // infamous for true'ing (F2I(-5.00) == -4.00)
     // public static int F2I(double val)
-    static F2I(val_0 : number) : number;
+    static F2I(val_0 : double) : int;
     // public static void RaiseError(long err)
-    static RaiseError(err_0 : number) : void;
+    static RaiseError(err_0 : long) : void;
     // actually is SessionClass::Callback
     // public static void SetProgress(int progress)
-    static SetProgress(progress_0 : number) : void;
+    static SetProgress(progress_0 : int) : void;
     // public static void CallBack()
     static CallBack() : void;
     // public static int GetResource(int ID, int Type)
-    static GetResource(ID_0 : number, Type_1 : number) : number;
+    static GetResource(ID_0 : int, Type_1 : int) : int;
     // public static void CenterWindowIn(HWND__ * Child, HWND__ * Parent)
     static CenterWindowIn(Child_0 : any, Parent_1 : any) : void;
     // public static void sub_53E420(HWND__ * hWindow)
@@ -11670,7 +11664,7 @@ class Game
     // public static void PlanningManager_WM_RBUTTONUP_63AB00(Point2D XY)
     static PlanningManager_WM_RBUTTONUP_63AB00(XY_0 : Point2D) : void;
     // public static long Save_Sides(IStream * pStm, DynamicVectorClass<SideClass *> * pVector)
-    static Save_Sides(pStm_0 : any, pVector_1 : DynamicVectorClass<any>) : number;
+    static Save_Sides(pStm_0 : any, pVector_1 : DynamicVectorClass<any>) : long;
     // public static void StreamerThreadFlush()
     static StreamerThreadFlush() : void;
     // public static void UICommands_TypeSelect_7327D0(char const * iniName)
@@ -11678,12 +11672,12 @@ class Game
     // public static bool IsTypeSelecting()
     static IsTypeSelecting() : boolean;
     // public static double GetFloaterGravity()
-    static GetFloaterGravity() : number;
+    static GetFloaterGravity() : double;
     // Main loop of the game.
     // public static void MainLoop()
     static MainLoop() : void;
     // public static void KeyboardProcess(unsigned long& input)
-    static KeyboardProcess(input_0 : number) : void;
+    static KeyboardProcess(input_0 : unsigned_long) : void;
     // public static _LARGE_INTEGER AudioGetTime()
     static AudioGetTime() : any;
     // public static void InitRandom()
@@ -11695,18 +11689,18 @@ class Game
     // public static void InitUIStuff()
     static InitUIStuff() : void;
     // public static void DrawRadialIndicator(bool drawLine, bool adjustColor, CoordStruct const pCoord, ColorStruct color, float lineMultiplier, bool unknown1, bool unknown2)
-    static DrawRadialIndicator(drawLine_0 : boolean, adjustColor_1 : boolean, pCoord_2 : CoordStruct, color_3 : ColorStruct, lineMultiplier_4 : number, unknown1_5 : boolean, unknown2_6 : boolean) : void;
+    static DrawRadialIndicator(drawLine_0 : boolean, adjustColor_1 : boolean, pCoord_2 : CoordStruct, color_3 : ColorStruct, lineMultiplier_4 : float, unknown1_5 : boolean, unknown2_6 : boolean) : void;
     // public static void PlayMovie(char const * movieName, int queue_theme = -1, char use_hidden_surface1 = -1, char stretch_movie = -1, char use_hidden_surface2 = -1, char set_state_1 = -1)
-    static PlayMovie(movieName_0 : string, queue_theme_1 : number, use_hidden_surface1_2 : number, stretch_movie_3 : number, use_hidden_surface2_4 : number, set_state_1_5 : number) : void;
+    static PlayMovie(movieName_0 : string, queue_theme_1 : int, use_hidden_surface1_2 : char, stretch_movie_3 : char, use_hidden_surface2_4 : char, set_state_1_5 : char) : void;
     // public static void ComputeFrameCRC()
     static ComputeFrameCRC() : void;
     // public static void LogFrameCRC(int frameIndex)
-    static LogFrameCRC(frameIndex_0 : number) : void;
+    static LogFrameCRC(frameIndex_0 : int) : void;
     // the magic checksum for version validation - linked in StaticInits
     // public static reference<unsigned long, 8639840, 0> const Savegame_Magic = 0x83D560u
-    static s_Savegame_Magic : number;
+    static s_Savegame_Magic : unsigned_long;
     // public static reference<DynamicVectorClass<unsigned long>, 11582600, 0> const COMClasses = 0xB0BC88u
-    static s_COMClasses : DynamicVectorClass<number>;
+    static s_COMClasses : DynamicVectorClass<unsigned_long>;
     // public static reference<HWND__ *, 12006736, 0> const hWnd = 0xB73550u
     static s_hWnd : any;
     // public static reference<HINSTANCE__ *, 12006128, 0> const hInstance = 0xB732F0u
@@ -11732,21 +11726,21 @@ class Game
     // public static reference<bool, 11070848, 0> const IsFocused = 0xA8ED80u
     static s_IsFocused : boolean;
     // public static reference<int, 11070880, 0> const SpecialDialog = 0xA8EDA0u
-    static s_SpecialDialog : number;
+    static s_SpecialDialog : int;
     // public static reference<bool, 11290836, 0> const PCXInitialized = 0xAC48D4
     static s_PCXInitialized : boolean;
     // public static reference<int, 11070868, 0> const Seed = 0xA8ED94u
-    static s_Seed : number;
+    static s_Seed : int;
     // public static reference<int, 8531188, 0> const TechLevel = 0x822CF4u
-    static s_TechLevel : number;
+    static s_TechLevel : int;
     // public static reference<int, 11056460, 0> const PlayerCount = 0xA8B54Cu
-    static s_PlayerCount : number;
+    static s_PlayerCount : int;
     // public static reference<int, 11056020, 0> const PlayerColor = 0xA8B394u
-    static s_PlayerColor : number;
+    static s_PlayerColor : int;
     // public static reference<bool, 11276488, 0> const ObserverMode = 0xAC10C8u
     static s_ObserverMode : boolean;
     // public static reference<char, 11057376, 0> const ScenarioName = 0xA8B8E0u
-    static s_ScenarioName : number;
+    static s_ScenarioName : char;
     // public static reference<bool, 11073452, 0> const DontSetExceptionHandler = 0xA8F7ACu
     static s_DontSetExceptionHandler : boolean;
     // public static reference<bool, 11552896, 0> const EnableMPSyncDebug = 0xB04880u
@@ -11769,20 +11763,20 @@ class SmudgeTypeClass
     static Find(pID_0 : string) : SmudgeTypeClass;
     // Array
     // public static int FindIndex(char const * pID)
-    static FindIndex(pID_0 : string) : number;
+    static FindIndex(pID_0 : string) : int;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // ObjectTypeClass
     // public virtual bool SpawnAtMapCoords(CellStruct * pMapCoords, HouseClass * pOwner)
     SpawnAtMapCoords(pMapCoords_0 : CellStruct | any, pOwner_1 : HouseClass | any) : boolean;
@@ -11790,9 +11784,9 @@ class SmudgeTypeClass
     CreateObject(pOwner_0 : HouseClass | any) : ObjectClass;
     // SmudgeTypeClass
     // public virtual void DrawIt(Point2D const& Point, RectangleStruct const& Rect, int SmudgeData, int Height, CellStruct const& MapCoords)
-    DrawIt(Point_0 : Point2D, Rect_1 : RectangleStruct, SmudgeData_2 : number, Height_3 : number, MapCoords_4 : CellStruct) : void;
+    DrawIt(Point_0 : Point2D, Rect_1 : RectangleStruct, SmudgeData_2 : int, Height_3 : int, MapCoords_4 : CellStruct) : void;
     // public static void LoadFromIniList(int idxTheatre)
-    static LoadFromIniList(idxTheatre_0 : number) : void;
+    static LoadFromIniList(idxTheatre_0 : int) : void;
     // public static AbstractType const AbsID = AbstractType::SmudgeType
     static s_AbsID : AbstractType;
     // Array
@@ -11802,11 +11796,11 @@ class SmudgeTypeClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ArrayIndex
-    m_ArrayIndex : number;
+    m_ArrayIndex : int;
     // public int Width
-    m_Width : number;
+    m_Width : int;
     // public int Height
-    m_Height : number;
+    m_Height : int;
     // public bool Crater
     m_Crater : boolean;
     // public bool Burn
@@ -11817,23 +11811,23 @@ class SmudgeTypeClass
 class DifficultyStruct
 {
     // public double Firepower
-    m_Firepower : number;
+    m_Firepower : double;
     // public double GroundSpeed
-    m_GroundSpeed : number;
+    m_GroundSpeed : double;
     // public double AirSpeed
-    m_AirSpeed : number;
+    m_AirSpeed : double;
     // public double Armor
-    m_Armor : number;
+    m_Armor : double;
     // public double ROF
-    m_ROF : number;
+    m_ROF : double;
     // public double Cost
-    m_Cost : number;
+    m_Cost : double;
     // public double BuildTime
-    m_BuildTime : number;
+    m_BuildTime : double;
     // public double RepairDelay
-    m_RepairDelay : number;
+    m_RepairDelay : double;
     // public double BuildDelay
-    m_BuildDelay : number;
+    m_BuildDelay : double;
     // public bool BuildSlowdown
     m_BuildSlowdown : boolean;
     // public bool DestroyWalls
@@ -11850,28 +11844,28 @@ class RocketStruct
     // public RocketStruct(noinit_t)
     constructor(_0 : any);
     // public int PauseFrames
-    m_PauseFrames : number;
+    m_PauseFrames : int;
     // public int TiltFrames
-    m_TiltFrames : number;
+    m_TiltFrames : int;
     // public float PitchInitial
-    m_PitchInitial : number;
+    m_PitchInitial : float;
     // public float PitchFinal
-    m_PitchFinal : number;
+    m_PitchFinal : float;
     // public float TurnRate
-    m_TurnRate : number;
+    m_TurnRate : float;
     // shouldn't this be a float? prolly a mistake by WW...
     // public int RaiseRate
-    m_RaiseRate : number;
+    m_RaiseRate : int;
     // public float Acceleration
-    m_Acceleration : number;
+    m_Acceleration : float;
     // public int Altitude
-    m_Altitude : number;
+    m_Altitude : int;
     // public int Damage
-    m_Damage : number;
+    m_Damage : int;
     // public int EliteDamage
-    m_EliteDamage : number;
+    m_EliteDamage : int;
     // public int BodyLength
-    m_BodyLength : number;
+    m_BodyLength : int;
     // public bool LazyCurve
     m_LazyCurve : boolean;
     // public AircraftTypeClass * Type
@@ -11972,43 +11966,43 @@ class RulesClass
     static s_Instance : RulesClass;
     // Properties
     // public int DetailMinFrameRateNormal
-    m_DetailMinFrameRateNormal : number;
+    m_DetailMinFrameRateNormal : int;
     // public int DetailMinFrameRateMovie
-    m_DetailMinFrameRateMovie : number;
+    m_DetailMinFrameRateMovie : int;
     // public int DetailBufferZoneWidth
-    m_DetailBufferZoneWidth : number;
+    m_DetailBufferZoneWidth : int;
     // public int AmmoCrateDamage
-    m_AmmoCrateDamage : number;
+    m_AmmoCrateDamage : int;
     // public UnitTypeClass * LargeVisceroid
     m_LargeVisceroid : UnitTypeClass;
     // public UnitTypeClass * SmallVisceroid
     m_SmallVisceroid : UnitTypeClass;
     // public int AttackingAircraftSightRange
-    m_AttackingAircraftSightRange : number;
+    m_AttackingAircraftSightRange : int;
     // public double TunnelSpeed
-    m_TunnelSpeed : number;
+    m_TunnelSpeed : double;
     // public double TiberiumHeal
-    m_TiberiumHeal : number;
+    m_TiberiumHeal : double;
     // public int SelfHealInfantryFrames
-    m_SelfHealInfantryFrames : number;
+    m_SelfHealInfantryFrames : int;
     // public int SelfHealInfantryAmount
-    m_SelfHealInfantryAmount : number;
+    m_SelfHealInfantryAmount : int;
     // public int SelfHealUnitFrames
-    m_SelfHealUnitFrames : number;
+    m_SelfHealUnitFrames : int;
     // public int SelfHealUnitAmount
-    m_SelfHealUnitAmount : number;
+    m_SelfHealUnitAmount : int;
     // public bool FreeMCV
     m_FreeMCV : boolean;
     // public bool BerzerkAllowed
     m_BerzerkAllowed : boolean;
     // public int PoseDir
-    m_PoseDir : number;
+    m_PoseDir : int;
     // public int DeployDir
-    m_DeployDir : number;
+    m_DeployDir : int;
     // public AnimTypeClass * DropPodPuff
     m_DropPodPuff : AnimTypeClass;
     // public int WaypointAnimationSpeed
-    m_WaypointAnimationSpeed : number;
+    m_WaypointAnimationSpeed : int;
     // public AnimTypeClass * BarrelExplode
     m_BarrelExplode : AnimTypeClass;
     // public TypeList<VoxelAnimTypeClass *> BarrelDebris
@@ -12016,19 +12010,19 @@ class RulesClass
     // public ParticleSystemTypeClass * BarrelParticle
     m_BarrelParticle : ParticleSystemTypeClass;
     // public float RadarEventColorSpeed
-    m_RadarEventColorSpeed : number;
+    m_RadarEventColorSpeed : float;
     // public int RadarEventMinRadius
-    m_RadarEventMinRadius : number;
+    m_RadarEventMinRadius : int;
     // public float RadarEventSpeed
-    m_RadarEventSpeed : number;
+    m_RadarEventSpeed : float;
     // public float RadarEventRotationSpeed
-    m_RadarEventRotationSpeed : number;
+    m_RadarEventRotationSpeed : float;
     // public int FlashFrameTime
-    m_FlashFrameTime : number;
+    m_FlashFrameTime : int;
     // public int RadarCombatFlashTime
-    m_RadarCombatFlashTime : number;
+    m_RadarCombatFlashTime : int;
     // public int MaxWaypointPathLength
-    m_MaxWaypointPathLength : number;
+    m_MaxWaypointPathLength : int;
     // public AnimTypeClass * Wake
     m_Wake : AnimTypeClass;
     // public AnimTypeClass * NukeTakeOff
@@ -12050,27 +12044,27 @@ class RulesClass
     // public AnimTypeClass * Behind
     m_Behind : AnimTypeClass;
     // public double AITriggerSuccessWeightDelta
-    m_AITriggerSuccessWeightDelta : number;
+    m_AITriggerSuccessWeightDelta : double;
     // public double AITriggerFailureWeightDelta
-    m_AITriggerFailureWeightDelta : number;
+    m_AITriggerFailureWeightDelta : double;
     // public double AITriggerTrackRecordCoefficient
-    m_AITriggerTrackRecordCoefficient : number;
+    m_AITriggerTrackRecordCoefficient : double;
     // public int VeinholeMonsterStrength
-    m_VeinholeMonsterStrength : number;
+    m_VeinholeMonsterStrength : int;
     // public int MaxVeinholeGrowth
-    m_MaxVeinholeGrowth : number;
+    m_MaxVeinholeGrowth : int;
     // public int VeinholeGrowthRate
-    m_VeinholeGrowthRate : number;
+    m_VeinholeGrowthRate : int;
     // public int VeinholeShrinkRate
-    m_VeinholeShrinkRate : number;
+    m_VeinholeShrinkRate : int;
     // public AnimTypeClass * VeinAttack
     m_VeinAttack : AnimTypeClass;
     // public int VeinDamage
-    m_VeinDamage : number;
+    m_VeinDamage : int;
     // public int MaximumQueuedObjects
-    m_MaximumQueuedObjects : number;
+    m_MaximumQueuedObjects : int;
     // public int AircraftFogReveal
-    m_AircraftFogReveal : number;
+    m_AircraftFogReveal : int;
     // public OverlayTypeClass * WoodCrateImg
     m_WoodCrateImg : OverlayTypeClass;
     // public OverlayTypeClass * CrateImg
@@ -12086,149 +12080,149 @@ class RulesClass
     // public TypeList<AnimTypeClass *> BridgeExplosions
     m_BridgeExplosions : TypeList<AnimTypeClass>;
     // public int DigSound
-    m_DigSound : number;
+    m_DigSound : int;
     // public int CreateUnitSound
-    m_CreateUnitSound : number;
+    m_CreateUnitSound : int;
     // public int CreateInfantrySound
-    m_CreateInfantrySound : number;
+    m_CreateInfantrySound : int;
     // public int CreateAircraftSound
-    m_CreateAircraftSound : number;
+    m_CreateAircraftSound : int;
     // public int BaseUnderAttackSound
-    m_BaseUnderAttackSound : number;
+    m_BaseUnderAttackSound : int;
     // public int GUIMainButtonSound
-    m_GUIMainButtonSound : number;
+    m_GUIMainButtonSound : int;
     // public int GUIBuildSound
-    m_GUIBuildSound : number;
+    m_GUIBuildSound : int;
     // public int GUITabSound
-    m_GUITabSound : number;
+    m_GUITabSound : int;
     // public int GUIOpenSound
-    m_GUIOpenSound : number;
+    m_GUIOpenSound : int;
     // public int GUICloseSound
-    m_GUICloseSound : number;
+    m_GUICloseSound : int;
     // public int GUIMoveOutSound
-    m_GUIMoveOutSound : number;
+    m_GUIMoveOutSound : int;
     // public int GUIMoveInSound
-    m_GUIMoveInSound : number;
+    m_GUIMoveInSound : int;
     // public int GUIComboOpenSound
-    m_GUIComboOpenSound : number;
+    m_GUIComboOpenSound : int;
     // public int GUIComboCloseSound
-    m_GUIComboCloseSound : number;
+    m_GUIComboCloseSound : int;
     // public int GUICheckboxSound
-    m_GUICheckboxSound : number;
+    m_GUICheckboxSound : int;
     // public int ScoreAnimSound
-    m_ScoreAnimSound : number;
+    m_ScoreAnimSound : int;
     // public int IFVTransformSound
-    m_IFVTransformSound : number;
+    m_IFVTransformSound : int;
     // public int PsychicSensorDetectSound
-    m_PsychicSensorDetectSound : number;
+    m_PsychicSensorDetectSound : int;
     // public int BuildingGarrisonedSound
-    m_BuildingGarrisonedSound : number;
+    m_BuildingGarrisonedSound : int;
     // public int BuildingAbandonedSound
-    m_BuildingAbandonedSound : number;
+    m_BuildingAbandonedSound : int;
     // public int BuildingRepairedSound
-    m_BuildingRepairedSound : number;
+    m_BuildingRepairedSound : int;
     // public int CheerSound
-    m_CheerSound : number;
+    m_CheerSound : int;
     // public int PlaceBeaconSound
-    m_PlaceBeaconSound : number;
+    m_PlaceBeaconSound : int;
     // public int DefaultChronoSound
-    m_DefaultChronoSound : number;
+    m_DefaultChronoSound : int;
     // public int StartPlanningModeSound
-    m_StartPlanningModeSound : number;
+    m_StartPlanningModeSound : int;
     // public int AddPlanningModeCommandSound
-    m_AddPlanningModeCommandSound : number;
+    m_AddPlanningModeCommandSound : int;
     // public int ExecutePlanSound
-    m_ExecutePlanSound : number;
+    m_ExecutePlanSound : int;
     // public int EndPlanningModeSound
-    m_EndPlanningModeSound : number;
+    m_EndPlanningModeSound : int;
     // public int CrateMoneySound
-    m_CrateMoneySound : number;
+    m_CrateMoneySound : int;
     // public int CrateRevealSound
-    m_CrateRevealSound : number;
+    m_CrateRevealSound : int;
     // public int CrateFireSound
-    m_CrateFireSound : number;
+    m_CrateFireSound : int;
     // public int CrateArmourSound
-    m_CrateArmourSound : number;
+    m_CrateArmourSound : int;
     // public int CrateSpeedSound
-    m_CrateSpeedSound : number;
+    m_CrateSpeedSound : int;
     // public int CrateUnitSound
-    m_CrateUnitSound : number;
+    m_CrateUnitSound : int;
     // public int CratePromoteSound
-    m_CratePromoteSound : number;
+    m_CratePromoteSound : int;
     // public int ImpactWaterSound
-    m_ImpactWaterSound : number;
+    m_ImpactWaterSound : int;
     // public int ImpactLandSound
-    m_ImpactLandSound : number;
+    m_ImpactLandSound : int;
     // public int SinkingSound
-    m_SinkingSound : number;
+    m_SinkingSound : int;
     // public int BombTickingSound
-    m_BombTickingSound : number;
+    m_BombTickingSound : int;
     // public int BombAttachSound
-    m_BombAttachSound : number;
+    m_BombAttachSound : int;
     // public int YuriMindControlSound
-    m_YuriMindControlSound : number;
+    m_YuriMindControlSound : int;
     // public int ChronoInSound
-    m_ChronoInSound : number;
+    m_ChronoInSound : int;
     // public int ChronoOutSound
-    m_ChronoOutSound : number;
+    m_ChronoOutSound : int;
     // public int SpySatActivationSound
-    m_SpySatActivationSound : number;
+    m_SpySatActivationSound : int;
     // public int SpySatDeactivationSound
-    m_SpySatDeactivationSound : number;
+    m_SpySatDeactivationSound : int;
     // public int UpgradeVeteranSound
-    m_UpgradeVeteranSound : number;
+    m_UpgradeVeteranSound : int;
     // public int UpgradeEliteSound
-    m_UpgradeEliteSound : number;
+    m_UpgradeEliteSound : int;
     // public int VoiceIFVRepair
-    m_VoiceIFVRepair : number;
+    m_VoiceIFVRepair : int;
     // public int SlavesFreeSound
-    m_SlavesFreeSound : number;
+    m_SlavesFreeSound : int;
     // public int SlaveMinerDeploySound
-    m_SlaveMinerDeploySound : number;
+    m_SlaveMinerDeploySound : int;
     // public int SlaveMinerUndeploySound
-    m_SlaveMinerUndeploySound : number;
+    m_SlaveMinerUndeploySound : int;
     // public int BunkerWallsUpSound
-    m_BunkerWallsUpSound : number;
+    m_BunkerWallsUpSound : int;
     // public int BunkerWallsDownSound
-    m_BunkerWallsDownSound : number;
+    m_BunkerWallsDownSound : int;
     // public int RepairBridgeSound
-    m_RepairBridgeSound : number;
+    m_RepairBridgeSound : int;
     // public int PsychicDominatorActivateSound
-    m_PsychicDominatorActivateSound : number;
+    m_PsychicDominatorActivateSound : int;
     // public int GeneticMutatorActivateSound
-    m_GeneticMutatorActivateSound : number;
+    m_GeneticMutatorActivateSound : int;
     // public int PsychicRevealActivateSound
-    m_PsychicRevealActivateSound : number;
+    m_PsychicRevealActivateSound : int;
     // public int MasterMindOverloadDeathSound
-    m_MasterMindOverloadDeathSound : number;
+    m_MasterMindOverloadDeathSound : int;
     // public int AirstrikeAbortSound
-    m_AirstrikeAbortSound : number;
+    m_AirstrikeAbortSound : int;
     // public int AirstrikeAttackVoice
-    m_AirstrikeAttackVoice : number;
+    m_AirstrikeAttackVoice : int;
     // public int MindClearedSound
-    m_MindClearedSound : number;
+    m_MindClearedSound : int;
     // public int EnterGrinderSound
-    m_EnterGrinderSound : number;
+    m_EnterGrinderSound : int;
     // public int LeaveGrinderSound
-    m_LeaveGrinderSound : number;
+    m_LeaveGrinderSound : int;
     // public int EnterBioReactorSound
-    m_EnterBioReactorSound : number;
+    m_EnterBioReactorSound : int;
     // public int LeaveBioReactorSound
-    m_LeaveBioReactorSound : number;
+    m_LeaveBioReactorSound : int;
     // public int ActivateSound
-    m_ActivateSound : number;
+    m_ActivateSound : int;
     // public int DeactivateSound
-    m_DeactivateSound : number;
+    m_DeactivateSound : int;
     // public int SpyPlaneCamera
-    m_SpyPlaneCamera : number;
+    m_SpyPlaneCamera : int;
     // public int LetsDoTheTimeWarpOutAgain
-    m_LetsDoTheTimeWarpOutAgain : number;
+    m_LetsDoTheTimeWarpOutAgain : int;
     // public int LetsDoTheTimeWarpInAgain
-    m_LetsDoTheTimeWarpInAgain : number;
+    m_LetsDoTheTimeWarpInAgain : int;
     // public int DiskLaserChargeUp
-    m_DiskLaserChargeUp : number;
+    m_DiskLaserChargeUp : int;
     // public int SpyPlaneCameraFrames
-    m_SpyPlaneCameraFrames : number;
+    m_SpyPlaneCameraFrames : int;
     // public AnimTypeClass * Dig
     m_Dig : AnimTypeClass;
     // public AnimTypeClass * IonBlast
@@ -12250,17 +12244,17 @@ class RulesClass
     // public AnimTypeClass * DominatorSecondAnim
     m_DominatorSecondAnim : AnimTypeClass;
     // public int DominatorFireAtPercentage
-    m_DominatorFireAtPercentage : number;
+    m_DominatorFireAtPercentage : int;
     // public int DominatorCaptureRange
-    m_DominatorCaptureRange : number;
+    m_DominatorCaptureRange : int;
     // public int DominatorDamage
-    m_DominatorDamage : number;
+    m_DominatorDamage : int;
     // public int MindControlAttackLineFrames
-    m_MindControlAttackLineFrames : number;
+    m_MindControlAttackLineFrames : int;
     // public int DrainMoneyFrameDelay
-    m_DrainMoneyFrameDelay : number;
+    m_DrainMoneyFrameDelay : int;
     // public int DrainMoneyAmount
-    m_DrainMoneyAmount : number;
+    m_DrainMoneyAmount : int;
     // public AnimTypeClass * DrainAnimationType
     m_DrainAnimationType : AnimTypeClass;
     // public AnimTypeClass * ControlledAnimationType
@@ -12292,60 +12286,60 @@ class RulesClass
     // public AnimTypeClass * AtmosphereEntry
     m_AtmosphereEntry : AnimTypeClass;
     // public TypeList<int> PrerequisitePower
-    m_PrerequisitePower : TypeList<number>;
+    m_PrerequisitePower : TypeList<int>;
     // public TypeList<int> PrerequisiteFactory
-    m_PrerequisiteFactory : TypeList<number>;
+    m_PrerequisiteFactory : TypeList<int>;
     // public TypeList<int> PrerequisiteBarracks
-    m_PrerequisiteBarracks : TypeList<number>;
+    m_PrerequisiteBarracks : TypeList<int>;
     // public TypeList<int> PrerequisiteRadar
-    m_PrerequisiteRadar : TypeList<number>;
+    m_PrerequisiteRadar : TypeList<int>;
     // public TypeList<int> PrerequisiteTech
-    m_PrerequisiteTech : TypeList<number>;
+    m_PrerequisiteTech : TypeList<int>;
     // public TypeList<int> PrerequisiteProc
-    m_PrerequisiteProc : TypeList<number>;
+    m_PrerequisiteProc : TypeList<int>;
     // public UnitTypeClass * PrerequisiteProcAlternate
     m_PrerequisiteProcAlternate : UnitTypeClass;
     // public int GateUp
-    m_GateUp : number;
+    m_GateUp : int;
     // public int GateDown
-    m_GateDown : number;
+    m_GateDown : int;
     // public int TurnRate
-    m_TurnRate : number;
+    m_TurnRate : int;
     // public int Speed
-    m_Speed : number;
+    m_Speed : int;
     // public double Climb
-    m_Climb : number;
+    m_Climb : double;
     // public int CruiseHeight
-    m_CruiseHeight : number;
+    m_CruiseHeight : int;
     // public double Acceleration
-    m_Acceleration : number;
+    m_Acceleration : double;
     // public double WobblesPerSecond
-    m_WobblesPerSecond : number;
+    m_WobblesPerSecond : double;
     // public int WobbleDeviation
-    m_WobbleDeviation : number;
+    m_WobbleDeviation : int;
     // public TypeList<int> RadarEventSuppressionDistances
-    m_RadarEventSuppressionDistances : TypeList<number>;
+    m_RadarEventSuppressionDistances : TypeList<int>;
     // public TypeList<int> RadarEventVisibilityDurations
-    m_RadarEventVisibilityDurations : TypeList<number>;
+    m_RadarEventVisibilityDurations : TypeList<int>;
     // public TypeList<int> RadarEventDurations
-    m_RadarEventDurations : TypeList<number>;
+    m_RadarEventDurations : TypeList<int>;
     // public int IonCannonDamage
-    m_IonCannonDamage : number;
+    m_IonCannonDamage : int;
     // public int RailgunDamageRadius
-    m_RailgunDamageRadius : number;
+    m_RailgunDamageRadius : int;
     // public BuildingTypeClass * PrismType
     m_PrismType : BuildingTypeClass;
     // this is int(100 * ini value)
     // public int PrismSupportModifier
-    m_PrismSupportModifier : number;
+    m_PrismSupportModifier : int;
     // public int PrismSupportMax
-    m_PrismSupportMax : number;
+    m_PrismSupportMax : int;
     // public int PrismSupportDelay
-    m_PrismSupportDelay : number;
+    m_PrismSupportDelay : int;
     // public int PrismSupportDuration
-    m_PrismSupportDuration : number;
+    m_PrismSupportDuration : int;
     // public int PrismSupportHeight
-    m_PrismSupportHeight : number;
+    m_PrismSupportHeight : int;
     // public RocketStruct V3Rocket
     m_V3Rocket : RocketStruct;
     // public RocketStruct DMisl
@@ -12353,63 +12347,63 @@ class RulesClass
     // public RocketStruct CMisl
     m_CMisl : RocketStruct;
     // public int ParadropRadius
-    m_ParadropRadius : number;
+    m_ParadropRadius : int;
     // public double ZoomInFactor
-    m_ZoomInFactor : number;
+    m_ZoomInFactor : double;
     // public double ConditionRedSparkingProbability
-    m_ConditionRedSparkingProbability : number;
+    m_ConditionRedSparkingProbability : double;
     // public double ConditionYellowSparkingProbability
-    m_ConditionYellowSparkingProbability : number;
+    m_ConditionYellowSparkingProbability : double;
     // public int TiberiumExplosionDamage
-    m_TiberiumExplosionDamage : number;
+    m_TiberiumExplosionDamage : int;
     // public int TiberiumStrength
-    m_TiberiumStrength : number;
+    m_TiberiumStrength : int;
     // public float MinLowPowerProductionSpeed
-    m_MinLowPowerProductionSpeed : number;
+    m_MinLowPowerProductionSpeed : float;
     // public float MaxLowPowerProductionSpeed
-    m_MaxLowPowerProductionSpeed : number;
+    m_MaxLowPowerProductionSpeed : float;
     // public float LowPowerPenaltyModifier
-    m_LowPowerPenaltyModifier : number;
+    m_LowPowerPenaltyModifier : float;
     // public float MultipleFactory
-    m_MultipleFactory : number;
+    m_MultipleFactory : float;
     // public int MaximumCheerRate
-    m_MaximumCheerRate : number;
+    m_MaximumCheerRate : int;
     // public double TreeFlammability
-    m_TreeFlammability : number;
+    m_TreeFlammability : double;
     // public double MissileSpeedVar
-    m_MissileSpeedVar : number;
+    m_MissileSpeedVar : double;
     // public double MissileROTVar
-    m_MissileROTVar : number;
+    m_MissileROTVar : double;
     // public int MissileSafetyAltitude
-    m_MissileSafetyAltitude : number;
+    m_MissileSafetyAltitude : int;
     // public WeaponTypeClass * DropPodWeapon
     m_DropPodWeapon : WeaponTypeClass;
     // public int DropPodHeight
-    m_DropPodHeight : number;
+    m_DropPodHeight : int;
     // public int DropPodSpeed
-    m_DropPodSpeed : number;
+    m_DropPodSpeed : int;
     // public double DropPodAngle
-    m_DropPodAngle : number;
+    m_DropPodAngle : double;
     // public double ScrollMultiplier
-    m_ScrollMultiplier : number;
+    m_ScrollMultiplier : double;
     // public double CrewEscape
-    m_CrewEscape : number;
+    m_CrewEscape : double;
     // public int ShakeScreen
-    m_ShakeScreen : number;
+    m_ShakeScreen : int;
     // public int HoverHeight
-    m_HoverHeight : number;
+    m_HoverHeight : int;
     // public double HoverBob
-    m_HoverBob : number;
+    m_HoverBob : double;
     // public double HoverBoost
-    m_HoverBoost : number;
+    m_HoverBoost : double;
     // public double HoverAcceleration
-    m_HoverAcceleration : number;
+    m_HoverAcceleration : double;
     // public double HoverBrake
-    m_HoverBrake : number;
+    m_HoverBrake : double;
     // public double HoverDampen
-    m_HoverDampen : number;
+    m_HoverDampen : double;
     // public double PlacementDelay
-    m_PlacementDelay : number;
+    m_PlacementDelay : double;
     // public TypeList<VoxelAnimTypeClass *> ExplosiveVoxelDebris
     m_ExplosiveVoxelDebris : TypeList<VoxelAnimTypeClass>;
     // public VoxelAnimTypeClass * TireVoxelDebris
@@ -12417,139 +12411,139 @@ class RulesClass
     // public VoxelAnimTypeClass * ScrapVoxelDebris
     m_ScrapVoxelDebris : VoxelAnimTypeClass;
     // public int BridgeVoxelMax
-    m_BridgeVoxelMax : number;
+    m_BridgeVoxelMax : int;
     // public int CloakingStages
-    m_CloakingStages : number;
+    m_CloakingStages : int;
     // public int RevealTriggerRadius
-    m_RevealTriggerRadius : number;
+    m_RevealTriggerRadius : int;
     // public double ShipSinkingWeight
-    m_ShipSinkingWeight : number;
+    m_ShipSinkingWeight : double;
     // public double IceCrackingWeight
-    m_IceCrackingWeight : number;
+    m_IceCrackingWeight : double;
     // public double IceBreakingWeight
-    m_IceBreakingWeight : number;
+    m_IceBreakingWeight : double;
     // public TypeList<int> IceCrackSounds
-    m_IceCrackSounds : TypeList<number>;
+    m_IceCrackSounds : TypeList<int>;
     // public unsigned char CliffBackImpassability
-    m_CliffBackImpassability : number;
+    m_CliffBackImpassability : unsigned_char;
     // public double VeteranRatio
-    m_VeteranRatio : number;
+    m_VeteranRatio : double;
     // public double VeteranCombat
-    m_VeteranCombat : number;
+    m_VeteranCombat : double;
     // public double VeteranSpeed
-    m_VeteranSpeed : number;
+    m_VeteranSpeed : double;
     // public double VeteranSight
-    m_VeteranSight : number;
+    m_VeteranSight : double;
     // public double VeteranArmor
-    m_VeteranArmor : number;
+    m_VeteranArmor : double;
     // public double VeteranROF
-    m_VeteranROF : number;
+    m_VeteranROF : double;
     // public double VeteranCap
-    m_VeteranCap : number;
+    m_VeteranCap : double;
     // public int CloakSound
-    m_CloakSound : number;
+    m_CloakSound : int;
     // public int SellSound
-    m_SellSound : number;
+    m_SellSound : int;
     // public int GameClosed
-    m_GameClosed : number;
+    m_GameClosed : int;
     // public int IncomingMessage
-    m_IncomingMessage : number;
+    m_IncomingMessage : int;
     // public int SystemError
-    m_SystemError : number;
+    m_SystemError : int;
     // public int OptionsChanged
-    m_OptionsChanged : number;
+    m_OptionsChanged : int;
     // public int GameForming
-    m_GameForming : number;
+    m_GameForming : int;
     // public int PlayerLeft
-    m_PlayerLeft : number;
+    m_PlayerLeft : int;
     // public int PlayerJoined
-    m_PlayerJoined : number;
+    m_PlayerJoined : int;
     // public int MessageCharTyped
-    m_MessageCharTyped : number;
+    m_MessageCharTyped : int;
     // public int Construction
-    m_Construction : number;
+    m_Construction : int;
     // public TypeList<int> CreditTicks
-    m_CreditTicks : TypeList<number>;
+    m_CreditTicks : TypeList<int>;
     // public int BuildingDieSound
-    m_BuildingDieSound : number;
+    m_BuildingDieSound : int;
     // public int BuildingSlam
-    m_BuildingSlam : number;
+    m_BuildingSlam : int;
     // public int RadarOn
-    m_RadarOn : number;
+    m_RadarOn : int;
     // public int RadarOff
-    m_RadarOff : number;
+    m_RadarOff : int;
     // public int MovieOn
-    m_MovieOn : number;
+    m_MovieOn : int;
     // public int MovieOff
-    m_MovieOff : number;
+    m_MovieOff : int;
     // public int ScoldSound
-    m_ScoldSound : number;
+    m_ScoldSound : int;
     // public int TeslaCharge
-    m_TeslaCharge : number;
+    m_TeslaCharge : int;
     // public int TeslaZap
-    m_TeslaZap : number;
+    m_TeslaZap : int;
     // public int GenericClick
-    m_GenericClick : number;
+    m_GenericClick : int;
     // public int GenericBeep
-    m_GenericBeep : number;
+    m_GenericBeep : int;
     // public int BuildingDamageSound
-    m_BuildingDamageSound : number;
+    m_BuildingDamageSound : int;
     // also "healing unit" sound, old hospital mode
     // public int HealCrateSound
-    m_HealCrateSound : number;
+    m_HealCrateSound : int;
     // public int ChuteSound
-    m_ChuteSound : number;
+    m_ChuteSound : int;
     // public int StopSound
-    m_StopSound : number;
+    m_StopSound : int;
     // public int GuardSound
-    m_GuardSound : number;
+    m_GuardSound : int;
     // public int ScatterSound
-    m_ScatterSound : number;
+    m_ScatterSound : int;
     // TS leftover! Never read from the INI.
     // public int DeploySound
-    m_DeploySound : number;
+    m_DeploySound : int;
     // public int StormSound
-    m_StormSound : number;
+    m_StormSound : int;
     // public TypeList<int> LightningSounds
-    m_LightningSounds : TypeList<number>;
+    m_LightningSounds : TypeList<int>;
     // public int ShellButtonSlideSound
-    m_ShellButtonSlideSound : number;
+    m_ShellButtonSlideSound : int;
     // public double WallBuildSpeedCoefficient
-    m_WallBuildSpeedCoefficient : number;
+    m_WallBuildSpeedCoefficient : double;
     // public double ChargeToDrainRatio
-    m_ChargeToDrainRatio : number;
+    m_ChargeToDrainRatio : double;
     // public double TrackedUphill
-    m_TrackedUphill : number;
+    m_TrackedUphill : double;
     // public double TrackedDownhill
-    m_TrackedDownhill : number;
+    m_TrackedDownhill : double;
     // public double WheeledUphill
-    m_WheeledUphill : number;
+    m_WheeledUphill : double;
     // public double WheeledDownhill
-    m_WheeledDownhill : number;
+    m_WheeledDownhill : double;
     // public int SpotlightMovementRadius
-    m_SpotlightMovementRadius : number;
+    m_SpotlightMovementRadius : int;
     // public int SpotlightLocationRadius
-    m_SpotlightLocationRadius : number;
+    m_SpotlightLocationRadius : int;
     // public double SpotlightSpeed
-    m_SpotlightSpeed : number;
+    m_SpotlightSpeed : double;
     // public double SpotlightAcceleration
-    m_SpotlightAcceleration : number;
+    m_SpotlightAcceleration : double;
     // public double SpotlightAngle
-    m_SpotlightAngle : number;
+    m_SpotlightAngle : double;
     // public int SpotlightRadius
-    m_SpotlightRadius : number;
+    m_SpotlightRadius : int;
     // public int WindDirection
-    m_WindDirection : number;
+    m_WindDirection : int;
     // public int CameraRange
-    m_CameraRange : number;
+    m_CameraRange : int;
     // public int FlightLevel
-    m_FlightLevel : number;
+    m_FlightLevel : int;
     // public int ParachuteMaxFallRate
-    m_ParachuteMaxFallRate : number;
+    m_ParachuteMaxFallRate : int;
     // public int NoParachuteMaxFallRate
-    m_NoParachuteMaxFallRate : number;
+    m_NoParachuteMaxFallRate : int;
     // public int BuildingDrop
-    m_BuildingDrop : number;
+    m_BuildingDrop : int;
     // public TypeList<SmudgeTypeClass *> Scorches
     m_Scorches : TypeList<SmudgeTypeClass>;
     // public TypeList<SmudgeTypeClass *> Scorches1
@@ -12601,7 +12595,7 @@ class RulesClass
     // public TypeList<BuildingTypeClass *> ThirdBaseDefenses
     m_ThirdBaseDefenses : TypeList<BuildingTypeClass>;
     // public TypeList<int> AIForcePredictionFudge
-    m_AIForcePredictionFudge : TypeList<number>;
+    m_AIForcePredictionFudge : TypeList<int>;
     // public TypeList<BuildingTypeClass *> BuildDefense
     m_BuildDefense : TypeList<BuildingTypeClass>;
     // public TypeList<BuildingTypeClass *> BuildPDefense
@@ -12625,17 +12619,17 @@ class RulesClass
     // public TypeList<BuildingTypeClass *> NeutralTechBuildings
     m_NeutralTechBuildings : TypeList<BuildingTypeClass>;
     // public double GDIWallDefense
-    m_GDIWallDefense : number;
+    m_GDIWallDefense : double;
     // public double GDIWallDefenseCoefficient
-    m_GDIWallDefenseCoefficient : number;
+    m_GDIWallDefenseCoefficient : double;
     // public double NodBaseDefenseCoefficient
-    m_NodBaseDefenseCoefficient : number;
+    m_NodBaseDefenseCoefficient : double;
     // public double GDIBaseDefenseCoefficient
-    m_GDIBaseDefenseCoefficient : number;
+    m_GDIBaseDefenseCoefficient : double;
     // public int ComputerBaseDefenseResponse
-    m_ComputerBaseDefenseResponse : number;
+    m_ComputerBaseDefenseResponse : int;
     // public int MaximumBaseDefenseValue
-    m_MaximumBaseDefenseValue : number;
+    m_MaximumBaseDefenseValue : int;
     // public TypeList<UnitTypeClass *> BaseUnit
     m_BaseUnit : TypeList<UnitTypeClass>;
     // public TypeList<UnitTypeClass *> HarvesterUnit
@@ -12666,35 +12660,35 @@ class RulesClass
     // public InfantryTypeClass * Paratrooper
     m_Paratrooper : InfantryTypeClass;
     // public int EliteFlashTimer
-    m_EliteFlashTimer : number;
+    m_EliteFlashTimer : int;
     // public int ChronoDelay
-    m_ChronoDelay : number;
+    m_ChronoDelay : int;
     // public int ChronoReinfDelay
-    m_ChronoReinfDelay : number;
+    m_ChronoReinfDelay : int;
     // public int ChronoDistanceFactor
-    m_ChronoDistanceFactor : number;
+    m_ChronoDistanceFactor : int;
     // public bool ChronoTrigger
     m_ChronoTrigger : boolean;
     // public int ChronoMinimumDelay
-    m_ChronoMinimumDelay : number;
+    m_ChronoMinimumDelay : int;
     // public int ChronoRangeMinimum
-    m_ChronoRangeMinimum : number;
+    m_ChronoRangeMinimum : int;
     // public TypeList<InfantryTypeClass *> AmerParaDropInf
     m_AmerParaDropInf : TypeList<InfantryTypeClass>;
     // public TypeList<int> AmerParaDropNum
-    m_AmerParaDropNum : TypeList<number>;
+    m_AmerParaDropNum : TypeList<int>;
     // public TypeList<InfantryTypeClass *> AllyParaDropInf
     m_AllyParaDropInf : TypeList<InfantryTypeClass>;
     // public TypeList<int> AllyParaDropNum
-    m_AllyParaDropNum : TypeList<number>;
+    m_AllyParaDropNum : TypeList<int>;
     // public TypeList<InfantryTypeClass *> SovParaDropInf
     m_SovParaDropInf : TypeList<InfantryTypeClass>;
     // public TypeList<int> SovParaDropNum
-    m_SovParaDropNum : TypeList<number>;
+    m_SovParaDropNum : TypeList<int>;
     // public TypeList<InfantryTypeClass *> YuriParaDropInf
     m_YuriParaDropInf : TypeList<InfantryTypeClass>;
     // public TypeList<int> YuriParaDropNum
-    m_YuriParaDropNum : TypeList<number>;
+    m_YuriParaDropNum : TypeList<int>;
     // public TypeList<InfantryTypeClass *> AnimToInfantry
     m_AnimToInfantry : TypeList<InfantryTypeClass>;
     // public TypeList<InfantryTypeClass *> SecretInfantry
@@ -12704,7 +12698,7 @@ class RulesClass
     // public TypeList<BuildingTypeClass *> SecretBuildings
     m_SecretBuildings : TypeList<BuildingTypeClass>;
     // public int SecretSum
-    m_SecretSum : number;
+    m_SecretSum : int;
     // public InfantryTypeClass * AlliedDisguise
     m_AlliedDisguise : InfantryTypeClass;
     // public InfantryTypeClass * SovietDisguise
@@ -12712,95 +12706,95 @@ class RulesClass
     // public InfantryTypeClass * ThirdDisguise
     m_ThirdDisguise : InfantryTypeClass;
     // public int SpyPowerBlackout
-    m_SpyPowerBlackout : number;
+    m_SpyPowerBlackout : int;
     // public float SpyMoneyStealPercent
-    m_SpyMoneyStealPercent : number;
+    m_SpyMoneyStealPercent : float;
     // public bool AttackCursorOnDisguise
     m_AttackCursorOnDisguise : boolean;
     // public float AIMinorSuperReadyPercent
-    m_AIMinorSuperReadyPercent : number;
+    m_AIMinorSuperReadyPercent : float;
     // public int AISafeDistance
-    m_AISafeDistance : number;
+    m_AISafeDistance : int;
     // public int HarvesterTooFarDistance
-    m_HarvesterTooFarDistance : number;
+    m_HarvesterTooFarDistance : int;
     // public int ChronoHarvTooFarDistance
-    m_ChronoHarvTooFarDistance : number;
+    m_ChronoHarvTooFarDistance : int;
     // public TypeList<int> AlliedBaseDefenseCounts
-    m_AlliedBaseDefenseCounts : TypeList<number>;
+    m_AlliedBaseDefenseCounts : TypeList<int>;
     // public TypeList<int> SovietBaseDefenseCounts
-    m_SovietBaseDefenseCounts : TypeList<number>;
+    m_SovietBaseDefenseCounts : TypeList<int>;
     // public TypeList<int> ThirdBaseDefenseCounts
-    m_ThirdBaseDefenseCounts : TypeList<number>;
+    m_ThirdBaseDefenseCounts : TypeList<int>;
     // public TypeList<int> AIPickWallDefensePercent
-    m_AIPickWallDefensePercent : TypeList<number>;
+    m_AIPickWallDefensePercent : TypeList<int>;
     // public int AIRestrictReplaceTime
-    m_AIRestrictReplaceTime : number;
+    m_AIRestrictReplaceTime : int;
     // public int ThreatPerOccupant
-    m_ThreatPerOccupant : number;
+    m_ThreatPerOccupant : int;
     // public int ApproachTargetResetMultiplier
-    m_ApproachTargetResetMultiplier : number;
+    m_ApproachTargetResetMultiplier : int;
     // public int CampaignMoneyDeltaEasy
-    m_CampaignMoneyDeltaEasy : number;
+    m_CampaignMoneyDeltaEasy : int;
     // public int CampaignMoneyDeltaHard
-    m_CampaignMoneyDeltaHard : number;
+    m_CampaignMoneyDeltaHard : int;
     // public int GuardAreaTargetingDelay
-    m_GuardAreaTargetingDelay : number;
+    m_GuardAreaTargetingDelay : int;
     // public int NormalTargetingDelay
-    m_NormalTargetingDelay : number;
+    m_NormalTargetingDelay : int;
     // public int AINavalYardAdjacency
-    m_AINavalYardAdjacency : number;
+    m_AINavalYardAdjacency : int;
     // public TypeList<int> DisabledDisguiseDetectionPercent
-    m_DisabledDisguiseDetectionPercent : TypeList<number>;
+    m_DisabledDisguiseDetectionPercent : TypeList<int>;
     // public TypeList<int> AIAutoDeployFrameDelay
-    m_AIAutoDeployFrameDelay : TypeList<number>;
+    m_AIAutoDeployFrameDelay : TypeList<int>;
     // public int MaximumBuildingPlacementFailures
-    m_MaximumBuildingPlacementFailures : number;
+    m_MaximumBuildingPlacementFailures : int;
     // public TypeList<int> AICaptureNormal
-    m_AICaptureNormal : TypeList<number>;
+    m_AICaptureNormal : TypeList<int>;
     // public TypeList<int> AICaptureWounded
-    m_AICaptureWounded : TypeList<number>;
+    m_AICaptureWounded : TypeList<int>;
     // public TypeList<int> AICaptureLowPower
-    m_AICaptureLowPower : TypeList<number>;
+    m_AICaptureLowPower : TypeList<int>;
     // public TypeList<int> AICaptureLowMoney
-    m_AICaptureLowMoney : TypeList<number>;
+    m_AICaptureLowMoney : TypeList<int>;
     // public int AICaptureLowMoneyMark
-    m_AICaptureLowMoneyMark : number;
+    m_AICaptureLowMoneyMark : int;
     // public int AICaptureWoundedMark
-    m_AICaptureWoundedMark : number;
+    m_AICaptureWoundedMark : int;
     // public TypeList<int> AISuperDefenseProbability
-    m_AISuperDefenseProbability : TypeList<number>;
+    m_AISuperDefenseProbability : TypeList<int>;
     // public int AISuperDefenseFrames
-    m_AISuperDefenseFrames : number;
+    m_AISuperDefenseFrames : int;
     // public float AISuperDefenseDistance
-    m_AISuperDefenseDistance : number;
+    m_AISuperDefenseDistance : float;
     // public TypeList<int> OverloadCount
-    m_OverloadCount : TypeList<number>;
+    m_OverloadCount : TypeList<int>;
     // public TypeList<int> OverloadDamage
-    m_OverloadDamage : TypeList<number>;
+    m_OverloadDamage : TypeList<int>;
     // public TypeList<int> OverloadFrames
-    m_OverloadFrames : TypeList<number>;
+    m_OverloadFrames : TypeList<int>;
     // public float PurifierBonus
-    m_PurifierBonus : number;
+    m_PurifierBonus : float;
     // public float OccupyDamageMultiplier
-    m_OccupyDamageMultiplier : number;
+    m_OccupyDamageMultiplier : float;
     // public float OccupyROFMultiplier
-    m_OccupyROFMultiplier : number;
+    m_OccupyROFMultiplier : float;
     // public int OccupyWeaponRange
-    m_OccupyWeaponRange : number;
+    m_OccupyWeaponRange : int;
     // public int BunkerDamageMultiplier
-    m_BunkerDamageMultiplier : number;
+    m_BunkerDamageMultiplier : int;
     // public float BunkerROFMultiplier
-    m_BunkerROFMultiplier : number;
+    m_BunkerROFMultiplier : float;
     // public int BunkerWeaponRangeBonus
-    m_BunkerWeaponRangeBonus : number;
+    m_BunkerWeaponRangeBonus : int;
     // public float OpenToppedDamageMultiplier
-    m_OpenToppedDamageMultiplier : number;
+    m_OpenToppedDamageMultiplier : float;
     // public int OpenToppedRangeBonus
-    m_OpenToppedRangeBonus : number;
+    m_OpenToppedRangeBonus : int;
     // public int OpenToppedWarpDistance
-    m_OpenToppedWarpDistance : number;
+    m_OpenToppedWarpDistance : int;
     // public float FallingDamageMultiplier
-    m_FallingDamageMultiplier : number;
+    m_FallingDamageMultiplier : float;
     // public bool CurrentStrengthDamage
     m_CurrentStrengthDamage : boolean;
     // public InfantryTypeClass * Technician
@@ -12852,15 +12846,15 @@ class RulesClass
     // public WarheadTypeClass * IvanWarhead
     m_IvanWarhead : WarheadTypeClass;
     // public int IvanDamage
-    m_IvanDamage : number;
+    m_IvanDamage : int;
     // public int IvanTimedDelay
-    m_IvanTimedDelay : number;
+    m_IvanTimedDelay : int;
     // public bool CanDetonateTimeBomb
     m_CanDetonateTimeBomb : boolean;
     // public bool CanDetonateDeathBomb
     m_CanDetonateDeathBomb : boolean;
     // public int IvanIconFlickerRate
-    m_IvanIconFlickerRate : number;
+    m_IvanIconFlickerRate : int;
     // public WeaponTypeClass * DeathWeapon
     m_DeathWeapon : WeaponTypeClass;
     // public SHPStruct * BOMBCURS_SHP
@@ -12868,9 +12862,9 @@ class RulesClass
     // public SHPStruct * CHRONOSK_SHP
     m_CHRONOSK_SHP : any;
     // public int IronCurtainDuration
-    m_IronCurtainDuration : number;
+    m_IronCurtainDuration : int;
     // public int PsychicRevealRadius
-    m_PsychicRevealRadius : number;
+    m_PsychicRevealRadius : int;
     // public WarheadTypeClass * IonCannonWarhead
     m_IonCannonWarhead : WarheadTypeClass;
     // public TerrainTypeClass * VeinholeTypeClass
@@ -12878,7 +12872,7 @@ class RulesClass
     // public TypeList<TerrainTypeClass *> DefaultMirageDisguises
     m_DefaultMirageDisguises : TypeList<TerrainTypeClass>;
     // public int InfantryBlinkDisguiseTime
-    m_InfantryBlinkDisguiseTime : number;
+    m_InfantryBlinkDisguiseTime : int;
     // public ParticleSystemTypeClass * DefaultLargeGreySmokeSystem
     m_DefaultLargeGreySmokeSystem : ParticleSystemTypeClass;
     // public ParticleSystemTypeClass * DefaultSmallGreySmokeSystem
@@ -12898,171 +12892,171 @@ class RulesClass
     // public ParticleSystemTypeClass * DefaultRepairParticleSystem
     m_DefaultRepairParticleSystem : ParticleSystemTypeClass;
     // public double MyEffectivenessCoefficientDefault
-    m_MyEffectivenessCoefficientDefault : number;
+    m_MyEffectivenessCoefficientDefault : double;
     // public double TargetEffectivenessCoefficientDefault
-    m_TargetEffectivenessCoefficientDefault : number;
+    m_TargetEffectivenessCoefficientDefault : double;
     // public double TargetSpecialThreatCoefficientDefault
-    m_TargetSpecialThreatCoefficientDefault : number;
+    m_TargetSpecialThreatCoefficientDefault : double;
     // public double TargetStrengthCoefficientDefault
-    m_TargetStrengthCoefficientDefault : number;
+    m_TargetStrengthCoefficientDefault : double;
     // public double TargetDistanceCoefficientDefault
-    m_TargetDistanceCoefficientDefault : number;
+    m_TargetDistanceCoefficientDefault : double;
     // public double DumbMyEffectivenessCoefficient
-    m_DumbMyEffectivenessCoefficient : number;
+    m_DumbMyEffectivenessCoefficient : double;
     // public double DumbTargetEffectivenessCoefficient
-    m_DumbTargetEffectivenessCoefficient : number;
+    m_DumbTargetEffectivenessCoefficient : double;
     // public double DumbTargetSpecialThreatCoefficient
-    m_DumbTargetSpecialThreatCoefficient : number;
+    m_DumbTargetSpecialThreatCoefficient : double;
     // public double DumbTargetStrengthCoefficient
-    m_DumbTargetStrengthCoefficient : number;
+    m_DumbTargetStrengthCoefficient : double;
     // public double DumbTargetDistanceCoefficient
-    m_DumbTargetDistanceCoefficient : number;
+    m_DumbTargetDistanceCoefficient : double;
     // public double EnemyHouseThreatBonus
-    m_EnemyHouseThreatBonus : number;
+    m_EnemyHouseThreatBonus : double;
     // public double TurboBoost
-    m_TurboBoost : number;
+    m_TurboBoost : double;
     // public double AttackInterval
-    m_AttackInterval : number;
+    m_AttackInterval : double;
     // public double AttackDelay
-    m_AttackDelay : number;
+    m_AttackDelay : double;
     // public double PowerEmergency
-    m_PowerEmergency : number;
+    m_PowerEmergency : double;
     // public double AirstripRatio
-    m_AirstripRatio : number;
+    m_AirstripRatio : double;
     // public int AirstripLimit
-    m_AirstripLimit : number;
+    m_AirstripLimit : int;
     // public double HelipadRatio
-    m_HelipadRatio : number;
+    m_HelipadRatio : double;
     // public int HelipadLimit
-    m_HelipadLimit : number;
+    m_HelipadLimit : int;
     // public double TeslaRatio
-    m_TeslaRatio : number;
+    m_TeslaRatio : double;
     // public int TeslaLimit
-    m_TeslaLimit : number;
+    m_TeslaLimit : int;
     // public double AARatio
-    m_AARatio : number;
+    m_AARatio : double;
     // public int AALimit
-    m_AALimit : number;
+    m_AALimit : int;
     // public double DefenseRatio
-    m_DefenseRatio : number;
+    m_DefenseRatio : double;
     // public int DefenseLimit
-    m_DefenseLimit : number;
+    m_DefenseLimit : int;
     // public double WarRatio
-    m_WarRatio : number;
+    m_WarRatio : double;
     // public int WarLimit
-    m_WarLimit : number;
+    m_WarLimit : int;
     // public double BarracksRatio
-    m_BarracksRatio : number;
+    m_BarracksRatio : double;
     // public int BarracksLimit
-    m_BarracksLimit : number;
+    m_BarracksLimit : int;
     // public int RefineryLimit
-    m_RefineryLimit : number;
+    m_RefineryLimit : int;
     // public double RefineryRatio
-    m_RefineryRatio : number;
+    m_RefineryRatio : double;
     // public int BaseSizeAdd
-    m_BaseSizeAdd : number;
+    m_BaseSizeAdd : int;
     // public int PowerSurplus
-    m_PowerSurplus : number;
+    m_PowerSurplus : int;
     // public int InfantryReserve
-    m_InfantryReserve : number;
+    m_InfantryReserve : int;
     // public int InfantryBaseMult
-    m_InfantryBaseMult : number;
+    m_InfantryBaseMult : int;
     // public int SoloCrateMoney
-    m_SoloCrateMoney : number;
+    m_SoloCrateMoney : int;
     // public int TreeStrength
-    m_TreeStrength : number;
+    m_TreeStrength : int;
     // public UnitTypeClass * UnitCrateType
     m_UnitCrateType : UnitTypeClass;
     // public double PatrolScan
-    m_PatrolScan : number;
+    m_PatrolScan : double;
     // public TypeList<int> TeamDelays
-    m_TeamDelays : TypeList<number>;
+    m_TeamDelays : TypeList<int>;
     // public TypeList<int> AIHateDelays
-    m_AIHateDelays : TypeList<number>;
+    m_AIHateDelays : TypeList<int>;
     // public int DissolveUnfilledTeamDelay
-    m_DissolveUnfilledTeamDelay : number;
+    m_DissolveUnfilledTeamDelay : int;
     // public TypeList<int> AIIonCannonConYardValue
-    m_AIIonCannonConYardValue : TypeList<number>;
+    m_AIIonCannonConYardValue : TypeList<int>;
     // public TypeList<int> AIIonCannonWarFactoryValue
-    m_AIIonCannonWarFactoryValue : TypeList<number>;
+    m_AIIonCannonWarFactoryValue : TypeList<int>;
     // public TypeList<int> AIIonCannonPowerValue
-    m_AIIonCannonPowerValue : TypeList<number>;
+    m_AIIonCannonPowerValue : TypeList<int>;
     // public TypeList<int> AIIonCannonTechCenterValue
-    m_AIIonCannonTechCenterValue : TypeList<number>;
+    m_AIIonCannonTechCenterValue : TypeList<int>;
     // public TypeList<int> AIIonCannonEngineerValue
-    m_AIIonCannonEngineerValue : TypeList<number>;
+    m_AIIonCannonEngineerValue : TypeList<int>;
     // public TypeList<int> AIIonCannonThiefValue
-    m_AIIonCannonThiefValue : TypeList<number>;
+    m_AIIonCannonThiefValue : TypeList<int>;
     // public TypeList<int> AIIonCannonHarvesterValue
-    m_AIIonCannonHarvesterValue : TypeList<number>;
+    m_AIIonCannonHarvesterValue : TypeList<int>;
     // public TypeList<int> AIIonCannonMCVValue
-    m_AIIonCannonMCVValue : TypeList<number>;
+    m_AIIonCannonMCVValue : TypeList<int>;
     // public TypeList<int> AIIonCannonAPCValue
-    m_AIIonCannonAPCValue : TypeList<number>;
+    m_AIIonCannonAPCValue : TypeList<int>;
     // public TypeList<int> AIIonCannonBaseDefenseValue
-    m_AIIonCannonBaseDefenseValue : TypeList<number>;
+    m_AIIonCannonBaseDefenseValue : TypeList<int>;
     // public TypeList<int> AIIonCannonPlugValue
-    m_AIIonCannonPlugValue : TypeList<number>;
+    m_AIIonCannonPlugValue : TypeList<int>;
     // public TypeList<int> AIIonCannonHelipadValue
-    m_AIIonCannonHelipadValue : TypeList<number>;
+    m_AIIonCannonHelipadValue : TypeList<int>;
     // public TypeList<int> AIIonCannonTempleValue
-    m_AIIonCannonTempleValue : TypeList<number>;
+    m_AIIonCannonTempleValue : TypeList<int>;
     // public int AIAlternateProductionCreditCutoff
-    m_AIAlternateProductionCreditCutoff : number;
+    m_AIAlternateProductionCreditCutoff : int;
     // public TypeList<int> MultiplayerAICM
-    m_MultiplayerAICM : TypeList<number>;
+    m_MultiplayerAICM : TypeList<int>;
     // public TypeList<int> AIVirtualPurifiers
-    m_AIVirtualPurifiers : TypeList<number>;
+    m_AIVirtualPurifiers : TypeList<int>;
     // public TypeList<int> AISlaveMinerNumber
-    m_AISlaveMinerNumber : TypeList<number>;
+    m_AISlaveMinerNumber : TypeList<int>;
     // public TypeList<int> HarvestersPerRefinery
-    m_HarvestersPerRefinery : TypeList<number>;
+    m_HarvestersPerRefinery : TypeList<int>;
     // public TypeList<int> AIExtraRefineries
-    m_AIExtraRefineries : TypeList<number>;
+    m_AIExtraRefineries : TypeList<int>;
     // public TypeList<int> MinimumAIDefensiveTeams
-    m_MinimumAIDefensiveTeams : TypeList<number>;
+    m_MinimumAIDefensiveTeams : TypeList<int>;
     // public TypeList<int> MaximumAIDefensiveTeams
-    m_MaximumAIDefensiveTeams : TypeList<number>;
+    m_MaximumAIDefensiveTeams : TypeList<int>;
     // public TypeList<int> TotalAITeamCap
-    m_TotalAITeamCap : TypeList<number>;
+    m_TotalAITeamCap : TypeList<int>;
     // public double AIUseTurbineUpgradeProbability
-    m_AIUseTurbineUpgradeProbability : number;
+    m_AIUseTurbineUpgradeProbability : double;
     // public TypeList<int> FillEarliestTeamProbability
-    m_FillEarliestTeamProbability : TypeList<number>;
+    m_FillEarliestTeamProbability : TypeList<int>;
     // public double CloakDelay
-    m_CloakDelay : number;
+    m_CloakDelay : double;
     // public double GameSpeedBias
-    m_GameSpeedBias : number;
+    m_GameSpeedBias : double;
     // public double BaseBias
-    m_BaseBias : number;
+    m_BaseBias : double;
     // public double ExpSpread
-    m_ExpSpread : number;
+    m_ExpSpread : double;
     // public int FireSupress
-    m_FireSupress : number;
+    m_FireSupress : int;
     // public int MaxIQLevels
-    m_MaxIQLevels : number;
+    m_MaxIQLevels : int;
     // public int SuperWeapons
-    m_SuperWeapons : number;
+    m_SuperWeapons : int;
     // public int Production
-    m_Production : number;
+    m_Production : int;
     // public int GuardArea
-    m_GuardArea : number;
+    m_GuardArea : int;
     // public int RepairSell
-    m_RepairSell : number;
+    m_RepairSell : int;
     // public int AutoCrush
-    m_AutoCrush : number;
+    m_AutoCrush : int;
     // public int Scatter
-    m_Scatter : number;
+    m_Scatter : int;
     // public int ContentScan
-    m_ContentScan : number;
+    m_ContentScan : int;
     // public int Aircraft
-    m_Aircraft : number;
+    m_Aircraft : int;
     // public int Harvester
-    m_Harvester : number;
+    m_Harvester : int;
     // public int SellBack
-    m_SellBack : number;
+    m_SellBack : int;
     // public int AIBaseSpacing
-    m_AIBaseSpacing : number;
+    m_AIBaseSpacing : int;
     // public Powerup SilverCrate
     m_SilverCrate : Powerup;
     // public Powerup WoodCrate
@@ -13070,36 +13064,36 @@ class RulesClass
     // public Powerup WaterCrate
     m_WaterCrate : Powerup;
     // public int CrateMinimum
-    m_CrateMinimum : number;
+    m_CrateMinimum : int;
     // public int CrateMaximum
-    m_CrateMaximum : number;
+    m_CrateMaximum : int;
     // defaults to 0x2000
     // public int unknown_int_1478
-    m_unknown_int_1478 : number;
+    m_unknown_int_1478 : int;
     // public AnimTypeClass * DropZoneAnim
     m_DropZoneAnim : AnimTypeClass;
     // public int MinMoney
-    m_MinMoney : number;
+    m_MinMoney : int;
     // public int Money
-    m_Money : number;
+    m_Money : int;
     // public int MaxMoney
-    m_MaxMoney : number;
+    m_MaxMoney : int;
     // public int MoneyIncrement
-    m_MoneyIncrement : number;
+    m_MoneyIncrement : int;
     // public int MinUnitCount
-    m_MinUnitCount : number;
+    m_MinUnitCount : int;
     // public int UnitCount
-    m_UnitCount : number;
+    m_UnitCount : int;
     // public int MaxUnitCount
-    m_MaxUnitCount : number;
+    m_MaxUnitCount : int;
     // public int TechLevel
-    m_TechLevel : number;
+    m_TechLevel : int;
     // public int GameSpeed
-    m_GameSpeed : number;
+    m_GameSpeed : int;
     // public int AIDifficultyStruct
-    m_AIDifficultyStruct : number;
+    m_AIDifficultyStruct : int;
     // public int AIPlayers
-    m_AIPlayers : number;
+    m_AIPlayers : int;
     // public bool BridgeDestruction
     m_BridgeDestruction : boolean;
     // public bool ShadowGrow
@@ -13133,39 +13127,39 @@ class RulesClass
     // public bool AllyChangeAllowed
     m_AllyChangeAllowed : boolean;
     // public int DropZoneRadius
-    m_DropZoneRadius : number;
+    m_DropZoneRadius : int;
     // public double MessageDelay
-    m_MessageDelay : number;
+    m_MessageDelay : double;
     // public double SavourDelay
-    m_SavourDelay : number;
+    m_SavourDelay : double;
     // public int Players
-    m_Players : number;
+    m_Players : int;
     // public double BaseDefenseDelay
-    m_BaseDefenseDelay : number;
+    m_BaseDefenseDelay : double;
     // public int SuspendPriority
-    m_SuspendPriority : number;
+    m_SuspendPriority : int;
     // public double SuspendDelay
-    m_SuspendDelay : number;
+    m_SuspendDelay : double;
     // public double SurvivorRate
-    m_SurvivorRate : number;
+    m_SurvivorRate : double;
     // public int AlliedSurvivorDivisor
-    m_AlliedSurvivorDivisor : number;
+    m_AlliedSurvivorDivisor : int;
     // public int SovietSurvivorDivisor
-    m_SovietSurvivorDivisor : number;
+    m_SovietSurvivorDivisor : int;
     // public int ThirdSurvivorDivisor
-    m_ThirdSurvivorDivisor : number;
+    m_ThirdSurvivorDivisor : int;
     // public double ReloadRate
-    m_ReloadRate : number;
+    m_ReloadRate : double;
     // public double AutocreateTime
-    m_AutocreateTime : number;
+    m_AutocreateTime : double;
     // public double BuildupTime
-    m_BuildupTime : number;
+    m_BuildupTime : double;
     // public int HarvesterLoadRate
-    m_HarvesterLoadRate : number;
+    m_HarvesterLoadRate : int;
     // public double HarvesterDumpRate
-    m_HarvesterDumpRate : number;
+    m_HarvesterDumpRate : double;
     // public int AtomDamage
-    m_AtomDamage : number;
+    m_AtomDamage : int;
     // public DifficultyStruct Easy
     m_Easy : DifficultyStruct;
     // public DifficultyStruct Normal
@@ -13173,157 +13167,157 @@ class RulesClass
     // public DifficultyStruct Difficult
     m_Difficult : DifficultyStruct;
     // public unsigned long[4] align_1628
-    m_align_1628 : number;
+    m_align_1628 : unsigned_long;
     // public double GrowthRate
-    m_GrowthRate : number;
+    m_GrowthRate : double;
     // public double ShroudRate
-    m_ShroudRate : number;
+    m_ShroudRate : double;
     // public double FogRate
-    m_FogRate : number;
+    m_FogRate : double;
     // public double IceGrowthRate
-    m_IceGrowthRate : number;
+    m_IceGrowthRate : double;
     // public double VeinGrowthRate
-    m_VeinGrowthRate : number;
+    m_VeinGrowthRate : double;
     // public int IceSolidifyFrameTime
-    m_IceSolidifyFrameTime : number;
+    m_IceSolidifyFrameTime : int;
     // public double AmbientChangeRate
-    m_AmbientChangeRate : number;
+    m_AmbientChangeRate : double;
     // public double AmbientChangeStep
-    m_AmbientChangeStep : number;
+    m_AmbientChangeStep : double;
     // public double CrateRegen
-    m_CrateRegen : number;
+    m_CrateRegen : double;
     // public double TimerWarning
-    m_TimerWarning : number;
+    m_TimerWarning : double;
     // public int TiberiumTransmogrify
-    m_TiberiumTransmogrify : number;
+    m_TiberiumTransmogrify : int;
     // 2.6875
     // public double unknown_double_1690
-    m_unknown_double_1690 : number;
+    m_unknown_double_1690 : double;
     // 2.3125
     // public double unknown_double_1698
-    m_unknown_double_1698 : number;
+    m_unknown_double_1698 : double;
     // 2.5625
     // public double unknown_double_16A0
-    m_unknown_double_16A0 : number;
+    m_unknown_double_16A0 : double;
     // public double SpeakDelay
-    m_SpeakDelay : number;
+    m_SpeakDelay : double;
     // public double DamageDelay
-    m_DamageDelay : number;
+    m_DamageDelay : double;
     // public int Gravity
-    m_Gravity : number;
+    m_Gravity : int;
     // public int LeptonsPerSightIncrease
-    m_LeptonsPerSightIncrease : number;
+    m_LeptonsPerSightIncrease : int;
     // public int Incoming
-    m_Incoming : number;
+    m_Incoming : int;
     // public int MinDamage
-    m_MinDamage : number;
+    m_MinDamage : int;
     // public int MaxDamage
-    m_MaxDamage : number;
+    m_MaxDamage : int;
     // public int RepairStep
-    m_RepairStep : number;
+    m_RepairStep : int;
     // public double RepairPercent
-    m_RepairPercent : number;
+    m_RepairPercent : double;
     // public int IRepairStep
-    m_IRepairStep : number;
+    m_IRepairStep : int;
     // public double RepairRate
-    m_RepairRate : number;
+    m_RepairRate : double;
     // public double URepairRate
-    m_URepairRate : number;
+    m_URepairRate : double;
     // public double IRepairRate
-    m_IRepairRate : number;
+    m_IRepairRate : double;
     // 1.875
     // public double unknown_double_16F8
-    m_unknown_double_16F8 : number;
+    m_unknown_double_16F8 : double;
     // public double ConditionYellow
-    m_ConditionYellow : number;
+    m_ConditionYellow : double;
     // public double ConditionRed
-    m_ConditionRed : number;
+    m_ConditionRed : double;
     // public double IdleActionFrequency
-    m_IdleActionFrequency : number;
+    m_IdleActionFrequency : double;
     // public int CloseEnough
-    m_CloseEnough : number;
+    m_CloseEnough : int;
     // public int Stray
-    m_Stray : number;
+    m_Stray : int;
     // public int RelaxedStray
-    m_RelaxedStray : number;
+    m_RelaxedStray : int;
     // public int GuardModeStray
-    m_GuardModeStray : number;
+    m_GuardModeStray : int;
     // public int Crush
-    m_Crush : number;
+    m_Crush : int;
     // public int CrateRadius
-    m_CrateRadius : number;
+    m_CrateRadius : int;
     // public int HomingScatter
-    m_HomingScatter : number;
+    m_HomingScatter : int;
     // public int BallisticScatter
-    m_BallisticScatter : number;
+    m_BallisticScatter : int;
     // public double RefundPercent
-    m_RefundPercent : number;
+    m_RefundPercent : double;
     // public int BridgeStrength
-    m_BridgeStrength : number;
+    m_BridgeStrength : int;
     // public double BuildSpeed
-    m_BuildSpeed : number;
+    m_BuildSpeed : double;
     // public double C4Delay
-    m_C4Delay : number;
+    m_C4Delay : double;
     // public int CreditReserve
-    m_CreditReserve : number;
+    m_CreditReserve : int;
     // public double PathDelay
-    m_PathDelay : number;
+    m_PathDelay : double;
     // public int BlockagePathDelay
-    m_BlockagePathDelay : number;
+    m_BlockagePathDelay : int;
     // public double MovieTime
-    m_MovieTime : number;
+    m_MovieTime : double;
     // public int TiberiumShortScan
-    m_TiberiumShortScan : number;
+    m_TiberiumShortScan : int;
     // public int TiberiumLongScan
-    m_TiberiumLongScan : number;
+    m_TiberiumLongScan : int;
     // public int SlaveMinerShortScan
-    m_SlaveMinerShortScan : number;
+    m_SlaveMinerShortScan : int;
     // public int SlaveMinerSlaveScan
-    m_SlaveMinerSlaveScan : number;
+    m_SlaveMinerSlaveScan : int;
     // public int SlaveMinerLongScan
-    m_SlaveMinerLongScan : number;
+    m_SlaveMinerLongScan : int;
     // public int SlaveMinerScanCorrection
-    m_SlaveMinerScanCorrection : number;
+    m_SlaveMinerScanCorrection : int;
     // public int SlaveMinerKickFrameDelay
-    m_SlaveMinerKickFrameDelay : number;
+    m_SlaveMinerKickFrameDelay : int;
     // public int LightningDeferment
-    m_LightningDeferment : number;
+    m_LightningDeferment : int;
     // public int LightningDamage
-    m_LightningDamage : number;
+    m_LightningDamage : int;
     // public int LightningStormDuration
-    m_LightningStormDuration : number;
+    m_LightningStormDuration : int;
     // public int LightningHitDelay
-    m_LightningHitDelay : number;
+    m_LightningHitDelay : int;
     // public int LightningScatterDelay
-    m_LightningScatterDelay : number;
+    m_LightningScatterDelay : int;
     // public int LightningCellSpread
-    m_LightningCellSpread : number;
+    m_LightningCellSpread : int;
     // public int LightningSeparation
-    m_LightningSeparation : number;
+    m_LightningSeparation : int;
     // public bool LightningPrintText
     m_LightningPrintText : boolean;
     // public WarheadTypeClass * LightningWarhead
     m_LightningWarhead : WarheadTypeClass;
     // public int ForceShieldRadius
-    m_ForceShieldRadius : number;
+    m_ForceShieldRadius : int;
     // public int ForceShieldDuration
-    m_ForceShieldDuration : number;
+    m_ForceShieldDuration : int;
     // public int ForceShieldBlackoutDuration
-    m_ForceShieldBlackoutDuration : number;
+    m_ForceShieldBlackoutDuration : int;
     // public int ForceShieldPlayFadeSoundTime
-    m_ForceShieldPlayFadeSoundTime : number;
+    m_ForceShieldPlayFadeSoundTime : int;
     // public bool MutateExplosion
     m_MutateExplosion : boolean;
     // public int CollapseChance
-    m_CollapseChance : number;
+    m_CollapseChance : int;
     // public int WeedCapacity
-    m_WeedCapacity : number;
+    m_WeedCapacity : int;
     // public float ExtraUnitLight
-    m_ExtraUnitLight : number;
+    m_ExtraUnitLight : float;
     // public float ExtraInfantryLight
-    m_ExtraInfantryLight : number;
+    m_ExtraInfantryLight : float;
     // public float ExtraAircraftLight
-    m_ExtraAircraftLight : number;
+    m_ExtraAircraftLight : float;
     // public bool Paranoid
     m_Paranoid : boolean;
     // public bool CurleyShuffle
@@ -13367,41 +13361,41 @@ class RulesClass
     // public AnimTypeClass * EMPulseSparkles
     m_EMPulseSparkles : AnimTypeClass;
     // public float EngineerCaptureLevel
-    m_EngineerCaptureLevel : number;
+    m_EngineerCaptureLevel : float;
     // public float EngineerCaptureLevel_
-    m_EngineerCaptureLevel_ : number;
+    m_EngineerCaptureLevel_ : float;
     // public float TalkBubbleTime
-    m_TalkBubbleTime : number;
+    m_TalkBubbleTime : float;
     // public int RadDurationMultiple
-    m_RadDurationMultiple : number;
+    m_RadDurationMultiple : int;
     // public int RadApplicationDelay
-    m_RadApplicationDelay : number;
+    m_RadApplicationDelay : int;
     // public int RadLevelMax
-    m_RadLevelMax : number;
+    m_RadLevelMax : int;
     // public int RadLevelDelay
-    m_RadLevelDelay : number;
+    m_RadLevelDelay : int;
     // public int RadLightDelay
-    m_RadLightDelay : number;
+    m_RadLightDelay : int;
     // public double RadLevelFactor
-    m_RadLevelFactor : number;
+    m_RadLevelFactor : double;
     // public double RadLightFactor
-    m_RadLightFactor : number;
+    m_RadLightFactor : double;
     // public double RadTintFactor
-    m_RadTintFactor : number;
+    m_RadTintFactor : double;
     // public ColorStruct RadColor
     m_RadColor : ColorStruct;
     // public WarheadTypeClass * RadSiteWarhead
     m_RadSiteWarhead : WarheadTypeClass;
     // public int ElevationIncrement
-    m_ElevationIncrement : number;
+    m_ElevationIncrement : int;
     // public double ElevationIncrementBonus
-    m_ElevationIncrementBonus : number;
+    m_ElevationIncrementBonus : double;
     // public double ElevationBonusCap
-    m_ElevationBonusCap : number;
+    m_ElevationBonusCap : double;
     // public bool AlliedWallTransparency
     m_AlliedWallTransparency : boolean;
     // public double WallPenetratorThreshold
-    m_WallPenetratorThreshold : number;
+    m_WallPenetratorThreshold : double;
     // public ColorStruct LocalRadarColor
     m_LocalRadarColor : ColorStruct;
     // public ColorStruct LineTrailColorOverride
@@ -13411,23 +13405,23 @@ class RulesClass
     // public ColorStruct MagnaBeamColor
     m_MagnaBeamColor : ColorStruct;
     // public int OreTwinkleChance
-    m_OreTwinkleChance : number;
+    m_OreTwinkleChance : int;
     // public AnimTypeClass * OreTwinkle
     m_OreTwinkle : AnimTypeClass;
     // public ColorStruct[16] ColorAdd
     m_ColorAdd : ColorStruct;
     // public int LaserTargetColor
-    m_LaserTargetColor : number;
+    m_LaserTargetColor : int;
     // public int IronCurtainColor
-    m_IronCurtainColor : number;
+    m_IronCurtainColor : int;
     // public int BerserkColor
-    m_BerserkColor : number;
+    m_BerserkColor : int;
     // public int ForceShieldColor
-    m_ForceShieldColor : number;
+    m_ForceShieldColor : int;
     // public float DirectRockingCoefficient
-    m_DirectRockingCoefficient : number;
+    m_DirectRockingCoefficient : float;
     // public float FallBackCoefficient
-    m_FallBackCoefficient : number;
+    m_FallBackCoefficient : float;
 }
 // forward declarations
 // LocomotionClass
@@ -13438,31 +13432,31 @@ class LocomotionClass
     constructor();
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : long;
     // public virtual unsigned long AddRef()
-    AddRef() : number;
+    AddRef() : unsigned_long;
     // public virtual unsigned long Release()
-    Release() : number;
+    Release() : unsigned_long;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID) = 0
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long IsDirty()
-    IsDirty() : number;
+    IsDirty() : long;
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // public virtual long GetSizeMax(_ULARGE_INTEGER * pcbSize)
-    GetSizeMax(pcbSize_0 : any | any) : number;
+    GetSizeMax(pcbSize_0 : any | any) : long;
     // public virtual int Size() = 0
-    Size() : number;
+    Size() : int;
     // ILocomotion
     // virtual HRESULT __stdcall QueryInterface(REFIID iid, void** ppvObject) { JMP_STD(0x4D0510); }
     // virtual ULONG __stdcall AddRef() { JMP_STD(0x4D0520); }
     // virtual ULONG __stdcall Release() { JMP_STD(0x4D0530); }
     // public virtual long Link_To_Object(void * pointer)
-    Link_To_Object(pointer_0 : ArrayBuffer | any) : number;
+    Link_To_Object(pointer_0 : ArrayBuffer | any) : long;
     // Sees if object is moving.
     // public virtual bool Is_Moving()
     Is_Moving() : boolean;
@@ -13495,7 +13489,7 @@ class LocomotionClass
     Visual_Character(raw_0 : boolean | any) : VisualType;
     // Z adjust control value.
     // public virtual int Z_Adjust()
-    Z_Adjust() : number;
+    Z_Adjust() : int;
     // Z gradient control value.
     // public virtual ZGradient Z_Gradient()
     Z_Gradient() : ZGradient;
@@ -13537,7 +13531,7 @@ class LocomotionClass
     Shove(dir_0 : DirStruct | any) : boolean;
     // Force drive track -- special case only.
     // public virtual void Force_Track(int track, CoordStruct coord)
-    Force_Track(track_0 : number | any, coord_1 : CoordStruct | any) : void;
+    Force_Track(track_0 : int | any, coord_1 : CoordStruct | any) : void;
     // What display layer is it located in.
     // public virtual Layer In_Which_Layer() = 0
     In_Which_Layer() : Layer;
@@ -13546,22 +13540,22 @@ class LocomotionClass
     Force_Immediate_Destination(coord_0 : CoordStruct | any) : void;
     // Force a voxel unit to a given slope. Used in cratering.
     // public virtual void Force_New_Slope(int ramp)
-    Force_New_Slope(ramp_0 : number | any) : void;
+    Force_New_Slope(ramp_0 : int | any) : void;
     // Is it actually moving across the ground this very second?
     // public virtual bool Is_Moving_Now()
     Is_Moving_Now() : boolean;
     // Actual current speed of object expressed as leptons per game frame.
     // public virtual int Apparent_Speed()
-    Apparent_Speed() : number;
+    Apparent_Speed() : int;
     // Special drawing feedback code (locomotor specific meaning)
     // public virtual int Drawing_Code()
-    Drawing_Code() : number;
+    Drawing_Code() : int;
     // Queries if any locomotor specific state prevents the object from firing.
     // public virtual FireError Can_Fire()
     Can_Fire() : FireError;
     // Queries the general state of the locomotor.
     // public virtual int Get_Status()
-    Get_Status() : number;
+    Get_Status() : int;
     // Forces a hunter seeker droid to find a target.
     // public virtual void Acquire_Hunter_Seeker_Target()
     Acquire_Hunter_Seeker_Target() : void;
@@ -13595,18 +13589,18 @@ class LocomotionClass
     Unlock() : void;
     // Queries internal variables.
     // public virtual int Get_Track_Number()
-    Get_Track_Number() : number;
+    Get_Track_Number() : int;
     // Queries internal variables.
     // public virtual int Get_Track_Index()
-    Get_Track_Index() : number;
+    Get_Track_Index() : int;
     // Queries internal variables.
     // public virtual int Get_Speed_Accum()
-    Get_Speed_Accum() : number;
+    Get_Speed_Accum() : int;
     // Non virtuals
     // public static long TryPiggyback(IPiggyback * * Piggy, ILocomotion * * Loco)
-    static TryPiggyback(Piggy_0 : IPiggyback, Loco_1 : ILocomotion) : number;
+    static TryPiggyback(Piggy_0 : IPiggyback, Loco_1 : ILocomotion) : long;
     // public static long CreateInstance(ILocomotion * * ppv, _GUID const * rclsid, IUnknown * pUnkOuter, unsigned long dwClsContext)
-    static CreateInstance(ppv_0 : ILocomotion, rclsid_1 : any, pUnkOuter_2 : any, dwClsContext_3 : number) : number;
+    static CreateInstance(ppv_0 : ILocomotion, rclsid_1 : any, pUnkOuter_2 : any, dwClsContext_3 : unsigned_long) : long;
     // these two are identical, why do they both exist...
     // public static void AddRef1(LocomotionClass * * Loco)
     static AddRef1(Loco_0 : LocomotionClass) : void;
@@ -13631,7 +13625,7 @@ class LocomotionClass
     // public bool Dirty
     m_Dirty : boolean;
     // public int RefCount
-    m_RefCount : number;
+    m_RefCount : int;
 }
 // Variable
 class Variable
@@ -13639,7 +13633,7 @@ class Variable
     // public char[40] Name
     m_Name : string;
     // public char Value
-    m_Value : number;
+    m_Value : char;
 }
 // LightingStruct
 class LightingStruct
@@ -13648,10 +13642,10 @@ class LightingStruct
     m_Tint : TintStruct;
     // all these are stored as ini value * 100 + 0.01
     // public int Ground
-    m_Ground : number;
+    m_Ground : int;
     // this one is stored as ini value * 1000 + 0.01
     // public int Level
-    m_Level : number;
+    m_Level : int;
 }
 // ScenarioFlags
 class ScenarioFlags
@@ -13734,19 +13728,19 @@ class ScenarioClass
     static UpdateLighting() : void;
     // this function is only being inlined in RecalcLighting, but we can call it for just updating the hashpals
     // public static void UpdateHashPalLighting(int R, int G, int B, bool tint)
-    static UpdateHashPalLighting(R_0 : number, G_1 : number, B_2 : number, tint_3 : boolean) : void;
+    static UpdateHashPalLighting(R_0 : int, G_1 : int, B_2 : int, tint_3 : boolean) : void;
     // public static void ScenarioLighting(int * r, int * g, int * b)
     static ScenarioLighting(r_0 : ArrayBuffer, g_1 : ArrayBuffer, b_2 : ArrayBuffer) : void;
     // this calls UpdateCellLighting() from above and does other good stuff
     // initializers call it with -1, -1, -1, 0 , map retint actions use current tint * 10, 0
     // public static void RecalcLighting(int R, int G, int B, bool tint)
-    static RecalcLighting(R_0 : number, G_1 : number, B_2 : number, tint_3 : boolean) : void;
+    static RecalcLighting(R_0 : int, G_1 : int, B_2 : int, tint_3 : boolean) : void;
     // public static bool SaveGame(char const * FileName, wchar_t const * Description, bool BarGraph = false)
     static SaveGame(FileName_0 : string, Description_1 : ArrayBuffer, BarGraph_2 : boolean) : boolean;
     // public static bool LoadGame(char const * FileName)
     static LoadGame(FileName_0 : string) : boolean;
     // public static bool StartScenario(char const * FileName, bool Briefing, int CampaignIndex)
-    static StartScenario(FileName_0 : string, Briefing_1 : boolean, CampaignIndex_2 : number) : boolean;
+    static StartScenario(FileName_0 : string, Briefing_1 : boolean, CampaignIndex_2 : int) : boolean;
     // public static void PauseGame()
     static PauseGame() : void;
     // public static void ResumeGame()
@@ -13757,16 +13751,16 @@ class ScenarioClass
     ReadStartPoints(ini_0 : INIClass) : void;
     // valid range [0..701]
     // public bool IsDefinedWaypoint(int idx)
-    IsDefinedWaypoint(idx_0 : number) : boolean;
+    IsDefinedWaypoint(idx_0 : int) : boolean;
     // public CellStruct * GetWaypointCoords(CellStruct * dest, int idx)
-    GetWaypointCoords(dest_0 : CellStruct, idx_1 : number) : CellStruct;
+    GetWaypointCoords(dest_0 : CellStruct, idx_1 : int) : CellStruct;
     // public CellStruct GetWaypointCoords(int idx)
-    GetWaypointCoords(idx_0 : number) : CellStruct;
+    GetWaypointCoords(idx_0 : int) : CellStruct;
     // Static
     // public static reference<ScenarioClass *, 11055664, 0> const Instance = 0xA8B230u
     static s_Instance : ScenarioClass;
     // public static reference<int, 11070844, 0> const NewINIFormat = 0xA8ED7Cu
-    static s_NewINIFormat : number;
+    static s_NewINIFormat : int;
     // public static reference<TheaterType, 8531192, 0> const LastTheater = 0x822CF8
     static s_LastTheater : TheaterType;
     // Properties
@@ -13778,53 +13772,53 @@ class ScenarioClass
     m_AltNextScenario : string;
     // CellStruct?
     // public int HomeCell
-    m_HomeCell : number;
+    m_HomeCell : int;
     // CellStruct?
     // public int AltHomeCell
-    m_AltHomeCell : number;
+    m_AltHomeCell : int;
     // defaults to 1,000,000 - random salt for this game's communications
     // public int UniqueID
-    m_UniqueID : number;
+    m_UniqueID : int;
     // 218
     // public Randomizer Random
     m_Random : Randomizer;
     // public unsigned long Difficulty1
-    m_Difficulty1 : number;
+    m_Difficulty1 : unsigned_long;
     // 2 - Difficulty1
     // public unsigned long Difficulty2
-    m_Difficulty2 : number;
+    m_Difficulty2 : unsigned_long;
     // public CDTimerClass ElapsedTimer
     m_ElapsedTimer : CDTimerClass;
     // public CDTimerClass PauseTimer
     m_PauseTimer : CDTimerClass;
     // public unsigned long unknown_62C
-    m_unknown_62C : number;
+    m_unknown_62C : unsigned_long;
     // public bool IsGamePaused
     m_IsGamePaused : boolean;
     // public CellStruct[702] Waypoints
     m_Waypoints : CellStruct;
     // Map Header
     // public int StartX
-    m_StartX : number;
+    m_StartX : int;
     // public int StartY
-    m_StartY : number;
+    m_StartY : int;
     // public int Width
-    m_Width : number;
+    m_Width : int;
     // public int Height
-    m_Height : number;
+    m_Height : int;
     // public int NumberStartingPoints
-    m_NumberStartingPoints : number;
+    m_NumberStartingPoints : int;
     // public Point2D[8] StartingPoints
     m_StartingPoints : Point2D;
     // starting position => HouseClass::Array->GetItem(#)
     // public int[16] HouseIndices
-    m_HouseIndices : number;
+    m_HouseIndices : int;
     // public CellStruct[8] HouseHomeCells
     m_HouseHomeCells : CellStruct;
     // public bool TeamsPresent
     m_TeamsPresent : boolean;
     // public int NumCoopHumanStartSpots
-    m_NumCoopHumanStartSpots : number;
+    m_NumCoopHumanStartSpots : int;
     // public CDTimerClass MissionTimer
     m_MissionTimer : CDTimerClass;
     // public wchar_t * MissionTimerTextCSF
@@ -13842,17 +13836,17 @@ class ScenarioClass
     // public CDTimerClass AmbientTimer
     m_AmbientTimer : CDTimerClass;
     // public int TechLevel
-    m_TechLevel : number;
+    m_TechLevel : int;
     // public TheaterType Theater
     m_Theater : TheaterType;
     // public char[260] FileName
     m_FileName : string;
     // public wchar_t[45] Name
-    m_Name : number;
+    m_Name : wchar_t;
     // public char[32] UIName
     m_UIName : string;
     // public wchar_t[45] UINameLoaded
-    m_UINameLoaded : number;
+    m_UINameLoaded : wchar_t;
     // Movie name
     // public char const * Intro
     m_Intro : string;
@@ -13869,19 +13863,19 @@ class ScenarioClass
     // public char const * PreMapSelect
     m_PreMapSelect : string;
     // public wchar_t[1024] Briefing
-    m_Briefing : number;
+    m_Briefing : wchar_t;
     // public char[32] BriefingCSF
     m_BriefingCSF : string;
     // public int ThemeIndex
-    m_ThemeIndex : number;
+    m_ThemeIndex : int;
     // public int HumanPlayerHouseTypeIndex
-    m_HumanPlayerHouseTypeIndex : number;
+    m_HumanPlayerHouseTypeIndex : int;
     // public double CarryOverMoney
-    m_CarryOverMoney : number;
+    m_CarryOverMoney : double;
     // public int CarryOverCap
-    m_CarryOverCap : number;
+    m_CarryOverCap : int;
     // public int Percent
-    m_Percent : number;
+    m_Percent : int;
     // public Variable[50] GlobalVariables
     m_GlobalVariables : Variable;
     // public Variable[100] LocalVariables
@@ -13895,7 +13889,7 @@ class ScenarioClass
     // public CellStruct View4
     m_View4 : CellStruct;
     // public unsigned long unknown_34A0
-    m_unknown_34A0 : number;
+    m_unknown_34A0 : unsigned_long;
     // 34A4
     // public bool FreeRadar
     m_FreeRadar : boolean;
@@ -13946,7 +13940,7 @@ class ScenarioClass
     m_unknown_bool_34B7 : boolean;
     // 34B8
     // public int PlayerSideIndex
-    m_PlayerSideIndex : number;
+    m_PlayerSideIndex : int;
     // 34BC
     // public bool MultiplayerOnly
     m_MultiplayerOnly : boolean;
@@ -13957,61 +13951,61 @@ class ScenarioClass
     // public CDTimerClass unknown_timer_34C0
     m_unknown_timer_34C0 : CDTimerClass;
     // public int CampaignIndex
-    m_CampaignIndex : number;
+    m_CampaignIndex : int;
     // public int StartingDropships
-    m_StartingDropships : number;
+    m_StartingDropships : int;
     // public TypeList<TechnoTypeClass *> AllowableUnits
     m_AllowableUnits : TypeList<TechnoTypeClass>;
     // public TypeList<int> AllowableUnitMaximums
-    m_AllowableUnitMaximums : TypeList<number>;
+    m_AllowableUnitMaximums : TypeList<int>;
     // public TypeList<int> DropshipUnitCounts
-    m_DropshipUnitCounts : TypeList<number>;
+    m_DropshipUnitCounts : TypeList<int>;
     // set at map creation
     // public int AmbientOriginal
-    m_AmbientOriginal : number;
+    m_AmbientOriginal : int;
     // current ambient
     // public int AmbientCurrent
-    m_AmbientCurrent : number;
+    m_AmbientCurrent : int;
     // target ambient (while changing)
     // public int AmbientTarget
-    m_AmbientTarget : number;
+    m_AmbientTarget : int;
     // public LightingStruct NormalLighting
     m_NormalLighting : LightingStruct;
     // Ion lighting
     // public int IonAmbient
-    m_IonAmbient : number;
+    m_IonAmbient : int;
     // public LightingStruct IonLighting
     m_IonLighting : LightingStruct;
     // Nuke flash lighting
     // public int NukeAmbient
-    m_NukeAmbient : number;
+    m_NukeAmbient : int;
     // public LightingStruct NukeLighting
     m_NukeLighting : LightingStruct;
     // public int NukeAmbientChangeRate
-    m_NukeAmbientChangeRate : number;
+    m_NukeAmbientChangeRate : int;
     // Dominator lighting
     // public int DominatorAmbient
-    m_DominatorAmbient : number;
+    m_DominatorAmbient : int;
     // public LightingStruct DominatorLighting
     m_DominatorLighting : LightingStruct;
     // public int DominatorAmbientChangeRate
-    m_DominatorAmbientChangeRate : number;
+    m_DominatorAmbientChangeRate : int;
     // public unsigned long unknown_3598
-    m_unknown_3598 : number;
+    m_unknown_3598 : unsigned_long;
     // public int InitTime
-    m_InitTime : number;
+    m_InitTime : int;
     // public short Stage
-    m_Stage : number;
+    m_Stage : short;
     // public bool UserInputLocked
     m_UserInputLocked : boolean;
     // public bool unknown_35A3
     m_unknown_35A3 : boolean;
     // public int ParTimeEasy
-    m_ParTimeEasy : number;
+    m_ParTimeEasy : int;
     // public int ParTimeMedium
-    m_ParTimeMedium : number;
+    m_ParTimeMedium : int;
     // public int ParTimeDifficult
-    m_ParTimeDifficult : number;
+    m_ParTimeDifficult : int;
     // 35B0
     // public char[31] UnderParTitle
     m_UnderParTitle : string;
@@ -14031,13 +14025,13 @@ class ScenarioClass
     // public char[31] LSBrief
     m_LSBrief : string;
     // public int LS640BriefLocX
-    m_LS640BriefLocX : number;
+    m_LS640BriefLocX : int;
     // public int LS640BriefLocY
-    m_LS640BriefLocY : number;
+    m_LS640BriefLocY : int;
     // public int LS800BriefLocX
-    m_LS800BriefLocX : number;
+    m_LS800BriefLocX : int;
     // public int LS800BriefLocY
-    m_LS800BriefLocY : number;
+    m_LS800BriefLocY : int;
     // public char[64] LS640BkgdName
     m_LS640BkgdName : string;
     // public char[64] LS800BkgdName
@@ -14052,23 +14046,23 @@ class OverlayClass
 {
     // Constructor
     // public OverlayClass(OverlayTypeClass * pType, CellStruct const& mapCoord, int flag)
-    constructor(pType_0 : OverlayTypeClass, mapCoord_1 : CellStruct, flag_2 : number);
+    constructor(pType_0 : OverlayTypeClass, mapCoord_1 : CellStruct, flag_2 : int);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // Gets overlay's tiberium type
     // public static int GetTiberiumType(int overlayTypeIndex)
-    static GetTiberiumType(overlayTypeIndex_0 : number) : number;
+    static GetTiberiumType(overlayTypeIndex_0 : int) : int;
     // public static AbstractType const AbsID = AbstractType::Overlay
     static s_AbsID : AbstractType;
     // Static
@@ -14087,17 +14081,17 @@ class SmudgeClass
     constructor(pType_0 : SmudgeTypeClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public static AbstractType const AbsID = AbstractType::Smudge
     static s_AbsID : AbstractType;
     // Static
@@ -14119,22 +14113,22 @@ class VoxelAnimClass
     constructor(pVoxelAnimType_0 : VoxelAnimTypeClass, pLocation_1 : CoordStruct, pOwnerHouse_2 : HouseClass);
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // AbstractClass
     // public virtual AbstractType WhatAmI() const
     WhatAmI() : AbstractType;
     // public virtual int Size() const
-    Size() : number;
+    Size() : int;
     // public static AbstractType const AbsID = AbstractType::VoxelAnim
     static s_AbsID : AbstractType;
     // Static
     // public static constant_ptr<DynamicVectorClass<VoxelAnimClass *>, 8942472> const Array = 0x887388u
     static s_Array : DynamicVectorClass<VoxelAnimClass>;
     // public int unknown_int_100
-    m_unknown_int_100 : number;
+    m_unknown_int_100 : int;
     // public VoxelAnimTypeClass * Type
     m_Type : VoxelAnimTypeClass;
     // public ParticleSystemClass * AttachedSystem
@@ -14149,7 +14143,7 @@ class VoxelAnimClass
     m_Invisible : boolean;
     // counting down to zero
     // public int Duration
-    m_Duration : number;
+    m_Duration : int;
     // public BounceClass Bounce
     m_Bounce : BounceClass;
     // public char[80] __Bounce
@@ -14173,11 +14167,11 @@ class FlyLocomotionClass
     constructor();
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : long;
     // public virtual unsigned long AddRef()
-    AddRef() : number;
+    AddRef() : unsigned_long;
     // public virtual unsigned long Release()
-    Release() : number;
+    Release() : unsigned_long;
     // ILocomotion
     // public virtual bool Is_Moving()
     Is_Moving() : boolean;
@@ -14208,17 +14202,17 @@ class FlyLocomotionClass
     Limbo() : void;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // LocomotionClass
     // public virtual int Size()
-    Size() : number;
+    Size() : int;
     // public static unsigned int const ILocoVTable = 0x7E89F4
-    static s_ILocoVTable : number;
+    static s_ILocoVTable : unsigned_int;
     // ===========================================================================
     // ===== Properties ==========================================================
     // ===========================================================================
@@ -14231,13 +14225,13 @@ class FlyLocomotionClass
     // public bool HasMoveOrder
     m_HasMoveOrder : boolean;
     // public int FlightLevel
-    m_FlightLevel : number;
+    m_FlightLevel : int;
     // public double TargetSpeed
-    m_TargetSpeed : number;
+    m_TargetSpeed : double;
     // public double CurrentSpeed
-    m_CurrentSpeed : number;
+    m_CurrentSpeed : double;
     // public char IsTakingOff
-    m_IsTakingOff : number;
+    m_IsTakingOff : char;
     // public bool IsLanding
     m_IsLanding : boolean;
     // public bool WasLanding
@@ -14245,9 +14239,9 @@ class FlyLocomotionClass
     // public bool unknown_bool_53
     m_unknown_bool_53 : boolean;
     // public unsigned long unknown_54
-    m_unknown_54 : number;
+    m_unknown_54 : unsigned_long;
     // public unsigned long unknown_58
-    m_unknown_58 : number;
+    m_unknown_58 : unsigned_long;
     // public bool IsElevating
     m_IsElevating : boolean;
     // public bool unknown_bool_5D
@@ -14267,11 +14261,11 @@ class RocketLocomotionClass
     constructor();
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : long;
     // public virtual unsigned long AddRef()
-    AddRef() : number;
+    AddRef() : unsigned_long;
     // public virtual unsigned long Release()
-    Release() : number;
+    Release() : unsigned_long;
     // ILocomotion
     // public virtual bool Is_Moving()
     Is_Moving() : boolean;
@@ -14302,15 +14296,15 @@ class RocketLocomotionClass
     Limbo() : void;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // LocomotionClass
     // public virtual int Size()
-    Size() : number;
+    Size() : int;
     // ===========================================================================
     // ===== Properties ==========================================================
     // ===========================================================================
@@ -14321,21 +14315,21 @@ class RocketLocomotionClass
     // public CDTimerClass TrailerTimer
     m_TrailerTimer : CDTimerClass;
     // public int MissionState
-    m_MissionState : number;
+    m_MissionState : int;
     // public unsigned long unknown_44
-    m_unknown_44 : number;
+    m_unknown_44 : unsigned_long;
     // public double CurrentSpeed
-    m_CurrentSpeed : number;
+    m_CurrentSpeed : double;
     // public bool unknown_bool_4C
     m_unknown_bool_4C : boolean;
     // public bool SpawnerIsElite
     m_SpawnerIsElite : boolean;
     // public float CurrentPitch
-    m_CurrentPitch : number;
+    m_CurrentPitch : float;
     // public unsigned long unknown_58
-    m_unknown_58 : number;
+    m_unknown_58 : unsigned_long;
     // public unsigned long unknown_5C
-    m_unknown_5C : number;
+    m_unknown_5C : unsigned_long;
 }
 // forward declarations
 // TeleportLocomotionClass
@@ -14347,23 +14341,23 @@ class TeleportLocomotionClass
     constructor();
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : long;
     // public virtual unsigned long AddRef()
-    AddRef() : number;
+    AddRef() : unsigned_long;
     // public virtual unsigned long Release()
-    Release() : number;
+    Release() : unsigned_long;
     // IPiggyback
     // public virtual long Begin_Piggyback(ILocomotion * pointer)
-    Begin_Piggyback(pointer_0 : ILocomotion | any) : number;
+    Begin_Piggyback(pointer_0 : ILocomotion | any) : long;
     // End piggyback process and restore locomotor interface pointer.
     // public virtual long End_Piggyback(ILocomotion * * pointer)
-    End_Piggyback(pointer_0 : ILocomotion | any) : number;
+    End_Piggyback(pointer_0 : ILocomotion | any) : long;
     // Determines when should the piggybacking be ended (done automatically in FootClass::AI).
     // public virtual bool Is_Ok_To_End()
     Is_Ok_To_End() : boolean;
     // Fetches piggybacked locomotor class ID.
     // public virtual long Piggyback_CLSID(_GUID * classid)
-    Piggyback_CLSID(classid_0 : any | any) : number;
+    Piggyback_CLSID(classid_0 : any | any) : long;
     // Is it currently piggybacking another locomotor?
     // public virtual bool Is_Piggybacking()
     Is_Piggybacking() : boolean;
@@ -14397,22 +14391,22 @@ class TeleportLocomotionClass
     Limbo() : void;
     // IPersist
     // public virtual long GetClassID(_GUID * pClassID)
-    GetClassID(pClassID_0 : any | any) : number;
+    GetClassID(pClassID_0 : any | any) : long;
     // IPersistStream
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any | any) : number;
+    Load(pStm_0 : any | any) : long;
     // public virtual long Save(IStream * pStm, int fClearDirty)
-    Save(pStm_0 : any | any, fClearDirty_1 : number | any) : number;
+    Save(pStm_0 : any | any, fClearDirty_1 : int | any) : long;
     // LocomotionClass
     // public virtual int Size()
-    Size() : number;
+    Size() : int;
     // TeleportLocomotionClass
     // public virtual void vt_entry_28(unsigned long dwUnk)
-    vt_entry_28(dwUnk_0 : number) : void;
+    vt_entry_28(dwUnk_0 : unsigned_long) : void;
     // public virtual bool IsStill()
     IsStill() : boolean;
     // public static unsigned int const ILocoVTable = 0x7F5000
-    static s_ILocoVTable : number;
+    static s_ILocoVTable : unsigned_int;
     // Current destination
     // public CoordStruct MovingDestination
     m_MovingDestination : CoordStruct;
@@ -14427,7 +14421,7 @@ class TeleportLocomotionClass
     // public bool unknown_bool_36
     m_unknown_bool_36 : boolean;
     // public int State
-    m_State : number;
+    m_State : int;
     // public CDTimerClass Timer
     m_Timer : CDTimerClass;
     // public ILocomotion * Piggybackee
@@ -14478,11 +14472,11 @@ class GScreenClass
     static DoBlit(mouseCaptured_0 : boolean, surface_1 : DSurface, rect_2 : RectangleStruct) : void;
     // IUnknown
     // public virtual long QueryInterface(_GUID const& iid, void * * ppvObject)
-    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : number;
+    QueryInterface(iid_0 : any | any, ppvObject_1 : ArrayBuffer | any) : long;
     // public virtual unsigned long AddRef()
-    AddRef() : number;
+    AddRef() : unsigned_long;
     // public virtual unsigned long Release()
-    Release() : number;
+    Release() : unsigned_long;
     // GScreenClass
     // public virtual void One_Time()
     One_Time() : void;
@@ -14493,9 +14487,9 @@ class GScreenClass
     // public virtual void Init_IO()
     Init_IO() : void;
     // public virtual void GetInputAndUpdate(unsigned long& outKeyCode, int& outMouseX, int& outMouseY)
-    GetInputAndUpdate(outKeyCode_0 : number, outMouseX_1 : number, outMouseY_2 : number) : void;
+    GetInputAndUpdate(outKeyCode_0 : unsigned_long, outMouseX_1 : int, outMouseY_2 : int) : void;
     // public virtual void Update(int const& keyCode, Point2D const& mouseCoords)
-    Update(keyCode_0 : number, mouseCoords_1 : Point2D) : void;
+    Update(keyCode_0 : int, mouseCoords_1 : Point2D) : void;
     // public virtual bool SetButtons(GadgetClass * pGadget)
     SetButtons(pGadget_0 : GadgetClass) : boolean;
     // public virtual bool AddButton(GadgetClass * pGadget)
@@ -14503,11 +14497,11 @@ class GScreenClass
     // public virtual bool RemoveButton(GadgetClass * pGadget)
     RemoveButton(pGadget_0 : GadgetClass) : boolean;
     // public virtual void MarkNeedsRedraw(int dwUnk)
-    MarkNeedsRedraw(dwUnk_0 : number) : void;
+    MarkNeedsRedraw(dwUnk_0 : int) : void;
     // public virtual void DrawOnTop()
     DrawOnTop() : void;
     // public virtual void Draw(unsigned long dwUnk)
-    Draw(dwUnk_0 : number) : void;
+    Draw(dwUnk_0 : unsigned_long) : void;
     // public virtual void vt_entry_44()
     vt_entry_44() : void;
     // public virtual bool SetCursor(MouseCursorType idxCursor, bool miniMap) = 0
@@ -14527,12 +14521,12 @@ class GScreenClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public int ScreenShakeX
-    m_ScreenShakeX : number;
+    m_ScreenShakeX : int;
     // public int ScreenShakeY
-    m_ScreenShakeY : number;
+    m_ScreenShakeY : int;
     // default is 2
     // public int Bitfield
-    m_Bitfield : number;
+    m_Bitfield : int;
 }
 // Powerup crates
 // Crate
@@ -14628,7 +14622,7 @@ class MapClass
     static GetLayer(lyr_0 : Layer) : LayerClass;
     // IGameMap
     // public virtual long Is_Visible(CellStruct cell)
-    Is_Visible(cell_0 : CellStruct | any) : number;
+    Is_Visible(cell_0 : CellStruct | any) : long;
     // MapClass
     // public virtual void AllocateCells()
     AllocateCells() : void;
@@ -14643,7 +14637,7 @@ class MapClass
     // public virtual void UpdateCrates()
     UpdateCrates() : void;
     // public virtual void CreateEmptyMap(RectangleStruct const& mapRect, bool reuse, char nLevel, bool bUnk2)
-    CreateEmptyMap(mapRect_0 : RectangleStruct, reuse_1 : boolean, nLevel_2 : number, bUnk2_3 : boolean) : void;
+    CreateEmptyMap(mapRect_0 : RectangleStruct, reuse_1 : boolean, nLevel_2 : char, bUnk2_3 : boolean) : void;
     // public virtual void SetVisibleRect(RectangleStruct const& mapRect)
     SetVisibleRect(mapRect_0 : RectangleStruct) : void;
     // Non-virtual
@@ -14660,17 +14654,17 @@ class MapClass
     // public bool CellExists(CellStruct const& MapCoords) const
     CellExists(MapCoords_0 : CellStruct) : boolean;
     // public int GetThreatPosed(CellStruct const& cell, HouseClass * pHouse) const
-    GetThreatPosed(cell_0 : CellStruct, pHouse_1 : HouseClass) : number;
+    GetThreatPosed(cell_0 : CellStruct, pHouse_1 : HouseClass) : int;
     // public bool IsLocationShrouded(CoordStruct const& crd) const
     IsLocationShrouded(crd_0 : CoordStruct) : boolean;
     // public static int GetCellIndex(CellStruct const& MapCoords)
-    static GetCellIndex(MapCoords_0 : CellStruct) : number;
+    static GetCellIndex(MapCoords_0 : CellStruct) : int;
     // gets a coordinate in a random direction a fixed distance in leptons away from coords
     // public static CoordStruct * GetRandomCoordsNear(CoordStruct& outBuffer, CoordStruct const& coords, int distance, bool center)
-    static GetRandomCoordsNear(outBuffer_0 : CoordStruct, coords_1 : CoordStruct, distance_2 : number, center_3 : boolean) : CoordStruct;
+    static GetRandomCoordsNear(outBuffer_0 : CoordStruct, coords_1 : CoordStruct, distance_2 : int, center_3 : boolean) : CoordStruct;
     // gets a coordinate in a random direction a fixed distance in leptons away from coords
     // public static CoordStruct GetRandomCoordsNear(CoordStruct const& coords, int distance, bool center)
-    static GetRandomCoordsNear(coords_0 : CoordStruct, distance_1 : number, center_2 : boolean) : CoordStruct;
+    static GetRandomCoordsNear(coords_0 : CoordStruct, distance_1 : int, center_2 : boolean) : CoordStruct;
     // public static CoordStruct * PickInfantrySublocation(CoordStruct& outBuffer, CoordStruct const& coords, bool ignoreContents = false)
     static PickInfantrySublocation(outBuffer_0 : CoordStruct, coords_1 : CoordStruct, ignoreContents_2 : boolean) : CoordStruct;
     // public static CoordStruct PickInfantrySublocation(CoordStruct const& coords, bool ignoreContents = false)
@@ -14684,7 +14678,7 @@ class MapClass
     // public CellClass * CellIteratorNext()
     CellIteratorNext() : CellClass;
     // public int GetMovementZoneType(CellStruct const& MapCoords, MovementZone movementZone, bool isBridge)
-    GetMovementZoneType(MapCoords_0 : CellStruct, movementZone_1 : MovementZone, isBridge_2 : boolean) : number;
+    GetMovementZoneType(MapCoords_0 : CellStruct, movementZone_1 : MovementZone, isBridge_2 : boolean) : int;
     // the key damage delivery
     // The key damage delivery function.
     // 
@@ -14695,7 +14689,7 @@ class MapClass
     // @param AffectsTiberium If this is false, Tiberium=yes is ignored.
     // @param SourceHouse The house to which SourceObject belongs, the owner/bringer of damage.
     // public static DamageAreaResult DamageArea(CoordStruct const& Coords, int Damage, TechnoClass * SourceObject, WarheadTypeClass * WH, bool AffectsTiberium, HouseClass * SourceHouse)
-    static DamageArea(Coords_0 : CoordStruct, Damage_1 : number, SourceObject_2 : TechnoClass, WH_3 : WarheadTypeClass, AffectsTiberium_4 : boolean, SourceHouse_5 : HouseClass) : DamageAreaResult;
+    static DamageArea(Coords_0 : CoordStruct, Damage_1 : int, SourceObject_2 : TechnoClass, WH_3 : WarheadTypeClass, AffectsTiberium_4 : boolean, SourceHouse_5 : HouseClass) : DamageAreaResult;
     // Picks the appropriate anim from WH's AnimList= based on damage dealt and land type (Conventional= )
     // so after DamageArea:
     // if(AnimTypeClass *damageAnimType = SelectDamageAnimation(...)) {
@@ -14704,14 +14698,14 @@ class MapClass
     // >(damageAnimType, location);
     // }
     // public static AnimTypeClass * SelectDamageAnimation(int Damage, WarheadTypeClass * WH, LandType LandType, CoordStruct const& coords)
-    static SelectDamageAnimation(Damage_0 : number, WH_1 : WarheadTypeClass, LandType_2 : LandType, coords_3 : CoordStruct) : AnimTypeClass;
+    static SelectDamageAnimation(Damage_0 : int, WH_1 : WarheadTypeClass, LandType_2 : LandType, coords_3 : CoordStruct) : AnimTypeClass;
     // public static void FlashbangWarheadAt(int Damage, WarheadTypeClass * WH, CoordStruct coords, bool Force = 0, SpotlightFlags CLDisableFlags = SpotlightFlags::None)
-    static FlashbangWarheadAt(Damage_0 : number, WH_1 : WarheadTypeClass, coords_2 : CoordStruct, Force_3 : boolean, CLDisableFlags_4 : SpotlightFlags) : void;
+    static FlashbangWarheadAt(Damage_0 : int, WH_1 : WarheadTypeClass, coords_2 : CoordStruct, Force_3 : boolean, CLDisableFlags_4 : SpotlightFlags) : void;
     // get the damage a warhead causes to specific armor
     // public static int GetTotalDamage(int damage, WarheadTypeClass const * pWarhead, Armor armor, int distance)
-    static GetTotalDamage(damage_0 : number, pWarhead_1 : WarheadTypeClass, armor_2 : Armor, distance_3 : number) : number;
+    static GetTotalDamage(damage_0 : int, pWarhead_1 : WarheadTypeClass, armor_2 : Armor, distance_3 : int) : int;
     // public int GetCellFloorHeight(CoordStruct const& crd) const
-    GetCellFloorHeight(crd_0 : CoordStruct) : number;
+    GetCellFloorHeight(crd_0 : CoordStruct) : int;
     // public CellStruct * PickCellOnEdge(CellStruct& buffer, Edge Edge, CellStruct const& CurrentLocation, CellStruct const& Fallback, SpeedType SpeedType, bool ValidateReachability, MovementZone MovZone) const
     PickCellOnEdge(buffer_0 : CellStruct, Edge_1 : Edge, CurrentLocation_2 : CellStruct, Fallback_3 : CellStruct, SpeedType_4 : SpeedType, ValidateReachability_5 : boolean, MovZone_6 : MovementZone) : CellStruct;
     // public CellStruct PickCellOnEdge(Edge Edge, CellStruct const& CurrentLocation, CellStruct const& Fallback, SpeedType SpeedType, bool ValidateReachability, MovementZone MovZone) const
@@ -14724,9 +14718,9 @@ class MapClass
     Update_Pathfinding_2(where_0 : DynamicVectorClass<Vector2D>) : void;
     // Find nearest spot
     // public CellStruct * NearByLocation(CellStruct& outBuffer, CellStruct const& position, SpeedType SpeedType, int a5, MovementZone MovementZone, bool alt, int SpaceSizeX, int SpaceSizeY, bool disallowOverlay, bool a11, bool requireBurrowable, bool allowBridge, CellStruct const& closeTo, bool a15, bool buildable)
-    NearByLocation(outBuffer_0 : CellStruct, position_1 : CellStruct, SpeedType_2 : SpeedType, a5_3 : number, MovementZone_4 : MovementZone, alt_5 : boolean, SpaceSizeX_6 : number, SpaceSizeY_7 : number, disallowOverlay_8 : boolean, a11_9 : boolean, requireBurrowable_10 : boolean, allowBridge_11 : boolean, closeTo_12 : CellStruct, a15_13 : boolean, buildable_14 : boolean) : CellStruct;
+    NearByLocation(outBuffer_0 : CellStruct, position_1 : CellStruct, SpeedType_2 : SpeedType, a5_3 : int, MovementZone_4 : MovementZone, alt_5 : boolean, SpaceSizeX_6 : int, SpaceSizeY_7 : int, disallowOverlay_8 : boolean, a11_9 : boolean, requireBurrowable_10 : boolean, allowBridge_11 : boolean, closeTo_12 : CellStruct, a15_13 : boolean, buildable_14 : boolean) : CellStruct;
     // public CellStruct NearByLocation(CellStruct const& position, SpeedType SpeedType, int a5, MovementZone MovementZone, bool alt, int SpaceSizeX, int SpaceSizeY, bool disallowOverlay, bool a11, bool requireBurrowable, bool allowBridge, CellStruct const& closeTo, bool a15, bool buildable)
-    NearByLocation(position_0 : CellStruct, SpeedType_1 : SpeedType, a5_2 : number, MovementZone_3 : MovementZone, alt_4 : boolean, SpaceSizeX_5 : number, SpaceSizeY_6 : number, disallowOverlay_7 : boolean, a11_8 : boolean, requireBurrowable_9 : boolean, allowBridge_10 : boolean, closeTo_11 : CellStruct, a15_12 : boolean, buildable_13 : boolean) : CellStruct;
+    NearByLocation(position_0 : CellStruct, SpeedType_1 : SpeedType, a5_2 : int, MovementZone_3 : MovementZone, alt_4 : boolean, SpaceSizeX_5 : int, SpaceSizeY_6 : int, disallowOverlay_7 : boolean, a11_8 : boolean, requireBurrowable_9 : boolean, allowBridge_10 : boolean, closeTo_11 : CellStruct, a15_12 : boolean, buildable_13 : boolean) : CellStruct;
     // public void AddContentAt(CellStruct * coords, TechnoClass * Content)
     AddContentAt(coords_0 : CellStruct, Content_1 : TechnoClass) : void;
     // public void RemoveContentAt(CellStruct * coords, TechnoClass * Content)
@@ -14754,7 +14748,7 @@ class MapClass
     // TechnoClass::See uses this on all (singleCampaign || !MultiplayPassive) units
     // TalkBubble uses this to display the unit to the player
     // public void RevealArea1(CoordStruct * Coords, int Radius, HouseClass * OwnerHouse, CellStruct arg4, unsigned char RevealByHeight, unsigned char arg6, unsigned char arg7, unsigned char arg8)
-    RevealArea1(Coords_0 : CoordStruct, Radius_1 : number, OwnerHouse_2 : HouseClass, arg4_3 : CellStruct, RevealByHeight_4 : number, arg6_5 : number, arg7_6 : number, arg8_7 : number) : void;
+    RevealArea1(Coords_0 : CoordStruct, Radius_1 : int, OwnerHouse_2 : HouseClass, arg4_3 : CellStruct, RevealByHeight_4 : unsigned_char, arg6_5 : unsigned_char, arg7_6 : unsigned_char, arg8_7 : unsigned_char) : void;
     // these come in pairs - first the last argument is 0 and then 1
     // AircraftClass::Fire - reveal the target area to the owner (0,0,0,1,x)
     // AircraftClass::See - reveal shroud when on the ground (arg,arg,0,1,x), and fog always (0,0,1,(height 
@@ -14767,7 +14761,7 @@ class MapClass
     // ActionClass::RevealWaypoint - reveal RevealTriggerRadius= to player (0,0,0,1,x)
     // ActionClass::RevealZoneOfWaypoint - reveal (r = 2) to player (0,0,0,1,x)
     // public void RevealArea2(CoordStruct * Coords, int Radius, HouseClass * OwnerHouse, unsigned long arg4, unsigned char RevealByHeight, unsigned char arg6, unsigned char arg7, unsigned char arg8)
-    RevealArea2(Coords_0 : CoordStruct, Radius_1 : number, OwnerHouse_2 : HouseClass, arg4_3 : number, RevealByHeight_4 : number, arg6_5 : number, arg7_6 : number, arg8_7 : number) : void;
+    RevealArea2(Coords_0 : CoordStruct, Radius_1 : int, OwnerHouse_2 : HouseClass, arg4_3 : unsigned_long, RevealByHeight_4 : unsigned_char, arg6_5 : unsigned_char, arg7_6 : unsigned_char, arg8_7 : unsigned_char) : void;
     // AircraftClass::SpyPlaneApproach
     // AircraftClass::SpyPlaneOverfly
     // AircraftClass::Carryall_Unload
@@ -14778,30 +14772,30 @@ class MapClass
     // TechnoClass::Unlimbo
     // TechnoClass::Fire uses this (r = 4) right after using RevealArea0, wtfcock
     // public void RevealArea3(CoordStruct * Coords, int Height, int Radius, bool SkipReveal)
-    RevealArea3(Coords_0 : CoordStruct, Height_1 : number, Radius_2 : number, SkipReveal_3 : boolean) : void;
+    RevealArea3(Coords_0 : CoordStruct, Height_1 : int, Radius_2 : int, SkipReveal_3 : boolean) : void;
     // public void Reveal(HouseClass * pHouse)
     Reveal(pHouse_0 : HouseClass) : void;
     // public void Reshroud(HouseClass * pHouse)
     Reshroud(pHouse_0 : HouseClass) : void;
     // public int GetZPos(CoordStruct * Coords)
-    GetZPos(Coords_0 : CoordStruct) : number;
+    GetZPos(Coords_0 : CoordStruct) : int;
     // these two VERY slowly reprocess the map after gapgen state changes
     // public void sub_657CE0()
     sub_657CE0() : void;
     // public void RedrawSidebar(int mode)
-    RedrawSidebar(mode_0 : number) : void;
+    RedrawSidebar(mode_0 : int) : void;
     // public ObjectClass * NextObject(ObjectClass * pCurrentObject)
     NextObject(pCurrentObject_0 : ObjectClass) : ObjectClass;
     // public void SetTogglePowerMode(int mode)
-    SetTogglePowerMode(mode_0 : number) : void;
+    SetTogglePowerMode(mode_0 : int) : void;
     // public void SetPlaceBeaconMode(int mode)
-    SetPlaceBeaconMode(mode_0 : number) : void;
+    SetPlaceBeaconMode(mode_0 : int) : void;
     // public void SetSellMode(int mode)
-    SetSellMode(mode_0 : number) : void;
+    SetSellMode(mode_0 : int) : void;
     // public void SetWaypointMode(int mode, bool somebool)
-    SetWaypointMode(mode_0 : number, somebool_1 : boolean) : void;
+    SetWaypointMode(mode_0 : int, somebool_1 : boolean) : void;
     // public void SetRepairMode(int mode)
-    SetRepairMode(mode_0 : number) : void;
+    SetRepairMode(mode_0 : int) : void;
     // public void DestroyCliff(CellClass * Cell)
     DestroyCliff(Cell_0 : CellClass) : void;
     // public bool IsLocationFogged(CoordStruct const& coord)
@@ -14835,7 +14829,7 @@ class MapClass
     // public static reference<CellClass, 11263056, 0> const InvalidCell = 0xABDC50u
     static s_InvalidCell : CellClass;
     // public static int const MaxCells = 0x40000
-    static s_MaxCells : number;
+    static s_MaxCells : int;
     // this actually points to 5 vectors, one for each layer
     // public static reference<LayerClass, 9044832, 5> const ObjectsInLayers = 0x8A0360u
     static s_ObjectsInLayers : LayerClass;
@@ -14845,32 +14839,32 @@ class MapClass
     // </summary
     // >
     // public static reference<int[13], 8562068, 8> const MovementAdjustArray = 13u
-    static s_MovementAdjustArray : number;
+    static s_MovementAdjustArray : int;
     // ===========================================================================
     // ===== Properties ==========================================================
     // ===========================================================================
     // public unsigned long unknown_10
-    m_unknown_10 : number;
+    m_unknown_10 : unsigned_long;
     // public HashTable<unsigned long, unsigned long> * unknown_pointer_14
     m_unknown_pointer_14 : any;
     // public void *[13] MovementZones
     m_MovementZones : void;
     // public unsigned long somecount_4C
-    m_somecount_4C : number;
+    m_somecount_4C : unsigned_long;
     // public DynamicVectorClass<ZoneConnectionClass> ZoneConnections
     m_ZoneConnections : DynamicVectorClass<any>;
     // public CellLevelPassabilityStruct * LevelAndPassability
     m_LevelAndPassability : any;
     // public int ValidMapCellCount
-    m_ValidMapCellCount : number;
+    m_ValidMapCellCount : int;
     // public LevelAndPassabilityStruct2 * LevelAndPassabilityStruct2pointer_70
     m_LevelAndPassabilityStruct2pointer_70 : any;
     // public unsigned long unknown_74
-    m_unknown_74 : number;
+    m_unknown_74 : unsigned_long;
     // public unsigned long unknown_78
-    m_unknown_78 : number;
+    m_unknown_78 : unsigned_long;
     // public unsigned long unknown_7C
-    m_unknown_7C : number;
+    m_unknown_7C : unsigned_long;
     // somehow connected to the 3 vectors below
     // public HashTable<unsigned long, SubzoneConnectionStruct> *[3] unknown_80
     m_unknown_80 : any;
@@ -14883,36 +14877,36 @@ class MapClass
     // public RectangleStruct VisibleRect
     m_VisibleRect : RectangleStruct;
     // public int CellIterator_NextX
-    m_CellIterator_NextX : number;
+    m_CellIterator_NextX : int;
     // public int CellIterator_NextY
-    m_CellIterator_NextY : number;
+    m_CellIterator_NextY : int;
     // public int CellIterator_CurrentY
-    m_CellIterator_CurrentY : number;
+    m_CellIterator_CurrentY : int;
     // public CellClass * CellIterator_NextCell
     m_CellIterator_NextCell : CellClass;
     // public int ZoneIterator_X
-    m_ZoneIterator_X : number;
+    m_ZoneIterator_X : int;
     // public int ZoneIterator_Y
-    m_ZoneIterator_Y : number;
+    m_ZoneIterator_Y : int;
     // the minimum and maximum cell struct values
     // public LTRBStruct MapCoordBounds
     m_MapCoordBounds : LTRBStruct;
     // public int TotalValue
-    m_TotalValue : number;
+    m_TotalValue : int;
     // public VectorClass<CellClass *> Cells
     m_Cells : VectorClass<CellClass>;
     // public int MaxLevel
-    m_MaxLevel : number;
+    m_MaxLevel : int;
     // public int MaxWidth
-    m_MaxWidth : number;
+    m_MaxWidth : int;
     // public int MaxHeight
-    m_MaxHeight : number;
+    m_MaxHeight : int;
     // public int MaxNumCells
-    m_MaxNumCells : number;
+    m_MaxNumCells : int;
     // public Crate[256] Crates
     m_Crates : Crate;
     // public int Redraws
-    m_Redraws : number;
+    m_Redraws : int;
     // public DynamicVectorClass<Vector2D<short>> TaggedCells
     m_TaggedCells : DynamicVectorClass<Vector2D>;
 }
@@ -14968,13 +14962,13 @@ class DisplayClass
     // MapClass
     // DisplayClass
     // public virtual long Load(IStream * pStm)
-    Load(pStm_0 : any) : number;
+    Load(pStm_0 : any) : long;
     // public virtual long Save(IStream * pStm)
-    Save(pStm_0 : any) : number;
+    Save(pStm_0 : any) : long;
     // public virtual void LoadFromINI(CCINIClass * pINI)
     LoadFromINI(pINI_0 : CCINIClass) : void;
     // public virtual wchar_t const * GetToolTip(unsigned int nDlgID)
-    GetToolTip(nDlgID_0 : number) : ArrayBuffer;
+    GetToolTip(nDlgID_0 : unsigned_int) : ArrayBuffer;
     // public virtual void CloseWindow()
     CloseWindow() : void;
     // public virtual void ClearDragBand()
@@ -14990,11 +14984,11 @@ class DisplayClass
     // public virtual MouseCursorType GetLastMouseCursor() = 0
     GetLastMouseCursor() : MouseCursorType;
     // public virtual bool ScrollMap(unsigned long dwUnk1, unsigned long dwUnk2, unsigned long dwUnk3)
-    ScrollMap(dwUnk1_0 : number, dwUnk2_1 : number, dwUnk3_2 : number) : boolean;
+    ScrollMap(dwUnk1_0 : unsigned_long, dwUnk2_1 : unsigned_long, dwUnk3_2 : unsigned_long) : boolean;
     // public virtual void Set_View_Dimensions(RectangleStruct const& rect)
     Set_View_Dimensions(rect_0 : RectangleStruct) : void;
     // public virtual void vt_entry_AC(unsigned long dwUnk)
-    vt_entry_AC(dwUnk_0 : number) : void;
+    vt_entry_AC(dwUnk_0 : unsigned_long) : void;
     // public virtual void RightMouseButtonClick(Point2D * pPoint)
     RightMouseButtonClick(pPoint_0 : Point2D) : void;
     // public virtual void LeftMouseButtonClick(Point2D * pPoint)
@@ -15006,12 +15000,12 @@ class DisplayClass
     // public virtual void LeftMouseButtonDown(Point2D const& point)
     LeftMouseButtonDown(point_0 : Point2D) : void;
     // public virtual void LeftMouseButtonUp(CoordStruct const& coords, CellStruct const& cell, ObjectClass * pObject, Action action, unsigned long dwUnk2)
-    LeftMouseButtonUp(coords_0 : CoordStruct, cell_1 : CellStruct, pObject_2 : ObjectClass, action_3 : Action, dwUnk2_4 : number) : void;
+    LeftMouseButtonUp(coords_0 : CoordStruct, cell_1 : CellStruct, pObject_2 : ObjectClass, action_3 : Action, dwUnk2_4 : unsigned_long) : void;
     // public virtual void RightMouseButtonUp(unsigned long dwUnk)
-    RightMouseButtonUp(dwUnk_0 : number) : void;
+    RightMouseButtonUp(dwUnk_0 : unsigned_long) : void;
     // Non-virtual
     // public Action DecideAction(CellStruct const& cell, ObjectClass * pObject, unsigned long dwUnk)
-    DecideAction(cell_0 : CellStruct, pObject_1 : ObjectClass, dwUnk_2 : number) : Action;
+    DecideAction(cell_0 : CellStruct, pObject_1 : ObjectClass, dwUnk_2 : unsigned_long) : Action;
     // pass in CurrentFoundationData and receive the width/height of a bounding rectangle in cells
     // public CellStruct * FoundationBoundsSize(CellStruct& outBuffer, CellStruct const * const pFoundationData) const
     FoundationBoundsSize(outBuffer_0 : CellStruct, pFoundationData_1 : CellStruct) : CellStruct;
@@ -15055,7 +15049,7 @@ class DisplayClass
     // public ObjectTypeClass * CurrentBuildingTypeCopy
     m_CurrentBuildingTypeCopy : ObjectTypeClass;
     // public int CurrentBuildingOwnerArrayIndexCopy
-    m_CurrentBuildingOwnerArrayIndexCopy : number;
+    m_CurrentBuildingOwnerArrayIndexCopy : int;
     // public bool FollowObject
     m_FollowObject : boolean;
     // public ObjectClass * ObjectToFollow
@@ -15067,7 +15061,7 @@ class DisplayClass
     // public ObjectTypeClass * CurrentBuildingType
     m_CurrentBuildingType : ObjectTypeClass;
     // public int CurrentBuildingOwnerArrayIndex
-    m_CurrentBuildingOwnerArrayIndex : number;
+    m_CurrentBuildingOwnerArrayIndex : int;
     // public bool RepairMode
     m_RepairMode : boolean;
     // public bool SellMode
@@ -15080,13 +15074,13 @@ class DisplayClass
     m_PlaceBeaconMode : boolean;
     // Index of the SuperWeaponType we have currently selected
     // public int CurrentSWTypeIndex
-    m_CurrentSWTypeIndex : number;
+    m_CurrentSWTypeIndex : int;
     // public unsigned long unknown_11BC
-    m_unknown_11BC : number;
+    m_unknown_11BC : unsigned_long;
     // public Point2D unknown_11C0
     m_unknown_11C0 : Point2D;
     // public unsigned long unknown_11C8
-    m_unknown_11C8 : number;
+    m_unknown_11C8 : unsigned_long;
     // public bool unknown_bool_11CC
     m_unknown_bool_11CC : boolean;
     // public bool unknown_bool_11CD
@@ -15148,7 +15142,7 @@ class RadarClass
 {
     // MapClass
     // public virtual void CreateEmptyMap(RectangleStruct const& pMapRect, bool reuse, char nLevel, bool bUnk2)
-    CreateEmptyMap(pMapRect_0 : RectangleStruct | any, reuse_1 : boolean | any, nLevel_2 : number | any, bUnk2_3 : boolean | any) : void;
+    CreateEmptyMap(pMapRect_0 : RectangleStruct | any, reuse_1 : boolean | any, nLevel_2 : char | any, bUnk2_3 : boolean | any) : void;
     // public virtual void SetVisibleRect(RectangleStruct const& mapRect)
     SetVisibleRect(mapRect_0 : RectangleStruct | any) : void;
     // RadarClass
@@ -15157,7 +15151,7 @@ class RadarClass
     // public virtual void * vt_entry_CC(void * out_pUnk, Point2D * pPoint)
     vt_entry_CC(out_pUnk_0 : ArrayBuffer, pPoint_1 : Point2D) : ArrayBuffer;
     // public virtual void vt_entry_D0(unsigned long dwUnk)
-    vt_entry_D0(dwUnk_0 : number) : void;
+    vt_entry_D0(dwUnk_0 : unsigned_long) : void;
     // public virtual void Init_For_House()
     Init_For_House() : void;
     // Static
@@ -15167,89 +15161,89 @@ class RadarClass
     // ===== Properties ==========================================================
     // ===========================================================================
     // public unsigned long unknown_11E8
-    m_unknown_11E8 : number;
+    m_unknown_11E8 : unsigned_long;
     // public unsigned long unknown_11EC
-    m_unknown_11EC : number;
+    m_unknown_11EC : unsigned_long;
     // public unsigned long unknown_11F0
-    m_unknown_11F0 : number;
+    m_unknown_11F0 : unsigned_long;
     // public unsigned long unknown_11F4
-    m_unknown_11F4 : number;
+    m_unknown_11F4 : unsigned_long;
     // public unsigned long unknown_11F8
-    m_unknown_11F8 : number;
+    m_unknown_11F8 : unsigned_long;
     // public unsigned long unknown_11FC
-    m_unknown_11FC : number;
+    m_unknown_11FC : unsigned_long;
     // public unsigned long unknown_1200
-    m_unknown_1200 : number;
+    m_unknown_1200 : unsigned_long;
     // public unsigned long unknown_1204
-    m_unknown_1204 : number;
+    m_unknown_1204 : unsigned_long;
     // public unsigned long unknown_1208
-    m_unknown_1208 : number;
+    m_unknown_1208 : unsigned_long;
     // public RectangleStruct unknown_rect_120C
     m_unknown_rect_120C : RectangleStruct;
     // public unsigned long unknown_121C
-    m_unknown_121C : number;
+    m_unknown_121C : unsigned_long;
     // public unsigned long unknown_1220
-    m_unknown_1220 : number;
+    m_unknown_1220 : unsigned_long;
     // public DynamicVectorClass<Vector2D<short>> unknown_cells_1124
     m_unknown_cells_1124 : DynamicVectorClass<Vector2D>;
     // public unsigned long unknown_123C
-    m_unknown_123C : number;
+    m_unknown_123C : unsigned_long;
     // public unsigned long unknown_1240
-    m_unknown_1240 : number;
+    m_unknown_1240 : unsigned_long;
     // public unsigned long unknown_1244
-    m_unknown_1244 : number;
+    m_unknown_1244 : unsigned_long;
     // public unsigned long unknown_1248
-    m_unknown_1248 : number;
+    m_unknown_1248 : unsigned_long;
     // public unsigned long unknown_124C
-    m_unknown_124C : number;
+    m_unknown_124C : unsigned_long;
     // public unsigned long unknown_1250
-    m_unknown_1250 : number;
+    m_unknown_1250 : unsigned_long;
     // public unsigned long unknown_1254
-    m_unknown_1254 : number;
+    m_unknown_1254 : unsigned_long;
     // public HashTable<RadarTrackingStruct, TechnoClass *> * unknown_1258
     m_unknown_1258 : any;
     // public DynamicVectorClass<Vector2D<int>> unknown_points_125C
     m_unknown_points_125C : DynamicVectorClass<Vector2D>;
     // public unsigned long unknown_1274
-    m_unknown_1274 : number;
+    m_unknown_1274 : unsigned_long;
     // public DynamicVectorClass<Vector2D<int>>[22] FoundationTypePixels
     m_FoundationTypePixels : DynamicVectorClass<Vector2D>;
     // public float RadarSizeFactor
-    m_RadarSizeFactor : number;
+    m_RadarSizeFactor : float;
     // public int unknown_int_148C
-    m_unknown_int_148C : number;
+    m_unknown_int_148C : int;
     // public unsigned long unknown_1490
-    m_unknown_1490 : number;
+    m_unknown_1490 : unsigned_long;
     // public unsigned long unknown_1494
-    m_unknown_1494 : number;
+    m_unknown_1494 : unsigned_long;
     // public unsigned long unknown_1498
-    m_unknown_1498 : number;
+    m_unknown_1498 : unsigned_long;
     // public RectangleStruct unknown_rect_149C
     m_unknown_rect_149C : RectangleStruct;
     // public unsigned long unknown_14AC
-    m_unknown_14AC : number;
+    m_unknown_14AC : unsigned_long;
     // public unsigned long unknown_14B0
-    m_unknown_14B0 : number;
+    m_unknown_14B0 : unsigned_long;
     // public unsigned long unknown_14B4
-    m_unknown_14B4 : number;
+    m_unknown_14B4 : unsigned_long;
     // public unsigned long unknown_14B8
-    m_unknown_14B8 : number;
+    m_unknown_14B8 : unsigned_long;
     // public bool unknown_bool_14BC
     m_unknown_bool_14BC : boolean;
     // public bool unknown_bool_14BD
     m_unknown_bool_14BD : boolean;
     // public unsigned long unknown_14C0
-    m_unknown_14C0 : number;
+    m_unknown_14C0 : unsigned_long;
     // public unsigned long unknown_14C4
-    m_unknown_14C4 : number;
+    m_unknown_14C4 : unsigned_long;
     // public unsigned long unknown_14C8
-    m_unknown_14C8 : number;
+    m_unknown_14C8 : unsigned_long;
     // public unsigned long unknown_14CC
-    m_unknown_14CC : number;
+    m_unknown_14CC : unsigned_long;
     // public unsigned long unknown_14D0
-    m_unknown_14D0 : number;
+    m_unknown_14D0 : unsigned_long;
     // public int unknown_int_14D4
-    m_unknown_int_14D4 : number;
+    m_unknown_int_14D4 : int;
     // public bool IsAvailableNow
     m_IsAvailableNow : boolean;
     // public bool unknown_bool_14D9
@@ -15259,15 +15253,15 @@ class RadarClass
     // public RectangleStruct unknown_rect_14DC
     m_unknown_rect_14DC : RectangleStruct;
     // public unsigned long unknown_14EC
-    m_unknown_14EC : number;
+    m_unknown_14EC : unsigned_long;
     // public unsigned long unknown_14F0
-    m_unknown_14F0 : number;
+    m_unknown_14F0 : unsigned_long;
     // public unsigned long unknown_14F4
-    m_unknown_14F4 : number;
+    m_unknown_14F4 : unsigned_long;
     // public unsigned long unknown_14F8
-    m_unknown_14F8 : number;
+    m_unknown_14F8 : unsigned_long;
     // public unsigned long unknown_14FC
-    m_unknown_14FC : number;
+    m_unknown_14FC : unsigned_long;
     // public CDTimerClass unknown_timer_1500
     m_unknown_timer_1500 : CDTimerClass;
 }
@@ -15324,21 +15318,21 @@ class PowerClass
     // public CDTimerClass unknown_timer_1510
     m_unknown_timer_1510 : CDTimerClass;
     // public unsigned long unknown_151C
-    m_unknown_151C : number;
+    m_unknown_151C : unsigned_long;
     // public CDTimerClass unknown_timer_1520
     m_unknown_timer_1520 : CDTimerClass;
     // public unsigned long unknown_152C
-    m_unknown_152C : number;
+    m_unknown_152C : unsigned_long;
     // public unsigned long unknown_1530
-    m_unknown_1530 : number;
+    m_unknown_1530 : unsigned_long;
     // public unsigned long unknown_1534
-    m_unknown_1534 : number;
+    m_unknown_1534 : unsigned_long;
     // public bool unknown_bool_1538
     m_unknown_bool_1538 : boolean;
     // public int PowerOutput
-    m_PowerOutput : number;
+    m_PowerOutput : int;
     // public int PowerDrain
-    m_PowerDrain : number;
+    m_PowerDrain : int;
 }
 // SidebarClass::StripClass::BuildType
 // BuildType
@@ -15347,7 +15341,7 @@ class BuildType
     // public BuildType()
     constructor();
     // public BuildType(int itemIndex, AbstractType itemType)
-    constructor(itemIndex_0 : number, itemType_1 : AbstractType);
+    constructor(itemIndex_0 : int, itemType_1 : AbstractType);
     // public bool operator==(BuildType const& rhs) const
     op_Equality(rhs_0 : BuildType) : boolean;
     // public bool operator!=(BuildType const& rhs) const
@@ -15355,9 +15349,9 @@ class BuildType
     // public bool operator<(BuildType const& rhs) const
     op_LessThan(rhs_0 : BuildType) : boolean;
     // public static bool SortsBefore(AbstractType leftType, int leftIndex, AbstractType rightType, int rightIndex)
-    static SortsBefore(leftType_0 : AbstractType, leftIndex_1 : number, rightType_2 : AbstractType, rightIndex_3 : number) : boolean;
+    static SortsBefore(leftType_0 : AbstractType, leftIndex_1 : int, rightType_2 : AbstractType, rightIndex_3 : int) : boolean;
     // public int ItemIndex
-    m_ItemIndex : number;
+    m_ItemIndex : int;
     // public AbstractType ItemType
     m_ItemType : AbstractType;
     // set on buildings that go on tab 2
@@ -15366,12 +15360,12 @@ class BuildType
     // public FactoryClass * CurrentFactory
     m_CurrentFactory : FactoryClass;
     // public unsigned long unknown_10
-    m_unknown_10 : number;
+    m_unknown_10 : unsigned_long;
     // 0 to 54, how much of this object is constructed (gclock anim level)
     // public StageClass Progress
     m_Progress : StageClass;
     // public int FlashEndFrame
-    m_FlashEndFrame : number;
+    m_FlashEndFrame : int;
 }
 // SidebarClass::StripClass
 // StripClass
@@ -15388,29 +15382,29 @@ class StripClass
     m_Bounds : RectangleStruct;
     // the index of this tab
     // public int Index
-    m_Index : number;
+    m_Index : int;
     // public bool NeedsRedraw
     m_NeedsRedraw : boolean;
     // public unsigned char unknown_3D
-    m_unknown_3D : number;
+    m_unknown_3D : unsigned_char;
     // public unsigned char unknown_3E
-    m_unknown_3E : number;
+    m_unknown_3E : unsigned_char;
     // public unsigned char unknown_3F
-    m_unknown_3F : number;
+    m_unknown_3F : unsigned_char;
     // public unsigned long unknown_40
-    m_unknown_40 : number;
+    m_unknown_40 : unsigned_long;
     // scroll position, which row is topmost visible
     // public int TopRowIndex
-    m_TopRowIndex : number;
+    m_TopRowIndex : int;
     // public unsigned long unknown_48
-    m_unknown_48 : number;
+    m_unknown_48 : unsigned_long;
     // public unsigned long unknown_4C
-    m_unknown_4C : number;
+    m_unknown_4C : unsigned_long;
     // public unsigned long unknown_50
-    m_unknown_50 : number;
+    m_unknown_50 : unsigned_long;
     // filled cameos
     // public int CameoCount
-    m_CameoCount : number;
+    m_CameoCount : int;
     // public BuildType[75] Cameos
     m_Cameos : BuildType;
 }
@@ -15457,42 +15451,42 @@ class SidebarClass
     extends PowerClass
 {
     // public void SidebarNeedsRepaint(int mode = 0)
-    SidebarNeedsRepaint(mode_0 : number) : void;
+    SidebarNeedsRepaint(mode_0 : int) : void;
     // public void RepaintSidebar(int tab = 0)
-    RepaintSidebar(tab_0 : number) : void;
+    RepaintSidebar(tab_0 : int) : void;
     // public bool AddCameo(AbstractType absType, int idxType)
-    AddCameo(absType_0 : AbstractType, idxType_1 : number) : boolean;
+    AddCameo(absType_0 : AbstractType, idxType_1 : int) : boolean;
     // public virtual void Draw(unsigned long dwUnk)
-    Draw(dwUnk_0 : number | any) : void;
+    Draw(dwUnk_0 : unsigned_long | any) : void;
     // SidebarClass
     // public virtual bool vt_entry_D8(int nUnknown)
-    vt_entry_D8(nUnknown_0 : number) : boolean;
+    vt_entry_D8(nUnknown_0 : int) : boolean;
     // which tab does the 'th object of that type belong in?
     // public static int GetObjectTabIdx(AbstractType abs, int idxType, int unused)
-    static GetObjectTabIdx(abs_0 : AbstractType, idxType_1 : number, unused_2 : number) : number;
+    static GetObjectTabIdx(abs_0 : AbstractType, idxType_1 : int, unused_2 : int) : int;
     // which tab does the 'th object of that type belong in?
     // public static int GetObjectTabIdx(AbstractType abs, BuildCat buildCat, bool isNaval)
-    static GetObjectTabIdx(abs_0 : AbstractType, buildCat_1 : BuildCat, isNaval_2 : boolean) : number;
+    static GetObjectTabIdx(abs_0 : AbstractType, buildCat_1 : BuildCat, isNaval_2 : boolean) : int;
     // public bool Scroll(bool up, int column)
-    Scroll(up_0 : boolean, column_1 : number) : boolean;
+    Scroll(up_0 : boolean, column_1 : int) : boolean;
     // Static
     // public static constant_ptr<SidebarClass, 8910824> const Instance = 0x87F7E8u
     static s_Instance : SidebarClass;
     // public static reference<wchar_t, 11566020, 66> const TooltipBuffer = 0xB07BC4u
-    static s_TooltipBuffer : number;
+    static s_TooltipBuffer : wchar_t;
     // ===========================================================================
     // ===== Properties ==========================================================
     // ===========================================================================
     // public StripClass[4] Tabs
     m_Tabs : StripClass;
     // public unsigned long unknown_5394
-    m_unknown_5394 : number;
+    m_unknown_5394 : unsigned_long;
     // public unsigned long unknown_5398
-    m_unknown_5398 : number;
+    m_unknown_5398 : unsigned_long;
     // public int ActiveTabIndex
-    m_ActiveTabIndex : number;
+    m_ActiveTabIndex : int;
     // public unsigned long unknown_53A0
-    m_unknown_53A0 : number;
+    m_unknown_53A0 : unsigned_long;
     // see 0x6A9343
     // public bool HideObjectNameInTooltip
     m_HideObjectNameInTooltip : boolean;
@@ -15509,39 +15503,39 @@ class SidebarClass
     m_DiplomacyHouses : HouseClass;
     // total amount of kills per house
     // public int[8] DiplomacyKills
-    m_DiplomacyKills : number;
+    m_DiplomacyKills : int;
     // total amount of currently owned unit/buildings per house
     // public int[8] DiplomacyOwned
-    m_DiplomacyOwned : number;
+    m_DiplomacyOwned : int;
     // current power drain per house
     // public int[8] DiplomacyPowerDrain
-    m_DiplomacyPowerDrain : number;
+    m_DiplomacyPowerDrain : int;
     // color scheme per house
     // public ColorScheme *[8] DiplomacyColors
     m_DiplomacyColors : ColorScheme;
     // ??? per house - unused
     // public unsigned long[8] unknown_544C
-    m_unknown_544C : number;
+    m_unknown_544C : unsigned_long;
     // ??? per house - unused
     // public unsigned long[8] unknown_546C
-    m_unknown_546C : number;
+    m_unknown_546C : unsigned_long;
     // ??? per house - unused
     // public unsigned long[8] unknown_548C
-    m_unknown_548C : number;
+    m_unknown_548C : unsigned_long;
     // ??? per house - unused
     // public unsigned long[8] unknown_54AC
-    m_unknown_54AC : number;
+    m_unknown_54AC : unsigned_long;
     // ??? per house - unused
     // public unsigned long[8] unknown_54CC
-    m_unknown_54CC : number;
+    m_unknown_54CC : unsigned_long;
     // ??? per house - unused
     // public unsigned long[8] unknown_54EC
-    m_unknown_54EC : number;
+    m_unknown_54EC : unsigned_long;
     // public unsigned char unknown_550C
-    m_unknown_550C : number;
+    m_unknown_550C : unsigned_char;
     // possibly?
     // public int DiplomacyNumHouses
-    m_DiplomacyNumHouses : number;
+    m_DiplomacyNumHouses : int;
     // public bool unknown_bool_5514
     m_unknown_bool_5514 : boolean;
     // public bool unknown_bool_5515
@@ -15551,9 +15545,9 @@ class SidebarClass
 class TabDataClass
 {
     // public int TargetValue
-    m_TargetValue : number;
+    m_TargetValue : int;
     // public int LastValue
-    m_LastValue : number;
+    m_LastValue : int;
     // public bool NeedsRedraw
     m_NeedsRedraw : boolean;
     // public bool ValueIncreased
@@ -15561,7 +15555,7 @@ class TabDataClass
     // public bool ValueChanged
     m_ValueChanged : boolean;
     // public int ValueDelta
-    m_ValueDelta : number;
+    m_ValueDelta : int;
 }
 // typedef struct tagCONNECTDATA
 // {
@@ -15607,7 +15601,7 @@ class TabClass
 {
     // non-virtual
     // public void Activate(int control = 1)
-    Activate(control_0 : number) : void;
+    Activate(control_0 : int) : void;
     // Static
     // public static constant_ptr<TabClass, 8910824> const Instance = 0x87F7E8u
     static s_Instance : TabClass;
@@ -15618,11 +15612,11 @@ class TabClass
     // public CDTimerClass InsufficientFundsBlinkTimer
     m_InsufficientFundsBlinkTimer : CDTimerClass;
     // public unsigned char unknown_byte_5544
-    m_unknown_byte_5544 : number;
+    m_unknown_byte_5544 : unsigned_char;
     // public bool MissionTimerPinged
     m_MissionTimerPinged : boolean;
     // public unsigned char unknown_byte_5546
-    m_unknown_byte_5546 : number;
+    m_unknown_byte_5546 : unsigned_char;
 }
 // typedef struct tagCONNECTDATA
 // {
@@ -15670,19 +15664,19 @@ class ScrollClass
     // public static constant_ptr<ScrollClass, 8910824> const Instance = 0x87F7E8u
     static s_Instance : ScrollClass;
     // public unsigned long unknown_int_5548
-    m_unknown_int_5548 : number;
+    m_unknown_int_5548 : unsigned_long;
     // public unsigned char unknown_byte_554C
-    m_unknown_byte_554C : number;
+    m_unknown_byte_554C : unsigned_char;
     // public unsigned long unknown_int_5550
-    m_unknown_int_5550 : number;
+    m_unknown_int_5550 : unsigned_long;
     // public unsigned long unknown_int_5554
-    m_unknown_int_5554 : number;
+    m_unknown_int_5554 : unsigned_long;
     // public unsigned char unknown_byte_5548
-    m_unknown_byte_5548 : number;
+    m_unknown_byte_5548 : unsigned_char;
     // public unsigned char unknown_byte_5549
-    m_unknown_byte_5549 : number;
+    m_unknown_byte_5549 : unsigned_char;
     // public unsigned char unknown_byte_554A
-    m_unknown_byte_554A : number;
+    m_unknown_byte_554A : unsigned_char;
 }
 // typedef struct tagCONNECTDATA
 // {
@@ -15748,14 +15742,14 @@ class MouseClass
     // public MouseCursorType MouseCursorLastIndex
     m_MouseCursorLastIndex : MouseCursorType;
     // public int MouseCursorCurrentFrame
-    m_MouseCursorCurrentFrame : number;
+    m_MouseCursorCurrentFrame : int;
 }
 // SpotlightClass
 class SpotlightClass
 {
     // Constructor
     // public SpotlightClass(CoordStruct coords, int size)
-    constructor(coords_0 : CoordStruct, size_1 : number);
+    constructor(coords_0 : CoordStruct, size_1 : int);
     // public void Draw()
     Draw() : void;
     // public void Update()
@@ -15773,9 +15767,9 @@ class SpotlightClass
     // public CoordStruct Coords
     m_Coords : CoordStruct;
     // public int MovementRadius
-    m_MovementRadius : number;
+    m_MovementRadius : int;
     // public int Size
-    m_Size : number;
+    m_Size : int;
     // public SpotlightFlags DisableFlags
     m_DisableFlags : SpotlightFlags;
 }
@@ -15789,9 +15783,9 @@ class ThemeControl
     // public FixedString<64, wchar_t> UIName
     m_UIName : any;
     // public int Scenario
-    m_Scenario : number;
+    m_Scenario : int;
     // public float Length
-    m_Length : number;
+    m_Length : float;
     // public bool Normal
     m_Normal : boolean;
     // public bool Repeat
@@ -15799,33 +15793,33 @@ class ThemeControl
     // public bool Exists
     m_Exists : boolean;
     // public int Side
-    m_Side : number;
+    m_Side : int;
 }
 // ThemeClass
 class ThemeClass
 {
     // public char const * GetID(unsigned int index) const
-    GetID(index_0 : number) : string;
+    GetID(index_0 : unsigned_int) : string;
     // public char const * GetName(unsigned int index) const
-    GetName(index_0 : number) : string;
+    GetName(index_0 : unsigned_int) : string;
     // public char const * GetFilename(unsigned int index) const
-    GetFilename(index_0 : number) : string;
+    GetFilename(index_0 : unsigned_int) : string;
     // public wchar_t const * GetUIName(unsigned int index) const
-    GetUIName(index_0 : number) : ArrayBuffer;
+    GetUIName(index_0 : unsigned_int) : ArrayBuffer;
     // public int GetLength(unsigned int index) const
-    GetLength(index_0 : number) : number;
+    GetLength(index_0 : unsigned_int) : int;
     // public bool IsAvailable(int index) const
-    IsAvailable(index_0 : number) : boolean;
+    IsAvailable(index_0 : int) : boolean;
     // public bool IsNormal(int index) const
-    IsNormal(index_0 : number) : boolean;
+    IsNormal(index_0 : int) : boolean;
     // public int FindIndex(char const * pID) const
-    FindIndex(pID_0 : string) : number;
+    FindIndex(pID_0 : string) : int;
     // public int GetRandomIndex(unsigned int lastTheme) const
-    GetRandomIndex(lastTheme_0 : number) : number;
+    GetRandomIndex(lastTheme_0 : unsigned_int) : int;
     // public void Queue(int index)
-    Queue(index_0 : number) : void;
+    Queue(index_0 : int) : void;
     // public int Play(int index)
-    Play(index_0 : number) : number;
+    Play(index_0 : int) : int;
     // public void Stop(bool fade = false)
     Stop(fade_0 : boolean) : void;
     // public void Suspend()
@@ -15840,15 +15834,15 @@ class ThemeClass
     static s_ScoresPresen : boolean;
     // the playing theme's index
     // public int CurrentTheme
-    m_CurrentTheme : number;
+    m_CurrentTheme : int;
     // the theme that cannot be selected randomly
     // public int LastTheme
-    m_LastTheme : number;
+    m_LastTheme : int;
     // the next theme to be played
     // public int QueuedTheme
-    m_QueuedTheme : number;
+    m_QueuedTheme : int;
     // public int Volume
-    m_Volume : number;
+    m_Volume : int;
     // public bool IsScoreRepeat
     m_IsScoreRepeat : boolean;
     // public bool IsFading
@@ -15874,29 +15868,29 @@ class SlaveManagerClass__SlaveControl
 
 class YRpp {
     // static reference<int, 11070852, 0> const CurrentFrame = 0xA8ED84
-    static s_Unsorted__CurrentFrame : number;
+    static s_Unsorted__CurrentFrame : int;
     // The length of a cell in its isometric projection
     // If an object's Height is above this value it's considered as in-air
     // int const CellHeight = 208
-    static s_Unsorted__CellHeight : number;
+    static s_Unsorted__CellHeight : int;
     // The height in the middle of a cell, which is therefore CellHeight/2
     // see ABC5E8, AC13C8
     // int const LevelHeight = 104
-    static s_Unsorted__LevelHeight : number;
+    static s_Unsorted__LevelHeight : int;
     // Leptons per cell.
     // int const LeptonsPerCell = 256
-    static s_Unsorted__LeptonsPerCell : number;
+    static s_Unsorted__LeptonsPerCell : int;
     // Cell width in pixels.
     // int const CellWidthInPixels = 60
-    static s_Unsorted__CellWidthInPixels : number;
+    static s_Unsorted__CellWidthInPixels : int;
     // Cell height in pixels.
     // int const CellHeightInPixels = 30
-    static s_Unsorted__CellHeightInPixels : number;
+    static s_Unsorted__CellHeightInPixels : int;
     // static reference<int, 8915360, 0> const CurrentSWType = 0x8809A0
-    static s_Unsorted__CurrentSWType : number;
+    static s_Unsorted__CurrentSWType : int;
     // h2ik
     // static reference<int, 11069356, 0> const IKnowWhatImDoing = 0xA8E7AC
-    static s_Unsorted__IKnowWhatImDoing : number;
+    static s_Unsorted__IKnowWhatImDoing : int;
 }
 // DirType
 enum DirType {

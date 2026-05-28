@@ -36,7 +36,7 @@ class gainput__InputMap
     GetName() : string;
     // Returns the map's auto-generated ID (that should not be used outside of the library).
     // public unsigned int GetId() const
-    GetId() : number;
+    GetId() : unsigned_int;
     // Maps a bool-type button.
     // 
     // @param userButton The user ID for this mapping.
@@ -56,7 +56,7 @@ class gainput__InputMap
     // @param filterUserData Optional user data pointer that is passed to filterFunc.
     // @return true if the mapping was created.
     // public bool MapFloat(UserButtonId userButton, DeviceId device, DeviceButtonId deviceButton, float min = 0.0f, float max = 1.0f, FilterFunc_T filterFunc = 0, void * filterUserData = 0)
-    MapFloat(userButton_0 : any, device_1 : any, deviceButton_2 : any, min_3 : number, max_4 : number, filterFunc_5 : any, filterUserData_6 : ArrayBuffer) : boolean;
+    MapFloat(userButton_0 : any, device_1 : any, deviceButton_2 : any, min_3 : float, max_4 : float, filterFunc_5 : any, filterUserData_6 : ArrayBuffer) : boolean;
     // Removes all mappings for the given user button.
     // public void Unmap(UserButtonId userButton)
     Unmap(userButton_0 : any) : void;
@@ -70,7 +70,7 @@ class gainput__InputMap
     // @param maxButtonCount The number of fields in outButtons.
     // @return The number of device buttons written to outButtons.
     // public unsigned int GetMappings(UserButtonId userButton, gainput::DeviceButtonSpec * outButtons, unsigned int maxButtonCount) const
-    GetMappings(userButton_0 : any, outButtons_1 : any, maxButtonCount_2 : number) : number;
+    GetMappings(userButton_0 : any, outButtons_1 : any, maxButtonCount_2 : unsigned_int) : unsigned_int;
     // Sets how a user button handles inputs from multiple device buttons.
     // 
     // @return true if the policy was set, false otherwise (i.e. the user button doesn't exist).
@@ -85,7 +85,7 @@ class gainput__InputMap
     // @param deadZone The dead zone to be set.
     // @return true if the dead zone was set, false otherwise (i.e. the user button doesn't exist).
     // public bool SetDeadZone(UserButtonId userButton, float deadZone)
-    SetDeadZone(userButton_0 : any, deadZone_1 : number) : boolean;
+    SetDeadZone(userButton_0 : any, deadZone_1 : float) : boolean;
     // Returns the bool state of a user button.
     // public bool GetBool(UserButtonId userButton) const
     GetBool(userButton_0 : any) : boolean;
@@ -100,13 +100,13 @@ class gainput__InputMap
     GetBoolWasDown(userButton_0 : any) : boolean;
     // Returns the float state of a user button.
     // public float GetFloat(UserButtonId userButton) const
-    GetFloat(userButton_0 : any) : number;
+    GetFloat(userButton_0 : any) : float;
     // Returns the float state of a user button from the previous frame.
     // public float GetFloatPrevious(UserButtonId userButton) const
-    GetFloatPrevious(userButton_0 : any) : number;
+    GetFloatPrevious(userButton_0 : any) : float;
     // Returns the delta between the previous and the current frame of the float state of the given user button.
     // public float GetFloatDelta(UserButtonId userButton) const
-    GetFloatDelta(userButton_0 : any) : number;
+    GetFloatDelta(userButton_0 : any) : float;
     // Gets the name of the device button mapped to the given user button.
     // 
     // @param userButton ID of the user button.
@@ -116,7 +116,7 @@ class gainput__InputMap
     // \
     // 0).
     // public unsigned int GetUserButtonName(UserButtonId userButton, char * buffer, unsigned int bufferLength) const
-    GetUserButtonName(userButton_0 : any, buffer_1 : string, bufferLength_2 : number) : number;
+    GetUserButtonName(userButton_0 : any, buffer_1 : string, bufferLength_2 : unsigned_int) : unsigned_int;
     // Returns the user button ID the given device button is mapped to.
     // This function iterates over all mapped buttons and therefore shouldn't be used in a performance critical
     // situation.
