@@ -29,11 +29,7 @@ void AbilitySystemComponent::InitializeFromType(AbilitySystemComponentType* InTy
 	// Spawn attribute sets first (abilities/effects may query attributes)
     for (auto* Define : Type->Attributes)
     {
-        AttributeSet* set = GameplayAbilitySystem::CreateAttributeSet(Define->AttributeSetCreator, Define, this);
-        if (set)
-        {
-            SpawnedAttributes.push_back(set);
-        }
+        this->AddAttributeSet(Define);
     }
 
     // Startup tags (loose)
@@ -372,8 +368,13 @@ GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbil
 GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbilityDefine* AbilityDefine)
 {
     GameplayAbility* Ability = GameplayAbilitySystem::CreateAbility(AbilityDefine->AbilityCreator, const_cast<GameplayAbilityDefine*>(AbilityDefine), this);
-    this->AllSelfCreatedAbilities.push_back(Ability);
-    return this->GiveAbility(GameplayAbilitySpec(Ability));
+    if (Ability)
+    {
+        Ability->Define = AbilityDefine;
+        this->AllSelfCreatedAbilities.push_back(Ability);
+        return this->GiveAbility(GameplayAbilitySpec(Ability));
+    }
+    return {};
 }
 
 void AbilitySystemComponent::RemoveAbility(GameplayAbilitySpecHandle Handle)

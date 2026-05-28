@@ -2,6 +2,8 @@
 #include "ability_system_component.h"
 #include "ability_system_globals.h"
 
+StringName AbilityTask::ScriptFunctionCategory = "AbilityTask";
+
 void AbilityTask::EndTask()
 {
 	if (bFinished)
@@ -45,7 +47,7 @@ void AbilityTask::K2_EndTask()
 
 AbilityTask* AbilityTask::CreateTask(GameplayAbility* Ability, StringName TaskName, AbilitySystemComponent& ASC)
 {
-	TaskCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<TaskCreator>(TaskName);
+	AbilityTaskCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<AbilityTaskCreator>(ScriptFunctionCategory, TaskName);
 	if (!creatorFunc)
 	{
 		return nullptr;

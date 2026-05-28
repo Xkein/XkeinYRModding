@@ -28,18 +28,18 @@ class ScriptFunctionRegister
 public:
     
     FUNCTION()
-    static void RegisterFunction(const StringName& name, ScriptFunctionBase* func);
+    static void RegisterFunction(const StringName& category, const StringName& name, ScriptFunctionBase* func);
     
     FUNCTION()
-    static void RegisterLoader(std::function<ScriptFunctionBase*(const StringName& name)> loader);
+    static void RegisterLoader(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader);
     
     FUNCTION()
-    static ScriptFunctionBase* GetFunction(const StringName& name);
+    static ScriptFunctionBase* GetFunction(const StringName& category, const StringName& name);
 
     template<typename TScriptFunction>
-    static TScriptFunction* GetFunctionAs(const StringName& name)
+    static TScriptFunction* GetFunctionAs(const StringName& category, const StringName& name)
     {
-        if (ScriptFunctionBase* baseFunc = GetFunction(name); baseFunc)
+        if (ScriptFunctionBase* baseFunc = GetFunction(category, name); baseFunc)
         {
             return static_cast<TScriptFunction*>(baseFunc);
         }

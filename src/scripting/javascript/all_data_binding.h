@@ -87,7 +87,7 @@ UsingCppType(GameplayAbilityWorldReticle);
 UsingCppType(GameplayCueStaticCreator);
 UsingCppType(GameplayCueActorCreator);
 UsingCppType(AbilityTask);
-UsingCppType(TaskCreator);
+UsingCppType(AbilityTaskCreator);
 UsingCppType(GameplayAbilityCreator);
 UsingCppType(AttributeSetCreator);
 UsingCppType(GameplayEffectSpec);

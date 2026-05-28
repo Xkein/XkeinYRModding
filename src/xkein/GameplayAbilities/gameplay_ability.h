@@ -180,7 +180,7 @@ class GameplayAbility
 {
     public:
 	PROPERTY()
-	GameplayAbilityDefine* Define;
+	const GameplayAbilityDefine* Define;
 
 	virtual void InitFromDefine(GameplayAbilityDefine* AbilityDefine);
     

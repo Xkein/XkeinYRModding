@@ -1,5 +1,6 @@
 #include "gameplay_cue_manager.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/GameplayAbilities/ability_system_globals.h"
 #include "scripting/common/script_function.h"
 #include <CCINIClass.h>
 #include <cstring>
@@ -94,14 +95,10 @@ void GameplayCueManager::AfterLoadIni(IniReader& parser, const char* pSection, c
         {
             for (const auto& name : staticNames)
             {
-                auto* creator = ScriptFunctionRegister::GetFunctionAs<GameplayCueStaticCreator>(name);
-                if (creator)
+                GameplayCueNotify_Static* cue = GameplayAbilitySystem::CreateCueStatic(name);
+                if (cue)
                 {
-                    GameplayCueNotify_Static* cue = (*creator)();
-                    if (cue)
-                    {
-                        AddCueNotify(tag, cue);
-                    }
+                    AddCueNotify(tag, cue);
                 }
             }
         }
@@ -112,14 +109,10 @@ void GameplayCueManager::AfterLoadIni(IniReader& parser, const char* pSection, c
         {
             for (const auto& name : actorNames)
             {
-                auto* creator = ScriptFunctionRegister::GetFunctionAs<GameplayCueActorCreator>(name);
-                if (creator)
+                GameplayCueNotify_Actor* cue = GameplayAbilitySystem::CreateCueActor(name);
+                if (cue)
                 {
-                    GameplayCueNotify_Actor* cue = (*creator)();
-                    if (cue)
-                    {
-                        AddCueNotify(tag, cue);
-                    }
+                    AddCueNotify(tag, cue);
                 }
             }
         }

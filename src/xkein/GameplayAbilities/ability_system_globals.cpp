@@ -5,6 +5,10 @@
 #include <unordered_map>
 #include <vector>
 
+StringName GameplayAbilitySystem::ScriptFunctionCategoryAbility = "GameplayAbility";
+StringName GameplayAbilitySystem::ScriptFunctionCategoryAttributeSet = "AttributeSet";
+StringName GameplayAbilitySystem::ScriptFunctionCategoryCue = "GameplayCue";
+
 void GameplayAbilitySystem::Tick()
 {
     float DeltaTime = 1;
@@ -18,7 +22,7 @@ void GameplayAbilitySystem::Tick()
 
 GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, GameplayAbilityDefine* define, AbilitySystemComponent* component)
 {
-	GameplayAbilityCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayAbilityCreator>(name);
+	GameplayAbilityCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayAbilityCreator>(ScriptFunctionCategoryAbility, name);
 	if (!creatorFunc) {
 		return nullptr;
 	}
@@ -27,7 +31,7 @@ GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, Ga
 
 AttributeSet* GameplayAbilitySystem::CreateAttributeSet(const StringName& name, AttributeSetDefine* define, AbilitySystemComponent* component)
 {
-	AttributeSetCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<AttributeSetCreator>(name);
+	AttributeSetCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<AttributeSetCreator>(ScriptFunctionCategoryAttributeSet, name);
 	if (!creatorFunc) {
 		return nullptr;
 	}
@@ -41,7 +45,7 @@ GameplayCueManager* GameplayAbilitySystem::GetCueManager()
 
 GameplayCueNotify_Static* GameplayAbilitySystem::CreateCueStatic(const StringName& name)
 {
-    GameplayCueStaticCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayCueStaticCreator>(name);
+    GameplayCueStaticCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayCueStaticCreator>(ScriptFunctionCategoryCue, name);
     if (!creatorFunc) {
         return nullptr;
     }
@@ -50,7 +54,7 @@ GameplayCueNotify_Static* GameplayAbilitySystem::CreateCueStatic(const StringNam
 
 GameplayCueNotify_Actor* GameplayAbilitySystem::CreateCueActor(const StringName& name)
 {
-    GameplayCueActorCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayCueActorCreator>(name);
+    GameplayCueActorCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayCueActorCreator>(ScriptFunctionCategoryCue, name);
     if (!creatorFunc) {
         return nullptr;
     }

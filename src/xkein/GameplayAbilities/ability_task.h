@@ -57,6 +57,9 @@ public:
 	/** Static factory: creates a task by name, initializes it, and registers it with the ASC.
 	 *  Uses ScriptFunction pattern (TaskCreator) for script-registered constructors. */
 	static AbilityTask* CreateTask(GameplayAbility* Ability, StringName TaskName, AbilitySystemComponent& ASC);
+	
+	PROPERTY()
+    static StringName ScriptFunctionCategory;
 
 protected:
 	/** Owning AbilitySystemComponent */
@@ -77,7 +80,7 @@ protected:
 
 /** ScriptFunction factory type for creating ability tasks, analogous to GameplayAbilityCreator */
 CLASS(BindJs)
-struct TaskCreator : public ScriptFunction<AbilityTask*(GameplayAbility*, AbilitySystemComponent*)>
+struct AbilityTaskCreator : public ScriptFunction<AbilityTask*(GameplayAbility*, AbilitySystemComponent*)>
 {
 	using ScriptFunction::ScriptFunction;
 };

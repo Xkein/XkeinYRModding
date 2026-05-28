@@ -111,12 +111,12 @@ class ScriptFunctionBase
 // ScriptFunctionRegister
 class ScriptFunctionRegister
 {
-    // public static void RegisterFunction(StringName const& name, ScriptFunctionBase * func)
-    static RegisterFunction(name_0 : StringName, func_1 : ScriptFunctionBase) : void;
-    // public static void RegisterLoader(std::function<ScriptFunctionBase * (*)(StringName const& _0)> loader)
-    static RegisterLoader(loader_0 : (_0 : StringName) => ScriptFunctionBase| undefined) : void;
-    // public static ScriptFunctionBase * GetFunction(StringName const& name)
-    static GetFunction(name_0 : StringName) : ScriptFunctionBase;
+    // public static void RegisterFunction(StringName const& category, StringName const& name, ScriptFunctionBase * func)
+    static RegisterFunction(category_0 : StringName, name_1 : StringName, func_2 : ScriptFunctionBase) : void;
+    // public static void RegisterLoader(StringName const& category, std::function<ScriptFunctionBase * (*)(StringName const& _0)> loader)
+    static RegisterLoader(category_0 : StringName, loader_1 : (_0 : StringName) => ScriptFunctionBase| undefined) : void;
+    // public static ScriptFunctionBase * GetFunction(StringName const& category, StringName const& name)
+    static GetFunction(category_0 : StringName, name_1 : StringName) : ScriptFunctionBase;
 }
 // JsCppHelper
 class JsCppHelper
@@ -304,7 +304,7 @@ class GameplayAbility
     K2_EndAbility() : void;
     // public virtual void K2_EndAbilityLocally()
     K2_EndAbilityLocally() : void;
-    // public GameplayAbilityDefine * Define
+    // public GameplayAbilityDefine const * Define
     m_Define : GameplayAbilityDefine;
     // public std::function<bool (*)(GameplayAbilityActorInfo _0, GameplayAbilitySpecHandle _1, GameplayTagContainer * _2)> OnK2CanActivateAbility
     m_OnK2CanActivateAbility : (_0 : GameplayAbilityActorInfo, _1 : GameplayAbilitySpecHandle, _2 : GameplayTagContainer) => boolean| undefined;
@@ -331,6 +331,8 @@ class AbilityTask
     // BlueprintImplementableEvent: script callback fired when the task ends
     // public std::function<void (*)()> OnK2_OnTaskEnd
     m_OnK2_OnTaskEnd : () => void| undefined;
+    // public static StringName ScriptFunctionCategory
+    static s_ScriptFunctionCategory : StringName;
 }
 // AbilitySystemComponentType
 class AbilitySystemComponentType
@@ -710,8 +712,8 @@ class FGameplayEffectQuery
 {
 }
 // ScriptFunction factory type for creating ability tasks, analogous to GameplayAbilityCreator
-// TaskCreator
-class TaskCreator
+// AbilityTaskCreator
+class AbilityTaskCreator
     extends ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__
 {
 }
@@ -821,6 +823,12 @@ class ScriptFunction_AttributeSet__AttributeSetDefine__0_AbilitySystemComponent_
 // GameplayAbilitySystem
 class GameplayAbilitySystem
 {
+    // public static StringName ScriptFunctionCategoryAbility
+    static s_ScriptFunctionCategoryAbility : StringName;
+    // public static StringName ScriptFunctionCategoryAttributeSet
+    static s_ScriptFunctionCategoryAttributeSet : StringName;
+    // public static StringName ScriptFunctionCategoryCue
+    static s_ScriptFunctionCategoryCue : StringName;
 }
 // AbilityTask_Repeat
 // Repeatedly fires an action callback at a specified time interval.

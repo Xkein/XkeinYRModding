@@ -75,6 +75,13 @@ class GameplayAbilitySystem
 public:
     static void Tick();
 
+	PROPERTY()
+    static StringName ScriptFunctionCategoryAbility;
+	PROPERTY()
+    static StringName ScriptFunctionCategoryAttributeSet;
+	PROPERTY()
+    static StringName ScriptFunctionCategoryCue;
+
     static GameplayAbility* CreateAbility(const StringName& name, GameplayAbilityDefine* define, AbilitySystemComponent* component);
     static AttributeSet* CreateAttributeSet(const StringName& name, AttributeSetDefine* define, AbilitySystemComponent* component);
 

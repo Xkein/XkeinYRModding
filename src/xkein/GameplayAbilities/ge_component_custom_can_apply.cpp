@@ -7,7 +7,7 @@ bool CustomCanApplyGEComponent::CanGameplayEffectApply(
 {
     for (const auto& creatorName : ApplicationRequirementCreators)
     {
-        auto* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayEffectCustomApplicationRequirementCreator>(creatorName);
+        auto* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayEffectCustomApplicationRequirementCreator>("GAS", creatorName);
         if (!creatorFunc)
         {
             // Creator not found - default to allowing application
