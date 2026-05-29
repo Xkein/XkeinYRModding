@@ -221,7 +221,7 @@ struct FGameplayTagQueryExpression
  * Supports AND/OR/NOT logic that cannot be expressed with RequireTags/IgnoreTags alone.
  * Node types index into TagTokens (leaf) or Expressions (composite) via StartIndex + Count.
  */
-STRUCT()
+CLASS(BindJs)
 struct GameplayTagQuery
 {
     /** Evaluate this query against the given tag container */
@@ -250,7 +250,7 @@ private:
 };
 
 /** Encapsulate require and ignore tags */
-CLASS()
+CLASS(BindJs)
 struct GameplayTagRequirements
 {
 	/** All of these tags must be present */

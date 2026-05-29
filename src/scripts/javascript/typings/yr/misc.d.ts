@@ -30,3 +30,12 @@ type entt_entity = number;
 
 type EventTypeExt = number;
 type CustomEventType = number;
+
+declare class StdVector<T> {
+    push_back(item: T): void;
+    pop_back(): void;
+    size(): number;
+    clear(): void;
+    empty(): boolean;
+    at(index: number): T;
+}

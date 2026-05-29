@@ -1,4 +1,5 @@
 #include "scripting/javascript/yr_data_bindings.h"
+#include "scripting/javascript/all_data_binding.h"
 #include <Binding.hpp>
 #include "core/raii_invoker.h"
 #include <WaypointPathClass.h>
@@ -246,6 +247,12 @@ template<typename CLS>
 void RegisterStdVector()
 {
     auto builder = PUERTS_NAMESPACE::DefineClass<std::vector<CLS>>();
+    MakeMethodCheck<static_cast<void(std::vector<CLS>::*)(const CLS&)>(&std::vector<CLS>::push_back)>(builder, "push_back");
+    MakeMethodCheck<&std::vector<CLS>::pop_back>(builder, "pop_back");
+    MakeMethodCheck<&std::vector<CLS>::size>(builder, "size");
+    MakeMethodCheck<&std::vector<CLS>::clear>(builder, "clear");
+    MakeMethodCheck<&std::vector<CLS>::empty>(builder, "empty");
+    MakeMethodCheck<static_cast<CLS& (std::vector<CLS>::*)(size_t)>(&std::vector<CLS>::at)>(builder, "at");
     builder.Register();
 }
 
@@ -363,6 +370,26 @@ void __JsRegister_YrContainers()
     RegisterIndexClass<ShadowVoxelIndexKey, VoxelCacheStruct*>();
 
     RegisterCounterClass();
+
+    RegisterStdVector<AttributeSet>();
+    RegisterStdVector<AttributeSet*>();
+    RegisterStdVector<AttributeSetDefine*>();
+    RegisterStdVector<AbilityTriggerData>();
+    RegisterStdVector<GameplayTag>();
+    RegisterStdVector<GameplayTag*>();
+    RegisterStdVector<GameplayAttribute>();
+    RegisterStdVector<GameplayAbility>();
+    RegisterStdVector<GameplayAbility*>();
+    RegisterStdVector<GameplayAbilityDefine*>();
+    RegisterStdVector<GameplayAbilitySpec>();
+    RegisterStdVector<GameplayEffect>();
+    RegisterStdVector<GameplayEffect*>();
+    RegisterStdVector<GameplayEffectCue*>();
+    RegisterStdVector<GameplayEffectComponent*>();
+    RegisterStdVector<GameplayEffectExecutionDefinition>();
+    RegisterStdVector<GameplayModifierInfo>();
+    RegisterStdVector<GameplayEffectAttributeCaptureDefinition>();
+    RegisterStdVector<entt::entity>();
 }
 
 GLOBAL_INVOKE_ON_CTOR(__JsRegister_YrContainers);

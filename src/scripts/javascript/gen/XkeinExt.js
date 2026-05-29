@@ -34,16 +34,22 @@ exports.GameplayTagContainer = puerts.loadCPPType("GameplayTagContainer")
 exports.GameplayTag = puerts.loadCPPType("GameplayTag")
 exports.CustomCalculationBasedFloat = puerts.loadCPPType("CustomCalculationBasedFloat")
 exports.SetByCallerFloat = puerts.loadCPPType("SetByCallerFloat")
+exports.GameplayModifierInfo = puerts.loadCPPType("GameplayModifierInfo")
+exports.GameplayTagRequirements = puerts.loadCPPType("GameplayTagRequirements")
+exports.GameplayTagQuery = puerts.loadCPPType("GameplayTagQuery")
+exports.GameplayEffectExecutionDefinition = puerts.loadCPPType("GameplayEffectExecutionDefinition")
 exports.GameplayEffectComponent = puerts.loadCPPType("GameplayEffectComponent")
 exports.ActiveGameplayEffectsContainer = puerts.loadCPPType("ActiveGameplayEffectsContainer")
 exports.ActiveGameplayEffectHandle = puerts.loadCPPType("ActiveGameplayEffectHandle")
 exports.GameplayAbilityDefine = puerts.loadCPPType("GameplayAbilityDefine")
+exports.AbilityTriggerData = puerts.loadCPPType("AbilityTriggerData")
 exports.GameplayAbilityActorInfo = puerts.loadCPPType("GameplayAbilityActorInfo")
 exports.GameplayAbilityActivationInfo = puerts.loadCPPType("GameplayAbilityActivationInfo")
 exports.GameplayEventData = puerts.loadCPPType("GameplayEventData")
 exports.GameplayAbilityTargetDataHandle = puerts.loadCPPType("GameplayAbilityTargetDataHandle")
 exports.GameplayAbilityTargetData = puerts.loadCPPType("GameplayAbilityTargetData")
 exports.GameplayAbilitySpec = puerts.loadCPPType("GameplayAbilitySpec")
+exports.GameplayEffectCue = puerts.loadCPPType("GameplayEffectCue")
 exports.FGameplayEffectQuery = puerts.loadCPPType("FGameplayEffectQuery")
 exports.AbilityTaskCreator = puerts.loadCPPType("AbilityTaskCreator")
 exports.ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__ = puerts.loadCPPType("ScriptFunction<AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1)>")
@@ -132,6 +138,20 @@ exports.EGameplayEffectPeriodInhibitionRemovedPolicy = (function () {
     EGameplayEffectPeriodInhibitionRemovedPolicy[EGameplayEffectPeriodInhibitionRemovedPolicy["ResetPeriod"] = 1] = "ResetPeriod";
     EGameplayEffectPeriodInhibitionRemovedPolicy[EGameplayEffectPeriodInhibitionRemovedPolicy["ExecuteAndResetPeriod"] = 2] = "ExecuteAndResetPeriod";
     return EGameplayEffectPeriodInhibitionRemovedPolicy;
+})();
+exports.EGameplayModOpType = (function () {
+    let EGameplayModOpType = {}
+    EGameplayModOpType[EGameplayModOpType["AddBase"] = 0] = "AddBase";
+    EGameplayModOpType[EGameplayModOpType["MultiplyAdditive"] = 1] = "MultiplyAdditive";
+    EGameplayModOpType[EGameplayModOpType["DivideAdditive"] = 2] = "DivideAdditive";
+    EGameplayModOpType[EGameplayModOpType["MultiplyCompound"] = 4] = "MultiplyCompound";
+    EGameplayModOpType[EGameplayModOpType["AddFinal"] = 5] = "AddFinal";
+    EGameplayModOpType[EGameplayModOpType["Max"] = 6] = "Max";
+    EGameplayModOpType[EGameplayModOpType["Additive"] = 0] = "Additive";
+    EGameplayModOpType[EGameplayModOpType["Multiplicitive"] = 1] = "Multiplicitive";
+    EGameplayModOpType[EGameplayModOpType["Division"] = 2] = "Division";
+    EGameplayModOpType[EGameplayModOpType["Override"] = 3] = "Override";
+    return EGameplayModOpType;
 })();
 exports.EGameplayAbilityInstancingPolicy = (function () {
     let EGameplayAbilityInstancingPolicy = {}

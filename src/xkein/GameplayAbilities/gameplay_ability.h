@@ -87,7 +87,7 @@ struct GameplayAbilityActorInfo
 
 
 /** Structure that defines how an ability will be triggered by external events */
-CLASS()
+CLASS(BindJs)
 struct AbilityTriggerData
 {
 	/** The tag to respond to */

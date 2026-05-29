@@ -86,6 +86,8 @@ UsingCppType(GameplayAbilityTargetActor_ActorPlacement);
 UsingCppType(GameplayAbilityWorldReticle);
 UsingCppType(GameplayCueStaticCreator);
 UsingCppType(GameplayCueActorCreator);
+UsingCppType(GameplayTagQuery);
+UsingCppType(GameplayTagRequirements);
 UsingCppType(AbilityTask);
 UsingCppType(AbilityTaskCreator);
 UsingCppType(GameplayAbilityCreator);

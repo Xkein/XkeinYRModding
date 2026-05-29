@@ -169,7 +169,7 @@ enum class EGameplayEffectAttributeCaptureSource : uint8
  * Defines the ways that mods will modify attributes. Values of the same type are aggregated, and then applied in the following equation:
  * ((BaseValue + AddBase) * MultiplyAdditive / DivideAdditive * MultiplyCompound) + AddFinal
  */
-ENUM()
+ENUM(BindJs)
 enum EGameplayModOpType : int
 {
 	/** Adds to the Base value. This happens first, before all other mods are considered. */
@@ -339,7 +339,7 @@ struct GameplayEffectModifierMagnitude final
  *	Tells us "Who/What we" modify
  *	Does not tell us how exactly
  */
-STRUCT()
+CLASS(BindJs)
 struct GameplayModifierInfo
 {
 	/** The Attribute we modify or the GE we modify modifies. */
@@ -374,7 +374,7 @@ struct GameplayModifierInfo
  * Struct representing the definition of a custom execution for a gameplay effect.
  * Custom executions run special logic from an outside class each time the gameplay effect executes.
  */
-CLASS()
+CLASS(BindJs)
 struct GameplayEffectExecutionDefinition
 {
 	/** These tags are passed into the execution as is, and may be used to do conditional logic */
@@ -386,7 +386,7 @@ struct GameplayEffectExecutionDefinition
 	std::vector<GameplayEffect*> ConditionalGameplayEffects;
 };
 
-CLASS()
+CLASS(BindJs)
 struct GameplayEffectCue final
 {
 	/** The attribute to use as the source for cue magnitude. If none use level */

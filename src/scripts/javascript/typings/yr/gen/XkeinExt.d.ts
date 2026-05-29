@@ -276,10 +276,10 @@ class AbilitySystemComponent
     // without an AbilitySystemComponent. For example an ability could be written to execute on a StaticMeshActor. As long as the ability doesn't require 
     // instancing or anything else that the AbilitySystemComponent would provide, then it doesn't need the component to function.
     // public std::vector<GameplayAbilitySpec, std::allocator<GameplayAbilitySpec>> ActivatableAbilities
-    m_ActivatableAbilities : any;
+    m_ActivatableAbilities : StdVector<GameplayAbilitySpec>;
     // List of attribute sets
     // public std::vector<AttributeSet *, std::allocator<AttributeSet *>> SpawnedAttributes
-    m_SpawnedAttributes : any;
+    m_SpawnedAttributes : StdVector<AttributeSet>;
     // Contains all of the gameplay effects that are currently active on this component
     // public ActiveGameplayEffectsContainer ActiveGameplayEffects
     m_ActiveGameplayEffects : ActiveGameplayEffectsContainer;
@@ -338,13 +338,13 @@ class AbilityTask
 class AbilitySystemComponentType
 {
     // public std::vector<AttributeSetDefine *, std::allocator<AttributeSetDefine *>> Attributes
-    m_Attributes : any;
+    m_Attributes : StdVector<AttributeSetDefine>;
     // public std::vector<GameplayAbilityDefine *, std::allocator<GameplayAbilityDefine *>> DefaultAbilities
-    m_DefaultAbilities : any;
+    m_DefaultAbilities : StdVector<GameplayAbilityDefine>;
     // public std::vector<GameplayTag, std::allocator<GameplayTag>> StartupTags
-    m_StartupTags : any;
+    m_StartupTags : StdVector<GameplayTag>;
     // public std::vector<GameplayEffect, std::allocator<GameplayEffect>> StartupEffects
-    m_StartupEffects : any;
+    m_StartupEffects : StdVector<GameplayEffect>;
 }
 // AttributeSetDefine
 class AttributeSetDefine
@@ -352,7 +352,7 @@ class AttributeSetDefine
     // public StringName AttributeSetCreator
     m_AttributeSetCreator : StringName;
     // public std::vector<GameplayAttribute, std::allocator<GameplayAttribute>> Attributes
-    m_Attributes : any;
+    m_Attributes : StdVector<GameplayAttribute>;
 }
 // GameplayAttribute
 class GameplayAttribute
@@ -399,20 +399,20 @@ class GameplayEffect
     m_PeriodicInhibitionPolicy : EGameplayEffectPeriodInhibitionRemovedPolicy;
     // Array of modifiers that will affect the target of this effect
     // public std::vector<GameplayModifierInfo, std::allocator<GameplayModifierInfo>> Modifiers
-    m_Modifiers : any;
+    m_Modifiers : StdVector<GameplayModifierInfo>;
     // Array of executions that will affect the target of this effect
     // public std::vector<GameplayEffectExecutionDefinition, std::allocator<GameplayEffectExecutionDefinition>> Executions
-    m_Executions : any;
+    m_Executions : StdVector<GameplayEffectExecutionDefinition>;
     // Gameplay Effect Components that define additional behaviors
     // (tag granting, tag requirements, ability granting, etc.)
     // public std::vector<GameplayEffectComponent *, std::allocator<GameplayEffectComponent *>> GEComponents
-    m_GEComponents : any;
+    m_GEComponents : StdVector<GameplayEffectComponent>;
     // If true, cues will only trigger when GE modifiers succeed being applied (whether through modifiers or executions)
     // public bool bRequireModifierSuccessToTriggerCues
     m_bRequireModifierSuccessToTriggerCues : boolean;
     // Cues to trigger non-simulated reactions in response to this GameplayEffect such as sounds, particle effects, etc
     // public std::vector<GameplayEffectCue *, std::allocator<GameplayEffectCue *>> GameplayCues
-    m_GameplayCues : any;
+    m_GameplayCues : StdVector<GameplayEffectCue>;
     // How this GameplayEffect stacks with other instances of this same GameplayEffect
     // public EGameplayEffectStackingType StackingType
     m_StackingType : EGameplayEffectStackingType;
@@ -430,7 +430,7 @@ class GameplayEffect
     m_StackExpirationPolicy : EGameplayEffectStackingExpirationPolicy;
     // Effects to apply when a stacking effect "overflows" its stack count through another attempted application. Added whether the overflow application succeeds or not.
     // public std::vector<GameplayEffect *, std::allocator<GameplayEffect *>> OverflowEffects
-    m_OverflowEffects : any;
+    m_OverflowEffects : StdVector<GameplayEffect>;
     // If true, stacking attempts made while at the stack count will fail, resulting in the duration and context not being refreshed
     // public bool bDenyOverflowApplication
     m_bDenyOverflowApplication : boolean;
@@ -511,7 +511,7 @@ class GameplayEffectAttributeCaptureDefinition
 class GameplayTagContainer
 {
     // public std::vector<GameplayTag, std::allocator<GameplayTag>> GameplayTags
-    m_GameplayTags : any;
+    m_GameplayTags : StdVector<GameplayTag>;
 }
 // GameplayTag
 class GameplayTag
@@ -542,6 +542,61 @@ class SetByCallerFloat
     m_DataName : any;
     // public GameplayTag DataTag
     m_DataTag : GameplayTag;
+}
+// GameplayModifierInfo
+// Tells us "Who/What we" modify
+// Does not tell us how exactly
+// GameplayModifierInfo
+class GameplayModifierInfo
+{
+    // The Attribute we modify or the GE we modify modifies.
+    // public GameplayAttribute Attribute
+    m_Attribute : GameplayAttribute;
+    // The numeric operation of this modifier: Override, Add, Multiply, etc
+    // When multiple modifiers aggregate together, the equation is:
+    // ((BaseValue + AddBase) * MultiplyAdditive / DivideAdditive * MultiplyCompound) + AddFinal
+    // public EGameplayModOpType ModifierOp
+    m_ModifierOp : EGameplayModOpType;
+    // Magnitude of the modifier
+    // public GameplayEffectModifierMagnitude ModifierMagnitude
+    m_ModifierMagnitude : GameplayEffectModifierMagnitude;
+    // public GameplayTagRequirements SourceTags
+    m_SourceTags : GameplayTagRequirements;
+    // public GameplayTagRequirements TargetTags
+    m_TargetTags : GameplayTagRequirements;
+}
+// Encapsulate require and ignore tags
+// GameplayTagRequirements
+class GameplayTagRequirements
+{
+    // All of these tags must be present
+    // public GameplayTagContainer RequireTags
+    m_RequireTags : GameplayTagContainer;
+    // None of these tags may be present
+    // public GameplayTagContainer IgnoreTags
+    m_IgnoreTags : GameplayTagContainer;
+    // Build up a more complex query that can't be expressed with RequireTags/IgnoreTags alone
+    // public GameplayTagQuery TagQuery
+    m_TagQuery : GameplayTagQuery;
+}
+// Expression tree for complex tag queries.
+// Supports AND/OR/NOT logic that cannot be expressed with RequireTags/IgnoreTags alone.
+// Node types index into TagTokens (leaf) or Expressions (composite) via StartIndex + Count.
+// GameplayTagQuery
+class GameplayTagQuery
+{
+}
+// Struct representing the definition of a custom execution for a gameplay effect.
+// Custom executions run special logic from an outside class each time the gameplay effect executes.
+// GameplayEffectExecutionDefinition
+class GameplayEffectExecutionDefinition
+{
+    // These tags are passed into the execution as is, and may be used to do conditional logic
+    // public GameplayTagContainer PassedInTags
+    m_PassedInTags : GameplayTagContainer;
+    // Other Gameplay Effects that will be applied to the target of this execution if the execution is successful
+    // public std::vector<GameplayEffect *, std::allocator<GameplayEffect *>> ConditionalGameplayEffects
+    m_ConditionalGameplayEffects : StdVector<GameplayEffect>;
 }
 // Base class for GameplayEffect components.
 // Components add modular behavior to GameplayEffects by hooking into lifecycle events.
@@ -582,7 +637,7 @@ class GameplayAbilityDefine
     m_CostGameplayEffectClass : GameplayEffect;
     // Triggers to determine if this ability should execute in response to an event
     // public std::vector<AbilityTriggerData, std::allocator<AbilityTriggerData>> AbilityTriggers
-    m_AbilityTriggers : any;
+    m_AbilityTriggers : StdVector<AbilityTriggerData>;
     // This GameplayEffect represents the cooldown. It will be applied when the ability is committed and the ability cannot be used again until it is expired.
     // public GameplayEffect * CooldownGameplayEffectClass
     m_CooldownGameplayEffectClass : GameplayEffect;
@@ -613,6 +668,17 @@ class GameplayAbilityDefine
     // This ability is blocked if the target actor/component has any of these tags
     // public GameplayTagContainer TargetBlockedTags
     m_TargetBlockedTags : GameplayTagContainer;
+}
+// Structure that defines how an ability will be triggered by external events
+// AbilityTriggerData
+class AbilityTriggerData
+{
+    // The tag to respond to
+    // public GameplayTag TriggerTag
+    m_TriggerTag : GameplayTag;
+    // The type of trigger to respond to
+    // public EGameplayAbilityTriggerSource TriggerSource
+    m_TriggerSource : EGameplayAbilityTriggerSource;
 }
 // GameplayAbilityActorInfo
 // Cached data associated with an Actor using an Ability.
@@ -703,6 +769,22 @@ class GameplayAbilitySpec
     // public GameplayTagContainer DynamicAbilityTags
     m_DynamicAbilityTags : GameplayTagContainer;
 }
+// GameplayEffectCue
+class GameplayEffectCue
+{
+    // The attribute to use as the source for cue magnitude. If none use level
+    // public GameplayAttribute MagnitudeAttribute
+    m_MagnitudeAttribute : GameplayAttribute;
+    // The minimum level that this Cue supports
+    // public float MinLevel
+    m_MinLevel : float;
+    // The maximum level that this Cue supports
+    // public float MaxLevel
+    m_MaxLevel : float;
+    // Tags passed to the gameplay cue handler when this cue is activated
+    // public GameplayTagContainer GameplayCueTags
+    m_GameplayCueTags : GameplayTagContainer;
+}
 // FGameplayEffectQuery
 // Query struct for flexible active GameplayEffect filtering.
 // All match fields are optional — empty/default fields are skipped.
@@ -756,7 +838,7 @@ class GameplayAbilityTargetData_ActorArray
     extends GameplayAbilityTargetData
 {
     // public std::vector<entt::entity, std::allocator<entt::entity>> TargetActors
-    m_TargetActors : any;
+    m_TargetActors : StdVector<entt_entity>;
 }
 // GameplayAbilityTargetData_LocationInfo
 // Stores a single world-space location as a target.
@@ -1119,7 +1201,7 @@ class GameplayEffectCalculation
 {
     // Attributes that this calculation needs to capture from source/target
     // public std::vector<GameplayEffectAttributeCaptureDefinition, std::allocator<GameplayEffectAttributeCaptureDefinition>> RelevantAttributesToCapture
-    m_RelevantAttributesToCapture : any;
+    m_RelevantAttributesToCapture : StdVector<GameplayEffectAttributeCaptureDefinition>;
 }
 // Parameters passed into a GameplayEffectExecutionCalculation's Execute() method.
 // Provides read access to the owning spec and both ability system components,
@@ -1292,6 +1374,41 @@ enum EGameplayEffectPeriodInhibitionRemovedPolicy {
     // Executes immediately and resets the period.
     // ExecuteAndResetPeriod = 
     ExecuteAndResetPeriod = 2,
+}
+// Defines the ways that mods will modify attributes. Values of the same type are aggregated, and then applied in the following equation:
+// ((BaseValue + AddBase) * MultiplyAdditive / DivideAdditive * MultiplyCompound) + AddFinal
+// EGameplayModOpType
+enum EGameplayModOpType {
+    // Adds to the Base value. This happens first, before all other mods are considered.
+    // AddBase = 
+    AddBase = 0,
+    // Multipliers are added together first, then multiplied against prev result. E.g. 50% + 50% = 100% in values is 1.5 + 1.5 = 2.0.
+    // MultiplyAdditive = 
+    MultiplyAdditive = 1,
+    // Divisors are added together, then divided against the prev result. E.g. 1/2 + 1/2 = 1/3 in values is 2 + 2 = 3.
+    // DivideAdditive = 
+    DivideAdditive = 2,
+    // Multiply the prev result by this value. E.g. two values of 1.5 compounded: 1.5 * 1.5 = 2.25.
+    // MultiplyCompound = 4
+    MultiplyCompound = 4,
+    // Add this value to the final computed result.
+    // AddFinal = 
+    AddFinal = 5,
+    // This must always be the last value (used in iteration code).
+    // Max = 
+    Max = 6,
+    // Backwards compat name
+    // Additive = 0
+    Additive = 0,
+    // Backwards compat name
+    // Multiplicitive = 1
+    Multiplicitive = 1,
+    // Backwards compat name
+    // Division = 2
+    Division = 2,
+    // Override the value, regardless of what the computation provides.
+    // Override = 3
+    Override = 3,
 }
 // Describes how a GameplayAbility will be instanced when executed
 // EGameplayAbilityInstancingPolicy
