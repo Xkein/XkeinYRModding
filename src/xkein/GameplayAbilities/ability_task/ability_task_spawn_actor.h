@@ -16,6 +16,7 @@ class AbilityTask_SpawnActor : public AbilityTask
 {
 public:
 	/** Create and register a new SpawnActor task */
+	FUNCTION()
 	static AbilityTask_SpawnActor* Create(GameplayAbility* Ability, GameplayAbilityDefine* Define, CoordStruct Location);
 
 	/** Tick: runs once, performs spawn, fires callback, then ends */

@@ -22,6 +22,11 @@ void GameplayAbilitySystem::Tick()
 
 GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, GameplayAbilityDefine* define, AbilitySystemComponent* component)
 {
+    if (name.IsEmpty()) {
+        // this gameplay ability use default creator, which just creates a new instance of the GameplayAbility class.
+        // This is useful for simple abilities that don't need custom logic in their constructor.
+        return new GameplayAbility();
+    }
 	GameplayAbilityCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayAbilityCreator>(ScriptFunctionCategoryAbility, name);
 	if (!creatorFunc) {
 		return nullptr;
@@ -31,6 +36,11 @@ GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, Ga
 
 AttributeSet* GameplayAbilitySystem::CreateAttributeSet(const StringName& name, AttributeSetDefine* define, AbilitySystemComponent* component)
 {
+    if (name.IsEmpty()) {
+        // this attribute set use default creator, which just creates a new instance of the AttributeSet class.
+        // This is useful for simple attribute sets that don't need custom logic in their constructor.
+        return new AttributeSet();
+    }
 	AttributeSetCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<AttributeSetCreator>(ScriptFunctionCategoryAttributeSet, name);
 	if (!creatorFunc) {
 		return nullptr;

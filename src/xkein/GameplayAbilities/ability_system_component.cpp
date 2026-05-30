@@ -1996,6 +1996,17 @@ GameplayAbilitySpec* AbilitySystemComponent::FindAbilitySpecFromClass(GameplayAb
 	return nullptr;
 }
 
+GameplayAbilitySpec* AbilitySystemComponent::FindAbilitySpecFromDefine(GameplayAbilityDefine* AbilityDefine)
+{
+	if (!AbilityDefine) return nullptr;
+	for (auto& Spec : ActivatableAbilities)
+	{
+		if (Spec.Ability->Define == AbilityDefine)
+			return &Spec;
+	}
+	return nullptr;
+}
+
 void AbilitySystemComponent::GetActivatableGameplayAbilitySpecsByAllMatchingTags(
 	const GameplayTagContainer& GameplayAbilityTags,
 	std::vector<GameplayAbilitySpec*>& OutSpecs,
@@ -2040,6 +2051,14 @@ bool AbilitySystemComponent::TryActivateAbilityByClass(GameplayAbility* Ability,
 {
 	if (!Ability) return false;
 	GameplayAbilitySpec* Spec = FindAbilitySpecFromClass(Ability);
+	if (!Spec) return false;
+	return TryActivateAbility(Spec->Handle, bAllowRemoteActivation);
+}
+
+bool AbilitySystemComponent::TryActivateAbilityByDefine(GameplayAbilityDefine* AbilityDefine, bool bAllowRemoteActivation)
+{
+	if (!AbilityDefine) return false;
+	GameplayAbilitySpec* Spec = FindAbilitySpecFromDefine(AbilityDefine);
 	if (!Spec) return false;
 	return TryActivateAbility(Spec->Handle, bAllowRemoteActivation);
 }

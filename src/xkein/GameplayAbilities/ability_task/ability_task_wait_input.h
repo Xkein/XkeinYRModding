@@ -13,6 +13,7 @@ class AbilityTask_WaitInput : public AbilityTask
 {
 public:
 	/** Create and register a new WaitInput task */
+	FUNCTION()
 	static AbilityTask_WaitInput* Create(GameplayAbility* Ability, int32 InputID, bool bTriggerOnPress, bool bTriggerOnRelease);
 
 	/** Tick: poll InputPressed state on the ability spec */

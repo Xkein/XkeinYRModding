@@ -13,6 +13,7 @@ class AbilityTask_Repeat : public AbilityTask
 {
 public:
 	/** Create and register a new Repeat task */
+	FUNCTION()
 	static AbilityTask_Repeat* Create(GameplayAbility* Ability, int32 MaxIterations, float Interval);
 
 	/** Tick: accumulate time, fire callback at interval boundaries */

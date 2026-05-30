@@ -15,6 +15,7 @@ class AbilityTask_WaitTargetData : public AbilityTask
 {
 public:
 	/** Create and register a new WaitTargetData task */
+	FUNCTION()
 	static AbilityTask_WaitTargetData* Create(GameplayAbility* Ability);
 
 	/** Called externally by the TargetActor when targeting is complete.

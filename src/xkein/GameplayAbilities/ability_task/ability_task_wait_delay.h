@@ -13,6 +13,7 @@ class AbilityTask_WaitDelay : public AbilityTask
 {
 public:
 	/** Create and register a new WaitDelay task */
+	FUNCTION()
 	static AbilityTask_WaitDelay* Create(GameplayAbility* Ability, float Duration);
 
 	/** Tick: accumulate elapsed time, end task when duration is reached */

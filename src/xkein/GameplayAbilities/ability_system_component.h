@@ -393,6 +393,9 @@ public:
 	/** Find an ability spec by ability CDO */
 	GameplayAbilitySpec* FindAbilitySpecFromClass(GameplayAbility* Ability);
 
+	/** Find an ability spec by ability CDO */
+	GameplayAbilitySpec* FindAbilitySpecFromDefine(GameplayAbilityDefine* AbilityDefine);
+
 	/** Get all activatable ability specs whose dynamic tags match all given tags.
 	 *  @param bOnlyAbilitiesThatSatisfyTagRequirements If true, also checks ability's tag requirements against ASC */
 	void GetActivatableGameplayAbilitySpecsByAllMatchingTags(const GameplayTagContainer& GameplayAbilityTags,
@@ -403,6 +406,10 @@ public:
 
 	/** Attempt to activate an ability by its CDO class */
 	bool TryActivateAbilityByClass(GameplayAbility* Ability, bool bAllowRemoteActivation = true);
+
+	/** Attempt to activate an ability by its CDO class */
+	FUNCTION()
+	bool TryActivateAbilityByDefine(GameplayAbilityDefine* AbilityDefine, bool bAllowRemoteActivation = true);
 
 	/** Collect all ability handles from activatable abilities */
 	void GetAllAbilities(std::vector<GameplayAbilitySpecHandle>& OutHandles);

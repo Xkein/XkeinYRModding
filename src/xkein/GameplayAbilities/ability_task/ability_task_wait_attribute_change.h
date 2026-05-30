@@ -14,6 +14,7 @@ class AbilityTask_WaitAttributeChange : public AbilityTask
 {
 public:
 	/** Create and register a new WaitAttributeChange task */
+	FUNCTION()
 	static AbilityTask_WaitAttributeChange* Create(GameplayAbility* Ability, const GameplayAttribute& Attribute, bool bTriggerOnce);
 
 	/** Tick: poll attribute value, detect changes */

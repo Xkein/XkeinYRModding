@@ -17,6 +17,7 @@ class AbilityTask_WaitGameplayEffectRemoved : public AbilityTask
 public:
 	/** Create and register a new WaitGameplayEffectRemoved task.
 	 *  If Handle is valid, watches that specific effect. Otherwise does nothing. */
+	FUNCTION()
 	static AbilityTask_WaitGameplayEffectRemoved* Create(GameplayAbility* Ability, ActiveGameplayEffectHandle Handle);
 
 	virtual void OnDestroy(bool bOwnerFinished) override;

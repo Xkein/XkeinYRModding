@@ -15,6 +15,7 @@ class AbilityTask_WaitGameplayTag : public AbilityTask
 {
 public:
 	/** Create and register a new WaitGameplayTag task */
+	FUNCTION()
 	static AbilityTask_WaitGameplayTag* Create(GameplayAbility* Ability, const GameplayTag& InTag, bool bOnlyTriggerOnce, bool bTriggerOnAdd);
 
 	virtual void OnDestroy(bool bOwnerFinished) override;

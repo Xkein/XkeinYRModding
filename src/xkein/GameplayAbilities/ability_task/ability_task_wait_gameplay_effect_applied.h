@@ -15,6 +15,7 @@ class AbilityTask_WaitGameplayEffectApplied : public AbilityTask
 {
 public:
 	/** Create and register a new WaitGameplayEffectApplied task */
+	FUNCTION()
 	static AbilityTask_WaitGameplayEffectApplied* Create(GameplayAbility* Ability, const FGameplayEffectQuery& Query, bool bTriggerOnce);
 
 	virtual void OnDestroy(bool bOwnerFinished) override;
