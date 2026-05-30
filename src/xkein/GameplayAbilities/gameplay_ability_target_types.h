@@ -96,6 +96,10 @@ CLASS(BindJs)
 struct GameplayAbilityTargetDataHandle
 {
 	GameplayAbilityTargetDataHandle() : FirstData(nullptr) {}
+	GameplayAbilityTargetDataHandle(GameplayAbilityTargetData* DataPtr)
+	{
+		Data.push_back(DataPtr);
+	}
 
 	/** First target data pointer for quick access */
 	GameplayAbilityTargetData* FirstData;

@@ -1,5 +1,6 @@
 #include "gameplay_ability.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/GameplayAbilities/ge_component_target_tags.h"
 
 GameplayAbilitySpec::GameplayAbilitySpec(GameplayAbility* InAbility, int32 InLevel)
     : ActiveCount(0)
@@ -120,16 +121,14 @@ bool GameplayAbility::CommitAbility(const GameplayAbilitySpecHandle Handle, cons
         return false;
     }
     
-    AbilitySystemComponent* ASC = ActorInfo->AbilitySystemCom;
-    
     // Check cooldown
-    if (!ASC->CheckCooldown(Handle))
+    if (!CheckCooldown(Handle, ActorInfo, OptionalRelevantTags))
     {
         return false;
     }
     
     // Check cost
-    if (!ASC->CheckCost(Handle))
+    if (!CheckCost(Handle, ActorInfo, OptionalRelevantTags))
     {
         return false;
     }
@@ -196,11 +195,35 @@ void GameplayAbility::K2_EndAbilityLocally()
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
 }
 
+const GameplayTagContainer* GameplayAbility::GetCooldownTags() const
+{
+    GameplayEffect* CDGE = GetCooldownGameplayEffect();
+    if (!CDGE) return nullptr;
+
+    for (auto* Component : CDGE->GEComponents)
+    {
+        if (auto* TagComp = dynamic_cast<TargetTagsGEComponent*>(Component))
+        {
+            return &TagComp->GrantedTags;
+        }
+    }
+    return nullptr;
+}
+
 bool GameplayAbility::CheckCooldown(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo, 
     GameplayTagContainer* OptionalRelevantTags) const
 {
     if (!ActorInfo || !ActorInfo->AbilitySystemCom) return false;
-    return ActorInfo->AbilitySystemCom->CheckCooldown(Handle);
+
+    const GameplayTagContainer* CooldownTags = GetCooldownTags();
+    if (CooldownTags && !CooldownTags->IsEmpty())
+    {
+        if (ActorInfo->AbilitySystemCom->HasAnyMatchingGameplayTags(*CooldownTags))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void GameplayAbility::ApplyCooldown(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo, 
@@ -217,8 +240,20 @@ void GameplayAbility::ApplyCooldown(const GameplayAbilitySpecHandle Handle, cons
 bool GameplayAbility::CheckCost(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo, 
     GameplayTagContainer* OptionalRelevantTags) const
 {
-    if (!ActorInfo || !ActorInfo->AbilitySystemCom) return false;
-    return ActorInfo->AbilitySystemCom->CheckCost(Handle);
+    GameplayEffect* CostGE = GetCostGameplayEffect();
+    if (CostGE)
+    {
+        if (!ActorInfo || !ActorInfo->AbilitySystemCom) return false;
+
+        int32 Level = GetAbilityLevel(Handle);
+        GameplayEffectContextHandle EffectContext = ActorInfo->AbilitySystemCom->MakeEffectContext();
+
+        if (!ActorInfo->AbilitySystemCom->CanApplyAttributeModifiers(CostGE, static_cast<float>(Level), EffectContext))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void GameplayAbility::ApplyCost(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo, 

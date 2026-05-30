@@ -2,20 +2,20 @@
 
 void GameplayAbilityWorldReticle::OnTargetingStart()
 {
-	// Stub: show reticle visual at current mouse/cursor world position
+	bIsActive = true;
 }
 
 void GameplayAbilityWorldReticle::OnTargetingEnd()
 {
-	// Stub: hide/destroy reticle visual when targeting completes or is canceled
+	bIsActive = false;
 }
 
 void GameplayAbilityWorldReticle::SetReticleLocation(const CoordStruct& Location)
 {
-	// Stub: move reticle visual to the given world-space CoordStruct position
+	ReticleLocation = Location;
 }
 
 void GameplayAbilityWorldReticle::SetReticleValid(bool bValid)
 {
-	// Stub: update reticle visual state (e.g., color change) based on validity
+	bIsTargetValid = bValid;
 }

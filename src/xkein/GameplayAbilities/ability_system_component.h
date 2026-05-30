@@ -190,6 +190,10 @@ public:
 	/** Returns explicit owned tags (no parent expansion), like UE's GetOwnedGameplayTags(). */
 	const GameplayTagContainer& GetOwnedGameplayTags() const { return TagCountContainer.GetExplicitGameplayTags(); }
 
+	bool HasMatchingGameplayTag(const GameplayTag& TagToCheck) const { return TagCountContainer.HasMatchingGameplayTag(TagToCheck); }
+	bool HasAllMatchingGameplayTags(const GameplayTagContainer& TagContainer) const { return TagCountContainer.HasAllMatchingGameplayTags(TagContainer); }
+	bool HasAnyMatchingGameplayTags(const GameplayTagContainer& TagContainer) const { return TagCountContainer.HasAnyMatchingGameplayTags(TagContainer); }
+
 	// /** Allow events to be registered for specific gameplay tags being added or removed */
 	// FOnGameplayEffectTagCountChanged& RegisterGameplayTagEvent(GameplayTag Tag, EGameplayTagEventType EventType = EGameplayTagEventType::NewOrRemoved);
     
@@ -620,14 +624,12 @@ public:
 	// Cooldown / Cost System (Phase 7)
 	// ============================================================
 
-	/** Check if an ability is on cooldown */
-	bool CheckCooldown(GameplayAbilitySpecHandle Handle) const;
-
 	/** Apply a cooldown effect for an ability */
 	void ApplyCooldown(GameplayAbilitySpecHandle Handle, GameplayEffect* CooldownEffect);
 
-	/** Check if an ability's cost can be paid */
-	bool CheckCost(GameplayAbilitySpecHandle Handle) const;
+	/** Check if a gameplay effect's attribute modifiers can be applied to this component.
+	 *  Used by GameplayAbility::CheckCost to verify attribute-based costs can be paid. */
+	bool CanApplyAttributeModifiers(const GameplayEffect* GameplayEffect, float Level, const GameplayEffectContextHandle& EffectContext);
 
 	/** Apply an ability's cost */
 	void ApplyCost(GameplayAbilitySpecHandle Handle, GameplayEffect* CostEffect);

@@ -29,4 +29,23 @@ public:
 	/** Set whether the current target location is valid.
 	 *  Visual state changes accordingly (e.g., green for valid, red for invalid). */
 	virtual void SetReticleValid(bool bValid);
+
+	/** Returns true if the reticle is currently active/visible */
+	bool IsActive() const { return bIsActive; }
+
+	/** Returns the current reticle location */
+	const CoordStruct& GetReticleLocation() const { return ReticleLocation; }
+
+	/** Returns whether the current target is valid */
+	bool IsTargetValid() const { return bIsTargetValid; }
+
+// protected:
+	PROPERTY()
+	bool bIsActive = false;
+
+	PROPERTY()
+	bool bIsTargetValid = true;
+
+	PROPERTY()
+	CoordStruct ReticleLocation;
 };

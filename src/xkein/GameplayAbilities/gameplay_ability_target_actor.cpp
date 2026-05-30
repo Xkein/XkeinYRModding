@@ -7,17 +7,21 @@
 
 void GameplayAbilityTargetActor::StartTargeting(GameplayAbility* Ability)
 {
-	// Stub: actual targeting logic uses game-specific APIs for cell/world-space queries
+	OwningAbility = Ability;
+	TargetDataHandle = GameplayAbilityTargetDataHandle();
 }
 
 void GameplayAbilityTargetActor::ConfirmTargeting()
 {
-	// Stub: fires OnTargetDataReady with collected target data when user confirms
+	if (OnTargetDataReady)
+	{
+		OnTargetDataReady(TargetDataHandle);
+	}
 }
 
 void GameplayAbilityTargetActor::CancelTargeting()
 {
-	// Stub: cleans up targeting state and visual indicators when targeting is aborted
+	TargetDataHandle = GameplayAbilityTargetDataHandle();
 }
 
 // ----------------------------------------------------------------------------
@@ -26,36 +30,47 @@ void GameplayAbilityTargetActor::CancelTargeting()
 
 void GameplayAbilityTargetActor_LineTrace::StartTargeting(GameplayAbility* Ability)
 {
-	// Stub: YR adaptation - traces along TileDirection through the tile grid,
-	// checking cell occupancy and returning the first valid target CellStruct
-}
+	GameplayAbilityTargetActor::StartTargeting(Ability);
 
-// ----------------------------------------------------------------------------
-//	GameplayAbilityTargetActor_Radius
-// ----------------------------------------------------------------------------
+	if (MaxRange <= 0.0f)
+		return;
+
+	GameplayAbilityTargetData_SingleTargetHit Data;
+	// YR: trace along TraceDirection through the tile grid from source position.
+	// For each step cell along the line, check occupancy via MapClass/CellClass.
+	// Stop at the first occupied cell or when MaxRange is exceeded.
+	// Assign Data.HitLocation and Data.HitActor from the result.
+	TargetDataHandle = GameplayAbilityTargetDataHandle(&Data);
+}
 
 void GameplayAbilityTargetActor_Radius::StartTargeting(GameplayAbility* Ability)
 {
-	// Stub: YR adaptation - queries all cells within Radius (CellStruct distance)
-	// from the source location, collecting occupied cells as targets
-}
+	GameplayAbilityTargetActor::StartTargeting(Ability);
 
-// ----------------------------------------------------------------------------
-//	GameplayAbilityTargetActor_GroundTrace
-// ----------------------------------------------------------------------------
+	GameplayAbilityTargetData_ActorArray Data;
+	// YR: query all cells within Radius (in CellStruct coordinates) from source.
+	// For each cell, check occupancy via MapClass/CellClass.
+	// Collect occupied cell's entity into Data.TargetActors.
+	TargetDataHandle = GameplayAbilityTargetDataHandle(&Data);
+}
 
 void GameplayAbilityTargetActor_GroundTrace::StartTargeting(GameplayAbility* Ability)
 {
-	// Stub: YR adaptation - selects cells within a rectangular area defined by
-	// GroundLocation and AreaExtents on the tile grid
-}
+	GameplayAbilityTargetActor::StartTargeting(Ability);
 
-// ----------------------------------------------------------------------------
-//	GameplayAbilityTargetActor_ActorPlacement
-// ----------------------------------------------------------------------------
+	GameplayAbilityTargetData_ActorArray Data;
+	// YR: query all cells within the rectangle defined by
+	// GroundLocation ± AreaExtents on the tile grid.
+	// For each cell, check occupancy via MapClass/CellClass.
+	// Collect occupied cell's entity into Data.TargetActors.
+	TargetDataHandle = GameplayAbilityTargetDataHandle(&Data);
+}
 
 void GameplayAbilityTargetActor_ActorPlacement::StartTargeting(GameplayAbility* Ability)
 {
-	// Stub: YR adaptation - validates PlacementLocation against game placement rules
-	// (cell passability, buildability) and spawns the entity
+	GameplayAbilityTargetActor::StartTargeting(Ability);
+
+	GameplayAbilityTargetData_LocationInfo Data;
+	Data.TargetLocation = PlacementLocation;
+	TargetDataHandle = GameplayAbilityTargetDataHandle(&Data);
 }

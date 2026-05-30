@@ -595,22 +595,6 @@ GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbilityAndActivateOnce(Gam
 // Cooldown / Cost System (Phase 7)
 // ============================================================
 
-bool AbilitySystemComponent::CheckCooldown(GameplayAbilitySpecHandle Handle) const
-{
-    // Check if any active effect on this ASC has a matching cooldown tag
-    for (const auto* Effect : ActiveGameplayEffects.GetAllActiveEffects())
-    {
-        if (Effect && Effect->Spec.Def)
-        {
-            for (auto* Component : Effect->Spec.Def->GEComponents)
-            {
-                // Future: check for cooldown tag matching via components
-            }
-        }
-    }
-    return true; // Assume no cooldown if no matching effect
-}
-
 void AbilitySystemComponent::ApplyCooldown(GameplayAbilitySpecHandle Handle, GameplayEffect* CooldownEffect)
 {
     if (!CooldownEffect) return;
@@ -623,10 +607,47 @@ void AbilitySystemComponent::ApplyCooldown(GameplayAbilitySpecHandle Handle, Gam
     ApplyGameplayEffectToTarget(CooldownEffect, const_cast<AbilitySystemComponent*>(this), Context);
 }
 
-bool AbilitySystemComponent::CheckCost(GameplayAbilitySpecHandle Handle) const
+bool AbilitySystemComponent::CanApplyAttributeModifiers(const GameplayEffect* GameplayEffect, float Level, const GameplayEffectContextHandle& EffectContext)
 {
-    // Simplified: always return true for base implementation
-    // Future: check attributes (e.g., has enough mana, stamina, etc.)
+    if (!GameplayEffect)
+    {
+        return true;
+    }
+
+    GameplayEffectSpec Spec;
+    Spec.Def = GameplayEffect;
+    Spec.Level = static_cast<int32>(Level);
+    Spec.EffectContext = EffectContext;
+    Spec.CalculateModifierMagnitudes();
+
+    for (size_t i = 0; i < Spec.Def->Modifiers.size(); ++i)
+    {
+        const auto& ModDef = Spec.Def->Modifiers[i];
+
+        if (ModDef.ModifierOp == EGameplayModOpType::Additive)
+        {
+            if (!ModDef.Attribute.IsValid())
+                continue;
+
+            float CurrentValue = 0.0f;
+            for (const auto* AttrSet : SpawnedAttributes)
+            {
+                const auto* Data = AttrSet->FindAttributeData(&ModDef.Attribute);
+                if (Data)
+                {
+                    CurrentValue += Data->GetCurrentValue();
+                }
+            }
+
+            float CostValue = (i < Spec.ModifierMagnitudes.size()) ? Spec.ModifierMagnitudes[i] : 0.0f;
+
+            if (CurrentValue + CostValue < 0.0f)
+            {
+                return false;
+            }
+        }
+    }
+
     return true;
 }
 

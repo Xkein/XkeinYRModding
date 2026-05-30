@@ -232,6 +232,10 @@ class GameplayAbility
 	/** Returns the cooldown gameplay effect to apply when this ability is committed */
 	virtual GameplayEffect* GetCooldownGameplayEffect() const { return nullptr; }
 
+	/** Returns the tags granted by this ability's cooldown gameplay effect.
+	 *  These tags are checked against the ASC's owned tags to determine if the ability is on cooldown. */
+	virtual const GameplayTagContainer* GetCooldownTags() const;
+
 	/** Returns the cost gameplay effect to apply when this ability is committed */
 	virtual GameplayEffect* GetCostGameplayEffect() const { return nullptr; }
 

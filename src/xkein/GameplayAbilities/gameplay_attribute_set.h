@@ -69,6 +69,8 @@ struct GameplayAttribute
     PROPERTY()
     StringName AttributeOwner;
 
+	bool IsValid() const { return !AttributeName.IsEmpty(); }
+
     /** Get current value from the given attribute set (name lookup) */
     float GetNumericValue(const AttributeSet* Set) const;
 

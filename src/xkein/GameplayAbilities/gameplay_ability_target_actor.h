@@ -39,19 +39,28 @@ class GameplayAbilityTargetActor
 public:
 	virtual ~GameplayAbilityTargetActor() = default;
 
-	/** Begin targeting. Called when the ability wants to start the targeting process. */
+	/** Begin targeting. Stores the owning ability and prepares targeting state. */
 	virtual void StartTargeting(GameplayAbility* Ability);
 
-	/** Confirm the current targeting selection and fire OnTargetDataReady */
+	/** Confirm the current targeting selection. Collects targets and fires OnTargetDataReady. */
 	virtual void ConfirmTargeting();
 
-	/** Cancel targeting without executing the ability */
+	/** Cancel targeting without executing the ability. Cleans up state. */
 	virtual void CancelTargeting();
 
 	/** Callback fired when target data is ready (either instant or after confirmation).
 	 *  Consumed by AbilityTask_WaitTargetData or the owning ability. */
 	PROPERTY()
 	std::function<void(const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
+
+// protected:
+	/** The ability that owns this target actor. Set by StartTargeting. */
+	PROPERTY()
+	GameplayAbility* OwningAbility = nullptr;
+
+	/** Accumulated target data collected during targeting */
+	PROPERTY()
+	GameplayAbilityTargetDataHandle TargetDataHandle;
 };
 
 // ----------------------------------------------------------------------------
