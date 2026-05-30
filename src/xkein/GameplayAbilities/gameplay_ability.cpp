@@ -63,13 +63,9 @@ bool GameplayAbility::CanActivateAbility(const GameplayAbilitySpecHandle Handle,
     
     // Check source tags against required/blocked tags
     // Note: full implementation would check against ASC's owned tags
-    if (OnK2CanActivateAbility)
+    if (!K2_CanActivateAbility(*ActorInfo, Handle, OptionalRelevantTags))
     {
-        GameplayAbilityActorInfo ActorInfoValue = *ActorInfo;
-        if (!OnK2CanActivateAbility(ActorInfoValue, Handle, OptionalRelevantTags))
-        {
-            return false;
-        }
+        return false;
     }
 
     return true;
@@ -78,16 +74,7 @@ bool GameplayAbility::CanActivateAbility(const GameplayAbilitySpecHandle Handle,
 void GameplayAbility::ActivateAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, const GameplayEventData* TriggerEventData)
 {
-    if (TriggerEventData && OnK2ActivateAbilityFromEvent)
-    {
-        OnK2ActivateAbilityFromEvent(*TriggerEventData);
-        return;
-    }
-
-    if (OnK2ActivateAbility)
-    {
-        OnK2ActivateAbility();
-    }
+    K2_OnActivateAbility(TriggerEventData);
 }
 
 void GameplayAbility::PreActivate(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
@@ -135,64 +122,9 @@ bool GameplayAbility::CommitAbility(const GameplayAbilitySpecHandle Handle, cons
 
     ApplyCooldown(Handle, ActorInfo, ActivationInfo);
     ApplyCost(Handle, ActorInfo, ActivationInfo);
-    if (OnK2CommitExecute)
-    {
-        OnK2CommitExecute();
-    }
+    K2_OnCommitExecute();
 
     return true;
-}
-
-void GameplayAbility::K2_CancelAbility()
-{
-    CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
-}
-
-bool GameplayAbility::K2_CommitAbility()
-{
-    return CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, nullptr);
-}
-
-bool GameplayAbility::K2_CommitAbilityCooldown()
-{
-    if (!CheckCooldown(CurrentSpecHandle, CurrentActorInfo, nullptr))
-    {
-        return false;
-    }
-
-    ApplyCooldown(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
-    return true;
-}
-
-bool GameplayAbility::K2_CommitAbilityCost()
-{
-    if (!CheckCost(CurrentSpecHandle, CurrentActorInfo, nullptr))
-    {
-        return false;
-    }
-
-    ApplyCost(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
-    return true;
-}
-
-bool GameplayAbility::K2_CheckAbilityCooldown()
-{
-    return CheckCooldown(CurrentSpecHandle, CurrentActorInfo, nullptr);
-}
-
-bool GameplayAbility::K2_CheckAbilityCost()
-{
-    return CheckCost(CurrentSpecHandle, CurrentActorInfo, nullptr);
-}
-
-void GameplayAbility::K2_EndAbility()
-{
-    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-}
-
-void GameplayAbility::K2_EndAbilityLocally()
-{
-    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
 }
 
 const GameplayTagContainer* GameplayAbility::GetCooldownTags() const
@@ -280,10 +212,7 @@ void GameplayAbility::CancelAbility(const GameplayAbilitySpecHandle Handle, cons
 void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-    if (OnK2OnEndAbility)
-    {
-        OnK2OnEndAbility(bWasCancelled);
-    }
+    K2_OnEndAbility(bWasCancelled);
 
     // Trigger the ended delegate if the ASC and spec exist
     if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))

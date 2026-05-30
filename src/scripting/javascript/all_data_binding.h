@@ -19,11 +19,14 @@
 #include "xkein/GameplayAbilities/gameplay_ability_target_actor.h"
 #include "xkein/GameplayAbilities/gameplay_ability_world_reticle.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
+#include "xkein/GameplayAbilities/custom_gameplay_ability.h"
+#include "xkein/GameplayAbilities/custom_attribute_set.h"
 
 UsingCppType(ActiveGameplayEffectHandle);
 UsingCppType(ActiveGameplayEffectsContainer);
 UsingCppType(AttributeSet);
 UsingCppType(CustomAttributeSet);
+UsingCppType(CustomGameplayAbility);
 UsingCppType(AttributeSetDefine);
 UsingCppType(AttributeMetaData);
 UsingCppType(AbilityTriggerData);

@@ -37,9 +37,12 @@ GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, Ga
 AttributeSet* GameplayAbilitySystem::CreateAttributeSet(const StringName& name, AttributeSetDefine* define, AbilitySystemComponent* component)
 {
     if (name.IsEmpty()) {
-        // this attribute set use default creator, which just creates a new instance of the AttributeSet class.
-        // This is useful for simple attribute sets that don't need custom logic in their constructor.
-        return new AttributeSet();
+        AttributeSet* NewSet = new AttributeSet();
+        for (const GameplayAttribute& Attr : define->Attributes)
+        {
+            NewSet->AddAttributeData(&Attr);
+        }
+        return NewSet;
     }
 	AttributeSetCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<AttributeSetCreator>(ScriptFunctionCategoryAttributeSet, name);
 	if (!creatorFunc) {

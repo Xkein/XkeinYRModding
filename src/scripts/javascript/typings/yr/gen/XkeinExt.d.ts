@@ -291,34 +291,8 @@ class AbilitySystemComponent
 // GameplayAbility
 class GameplayAbility
 {
-    // public virtual void K2_CancelAbility()
-    K2_CancelAbility() : void;
-    // public virtual bool K2_CommitAbility()
-    K2_CommitAbility() : boolean;
-    // public virtual bool K2_CommitAbilityCooldown()
-    K2_CommitAbilityCooldown() : boolean;
-    // public virtual bool K2_CommitAbilityCost()
-    K2_CommitAbilityCost() : boolean;
-    // public virtual bool K2_CheckAbilityCooldown()
-    K2_CheckAbilityCooldown() : boolean;
-    // public virtual bool K2_CheckAbilityCost()
-    K2_CheckAbilityCost() : boolean;
-    // public virtual void K2_EndAbility()
-    K2_EndAbility() : void;
-    // public virtual void K2_EndAbilityLocally()
-    K2_EndAbilityLocally() : void;
     // public GameplayAbilityDefine const * Define
     m_Define : GameplayAbilityDefine;
-    // public std::function<bool (*)(GameplayAbilityActorInfo _0, GameplayAbilitySpecHandle _1, GameplayTagContainer * _2)> OnK2CanActivateAbility
-    m_OnK2CanActivateAbility : (_0 : GameplayAbilityActorInfo, _1 : GameplayAbilitySpecHandle, _2 : GameplayTagContainer) => boolean| undefined;
-    // public std::function<void (*)()> OnK2ActivateAbility
-    m_OnK2ActivateAbility : () => void| undefined;
-    // public std::function<void (*)(GameplayEventData const& _0)> OnK2ActivateAbilityFromEvent
-    m_OnK2ActivateAbilityFromEvent : (_0 : GameplayEventData) => void| undefined;
-    // public std::function<void (*)()> OnK2CommitExecute
-    m_OnK2CommitExecute : () => void| undefined;
-    // public std::function<void (*)(bool _0)> OnK2OnEndAbility
-    m_OnK2OnEndAbility : (_0 : boolean) => void| undefined;
 }
 // AbilityTask
 // Base class for ability-level tasks that tick per-frame during ability execution.
@@ -854,23 +828,6 @@ class AttributeMetaData
     // public bool CanStack
     m_CanStack : boolean;
 }
-// CustomAttributeSet
-class CustomAttributeSet
-    extends AttributeSet
-{
-    // public std::function<bool (*)(FGameplayEffectModCallbackData * _0)> OnK2_PreGameplayEffectExecute
-    m_OnK2_PreGameplayEffectExecute : (_0 : FGameplayEffectModCallbackData) => boolean| undefined;
-    // public std::function<void (*)(FGameplayEffectModCallbackData const * _0)> OnK2_PostGameplayEffectExecute
-    m_OnK2_PostGameplayEffectExecute : (_0 : FGameplayEffectModCallbackData) => void| undefined;
-    // public std::function<void (*)(GameplayAttribute const& _0, float& _1)> OnK2_PreAttributeChange
-    m_OnK2_PreAttributeChange : (_0 : GameplayAttribute, _1 : float) => void| undefined;
-    // public std::function<void (*)(GameplayAttribute const& _0, float _1, float _2)> OnK2_PostAttributeChange
-    m_OnK2_PostAttributeChange : (_0 : GameplayAttribute, _1 : float, _2 : float) => void| undefined;
-    // public std::function<void (*)(GameplayAttribute const& _0, float& _1)> OnK2_PreAttributeBaseChange
-    m_OnK2_PreAttributeBaseChange : (_0 : GameplayAttribute, _1 : float) => void| undefined;
-    // public std::function<void (*)(GameplayAttribute const& _0, float _1, float _2)> OnK2_PostAttributeBaseChange
-    m_OnK2_PostAttributeBaseChange : (_0 : GameplayAttribute, _1 : float, _2 : float) => void| undefined;
-}
 // GameplayAbilityTargetData_SingleTargetHit
 // Stores the result of a single trace/query hit:
 // the world-space hit location and the entity that was hit.
@@ -1177,6 +1134,55 @@ class AbilityTask_WaitTargetData
     // Callback fired when target data is ready
     // public std::function<void (*)(GameplayAbilityTargetDataHandle const& _0)> OnTargetDataReady
     m_OnTargetDataReady : (_0 : GameplayAbilityTargetDataHandle) => void| undefined;
+}
+// CustomAttributeSet
+class CustomAttributeSet
+    extends AttributeSet
+{
+    // public std::function<bool (*)(FGameplayEffectModCallbackData * _0)> OnK2_PreGameplayEffectExecute
+    m_OnK2_PreGameplayEffectExecute : (_0 : FGameplayEffectModCallbackData) => boolean| undefined;
+    // public std::function<void (*)(FGameplayEffectModCallbackData const * _0)> OnK2_PostGameplayEffectExecute
+    m_OnK2_PostGameplayEffectExecute : (_0 : FGameplayEffectModCallbackData) => void| undefined;
+    // public std::function<void (*)(GameplayAttribute const& _0, float& _1)> OnK2_PreAttributeChange
+    m_OnK2_PreAttributeChange : (_0 : GameplayAttribute, _1 : float) => void| undefined;
+    // public std::function<void (*)(GameplayAttribute const& _0, float _1, float _2)> OnK2_PostAttributeChange
+    m_OnK2_PostAttributeChange : (_0 : GameplayAttribute, _1 : float, _2 : float) => void| undefined;
+    // public std::function<void (*)(GameplayAttribute const& _0, float& _1)> OnK2_PreAttributeBaseChange
+    m_OnK2_PreAttributeBaseChange : (_0 : GameplayAttribute, _1 : float) => void| undefined;
+    // public std::function<void (*)(GameplayAttribute const& _0, float _1, float _2)> OnK2_PostAttributeBaseChange
+    m_OnK2_PostAttributeBaseChange : (_0 : GameplayAttribute, _1 : float, _2 : float) => void| undefined;
+}
+// Abilities define custom gameplay logic that can be activated by players or external game logic
+// CustomGameplayAbility
+class CustomGameplayAbility
+    extends GameplayAbility
+{
+    // public void K2_CancelAbility()
+    K2_CancelAbility() : void;
+    // public bool K2_CommitAbility()
+    K2_CommitAbility() : boolean;
+    // public bool K2_CommitAbilityCooldown()
+    K2_CommitAbilityCooldown() : boolean;
+    // public bool K2_CommitAbilityCost()
+    K2_CommitAbilityCost() : boolean;
+    // public bool K2_CheckAbilityCooldown()
+    K2_CheckAbilityCooldown() : boolean;
+    // public bool K2_CheckAbilityCost()
+    K2_CheckAbilityCost() : boolean;
+    // public void K2_EndAbility()
+    K2_EndAbility() : void;
+    // public void K2_EndAbilityLocally()
+    K2_EndAbilityLocally() : void;
+    // public std::function<bool (*)(GameplayAbilityActorInfo _0, GameplayAbilitySpecHandle _1, GameplayTagContainer * _2)> OnK2CanActivateAbility
+    m_OnK2CanActivateAbility : (_0 : GameplayAbilityActorInfo, _1 : GameplayAbilitySpecHandle, _2 : GameplayTagContainer) => boolean| undefined;
+    // public std::function<void (*)()> OnK2ActivateAbility
+    m_OnK2ActivateAbility : () => void| undefined;
+    // public std::function<void (*)(GameplayEventData const& _0)> OnK2ActivateAbilityFromEvent
+    m_OnK2ActivateAbilityFromEvent : (_0 : GameplayEventData) => void| undefined;
+    // public std::function<void (*)()> OnK2CommitExecute
+    m_OnK2CommitExecute : () => void| undefined;
+    // public std::function<void (*)(bool _0)> OnK2OnEndAbility
+    m_OnK2OnEndAbility : (_0 : boolean) => void| undefined;
 }
 // GameplayAbilityTargetActor
 // Base class for actors that handle ability targeting.

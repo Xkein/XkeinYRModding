@@ -205,29 +205,18 @@ class GameplayAbility
 	virtual bool CommitAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
         const GameplayAbilityActivationInfo ActivationInfo, GameplayTagContainer* OptionalRelevantTags = nullptr);
 
-    FUNCTION()
-    virtual void K2_CancelAbility();
+    /** Blueprint hook: return false to block activation. Default allows activation. */
+	virtual bool K2_CanActivateAbility(const GameplayAbilityActorInfo& ActorInfo, const GameplayAbilitySpecHandle Handle,
+        GameplayTagContainer* OptionalRelevantTags) const { return true; }
 
-    FUNCTION()
-    virtual bool K2_CommitAbility();
+	/** Blueprint hook: called when ability is activated. TriggerEventData is non-null for event-driven activation. */
+	virtual void K2_OnActivateAbility(const GameplayEventData* TriggerEventData) {}
 
-    FUNCTION()
-    virtual bool K2_CommitAbilityCooldown();
+	/** Blueprint hook: called when ability is committed (after cooldown/cost checks pass). */
+	virtual void K2_OnCommitExecute() {}
 
-    FUNCTION()
-    virtual bool K2_CommitAbilityCost();
-
-    FUNCTION()
-    virtual bool K2_CheckAbilityCooldown();
-
-    FUNCTION()
-    virtual bool K2_CheckAbilityCost();
-
-    FUNCTION()
-    virtual void K2_EndAbility();
-
-    FUNCTION()
-    virtual void K2_EndAbilityLocally();
+	/** Blueprint hook: called when ability ends. bWasCancelled is true if cancelled rather than completed. */
+	virtual void K2_OnEndAbility(bool bWasCancelled) {}
 
 	/** Returns the cooldown gameplay effect to apply when this ability is committed */
 	virtual GameplayEffect* GetCooldownGameplayEffect() const { return nullptr; }
@@ -323,22 +312,6 @@ protected:
 	const GameplayAbilityActorInfo* CurrentActorInfo = nullptr;
 	/** For instanced abilities */
     GameplayAbilitySpecHandle CurrentSpecHandle;
-
-public:
-    PROPERTY()
-    std::function<bool(GameplayAbilityActorInfo, GameplayAbilitySpecHandle, GameplayTagContainer*)> OnK2CanActivateAbility;
-
-    PROPERTY()
-    std::function<void()> OnK2ActivateAbility;
-
-    PROPERTY()
-    std::function<void(const GameplayEventData&)> OnK2ActivateAbilityFromEvent;
-
-    PROPERTY()
-    std::function<void()> OnK2CommitExecute;
-
-    PROPERTY()
-    std::function<void(bool)> OnK2OnEndAbility;
 
 };
 
