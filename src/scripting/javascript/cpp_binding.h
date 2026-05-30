@@ -189,6 +189,8 @@ namespace PUERTS_NAMESPACE                                                      
     }                                                                                                      \
 }
 
+#define UsingCppTypeWithRefConverter(CLS) UsingCppType(CLS) UsingReferenceConverter(CLS)
+
 #define UsingNamespace(NS) \
 class __NS__ {}; \
 UsingCppType(__NS__);

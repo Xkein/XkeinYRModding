@@ -261,6 +261,9 @@ class AbilitySystemComponent
     // If bAllowRemoteActivation is true, it will remotely activate local/server abilities, if false it will only try to locally activate the ability
     // public bool TryActivateAbility(GameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation = true)
     TryActivateAbility(AbilityToActivate_0 : GameplayAbilitySpecHandle, bAllowRemoteActivation_1 : boolean) : boolean;
+    // Attempt to activate an ability by its CDO class
+    // public bool TryActivateAbilityByDefine(GameplayAbilityDefine * AbilityDefine, bool bAllowRemoteActivation = true)
+    TryActivateAbilityByDefine(AbilityDefine_0 : GameplayAbilityDefine, bAllowRemoteActivation_1 : boolean) : boolean;
     // The actor that owns this component logically
     // public entity Owner
     m_Owner : entt_entity;
@@ -362,7 +365,6 @@ class GameplayAttribute
     // public StringName AttributeOwner
     m_AttributeOwner : StringName;
 }
-// Describes a GameplayAttributeData inside an attribute set
 // AttributeSet
 class AttributeSet
 {
@@ -376,9 +378,32 @@ class GameplayAttributeData
     // protected float CurrentValue
     m_CurrentValue : float;
 }
+// Callback data passed to Pre/PostGameplayEffectExecute on AttributeSets
+// FGameplayEffectModCallbackData
+class FGameplayEffectModCallbackData
+{
+    // The effect spec being applied (pointer to spec)
+    // public GameplayEffectSpec const * EffectSpec
+    m_EffectSpec : GameplayEffectSpec;
+    // Evaluated modifier data for the attribute being modified
+    // public FGameplayModifierEvaluatedData EvaluatedData
+    m_EvaluatedData : FGameplayModifierEvaluatedData;
+    // Target ability system component receiving the effect
+    // public AbilitySystemComponent * Target
+    m_Target : AbilitySystemComponent;
+}
 // GameplayEffectSpec
 class GameplayEffectSpec
 {
+    // The gameplay effect definition this spec was created from
+    // public GameplayEffect const * Def
+    m_Def : GameplayEffect;
+    // Tags captured from the source at the time of creation
+    // public GameplayTagContainer CapturedSourceTags
+    m_CapturedSourceTags : GameplayTagContainer;
+    // Tags captured from the target at the time of creation
+    // public GameplayTagContainer CapturedTargetTags
+    m_CapturedTargetTags : GameplayTagContainer;
 }
 // UGameplayEffect
 // The GameplayEffect definition. This is the data asset defined in the editor that drives everything.
@@ -785,6 +810,17 @@ class GameplayEffectCue
     // public GameplayTagContainer GameplayCueTags
     m_GameplayCueTags : GameplayTagContainer;
 }
+// Evaluated modifier data used by calculation classes and delegate callbacks
+// FGameplayModifierEvaluatedData
+class FGameplayModifierEvaluatedData
+{
+    // public GameplayAttribute Attribute
+    m_Attribute : GameplayAttribute;
+    // public EGameplayModOpType ModifierOp
+    m_ModifierOp : EGameplayModOpType;
+    // public float Magnitude
+    m_Magnitude : float;
+}
 // FGameplayEffectQuery
 // Query struct for flexible active GameplayEffect filtering.
 // All match fields are optional — empty/default fields are skipped.
@@ -817,6 +853,23 @@ class AttributeMetaData
     m_MaxValue : float;
     // public bool CanStack
     m_CanStack : boolean;
+}
+// CustomAttributeSet
+class CustomAttributeSet
+    extends AttributeSet
+{
+    // public std::function<bool (*)(FGameplayEffectModCallbackData * _0)> OnK2_PreGameplayEffectExecute
+    m_OnK2_PreGameplayEffectExecute : (_0 : FGameplayEffectModCallbackData) => boolean| undefined;
+    // public std::function<void (*)(FGameplayEffectModCallbackData const * _0)> OnK2_PostGameplayEffectExecute
+    m_OnK2_PostGameplayEffectExecute : (_0 : FGameplayEffectModCallbackData) => void| undefined;
+    // public std::function<void (*)(GameplayAttribute const& _0, float& _1)> OnK2_PreAttributeChange
+    m_OnK2_PreAttributeChange : (_0 : GameplayAttribute, _1 : float) => void| undefined;
+    // public std::function<void (*)(GameplayAttribute const& _0, float _1, float _2)> OnK2_PostAttributeChange
+    m_OnK2_PostAttributeChange : (_0 : GameplayAttribute, _1 : float, _2 : float) => void| undefined;
+    // public std::function<void (*)(GameplayAttribute const& _0, float& _1)> OnK2_PreAttributeBaseChange
+    m_OnK2_PreAttributeBaseChange : (_0 : GameplayAttribute, _1 : float) => void| undefined;
+    // public std::function<void (*)(GameplayAttribute const& _0, float _1, float _2)> OnK2_PostAttributeBaseChange
+    m_OnK2_PostAttributeBaseChange : (_0 : GameplayAttribute, _1 : float, _2 : float) => void| undefined;
 }
 // GameplayAbilityTargetData_SingleTargetHit
 // Stores the result of a single trace/query hit:
@@ -922,6 +975,9 @@ class GameplayAbilitySystem
 class AbilityTask_Repeat
     extends AbilityTask
 {
+    // Create and register a new Repeat task
+    // public static AbilityTask_Repeat * Create(GameplayAbility * Ability, int32 MaxIterations, float Interval)
+    static Create(Ability_0 : GameplayAbility, MaxIterations_1 : int32, Interval_2 : float) : AbilityTask_Repeat;
     // Maximum number of times to perform the action
     // public int32 MaxIterations
     m_MaxIterations : int32;
@@ -940,6 +996,9 @@ class AbilityTask_Repeat
 class AbilityTask_SpawnActor
     extends AbilityTask
 {
+    // Create and register a new SpawnActor task
+    // public static AbilityTask_SpawnActor * Create(GameplayAbility * Ability, GameplayAbilityDefine * Define, Vector3D<int> Location)
+    static Create(Ability_0 : GameplayAbility, Define_1 : GameplayAbilityDefine, Location_2 : Vector3D) : AbilityTask_SpawnActor;
     // Definition of the actor to spawn
     // public GameplayAbilityDefine * ActorDefine
     m_ActorDefine : GameplayAbilityDefine;
@@ -958,6 +1017,9 @@ class AbilityTask_SpawnActor
 class AbilityTask_WaitAttributeChange
     extends AbilityTask
 {
+    // Create and register a new WaitAttributeChange task
+    // public static AbilityTask_WaitAttributeChange * Create(GameplayAbility * Ability, GameplayAttribute const& Attribute, bool bTriggerOnce)
+    static Create(Ability_0 : GameplayAbility, Attribute_1 : GameplayAttribute, bTriggerOnce_2 : boolean) : AbilityTask_WaitAttributeChange;
     // Attribute to watch for value changes
     // public GameplayAttribute AttributeToWatch
     m_AttributeToWatch : GameplayAttribute;
@@ -975,6 +1037,9 @@ class AbilityTask_WaitAttributeChange
 class AbilityTask_WaitDelay
     extends AbilityTask
 {
+    // Create and register a new WaitDelay task
+    // public static AbilityTask_WaitDelay * Create(GameplayAbility * Ability, float Duration)
+    static Create(Ability_0 : GameplayAbility, Duration_1 : float) : AbilityTask_WaitDelay;
     // Duration to wait before finishing (level-scaled)
     // public FScalableFloat Duration
     m_Duration : FScalableFloat;
@@ -993,6 +1058,9 @@ class AbilityTask_WaitDelay
 class AbilityTask_WaitGameplayEffectApplied
     extends AbilityTask
 {
+    // Create and register a new WaitGameplayEffectApplied task
+    // public static AbilityTask_WaitGameplayEffectApplied * Create(GameplayAbility * Ability, FGameplayEffectQuery const& Query, bool bTriggerOnce)
+    static Create(Ability_0 : GameplayAbility, Query_1 : FGameplayEffectQuery, bTriggerOnce_2 : boolean) : AbilityTask_WaitGameplayEffectApplied;
     // Source tag requirements to filter which effects trigger the callback
     // public FGameplayEffectQuery SourceTagRequirements
     m_SourceTagRequirements : FGameplayEffectQuery;
@@ -1011,6 +1079,10 @@ class AbilityTask_WaitGameplayEffectApplied
 class AbilityTask_WaitGameplayEffectRemoved
     extends AbilityTask
 {
+    // Create and register a new WaitGameplayEffectRemoved task.
+    // If Handle is valid, watches that specific effect. Otherwise does nothing.
+    // public static AbilityTask_WaitGameplayEffectRemoved * Create(GameplayAbility * Ability, ActiveGameplayEffectHandle Handle)
+    static Create(Ability_0 : GameplayAbility, Handle_1 : ActiveGameplayEffectHandle) : AbilityTask_WaitGameplayEffectRemoved;
     // Handle of the active gameplay effect to watch for removal
     // public ActiveGameplayEffectHandle EffectHandle
     m_EffectHandle : ActiveGameplayEffectHandle;
@@ -1026,6 +1098,9 @@ class AbilityTask_WaitGameplayEffectRemoved
 class AbilityTask_WaitGameplayEvent
     extends AbilityTask
 {
+    // Create and register a new WaitGameplayEvent task
+    // public static AbilityTask_WaitGameplayEvent * Create(GameplayAbility * Ability, GameplayTag const& InEventTag, bool bOnlyTriggerOnce)
+    static Create(Ability_0 : GameplayAbility, InEventTag_1 : GameplayTag, bOnlyTriggerOnce_2 : boolean) : AbilityTask_WaitGameplayEvent;
     // Tag of the gameplay event to wait for
     // public GameplayTag EventTag
     m_EventTag : GameplayTag;
@@ -1044,6 +1119,9 @@ class AbilityTask_WaitGameplayEvent
 class AbilityTask_WaitGameplayTag
     extends AbilityTask
 {
+    // Create and register a new WaitGameplayTag task
+    // public static AbilityTask_WaitGameplayTag * Create(GameplayAbility * Ability, GameplayTag const& InTag, bool bOnlyTriggerOnce, bool bTriggerOnAdd)
+    static Create(Ability_0 : GameplayAbility, InTag_1 : GameplayTag, bOnlyTriggerOnce_2 : boolean, bTriggerOnAdd_3 : boolean) : AbilityTask_WaitGameplayTag;
     // Tag to watch for add/remove events
     // public GameplayTag Tag
     m_Tag : GameplayTag;
@@ -1065,6 +1143,9 @@ class AbilityTask_WaitGameplayTag
 class AbilityTask_WaitInput
     extends AbilityTask
 {
+    // Create and register a new WaitInput task
+    // public static AbilityTask_WaitInput * Create(GameplayAbility * Ability, int32 InputID, bool bTriggerOnPress, bool bTriggerOnRelease)
+    static Create(Ability_0 : GameplayAbility, InputID_1 : int32, bTriggerOnPress_2 : boolean, bTriggerOnRelease_3 : boolean) : AbilityTask_WaitInput;
     // InputID to watch. Should match the ability's bound InputID.
     // public int32 InputID
     m_InputID : int32;
@@ -1090,6 +1171,9 @@ class AbilityTask_WaitInput
 class AbilityTask_WaitTargetData
     extends AbilityTask
 {
+    // Create and register a new WaitTargetData task
+    // public static AbilityTask_WaitTargetData * Create(GameplayAbility * Ability)
+    static Create(Ability_0 : GameplayAbility) : AbilityTask_WaitTargetData;
     // Callback fired when target data is ready
     // public std::function<void (*)(GameplayAbilityTargetDataHandle const& _0)> OnTargetDataReady
     m_OnTargetDataReady : (_0 : GameplayAbilityTargetDataHandle) => void| undefined;

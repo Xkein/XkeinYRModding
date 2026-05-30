@@ -894,7 +894,7 @@ static void ExecuteInstantEffect(AbilitySystemComponent* Target, const GameplayE
             if (!AttrSet->FindAttributeData(&Modifier.Attribute))
                 continue;
             
-            FGameplayEffectModCallbackData CallbackData(Spec, EvalData, Target);
+            FGameplayEffectModCallbackData CallbackData(&Spec, EvalData, Target);
             
             if (!AttrSet->PreGameplayEffectExecute(CallbackData))
                 continue;
@@ -1120,7 +1120,7 @@ void AbilitySystemComponent::ApplyModToAttribute(const GameplayAttribute& Attrib
         if (!AttrSet->FindAttributeData(&Attribute))
             continue;
 
-        FGameplayEffectModCallbackData CallbackData(PlaceholderSpec, EvalData, this);
+        FGameplayEffectModCallbackData CallbackData(&PlaceholderSpec, EvalData, this);
 
         if (!AttrSet->PreGameplayEffectExecute(CallbackData))
             continue;

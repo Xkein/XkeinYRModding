@@ -1,5 +1,6 @@
 #pragma once
 #include "core/reflection/reflection.h"
+#include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 
 class AbilitySystemComponent;
@@ -15,22 +16,8 @@ enum EGameplayTagEventType : int
     AnyCountChange		
 };
 
-/** Information about a gameplay effect being removed, passed to removal delegate callbacks */
-CLASS()
-struct FGameplayEffectRemovalInfo
-{
-    /** Whether the effect was removed before its natural expiry */
-    bool bPrematureRemoval = false;
-
-    /** Stack count at the time of removal */
-    int32 StackCount = 0;
-
-    /** Context from when the gameplay effect was applied */
-    GameplayEffectContextHandle EffectContext;
-};
-
 /** Evaluated modifier data used by calculation classes and delegate callbacks */
-CLASS()
+CLASS(BindJs)
 struct FGameplayModifierEvaluatedData
 {
     PROPERTY()
@@ -46,22 +33,40 @@ struct FGameplayModifierEvaluatedData
 };
 
 /** Callback data passed to Pre/PostGameplayEffectExecute on AttributeSets */
+CLASS(BindJs)
 struct FGameplayEffectModCallbackData
 {
-    /** The effect spec being applied (referenced, not copied) */
-    const GameplayEffectSpec& EffectSpec;
+    /** The effect spec being applied (pointer to spec) */
+    PROPERTY()
+    const GameplayEffectSpec* EffectSpec;
 
     /** Evaluated modifier data for the attribute being modified */
+    PROPERTY()
     FGameplayModifierEvaluatedData EvaluatedData;
 
     /** Target ability system component receiving the effect */
+    PROPERTY()
     AbilitySystemComponent* Target;
-
-    FGameplayEffectModCallbackData(const GameplayEffectSpec& InEffectSpec,
+    
+    FGameplayEffectModCallbackData(const GameplayEffectSpec* InEffectSpec,
         const FGameplayModifierEvaluatedData& InEvalData,
         AbilitySystemComponent* InTarget)
         : EffectSpec(InEffectSpec)
         , EvaluatedData(InEvalData)
         , Target(InTarget)
     {}
+};
+
+/** Information about a gameplay effect being removed, passed to removal delegate callbacks */
+CLASS()
+struct FGameplayEffectRemovalInfo
+{
+    /** Whether the effect was removed before its natural expiry */
+    bool bPrematureRemoval = false;
+
+    /** Stack count at the time of removal */
+    int32 StackCount = 0;
+
+    /** Context from when the gameplay effect was applied */
+    GameplayEffectContextHandle EffectContext;
 };

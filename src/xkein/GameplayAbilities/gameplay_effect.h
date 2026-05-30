@@ -583,6 +583,7 @@ CLASS(BindJs)
 struct GameplayEffectSpec
 {
 	/** The gameplay effect definition this spec was created from */
+    PROPERTY()
 	const GameplayEffect* Def = nullptr;
 
 	/** Level of the effect */
@@ -592,9 +593,11 @@ struct GameplayEffectSpec
 	GameplayEffectContextHandle EffectContext;
 
 	/** Tags captured from the source at the time of creation */
+    PROPERTY()
 	GameplayTagContainer CapturedSourceTags;
 
 	/** Tags captured from the target at the time of creation */
+    PROPERTY()
 	GameplayTagContainer CapturedTargetTags;
 
 	/** SetByCaller magnitudes */

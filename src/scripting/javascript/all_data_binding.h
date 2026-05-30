@@ -18,10 +18,12 @@
 #include "xkein/GameplayAbilities/gameplay_cue_manager.h"
 #include "xkein/GameplayAbilities/gameplay_ability_target_actor.h"
 #include "xkein/GameplayAbilities/gameplay_ability_world_reticle.h"
+#include "xkein/GameplayAbilities/gameplay_effect_types.h"
 
 UsingCppType(ActiveGameplayEffectHandle);
 UsingCppType(ActiveGameplayEffectsContainer);
 UsingCppType(AttributeSet);
+UsingCppType(CustomAttributeSet);
 UsingCppType(AttributeSetDefine);
 UsingCppType(AttributeMetaData);
 UsingCppType(AbilityTriggerData);
@@ -99,6 +101,8 @@ UsingCppType(FScalableFloat);
 UsingCppType(GameplayEffectCalculation);
 UsingCppType(GameplayEffectExecutionCalculation);
 UsingCppType(GameplayEffectExecutionDefinition);
+UsingCppType(FGameplayEffectModCallbackData);
+UsingCppType(FGameplayModifierEvaluatedData);
 UsingCppType(GameplayModMagnitudeCalculation);
 UsingCppType(GameplayModifierInfo);
 UsingCppType(GameplayEffectModifierMagnitude);
