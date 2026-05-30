@@ -5,16 +5,16 @@
 #include "xkein/GameplayAbilities/ability_system_globals.h"
 #include "xkein/GameplayAbilities/gameplay_effect_execution_calculation.h"
 #include "xkein/GameplayAbilities/gameplay_mod_magnitude_calculation.h"
-#include "xkein/GameplayAbilities/ability_task_repeat.h"
-#include "xkein/GameplayAbilities/ability_task_spawn_actor.h"
-#include "xkein/GameplayAbilities/ability_task_wait_attribute_change.h"
-#include "xkein/GameplayAbilities/ability_task_wait_delay.h"
-#include "xkein/GameplayAbilities/ability_task_wait_gameplay_effect_applied.h"
-#include "xkein/GameplayAbilities/ability_task_wait_gameplay_event.h"
-#include "xkein/GameplayAbilities/ability_task_wait_gameplay_tag.h"
-#include "xkein/GameplayAbilities/ability_task_wait_gameplay_effect_removed.h"
-#include "xkein/GameplayAbilities/ability_task_wait_input.h"
-#include "xkein/GameplayAbilities/ability_task_wait_target_data.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_repeat.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_spawn_actor.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_attribute_change.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_delay.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_effect_applied.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_event.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_tag.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_effect_removed.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_input.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_target_data.h"
 #include "xkein/GameplayAbilities/gameplay_cue_manager.h"
 #include "xkein/GameplayAbilities/gameplay_ability_target_actor.h"
 #include "xkein/GameplayAbilities/gameplay_ability_world_reticle.h"
@@ -159,6 +159,9 @@ MuteFunctionPtr(std::remove_pointer_t<gainput::FilterFunc_T>);
 UsingCppType(XkeinTools);
 UsingCppType(QueryVolume);
 UsingCppType(QuerySphere);
+
+#include "yr/api/yr_entity.h"
+UsingCppType(YrEntityAbstractComponent);
 
 #include "yr/parse/ini_reader.h"
 UsingCppType(IniReader);

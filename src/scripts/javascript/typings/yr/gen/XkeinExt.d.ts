@@ -905,6 +905,8 @@ class ScriptFunction_AttributeSet__AttributeSetDefine__0_AbilitySystemComponent_
 // GameplayAbilitySystem
 class GameplayAbilitySystem
 {
+    // public static AbilitySystemComponent * GetAbilitySystemComponent(entity entity)
+    static GetAbilitySystemComponent(entity_0 : entt_entity) : AbilitySystemComponent;
     // public static StringName ScriptFunctionCategoryAbility
     static s_ScriptFunctionCategoryAbility : StringName;
     // public static StringName ScriptFunctionCategoryAttributeSet
@@ -1103,6 +1105,13 @@ class GameplayAbilityTargetActor
     // Consumed by AbilityTask_WaitTargetData or the owning ability.
     // public std::function<void (*)(GameplayAbilityTargetDataHandle const& _0)> OnTargetDataReady
     m_OnTargetDataReady : (_0 : GameplayAbilityTargetDataHandle) => void| undefined;
+    // protected:
+    // The ability that owns this target actor. Set by StartTargeting.
+    // public GameplayAbility * OwningAbility
+    m_OwningAbility : GameplayAbility;
+    // Accumulated target data collected during targeting
+    // public GameplayAbilityTargetDataHandle TargetDataHandle
+    m_TargetDataHandle : GameplayAbilityTargetDataHandle;
 }
 // GameplayAbilityTargetActor_LineTrace
 // Performs a ray trace along a direction from the source actor.
@@ -1165,6 +1174,13 @@ class GameplayAbilityTargetActor_ActorPlacement
 // GameplayAbilityWorldReticle
 class GameplayAbilityWorldReticle
 {
+    // protected:
+    // public bool bIsActive
+    m_bIsActive : boolean;
+    // public bool bIsTargetValid
+    m_bIsTargetValid : boolean;
+    // public Vector3D<int> ReticleLocation
+    m_ReticleLocation : Vector3D;
 }
 // Script function creator for static gameplay cue notifies.
 // Registered factories allow creating cue notify instances by name from INI.

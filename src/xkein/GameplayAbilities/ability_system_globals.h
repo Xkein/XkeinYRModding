@@ -7,6 +7,7 @@
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_cue.h"
+#include "xkein/GameplayAbilities/ability_system_component.h"
 #include <cstring>
 #include <unordered_map>
 
@@ -93,6 +94,11 @@ public:
 
     /** Create an actor-based cue notify instance by factory name */
     static GameplayCueNotify_Actor* CreateCueActor(const StringName& name);
+
+    FUNCTION()
+    static inline AbilitySystemComponent* GetAbilitySystemComponent(entt::entity entity) {
+        return gEntt->try_get<AbilitySystemComponent>(entity);
+    }
 };
 
 #ifndef __HEADER_TOOL__

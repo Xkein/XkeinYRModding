@@ -16,6 +16,12 @@ class StringName
     // public bool IsEmpty() const
     IsEmpty() : boolean;
 }
+// YrEntityAbstractComponent
+class YrEntityAbstractComponent
+{
+    // public AbstractClass * yrObject
+    m_yrObject : AbstractClass;
+}
 // IniReader
 class IniReader
 {
@@ -1478,6 +1484,8 @@ class YrHelper
 class YrExtCore {
     // int const EventPackMaxDataSize = sizeof(EventPackRaw)-offsetof(EventPackRaw,Custom.Data)
     static s_EventPackMaxDataSize : int;
+    // YrEntityAbstractComponent * GetYrAbstractComponent(entity entity)
+    static GetYrAbstractComponent(entity_0 : entt_entity) : YrEntityAbstractComponent;
     // std::basic_string<char, std::char_traits<char>, std::allocator<char>> GetStackTrace()
     static GetStackTrace() : string;
 }
