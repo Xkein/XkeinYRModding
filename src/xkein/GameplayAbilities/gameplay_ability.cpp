@@ -1,6 +1,6 @@
 #include "gameplay_ability.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
-#include "xkein/GameplayAbilities/ge_component_target_tags.h"
+#include "xkein/GameplayAbilities/ge_component/ge_component_target_tags.h"
 
 GameplayAbilitySpec::GameplayAbilitySpec(GameplayAbility* InAbility, int32 InLevel)
     : ActiveCount(0)

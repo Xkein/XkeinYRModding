@@ -1,6 +1,6 @@
 #include "ability_task_wait_input.h"
-#include "ability_system_component.h"
-#include "gameplay_ability.h"
+#include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/GameplayAbilities/gameplay_ability.h"
 
 AbilityTask_WaitInput* AbilityTask_WaitInput::Create(GameplayAbility* Ability, int32 InputID, bool bTriggerOnPress, bool bTriggerOnRelease)
 {

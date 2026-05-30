@@ -1,6 +1,6 @@
 #include "gameplay_effect.h"
 #include "ability_system_globals.h"
-#include "xkein/GameplayAbilities/ge_component.h"
+#include "xkein/GameplayAbilities/ge_component/ge_component.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
 #include <map>
 

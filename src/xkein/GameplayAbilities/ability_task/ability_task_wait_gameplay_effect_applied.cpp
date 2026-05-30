@@ -1,5 +1,5 @@
 #include "ability_task_wait_gameplay_effect_applied.h"
-#include "ability_system_component.h"
+#include "xkein/GameplayAbilities/ability_system_component.h"
 
 AbilityTask_WaitGameplayEffectApplied* AbilityTask_WaitGameplayEffectApplied::Create(GameplayAbility* Ability, const FGameplayEffectQuery& Query, bool bTriggerOnce)
 {

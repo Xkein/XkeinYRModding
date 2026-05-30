@@ -1,20 +1,18 @@
 #pragma once
 #include "core/reflection/reflection.h"
-#include "xkein/GameplayAbilities/ge_component.h"
+#include "xkein/GameplayAbilities/ge_component/ge_component.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 
 /**
- * Blocks abilities whose ability tags match the specified tags while the GE is active.
- * When the GE expires or is removed, the block is lifted.
- * UE equivalent: UBlockAbilityTagsGameplayEffectComponent
+ * Grants tags to the target actor when the GE is applied.
+ * UE equivalent: UTargetTagsGameplayEffectComponent
  */
 CLASS(IniComponent, IniAutoLoad)
-class BlockAbilityTagsGEComponent : public GameplayEffectComponent
+class TargetTagsGEComponent : public GameplayEffectComponent
 {
 public:
-    /** Tags to block. CombinedTags = Inherited - Removed + Added */
     PROPERTY()
-    FInheritedTagContainer InheritableBlockedAbilityTagsContainer;
+    GameplayTagContainer GrantedTags;
 
     bool OnActiveGameplayEffectAdded(
         ActiveGameplayEffectsContainer& Container,

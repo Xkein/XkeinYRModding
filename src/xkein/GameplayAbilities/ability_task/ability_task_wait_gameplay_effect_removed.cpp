@@ -1,5 +1,5 @@
 #include "ability_task_wait_gameplay_effect_removed.h"
-#include "ability_system_component.h"
+#include "xkein/GameplayAbilities/ability_system_component.h"
 
 AbilityTask_WaitGameplayEffectRemoved* AbilityTask_WaitGameplayEffectRemoved::Create(GameplayAbility* Ability, ActiveGameplayEffectHandle Handle)
 {

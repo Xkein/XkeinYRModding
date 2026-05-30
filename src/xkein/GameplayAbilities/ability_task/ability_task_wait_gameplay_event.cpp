@@ -1,5 +1,5 @@
 #include "ability_task_wait_gameplay_event.h"
-#include "ability_system_component.h"
+#include "xkein/GameplayAbilities/ability_system_component.h"
 
 AbilityTask_WaitGameplayEvent* AbilityTask_WaitGameplayEvent::Create(GameplayAbility* Ability, const GameplayTag& InEventTag, bool bOnlyTriggerOnce)
 {

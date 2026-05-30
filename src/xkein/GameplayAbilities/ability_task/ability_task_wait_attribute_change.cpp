@@ -1,5 +1,5 @@
 #include "ability_task_wait_attribute_change.h"
-#include "ability_system_component.h"
+#include "xkein/GameplayAbilities/ability_system_component.h"
 
 AbilityTask_WaitAttributeChange* AbilityTask_WaitAttributeChange::Create(GameplayAbility* Ability, const GameplayAttribute& Attribute, bool bTriggerOnce)
 {

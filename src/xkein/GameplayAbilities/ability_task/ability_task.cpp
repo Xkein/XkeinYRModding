@@ -1,6 +1,6 @@
 #include "ability_task.h"
-#include "ability_system_component.h"
-#include "ability_system_globals.h"
+#include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/GameplayAbilities/ability_system_globals.h"
 
 StringName AbilityTask::ScriptFunctionCategory = "AbilityTask";
 

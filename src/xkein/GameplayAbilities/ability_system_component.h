@@ -2,7 +2,7 @@
 #include "core/reflection/reflection.h"
 #include "core/tool/delegate.h"
 #include "yr/component/component.h"
-#include "xkein/GameplayAbilities/ability_task.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task.h"
 #include "xkein/GameplayAbilities/gameplay_ability.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_cue.h"
