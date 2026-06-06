@@ -82,5 +82,6 @@ protected:
 CLASS(BindJs)
 struct AbilityTaskCreator : public ScriptFunction<AbilityTask*(GameplayAbility*, AbilitySystemComponent*)>
 {
-	using ScriptFunction::ScriptFunction;
+	FUNCTION()
+	AbilityTaskCreator(std::function<AbilityTask*(GameplayAbility*, AbilitySystemComponent*)> func) : ScriptFunction(func) { }
 };

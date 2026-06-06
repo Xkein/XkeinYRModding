@@ -103,12 +103,17 @@ struct AbilitySystemComponentType final
 };
 IMPL_YR_SERIALIZE_SWIZZLE(AbilitySystemComponentType);
 
-CLASS(BindJs)
+CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass], AutoSavegame)
 class AbilitySystemComponent
 {
 	friend struct ActiveGameplayEffectsContainer;
 
+    static void OnEntityConstruct(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);
 public:
+    template<typename TargetType>
+    static void OnEntityConstruct(entt::registry& reg, entt::entity entity, TargetType* pYrObject) {
+        OnEntityConstruct(reg, entity, pYrObject, pYrObject->Type);
+    }
 
 	/** The actor that owns this component logically */
     PROPERTY()

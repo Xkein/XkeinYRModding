@@ -61,13 +61,15 @@ struct AbilitySystemGlobals
 CLASS(BindJs)
 struct GameplayAbilityCreator : public ScriptFunction<GameplayAbility*(GameplayAbilityDefine* define, AbilitySystemComponent* component)>
 {
-    using ScriptFunction::ScriptFunction;
+    FUNCTION()
+    GameplayAbilityCreator(std::function<GameplayAbility*(GameplayAbilityDefine*, AbilitySystemComponent*)> func) : ScriptFunction(func) { }
 };
 
 CLASS(BindJs)
 struct AttributeSetCreator : public ScriptFunction<AttributeSet*(AttributeSetDefine* define, AbilitySystemComponent* component)>
 {
-    using ScriptFunction::ScriptFunction;
+    FUNCTION()
+    AttributeSetCreator(std::function<AttributeSet*(AttributeSetDefine*, AbilitySystemComponent*)> func) : ScriptFunction(func) { }
 };
 
 CLASS(BindJs)

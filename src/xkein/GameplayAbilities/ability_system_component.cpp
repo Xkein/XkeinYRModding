@@ -16,6 +16,20 @@
 #include <AnimClass.h>
 #include <AbstractClass.h>
 
+void AbilitySystemComponent::OnEntityConstruct(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType)
+{
+    if (!pYrType)
+        return;
+    AbilitySystemComponentType* const typeCom = GetYrComponent<AbilitySystemComponentType>(pYrType);
+    if (typeCom)
+    {
+        AbilitySystemComponent& com = reg.emplace<AbilitySystemComponent>(entity);
+        com.InitializeFromType(typeCom);
+        com.Owner = entity;
+        com.Avatar = entity;
+    }
+}
+
 void AbilitySystemComponent::InitializeFromType(AbilitySystemComponentType* InType)
 {
     Type = InType;

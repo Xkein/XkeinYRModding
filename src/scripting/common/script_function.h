@@ -3,6 +3,7 @@
 #include "core/reflection/reflection.h"
 #include "runtime/platform/platform.h"
 #include "core/string/string_name.h"
+#include "runtime/logger/logger.h"
 #include <functional>
 #include <string>
 
@@ -18,7 +19,7 @@ template<typename TFunc>
 struct ScriptFunction : public ScriptFunctionBase, public std::function<TFunc>
 {
     FUNCTION()
-    ScriptFunction(std::function<TFunc> func) : std::function<TFunc>(std::move(func)) {}
+    ScriptFunction(std::function<TFunc> func) : ScriptFunctionBase(), std::function<TFunc>(std::move(func)) { }
 
 };
                         

@@ -48,12 +48,14 @@ struct GameplayCueManager
 CLASS(BindJs)
 struct GameplayCueStaticCreator : public ScriptFunction<GameplayCueNotify_Static*()>
 {
-    using ScriptFunction::ScriptFunction;
+    FUNCTION()
+    GameplayCueStaticCreator(std::function<GameplayCueNotify_Static*()> func) : ScriptFunction(func) { }
 };
 
 /** Script function creator for actor-based gameplay cue notifies. */
 CLASS(BindJs)
 struct GameplayCueActorCreator : public ScriptFunction<GameplayCueNotify_Actor*()>
 {
-    using ScriptFunction::ScriptFunction;
+    FUNCTION()
+    GameplayCueActorCreator(std::function<GameplayCueNotify_Actor*()> func) : ScriptFunction(func) { }
 };

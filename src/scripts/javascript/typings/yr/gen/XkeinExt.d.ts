@@ -808,6 +808,8 @@ class FGameplayEffectQuery
 class AbilityTaskCreator
     extends ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__
 {
+    // public AbilityTaskCreator(std::function<AbilityTask * (*)(GameplayAbility * _0, AbilitySystemComponent * _1)> func)
+    constructor(func_0 : (_0 : GameplayAbility, _1 : AbilitySystemComponent) => AbilityTask| undefined);
 }
 // ScriptFunction<AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1)>
 class ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__
@@ -892,6 +894,8 @@ class GameplayCueNotify_Actor
 class GameplayAbilityCreator
     extends ScriptFunction_GameplayAbility__GameplayAbilityDefine__0_AbilitySystemComponent__1__
 {
+    // public GameplayAbilityCreator(std::function<GameplayAbility * (*)(GameplayAbilityDefine * _0, AbilitySystemComponent * _1)> func)
+    constructor(func_0 : (_0 : GameplayAbilityDefine, _1 : AbilitySystemComponent) => GameplayAbility| undefined);
 }
 // ScriptFunction<GameplayAbility * (GameplayAbilityDefine * _0, AbilitySystemComponent * _1)>
 class ScriptFunction_GameplayAbility__GameplayAbilityDefine__0_AbilitySystemComponent__1__
@@ -904,6 +908,8 @@ class ScriptFunction_GameplayAbility__GameplayAbilityDefine__0_AbilitySystemComp
 class AttributeSetCreator
     extends ScriptFunction_AttributeSet__AttributeSetDefine__0_AbilitySystemComponent__1__
 {
+    // public AttributeSetCreator(std::function<AttributeSet * (*)(AttributeSetDefine * _0, AbilitySystemComponent * _1)> func)
+    constructor(func_0 : (_0 : AttributeSetDefine, _1 : AbilitySystemComponent) => AttributeSet| undefined);
 }
 // ScriptFunction<AttributeSet * (AttributeSetDefine * _0, AbilitySystemComponent * _1)>
 class ScriptFunction_AttributeSet__AttributeSetDefine__0_AbilitySystemComponent__1__
@@ -1278,6 +1284,8 @@ class GameplayAbilityWorldReticle
 class GameplayCueStaticCreator
     extends ScriptFunction_GameplayCueNotify_Static____
 {
+    // public GameplayCueStaticCreator(std::function<GameplayCueNotify_Static * (*)()> func)
+    constructor(func_0 : () => GameplayCueNotify_Static| undefined);
 }
 // ScriptFunction<GameplayCueNotify_Static * ()>
 class ScriptFunction_GameplayCueNotify_Static____
@@ -1291,6 +1299,8 @@ class ScriptFunction_GameplayCueNotify_Static____
 class GameplayCueActorCreator
     extends ScriptFunction_GameplayCueNotify_Actor____
 {
+    // public GameplayCueActorCreator(std::function<GameplayCueNotify_Actor * (*)()> func)
+    constructor(func_0 : () => GameplayCueNotify_Actor| undefined);
 }
 // ScriptFunction<GameplayCueNotify_Actor * ()>
 class ScriptFunction_GameplayCueNotify_Actor____

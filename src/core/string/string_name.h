@@ -83,7 +83,7 @@ public:
     FUNCTION()
     bool IsEmpty() const noexcept {
         // Extremely fast and safe inline check
-        return NameStr->empty();
+        return NameStr->empty() && NameStr == StringNamePool::GetEmpty();
     }
 
     // Shared pointer instances pointing to the same interned string will have identical memory addresses.
