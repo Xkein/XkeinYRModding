@@ -61,6 +61,9 @@ struct FGameplayEffectModCallbackData
 CLASS()
 struct FGameplayEffectRemovalInfo
 {
+    /** The active effect that was removed */
+    const struct ActiveGameplayEffect* ActiveEffect = nullptr;
+
     /** Whether the effect was removed before its natural expiry */
     bool bPrematureRemoval = false;
 

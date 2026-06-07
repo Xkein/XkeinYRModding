@@ -2,6 +2,7 @@
 #include "ability_system_globals.h"
 #include "xkein/GameplayAbilities/ge_component/ge_component.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
+#include "xkein/GameplayAbilities/ability_system_component.h"
 #include <map>
 
 class AbilitySystemComponent;
@@ -242,4 +243,9 @@ void GameplayEffect::OnApplied(ActiveGameplayEffectsContainer& ActiveGEContainer
             Component->OnGameplayEffectApplied(ActiveGEContainer, Spec, OwningASC);
         }
     }
+}
+
+bool ActiveGameplayEffectsContainer::IsNetAuthority() const
+{
+    return Owner ? Owner->IsOwnerActorAuthoritative() : true;
 }

@@ -5,6 +5,9 @@ CLASS(BindJs)
 class CustomAttributeSet : public AttributeSet
 {
 public:
+    FUNCTION()
+    CustomAttributeSet() {}
+    
     bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override
     {
         if (OnK2_PreGameplayEffectExecute)

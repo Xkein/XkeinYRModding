@@ -183,6 +183,15 @@ class GameplayAbility
 	const GameplayAbilityDefine* Define;
 
 	virtual void InitFromDefine(GameplayAbilityDefine* AbilityDefine);
+
+	/** Returns the instancing policy for this ability */
+	EGameplayAbilityInstancingPolicy GetInstancingPolicy() const { return Define ? Define->InstancingPolicy : EGameplayAbilityInstancingPolicy::InstancedPerActor; }
+
+	/** Called when this ability is granted to an ability system component */
+	virtual void OnGiveAbility(const GameplayAbilityActorInfo* ActorInfo, const GameplayAbilitySpec& Spec) {}
+
+	/** Called when this ability is removed from an ability system component */
+	virtual void OnRemoveAbility(const GameplayAbilityActorInfo* ActorInfo, const GameplayAbilitySpec& Spec) {}
     
 	/** Returns true if this ability can be activated right now. Has no side effects */
 	virtual bool CanActivateAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
@@ -282,6 +291,9 @@ class GameplayAbility
 	/** Called from outside to cancel the ability, replicates to the other side */
 	virtual void ExternalCancelAbility();
 
+	/** Returns true if this ability is currently active */
+	bool IsActive() const { return bIsActive; }
+
 	/** Check if this ability satisfies the tag requirements based on the given ASC */
 	virtual bool DoesAbilitySatisfyTagRequirements(const AbilitySystemComponent& ASC) const;
 
@@ -312,6 +324,9 @@ protected:
 	const GameplayAbilityActorInfo* CurrentActorInfo = nullptr;
 	/** For instanced abilities */
     GameplayAbilitySpecHandle CurrentSpecHandle;
+
+	/** True if this ability is currently active */
+	bool bIsActive = false;
 
 };
 

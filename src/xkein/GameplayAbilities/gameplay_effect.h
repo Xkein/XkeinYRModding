@@ -1,10 +1,12 @@
 #pragma once
 #include "core/reflection/reflection.h"
+#include "core/tool/delegate.h"
 #include "yr/serialization/serialization.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec_handle.h"
 #include "xkein/GameplayAbilities/active_gameplay_effect_handle.h"
+#include <entt/signal/sigh.hpp>
 #include <map>
 
 struct FGameplayEffectRemovalInfo;
@@ -658,6 +660,12 @@ struct ActiveGameplayEffect
 	PROPERTY()
 	std::vector<GameplayAbilitySpecHandle> GrantedAbilityHandles;
 
+	/** Delegate handle for the OnRemoved event (used by GE components to unregister) */
+	entt::connection OnRemovedDelegateHandle;
+
+	/** Delegate handle for the OnInhibitionChanged event (used by GE components to unregister) */
+	entt::connection OnInhibitionChangedDelegateHandle;
+
 	/** Get time remaining based on current world time */
 	float GetTimeRemaining(float CurrentWorldTime) const
 	{
@@ -721,6 +729,12 @@ struct ActiveGameplayEffectsContainer
 
     /** Set whether an active gameplay effect is inhibited (temporarily disabled) */
     void SetActiveGameplayEffectInhibit(ActiveGameplayEffectHandle Handle, bool bInhibit);
+
+    /** Returns true if this container's owner is authoritative (always true in lockstep RTS) */
+    bool IsNetAuthority() const;
+
+    /** Mark an active effect as dirty (for replication; no-op in lockstep) */
+    void MarkItemDirty(ActiveGameplayEffect& Effect) { /* Replication not needed in lockstep */ }
 
     /**
      * Called anytime a new ActiveGameplayEffect is added.

@@ -220,9 +220,30 @@ struct GameplayAbilitySpec
 
 	bool IsActive() const { return ActiveCount > 0; }
 
-	GameplayAbility* GetPrimaryInstance() const { return Ability; }
+	GameplayAbility* GetPrimaryInstance() const
+	{
+		if (NonReplicatedInstances.size() > 0)
+			return NonReplicatedInstances[0];
+		if (ReplicatedInstances.size() > 0)
+			return ReplicatedInstances[0];
+		return Ability;
+	}
 
-	std::vector<GameplayAbility*> GetAbilityInstances() const { return { Ability }; }
+	std::vector<GameplayAbility*> GetAbilityInstances() const
+	{
+		std::vector<GameplayAbility*> Result;
+		Result.insert(Result.end(), NonReplicatedInstances.begin(), NonReplicatedInstances.end());
+		Result.insert(Result.end(), ReplicatedInstances.begin(), ReplicatedInstances.end());
+		if (Result.empty() && Ability)
+			Result.push_back(Ability);
+		return Result;
+	}
+
+	/** Instances that are not replicated (for ReplicateNo abilities) */
+	std::vector<GameplayAbility*> NonReplicatedInstances;
+
+	/** Instances that are replicated */
+	std::vector<GameplayAbility*> ReplicatedInstances;
 };
 
 class AbilitySystemComponent;

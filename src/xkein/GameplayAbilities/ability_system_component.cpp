@@ -361,20 +361,41 @@ int32 AbilitySystemComponent::GetGameplayTagCount(const GameplayTag& Tag) const
 GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbilitySpec& AbilitySpec)
 {
     if (AbilitySpec.Ability == nullptr) {
-        
         gLogger->error("GiveAbility called with an invalid Ability Class.");
-
-		return GameplayAbilitySpecHandle();
+        return GameplayAbilitySpecHandle();
     }
 
+    if (!IsOwnerActorAuthoritative())
+    {
+        gLogger->error("GiveAbility called on the client, not allowed!");
+        return GameplayAbilitySpecHandle();
+    }
+
+    // If locked, add to pending list. The Spec.Handle is not regenerated when we receive, so returning this is ok.
+    if (AbilityScopeLockCount > 0)
+    {
+        AbilityPendingAdds.push_back(AbilitySpec);
+        return AbilitySpec.Handle;
+    }
+
+    ABILITYLIST_SCOPE_LOCK();
     ActivatableAbilities.push_back(AbilitySpec);
     GameplayAbilitySpec& OwnedSpec = ActivatableAbilities.back();
-    
-    // Assign a unique handle
-    OwnedSpec.Handle = GameplayAbilitySpecHandle::GenerateNewHandle();
+
+    // Assign a unique handle if not already set
+    if (!OwnedSpec.Handle.IsValid())
+    {
+        OwnedSpec.Handle = GameplayAbilitySpecHandle::GenerateNewHandle();
+    }
+
+    if (OwnedSpec.Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor)
+    {
+        // Create the instance at creation time
+        CreateNewInstanceOfAbility(OwnedSpec, OwnedSpec.Ability);
+    }
 
     OnGiveAbility(OwnedSpec);
-	MarkAbilitySpecDirty(OwnedSpec, true);
+    MarkAbilitySpecDirty(OwnedSpec, true);
 
     return OwnedSpec.Handle;
 }
@@ -389,6 +410,45 @@ GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbil
         return this->GiveAbility(GameplayAbilitySpec(Ability));
     }
     return {};
+}
+
+GameplayAbility* AbilitySystemComponent::CreateNewInstanceOfAbility(GameplayAbilitySpec& Spec, const GameplayAbility* Ability)
+{
+    if (!Ability || !Ability->Define)
+    {
+        return nullptr;
+    }
+
+    GameplayAbility* AbilityInstance = GameplayAbilitySystem::CreateAbility(
+        Ability->Define->AbilityCreator, const_cast<GameplayAbilityDefine*>(Ability->Define), this);
+    if (!AbilityInstance)
+    {
+        return nullptr;
+    }
+
+    AbilityInstance->Define = Ability->Define;
+    Spec.NonReplicatedInstances.push_back(AbilityInstance);
+    this->AllSelfCreatedAbilities.push_back(AbilityInstance);
+
+    return AbilityInstance;
+}
+
+std::vector<const GameplayAbilitySpec*> AbilitySystemComponent::FindAbilitySpecsFromGEHandle(
+    FScopedAbilityListLock& Lock, ActiveGameplayEffectHandle Handle, EConsiderPending ConsiderPending) const
+{
+    std::vector<const GameplayAbilitySpec*> OutSpecs;
+    for (const auto& Spec : ActivatableAbilities)
+    {
+        if (Spec.GameplayEffectHandle == Handle)
+        {
+            if (Spec.PendingRemove && ConsiderPending == EConsiderPending::No)
+            {
+                continue;
+            }
+            OutSpecs.push_back(&Spec);
+        }
+    }
+    return OutSpecs;
 }
 
 void AbilitySystemComponent::RemoveAbility(GameplayAbilitySpecHandle Handle)
@@ -424,6 +484,16 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 
     const GameplayAbility* SpecAbility = Spec.Ability;
 
+    // If InstancedPerActor and missing an instance, create one
+    if (SpecAbility->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor)
+    {
+        if (Spec.NonReplicatedInstances.size() == 0)
+        {
+            CreateNewInstanceOfAbility(Spec, SpecAbility);
+        }
+    }
+
+    // If this Ability Spec specified that it was created from an Active Gameplay Effect, then link the handle to the Active Gameplay Effect.
     if (Spec.GameplayEffectHandle.IsValid())
     {
 		AbilitySystemComponent* SourceASC = Spec.GameplayEffectHandle.GetOwningAbilitySystemComponent();
@@ -433,7 +503,7 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 			if (SourceActiveGE)
 			{
                 std_vector_add_unique(SourceActiveGE->GrantedAbilityHandles, Spec.Handle);
-				// SourceASC->ActiveGameplayEffects.MarkItemDirty(*SourceActiveGE);
+				SourceASC->ActiveGameplayEffects.MarkItemDirty(*SourceActiveGE);
 			}
 			else {
 				gLogger->error("OnGiveAbility Spec has invalid ActiveGameplayEffect");
@@ -455,7 +525,7 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 
 			if (TriggeredAbilityMap.contains(EventTag))
 			{
-				std_vector_add_unique(TriggeredAbilityMap[EventTag], Spec.Handle); // Fixme: is this right? Do we want to trigger the ability directly of the spec?
+				std_vector_add_unique(TriggeredAbilityMap[EventTag], Spec.Handle);
 			}
 			else
 			{
@@ -464,16 +534,26 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 				TriggeredAbilityMap[EventTag] = Triggers;
 			}
 
-			// if (TriggerData.TriggerSource != EGameplayAbilityTriggerSource::GameplayEvent)
-			// {
-			// 	FOnGameplayEffectTagCountChanged& CountChangedEvent = RegisterGameplayTagEvent(EventTag);
-			// 	// Add a change callback if it isn't on it already
+			if (TriggerData.TriggerSource != EGameplayAbilityTriggerSource::GameplayEvent)
+			{
+				FOnGameplayEffectTagCountChanged& CountChangedEvent = RegisterGameplayTagEvent(EventTag);
+				// Add a tag change callback if there isn't one already
+				if (CountChangedEvent.empty())
+				{
+					CountChangedEvent.connect<&AbilitySystemComponent::NotifyTagCountChanged>(*this);
+				}
+			}
+		}
+	}
 
-			// 	if (!CountChangedEvent.IsBoundToObject(this))
-			// 	{
-			// 		MonitoredTagChangedDelegateHandle = CountChangedEvent.AddUObject(this, &UAbilitySystemComponent::MonitoredTagChanged);
-			// 	}
-			// }
+	// Call OnGiveAbility on all instances
+	std::vector<GameplayAbility*> Instances = Spec.GetAbilityInstances();
+	for (auto* Instance : Instances)
+	{
+		if (Instance)
+		{
+			GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
+			Instance->OnGiveAbility(&ActorInfo, Spec);
 		}
 	}
 }
@@ -739,6 +819,29 @@ void AbilitySystemComponent::OnRemoveAbility(GameplayAbilitySpec& Spec)
                     TriggeredAbilityMap.erase(It);
                 }
             }
+        }
+    }
+
+    // End all active ability instances
+    std::vector<GameplayAbility*> Instances = Spec.GetAbilityInstances();
+    for (auto* Instance : Instances)
+    {
+        if (Instance && Instance->IsActive())
+        {
+            // End the ability but don't replicate it
+            bool bReplicateEndAbility = false;
+            bool bWasCancelled = false;
+            Instance->EndAbility(Instance->CurrentSpecHandle, Instance->CurrentActorInfo, Instance->CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
+        }
+    }
+
+    // Call OnRemoveAbility on all instances
+    for (auto* Instance : Instances)
+    {
+        if (Instance)
+        {
+            GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
+            Instance->OnRemoveAbility(&ActorInfo, Spec);
         }
     }
     
@@ -1406,6 +1509,7 @@ void ActiveGameplayEffectsContainer::Remove(ActiveGameplayEffectHandle Handle, b
             if (Effect)
             {
                 FGameplayEffectRemovalInfo RemovalInfo;
+                RemovalInfo.ActiveEffect = Effect;
                 RemovalInfo.bPrematureRemoval = bPrematureRemoval;
                 RemovalInfo.StackCount = Effect->StackCount;
                 RemovalInfo.EffectContext = Effect->Spec.EffectContext;
@@ -1419,6 +1523,12 @@ void ActiveGameplayEffectsContainer::Remove(ActiveGameplayEffectHandle Handle, b
         [&Handle, this, bPrematureRemoval](ActiveGameplayEffect* Effect) {
             if (Effect && Effect->Handle == Handle)
             {
+                // Release delegate connections
+                if (Effect->OnRemovedDelegateHandle)
+                    Effect->OnRemovedDelegateHandle.release();
+                if (Effect->OnInhibitionChangedDelegateHandle)
+                    Effect->OnInhibitionChangedDelegateHandle.release();
+
                 if (Effect->Spec.Def)
                 {
                     FGameplayEffectRemovalInfo RemovalInfo;

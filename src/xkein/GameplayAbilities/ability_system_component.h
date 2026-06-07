@@ -155,6 +155,12 @@ public:
 
     /** Lock counter for target list scoped locks. While > 0, target modifications are deferred. */
     int32 TargetListLockCount = 0;
+
+    /** Abilities that are pending add while the ability list is locked */
+    std::vector<GameplayAbilitySpec> AbilityPendingAdds;
+
+    /** If true, suppress granting abilities from GameplayEffects */
+    bool bSuppressGrantAbility = false;
     
 	/** List of attribute sets */
 	PROPERTY()
@@ -242,6 +248,15 @@ public:
 	/** Grants an ability based on its definition */
     FUNCTION()
 	GameplayAbilitySpecHandle GiveAbility(const GameplayAbilityDefine* AbilityDefine);
+
+	/** Create a new instance of an ability (for InstancedPerActor abilities) */
+	GameplayAbility* CreateNewInstanceOfAbility(GameplayAbilitySpec& Spec, const GameplayAbility* Ability);
+
+	/** Returns true if the owner actor is authoritative (always true in lockstep RTS) */
+	bool IsOwnerActorAuthoritative() const { return true; }
+
+	/** Returns the activatable abilities array */
+	const std::vector<GameplayAbilitySpec>& GetActivatableAbilities() const { return ActivatableAbilities; }
 
     /** Removes an ability by handle. If the ability list is locked, marks the spec PendingRemove instead. */
     FUNCTION()
@@ -422,6 +437,9 @@ public:
 	/** Find all ability handles whose dynamic tags match the given container.
 	 *  @param bExactMatch If true, requires exact tag match instead of parent hierarchy */
 	void FindAllAbilitiesWithTags(std::vector<GameplayAbilitySpecHandle>& OutHandles, const GameplayTagContainer& Tags, bool bExactMatch = false);
+
+	/** Find all ability specs that were granted by a specific GameplayEffect handle */
+	std::vector<const GameplayAbilitySpec*> FindAbilitySpecsFromGEHandle(FScopedAbilityListLock& Lock, ActiveGameplayEffectHandle Handle, EConsiderPending ConsiderPending = EConsiderPending::No) const;
 
 	/** Cancel the ability identified by handle */
 	void CancelAbilityHandle(GameplayAbilitySpecHandle Handle);

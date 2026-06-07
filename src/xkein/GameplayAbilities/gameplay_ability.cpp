@@ -84,6 +84,7 @@ void GameplayAbility::PreActivate(const GameplayAbilitySpecHandle Handle, const 
     CurrentActorInfo = ActorInfo;
     CurrentSpecHandle = Handle;
     CurrentActivationInfo = ActivationInfo;
+    bIsActive = true;
     if (TriggerEventData)
     {
         CurrentEventData = *TriggerEventData;
@@ -212,6 +213,7 @@ void GameplayAbility::CancelAbility(const GameplayAbilitySpecHandle Handle, cons
 void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+    bIsActive = false;
     K2_OnEndAbility(bWasCancelled);
 
     // Trigger the ended delegate if the ASC and spec exist
