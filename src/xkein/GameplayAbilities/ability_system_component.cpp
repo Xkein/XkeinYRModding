@@ -540,7 +540,8 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 				// Add a tag change callback if there isn't one already
 				if (CountChangedEvent.empty())
 				{
-					CountChangedEvent.connect<&AbilitySystemComponent::NotifyTagCountChanged>(*this);
+					entt::sink sink{CountChangedEvent};
+					sink.connect<&AbilitySystemComponent::NotifyTagCountChanged>(*this);
 				}
 			}
 		}
@@ -831,7 +832,7 @@ void AbilitySystemComponent::OnRemoveAbility(GameplayAbilitySpec& Spec)
             // End the ability but don't replicate it
             bool bReplicateEndAbility = false;
             bool bWasCancelled = false;
-            Instance->EndAbility(Instance->CurrentSpecHandle, Instance->CurrentActorInfo, Instance->CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
+            Instance->EndAbility(Instance->GetCurrentSpecHandle(), Instance->GetCurrentActorInfo(), Instance->GetCurrentActivationInfo(), bReplicateEndAbility, bWasCancelled);
         }
     }
 

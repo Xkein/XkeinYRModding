@@ -210,13 +210,51 @@ void GameplayAbility::CancelAbility(const GameplayAbilitySpecHandle Handle, cons
     EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility, true);
 }
 
+bool GameplayAbility::IsEndAbilityValid(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo) const
+{
+    // 防止 EndAbility 被多次调用
+    if (bIsActive == false || bIsAbilityEnding == true)
+    {
+        return false;
+    }
+
+    // 检查 ASC 是否有效
+    AbilitySystemComponent* Comp = ActorInfo ? ActorInfo->AbilitySystemCom : nullptr;
+    if (Comp == nullptr)
+    {
+        return false;
+    }
+
+    // 检查 spec 是否仍然活跃
+    const GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo);
+    const bool bIsSpecActive = Spec ? Spec->IsActive() : IsActive();
+    if (!bIsSpecActive)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-    bIsActive = false;
+    if (!IsEndAbilityValid(Handle, ActorInfo))
+    {
+        return;
+    }
+
+    bIsAbilityEnding = true;
+
     K2_OnEndAbility(bWasCancelled);
 
-    // Trigger the ended delegate if the ASC and spec exist
+    // 防止 K2 回调中重入 EndAbility 导致重复清理
+    if (bIsActive == false)
+    {
+        return;
+    }
+
+    // 广播结束委托
     if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
     {
         if (Spec->ActiveCount > 0)
@@ -225,12 +263,14 @@ void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const G
         }
         Spec->OnGameplayAbilityEnded.publish(Spec);
         
-        // If marked for removal after activation, remove it now
         if (Spec->RemoveAfterActivation)
         {
             // Mark for removal - actual removal happens in Tick to avoid iterator invalidation
         }
     }
+
+    bIsActive = false;
+    bIsAbilityEnding = false;
 
     CurrentActorInfo = nullptr;
     CurrentSpecHandle = GameplayAbilitySpecHandle();

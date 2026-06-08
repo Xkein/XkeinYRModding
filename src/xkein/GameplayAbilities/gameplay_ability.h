@@ -264,6 +264,12 @@ class GameplayAbility
 	/** Returns the actor info associated with this ability, if any */
 	const GameplayAbilityActorInfo* GetCurrentActorInfo() const { return CurrentActorInfo; }
 
+	/** Returns the spec handle associated with this ability activation */
+	const GameplayAbilitySpecHandle& GetCurrentSpecHandle() const { return CurrentSpecHandle; }
+
+	/** Returns the activation info associated with this ability activation */
+	const GameplayAbilityActivationInfo& GetCurrentActivationInfo() const { return CurrentActivationInfo; }
+
 	/** Returns the owning actor from the actor info */
 	entt::entity GetOwningActorFromActorInfo() const
 	{
@@ -303,6 +309,9 @@ class GameplayAbility
 	/** Get the level of the ability spec referenced by Handle */
 	virtual int32 GetAbilityLevel(const GameplayAbilitySpecHandle Handle) const;
 
+	/** Check if EndAbility can proceed (guards against re-entrancy and invalid state) */
+	bool IsEndAbilityValid(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo) const;
+
 protected:
 	// -------------------------------------
 	//	Protected properties
@@ -327,6 +336,9 @@ protected:
 
 	/** True if this ability is currently active */
 	bool bIsActive = false;
+
+	/** True if this ability is in the process of ending (prevents re-entrancy) */
+	bool bIsAbilityEnding = false;
 
 };
 
