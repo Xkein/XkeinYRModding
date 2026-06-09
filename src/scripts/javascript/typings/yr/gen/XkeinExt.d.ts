@@ -689,17 +689,24 @@ class AbilityTriggerData
 class GameplayAbilityActorInfo
 {
 }
-// GameplayAbilityActivationInfo
-// Data tied to a specific activation of an ability.
-// -Tell us whether we are the authority, if we are predicting, confirmed, etc.
-// -Holds current and previous PredictionKey
-// -Generally not meant to be subclassed in projects.
-// -Passed around by value since the struct is small.
-// GameplayAbilityActivationInfo
-class GameplayAbilityActivationInfo
+// An activatable ability spec, hosted on the ability system component. This defines both what the ability is (what class, what level, input binding etc)
+// and also holds runtime state that must be kept outside of the ability being instanced/activated.
+// GameplayAbilitySpec
+class GameplayAbilitySpec
 {
-    // public EGameplayAbilityActivationMode ActivationMode
-    m_ActivationMode : EGameplayAbilityActivationMode;
+    // Handle to GE that granted us (usually invalid). FActiveGameplayEffectHandles are not synced across the network and this is valid only on Authority.
+    // If you need FGameplayAbilitySpec -> FActiveGameplayEffectHandle, then use AbilitySystemComponent::FindActiveGameplayEffectHandle.
+    // public ActiveGameplayEffectHandle GameplayEffectHandle
+    m_GameplayEffectHandle : ActiveGameplayEffectHandle;
+    // InputID, if bound to an input
+    // public int32 InputID
+    m_InputID : int32;
+    // Count of how many times this ability has been activated
+    // public uint8 ActiveCount
+    m_ActiveCount : uint8;
+    // Tags that this ability has. These are replicated and can be used for GE source tags
+    // public GameplayTagContainer DynamicAbilityTags
+    m_DynamicAbilityTags : GameplayTagContainer;
 }
 // Metadata for a tag-based Gameplay Event, that can activate other abilities or run ability-specific logic
 // GameplayEventData
@@ -749,24 +756,17 @@ class GameplayAbilityTargetDataHandle
 class GameplayAbilityTargetData
 {
 }
-// An activatable ability spec, hosted on the ability system component. This defines both what the ability is (what class, what level, input binding etc)
-// and also holds runtime state that must be kept outside of the ability being instanced/activated.
-// GameplayAbilitySpec
-class GameplayAbilitySpec
+// GameplayAbilityActivationInfo
+// Data tied to a specific activation of an ability.
+// -Tell us whether we are the authority, if we are predicting, confirmed, etc.
+// -Holds current and previous PredictionKey
+// -Generally not meant to be subclassed in projects.
+// -Passed around by value since the struct is small.
+// GameplayAbilityActivationInfo
+class GameplayAbilityActivationInfo
 {
-    // Handle to GE that granted us (usually invalid). FActiveGameplayEffectHandles are not synced across the network and this is valid only on Authority.
-    // If you need FGameplayAbilitySpec -> FActiveGameplayEffectHandle, then use AbilitySystemComponent::FindActiveGameplayEffectHandle.
-    // public ActiveGameplayEffectHandle GameplayEffectHandle
-    m_GameplayEffectHandle : ActiveGameplayEffectHandle;
-    // InputID, if bound to an input
-    // public int32 InputID
-    m_InputID : int32;
-    // Count of how many times this ability has been activated
-    // public uint8 ActiveCount
-    m_ActiveCount : uint8;
-    // Tags that this ability has. These are replicated and can be used for GE source tags
-    // public GameplayTagContainer DynamicAbilityTags
-    m_DynamicAbilityTags : GameplayTagContainer;
+    // public EGameplayAbilityActivationMode ActivationMode
+    m_ActivationMode : EGameplayAbilityActivationMode;
 }
 // GameplayEffectCue
 class GameplayEffectCue
@@ -1145,6 +1145,8 @@ class AbilityTask_WaitTargetData
 class CustomAttributeSet
     extends AttributeSet
 {
+    // public CustomAttributeSet()
+    constructor();
     // public std::function<bool (*)(FGameplayEffectModCallbackData * _0)> OnK2_PreGameplayEffectExecute
     m_OnK2_PreGameplayEffectExecute : (_0 : FGameplayEffectModCallbackData) => boolean| undefined;
     // public std::function<void (*)(FGameplayEffectModCallbackData const * _0)> OnK2_PostGameplayEffectExecute
@@ -1163,6 +1165,8 @@ class CustomAttributeSet
 class CustomGameplayAbility
     extends GameplayAbility
 {
+    // public CustomGameplayAbility()
+    constructor();
     // public void K2_CancelAbility()
     K2_CancelAbility() : void;
     // public bool K2_CommitAbility()

@@ -2,31 +2,42 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupGas = setupGas;
 const XkeinExt_1 = require("XkeinExt");
+const persistentObjs = [];
 function abilityLoader(name) {
     const m = require(name.c_str());
     if (m && m.ability_creator) {
-        return new XkeinExt_1.GameplayAbilityCreator(m.ability_creator);
+        let creator = new XkeinExt_1.GameplayAbilityCreator(m.ability_creator);
+        persistentObjs.push(creator);
+        return creator;
     }
 }
 function attributeSetLoader(name) {
     const m = require(name.c_str());
     if (m && m.attribute_set_creator) {
-        return new XkeinExt_1.AttributeSetCreator(m.attribute_set_creator);
+        let creator = new XkeinExt_1.AttributeSetCreator(m.attribute_set_creator);
+        persistentObjs.push(creator);
+        return creator;
     }
 }
 function cueLoader(name) {
     const m = require(name.c_str());
     if (m && m.cue_static_creator) {
-        return new XkeinExt_1.GameplayCueStaticCreator(m.cue_static_creator);
+        let creator = new XkeinExt_1.GameplayCueStaticCreator(m.cue_static_creator);
+        persistentObjs.push(creator);
+        return creator;
     }
     if (m && m.cue_actor_creator) {
-        return new XkeinExt_1.GameplayCueStaticCreator(m.cue_actor_creator);
+        let creator = new XkeinExt_1.GameplayCueStaticCreator(m.cue_actor_creator);
+        persistentObjs.push(creator);
+        return creator;
     }
 }
 function taskLoader(name) {
     const m = require(name.c_str());
     if (m && m.ability_task_creator) {
-        return new XkeinExt_1.AbilityTaskCreator(m.ability_task_creator);
+        let creator = new XkeinExt_1.AbilityTaskCreator(m.ability_task_creator);
+        persistentObjs.push(creator);
+        return creator;
     }
 }
 function setupGas() {
