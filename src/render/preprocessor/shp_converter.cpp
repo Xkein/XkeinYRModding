@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
+#include <fstream>
 #include <string>
 
 #include <FileFormats/SHP.h>
@@ -62,20 +63,24 @@ bool SHPConverter::ConvertSHP(const std::string& shpFilename,
     if (!file.Exists())
         return false;
 
-    // 从内存加载 SHP（直接读取文件内容，构造 SHPStruct）
-    // SHPStruct 需要从游戏内存中分配，使用重载的函数
-    // 注意：这里需要 SHPStruct 的内部结构来解析
-
-    // 对于 MVP，直接从文件读取原始字节并手动解析 SHP 格式
-    // SHP 格式: [WORD frames][WORD width][WORD height][WORD type]
-    //   然后每个帧: [SHPFrame header][像素数据]
-
-    auto fileBytes = file.ReadAllBytes();
-    if (!fileBytes.get() || file.GetSize() < 8)
+    if (!file.Open(FileAccessMode::Read))
         return false;
 
-    const uint8_t* data = fileBytes.get();
-    uint32_t dataSize   = file.GetSize();
+    int dataSize = file.GetFileSize();
+    if (dataSize < 8) {
+        file.Close();
+        return false;
+    }
+
+    // 读取整个文件到 buffer
+    std::vector<uint8_t> buffer(static_cast<size_t>(dataSize));
+    int bytesRead = file.ReadBytes(buffer.data(), dataSize);
+    file.Close();
+
+    if (bytesRead != dataSize)
+        return false;
+
+    const uint8_t* data = buffer.data();
 
     // 读取头
     uint16_t nFrames = *reinterpret_cast<const uint16_t*>(data);
@@ -83,7 +88,7 @@ bool SHPConverter::ConvertSHP(const std::string& shpFilename,
     uint16_t height  = *reinterpret_cast<const uint16_t*>(data + 4);
     // uint16_t type    = *reinterpret_cast<const uint16_t*>(data + 6); // 0xFFFF = reference
 
-    if (dataSize < 8) return false;
+    if (nFrames == 0) return false;
 
     // 准备元数据
     SHPMeta meta;
@@ -108,7 +113,7 @@ bool SHPConverter::ConvertSHP(const std::string& shpFilename,
     const PALColor* pal = palette ? palette : defaultPalette;
 
     for (int frameIdx = 0; frameIdx < nFrames; ++frameIdx) {
-        if (offset + sizeof(SHPFrame) > dataSize) return false;
+        if (offset + sizeof(SHPFrame) > static_cast<size_t>(dataSize)) return false;
 
         auto* frameHdr = reinterpret_cast<const SHPFrame*>(data + offset);
         offset += sizeof(SHPFrame);
@@ -117,7 +122,7 @@ bool SHPConverter::ConvertSHP(const std::string& shpFilename,
         int16_t fh = frameHdr->Height;
 
         uint32_t pixelCount = static_cast<uint32_t>(fw) * fh;
-        if (offset + pixelCount > dataSize) return false;
+        if (offset + pixelCount > static_cast<size_t>(dataSize)) return false;
 
         meta.Frames.push_back({
             frameHdr->Left,

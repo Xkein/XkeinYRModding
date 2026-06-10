@@ -52,7 +52,7 @@ static ESyncedEntityType MapAbstractType(AbstractType at)
         case AbstractType::Particle:   return ESyncedEntityType::Particle;
         case AbstractType::VoxelAnim:  return ESyncedEntityType::VoxelAnim;
         case AbstractType::Wave:       return ESyncedEntityType::Wave;
-        case AbstractType::IsometricTile: return ESyncedEntityType::IsometricTile;
+        case AbstractType::Isotile:       return ESyncedEntityType::IsometricTile;
         case AbstractType::Overlay:    return ESyncedEntityType::Overlay;
         case AbstractType::ParticleSystem: return ESyncedEntityType::ParticleSystem;
         case AbstractType::Smudge:     return ESyncedEntityType::Smudge;
@@ -174,7 +174,7 @@ std::string SyncDataCollector::GetAssetFilename(AbstractClass* obj) const
         auto* pTT = pTechno->GetTechnoType();
         if (pTT) {
             if (pTT->ImageFile[0])
-                return std::to_string(pTT->ImageFile) + (pTT->Voxel ? ".vxl" : ".shp");
+                return std::string(pTT->ImageFile) + (pTT->Voxel ? ".vxl" : ".shp");
             return std::string(pTT->get_ID()) + (pTT->Voxel ? ".vxl" : ".shp");
         }
     }
@@ -219,30 +219,20 @@ int32_t SyncDataCollector::GetCurrentFrame(AbstractClass* obj) const
 
     // VoxelAnimClass
     if (at == AbstractType::VoxelAnim) {
-        return static_cast<int32_t>(static_cast<VoxelAnimClass*>(obj)->Animation.Value);
+        // VoxelAnimClass 无 Animation 成员，帧通过 Duration 和 Type 计算
+        // TODO: 逆向后补充
+        return 0;
     }
 
     // TechnoClass: BodyType 驱动的行走帧
     auto* pTechno = generic_cast<TechnoClass*>(obj);
     if (pTechno) {
-        // BodyType 帧索引: Body[ToA(GetRealFacing())].Frame
-        // FootClass 的 FrameIndex 由 WalkedFramesSoFar / WalkRate 计算
         auto* pFoot = generic_cast<FootClass*>(obj);
         if (pFoot) {
-            auto* pTT = pFoot->GetTechnoType();
-            if (pTT) {
-                auto* pBodyType = pTT->GetBodyType();
-                if (pBodyType) {
-                    // 通过 GetRealFacing 获取朝向，映射到 BodyType 的帧
-                    DirStruct facing = pFoot->GetRealFacing();
-                    int facingIdx = facing.Raw & 7;
-                    auto* pBodyData = &pBodyType->Bodies[facingIdx];
-                    // 帧索引 = WalkedFramesSoFar 在 WalkRate 的哪个阶段
-                    // return pBodyData->Frame + (pFoot->WalkedFramesSoFar / pBodyData->WalkRate);
-                    // TODO: 需要逆向确认 Frame/WalkRate 字段偏移
-                    return 0;
-                }
-            }
+            // TODO: 逆向获取 BodyType 帧索引
+            // BodyType 帧索引: Body[ToA(GetRealFacing())].Frame
+            // FootClass 的 FrameIndex 由 WalkedFramesSoFar / WalkRate 计算
+            return 0;
         }
         // 建筑等无行走动画的 Techno
         return 0;
@@ -278,14 +268,14 @@ uint8_t SyncDataCollector::GetPlayerIndex(AbstractClass* obj) const
 
     if (obj->WhatAmI() == AbstractType::Anim) {
         auto* pAnim = static_cast<AnimClass*>(obj);
-        if (pAnim->Owner)
-            return static_cast<uint8_t>(pAnim->Owner->ArrayIndex);
+        if (pAnim->OwnerObject)
+            return static_cast<uint8_t>(reinterpret_cast<HouseClass*>(pAnim->OwnerObject)->ArrayIndex);
         return 0;
     }
 
-    auto* pObj = generic_cast<ObjectClass*>(obj);
-    if (pObj && pObj->Owner)
-        return static_cast<uint8_t>(pObj->Owner->ArrayIndex);
+    auto* pTechno = generic_cast<TechnoClass*>(obj);
+    if (pTechno && pTechno->Owner)
+        return static_cast<uint8_t>(pTechno->Owner->ArrayIndex);
 
     return 0;
 }
@@ -480,7 +470,7 @@ public:
 
         // 初始化共享内存通道
         if (collector.IsUE5Enabled()) {
-            if (collector._channel.InitWriter()) {
+            if (collector.GetChannel().InitWriter()) {
                 gLogger->info("UE5 render sync: shared memory initialized");
             } else {
                 // 降级：共享内存初始化失败，回退到原引擎渲染
@@ -523,6 +513,9 @@ public:
     {
         _impl->Tick();
     }
+
+private:
+    RenderBackendImpl* _impl = nullptr;
 };
 
 // === 全局实例 ===
@@ -548,5 +541,3 @@ void ShutdownRenderBackend()
     delete gRenderBackend;
     gRenderBackend = nullptr;
 }
-
-#include "yr/yr_all_events.h"

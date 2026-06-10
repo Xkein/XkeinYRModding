@@ -1,5 +1,7 @@
 #pragma once
 
+#include "pal_converter.h"
+
 #include <string>
 #include <vector>
 #include <cstdint>
@@ -28,11 +30,6 @@ struct SHPMeta
 
     // 总像素数据字节数 = MaxWidth * TotalHeight * 4
     uint32_t TotalPixelBytes() const { return static_cast<uint32_t>(MaxWidth) * TotalHeight * 4; }
-};
-
-struct PALColor
-{
-    uint8_t R, G, B;
 };
 
 class SHPConverter

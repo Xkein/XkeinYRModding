@@ -39,8 +39,7 @@ enum class EVisualType : uint8_t {
 struct SyncedEntity {
     uint32_t    EntityID;         // 唯一 ID（继承自现有 RenderSyncComponent.id）
     ESyncedEntityType Type;
-    uint32_t    AssetNameHash;    // 文件名(含后缀)哈希 → UE5 端通过后缀区分 SHP(.shp→.png) 和 VXL(.vxl)
-    uint32_t    AssetNameLen;     // 文件名长度（首次出现时附带文件名字符串）
+    uint32_t    AssetNameHash;    // 文件名(含后缀)哈希
     float       PosX, PosY, PosZ; // 世界坐标 (Lepton)
     float       RotX, RotY, RotZ, RotW; // 旋转四元数
     int32_t     Facing;           // 朝向 (0-7, 或 -1 未指定)
@@ -49,6 +48,7 @@ struct SyncedEntity {
     int32_t     Brightness;       // 亮度 0~2000
     EVisualType Visual;           // 视觉状态
     uint8_t     PlayerIndex;      // 所属玩家
+    uint8_t     _padding[9];      // 保留字段，对齐 64 字节
 };
 #pragma pack(pop)
 

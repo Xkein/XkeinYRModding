@@ -45,6 +45,12 @@ public:
     void OnEntityCreated(uint32_t entityID);
     void OnEntityDestroyed(uint32_t entityID);
 
+    // 获取共享内存通道（供 RenderBackendImpl 初始化使用）
+    SharedMemChannel& GetChannel() { return _channel; }
+
+    // 更新 EntityID 计数
+    static uint32_t AllocEntityID_Static();
+
 private:
     // 收集单个实体的状态
     void CollectEntity(SyncComponent& com);
@@ -60,9 +66,6 @@ private:
 
     // 获取所属玩家
     uint8_t GetPlayerIndex(AbstractClass* obj) const;
-
-    // 更新 EntityID 计数
-    static uint32_t AllocEntityID_Static();
 
     SharedMemChannel _channel;
     FramePacket      _framePacket;

@@ -1,6 +1,6 @@
 #pragma once
 
-// SyncedEntity: 定长 64 字节
+// SyncedEntity: 64 字节
 //   [4] EntityID
 //   [1] Type
 //   [4] AssetNameHash
@@ -12,7 +12,7 @@
 //   [4] Brightness
 //   [1] Visual
 //   [1] PlayerIndex
-//   [2] padding
+//   [9] _padding (reserved)
 
 static_assert(sizeof(SyncedEntity) == 64, "SyncedEntity must be 64 bytes");
 
@@ -39,8 +39,8 @@ inline void FramePacketSerializer::SerializeEntity(const SyncedEntity& se, std::
     push(&se.Brightness, 4);
     push(&se.Visual, 1);
     push(&se.PlayerIndex, 1);
-    uint8_t pad[2] = {0, 0};
-    push(pad, 2);
+    uint8_t pad[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    push(pad, 9);
 }
 
 inline void FramePacketSerializer::DeserializeEntity(const uint8_t* data, SyncedEntity& se)
@@ -67,7 +67,7 @@ inline void FramePacketSerializer::DeserializeEntity(const uint8_t* data, Synced
     read(&se.Brightness, 4);
     read(&se.Visual, 1);
     read(&se.PlayerIndex, 1);
-    off += 2; // padding
+    off += 9; // _padding (reserved)
 }
 
 inline void FramePacketSerializer::Serialize(const FramePacket& packet, std::vector<uint8_t>& out)
