@@ -28,4 +28,9 @@ void YrExtCoreConfig::Init()
     this->assetsPath  = Paths::GetLaunchDir() / rawData.value("assets_dir", "assets");
     this->pluginsPath = Paths::GetLaunchDir() / rawData.value("plugins_dir", "plugins");
     this->extensions  = rawData["extensions"];
+
+    // UE5 渲染前端配置
+    this->enableOriginalRender = rawData.value("enable_original_render", true);
+    this->ue5RenderCachePath   = rawData.value("ue5_render_cache_path", "assets/cache/ue5_render");
+    this->renderSyncPort       = rawData.value("render_sync_port", 9900);
 }
