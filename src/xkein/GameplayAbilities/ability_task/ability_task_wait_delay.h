@@ -1,6 +1,7 @@
 #pragma once
 #include "ability_task.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
+#include "xkein/misc/timer_manager.h"
 
 /**
  * AbilityTask_WaitDelay
@@ -18,18 +19,17 @@ public:
 
 	virtual void Activate() override;
 	
-	/** Tick: accumulate elapsed time, end task when duration is reached */
-	virtual void Tick(float DeltaTime) override;
+	virtual void OnDestroy(bool bOwnerFinished) override;
 
 	/** Duration to wait before finishing (level-scaled) */
 	PROPERTY()
 	FScalableFloat Duration;
 
-	/** Time elapsed so far, accumulated by Tick */
-	PROPERTY()
-	float ElapsedTime = 0;
-
 	/** Callback fired when the delay completes */
 	PROPERTY()
 	std::function<void()> OnFinish;
+
+private:
+	void OnTimeFinish();
+	TimerHandle WaitTimerHandle;
 };

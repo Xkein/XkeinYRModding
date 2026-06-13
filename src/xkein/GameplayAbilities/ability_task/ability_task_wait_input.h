@@ -1,5 +1,6 @@
 #pragma once
 #include "ability_task.h"
+#include "xkein/misc/timer_manager.h"
 
 /**
  * AbilityTask_WaitInput
@@ -20,9 +21,7 @@ public:
 	static AbilityTask_WaitInput* Create(GameplayAbility* Ability, int32 InputID, bool bTriggerOnPress, bool bTriggerOnRelease);
 
 	virtual void Activate() override;
-
-	/** Tick: poll InputPressed state on the ability spec */
-	virtual void Tick(float DeltaTime) override;
+	virtual void OnDestroy(bool bOwnerFinished) override;
 
 	/** InputID to watch. Should match the ability's bound InputID. */
 	PROPERTY()
@@ -45,6 +44,11 @@ public:
 	std::function<void()> OnInputRelease;
 
 private:
+	void OnPollInput();
+
 	/** Last known pressed state, used for edge detection */
 	bool bWasPressed = false;
+
+	/** Repeating timer handle for per-frame input polling */
+	TimerHandle PollTimerHandle;
 };

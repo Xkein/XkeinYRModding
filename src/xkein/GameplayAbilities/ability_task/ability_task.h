@@ -2,18 +2,18 @@
 #include "core/reflection/reflection.h"
 #include "scripting/common/script_function.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec_handle.h"
+#include "xkein/GameplayAbilities/gameplay_ability.h"
 #include <functional>
 
 class AbilitySystemComponent;
-class GameplayAbility;
 
 /**
  * AbilityTask
  *
  * Base class for ability-level tasks. Lifecycle mirrors UAbilityTask:
  *   1. Create factory allocates the task and calls InitTask + AddAbilityTask
- *   2. Activate() is called to register delegates / start timers / begin work
- *   3. Tick() is called per-frame (for tasks that poll; prefer delegate-driven)
+ *   2. Activate() is called by PreActivate batch after all tasks are created — registers delegates / starts timers / begins work
+ *   3. Subclasses may use TimerManager (preferred) or polling to do work
  *   4. EndTask() marks the task finished and fires OnK2_OnTaskEnd
  *   5. OnDestroy() is called when the owning ability ends or task is cleaned up
  *   6. ReadyForDestroy() schedules removal from the active task list
@@ -30,9 +30,10 @@ public:
 	 *  Subclasses override this to register delegates, set timers, etc. */
 	virtual void Activate() {}
 
-	/** Tick this task. Called from ASC::TickTasks every frame while the task is active.
-	 *  Prefer delegate-driven patterns over polling in Tick where possible. */
-	virtual void Tick(float DeltaTime) {}
+	void CallActivate() {
+		bActivated = true;
+		Activate();
+	}
 
 	/** Mark this task as finished. Fires OnK2_OnTaskEnd callback. */
 	virtual void EndTask();
@@ -43,6 +44,9 @@ public:
 
 	/** Returns true if EndTask() has been called */
 	bool IsFinished() const { return bFinished; }
+
+	/** Returns true if Activate() has been called */
+	bool IsActivated() const { return bActivated; }
 
 	/** Returns true if ReadyForDestroy() has been called */
 	bool IsReadyForDestroy() const { return bReadyForDestroy; }
@@ -67,7 +71,26 @@ public:
 	/** Static factory: creates a task by name, initializes it, and registers it with the ASC.
 	 *  Uses ScriptFunction pattern (TaskCreator) for script-registered constructors. */
 	static AbilityTask* CreateTask(GameplayAbility* Ability, StringName TaskName, AbilitySystemComponent& ASC);
-	
+
+	/** Helper template for instantiating and initializing a new task.
+	 *  Parallels UE's UAbilityTask::NewAbilityTask<T>().
+	 *  Activate() is called by GameplayAbility::PreActivate after all tasks are created.
+	 *  Usage: auto* Task = NewAbilityTask<AbilityTask_WaitDelay>(Ability);
+	 *         Task->Duration = 3.0f;
+	 *         // Activate() is called automatically by GameplayAbility::PreActivate */
+	template <class T>
+	static T* NewAbilityTask(GameplayAbility* ThisAbility)
+	{
+		T* Task = new T();
+		AbilitySystemComponent* ASC = ThisAbility->GetAbilitySystemComponentFromActorInfo();
+		if (ASC)
+		{
+			Task->InitTask(*ASC, ThisAbility->GetCurrentSpecHandle(), ThisAbility);
+			ThisAbility->AddAbilityTask(Task);
+		}
+		return Task;
+	}
+
 	PROPERTY()
     static StringName ScriptFunctionCategory;
 
@@ -93,6 +116,9 @@ protected:
 
 	/** True after ReadyForDestroy() has been called; task will be removed on next TickTasks pass */
 	bool bReadyForDestroy = false;
+
+	/** True after Activate() has been called. Set by TickTasks activation pass. */
+	bool bActivated = false;
 };
 
 /** ScriptFunction factory type for creating ability tasks, analogous to GameplayAbilityCreator */

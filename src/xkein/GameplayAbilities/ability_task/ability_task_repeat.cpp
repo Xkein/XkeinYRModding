@@ -1,86 +1,71 @@
 #include "ability_task_repeat.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/misc/timer_manager.h"
 
 AbilityTask_Repeat* AbilityTask_Repeat::Create(GameplayAbility* Ability, int32 MaxIterations, float Interval)
 {
-	auto* Task = new AbilityTask_Repeat();
+	auto* Task = NewAbilityTask<AbilityTask_Repeat>(Ability);
 	Task->MaxIterations = MaxIterations;
 	Task->IntervalBetweenIterations = Interval;
-
-	AbilitySystemComponent* ASC = Ability->GetAbilitySystemComponentFromActorInfo();
-	if (ASC)
-	{
-		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
-		Ability->AddAbilityTask(Task);
-		Task->Activate();
-	}
-
 	return Task;
 }
 
 void AbilityTask_Repeat::Activate()
 {
-	// TODO: Refactor to use a timer system instead of polling in Tick.
-	// See UAbilityTask_Repeat::Activate for reference (uses TimerManager::SetTimer).
-	// For now, fire the first action immediately, then let Tick handle the rest.
+	// Fire the first action immediately (existing behavior preserved)
 	if (CurrentIteration < MaxIterations)
 	{
-		if (ShouldBroadcastAbilityTaskDelegates())
+		if (ShouldBroadcastAbilityTaskDelegates() && OnPerformAction)
 		{
-			if (OnPerformAction)
-			{
-				OnPerformAction(CurrentIteration);
-			}
+			OnPerformAction(CurrentIteration);
 		}
 		CurrentIteration++;
 	}
 
 	if (CurrentIteration >= MaxIterations)
 	{
-		if (ShouldBroadcastAbilityTaskDelegates())
+		if (ShouldBroadcastAbilityTaskDelegates() && OnFinished)
 		{
-			if (OnFinished)
-			{
-				OnFinished(CurrentIteration);
-			}
+			OnFinished(CurrentIteration);
 		}
 		EndTask();
-	}
-}
-
-void AbilityTask_Repeat::Tick(float DeltaTime)
-{
-	if (bFinished)
-	{
 		return;
 	}
 
-	AccumulatedTime += DeltaTime;
-
-	while (AccumulatedTime >= IntervalBetweenIterations && CurrentIteration < MaxIterations)
+	// Set repeating timer for remaining iterations
+	if (ASC)
 	{
-		AccumulatedTime -= IntervalBetweenIterations;
-
-		if (ShouldBroadcastAbilityTaskDelegates())
-		{
-			if (OnPerformAction)
-			{
-				OnPerformAction(CurrentIteration);
-			}
-		}
-
-		CurrentIteration++;
+		RepeatTimerHandle = ASC->GetTimerManager().SetRepeatingTimer([this]() { OnTimerTick(); }, IntervalBetweenIterations);
 	}
+}
+
+void AbilityTask_Repeat::OnTimerTick()
+{
+	if (bFinished || CurrentIteration >= MaxIterations)
+		return;
+
+	if (ShouldBroadcastAbilityTaskDelegates() && OnPerformAction)
+	{
+		OnPerformAction(CurrentIteration);
+	}
+	CurrentIteration++;
 
 	if (CurrentIteration >= MaxIterations)
 	{
-		if (ShouldBroadcastAbilityTaskDelegates())
+		if (ShouldBroadcastAbilityTaskDelegates() && OnFinished)
 		{
-			if (OnFinished)
-			{
-				OnFinished(CurrentIteration);
-			}
+			OnFinished(CurrentIteration);
 		}
 		EndTask();
+		ReadyForDestroy();
 	}
+}
+
+void AbilityTask_Repeat::OnDestroy(bool bOwnerFinished)
+{
+	if (ASC)
+	{
+		ASC->GetTimerManager().ClearTimer(RepeatTimerHandle);
+	}
+	AbilityTask::OnDestroy(bOwnerFinished);
 }

@@ -1,6 +1,7 @@
 #include "ability_task_wait_input.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include "xkein/GameplayAbilities/gameplay_ability.h"
+#include "xkein/misc/timer_manager.h"
 
 AbilityTask_WaitInput* AbilityTask_WaitInput::Create(GameplayAbility* Ability, int32 InputID, bool bTriggerOnPress, bool bTriggerOnRelease)
 {
@@ -14,7 +15,6 @@ AbilityTask_WaitInput* AbilityTask_WaitInput::Create(GameplayAbility* Ability, i
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		Task->Activate();
 	}
 
 	return Task;
@@ -22,7 +22,7 @@ AbilityTask_WaitInput* AbilityTask_WaitInput::Create(GameplayAbility* Ability, i
 
 void AbilityTask_WaitInput::Activate()
 {
-	// Capture initial pressed state so we don't fire on the first Tick if already pressed
+	// Capture initial pressed state so we don't fire on the first poll if already pressed
 	if (ASC && AbilityInstance)
 	{
 		GameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(AbilityInstance);
@@ -31,9 +31,15 @@ void AbilityTask_WaitInput::Activate()
 			bWasPressed = (Spec->InputPressed != 0);
 		}
 	}
+
+	// Start per-frame polling via TimerManager (interval 0 = every frame)
+	if (ASC)
+	{
+		ASC->GetTimerManager().SetRepeatingTimer([this]() { OnPollInput(); }, 0.0f);
+	}
 }
 
-void AbilityTask_WaitInput::Tick(float DeltaTime)
+void AbilityTask_WaitInput::OnPollInput()
 {
 	if (bFinished || !ASC)
 	{
@@ -72,4 +78,13 @@ void AbilityTask_WaitInput::Tick(float DeltaTime)
 	}
 
 	bWasPressed = bIsPressed;
+}
+
+void AbilityTask_WaitInput::OnDestroy(bool bOwnerFinished)
+{
+	if (ASC)
+	{
+		ASC->GetTimerManager().ClearTimer(PollTimerHandle);
+	}
+	AbilityTask::OnDestroy(bOwnerFinished);
 }

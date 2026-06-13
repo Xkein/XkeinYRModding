@@ -13,7 +13,6 @@ AbilityTask_WaitGameplayEvent* AbilityTask_WaitGameplayEvent::Create(GameplayAbi
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		Task->Activate();
 	}
 
 	return Task;
@@ -54,6 +53,8 @@ void AbilityTask_WaitGameplayEvent::OnDestroy(bool bOwnerFinished)
 	{
 		EndTask();
 	}
+
+	AbilityTask::OnDestroy(bOwnerFinished);
 }
 
 void AbilityTask_WaitGameplayEvent::OnGameplayEvent(const GameplayTag& InTag, const GameplayEventData* Payload)

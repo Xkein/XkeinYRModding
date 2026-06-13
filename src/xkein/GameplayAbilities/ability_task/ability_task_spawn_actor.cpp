@@ -20,7 +20,6 @@ AbilityTask_SpawnActor* AbilityTask_SpawnActor::Create(GameplayAbility* Ability,
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		Task->Activate();
 	}
 
 	return Task;

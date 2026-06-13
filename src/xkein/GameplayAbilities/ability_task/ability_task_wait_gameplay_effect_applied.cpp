@@ -12,7 +12,6 @@ AbilityTask_WaitGameplayEffectApplied* AbilityTask_WaitGameplayEffectApplied::Cr
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		Task->Activate();
 	}
 
 	return Task;

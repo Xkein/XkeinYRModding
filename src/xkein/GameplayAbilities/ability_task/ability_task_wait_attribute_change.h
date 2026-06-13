@@ -1,6 +1,7 @@
 #pragma once
 #include "ability_task.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
+#include "xkein/misc/timer_manager.h"
 
 /**
  * AbilityTask_WaitAttributeChange
@@ -21,10 +22,6 @@ public:
 	static AbilityTask_WaitAttributeChange* Create(GameplayAbility* Ability, const GameplayAttribute& Attribute, bool bTriggerOnce);
 
 	virtual void Activate() override;
-
-	/** Tick: poll attribute value, detect changes */
-	virtual void Tick(float DeltaTime) override;
-
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
 	/** Attribute to watch for value changes */
@@ -40,9 +37,14 @@ public:
 	std::function<void(float)> OnAttributeChanged;
 
 private:
+	void OnPollAttribute();
+
 	/** Last known value of the watched attribute, used for change detection */
 	float LastKnownValue = 0.0f;
 
 	/** Whether the task has been fully initialized and registered first value */
 	bool bInitialized = false;
+
+	/** Repeating timer handle for per-frame attribute polling */
+	TimerHandle PollTimerHandle;
 };

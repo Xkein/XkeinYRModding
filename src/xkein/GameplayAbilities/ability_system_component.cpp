@@ -75,6 +75,7 @@ void AbilitySystemComponent::InitializeFromType(AbilitySystemComponentType* InTy
 void AbilitySystemComponent::Tick(float DeltaTime)
 {
 	ActiveGameplayEffects.Tick(DeltaTime);
+	TaskTimerManager.Tick(DeltaTime);
 	TickTasks(DeltaTime);
 
 	// Delete pending InstancedPerExecution abilities
@@ -98,12 +99,12 @@ void AbilitySystemComponent::TickTasks(float DeltaTime)
 
 			auto& Tasks = Instance->GetActiveTasks();
 
-			// Tick all non-finished tasks
+			// Activate tasks that haven't been activated yet
 			for (auto* Task : Tasks)
 			{
-				if (Task && !Task->IsFinished())
+				if (Task && !Task->IsFinished() && !Task->IsActivated())
 				{
-					Task->Tick(DeltaTime);
+					Task->CallActivate();
 				}
 			}
 

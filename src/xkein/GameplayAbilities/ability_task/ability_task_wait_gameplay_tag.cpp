@@ -16,7 +16,6 @@ AbilityTask_WaitGameplayTagAdded* AbilityTask_WaitGameplayTagAdded::Create(Gamep
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		Task->Activate();
 	}
 
 	return Task;
@@ -111,7 +110,6 @@ AbilityTask_WaitGameplayTagRemoved* AbilityTask_WaitGameplayTagRemoved::Create(G
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		Task->Activate();
 	}
 
 	return Task;

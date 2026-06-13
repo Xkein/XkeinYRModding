@@ -10,6 +10,7 @@
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
 #include "xkein/GameplayAbilities/gameplay_tag_count_container.h"
 #include "xkein/GameplayAbilities/gameplay_effect_query.h"
+#include "xkein/misc/timer_manager.h"
 #include <functional>
 #include <set>
 
@@ -132,6 +133,9 @@ public:
 	/** Tick all active ability tasks, cleaning up finished ones */
 	void TickTasks(float DeltaTime);
 
+	/** Accessor for the task timer manager (used by ability tasks for delayed callbacks) */
+	TimerManager& GetTimerManager() { return TaskTimerManager; }
+
 	/** Create and register an attribute set via the factory system */
 	AttributeSet* AddAttributeSet(AttributeSetDefine* define);
 
@@ -174,6 +178,9 @@ public:
 	/** Contains all of the gameplay effects that are currently active on this component */
 	PROPERTY()
 	ActiveGameplayEffectsContainer ActiveGameplayEffects;
+
+	/** Timer manager for ability tasks (delayed callbacks, repeating timers) */
+	TimerManager TaskTimerManager;
 	
 	/** Abilities that are triggered from a gameplay event */
 	std::map<GameplayTag, std::vector<GameplayAbilitySpecHandle > > GameplayEventTriggeredAbilities;

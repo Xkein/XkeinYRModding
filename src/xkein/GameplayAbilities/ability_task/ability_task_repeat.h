@@ -1,11 +1,13 @@
 #pragma once
 #include "ability_task.h"
+#include "xkein/misc/timer_manager.h"
 
 /**
  * AbilityTask_Repeat
  *
  * Repeatedly fires an action callback at a specified time interval.
- * Tick accumulates time and fires OnPerformAction on each interval boundary.
+ * First iteration fires immediately in Activate; remaining iterations
+ * are scheduled via TimerManager::SetRepeatingTimer.
  * Ends after MaxIterations actions have been performed.
  * Fires OnFinished when all iterations complete.
  */
@@ -18,9 +20,6 @@ public:
 	static AbilityTask_Repeat* Create(GameplayAbility* Ability, int32 MaxIterations, float Interval);
 
 	virtual void Activate() override;
-
-	/** Tick: accumulate time, fire callback at interval boundaries */
-	virtual void Tick(float DeltaTime) override;
 
 	/** Maximum number of times to perform the action */
 	PROPERTY()
@@ -38,10 +37,13 @@ public:
 	PROPERTY()
 	std::function<void(int32)> OnFinished;
 
+	/** Cancel pending timer on destruction */
+	virtual void OnDestroy(bool bOwnerFinished) override;
+
 private:
 	/** Current iteration count (0-based, increments after each fire) */
 	int32 CurrentIteration = 0;
 
-	/** Accumulated time since last iteration fire */
-	float AccumulatedTime = 0.0f;
+	void OnTimerTick();
+	TimerHandle RepeatTimerHandle;
 };

@@ -1,5 +1,6 @@
 #include "ability_task_wait_attribute_change.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/misc/timer_manager.h"
 
 AbilityTask_WaitAttributeChange* AbilityTask_WaitAttributeChange::Create(GameplayAbility* Ability, const GameplayAttribute& Attribute, bool bTriggerOnce)
 {
@@ -12,7 +13,6 @@ AbilityTask_WaitAttributeChange* AbilityTask_WaitAttributeChange::Create(Gamepla
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		Task->Activate();
 	}
 
 	return Task;
@@ -27,9 +27,15 @@ void AbilityTask_WaitAttributeChange::Activate()
 		LastKnownValue = ASC->GetGameplayAttributeValue(AttributeToWatch, bFound);
 		bInitialized = bFound;
 	}
+
+	// Start per-frame polling via TimerManager (interval 0 = every frame)
+	if (ASC)
+	{
+		ASC->GetTimerManager().SetRepeatingTimer([this]() { OnPollAttribute(); }, 0.0f);
+	}
 }
 
-void AbilityTask_WaitAttributeChange::Tick(float DeltaTime)
+void AbilityTask_WaitAttributeChange::OnPollAttribute()
 {
 	if (bFinished || !ASC)
 	{
@@ -72,8 +78,15 @@ void AbilityTask_WaitAttributeChange::Tick(float DeltaTime)
 
 void AbilityTask_WaitAttributeChange::OnDestroy(bool bOwnerFinished)
 {
+	if (ASC)
+	{
+		ASC->GetTimerManager().ClearTimer(PollTimerHandle);
+	}
+
 	if (!bFinished)
 	{
 		EndTask();
 	}
+
+	AbilityTask::OnDestroy(bOwnerFinished);
 }
