@@ -76,54 +76,50 @@ void AbilitySystemComponent::Tick(float DeltaTime)
 {
 	ActiveGameplayEffects.Tick(DeltaTime);
 	TickTasks(DeltaTime);
+
+	// Delete pending InstancedPerExecution abilities
+	for (GameplayAbility* Ability : PendingDeleteAbilities)
+	{
+		if (Ability)
+		{
+			delete Ability;
+		}
+	}
+	PendingDeleteAbilities.clear();
 }
 
 void AbilitySystemComponent::TickTasks(float DeltaTime)
 {
-	// Tick all non-finished tasks
-	for (auto* Task : ActiveTasks)
+	for (auto& Spec : ActivatableAbilities)
 	{
-		if (Task && !Task->IsFinished())
+		for (auto* Instance : Spec.GetAbilityInstances())
 		{
-			Task->Tick(DeltaTime);
+			if (!Instance) continue;
+
+			auto& Tasks = Instance->GetActiveTasks();
+
+			// Tick all non-finished tasks
+			for (auto* Task : Tasks)
+			{
+				if (Task && !Task->IsFinished())
+				{
+					Task->Tick(DeltaTime);
+				}
+			}
+
+			// Remove and delete tasks marked for destroy
+			Tasks.erase(
+				std::remove_if(Tasks.begin(), Tasks.end(),
+					[](AbilityTask* Task) {
+						if (Task && Task->IsReadyForDestroy())
+						{
+							delete Task;
+							return true;
+						}
+						return false;
+					}),
+				Tasks.end());
 		}
-	}
-
-	// Remove and delete tasks marked for destroy
-	ActiveTasks.erase(
-		std::remove_if(ActiveTasks.begin(), ActiveTasks.end(),
-			[](AbilityTask* Task) {
-				if (Task && Task->IsReadyForDestroy())
-				{
-					delete Task;
-					return true;
-				}
-				return false;
-			}),
-		ActiveTasks.end());
-}
-
-void AbilitySystemComponent::ClearAbilityTasks(GameplayAbilitySpecHandle Handle)
-{
-	ActiveTasks.erase(
-		std::remove_if(ActiveTasks.begin(), ActiveTasks.end(),
-			[&Handle](AbilityTask* Task) {
-				if (Task && Task->GetAbilityHandle() == Handle)
-				{
-					Task->OnDestroy(true);
-					delete Task;
-					return true;
-				}
-				return false;
-			}),
-		ActiveTasks.end());
-}
-
-void AbilitySystemComponent::RegisterTask(AbilityTask* Task)
-{
-	if (Task)
-	{
-		ActiveTasks.push_back(Task);
 	}
 }
 
@@ -407,7 +403,6 @@ GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbil
     if (Ability)
     {
         Ability->Define = AbilityDefine;
-        this->AllSelfCreatedAbilities.push_back(Ability);
         return this->GiveAbility(GameplayAbilitySpec(Ability));
     }
     return {};
@@ -429,7 +424,6 @@ GameplayAbility* AbilitySystemComponent::CreateNewInstanceOfAbility(GameplayAbil
 
     AbilityInstance->Define = Ability->Define;
     Spec.NonReplicatedInstances.push_back(AbilityInstance);
-    this->AllSelfCreatedAbilities.push_back(AbilityInstance);
 
     return AbilityInstance;
 }
@@ -607,6 +601,16 @@ bool AbilitySystemComponent::TryActivateAbility(GameplayAbilitySpecHandle Abilit
 	}
 	
 	GameplayAbility* Ability = FoundSpec->Ability;
+
+    // For InstancedPerExecution, create a new instance for each activation
+    if (Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerExecution)
+    {
+        GameplayAbility* Instance = CreateNewInstanceOfAbility(*FoundSpec, Ability);
+        if (Instance)
+        {
+            Ability = Instance;
+        }
+    }
     
     // Build ActorInfo
     GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
@@ -651,16 +655,6 @@ void AbilitySystemComponent::CancelAbility(GameplayAbility* Ability)
         {
             GameplayAbilityActivationInfo ActivationInfo;
             Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
-            if (Spec.ActiveCount > 0)
-            {
-                Spec.ActiveCount--;
-            }
-            
-            // Clean up ability tasks for this ability
-            ClearAbilityTasks(Spec.Handle);
-
-            // Broadcast ability ended
-            NotifyAbilityEnded(Ability);
             break;
         }
     }
@@ -791,10 +785,44 @@ void AbilitySystemComponent::NotifyAbilityFailed(const GameplayAbilitySpecHandle
     AbilityFailedCallbacks.publish(Ability, FailureReason);
 }
 
-void AbilitySystemComponent::NotifyAbilityEnded(GameplayAbility* Ability)
+void AbilitySystemComponent::NotifyAbilityEnded(GameplayAbilitySpecHandle Handle, GameplayAbility* Ability, bool bWasCancelled)
 {
     if (!Ability) return;
+
+    // Find the spec
+    GameplayAbilitySpec* Spec = nullptr;
+    for (auto& S : ActivatableAbilities)
+    {
+        if (S.Handle == Handle)
+        {
+            Spec = &S;
+            break;
+        }
+    }
+
+    if (!Spec) return;
+
+    if (Spec->ActiveCount > 0)
+    {
+        Spec->ActiveCount--;
+    }
+
     AbilityEndedCallbacks.publish(Ability);
+
+    // For InstancedPerExecution, mark for deletion
+    if (Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerExecution)
+    {
+        Spec->NonReplicatedInstances.erase(
+            std::remove(Spec->NonReplicatedInstances.begin(), Spec->NonReplicatedInstances.end(), Ability),
+            Spec->NonReplicatedInstances.end());
+        PendingDeleteAbilities.push_back(Ability);
+    }
+
+    // If RemoveAfterActivation and no longer active, clear the ability
+    if (Spec->RemoveAfterActivation && !Spec->IsActive())
+    {
+        ClearAbility(Handle);
+    }
 }
 
 void AbilitySystemComponent::OnRemoveAbility(GameplayAbilitySpec& Spec)
@@ -845,6 +873,26 @@ void AbilitySystemComponent::OnRemoveAbility(GameplayAbilitySpec& Spec)
             GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
             Instance->OnRemoveAbility(&ActorInfo, Spec);
         }
+    }
+
+    // Delete all instance objects
+    for (auto* Instance : Spec.NonReplicatedInstances)
+    {
+        delete Instance;
+    }
+    Spec.NonReplicatedInstances.clear();
+
+    for (auto* Instance : Spec.ReplicatedInstances)
+    {
+        delete Instance;
+    }
+    Spec.ReplicatedInstances.clear();
+
+    // Delete the CDO
+    if (Spec.Ability)
+    {
+        delete Spec.Ability;
+        Spec.Ability = nullptr;
     }
     
     MarkAbilitySpecDirty(Spec, true);
@@ -2249,9 +2297,6 @@ void AbilitySystemComponent::CancelAbilityHandle(GameplayAbilitySpecHandle Handl
 		GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 		GameplayAbilityActivationInfo ActivationInfo;
 		Spec->Ability->CancelAbility(Spec->Handle, &ActorInfo, ActivationInfo, true);
-		if (Spec->ActiveCount > 0)
-			Spec->ActiveCount--;
-		NotifyAbilityEnded(Spec->Ability);
 	}
 }
 
@@ -2298,9 +2343,6 @@ void AbilitySystemComponent::CancelAbilities(const GameplayTagContainer* WithTag
 		GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 		GameplayAbilityActivationInfo ActivationInfo;
 		Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
-		if (Spec.ActiveCount > 0)
-			Spec.ActiveCount--;
-		NotifyAbilityEnded(Spec.Ability);
 	}
 }
 
@@ -2317,9 +2359,6 @@ void AbilitySystemComponent::CancelAllAbilities(GameplayAbility* Ignore)
 		GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 		GameplayAbilityActivationInfo ActivationInfo;
 		Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
-		if (Spec.ActiveCount > 0)
-			Spec.ActiveCount--;
-		NotifyAbilityEnded(Spec.Ability);
 	}
 }
 
@@ -2346,6 +2385,28 @@ void AbilitySystemComponent::UnBlockAbilitiesWithTags(const GameplayTagContainer
 	for (const auto& Tag : Tags.GameplayTags)
 	{
 		BlockedAbilityTags.UpdateTagCount(Tag, -1);
+	}
+}
+
+void AbilitySystemComponent::ApplyAbilityBlockAndCancelTags(const GameplayTagContainer& AbilityTags, GameplayAbility* RequestingAbility, bool bEnable, const GameplayTagContainer& BlockTags, bool bExecuteBlockTags, const GameplayTagContainer& CancelTags)
+{
+	if (bEnable)
+	{
+		if (bExecuteBlockTags)
+		{
+			BlockAbilitiesWithTags(BlockTags);
+		}
+		if (!CancelTags.IsEmpty())
+		{
+			CancelAbilities(&CancelTags, nullptr, RequestingAbility);
+		}
+	}
+	else
+	{
+		if (bExecuteBlockTags)
+		{
+			UnBlockAbilitiesWithTags(BlockTags);
+		}
 	}
 }
 
@@ -2669,7 +2730,6 @@ void AbilitySystemComponent::ClearAllAbilities()
 				GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 				GameplayAbilityActivationInfo ActivationInfo;
 				Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
-				NotifyAbilityEnded(Spec.Ability);
 			}
 			Spec.PendingRemove = true;
 		}
@@ -2689,7 +2749,6 @@ void AbilitySystemComponent::ClearAllAbilitiesWithInputID(int32 InputID)
 				GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 				GameplayAbilityActivationInfo ActivationInfo;
 				Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
-				NotifyAbilityEnded(Spec.Ability);
 			}
 			Spec.PendingRemove = true;
 		}
@@ -2707,7 +2766,6 @@ void AbilitySystemComponent::ClearAbility(GameplayAbilitySpecHandle Handle)
 				GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 				GameplayAbilityActivationInfo ActivationInfo;
 				Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
-				NotifyAbilityEnded(Spec.Ability);
 			}
 			Spec.PendingRemove = true;
 			return;

@@ -132,9 +132,6 @@ public:
 	/** Tick all active ability tasks, cleaning up finished ones */
 	void TickTasks(float DeltaTime);
 
-	/** Register a task with this ASC so it receives per-frame ticks */
-	void RegisterTask(AbilityTask* Task);
-
 	/** Create and register an attribute set via the factory system */
 	AttributeSet* AddAttributeSet(AttributeSetDefine* define);
 
@@ -461,9 +458,6 @@ public:
 	/** Destroy all active state (cancel all abilities) */
 	void DestroyActiveState();
 
-	/** Remove all active ability tasks belonging to a specific ability handle */
-	void ClearAbilityTasks(GameplayAbilitySpecHandle Handle);
-
 	/** Check if any abilities are blocked based on the given tag container */
 	bool AreAbilityTagsBlocked(const GameplayTagContainer& Tags) const;
 
@@ -656,7 +650,10 @@ public:
 	void NotifyAbilityFailed(const GameplayAbilitySpecHandle Handle, GameplayAbility* Ability, const GameplayTagContainer& FailureReason);
 
 	/** Notify that an ability ended (normal or cancelled) */
-	void NotifyAbilityEnded(GameplayAbility* Ability);
+	void NotifyAbilityEnded(GameplayAbilitySpecHandle Handle, GameplayAbility* Ability, bool bWasCancelled = false);
+
+	/** Apply or remove block and cancel tags for an ability */
+	void ApplyAbilityBlockAndCancelTags(const GameplayTagContainer& AbilityTags, GameplayAbility* RequestingAbility, bool bEnable, const GameplayTagContainer& BlockTags, bool bExecuteBlockTags, const GameplayTagContainer& CancelTags);
 
 	// ============================================================
 	// Cooldown / Cost System (Phase 7)
@@ -719,7 +716,8 @@ protected:
 
 	std::vector<GameplayAbility*> AllReplicatedInstancedAbilities;
 
-	std::vector<GameplayAbility*> AllSelfCreatedAbilities;
+	/** Abilities pending deletion (InstancedPerExecution). Processed in Tick. */
+	std::vector<GameplayAbility*> PendingDeleteAbilities;
 
 private:
 	/** Per-handle event sets for active gameplay effects, providing removal/stack/time/inhibition callbacks */
@@ -727,9 +725,6 @@ private:
 
 	/** Input IDs that are currently blocked from ability activation */
 	std::set<int32> BlockedInputIDs;
-
-	/** Active ability tasks, owned by this ASC. TickTasks iterates and cleans them up. */
-	std::vector<AbilityTask*> ActiveTasks;
 
 	/** Set of gameplay cue tags currently active on this ASC (for IsGameplayCueActive / RemoveAllGameplayCues) */
 	std::set<GameplayTag> ActiveGameplayCues;

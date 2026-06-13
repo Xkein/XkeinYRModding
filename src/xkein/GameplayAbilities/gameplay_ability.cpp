@@ -1,6 +1,8 @@
 #include "gameplay_ability.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include "xkein/GameplayAbilities/ge_component/ge_component_target_tags.h"
+#include "xkein/GameplayAbilities/gameplay_cue.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task.h"
 
 GameplayAbilitySpec::GameplayAbilitySpec(GameplayAbility* InAbility, int32 InLevel)
     : InputID(-1), SourceObject(entt::null), ActiveCount(0), InputPressed(false), RemoveAfterActivation(false), PendingRemove(false), bActivateOnce(false)
@@ -81,13 +83,44 @@ void GameplayAbility::PreActivate(const GameplayAbilitySpecHandle Handle, const 
     const GameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded* OnGameplayAbilityEndedDelegate,
     const GameplayEventData* TriggerEventData)
 {
+    AbilitySystemComponent* Comp = ActorInfo->AbilitySystemCom;
+
+    if (GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
+    {
+        bIsActive = true;
+        bIsBlockingOtherAbilities = true;
+        bIsCancelable = true;
+    }
+
+    // This must be called before we start applying tags and blocking or canceling other abilities.
     CurrentActorInfo = ActorInfo;
     CurrentSpecHandle = Handle;
     CurrentActivationInfo = ActivationInfo;
-    bIsActive = true;
+
     if (TriggerEventData)
     {
         CurrentEventData = *TriggerEventData;
+    }
+
+    if (Comp && Define)
+    {
+        if (bIsBlockingOtherAbilities && !Define->BlockAbilitiesWithTag.IsEmpty())
+        {
+            Comp->BlockAbilitiesWithTags(Define->BlockAbilitiesWithTag);
+        }
+        if (!Define->CancelAbilitiesWithTag.IsEmpty())
+        {
+            Comp->CancelAbilities(&Define->CancelAbilitiesWithTag, nullptr, this);
+        }
+
+        // Add activation owned tags to the owner
+        if (!Define->ActivationOwnedTags.IsEmpty())
+        {
+            for (const auto& Tag : Define->ActivationOwnedTags.GameplayTags)
+            {
+                Comp->AddLooseGameplayTag(Tag);
+            }
+        }
     }
 
     // Call the derived implementation
@@ -203,11 +236,28 @@ void GameplayAbility::ApplyCost(const GameplayAbilitySpecHandle Handle, const Ga
 void GameplayAbility::CancelAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
     const GameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
+    if (!CanBeCanceled())
+    {
+        return;
+    }
+
+    if (ScopeLockCount > 0)
+    {
+        WaitingToExecute.push_back([this, Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility]() {
+            CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
+        });
+        return;
+    }
+
     if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
     {
         Spec->OnGameplayAbilityCancelled.publish();
     }
-    EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility, true);
+
+    // End the ability but don't replicate it separately, we replicate the CancelAbility call directly
+    bool bReplicateEndAbility = false;
+    bool bWasCancelled = true;
+    EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 bool GameplayAbility::IsEndAbilityValid(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo) const
@@ -244,48 +294,93 @@ void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const G
         return;
     }
 
-    bIsAbilityEnding = true;
+    if (ScopeLockCount > 0)
+    {
+        WaitingToExecute.push_back([this, Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled]() {
+            EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+        });
+        return;
+    }
 
+    if (GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
+    {
+        bIsAbilityEnding = true;
+    }
+
+    // Give blueprint a chance to react
     K2_OnEndAbility(bWasCancelled);
 
-    // 防止 K2 回调中重入 EndAbility 导致重复清理
-    if (bIsActive == false)
+    // Protect against blueprint causing us to EndAbility already
+    if (bIsActive == false && GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
     {
         return;
     }
 
-    // 广播结束委托
+    // Broadcast end delegate on the spec
     if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
     {
-        if (Spec->ActiveCount > 0)
-        {
-            Spec->ActiveCount--;
-        }
         Spec->OnGameplayAbilityEnded.publish(Spec);
-        
-        if (Spec->RemoveAfterActivation)
-        {
-            // Mark for removal - actual removal happens in Tick to avoid iterator invalidation
-        }
     }
 
-    bIsActive = false;
-    bIsAbilityEnding = false;
+    if (GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
+    {
+        bIsActive = false;
+        bIsAbilityEnding = false;
+        bIsCancelable = false;
+        bIsBlockingOtherAbilities = false;
+    }
 
-    CurrentActorInfo = nullptr;
-    CurrentSpecHandle = GameplayAbilitySpecHandle();
-    CurrentActivationInfo = GameplayAbilityActivationInfo();
-    CurrentEventData = GameplayEventData();
+    // Tell all our tasks that we are finished and they should cleanup
+    for (int32 TaskIdx = static_cast<int32>(ActiveTasks.size()) - 1; TaskIdx >= 0; --TaskIdx)
+    {
+        AbilityTask* Task = ActiveTasks[TaskIdx];
+        if (Task)
+        {
+            Task->OnDestroy(true);
+            delete Task;
+        }
+    }
+    ActiveTasks.clear();
+
+    AbilitySystemComponent* const Comp = ActorInfo->AbilitySystemCom;
+    if (Comp)
+    {
+        // Remove tags we added to owner
+        if (Define && !Define->ActivationOwnedTags.IsEmpty())
+        {
+            for (const auto& Tag : Define->ActivationOwnedTags.GameplayTags)
+            {
+                Comp->RemoveLooseGameplayTag(Tag);
+            }
+        }
+
+        // Remove tracked GameplayCues that we added
+        for (const GameplayTag& CueTag : TrackedGameplayCues)
+        {
+            Comp->RemoveGameplayCue(CueTag);
+        }
+        TrackedGameplayCues.clear();
+
+        if (bIsBlockingOtherAbilities && Define && !Define->BlockAbilitiesWithTag.IsEmpty())
+        {
+            // Unblock abilities
+            Comp->UnBlockAbilitiesWithTags(Define->BlockAbilitiesWithTag);
+        }
+
+        // Tell owning AbilitySystemComponent that we ended so it can do stuff (including deleting us)
+        Comp->NotifyAbilityEnded(Handle, this, bWasCancelled);
+    }
+
+    // Reset event data for instanced abilities
+    if (GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)
+    {
+        CurrentEventData = GameplayEventData{};
+    }
 }
 
 // ============================================================
 // Wave 2 Task 11 - New virtual methods
 // ============================================================
-
-bool GameplayAbility::CanBeCanceled() const
-{
-    return true;
-}
 
 void GameplayAbility::ExternalEndAbility()
 {
@@ -364,4 +459,52 @@ int32 GameplayAbility::GetAbilityLevel(const GameplayAbilitySpecHandle Handle) c
     }
 
     return 0;
+}
+
+// ============================================================
+// GameplayCue tracking
+// ============================================================
+
+void GameplayAbility::K2_AddGameplayCue(const GameplayTag& CueTag, const GameplayCueParameters& Params)
+{
+    AbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+    if (!ASC)
+    {
+        return;
+    }
+
+    ASC->AddGameplayCue(CueTag, Params);
+    TrackedGameplayCues.push_back(CueTag);
+}
+
+void GameplayAbility::K2_RemoveGameplayCue(const GameplayTag& CueTag)
+{
+    AbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+    if (!ASC)
+    {
+        return;
+    }
+
+    ASC->RemoveGameplayCue(CueTag);
+    TrackedGameplayCues.erase(
+        std::remove(TrackedGameplayCues.begin(), TrackedGameplayCues.end(), CueTag),
+        TrackedGameplayCues.end());
+}
+
+// ============================================================
+// Scope lock
+// ============================================================
+
+void GameplayAbility::DecrementListLock() const
+{
+    if (--ScopeLockCount == 0)
+    {
+        // execute delayed functions in the order they came in
+        // These may end or cancel this ability
+        for (auto& Func : WaitingToExecute)
+        {
+            Func();
+        }
+        WaitingToExecute.clear();
+    }
 }

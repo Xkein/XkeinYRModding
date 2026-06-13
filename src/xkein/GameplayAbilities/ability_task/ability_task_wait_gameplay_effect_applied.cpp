@@ -11,7 +11,8 @@ AbilityTask_WaitGameplayEffectApplied* AbilityTask_WaitGameplayEffectApplied::Cr
 	if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 
 		// Connect to ASC's OnGameplayEffectAppliedDelegateToSelf
 		entt::sink sink{ASC->OnGameplayEffectAppliedDelegateToSelf};

@@ -57,7 +57,7 @@ AbilityTask* AbilityTask::CreateTask(GameplayAbility* Ability, StringName TaskNa
 	if (Task)
 	{
 		Task->InitTask(ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC.RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
 	}
 	return Task;
 }

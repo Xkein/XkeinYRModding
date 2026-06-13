@@ -10,7 +10,8 @@ AbilityTask_WaitDelay* AbilityTask_WaitDelay::Create(GameplayAbility* Ability, f
 	if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 	}
 
 	return Task;

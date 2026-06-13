@@ -13,7 +13,8 @@ AbilityTask_WaitInput* AbilityTask_WaitInput::Create(GameplayAbility* Ability, i
 	if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 	}
 
 	return Task;

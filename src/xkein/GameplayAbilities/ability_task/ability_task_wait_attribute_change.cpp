@@ -11,7 +11,8 @@ AbilityTask_WaitAttributeChange* AbilityTask_WaitAttributeChange::Create(Gamepla
 	if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 
 		// Capture initial value
 		bool bFound = false;

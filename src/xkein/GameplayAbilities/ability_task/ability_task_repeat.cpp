@@ -11,7 +11,8 @@ AbilityTask_Repeat* AbilityTask_Repeat::Create(GameplayAbility* Ability, int32 M
 	if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 	}
 
 	return Task;

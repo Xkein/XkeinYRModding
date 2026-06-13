@@ -9,7 +9,8 @@ AbilityTask_WaitTargetData* AbilityTask_WaitTargetData::Create(GameplayAbility* 
 	if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 	}
 
 	return Task;

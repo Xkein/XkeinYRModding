@@ -12,7 +12,8 @@ AbilityTask_WaitGameplayTag* AbilityTask_WaitGameplayTag::Create(GameplayAbility
 	if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 
 		// Register callback on ASC for tag count changes
 		Task->DelegateHandle = ASC->RegisterAndCallGameplayTagEvent(

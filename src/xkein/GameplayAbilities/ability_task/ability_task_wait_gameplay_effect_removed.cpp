@@ -10,7 +10,8 @@ AbilityTask_WaitGameplayEffectRemoved* AbilityTask_WaitGameplayEffectRemoved::Cr
 	if (ASC && Handle.IsValid())
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 
 		// Get the event set for this specific active effect
 		FActiveGameplayEffectEvents* Events = ASC->GetActiveEffectEventSet(Handle);
@@ -23,7 +24,8 @@ AbilityTask_WaitGameplayEffectRemoved* AbilityTask_WaitGameplayEffectRemoved::Cr
 	else if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 	}
 
 	return Task;

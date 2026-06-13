@@ -8,10 +8,13 @@
 #include "xkein/GameplayAbilities/gameplay_ability_spec.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec_handle.h"
 #include <functional>
+#include <vector>
 
 class GameplayAbility;
 class AbilitySystemComponent;
+class AbilityTask;
 struct GameplayAbilitySpec;
+struct GameplayCueParameters;
 struct ActiveGameplayEffectHandle;
 
 /** Delegate for when an ability ends */
@@ -291,8 +294,26 @@ class GameplayAbility
 		return CurrentActorInfo ? CurrentActorInfo->AbilitySystemCom : nullptr;
 	}
 
-	/** Returns true if this ability can be canceled. Default implementation returns true. */
-	virtual bool CanBeCanceled() const;
+	/** Returns true if this ability can be canceled. Default implementation checks bIsCancelable flag. */
+	virtual bool CanBeCanceled() const { return bIsCancelable; }
+
+	/** Add a persistent gameplay cue and track it for automatic cleanup when the ability ends */
+	virtual void K2_AddGameplayCue(const GameplayTag& CueTag, const GameplayCueParameters& Params);
+
+	/** Remove a persistent gameplay cue and stop tracking it */
+	virtual void K2_RemoveGameplayCue(const GameplayTag& CueTag);
+
+	/** Increment the scope lock counter. While > 0, EndAbility/CancelAbility calls are deferred. */
+	void IncrementListLock() const { ++ScopeLockCount; }
+
+	/** Decrement the scope lock counter. On reaching 0, executes deferred EndAbility/CancelAbility calls. */
+	void DecrementListLock() const;
+
+	/** Add a task to this ability's ActiveTasks. Called by AbilityTask::CreateTask and task-specific Create methods. */
+	void AddAbilityTask(AbilityTask* Task) { ActiveTasks.push_back(Task); }
+
+	/** Get the active tasks owned by this ability (for tick iteration). */
+	std::vector<AbilityTask*>& GetActiveTasks() { return ActiveTasks; }
 
 	/** Called from outside to end the ability, replicates to the other side */
 	virtual void ExternalEndAbility();
@@ -342,6 +363,24 @@ protected:
 
 	/** True if this ability is in the process of ending (prevents re-entrancy) */
 	bool bIsAbilityEnding = false;
+
+	/** True if this ability is blocking other abilities from activating */
+	bool bIsBlockingOtherAbilities = false;
+
+	/** True if this ability can be canceled */
+	bool bIsCancelable = false;
+
+	/** Active ability tasks owned by this ability. Cleaned up in EndAbility. */
+	std::vector<AbilityTask*> ActiveTasks;
+
+	/** Gameplay cues added by this ability, tracked for automatic cleanup when the ability ends */
+	std::vector<GameplayTag> TrackedGameplayCues;
+
+	/** Lock counter for scope locks. While > 0, EndAbility/CancelAbility calls are deferred to WaitingToExecute. */
+	mutable int32 ScopeLockCount = 0;
+
+	/** Deferred EndAbility/CancelAbility calls, executed when ScopeLockCount reaches 0 */
+	mutable std::vector<std::function<void()>> WaitingToExecute;
 
 };
 

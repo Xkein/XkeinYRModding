@@ -11,7 +11,8 @@ AbilityTask_WaitGameplayEvent* AbilityTask_WaitGameplayEvent::Create(GameplayAbi
 	if (ASC)
 	{
 		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
-		ASC->RegisterTask(Task);
+		Ability->AddAbilityTask(Task);
+		
 
 		// Register callback on ASC for gameplay events matching the tag
 		GameplayTagContainer Tags;
