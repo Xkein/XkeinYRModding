@@ -5,8 +5,10 @@ CLASS(BindJs)
 class CustomAttributeSet : public AttributeSet
 {
 public:
+    CustomAttributeSet();
+
     FUNCTION()
-    CustomAttributeSet() {}
+    static CustomAttributeSet* CreateCustomAttributeSet();
     
     bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override
     {

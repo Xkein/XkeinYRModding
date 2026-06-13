@@ -402,6 +402,7 @@ GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbil
 
 GameplayAbilitySpecHandle AbilitySystemComponent::GiveAbility(const GameplayAbilityDefine* AbilityDefine)
 {
+    // create a default object
     GameplayAbility* Ability = GameplayAbilitySystem::CreateAbility(AbilityDefine->AbilityCreator, const_cast<GameplayAbilityDefine*>(AbilityDefine), this);
     if (Ability)
     {
@@ -1783,28 +1784,12 @@ void ActiveGameplayEffectsContainer::ApplyStackingLogic(GameplayEffectSpec& Spec
 FScopedAbilityListLock::FScopedAbilityListLock(AbilitySystemComponent& InASC)
     : ASC(InASC)
 {
-    ASC.AbilityScopeLockCount++;
+    ASC.IncrementAbilityListLock();
 }
 
 FScopedAbilityListLock::~FScopedAbilityListLock()
 {
-    ASC.AbilityScopeLockCount--;
-    if (ASC.AbilityScopeLockCount == 0)
-    {
-        // Process all pending removes on the outermost unlock
-        auto& Abilities = ASC.ActivatableAbilities;
-        Abilities.erase(
-            std::remove_if(Abilities.begin(), Abilities.end(),
-                [this](GameplayAbilitySpec& Spec) {
-                    if (Spec.PendingRemove)
-                    {
-                        ASC.OnRemoveAbility(Spec);
-                        return true;
-                    }
-                    return false;
-                }),
-            Abilities.end());
-    }
+    ASC.DecrementAbilityListLock();
 }
 
 FScopedTargetListLock::FScopedTargetListLock(AbilitySystemComponent& InASC)
@@ -1816,6 +1801,45 @@ FScopedTargetListLock::FScopedTargetListLock(AbilitySystemComponent& InASC)
 FScopedTargetListLock::~FScopedTargetListLock()
 {
     ASC.TargetListLockCount--;
+}
+
+// ============================================================
+// AbilitySystemComponent lock helpers
+// ============================================================
+
+void AbilitySystemComponent::IncrementAbilityListLock()
+{
+    AbilityScopeLockCount++;
+}
+
+void AbilitySystemComponent::DecrementAbilityListLock()
+{
+    if (--AbilityScopeLockCount == 0)
+    {
+        // Process pending adds first
+        if (!AbilityPendingAdds.empty())
+        {
+            for (GameplayAbilitySpec& Spec : AbilityPendingAdds)
+            {
+                GiveAbility(Spec);
+            }
+            AbilityPendingAdds.clear();
+        }
+
+        // Process pending removes
+        auto& Abilities = ActivatableAbilities;
+        Abilities.erase(
+            std::remove_if(Abilities.begin(), Abilities.end(),
+                [this](GameplayAbilitySpec& Spec) {
+                    if (Spec.PendingRemove)
+                    {
+                        OnRemoveAbility(Spec);
+                        return true;
+                    }
+                    return false;
+                }),
+            Abilities.end());
+    }
 }
 
 // ============================================================

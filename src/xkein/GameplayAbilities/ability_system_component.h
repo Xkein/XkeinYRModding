@@ -159,6 +159,14 @@ public:
     /** Abilities that are pending add while the ability list is locked */
     std::vector<GameplayAbilitySpec> AbilityPendingAdds;
 
+public:
+    /** Increment the ability list lock counter. Called by FScopedAbilityListLock. */
+    void IncrementAbilityListLock();
+
+    /** Decrement the ability list lock counter. On reaching 0, processes pending adds and removes. */
+    void DecrementAbilityListLock();
+
+
     /** If true, suppress granting abilities from GameplayEffects */
     bool bSuppressGrantAbility = false;
     

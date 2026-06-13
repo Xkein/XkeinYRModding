@@ -6,8 +6,10 @@ CLASS(BindJs)
 class CustomGameplayAbility : public GameplayAbility
 {
 public:
+    CustomGameplayAbility();
+
     FUNCTION()
-    CustomGameplayAbility() {}
+    static CustomGameplayAbility* CreateCustomGameplayAbility();
 
     bool K2_CanActivateAbility(const GameplayAbilityActorInfo& ActorInfo, const GameplayAbilitySpecHandle Handle,
         GameplayTagContainer* OptionalRelevantTags) const override

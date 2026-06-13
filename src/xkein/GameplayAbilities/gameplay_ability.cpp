@@ -3,7 +3,7 @@
 #include "xkein/GameplayAbilities/ge_component/ge_component_target_tags.h"
 
 GameplayAbilitySpec::GameplayAbilitySpec(GameplayAbility* InAbility, int32 InLevel)
-    : ActiveCount(0)
+    : InputID(-1), SourceObject(entt::null), ActiveCount(0), InputPressed(false), RemoveAfterActivation(false), PendingRemove(false), bActivateOnce(false)
 {
     Ability = InAbility;
     Level = InLevel;

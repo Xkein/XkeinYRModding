@@ -34,6 +34,9 @@ enum EGameplayAbilityTriggerSource : int
 ENUM(BindJs)
 enum class EGameplayAbilityInstancingPolicy : uint8
 {
+	// This ability is never instanced. Anything that executes the ability is operating on the CDO.
+	NonInstanced,
+	
 	/** This ability can only be instanced once per actor. Every execution will use the same instance */
 	InstancedPerActor,
 	

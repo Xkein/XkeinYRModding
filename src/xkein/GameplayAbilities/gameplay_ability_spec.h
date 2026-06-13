@@ -164,8 +164,9 @@ struct GameplayAbilityActivationInfo
 CLASS(BindJs)
 struct GameplayAbilitySpec
 {
-    GameplayAbilitySpec() : ActiveCount(0) {}
-	/** Version that takes an ability CDO, this exists for backward compatibility */
+    GameplayAbilitySpec()
+		: Ability(nullptr), Level(1), InputID(-1), SourceObject(entt::null), ActiveCount(0), InputPressed(false), RemoveAfterActivation(false), PendingRemove(false), bActivateOnce(false)
+	{}	/** Version that takes an ability CDO, this exists for backward compatibility */
 	GameplayAbilitySpec(GameplayAbility* InAbility, int32 InLevel = 1);
 
 	/** Handle for outside sources to refer to this spec by */
@@ -190,6 +191,9 @@ struct GameplayAbilitySpec
 	/** InputID, if bound to an input */
 	PROPERTY()
 	int32 InputID = -1;
+
+	PROPERTY()
+	entt::entity SourceObject;
 
 	/** Count of how many times this ability has been activated */
 	PROPERTY(NotReplicated)
