@@ -12,10 +12,40 @@ AbilityTask_Repeat* AbilityTask_Repeat::Create(GameplayAbility* Ability, int32 M
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		
+		Task->Activate();
 	}
 
 	return Task;
+}
+
+void AbilityTask_Repeat::Activate()
+{
+	// TODO: Refactor to use a timer system instead of polling in Tick.
+	// See UAbilityTask_Repeat::Activate for reference (uses TimerManager::SetTimer).
+	// For now, fire the first action immediately, then let Tick handle the rest.
+	if (CurrentIteration < MaxIterations)
+	{
+		if (ShouldBroadcastAbilityTaskDelegates())
+		{
+			if (OnPerformAction)
+			{
+				OnPerformAction(CurrentIteration);
+			}
+		}
+		CurrentIteration++;
+	}
+
+	if (CurrentIteration >= MaxIterations)
+	{
+		if (ShouldBroadcastAbilityTaskDelegates())
+		{
+			if (OnFinished)
+			{
+				OnFinished(CurrentIteration);
+			}
+		}
+		EndTask();
+	}
 }
 
 void AbilityTask_Repeat::Tick(float DeltaTime)
@@ -31,9 +61,12 @@ void AbilityTask_Repeat::Tick(float DeltaTime)
 	{
 		AccumulatedTime -= IntervalBetweenIterations;
 
-		if (OnPerformAction)
+		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			OnPerformAction(CurrentIteration);
+			if (OnPerformAction)
+			{
+				OnPerformAction(CurrentIteration);
+			}
 		}
 
 		CurrentIteration++;
@@ -41,6 +74,13 @@ void AbilityTask_Repeat::Tick(float DeltaTime)
 
 	if (CurrentIteration >= MaxIterations)
 	{
+		if (ShouldBroadcastAbilityTaskDelegates())
+		{
+			if (OnFinished)
+			{
+				OnFinished(CurrentIteration);
+			}
+		}
 		EndTask();
 	}
 }

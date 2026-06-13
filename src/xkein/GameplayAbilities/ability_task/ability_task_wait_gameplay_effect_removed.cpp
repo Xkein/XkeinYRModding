@@ -7,28 +7,49 @@ AbilityTask_WaitGameplayEffectRemoved* AbilityTask_WaitGameplayEffectRemoved::Cr
 	Task->EffectHandle = Handle;
 
 	AbilitySystemComponent* ASC = Ability->GetAbilitySystemComponentFromActorInfo();
-	if (ASC && Handle.IsValid())
+	if (ASC)
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		
-
-		// Get the event set for this specific active effect
-		FActiveGameplayEffectEvents* Events = ASC->GetActiveEffectEventSet(Handle);
-		if (Events)
-		{
-			entt::sink sink{Events->OnRemoved};
-			Task->DelegateConnection = sink.connect<&AbilityTask_WaitGameplayEffectRemoved::OnEffectRemovedCallback>(*Task);
-		}
-	}
-	else if (ASC)
-	{
-		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
-		Ability->AddAbilityTask(Task);
-		
+		Task->Activate();
 	}
 
 	return Task;
+}
+
+void AbilityTask_WaitGameplayEffectRemoved::Activate()
+{
+	if (!EffectHandle.IsValid())
+	{
+		// Handle is invalid — broadcast and end immediately
+		if (ShouldBroadcastAbilityTaskDelegates())
+		{
+			if (OnInvalidHandle)
+			{
+				OnInvalidHandle();
+			}
+		}
+		EndTask();
+		return;
+	}
+
+	if (ASC)
+	{
+		// Get the event set for this specific active effect
+		FActiveGameplayEffectEvents* Events = ASC->GetActiveEffectEventSet(EffectHandle);
+		if (Events)
+		{
+			entt::sink sink{Events->OnRemoved};
+			DelegateConnection = sink.connect<&AbilityTask_WaitGameplayEffectRemoved::OnEffectRemovedCallback>(*this);
+			bRegistered = true;
+		}
+	}
+
+	if (!bRegistered)
+	{
+		// The effect was already removed — treat as removed
+		OnEffectRemovedCallback(FGameplayEffectRemovalInfo());
+	}
 }
 
 void AbilityTask_WaitGameplayEffectRemoved::OnDestroy(bool bOwnerFinished)
@@ -52,9 +73,12 @@ void AbilityTask_WaitGameplayEffectRemoved::OnEffectRemovedCallback(const FGamep
 		return;
 	}
 
-	if (OnEffectRemoved)
+	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		OnEffectRemoved();
+		if (OnEffectRemoved)
+		{
+			OnEffectRemoved();
+		}
 	}
 
 	EndTask();

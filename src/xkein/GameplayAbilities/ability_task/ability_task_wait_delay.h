@@ -16,6 +16,8 @@ public:
 	FUNCTION()
 	static AbilityTask_WaitDelay* Create(GameplayAbility* Ability, float Duration);
 
+	virtual void Activate() override;
+	
 	/** Tick: accumulate elapsed time, end task when duration is reached */
 	virtual void Tick(float DeltaTime) override;
 

@@ -1,6 +1,7 @@
 #include "ability_task.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include "xkein/GameplayAbilities/ability_system_globals.h"
+#include "xkein/GameplayAbilities/gameplay_ability.h"
 
 StringName AbilityTask::ScriptFunctionCategory = "AbilityTask";
 
@@ -12,10 +13,13 @@ void AbilityTask::EndTask()
 	}
 	bFinished = true;
 
-	// Fire BlueprintImplementableEvent callback
-	if (OnK2_OnTaskEnd)
+	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		OnK2_OnTaskEnd();
+		// Fire BlueprintImplementableEvent callback
+		if (OnK2_OnTaskEnd)
+		{
+			OnK2_OnTaskEnd();
+		}
 	}
 }
 
@@ -26,6 +30,11 @@ void AbilityTask::OnDestroy(bool bOwnerFinished)
 	{
 		EndTask();
 	}
+}
+
+bool AbilityTask::ShouldBroadcastAbilityTaskDelegates() const
+{
+	return AbilityInstance && AbilityInstance->IsActive();
 }
 
 void AbilityTask::ReadyForDestroy()
@@ -58,6 +67,7 @@ AbilityTask* AbilityTask::CreateTask(GameplayAbility* Ability, StringName TaskNa
 	{
 		Task->InitTask(ASC, GameplayAbilitySpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
+		Task->Activate();
 	}
 	return Task;
 }

@@ -12,15 +12,21 @@ AbilityTask_WaitAttributeChange* AbilityTask_WaitAttributeChange::Create(Gamepla
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		
-
-		// Capture initial value
-		bool bFound = false;
-		Task->LastKnownValue = ASC->GetGameplayAttributeValue(Task->AttributeToWatch, bFound);
-		Task->bInitialized = bFound;
+		Task->Activate();
 	}
 
 	return Task;
+}
+
+void AbilityTask_WaitAttributeChange::Activate()
+{
+	// Capture initial value on activation
+	if (ASC)
+	{
+		bool bFound = false;
+		LastKnownValue = ASC->GetGameplayAttributeValue(AttributeToWatch, bFound);
+		bInitialized = bFound;
+	}
 }
 
 void AbilityTask_WaitAttributeChange::Tick(float DeltaTime)
@@ -49,9 +55,12 @@ void AbilityTask_WaitAttributeChange::Tick(float DeltaTime)
 	{
 		LastKnownValue = CurrentValue;
 
-		if (OnAttributeChanged)
+		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			OnAttributeChanged(CurrentValue);
+			if (OnAttributeChanged)
+			{
+				OnAttributeChanged(CurrentValue);
+			}
 		}
 
 		if (bTriggerOnce)

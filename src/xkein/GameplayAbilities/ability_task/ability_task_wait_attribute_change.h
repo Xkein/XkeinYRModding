@@ -6,8 +6,11 @@
  * AbilityTask_WaitAttributeChange
  *
  * Waits for a specific gameplay attribute's value to change on the owning ASC.
- * Polls in Tick using ASC::GetNumericAttribute and fires OnAttributeChanged
- * when the value differs from the last known value.
+ * Currently polls in Tick using ASC::GetGameplayAttributeValue and fires
+ * OnAttributeChanged when the value differs from the last known value.
+ *
+ * TODO: Refactor to event-driven using ASC::GetGameplayAttributeValueChangeDelegate
+ * when the delegate infrastructure is available. See UAbilityTask_WaitAttributeChange.
  */
 CLASS(BindJs)
 class AbilityTask_WaitAttributeChange : public AbilityTask
@@ -16,6 +19,8 @@ public:
 	/** Create and register a new WaitAttributeChange task */
 	FUNCTION()
 	static AbilityTask_WaitAttributeChange* Create(GameplayAbility* Ability, const GameplayAttribute& Attribute, bool bTriggerOnce);
+
+	virtual void Activate() override;
 
 	/** Tick: poll attribute value, detect changes */
 	virtual void Tick(float DeltaTime) override;

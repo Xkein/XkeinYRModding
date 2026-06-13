@@ -4,12 +4,20 @@
 #include <entt/entity/fwd.hpp>
 #include <YRMathVector.h>
 
+class TechnoTypeClass;
+
 /**
  * AbilityTask_SpawnActor
  *
- * Spawns an actor defined by ActorDefine at the given location.
- * Tick runs once, delegates to the game spawn system, fires OnSpawnComplete
- * with the spawned entity, and ends the task.
+ * Spawns a Techno (Unit/Building/Infantry/Aircraft) defined by TechnoTypeClass
+ * at the given location with the given facing direction.
+ * Uses the two-phase spawn pattern: CreateObject → Unlimbo.
+ *
+ * Activate() performs the spawn immediately and ends the task.
+ * Fires OnSpawnComplete with the spawned entity on success,
+ * or OnSpawnFailed on failure.
+ *
+ * Mirrors UAbilityTask_SpawnActor::BeginSpawningActor/FinishSpawningActor.
  */
 CLASS(BindJs)
 class AbilityTask_SpawnActor : public AbilityTask
@@ -17,24 +25,27 @@ class AbilityTask_SpawnActor : public AbilityTask
 public:
 	/** Create and register a new SpawnActor task */
 	FUNCTION()
-	static AbilityTask_SpawnActor* Create(GameplayAbility* Ability, GameplayAbilityDefine* Define, CoordStruct Location);
+	static AbilityTask_SpawnActor* Create(GameplayAbility* Ability, TechnoTypeClass* Type, CoordStruct Location, uint8 Direction = 0);
 
-	/** Tick: runs once, performs spawn, fires callback, then ends */
-	virtual void Tick(float DeltaTime) override;
+	virtual void Activate() override;
 
-	/** Definition of the actor to spawn */
+	/** Type of the Techno to spawn */
 	PROPERTY()
-	GameplayAbilityDefine* ActorDefine = nullptr;
+	TechnoTypeClass* ActorType = nullptr;
 
-	/** World location at which to spawn the actor */
+	/** World location at which to spawn the Techno */
 	PROPERTY()
 	CoordStruct SpawnLocation;
 
-	/** Callback fired when the actor is spawned. Parameter: spawned entity. */
+	/** Facing direction (0-255, where 64 = East, 128 = South, 192 = West) */
+	PROPERTY()
+	uint8 SpawnDirection = 0;
+
+	/** Callback fired when the Techno is spawned successfully. Parameter: spawned entity. */
 	PROPERTY()
 	std::function<void(entt::entity)> OnSpawnComplete;
 
-private:
-	/** Whether the spawn has already been executed */
-	bool bHasSpawned = false;
+	/** Callback fired when the spawn fails (e.g. invalid type, blocked cell, no owner house). */
+	PROPERTY()
+	std::function<void()> OnSpawnFailed;
 };

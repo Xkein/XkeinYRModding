@@ -10,7 +10,7 @@ AbilityTask_WaitTargetData* AbilityTask_WaitTargetData::Create(GameplayAbility* 
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		
+		Task->Activate();
 	}
 
 	return Task;
@@ -23,9 +23,30 @@ void AbilityTask_WaitTargetData::TargetDataReceived(const GameplayAbilityTargetD
 		return;
 	}
 
-	if (OnTargetDataReady)
+	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		OnTargetDataReady(Data);
+		if (OnTargetDataReady)
+		{
+			OnTargetDataReady(Data);
+		}
+	}
+
+	EndTask();
+}
+
+void AbilityTask_WaitTargetData::TargetDataCancelled()
+{
+	if (bFinished)
+	{
+		return;
+	}
+
+	if (ShouldBroadcastAbilityTaskDelegates())
+	{
+		if (OnTargetDataCancelled)
+		{
+			OnTargetDataCancelled();
+		}
 	}
 
 	EndTask();

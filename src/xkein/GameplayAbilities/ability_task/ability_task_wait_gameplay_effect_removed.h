@@ -8,8 +8,9 @@
  * AbilityTask_WaitGameplayEffectRemoved
  *
  * Waits for a specific active GameplayEffect to be removed from the owning ASC.
- * Uses FActiveGameplayEffectEvents::OnRemoved via ASC::GetActiveEffectEventSet.
+ * Registers callback on the effect's removal delegate in Activate().
  * Fires OnEffectRemoved when the tracked effect is removed.
+ * Fires OnInvalidHandle if the handle is invalid on activation.
  */
 CLASS(BindJs)
 class AbilityTask_WaitGameplayEffectRemoved : public AbilityTask
@@ -20,6 +21,7 @@ public:
 	FUNCTION()
 	static AbilityTask_WaitGameplayEffectRemoved* Create(GameplayAbility* Ability, ActiveGameplayEffectHandle Handle);
 
+	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
 	/** Handle of the active gameplay effect to watch for removal */
@@ -30,9 +32,16 @@ public:
 	PROPERTY()
 	std::function<void()> OnEffectRemoved;
 
+	/** Callback fired if the handle was invalid on activation */
+	PROPERTY()
+	std::function<void()> OnInvalidHandle;
+
 private:
 	/** Connection to the active effect's OnRemoved delegate */
 	entt::connection DelegateConnection;
+
+	/** Whether the delegate was successfully registered */
+	bool bRegistered = false;
 
 	/** Internal callback invoked when the active effect is removed */
 	void OnEffectRemovedCallback(const FGameplayEffectRemovalInfo& Info);

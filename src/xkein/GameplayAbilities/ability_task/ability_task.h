@@ -10,9 +10,13 @@ class GameplayAbility;
 /**
  * AbilityTask
  *
- * Base class for ability-level tasks that tick per-frame during ability execution.
- * Tasks are owned by the AbilitySystemComponent and cleaned up when the owning
- * ability ends or when they explicitly call EndTask() + ReadyForDestroy().
+ * Base class for ability-level tasks. Lifecycle mirrors UAbilityTask:
+ *   1. Create factory allocates the task and calls InitTask + AddAbilityTask
+ *   2. Activate() is called to register delegates / start timers / begin work
+ *   3. Tick() is called per-frame (for tasks that poll; prefer delegate-driven)
+ *   4. EndTask() marks the task finished and fires OnK2_OnTaskEnd
+ *   5. OnDestroy() is called when the owning ability ends or task is cleaned up
+ *   6. ReadyForDestroy() schedules removal from the active task list
  *
  * Inherits: standalone class (does NOT inherit from any GameplayTask)
  */
@@ -22,13 +26,19 @@ class AbilityTask
 public:
 	virtual ~AbilityTask() = default;
 
-	/** Tick this task. Called from ASC::TickTasks every frame while the task is active. */
+	/** Called after InitTask, when the task should begin its work.
+	 *  Subclasses override this to register delegates, set timers, etc. */
+	virtual void Activate() {}
+
+	/** Tick this task. Called from ASC::TickTasks every frame while the task is active.
+	 *  Prefer delegate-driven patterns over polling in Tick where possible. */
 	virtual void Tick(float DeltaTime) {}
 
 	/** Mark this task as finished. Fires OnK2_OnTaskEnd callback. */
 	virtual void EndTask();
 
-	/** Called when the task is being destroyed. bOwnerFinished=true if owning ability ended normally. */
+	/** Called when the task is being destroyed. bOwnerFinished=true if owning ability ended normally.
+	 *  Subclasses should clean up delegates/timers, then call AbilityTask::OnDestroy. */
 	virtual void OnDestroy(bool bOwnerFinished);
 
 	/** Returns true if EndTask() has been called */
@@ -62,6 +72,13 @@ public:
     static StringName ScriptFunctionCategory;
 
 protected:
+	/**
+	 * Check if ability task delegates should be broadcast.
+	 * Returns false (and suppresses broadcast) if the owning ability is no longer active.
+	 * Mirrors UAbilityTask::ShouldBroadcastAbilityTaskDelegates.
+	 */
+	bool ShouldBroadcastAbilityTaskDelegates() const;
+
 	/** Owning AbilitySystemComponent */
 	AbilitySystemComponent* ASC = nullptr;
 

@@ -12,14 +12,19 @@ AbilityTask_WaitGameplayEffectApplied* AbilityTask_WaitGameplayEffectApplied::Cr
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		
-
-		// Connect to ASC's OnGameplayEffectAppliedDelegateToSelf
-		entt::sink sink{ASC->OnGameplayEffectAppliedDelegateToSelf};
-		Task->DelegateConnection = sink.connect<&AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf>(*Task);
+		Task->Activate();
 	}
 
 	return Task;
+}
+
+void AbilityTask_WaitGameplayEffectApplied::Activate()
+{
+	if (ASC)
+	{
+		entt::sink sink{ASC->OnGameplayEffectAppliedDelegateToSelf};
+		DelegateConnection = sink.connect<&AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf>(*this);
+	}
 }
 
 void AbilityTask_WaitGameplayEffectApplied::OnDestroy(bool bOwnerFinished)
@@ -43,19 +48,32 @@ void AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf(AbilitySystemC
 		return;
 	}
 
+	// Prevent re-entrancy (e.g. applying a GE in the callback itself)
+	if (bLocked)
+	{
+		return;
+	}
+	bLocked = true;
+
 	// If a query is specified, check if the effect matches
 	if (!SourceTagRequirements.IsEmpty())
 	{
 		if (!SourceTagRequirements.Matches(Spec))
 		{
+			bLocked = false;
 			return;
 		}
 	}
 
-	if (OnEffectApplied)
+	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		OnEffectApplied(Spec);
+		if (OnEffectApplied)
+		{
+			OnEffectApplied(Spec);
+		}
 	}
+
+	bLocked = false;
 
 	if (bTriggerOnce)
 	{

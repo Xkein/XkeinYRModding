@@ -7,7 +7,7 @@
  * AbilityTask_WaitGameplayEffectApplied
  *
  * Waits for a GameplayEffect matching the given query to be applied to the owning ASC.
- * Uses ASC::OnGameplayEffectAppliedDelegateToSelf to register the callback.
+ * Registers callback on ASC::OnGameplayEffectAppliedDelegateToSelf in Activate().
  * Fires OnEffectApplied when a matching effect is applied.
  */
 CLASS(BindJs)
@@ -18,6 +18,7 @@ public:
 	FUNCTION()
 	static AbilityTask_WaitGameplayEffectApplied* Create(GameplayAbility* Ability, const FGameplayEffectQuery& Query, bool bTriggerOnce);
 
+	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
 	/** Source tag requirements to filter which effects trigger the callback */
@@ -35,6 +36,9 @@ public:
 private:
 	/** Connection to the ASC's OnGameplayEffectAppliedDelegateToSelf delegate */
 	entt::connection DelegateConnection;
+
+	/** Prevents re-entrancy in the callback (mirrors UE's Locked flag) */
+	bool bLocked = false;
 
 	/** Internal callback invoked by ASC when any effect is applied to self */
 	void OnEffectAppliedToSelf(AbilitySystemComponent* Target, const GameplayEffectSpec& Spec, ActiveGameplayEffectHandle Handle);

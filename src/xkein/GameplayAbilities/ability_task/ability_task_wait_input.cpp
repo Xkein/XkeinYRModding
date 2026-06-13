@@ -14,10 +14,23 @@ AbilityTask_WaitInput* AbilityTask_WaitInput::Create(GameplayAbility* Ability, i
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		
+		Task->Activate();
 	}
 
 	return Task;
+}
+
+void AbilityTask_WaitInput::Activate()
+{
+	// Capture initial pressed state so we don't fire on the first Tick if already pressed
+	if (ASC && AbilityInstance)
+	{
+		GameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(AbilityInstance);
+		if (Spec)
+		{
+			bWasPressed = (Spec->InputPressed != 0);
+		}
+	}
 }
 
 void AbilityTask_WaitInput::Tick(float DeltaTime)
@@ -38,17 +51,23 @@ void AbilityTask_WaitInput::Tick(float DeltaTime)
 
 	if (bTriggerOnPress && bIsPressed && !bWasPressed)
 	{
-		if (OnInputPress)
+		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			OnInputPress();
+			if (OnInputPress)
+			{
+				OnInputPress();
+			}
 		}
 	}
 
 	if (bTriggerOnRelease && !bIsPressed && bWasPressed)
 	{
-		if (OnInputRelease)
+		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			OnInputRelease();
+			if (OnInputRelease)
+			{
+				OnInputRelease();
+			}
 		}
 	}
 

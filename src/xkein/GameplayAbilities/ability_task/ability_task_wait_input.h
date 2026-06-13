@@ -6,7 +6,10 @@
  *
  * Waits for input press and/or release on the owning ability's InputID.
  * Polls in Tick by checking the ability spec's InputPressed state.
- * Fires OnInputPress and/or OnInputRelease callbacks as configured.
+ *
+ * TODO: Refactor to delegate-driven using ASC::AbilityReplicatedEventDelegate
+ * when available. See UAbilityTask_WaitInputPress/Release for reference.
+ * Note: Frame-sync project, so no replication is needed.
  */
 CLASS(BindJs)
 class AbilityTask_WaitInput : public AbilityTask
@@ -15,6 +18,8 @@ public:
 	/** Create and register a new WaitInput task */
 	FUNCTION()
 	static AbilityTask_WaitInput* Create(GameplayAbility* Ability, int32 InputID, bool bTriggerOnPress, bool bTriggerOnRelease);
+
+	virtual void Activate() override;
 
 	/** Tick: poll InputPressed state on the ability spec */
 	virtual void Tick(float DeltaTime) override;

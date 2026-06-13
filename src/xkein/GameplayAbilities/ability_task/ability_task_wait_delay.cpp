@@ -11,10 +11,16 @@ AbilityTask_WaitDelay* AbilityTask_WaitDelay::Create(GameplayAbility* Ability, f
 	{
 		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
-		
+		Task->Activate();
 	}
 
 	return Task;
+}
+
+void AbilityTask_WaitDelay::Activate()
+{
+	// TODO: Refactor to use a timer system (World::GetTimerManager equivalent)
+	// instead of polling in Tick. See UAbilityTask_WaitDelay::Activate for reference.
 }
 
 void AbilityTask_WaitDelay::Tick(float DeltaTime)
@@ -31,11 +37,13 @@ void AbilityTask_WaitDelay::Tick(float DeltaTime)
 
 	if (ElapsedTime >= TargetDuration)
 	{
-		EndTask();
-
-		if (OnFinish)
+		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			OnFinish();
+			if (OnFinish)
+			{
+				OnFinish();
+			}
 		}
+		EndTask();
 	}
 }

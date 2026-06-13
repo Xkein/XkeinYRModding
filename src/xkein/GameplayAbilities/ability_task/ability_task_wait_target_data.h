@@ -22,7 +22,15 @@ public:
 	 *  Fires OnTargetDataReady and ends the task. */
 	void TargetDataReceived(const GameplayAbilityTargetDataHandle& Data);
 
+	/** Called externally when targeting is cancelled.
+	 *  Fires OnTargetDataCancelled and ends the task. */
+	void TargetDataCancelled();
+
 	/** Callback fired when target data is ready */
 	PROPERTY()
 	std::function<void(const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
+
+	/** Callback fired when targeting is cancelled */
+	PROPERTY()
+	std::function<void()> OnTargetDataCancelled;
 };

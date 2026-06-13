@@ -7,7 +7,7 @@
  * AbilityTask_WaitGameplayEvent
  *
  * Waits for a specific gameplay event (tag + payload) to be fired on the owning ASC.
- * Uses ASC::AddGameplayEventTagContainerDelegate to register the callback.
+ * Registers callback on ASC's event delegate in Activate().
  * Fires OnEventReceived when the event occurs.
  */
 CLASS(BindJs)
@@ -16,8 +16,9 @@ class AbilityTask_WaitGameplayEvent : public AbilityTask
 public:
 	/** Create and register a new WaitGameplayEvent task */
 	FUNCTION()
-	static AbilityTask_WaitGameplayEvent* Create(GameplayAbility* Ability, const GameplayTag& InEventTag, bool bOnlyTriggerOnce);
+	static AbilityTask_WaitGameplayEvent* Create(GameplayAbility* Ability, const GameplayTag& InEventTag, bool bOnlyTriggerOnce, bool bOnlyMatchExact = false);
 
+	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
 	/** Tag of the gameplay event to wait for */
@@ -27,6 +28,10 @@ public:
 	/** If true, EndTask after the first event */
 	PROPERTY()
 	bool bOnlyTriggerOnce = true;
+
+	/** If true, match only the exact tag; if false, match tag and its children */
+	PROPERTY()
+	bool bOnlyMatchExact = false;
 
 	/** Callback fired when the event is received */
 	PROPERTY()
