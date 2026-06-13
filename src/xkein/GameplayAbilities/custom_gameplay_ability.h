@@ -9,7 +9,7 @@ public:
     CustomGameplayAbility();
 
     FUNCTION()
-    static CustomGameplayAbility* CreateCustomGameplayAbility();
+    static CustomGameplayAbility* Create();
 
     bool K2_CanActivateAbility(const GameplayAbilityActorInfo& ActorInfo, const GameplayAbilitySpecHandle Handle,
         GameplayTagContainer* OptionalRelevantTags) const override

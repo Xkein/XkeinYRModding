@@ -4,7 +4,7 @@ CustomAttributeSet::CustomAttributeSet() : AttributeSet()
 {
 }
 
-CustomAttributeSet* CustomAttributeSet::CreateCustomAttributeSet()
+CustomAttributeSet* CustomAttributeSet::Create()
 {
     return new CustomAttributeSet();
 }

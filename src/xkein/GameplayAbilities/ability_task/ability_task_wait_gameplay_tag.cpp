@@ -11,7 +11,7 @@ AbilityTask_WaitGameplayTag* AbilityTask_WaitGameplayTag::Create(GameplayAbility
 	AbilitySystemComponent* ASC = Ability->GetAbilitySystemComponentFromActorInfo();
 	if (ASC)
 	{
-		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
+		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
 		
 

@@ -5,7 +5,7 @@ CustomGameplayAbility::CustomGameplayAbility() : GameplayAbility()
 {
 }
 
-CustomGameplayAbility* CustomGameplayAbility::CreateCustomGameplayAbility()
+CustomGameplayAbility* CustomGameplayAbility::Create()
 {
     return new CustomGameplayAbility();
 }

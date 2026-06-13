@@ -9,7 +9,7 @@ AbilityTask_WaitGameplayEffectRemoved* AbilityTask_WaitGameplayEffectRemoved::Cr
 	AbilitySystemComponent* ASC = Ability->GetAbilitySystemComponentFromActorInfo();
 	if (ASC && Handle.IsValid())
 	{
-		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
+		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
 		
 
@@ -23,7 +23,7 @@ AbilityTask_WaitGameplayEffectRemoved* AbilityTask_WaitGameplayEffectRemoved::Cr
 	}
 	else if (ASC)
 	{
-		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
+		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
 		
 	}

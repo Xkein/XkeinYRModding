@@ -8,7 +8,7 @@ public:
     CustomAttributeSet();
 
     FUNCTION()
-    static CustomAttributeSet* CreateCustomAttributeSet();
+    static CustomAttributeSet* Create();
     
     bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override
     {

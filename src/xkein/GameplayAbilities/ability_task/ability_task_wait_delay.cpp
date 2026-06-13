@@ -9,7 +9,7 @@ AbilityTask_WaitDelay* AbilityTask_WaitDelay::Create(GameplayAbility* Ability, f
 	AbilitySystemComponent* ASC = Ability->GetAbilitySystemComponentFromActorInfo();
 	if (ASC)
 	{
-		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
+		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
 		
 	}

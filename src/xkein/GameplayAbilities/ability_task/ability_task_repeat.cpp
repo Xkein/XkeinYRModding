@@ -10,7 +10,7 @@ AbilityTask_Repeat* AbilityTask_Repeat::Create(GameplayAbility* Ability, int32 M
 	AbilitySystemComponent* ASC = Ability->GetAbilitySystemComponentFromActorInfo();
 	if (ASC)
 	{
-		Task->InitTask(*ASC, GameplayAbilitySpecHandle(), Ability);
+		Task->InitTask(*ASC, Ability->GetCurrentSpecHandle(), Ability);
 		Ability->AddAbilityTask(Task);
 		
 	}
