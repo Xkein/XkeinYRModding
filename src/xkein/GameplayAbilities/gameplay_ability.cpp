@@ -262,20 +262,20 @@ void GameplayAbility::CancelAbility(const GameplayAbilitySpecHandle Handle, cons
 
 bool GameplayAbility::IsEndAbilityValid(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo) const
 {
-    // 防止 EndAbility 被多次调用
+    // Prevent EndAbility from being called multiple times
     if (bIsActive == false || bIsAbilityEnding == true)
     {
         return false;
     }
 
-    // 检查 ASC 是否有效
+    // Check if ASC is valid
     AbilitySystemComponent* Comp = ActorInfo ? ActorInfo->AbilitySystemCom : nullptr;
     if (Comp == nullptr)
     {
         return false;
     }
 
-    // 检查 spec 是否仍然活跃
+    // Check if spec is still active
     const GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo);
     const bool bIsSpecActive = Spec ? Spec->IsActive() : IsActive();
     if (!bIsSpecActive)
