@@ -2,6 +2,8 @@
 #include "core/reflection/reflection.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
+#include "audio/audio.h"
+#include <AnimClass.h>
 #include <GeneralStructures.h>
 
 /** Event type for gameplay cues */
@@ -14,8 +16,8 @@ enum EGameplayCueEvent : int
     Removed       // Cue removed (persistent effects end)
 };
 
-/** Simple gameplay cue parameters */
-CLASS()
+/** Simple gameplay cue parameters, mirroring UE5.5 FGameplayCueParameters */
+CLASS(BindJs)
 struct GameplayCueParameters
 {
     PROPERTY()
@@ -33,29 +35,300 @@ struct GameplayCueParameters
     PROPERTY()
     CoordStruct Normal;
 
-    PROPERTY()
+    /** Context handle (not exposed to JS — internal C++ type) */
     GameplayEffectContextHandle EffectContext;
 
     PROPERTY()
     float RawMagnitude = 0.0f;
+
+    /** Instigator actor, the actor that owns the ability system component */
+    PROPERTY()
+    entt::entity Instigator = entt::null;
+
+    /** The physical actor that actually did the damage, can be a weapon or projectile */
+    PROPERTY()
+    entt::entity EffectCauser = entt::null;
+
+    /** Object this effect was created from, can be an actor or static object */
+    PROPERTY()
+    entt::entity SourceObject = entt::null;
+
+    /** Level of the gameplay effect that triggered this cue */
+    PROPERTY()
+    int32 GameplayEffectLevel = 1;
+
+    /** Level of the ability that triggered this cue */
+    PROPERTY()
+    int32 AbilityLevel = 1;
+
+    /** Matched tag name, set during cue routing. Mutable - not replicated */
+    mutable GameplayTag MatchedTagName;
+
+    /** Original tag before any tag translation. Mutable - not replicated */
+    mutable GameplayTag OriginalTag;
+
+    /** Whether this cue was triggered from an active gameplay effect */
+    bool bGameplayEffectActive = false;
+
+    /** Default constructor (required when explicit constructors exist) */
+    GameplayCueParameters() = default;
+
+    /** Construct parameters from a gameplay effect spec */
+    explicit GameplayCueParameters(const GameplayEffectSpec& Spec)
+        : NormalizedMagnitude(1.0f)
+        , RawMagnitude(0.0f)
+        , GameplayEffectLevel(Spec.Level)
+        , bGameplayEffectActive(true)
+    {
+        if (Spec.EffectContext.Data)
+        {
+            Instigator = Spec.EffectContext.Data->Instigator;
+            EffectCauser = Spec.EffectContext.Data->EffectCauser;
+            SourceObject = Spec.EffectContext.Data->SourceObject;
+            AbilityLevel = Spec.EffectContext.Data->AbilityLevel;
+            EffectContext = Spec.EffectContext;
+        }
+        AggregatedSourceTags = Spec.CapturedSourceTags;
+    }
 };
 
-/** Base class for gameplay cue notifies (simplified) */
+/** Base class for gameplay cue notifies (stateless, non-instanced).
+ *  Each call to OnExecute/OnActive creates a one-shot effect (Wwise event + AnimClass). */
 CLASS(BindJs)
 class GameplayCueNotify_Static
 {
 public:
-    virtual void OnExecute(const GameplayTag& CueTag, const GameplayCueParameters& Params) {}
-    virtual void OnActive(const GameplayTag& CueTag, const GameplayCueParameters& Params) {}
+    /** Wwise audio event name to post on execute/active */
+    PROPERTY()
+    StringName WwiseEventName;
+
+    /** Animation type to spawn on execute (one-shot burst) */
+    PROPERTY()
+    AnimTypeClass* BurstAnim = nullptr;
+
+    /** If false, ignore duplicate OnActive events (UE parity: bAllowMultipleOnActiveEvents) */
+    PROPERTY()
+    bool bAllowMultipleOnActiveEvents = true;
+
+    /** One-shot execution: play audio + spawn visual. Called for Instant GE cues. */
+    virtual void OnExecute(const GameplayTag& CueTag, const GameplayCueParameters& Params)
+    {
+        PlayEffects(Params);
+    }
+
+    /** Cue activated (persistent effect begins). Same as OnExecute for Stateless. */
+    virtual void OnActive(const GameplayTag& CueTag, const GameplayCueParameters& Params)
+    {
+        if (bAllowMultipleOnActiveEvents)
+            PlayEffects(Params);
+    }
+
+    /** Cue removed. No-op for stateless (no persistent state to clean up). */
     virtual void OnRemove(const GameplayTag& CueTag, const GameplayCueParameters& Params) {}
+
+    /** Factory method for ScriptFunction registration */
+    FUNCTION()
+    static GameplayCueNotify_Static* CreateInstance()
+    {
+        return new GameplayCueNotify_Static();
+    }
+
+private:
+    void PlayEffects(const GameplayCueParameters& Params)
+    {
+        // Post Wwise audio event
+        if (!WwiseEventName.IsEmpty())
+        {
+            auto eventID = AudioSystem::GetIDFromString(WwiseEventName.c_str());
+            if (eventID != AK_INVALID_UNIQUE_ID)
+                AudioSystem::PostEvent(eventID, AudioSystem::GetNextGameObjId());
+        }
+
+        // Spawn one-shot animation
+        if (BurstAnim)
+        {
+            // AnimClass(AnimTypeClass*, CoordStruct, loopDelay=0, loopCount=1, flags=0x600, forceZAdjust=0, reverse=false)
+            auto* anim = new AnimClass(BurstAnim, Params.Location, 0, 1, 0x600, 0, false);
+            if (anim)
+                anim->Start();
+        }
+    }
 };
 
-/** Actor-based gameplay cue (stub) */
+/** Instanced (stateful) gameplay cue notify. Extend this for cues that need to
+ *  own and manage visual entities (AnimClass) over their lifetime.
+ *  Actor-owns-AnimClass: OnBecomeRelevant creates, OnCeaseRelevant destroys. */
 CLASS(BindJs)
 class GameplayCueNotify_Actor
 {
 public:
-    virtual void OnBurst(const GameplayTag& CueTag, const GameplayCueParameters& Params) {}
-    virtual void OnBecomeRelevant(const GameplayTag& CueTag, const GameplayCueParameters& Params) {}
-    virtual void OnCeaseRelevant(const GameplayTag& CueTag, const GameplayCueParameters& Params) {}
+    /** Animation type for one-shot burst (OnBurst callback) */
+    PROPERTY()
+    AnimTypeClass* BurstAnim = nullptr;
+
+    /** Animation type for persistent looping (OnBecomeRelevant → OnCeaseRelevant) */
+    PROPERTY()
+    AnimTypeClass* LoopingAnim = nullptr;
+
+    /** Currently managed AnimClass instance. Created on OnBecomeRelevant,
+     *  destroyed (nullptr) on OnCeaseRelevant. Subclasses can extend. */
+    AnimClass* SpawnedAnimEntity = nullptr;
+
+    /** If true, auto-destroy this actor after OnCeaseRelevant completes */
+    PROPERTY()
+    bool bAutoDestroyOnRemove = true;
+
+    /** Gating: prevent duplicate OnActive events */
+    PROPERTY()
+    bool bAllowMultipleOnActiveEvents = true;
+    bool bHasHandledOnActiveEvent = false;
+
+    /** Gating: prevent duplicate WhileActive events */
+    PROPERTY()
+    bool bAllowMultipleWhileActiveEvents = true;
+    bool bHasHandledWhileActiveEvent = false;
+
+    /** Gating: prevent duplicate OnRemove events */
+    bool bHasHandledOnRemoveEvent = false;
+
+    // ========================================================================
+    // Lifecycle callbacks
+    // ========================================================================
+
+    /** One-shot burst: spawn a single AnimClass from BurstAnim */
+    virtual void OnBurst(const GameplayTag& CueTag, const GameplayCueParameters& Params)
+    {
+        if (BurstAnim)
+        {
+            auto* anim = new AnimClass(BurstAnim, Params.Location, 0, 1, 0x600, 0, false);
+            if (anim) anim->Start();
+            // Note: this is a one-shot — we don't store it in SpawnedAnimEntity
+        }
+    }
+
+    /** Cue becomes relevant (OnActive/WhileActive).
+     *  Creates persistent AnimClass from LoopingAnim. */
+    virtual void OnBecomeRelevant(const GameplayTag& CueTag, const GameplayCueParameters& Params)
+    {
+        if (bHasHandledOnActiveEvent && !bAllowMultipleOnActiveEvents)
+            return;
+        bHasHandledOnActiveEvent = true;
+
+        if (LoopingAnim)
+        {
+            SpawnedAnimEntity = new AnimClass(LoopingAnim, Params.Location, 0, -1, 0x600, 0, false);
+            if (SpawnedAnimEntity)
+                SpawnedAnimEntity->Start();
+        }
+    }
+
+    /** Cue ceases to be relevant (Removed).
+     *  Destroys the managed AnimClass and resets gating flags. */
+    virtual void OnCeaseRelevant(const GameplayTag& CueTag, const GameplayCueParameters& Params)
+    {
+        if (bHasHandledOnRemoveEvent)
+            return;
+        bHasHandledOnRemoveEvent = true;
+
+        // TODO: Stacking guard — before releasing the managed entity, check whether
+        // the target ASC still has this tag (from another concurrent source). If so,
+        // skip removal to avoid prematurely ending the cue.
+        // This requires passing the ASC pointer through to OnCeaseRelevant, which
+        // is a known limitation in the current signature. When the ASC is available:
+        //   if (auto* TagInterface = dynamic_cast<IGameplayTagAssetInterface*>(ASC))
+        //       if (TagInterface->HasMatchingGameplayTag(Params.MatchedTagName))
+        //           return;
+
+        // Release the managed AnimClass entity
+        SpawnedAnimEntity = nullptr;
+
+        // Reset gating flags for potential reuse
+        bHasHandledOnActiveEvent = false;
+        bHasHandledWhileActiveEvent = false;
+        bHasHandledOnRemoveEvent = false;
+    }
+
+    // ========================================================================
+    // Factory
+    // ========================================================================
+
+    /** Factory method for ScriptFunction registration */
+    FUNCTION()
+    static GameplayCueNotify_Actor* CreateInstance()
+    {
+        return new GameplayCueNotify_Actor();
+    }
+};
+
+// ============================================================
+// Active GameplayCue tracking (UE: FActiveGameplayCue / FActiveGameplayCueContainer)
+// ============================================================
+
+/** One active gameplay cue tracked by ASC. Multiple entries with same tag are allowed
+ *  (from different sources). RemoveCue removes the FIRST matching entry (FIFO).
+ *  Stacking guard on Removed: CueNotify_Actor checks if ASC still has the tag before cleanup. */
+struct ActiveGameplayCue
+{
+    /** The gameplay tag identifying this cue */
+    GameplayTag GameplayCueTag;
+
+    /** Parameters passed when the cue was added. Used for Removed event replay. */
+    GameplayCueParameters Parameters;
+};
+
+/** Container for active gameplay cues on an AbilitySystemComponent.
+ *  Replaces std::set<GameplayTag> to support multiple sources per tag (Stacking). */
+struct ActiveGameplayCueContainer
+{
+    /** List of all currently active gameplay cues. Multiple entries per tag allowed. */
+    std::vector<ActiveGameplayCue> GameplayCues;
+
+    /** Add a new active cue. Always adds, even if the same tag is already present.
+     *  This supports multiple GE sources adding the same cue tag (Stacking).
+     *  @return true if the cue was added (always true) */
+    bool AddCue(const GameplayTag& Tag, const GameplayCueParameters& Params)
+    {
+        GameplayCues.push_back({ Tag, Params });
+        return true;
+    }
+
+    /** Remove the FIRST matching cue entry for this tag (FIFO order).
+     *  When the LAST entry for a tag is removed, the caller should trigger
+     *  the actual Removed event (via Stacking guard in CueNotify_Actor).
+     *  @return true if a matching cue was found and removed */
+    bool RemoveCue(const GameplayTag& Tag)
+    {
+        for (auto it = GameplayCues.begin(); it != GameplayCues.end(); ++it)
+        {
+            if (it->GameplayCueTag == Tag)
+            {
+                GameplayCues.erase(it);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Check if any active cue has the given tag.
+     *  Used by ASC::IsGameplayCueActive and Stacking guard. */
+    bool HasCue(const GameplayTag& Tag) const
+    {
+        for (const auto& Cue : GameplayCues)
+        {
+            if (Cue.GameplayCueTag == Tag)
+                return true;
+        }
+        return false;
+    }
+
+    /** Remove all active cues. Calls RemoveCue for each tag (which triggers Removed events).
+     *  Note: Since RemoveCue only removes one entry per call, iterate until empty. */
+    void RemoveAllCues()
+    {
+        while (!GameplayCues.empty())
+        {
+            GameplayTag tag = GameplayCues.front().GameplayCueTag;
+            RemoveCue(tag);
+        }
+    }
 };

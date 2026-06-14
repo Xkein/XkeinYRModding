@@ -6,6 +6,7 @@
 #include "xkein/GameplayAbilities/gameplay_ability.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_cue.h"
+#include "xkein/GameplayAbilities/gameplay_cue_interface.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
 #include "xkein/GameplayAbilities/gameplay_tag_count_container.h"
@@ -105,9 +106,10 @@ struct AbilitySystemComponentType final
 IMPL_YR_SERIALIZE_SWIZZLE(AbilitySystemComponentType);
 
 CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass], AutoSavegame)
-class AbilitySystemComponent
+class AbilitySystemComponent : public IGameplayCueInterface, public IGameplayTagAssetInterface
 {
 	friend struct ActiveGameplayEffectsContainer;
+
 
     static void OnEntityConstruct(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType);
 public:
@@ -116,6 +118,9 @@ public:
         OnEntityConstruct(reg, entity, pYrObject, pYrObject->Type);
     }
 
+	/** Destructor — ensures all pending gameplay cues are removed with Removed events */
+	~AbilitySystemComponent();
+	
 	/** The actor that owns this component logically */
     PROPERTY()
     entt::entity Owner;
@@ -336,6 +341,13 @@ public:
 
 	/** Get the current numeric value of an attribute */
 	float GetNumericAttribute(const GameplayAttribute& Attribute) const;
+
+	// ============================================================
+	// IGameplayCueInterface
+	// ============================================================
+
+	bool ShouldAcceptGameplayCue(const GameplayTag& CueTag, EGameplayCueEvent EventType, const GameplayCueParameters& Params) const;
+	void HandleGameplayCue(const GameplayTag& CueTag, EGameplayCueEvent EventType, const GameplayCueParameters& Params);
 
 	/** Initialize gameplay cue parameters with default values from this ASC's context */
 	void InitDefaultGameplayCueParameters(GameplayCueParameters& Parameters);
@@ -733,6 +745,6 @@ private:
 	/** Input IDs that are currently blocked from ability activation */
 	std::set<int32> BlockedInputIDs;
 
-	/** Set of gameplay cue tags currently active on this ASC (for IsGameplayCueActive / RemoveAllGameplayCues) */
-	std::set<GameplayTag> ActiveGameplayCues;
+	/** Container of gameplay cue tags currently active on this ASC (for IsGameplayCueActive / RemoveAllGameplayCues) */
+	ActiveGameplayCueContainer ActiveGameplayCues;
 };

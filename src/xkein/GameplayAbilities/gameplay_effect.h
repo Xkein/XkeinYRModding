@@ -8,6 +8,7 @@
 #include "xkein/GameplayAbilities/active_gameplay_effect_handle.h"
 #include <entt/signal/sigh.hpp>
 #include <map>
+#include <memory>
 
 struct FGameplayEffectRemovalInfo;
 struct ActiveGameplayEffect;
@@ -578,7 +579,7 @@ struct GameplayEffectContext
 
 struct GameplayEffectContextHandle
 {
-	GameplayEffectContext* Data;
+	std::shared_ptr<GameplayEffectContext> Data;
 };
 
 CLASS(BindJs)
@@ -746,4 +747,11 @@ private:
     /** Internal storage of active effects */
 	std::vector<ActiveGameplayEffect*> Effects;
 };
+
+// Forward-declare EGameplayCueEvent (defined in gameplay_cue.h)
+enum EGameplayCueEvent : int;
+
+/** Trigger gameplay cues for a GameplayEffect. Typically called after Instant GE execution. */
+void TriggerGameplayCues(const GameplayEffect* Effect, const GameplayEffectSpec& Spec,
+                          class AbilitySystemComponent* Target, EGameplayCueEvent EventType);
 

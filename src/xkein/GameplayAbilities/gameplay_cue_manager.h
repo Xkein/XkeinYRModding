@@ -4,6 +4,8 @@
 #include "yr/parse/ini_reader.h"
 #include "scripting/common/script_function.h"
 #include "xkein/GameplayAbilities/gameplay_cue.h"
+#include "xkein/GameplayAbilities/gameplay_cue_set.h"
+#include "xkein/GameplayAbilities/gameplay_cue_translator.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include <map>
 #include <vector>
@@ -23,6 +25,17 @@ struct GameplayCueManager
 
     /** Map of tag → registered actor-based cue notify instances */
     std::map<GameplayTag, std::vector<GameplayCueNotify_Actor*>> ActorCues;
+
+    /** The runtime cue set that handles tag-to-notify lookup and dispatch.
+     *  Replaces direct map iteration in HandleGameplayCue. */
+    GameplayCueSet RuntimeCueSet;
+
+    /** Reserved translation manager for future tag translation pipeline. */
+    GameplayCueTranslationManager TranslationManager;
+
+    /** Recursion guard: prevents infinite loops when a cue handler triggers another cue.
+     *  Set on entry to HandleGameplayCue, cleared on exit. */
+    bool bIsHandlingCue = false;
 
     /** Main entry point for routing a gameplay cue event to registered notifies.
      *  @param ASC The ability system component that triggered the cue

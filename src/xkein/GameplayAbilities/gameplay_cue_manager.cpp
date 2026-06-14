@@ -13,7 +13,24 @@ GameplayCueManager* GameplayCueManager::Get()
 void GameplayCueManager::HandleGameplayCue(AbilitySystemComponent* ASC, const GameplayTag& CueTag,
                                             EGameplayCueEvent EventType, const GameplayCueParameters& Params)
 {
-    // Route to static cue notifies
+    // Recursion guard: prevent infinite loops from cue-to-cue triggering
+    if (bIsHandlingCue)
+        return;
+    bIsHandlingCue = true;
+
+    // Set OriginalTag if not already set (for future Translator use)
+    GameplayCueParameters LocalParams = Params;
+    if (!LocalParams.OriginalTag.IsValid())
+    {
+        LocalParams.OriginalTag = CueTag;
+    }
+    // MatchedTagName will be set by CueSet during routing
+
+    // Route through the CueSet for tag-based dispatch with parent fallback
+    RuntimeCueSet.HandleGameplayCue(ASC, CueTag, EventType, LocalParams);
+
+    // Legacy fallback: also route through the old StaticCues/ActorCues maps
+    // (remove this block after Task 22 when INI loading is fully CueSet-based)
     auto itStatic = StaticCues.find(CueTag);
     if (itStatic != StaticCues.end())
     {
@@ -22,21 +39,13 @@ void GameplayCueManager::HandleGameplayCue(AbilitySystemComponent* ASC, const Ga
             if (!Cue) continue;
             switch (EventType)
             {
-                case EGameplayCueEvent::Executed:
-                    Cue->OnExecute(CueTag, Params);
-                    break;
+                case EGameplayCueEvent::Executed:    Cue->OnExecute(CueTag, LocalParams); break;
                 case EGameplayCueEvent::OnActive:
-                case EGameplayCueEvent::WhileActive:
-                    Cue->OnActive(CueTag, Params);
-                    break;
-                case EGameplayCueEvent::Removed:
-                    Cue->OnRemove(CueTag, Params);
-                    break;
+                case EGameplayCueEvent::WhileActive:  Cue->OnActive(CueTag, LocalParams); break;
+                case EGameplayCueEvent::Removed:      Cue->OnRemove(CueTag, LocalParams); break;
             }
         }
     }
-
-    // Route to actor cue notifies
     auto itActor = ActorCues.find(CueTag);
     if (itActor != ActorCues.end())
     {
@@ -45,25 +54,23 @@ void GameplayCueManager::HandleGameplayCue(AbilitySystemComponent* ASC, const Ga
             if (!Cue) continue;
             switch (EventType)
             {
-                case EGameplayCueEvent::Executed:
-                    Cue->OnBurst(CueTag, Params);
-                    break;
+                case EGameplayCueEvent::Executed:    Cue->OnBurst(CueTag, LocalParams); break;
                 case EGameplayCueEvent::OnActive:
-                case EGameplayCueEvent::WhileActive:
-                    Cue->OnBecomeRelevant(CueTag, Params);
-                    break;
-                case EGameplayCueEvent::Removed:
-                    Cue->OnCeaseRelevant(CueTag, Params);
-                    break;
+                case EGameplayCueEvent::WhileActive:  Cue->OnBecomeRelevant(CueTag, LocalParams); break;
+                case EGameplayCueEvent::Removed:      Cue->OnCeaseRelevant(CueTag, LocalParams); break;
             }
         }
     }
+
+    bIsHandlingCue = false;
 }
 
 void GameplayCueManager::AddCueNotify(const GameplayTag& Tag, GameplayCueNotify_Static* Cue)
 {
     if (!Cue) return;
     StaticCues[Tag].push_back(Cue);
+    
+    // Register with CueSet (Task 22 will call BuildAccelerationMap after INI loading)
 }
 
 void GameplayCueManager::AddCueNotify(const GameplayTag& Tag, GameplayCueNotify_Actor* Cue)
@@ -100,6 +107,13 @@ void GameplayCueManager::AfterLoadIni(IniReader& parser, const char* pSection, c
                 {
                     AddCueNotify(tag, cue);
                 }
+
+                // Register to RuntimeCueSet for tag-based lookup with parent fallback
+                GameplayCueNotifyData data;
+                data.GameplayCueTag = tag;
+                data.GameplayCueNotifyObj = name;
+                data.ParentDataIdx = -1;
+                RuntimeCueSet.AddCueNotify(data);
             }
         }
 
@@ -114,7 +128,16 @@ void GameplayCueManager::AfterLoadIni(IniReader& parser, const char* pSection, c
                 {
                     AddCueNotify(tag, cue);
                 }
+
+                // Register to RuntimeCueSet for tag-based lookup with parent fallback
+                GameplayCueNotifyData data;
+                data.GameplayCueTag = tag;
+                data.GameplayCueNotifyObj = name;
+                data.ParentDataIdx = -1;
+                RuntimeCueSet.AddCueNotify(data);
             }
         }
     }
+
+    RuntimeCueSet.BuildAccelerationMap_Internal();
 }

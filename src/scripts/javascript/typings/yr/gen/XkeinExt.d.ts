@@ -507,8 +507,11 @@ class GameplayEffectComponent
 class ActiveGameplayEffectsContainer
 {
 }
+// Interface for objects that can receive gameplay cue events.
+// Implemented by AbilitySystemComponent and potentially by target actors.
 // AbilitySystemComponent
 class AbilitySystemComponent
+    extends IGameplayCueInterface
 {
     // Grants an Ability.
     // This will be ignored if the actor is not authoritative.
@@ -564,25 +567,44 @@ class AbilitySystemComponent
     // public ActiveGameplayEffectsContainer ActiveGameplayEffects
     m_ActiveGameplayEffects : ActiveGameplayEffectsContainer;
 }
-// AbilitySystemComponentType
-class AbilitySystemComponentType
+// Simple gameplay cue parameters, mirroring UE5.5 FGameplayCueParameters
+// GameplayCueParameters
+class GameplayCueParameters
 {
-    // public std::vector<AttributeSetDefine *, std::allocator<AttributeSetDefine *>> Attributes
-    m_Attributes : StdVector<AttributeSetDefine>;
-    // public std::vector<GameplayAbilityDefine *, std::allocator<GameplayAbilityDefine *>> DefaultAbilities
-    m_DefaultAbilities : StdVector<GameplayAbilityDefine>;
-    // public std::vector<GameplayTag, std::allocator<GameplayTag>> StartupTags
-    m_StartupTags : StdVector<GameplayTag>;
-    // public std::vector<GameplayEffect, std::allocator<GameplayEffect>> StartupEffects
-    m_StartupEffects : StdVector<GameplayEffect>;
+    // public float NormalizedMagnitude
+    m_NormalizedMagnitude : float;
+    // public GameplayTagContainer AggregatedSourceTags
+    m_AggregatedSourceTags : GameplayTagContainer;
+    // public GameplayTagContainer AggregatedTargetTags
+    m_AggregatedTargetTags : GameplayTagContainer;
+    // public Vector3D<int> Location
+    m_Location : Vector3D;
+    // public Vector3D<int> Normal
+    m_Normal : Vector3D;
+    // public float RawMagnitude
+    m_RawMagnitude : float;
+    // Instigator actor, the actor that owns the ability system component
+    // public entity Instigator
+    m_Instigator : entt_entity;
+    // The physical actor that actually did the damage, can be a weapon or projectile
+    // public entity EffectCauser
+    m_EffectCauser : entt_entity;
+    // Object this effect was created from, can be an actor or static object
+    // public entity SourceObject
+    m_SourceObject : entt_entity;
+    // Level of the gameplay effect that triggered this cue
+    // public int32 GameplayEffectLevel
+    m_GameplayEffectLevel : int32;
+    // Level of the ability that triggered this cue
+    // public int32 AbilityLevel
+    m_AbilityLevel : int32;
 }
-// AttributeSetDefine
-class AttributeSetDefine
+// Abilities define custom gameplay logic that can be activated by players or external game logic
+// GameplayAbility
+class GameplayAbility
 {
-    // public StringName AttributeSetCreator
-    m_AttributeSetCreator : StringName;
-    // public std::vector<GameplayAttribute, std::allocator<GameplayAttribute>> Attributes
-    m_Attributes : StdVector<GameplayAttribute>;
+    // public GameplayAbilityDefine const * Define
+    m_Define : GameplayAbilityDefine;
 }
 // Abilities define custom gameplay logic that can be activated by players or external game logic
 // GameplayAbilityDefine
@@ -647,6 +669,16 @@ class AbilityTriggerData
     // public EGameplayAbilityTriggerSource TriggerSource
     m_TriggerSource : EGameplayAbilityTriggerSource;
 }
+// GameplayAbilityActorInfo
+// Cached data associated with an Actor using an Ability.
+// -Initialized from an AActor* in InitFromActor
+// -Abilities use this to know what to actor upon. E.g., instead of being coupled to a specific actor class.
+// -These are generally passed around as pointers to support polymorphism.
+// -Projects can override UAbilitySystemGlobals::AllocAbilityActorInfo to override the default struct type that is created.
+// GameplayAbilityActorInfo
+class GameplayAbilityActorInfo
+{
+}
 // An activatable ability spec, hosted on the ability system component. This defines both what the ability is (what class, what level, input binding etc)
 // and also holds runtime state that must be kept outside of the ability being instanced/activated.
 // GameplayAbilitySpec
@@ -668,34 +700,13 @@ class GameplayAbilitySpec
     // public GameplayTagContainer DynamicAbilityTags
     m_DynamicAbilityTags : GameplayTagContainer;
 }
-// Abilities define custom gameplay logic that can be activated by players or external game logic
-// GameplayAbility
-class GameplayAbility
+// ActiveGameplayEffectHandle
+class ActiveGameplayEffectHandle
 {
-    // public GameplayAbilityDefine const * Define
-    m_Define : GameplayAbilityDefine;
-}
-// GameplayAbilityActorInfo
-// Cached data associated with an Actor using an Ability.
-// -Initialized from an AActor* in InitFromActor
-// -Abilities use this to know what to actor upon. E.g., instead of being coupled to a specific actor class.
-// -These are generally passed around as pointers to support polymorphism.
-// -Projects can override UAbilitySystemGlobals::AllocAbilityActorInfo to override the default struct type that is created.
-// GameplayAbilityActorInfo
-class GameplayAbilityActorInfo
-{
-}
-// GameplayAbilityActivationInfo
-// Data tied to a specific activation of an ability.
-// -Tell us whether we are the authority, if we are predicting, confirmed, etc.
-// -Holds current and previous PredictionKey
-// -Generally not meant to be subclassed in projects.
-// -Passed around by value since the struct is small.
-// GameplayAbilityActivationInfo
-class GameplayAbilityActivationInfo
-{
-    // public EGameplayAbilityActivationMode ActivationMode
-    m_ActivationMode : EGameplayAbilityActivationMode;
+    // public int32 Handle
+    m_Handle : int32;
+    // public bool bPassedFiltersAndWasExecuted
+    m_bPassedFiltersAndWasExecuted : boolean;
 }
 // Metadata for a tag-based Gameplay Event, that can activate other abilities or run ability-specific logic
 // GameplayEventData
@@ -745,6 +756,18 @@ class GameplayAbilityTargetDataHandle
 class GameplayAbilityTargetData
 {
 }
+// GameplayAbilityActivationInfo
+// Data tied to a specific activation of an ability.
+// -Tell us whether we are the authority, if we are predicting, confirmed, etc.
+// -Holds current and previous PredictionKey
+// -Generally not meant to be subclassed in projects.
+// -Passed around by value since the struct is small.
+// GameplayAbilityActivationInfo
+class GameplayAbilityActivationInfo
+{
+    // public EGameplayAbilityActivationMode ActivationMode
+    m_ActivationMode : EGameplayAbilityActivationMode;
+}
 // AbilityTask
 // Base class for ability-level tasks. Lifecycle mirrors UAbilityTask:
 // 1. Create factory allocates the task and calls InitTask + AddAbilityTask
@@ -766,13 +789,25 @@ class AbilityTask
     // public static StringName ScriptFunctionCategory
     static s_ScriptFunctionCategory : StringName;
 }
-// ActiveGameplayEffectHandle
-class ActiveGameplayEffectHandle
+// AbilitySystemComponentType
+class AbilitySystemComponentType
 {
-    // public int32 Handle
-    m_Handle : int32;
-    // public bool bPassedFiltersAndWasExecuted
-    m_bPassedFiltersAndWasExecuted : boolean;
+    // public std::vector<AttributeSetDefine *, std::allocator<AttributeSetDefine *>> Attributes
+    m_Attributes : StdVector<AttributeSetDefine>;
+    // public std::vector<GameplayAbilityDefine *, std::allocator<GameplayAbilityDefine *>> DefaultAbilities
+    m_DefaultAbilities : StdVector<GameplayAbilityDefine>;
+    // public std::vector<GameplayTag, std::allocator<GameplayTag>> StartupTags
+    m_StartupTags : StdVector<GameplayTag>;
+    // public std::vector<GameplayEffect, std::allocator<GameplayEffect>> StartupEffects
+    m_StartupEffects : StdVector<GameplayEffect>;
+}
+// AttributeSetDefine
+class AttributeSetDefine
+{
+    // public StringName AttributeSetCreator
+    m_AttributeSetCreator : StringName;
+    // public std::vector<GameplayAttribute, std::allocator<GameplayAttribute>> Attributes
+    m_Attributes : StdVector<GameplayAttribute>;
 }
 // FGameplayEffectQuery
 // Query struct for flexible active GameplayEffect filtering.
@@ -886,15 +921,48 @@ class ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__
     // public ScriptFunction(std::function<AbilityTask * (*)(GameplayAbility * _0, AbilitySystemComponent * _1)> func)
     constructor(func_0 : (_0 : GameplayAbility, _1 : AbilitySystemComponent) => AbilityTask| undefined);
 }
-// Base class for gameplay cue notifies (simplified)
+// Base class for gameplay cue notifies (stateless, non-instanced).
+// Each call to OnExecute/OnActive creates a one-shot effect (Wwise event + AnimClass).
 // GameplayCueNotify_Static
 class GameplayCueNotify_Static
 {
+    // Factory method for ScriptFunction registration
+    // public static GameplayCueNotify_Static * CreateInstance()
+    static CreateInstance() : GameplayCueNotify_Static;
+    // Wwise audio event name to post on execute/active
+    // public StringName WwiseEventName
+    m_WwiseEventName : StringName;
+    // Animation type to spawn on execute (one-shot burst)
+    // public AnimTypeClass * BurstAnim
+    m_BurstAnim : AnimTypeClass;
+    // If false, ignore duplicate OnActive events (UE parity: bAllowMultipleOnActiveEvents)
+    // public bool bAllowMultipleOnActiveEvents
+    m_bAllowMultipleOnActiveEvents : boolean;
 }
-// Actor-based gameplay cue (stub)
+// Instanced (stateful) gameplay cue notify. Extend this for cues that need to
+// own and manage visual entities (AnimClass) over their lifetime.
+// Actor-owns-AnimClass: OnBecomeRelevant creates, OnCeaseRelevant destroys.
 // GameplayCueNotify_Actor
 class GameplayCueNotify_Actor
 {
+    // Factory method for ScriptFunction registration
+    // public static GameplayCueNotify_Actor * CreateInstance()
+    static CreateInstance() : GameplayCueNotify_Actor;
+    // Animation type for one-shot burst (OnBurst callback)
+    // public AnimTypeClass * BurstAnim
+    m_BurstAnim : AnimTypeClass;
+    // Animation type for persistent looping (OnBecomeRelevant → OnCeaseRelevant)
+    // public AnimTypeClass * LoopingAnim
+    m_LoopingAnim : AnimTypeClass;
+    // If true, auto-destroy this actor after OnCeaseRelevant completes
+    // public bool bAutoDestroyOnRemove
+    m_bAutoDestroyOnRemove : boolean;
+    // Gating: prevent duplicate OnActive events
+    // public bool bAllowMultipleOnActiveEvents
+    m_bAllowMultipleOnActiveEvents : boolean;
+    // Gating: prevent duplicate WhileActive events
+    // public bool bAllowMultipleWhileActiveEvents
+    m_bAllowMultipleWhileActiveEvents : boolean;
 }
 // GameplayAbilityCreator
 class GameplayAbilityCreator
@@ -1244,6 +1312,117 @@ class CustomGameplayAbility
     m_OnK2CommitExecute : () => void| undefined;
     // public std::function<void (*)(bool _0)> OnK2OnEndAbility
     m_OnK2OnEndAbility : (_0 : boolean) => void| undefined;
+}
+// Collection of burst effects (multiple audio + visual) for one-shot cues.
+// Naming follows project convention: no F-prefix.
+// GameplayCueNotify_BurstEffects
+class GameplayCueNotify_BurstEffects
+{
+    // Wwise audio events to post simultaneously
+    // public std::vector<StringName, std::allocator<StringName>> WwiseEvents
+    m_WwiseEvents : StdVector<StringName>;
+    // Animation types to spawn simultaneously
+    // public std::vector<AnimTypeClass *, std::allocator<AnimTypeClass *>> Anims
+    m_Anims : StdVector<AnimTypeClass>;
+}
+// Stateless, non-instanced one-shot cue with array-based BurstEffects.
+// Overrides OnExecute to iterate all effects in the array.
+// GameplayCueNotify_Burst
+class GameplayCueNotify_Burst
+    extends GameplayCueNotify_Static
+{
+    // public static GameplayCueNotify_Burst * CreateInstance()
+    static CreateInstance() : GameplayCueNotify_Burst;
+    // Burst effects to trigger on execution
+    // public GameplayCueNotify_BurstEffects BurstEffects
+    m_BurstEffects : GameplayCueNotify_BurstEffects;
+}
+// Instanced, one-shot gameplay cue with support for latent actions (delays, callbacks).
+// Since it is instanced (extends Actor), it can hold state for timed operations like
+// auto-destroying after animation playback completes.
+// JS bindable: OnK2_OnBurst std::function follows CustomGameplayAbility pattern.
+// GameplayCueNotify_BurstLatent
+class GameplayCueNotify_BurstLatent
+    extends GameplayCueNotify_Actor
+{
+    // Factory method for ScriptFunction registration
+    // public static GameplayCueNotify_BurstLatent * CreateInstance()
+    static CreateInstance() : GameplayCueNotify_BurstLatent;
+    // JS-scriptable OnBurst callback (BlueprintImplementableEvent pattern).
+    // Called when this burst cue fires. Script can override for custom behavior.
+    // public std::function<void (*)(GameplayTag const& _0, GameplayCueParameters const& _1)> OnK2_OnBurst
+    m_OnK2_OnBurst : (_0 : GameplayTag, _1 : GameplayCueParameters) => void| undefined;
+    // Animation type to spawn on burst
+    // public AnimTypeClass * BurstAnim
+    m_BurstAnim : AnimTypeClass;
+}
+// Effects for the looping phase of a GameplayCueNotify_Looping.
+// The looping AnimClass persists until OnCeaseRelevant is called.
+// GameplayCueNotify_LoopingEffects
+class GameplayCueNotify_LoopingEffects
+{
+    // public AnimTypeClass * LoopingAnim
+    m_LoopingAnim : AnimTypeClass;
+    // looping audio events
+    // public std::vector<StringName, std::allocator<StringName>> WwiseEvents
+    m_WwiseEvents : StdVector<StringName>;
+}
+// Instanced, continuous gameplay cue with four-phase effect model.
+// - Application (OnBecomeRelevant): one-shot burst effects when cue starts
+// - Looping (WhileActive): persistent AnimClass that runs until Removed
+// - Recurring (OnBurst): periodic burst during active phase
+// - Removal (OnCeaseRelevant): one-shot burst + stop looping when cue ends
+// GameplayCueNotify_Looping
+class GameplayCueNotify_Looping
+    extends GameplayCueNotify_Actor
+{
+    // public static GameplayCueNotify_Looping * CreateInstance()
+    static CreateInstance() : GameplayCueNotify_Looping;
+    // One-shot burst effects triggered when the looping cue becomes active
+    // public GameplayCueNotify_BurstEffects ApplicationEffects
+    m_ApplicationEffects : GameplayCueNotify_BurstEffects;
+    // Persistent looping effects (AnimClass that stays alive until removed)
+    // public GameplayCueNotify_LoopingEffects LoopingEffects
+    m_LoopingEffects : GameplayCueNotify_LoopingEffects;
+    // Burst effects triggered on periodic/Executed events while active
+    // public GameplayCueNotify_BurstEffects RecurringEffects
+    m_RecurringEffects : GameplayCueNotify_BurstEffects;
+    // One-shot burst effects triggered when the looping cue is removed
+    // public GameplayCueNotify_BurstEffects RemovalEffects
+    m_RemovalEffects : GameplayCueNotify_BurstEffects;
+}
+// Custom gameplay cue notify (Stateless) with JS-scriptable callbacks.
+// Follows CustomGameplayAbility pattern: virtual methods + PROPERTY std::function for JS overrides.
+// CustomGameplayCueNotify_Static
+class CustomGameplayCueNotify_Static
+    extends GameplayCueNotify_Static
+{
+    // public std::function<void (*)(GameplayTag const& _0, GameplayCueParameters const& _1)> OnK2_OnExecute
+    m_OnK2_OnExecute : (_0 : GameplayTag, _1 : GameplayCueParameters) => void| undefined;
+    // public std::function<void (*)(GameplayTag const& _0, GameplayCueParameters const& _1)> OnK2_OnActive
+    m_OnK2_OnActive : (_0 : GameplayTag, _1 : GameplayCueParameters) => void| undefined;
+    // public std::function<void (*)(GameplayTag const& _0, GameplayCueParameters const& _1)> OnK2_OnRemove
+    m_OnK2_OnRemove : (_0 : GameplayTag, _1 : GameplayCueParameters) => void| undefined;
+}
+// Custom burst-latent cue (instanced) with JS callback for OnBurst.
+// CustomGameplayCueNotify_BurstLatent
+class CustomGameplayCueNotify_BurstLatent
+    extends GameplayCueNotify_BurstLatent
+{
+    // public std::function<void (*)(GameplayTag const& _0, GameplayCueParameters const& _1)> OnK2_OnBurst
+    m_OnK2_OnBurst : (_0 : GameplayTag, _1 : GameplayCueParameters) => void| undefined;
+}
+// Custom looping cue (instanced) with JS callbacks for all phases.
+// CustomGameplayCueNotify_Looping
+class CustomGameplayCueNotify_Looping
+    extends GameplayCueNotify_Looping
+{
+    // public std::function<void (*)(GameplayTag const& _0, GameplayCueParameters const& _1)> OnK2_OnBurst
+    m_OnK2_OnBurst : (_0 : GameplayTag, _1 : GameplayCueParameters) => void| undefined;
+    // public std::function<void (*)(GameplayTag const& _0, GameplayCueParameters const& _1)> OnK2_OnBecomeRelevant
+    m_OnK2_OnBecomeRelevant : (_0 : GameplayTag, _1 : GameplayCueParameters) => void| undefined;
+    // public std::function<void (*)(GameplayTag const& _0, GameplayCueParameters const& _1)> OnK2_OnCeaseRelevant
+    m_OnK2_OnCeaseRelevant : (_0 : GameplayTag, _1 : GameplayCueParameters) => void| undefined;
 }
 // GameplayAbilityTargetActor
 // Base class for actors that handle ability targeting.

@@ -3,6 +3,7 @@
 #include "xkein/GameplayAbilities/ge_component/ge_component.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/GameplayAbilities/gameplay_cue.h"
 #include <map>
 
 class AbilitySystemComponent;
@@ -181,6 +182,53 @@ GameplayEffectContext GameplayEffectContext::Duplicate() const
     NewContext.WorldOrigin = WorldOrigin;
     NewContext.bHasWorldOrigin = bHasWorldOrigin;
     return NewContext;
+}
+
+// ============================================================
+// GameplayCue auto-trigger for Instant GameplayEffects
+// ============================================================
+
+void TriggerGameplayCues(const GameplayEffect* Effect, const GameplayEffectSpec& Spec,
+                          AbilitySystemComponent* Target, EGameplayCueEvent EventType)
+{
+    if (!Target || !Effect) return;
+    
+    // Build base parameters from the GE spec
+    GameplayCueParameters BaseParams(Spec);
+    Target->InitDefaultGameplayCueParameters(BaseParams);
+    
+    for (auto* Cue : Effect->GameplayCues)
+    {
+        if (!Cue) continue;
+        if (Cue->GameplayCueTags.IsEmpty()) continue;
+        
+        GameplayCueParameters Params = BaseParams;
+        
+        // Normalize magnitude from level
+        float RawMag = static_cast<float>(Spec.Level);
+        float Min = Cue->MinLevel;
+        float Max = Cue->MaxLevel;
+        if (Max > Min && RawMag > Min)
+        {
+            Params.RawMagnitude = RawMag;
+            Params.NormalizedMagnitude = (RawMag - Min) / (Max - Min);
+            if (Params.NormalizedMagnitude > 1.0f) Params.NormalizedMagnitude = 1.0f;
+        }
+        else
+        {
+            Params.RawMagnitude = RawMag;
+            Params.NormalizedMagnitude = 1.0f;
+        }
+        
+        // Trigger for each cue tag
+        for (const auto& CueTag : Cue->GameplayCueTags.GameplayTags)
+        {
+            if (CueTag.IsValid())
+            {
+                Target->ExecuteGameplayCue(CueTag, Params);
+            }
+        }
+    }
 }
 
 // ============================================================

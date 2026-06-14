@@ -16,6 +16,12 @@
 #include <AnimClass.h>
 #include <AbstractClass.h>
 
+
+AbilitySystemComponent::~AbilitySystemComponent()
+{
+    RemoveAllGameplayCues();
+}
+
 void AbilitySystemComponent::OnEntityConstruct(entt::registry& reg, entt::entity entity, AbstractClass* pYrObject, AbstractTypeClass* pYrType)
 {
     if (!pYrType)
@@ -153,7 +159,7 @@ FDelegateHandle AbilitySystemComponent::RegisterAndCallGameplayTagEvent(const Ga
 
     FilteredTagCallbacks[Tag].push_back(std::move(Entry));
 
-    // "AndCall" part — immediately call if tag already has a count
+    // "AndCall" part �?immediately call if tag already has a count
     int32 CurrentCount = GetGameplayTagCount(Tag);
     if (CurrentCount > 0)
     {
@@ -1083,7 +1089,7 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
     GameplayEffectSpec Spec;
     Spec.Def = Effect;
     Spec.Level = Context.AbilityLevel;
-    Spec.EffectContext.Data = new GameplayEffectContext(Context);
+    Spec.EffectContext.Data = std::make_unique<GameplayEffectContext>(Context);
     
     // Calculate modifier magnitudes
     Spec.CalculateModifierMagnitudes();
@@ -1113,6 +1119,12 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
         
         // Notify components of execution
         Effect->OnExecuted(Target->ActiveGameplayEffects, Spec);
+        
+        // Trigger gameplay cues for Instant GE
+        if (Effect->GameplayCues.size() > 0)
+        {
+            TriggerGameplayCues(Effect, Spec, Target, EGameplayCueEvent::Executed);
+        }
         
         // Notify components of application
         Effect->OnApplied(Target->ActiveGameplayEffects, Spec, *Target);
@@ -1164,7 +1176,7 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToSelf(
         GameplayEffectSpec Spec;
         Spec.Def = Effect;
         Spec.Level = Context.AbilityLevel;
-        Spec.EffectContext.Data = new GameplayEffectContext(Context);
+        Spec.EffectContext.Data = std::make_unique<GameplayEffectContext>(Context);
         Spec.CalculateModifierMagnitudes();
 
         // Broadcast self-applied delegate
@@ -1196,7 +1208,7 @@ GameplayEffectSpec AbilitySystemComponent::MakeOutgoingSpec(GameplayEffect* Effe
 GameplayEffectContextHandle AbilitySystemComponent::MakeEffectContext() const
 {
     GameplayEffectContextHandle Handle;
-    Handle.Data = new GameplayEffectContext();
+    Handle.Data = std::make_unique<GameplayEffectContext>();
     Handle.Data->Instigator = Owner;
     Handle.Data->InstigatorAbilitySystemComponent = const_cast<AbilitySystemComponent*>(this);
     return Handle;
@@ -1317,6 +1329,12 @@ void AbilitySystemComponent::InitDefaultGameplayCueParameters(GameplayCueParamet
     Parameters.EffectContext = MakeEffectContext();
     Parameters.RawMagnitude = 0.0f;
 
+    // Fill entity references and level defaults
+    Parameters.Instigator = Owner;
+    Parameters.EffectCauser = (Avatar != entt::null) ? Avatar : Owner;
+    Parameters.GameplayEffectLevel = 1;
+    Parameters.AbilityLevel = 1;
+
     // Fill Location from Owner entity's position.
     // Owner is a YR entity with YrEntityComponent<T> where T is a concrete YR class.
     // Try the common YR types that ASC targets: TechnoClass subclasses, BulletClass,
@@ -1362,7 +1380,7 @@ void AbilitySystemComponent::AddGameplayCue(const GameplayTag& CueTag, const Gam
 {
     GameplayCueParameters LocalParams = Params;
     InitDefaultGameplayCueParameters(LocalParams);
-    ActiveGameplayCues.insert(CueTag);
+    ActiveGameplayCues.AddCue(CueTag, LocalParams);
     if (auto* CueManager = GameplayCueManager::Get())
     {
         CueManager->HandleGameplayCue(this, CueTag, EGameplayCueEvent::OnActive, LocalParams);
@@ -1371,7 +1389,7 @@ void AbilitySystemComponent::AddGameplayCue(const GameplayTag& CueTag, const Gam
 
 void AbilitySystemComponent::RemoveGameplayCue(const GameplayTag& CueTag)
 {
-    ActiveGameplayCues.erase(CueTag);
+    ActiveGameplayCues.RemoveCue(CueTag);
     GameplayCueParameters LocalParams;
     InitDefaultGameplayCueParameters(LocalParams);
     if (auto* CueManager = GameplayCueManager::Get())
@@ -1382,18 +1400,28 @@ void AbilitySystemComponent::RemoveGameplayCue(const GameplayTag& CueTag)
 
 void AbilitySystemComponent::RemoveAllGameplayCues()
 {
-    // Copy the set since RemoveGameplayCue modifies ActiveGameplayCues
-    auto ActiveCuesCopy = ActiveGameplayCues;
-    for (const auto& Tag : ActiveCuesCopy)
-    {
-        RemoveGameplayCue(Tag);
-    }
-    ActiveGameplayCues.clear();
+    ActiveGameplayCues.RemoveAllCues();
 }
 
 bool AbilitySystemComponent::IsGameplayCueActive(const GameplayTag& CueTag) const
 {
-    return ActiveGameplayCues.find(CueTag) != ActiveGameplayCues.end();
+    return ActiveGameplayCues.HasCue(CueTag);
+}
+
+// ============================================================
+// IGameplayCueInterface
+// ============================================================
+
+bool AbilitySystemComponent::ShouldAcceptGameplayCue(const GameplayTag& CueTag, EGameplayCueEvent EventType, const GameplayCueParameters& Params) const
+{
+    return true; // Accept all cues by default
+}
+
+void AbilitySystemComponent::HandleGameplayCue(const GameplayTag& CueTag, EGameplayCueEvent EventType, const GameplayCueParameters& Params)
+{
+    // Delegate to global manager
+    if (auto* CueManager = GameplayCueManager::Get())
+        CueManager->HandleGameplayCue(this, CueTag, EventType, Params);
 }
 
 std::vector<ActiveGameplayEffectHandle> AbilitySystemComponent::GetActiveEffects(const GameplayTagContainer& Tags) const
@@ -1545,6 +1573,25 @@ ActiveGameplayEffectHandle ActiveGameplayEffectsContainer::Add(AbilitySystemComp
         Owner->ActiveEffectEventSets[NewEffect->Handle] = FActiveGameplayEffectEvents();
     }
 
+    // Trigger OnActive cues for duration/infinite effects
+    if (Spec.Def && Spec.Def->GameplayCues.size() > 0 && 
+        Spec.Def->DurationPolicy != EGameplayEffectDurationType::Instant)
+    {
+        GameplayCueParameters Params(Spec);
+        OwningASC->InitDefaultGameplayCueParameters(Params);
+        Params.bGameplayEffectActive = true;
+        
+        for (auto* Cue : Spec.Def->GameplayCues)
+        {
+            if (!Cue || Cue->GameplayCueTags.IsEmpty()) continue;
+            for (auto& CueTag : Cue->GameplayCueTags.GameplayTags)
+            {
+                if (CueTag.IsValid())
+                    OwningASC->AddGameplayCue(CueTag, Params);
+            }
+        }
+    }
+
     return NewEffect->Handle;
 }
 
@@ -1567,6 +1614,28 @@ void ActiveGameplayEffectsContainer::Remove(ActiveGameplayEffectHandle Handle, b
                 EventIt->second.OnRemoved.publish(RemovalInfo);
             }
             Owner->ActiveEffectEventSets.erase(EventIt);
+        }
+
+        // Trigger Removed cues BEFORE effect is removed from the list
+        if (ActiveGameplayEffect* RemovingEffect = GetActiveGameplayEffect(Handle))
+        {
+            const GameplayEffect* Def = RemovingEffect->Spec.Def;
+            if (Def && Def->GameplayCues.size() > 0)
+            {
+                GameplayCueParameters Params;
+                Params.bGameplayEffectActive = false;
+                Owner->InitDefaultGameplayCueParameters(Params);
+                
+                for (auto* Cue : Def->GameplayCues)
+                {
+                    if (!Cue || Cue->GameplayCueTags.IsEmpty()) continue;
+                    for (auto& CueTag : Cue->GameplayCueTags.GameplayTags)
+                    {
+                        if (CueTag.IsValid())
+                            Owner->RemoveGameplayCue(CueTag);
+                    }
+                }
+            }
         }
     }
 
@@ -1675,10 +1744,16 @@ void ActiveGameplayEffectsContainer::Tick(float DeltaTime)
             // Execute instant effect modifiers
             ExecuteInstantEffect(Owner, Effect->Spec);
             
-            // Broadcast periodic execution — both self and target delegates fire
+            // Broadcast periodic execution �?both self and target delegates fire
             // since active effects are always on the owning ASC
             Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.publish(Owner, Effect->Spec, Handle);
             Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.publish(Owner, Effect->Spec, Handle);
+
+            // Trigger Executed GameplayCues for periodic effects
+            if (Effect->Spec.Def->GameplayCues.size() > 0)
+            {
+                TriggerGameplayCues(Effect->Spec.Def, Effect->Spec, Owner, EGameplayCueEvent::Executed);
+            }
         }
     }
     
@@ -1932,7 +2007,7 @@ void ActiveGameplayEffectsContainer::SetActiveGameplayEffectInhibit(ActiveGamepl
 }
 
 // ============================================================
-// AbilitySystemComponent — Per-effect event set accessors
+// AbilitySystemComponent �?Per-effect event set accessors
 // ============================================================
 
 FActiveGameplayEffectEvents* AbilitySystemComponent::GetActiveEffectEventSet(ActiveGameplayEffectHandle Handle)
@@ -1977,7 +2052,7 @@ void AbilitySystemComponent::AddSpawnedAttribute(AttributeSet* AttrSet)
 {
 	if (!AttrSet) return;
 	SpawnedAttributes.push_back(AttrSet);
-	// Wire OnAttributeAggregatorCreated — for frame-sync, aggregators are computed on-the-fly,
+	// Wire OnAttributeAggregatorCreated �?for frame-sync, aggregators are computed on-the-fly,
 	// so this is a no-op beyond adding to the list.
 }
 
@@ -2089,7 +2164,7 @@ float AbilitySystemComponent::GetNumericAttributeBase(GameplayAttribute Attribut
 
 float AbilitySystemComponent::GetNumericAttributeChecked(GameplayAttribute Attribute) const
 {
-    // Same as GetNumericAttribute but checked access — falls back to 0.0f if not found
+    // Same as GetNumericAttribute but checked access �?falls back to 0.0f if not found
 	return GetNumericAttribute(Attribute);
 }
 
@@ -2311,7 +2386,7 @@ void AbilitySystemComponent::CancelAbilities(const GameplayTagContainer* WithTag
 		if (!Spec.Ability || Spec.Ability == Ignore) continue;
 		if (!Spec.IsActive()) continue;
 
-		// WithTags check — if specified, at least one matching tag must be present
+		// WithTags check �?if specified, at least one matching tag must be present
 		if (WithTags && WithTags->IsValid())
 		{
 			bool bHasMatching = false;
@@ -2326,7 +2401,7 @@ void AbilitySystemComponent::CancelAbilities(const GameplayTagContainer* WithTag
 			if (!bHasMatching) continue;
 		}
 
-		// WithoutTags check — if specified, none of these tags may be present
+		// WithoutTags check �?if specified, none of these tags may be present
 		if (WithoutTags && WithoutTags->IsValid())
 		{
 			bool bHasExcluded = false;
@@ -2483,7 +2558,7 @@ void AbilitySystemComponent::SetActiveGameplayEffectInhibit(ActiveGameplayEffect
 {
 	ActiveGameplayEffects.SetActiveGameplayEffectInhibit(Handle, bInhibit);
 	// The container method already fires the OnInhibitionChanged callback.
-	// bFireCallback controls whether the callback is fired — the container always fires it
+	// bFireCallback controls whether the callback is fired �?the container always fires it
 	// via the delegate system, so this parameter is respected at the container level.
 }
 
@@ -2527,7 +2602,7 @@ int32 AbilitySystemComponent::GetCurrentStackCount(GameplayAbilitySpecHandle Abi
 	if (!FoundSpec || !FoundSpec->GameplayEffectHandle.IsValid())
 		return 0;
 
-	// Get the active effect that granted this ability — it lives on the source ASC
+	// Get the active effect that granted this ability �?it lives on the source ASC
 	AbilitySystemComponent* SourceASC = FoundSpec->GameplayEffectHandle.GetOwningAbilitySystemComponent();
 	if (!SourceASC) return 0;
 
