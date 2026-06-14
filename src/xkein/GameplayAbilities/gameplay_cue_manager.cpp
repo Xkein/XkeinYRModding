@@ -26,41 +26,19 @@ void GameplayCueManager::HandleGameplayCue(AbilitySystemComponent* ASC, const Ga
     }
     // MatchedTagName will be set by CueSet during routing
 
-    // Route through the CueSet for tag-based dispatch with parent fallback
-    RuntimeCueSet.HandleGameplayCue(ASC, CueTag, EventType, LocalParams);
+    // --- Step 1: ShouldAcceptGameplayCue check (UE: RouteGameplayCue lines 189-193) ---
+    bool bAcceptsCue = true;
+    if (ASC)
+        bAcceptsCue = ASC->ShouldAcceptGameplayCue(CueTag, EventType, LocalParams);
 
-    // Legacy fallback: also route through the old StaticCues/ActorCues maps
-    // (remove this block after Task 22 when INI loading is fully CueSet-based)
-    auto itStatic = StaticCues.find(CueTag);
-    if (itStatic != StaticCues.end())
-    {
-        for (auto* Cue : itStatic->second)
-        {
-            if (!Cue) continue;
-            switch (EventType)
-            {
-                case EGameplayCueEvent::Executed:    Cue->OnExecute(CueTag, LocalParams); break;
-                case EGameplayCueEvent::OnActive:
-                case EGameplayCueEvent::WhileActive:  Cue->OnActive(CueTag, LocalParams); break;
-                case EGameplayCueEvent::Removed:      Cue->OnRemove(CueTag, LocalParams); break;
-            }
-        }
-    }
-    auto itActor = ActorCues.find(CueTag);
-    if (itActor != ActorCues.end())
-    {
-        for (auto* Cue : itActor->second)
-        {
-            if (!Cue) continue;
-            switch (EventType)
-            {
-                case EGameplayCueEvent::Executed:    Cue->OnBurst(CueTag, LocalParams); break;
-                case EGameplayCueEvent::OnActive:
-                case EGameplayCueEvent::WhileActive:  Cue->OnBecomeRelevant(CueTag, LocalParams); break;
-                case EGameplayCueEvent::Removed:      Cue->OnCeaseRelevant(CueTag, LocalParams); break;
-            }
-        }
-    }
+    // --- Step 2: Route through CueSet (UE: RouteGameplayCue lines 221-224) ---
+    if (bAcceptsCue)
+        RuntimeCueSet.HandleGameplayCue(ASC, CueTag, EventType, LocalParams);
+
+    // --- Step 3: ASC-level IGameplayCueInterface::HandleGameplayCue (UE: lines 227-230) ---
+    // Independent hook — ASC can intercept cues after CueSet dispatch
+    if (ASC && bAcceptsCue)
+        ASC->HandleGameplayCue(CueTag, EventType, LocalParams);
 
     bIsHandlingCue = false;
 }

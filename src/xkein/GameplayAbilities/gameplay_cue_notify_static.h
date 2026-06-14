@@ -44,10 +44,10 @@ public:
         }
     }
 
-    /** Override OnActive same as OnExecute for Burst */
-    virtual void OnActive(const GameplayTag& CueTag, const GameplayCueParameters& Params) override
+    /** Burst only handles Executed events (one-shot), not OnActive/WhileActive/Removed */
+    virtual bool HandlesEvent(EGameplayCueEvent EventType) const override
     {
-        OnExecute(CueTag, Params);
+        return EventType == EGameplayCueEvent::Executed;
     }
 
     FUNCTION()

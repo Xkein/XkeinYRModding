@@ -3,6 +3,7 @@
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "audio/audio.h"
+#include <entt/entity/fwd.hpp>
 #include <AnimClass.h>
 #include <GeneralStructures.h>
 
@@ -70,6 +71,14 @@ struct GameplayCueParameters
     /** Whether this cue was triggered from an active gameplay effect */
     bool bGameplayEffectActive = false;
 
+    /** Physical material from hit result (UE parity) */
+    PROPERTY()
+    int32 PhysicalMaterial = 0;
+
+    /** Component/entity to attach spawned effects to (UE parity) */
+    PROPERTY()
+    entt::entity TargetAttachComponent = entt::null;
+
     /** Default constructor (required when explicit constructors exist) */
     GameplayCueParameters() = default;
 
@@ -133,6 +142,18 @@ public:
         return new GameplayCueNotify_Static();
     }
 
+    /** Does this notify handle this event type? Default: true. Override to filter. */
+    virtual bool HandlesEvent(EGameplayCueEvent EventType) const { return true; }
+
+    /** If true, prevents parent tag fallback when this notify handles the event.
+     *  If false, parent notifies ALSO run after this one. */
+    PROPERTY()
+    bool IsOverride = false;
+
+    /** Tag this notify is activated by (set during INI loading / registration) */
+    PROPERTY()
+    GameplayTag GameplayCueTag;
+
 private:
     void PlayEffects(const GameplayCueParameters& Params)
     {
@@ -192,6 +213,41 @@ public:
     bool bHasHandledOnRemoveEvent = false;
 
     // ========================================================================
+    // UE5.5 alignment: central dispatch + lifecycle
+    // ========================================================================
+
+    /** Central dispatch — called by CueSet. Handles gating, stacking guard, K2, and routing to specific events. */
+    virtual void HandleGameplayCue(entt::entity TargetEntity, EGameplayCueEvent EventType, const GameplayCueParameters& Params);
+
+    /** Called when the GC is finished. Resets state for potential reuse. */
+    virtual void GameplayCueFinishedCallback();
+
+    /** Reset state so this instance can be reused. Returns false if this class cannot be recycled. */
+    virtual bool Recycle();
+
+    /** Called when about to reuse after recycling. Undo what Recycle did. */
+    virtual void ReuseAfterRecycle() {}
+
+    /** Generic K2 handler (BlueprintImplementableEvent) — called for every event type before specific dispatch */
+    PROPERTY()
+    std::function<void(EGameplayCueEvent, const GameplayCueParameters&)> OnK2_HandleGameplayCue;
+
+    /** Does this notify handle this event type? Default: true. */
+    virtual bool HandlesEvent(EGameplayCueEvent EventType) const { return true; }
+
+    /** If true, prevents parent tag fallback. If false, parent notifies ALSO run. */
+    PROPERTY()
+    bool IsOverride = false;
+
+    /** Tag this notify is activated by */
+    PROPERTY()
+    GameplayTag GameplayCueTag;
+
+    /** Delay before auto-destroy after OnRemove (seconds). 0 = immediate. */
+    PROPERTY()
+    float AutoDestroyDelay = 0.0f;
+
+    // ========================================================================
     // Lifecycle callbacks
     // ========================================================================
 
@@ -226,10 +282,6 @@ public:
      *  Destroys the managed AnimClass and resets gating flags. */
     virtual void OnCeaseRelevant(const GameplayTag& CueTag, const GameplayCueParameters& Params)
     {
-        if (bHasHandledOnRemoveEvent)
-            return;
-        bHasHandledOnRemoveEvent = true;
-
         // TODO: Stacking guard — before releasing the managed entity, check whether
         // the target ASC still has this tag (from another concurrent source). If so,
         // skip removal to avoid prematurely ending the cue.

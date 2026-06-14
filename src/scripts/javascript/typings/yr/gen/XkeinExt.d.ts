@@ -598,6 +598,12 @@ class GameplayCueParameters
     // Level of the ability that triggered this cue
     // public int32 AbilityLevel
     m_AbilityLevel : int32;
+    // Physical material from hit result (UE parity)
+    // public int32 PhysicalMaterial
+    m_PhysicalMaterial : int32;
+    // Component/entity to attach spawned effects to (UE parity)
+    // public entity TargetAttachComponent
+    m_TargetAttachComponent : entt_entity;
 }
 // Abilities define custom gameplay logic that can be activated by players or external game logic
 // GameplayAbility
@@ -938,6 +944,13 @@ class GameplayCueNotify_Static
     // If false, ignore duplicate OnActive events (UE parity: bAllowMultipleOnActiveEvents)
     // public bool bAllowMultipleOnActiveEvents
     m_bAllowMultipleOnActiveEvents : boolean;
+    // If true, prevents parent tag fallback when this notify handles the event.
+    // If false, parent notifies ALSO run after this one.
+    // public bool IsOverride
+    m_IsOverride : boolean;
+    // Tag this notify is activated by (set during INI loading / registration)
+    // public GameplayTag GameplayCueTag
+    m_GameplayCueTag : GameplayTag;
 }
 // Instanced (stateful) gameplay cue notify. Extend this for cues that need to
 // own and manage visual entities (AnimClass) over their lifetime.
@@ -963,6 +976,18 @@ class GameplayCueNotify_Actor
     // Gating: prevent duplicate WhileActive events
     // public bool bAllowMultipleWhileActiveEvents
     m_bAllowMultipleWhileActiveEvents : boolean;
+    // Generic K2 handler (BlueprintImplementableEvent) — called for every event type before specific dispatch
+    // public std::function<void (*)(EGameplayCueEvent _0, GameplayCueParameters const& _1)> OnK2_HandleGameplayCue
+    m_OnK2_HandleGameplayCue : (_0 : EGameplayCueEvent, _1 : GameplayCueParameters) => void| undefined;
+    // If true, prevents parent tag fallback. If false, parent notifies ALSO run.
+    // public bool IsOverride
+    m_IsOverride : boolean;
+    // Tag this notify is activated by
+    // public GameplayTag GameplayCueTag
+    m_GameplayCueTag : GameplayTag;
+    // Delay before auto-destroy after OnRemove (seconds). 0 = immediate.
+    // public float AutoDestroyDelay
+    m_AutoDestroyDelay : float;
 }
 // GameplayAbilityCreator
 class GameplayAbilityCreator
