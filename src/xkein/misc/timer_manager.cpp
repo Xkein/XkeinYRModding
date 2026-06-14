@@ -96,6 +96,8 @@ void TimerManager::ClearAllTimers()
 
 void TimerManager::Tick(float DeltaTime)
 {
+	++FrameCount;
+
 	bIsProcessingCallbacks = true;
 
 	// Swap-snapshot: iterate local copy so callbacks that ClearAllTimers / ClearTimer
@@ -148,4 +150,25 @@ void TimerManager::Tick(float DeltaTime)
 		}
 	}
 	PendingTimerAdds.clear();
+}
+
+TimerHandle TimerManager::SetTimerForNextTick(std::function<void()> Callback)
+{
+	TimerEntry Entry;
+	Entry.Handle.Id = NextHandleId++;
+	Entry.RemainingTime = 0.0f;  // Fires on next Tick
+	Entry.Interval = 0.0f;
+	Entry.Callback = std::move(Callback);
+	Entry.bLooping = false;
+	Entry.bActive = true;
+
+	if (bIsProcessingCallbacks)
+	{
+		PendingTimerAdds.push_back(std::move(Entry));
+	}
+	else
+	{
+		Timers.push_back(std::move(Entry));
+	}
+	return Entry.Handle;
 }

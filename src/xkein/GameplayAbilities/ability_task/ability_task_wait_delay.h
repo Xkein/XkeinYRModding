@@ -1,13 +1,11 @@
 #pragma once
 #include "ability_task.h"
-#include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/misc/timer_manager.h"
 
 /**
  * AbilityTask_WaitDelay
  *
  * Waits for a specified duration, then fires OnFinish and ends the task.
- * The duration is level-scalable via FScalableFloat.
  */
 CLASS(BindJs)
 class AbilityTask_WaitDelay : public AbilityTask
@@ -15,15 +13,15 @@ class AbilityTask_WaitDelay : public AbilityTask
 public:
 	/** Create and register a new WaitDelay task */
 	FUNCTION()
-	static AbilityTask_WaitDelay* Create(GameplayAbility* Ability, float Duration);
+	static AbilityTask_WaitDelay* Create(GameplayAbility* Ability, float Time);
 
 	virtual void Activate() override;
 	
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
-	/** Duration to wait before finishing (level-scaled) */
+	/** Wait time in game seconds */
 	PROPERTY()
-	FScalableFloat Duration;
+	float Time = 0.0f;
 
 	/** Callback fired when the delay completes */
 	PROPERTY()
@@ -32,4 +30,5 @@ public:
 private:
 	void OnTimeFinish();
 	TimerHandle WaitTimerHandle;
+	float TimeStarted = 0.0f;  // Frame count at activation time
 };

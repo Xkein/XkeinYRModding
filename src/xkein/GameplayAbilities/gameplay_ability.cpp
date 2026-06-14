@@ -392,6 +392,25 @@ void GameplayAbility::ExternalCancelAbility()
     CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 }
 
+bool GameplayAbility::IsActive() const
+{
+	// Only Instanced-Per-Actor abilities persist between activations
+	if (GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor)
+	{
+		return bIsActive;
+	}
+
+	// this should not be called on NonInstanced warn about it, Should call IsActive on the ability spec instead
+	if (GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::NonInstanced)
+	{
+		// ABILITY_LOG(Warning, TEXT("UGameplayAbility::IsActive() called on %s NonInstanced ability, call IsActive on the Ability Spec instead"), *GetName());
+	}
+
+	// NonInstanced and Instanced-Per-Execution abilities are by definition active unless they are pending kill
+	// return IsValid(this);
+    return true;
+}
+
 bool GameplayAbility::DoesAbilitySatisfyTagRequirements(const AbilitySystemComponent& ASC) const
 {
     if (!Define)

@@ -322,7 +322,7 @@ class GameplayAbility
 	virtual void ExternalCancelAbility();
 
 	/** Returns true if this ability is currently active */
-	bool IsActive() const { return bIsActive; }
+	bool IsActive() const;
 
 	/** Check if this ability satisfies the tag requirements based on the given ASC */
 	virtual bool DoesAbilitySatisfyTagRequirements(const AbilitySystemComponent& ASC) const;

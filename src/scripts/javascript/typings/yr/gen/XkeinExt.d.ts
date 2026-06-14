@@ -230,127 +230,43 @@ class JsEvents
 class GameplayAbilitySpecHandle
 {
 }
-// AbilitySystemComponent
-class AbilitySystemComponent
+// GameplayTag
+class GameplayTag
 {
-    // Grants an Ability.
-    // This will be ignored if the actor is not authoritative.
-    // Returns handle that can be used in TryActivateAbility, etc.
-    // 
-    // @param AbilitySpec GameplayAbilitySpec containing information about the ability class, level and input ID to bind it to.
-    // public GameplayAbilitySpecHandle GiveAbility(GameplayAbilitySpec const& AbilitySpec)
-    GiveAbility(AbilitySpec_0 : GameplayAbilitySpec) : GameplayAbilitySpecHandle;
-    // Grants an ability based on its definition
-    // public GameplayAbilitySpecHandle GiveAbility(GameplayAbilityDefine const * AbilityDefine)
-    GiveAbility(AbilityDefine_0 : GameplayAbilityDefine) : GameplayAbilitySpecHandle;
-    // Removes an ability by handle. If the ability list is locked, marks the spec PendingRemove instead.
-    // public void RemoveAbility(GameplayAbilitySpecHandle Handle)
-    RemoveAbility(Handle_0 : GameplayAbilitySpecHandle) : void;
-    // Cancels the specified ability CDO.
-    // public void CancelAbility(GameplayAbility * Ability)
-    CancelAbility(Ability_0 : GameplayAbility) : void;
-    // Grants an ability and attempts to activate it exactly one time, which will cause it to be removed.
-    // Only valid on the server, and the ability's Net Execution Policy cannot be set to Local or Local Predicted
-    // 
-    // @param AbilitySpec GameplayAbilitySpec containing information about the ability class, level and input ID to bind it to.
-    // @param GameplayEventData Optional activation event data. If provided, Activate Ability From Event will be called instead of ActivateAbility, passing the Event Data
-    // public GameplayAbilitySpecHandle GiveAbilityAndActivateOnce(GameplayAbilitySpec& AbilitySpec, GameplayEventData const * GameplayEventData = nullptr)
-    GiveAbilityAndActivateOnce(AbilitySpec_0 : GameplayAbilitySpec, GameplayEventData_1 : GameplayEventData) : GameplayAbilitySpecHandle;
-    // Attempts to activate the given ability, will check costs and requirements before doing so.
-    // Returns true if it thinks it activated, but it may return false positives due to failure later in activation.
-    // If bAllowRemoteActivation is true, it will remotely activate local/server abilities, if false it will only try to locally activate the ability
-    // public bool TryActivateAbility(GameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation = true)
-    TryActivateAbility(AbilityToActivate_0 : GameplayAbilitySpecHandle, bAllowRemoteActivation_1 : boolean) : boolean;
-    // Attempt to activate an ability by its CDO class
-    // public bool TryActivateAbilityByDefine(GameplayAbilityDefine * AbilityDefine, bool bAllowRemoteActivation = true)
-    TryActivateAbilityByDefine(AbilityDefine_0 : GameplayAbilityDefine, bAllowRemoteActivation_1 : boolean) : boolean;
-    // The actor that owns this component logically
-    // public entity Owner
-    m_Owner : entt_entity;
-    // The actor that is the physical representation used for abilities. Can be NULL
-    // public entity Avatar
-    m_Avatar : entt_entity;
-    // public AbilitySystemComponentType * Type
-    m_Type : AbilitySystemComponentType;
-    // The abilities we can activate. 
-    // -This will include CDOs for non instanced abilities and per-execution instanced abilities. 
-    // -Actor-instanced abilities will be the actual instance (not CDO)
-    // This array is not vital for things to work. It is a convenience thing for 'giving abilities to the actor'. But abilities could also work on things
-    // without an AbilitySystemComponent. For example an ability could be written to execute on a StaticMeshActor. As long as the ability doesn't require 
-    // instancing or anything else that the AbilitySystemComponent would provide, then it doesn't need the component to function.
-    // public std::vector<GameplayAbilitySpec, std::allocator<GameplayAbilitySpec>> ActivatableAbilities
-    m_ActivatableAbilities : StdVector<GameplayAbilitySpec>;
-    // List of attribute sets
-    // public std::vector<AttributeSet *, std::allocator<AttributeSet *>> SpawnedAttributes
-    m_SpawnedAttributes : StdVector<AttributeSet>;
-    // Contains all of the gameplay effects that are currently active on this component
-    // public ActiveGameplayEffectsContainer ActiveGameplayEffects
-    m_ActiveGameplayEffects : ActiveGameplayEffectsContainer;
+    // Tag name - using StringName for pooled string storage and O(1) pointer-based comparison
+    // public StringName TagName
+    m_TagName : StringName;
 }
-// Abilities define custom gameplay logic that can be activated by players or external game logic
-// GameplayAbility
-class GameplayAbility
+// GameplayTagContainer
+class GameplayTagContainer
 {
-    // public GameplayAbilityDefine const * Define
-    m_Define : GameplayAbilityDefine;
+    // public std::vector<GameplayTag, std::allocator<GameplayTag>> GameplayTags
+    m_GameplayTags : StdVector<GameplayTag>;
 }
-// AbilityTask
-// Base class for ability-level tasks that tick per-frame during ability execution.
-// Tasks are owned by the AbilitySystemComponent and cleaned up when the owning
-// ability ends or when they explicitly call EndTask() + ReadyForDestroy().
-// Inherits: standalone class (does NOT inherit from any GameplayTask)
-// AbilityTask
-class AbilityTask
+// Expression tree for complex tag queries.
+// Supports AND/OR/NOT logic that cannot be expressed with RequireTags/IgnoreTags alone.
+// Node types index into TagTokens (leaf) or Expressions (composite) via StartIndex + Count.
+// GameplayTagQuery
+class GameplayTagQuery
 {
-    // BlueprintCallable: ends the task from script
-    // public virtual void K2_EndTask()
-    K2_EndTask() : void;
-    // BlueprintImplementableEvent: script callback fired when the task ends
-    // public std::function<void (*)()> OnK2_OnTaskEnd
-    m_OnK2_OnTaskEnd : () => void| undefined;
-    // public static StringName ScriptFunctionCategory
-    static s_ScriptFunctionCategory : StringName;
 }
-// AbilitySystemComponentType
-class AbilitySystemComponentType
+// Encapsulate require and ignore tags
+// GameplayTagRequirements
+class GameplayTagRequirements
 {
-    // public std::vector<AttributeSetDefine *, std::allocator<AttributeSetDefine *>> Attributes
-    m_Attributes : StdVector<AttributeSetDefine>;
-    // public std::vector<GameplayAbilityDefine *, std::allocator<GameplayAbilityDefine *>> DefaultAbilities
-    m_DefaultAbilities : StdVector<GameplayAbilityDefine>;
-    // public std::vector<GameplayTag, std::allocator<GameplayTag>> StartupTags
-    m_StartupTags : StdVector<GameplayTag>;
-    // public std::vector<GameplayEffect, std::allocator<GameplayEffect>> StartupEffects
-    m_StartupEffects : StdVector<GameplayEffect>;
-}
-// AttributeSetDefine
-class AttributeSetDefine
-{
-    // public StringName AttributeSetCreator
-    m_AttributeSetCreator : StringName;
-    // public std::vector<GameplayAttribute, std::allocator<GameplayAttribute>> Attributes
-    m_Attributes : StdVector<GameplayAttribute>;
-}
-// GameplayAttribute
-class GameplayAttribute
-{
-    // public StringName AttributeName
-    m_AttributeName : StringName;
-    // public StringName AttributeOwner
-    m_AttributeOwner : StringName;
+    // All of these tags must be present
+    // public GameplayTagContainer RequireTags
+    m_RequireTags : GameplayTagContainer;
+    // None of these tags may be present
+    // public GameplayTagContainer IgnoreTags
+    m_IgnoreTags : GameplayTagContainer;
+    // Build up a more complex query that can't be expressed with RequireTags/IgnoreTags alone
+    // public GameplayTagQuery TagQuery
+    m_TagQuery : GameplayTagQuery;
 }
 // AttributeSet
 class AttributeSet
 {
-}
-// Place in an AttributeSet to create an attribute that can be accesed using FGameplayAttribute. It is strongly encouraged to use this instead of raw float attributes
-// GameplayAttributeData
-class GameplayAttributeData
-{
-    // protected float BaseValue
-    m_BaseValue : float;
-    // protected float CurrentValue
-    m_CurrentValue : float;
 }
 // Callback data passed to Pre/PostGameplayEffectExecute on AttributeSets
 // FGameplayEffectModCallbackData
@@ -365,6 +281,23 @@ class FGameplayEffectModCallbackData
     // Target ability system component receiving the effect
     // public AbilitySystemComponent * Target
     m_Target : AbilitySystemComponent;
+}
+// Place in an AttributeSet to create an attribute that can be accesed using FGameplayAttribute. It is strongly encouraged to use this instead of raw float attributes
+// GameplayAttributeData
+class GameplayAttributeData
+{
+    // protected float BaseValue
+    m_BaseValue : float;
+    // protected float CurrentValue
+    m_CurrentValue : float;
+}
+// GameplayAttribute
+class GameplayAttribute
+{
+    // public StringName AttributeName
+    m_AttributeName : StringName;
+    // public StringName AttributeOwner
+    m_AttributeOwner : StringName;
 }
 // GameplayEffectSpec
 class GameplayEffectSpec
@@ -506,19 +439,6 @@ class GameplayEffectAttributeCaptureDefinition
     // public EGameplayEffectAttributeCaptureSource AttributeSource
     m_AttributeSource : EGameplayEffectAttributeCaptureSource;
 }
-// GameplayTagContainer
-class GameplayTagContainer
-{
-    // public std::vector<GameplayTag, std::allocator<GameplayTag>> GameplayTags
-    m_GameplayTags : StdVector<GameplayTag>;
-}
-// GameplayTag
-class GameplayTag
-{
-    // Tag name - using StringName for pooled string storage and O(1) pointer-based comparison
-    // public StringName TagName
-    m_TagName : StringName;
-}
 // CustomCalculationBasedFloat
 class CustomCalculationBasedFloat
 {
@@ -564,27 +484,6 @@ class GameplayModifierInfo
     // public GameplayTagRequirements TargetTags
     m_TargetTags : GameplayTagRequirements;
 }
-// Encapsulate require and ignore tags
-// GameplayTagRequirements
-class GameplayTagRequirements
-{
-    // All of these tags must be present
-    // public GameplayTagContainer RequireTags
-    m_RequireTags : GameplayTagContainer;
-    // None of these tags may be present
-    // public GameplayTagContainer IgnoreTags
-    m_IgnoreTags : GameplayTagContainer;
-    // Build up a more complex query that can't be expressed with RequireTags/IgnoreTags alone
-    // public GameplayTagQuery TagQuery
-    m_TagQuery : GameplayTagQuery;
-}
-// Expression tree for complex tag queries.
-// Supports AND/OR/NOT logic that cannot be expressed with RequireTags/IgnoreTags alone.
-// Node types index into TagTokens (leaf) or Expressions (composite) via StartIndex + Count.
-// GameplayTagQuery
-class GameplayTagQuery
-{
-}
 // Struct representing the definition of a custom execution for a gameplay effect.
 // Custom executions run special logic from an outside class each time the gameplay effect executes.
 // GameplayEffectExecutionDefinition
@@ -608,13 +507,82 @@ class GameplayEffectComponent
 class ActiveGameplayEffectsContainer
 {
 }
-// ActiveGameplayEffectHandle
-class ActiveGameplayEffectHandle
+// AbilitySystemComponent
+class AbilitySystemComponent
 {
-    // public int32 Handle
-    m_Handle : int32;
-    // public bool bPassedFiltersAndWasExecuted
-    m_bPassedFiltersAndWasExecuted : boolean;
+    // Grants an Ability.
+    // This will be ignored if the actor is not authoritative.
+    // Returns handle that can be used in TryActivateAbility, etc.
+    // 
+    // @param AbilitySpec GameplayAbilitySpec containing information about the ability class, level and input ID to bind it to.
+    // public GameplayAbilitySpecHandle GiveAbility(GameplayAbilitySpec const& AbilitySpec)
+    GiveAbility(AbilitySpec_0 : GameplayAbilitySpec) : GameplayAbilitySpecHandle;
+    // Grants an ability based on its definition
+    // public GameplayAbilitySpecHandle GiveAbility(GameplayAbilityDefine const * AbilityDefine)
+    GiveAbility(AbilityDefine_0 : GameplayAbilityDefine) : GameplayAbilitySpecHandle;
+    // Removes an ability by handle. If the ability list is locked, marks the spec PendingRemove instead.
+    // public void RemoveAbility(GameplayAbilitySpecHandle Handle)
+    RemoveAbility(Handle_0 : GameplayAbilitySpecHandle) : void;
+    // Cancels the specified ability CDO.
+    // public void CancelAbility(GameplayAbility * Ability)
+    CancelAbility(Ability_0 : GameplayAbility) : void;
+    // Grants an ability and attempts to activate it exactly one time, which will cause it to be removed.
+    // Only valid on the server, and the ability's Net Execution Policy cannot be set to Local or Local Predicted
+    // 
+    // @param AbilitySpec GameplayAbilitySpec containing information about the ability class, level and input ID to bind it to.
+    // @param GameplayEventData Optional activation event data. If provided, Activate Ability From Event will be called instead of ActivateAbility, passing the Event Data
+    // public GameplayAbilitySpecHandle GiveAbilityAndActivateOnce(GameplayAbilitySpec& AbilitySpec, GameplayEventData const * GameplayEventData = nullptr)
+    GiveAbilityAndActivateOnce(AbilitySpec_0 : GameplayAbilitySpec, GameplayEventData_1 : GameplayEventData) : GameplayAbilitySpecHandle;
+    // Attempts to activate the given ability, will check costs and requirements before doing so.
+    // Returns true if it thinks it activated, but it may return false positives due to failure later in activation.
+    // If bAllowRemoteActivation is true, it will remotely activate local/server abilities, if false it will only try to locally activate the ability
+    // public bool TryActivateAbility(GameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation = true)
+    TryActivateAbility(AbilityToActivate_0 : GameplayAbilitySpecHandle, bAllowRemoteActivation_1 : boolean) : boolean;
+    // Attempt to activate an ability by its CDO class
+    // public bool TryActivateAbilityByDefine(GameplayAbilityDefine * AbilityDefine, bool bAllowRemoteActivation = true)
+    TryActivateAbilityByDefine(AbilityDefine_0 : GameplayAbilityDefine, bAllowRemoteActivation_1 : boolean) : boolean;
+    // The actor that owns this component logically
+    // public entity Owner
+    m_Owner : entt_entity;
+    // The actor that is the physical representation used for abilities. Can be NULL
+    // public entity Avatar
+    m_Avatar : entt_entity;
+    // public AbilitySystemComponentType * Type
+    m_Type : AbilitySystemComponentType;
+    // The abilities we can activate. 
+    // -This will include CDOs for non instanced abilities and per-execution instanced abilities. 
+    // -Actor-instanced abilities will be the actual instance (not CDO)
+    // This array is not vital for things to work. It is a convenience thing for 'giving abilities to the actor'. But abilities could also work on things
+    // without an AbilitySystemComponent. For example an ability could be written to execute on a StaticMeshActor. As long as the ability doesn't require 
+    // instancing or anything else that the AbilitySystemComponent would provide, then it doesn't need the component to function.
+    // public std::vector<GameplayAbilitySpec, std::allocator<GameplayAbilitySpec>> ActivatableAbilities
+    m_ActivatableAbilities : StdVector<GameplayAbilitySpec>;
+    // List of attribute sets
+    // public std::vector<AttributeSet *, std::allocator<AttributeSet *>> SpawnedAttributes
+    m_SpawnedAttributes : StdVector<AttributeSet>;
+    // Contains all of the gameplay effects that are currently active on this component
+    // public ActiveGameplayEffectsContainer ActiveGameplayEffects
+    m_ActiveGameplayEffects : ActiveGameplayEffectsContainer;
+}
+// AbilitySystemComponentType
+class AbilitySystemComponentType
+{
+    // public std::vector<AttributeSetDefine *, std::allocator<AttributeSetDefine *>> Attributes
+    m_Attributes : StdVector<AttributeSetDefine>;
+    // public std::vector<GameplayAbilityDefine *, std::allocator<GameplayAbilityDefine *>> DefaultAbilities
+    m_DefaultAbilities : StdVector<GameplayAbilityDefine>;
+    // public std::vector<GameplayTag, std::allocator<GameplayTag>> StartupTags
+    m_StartupTags : StdVector<GameplayTag>;
+    // public std::vector<GameplayEffect, std::allocator<GameplayEffect>> StartupEffects
+    m_StartupEffects : StdVector<GameplayEffect>;
+}
+// AttributeSetDefine
+class AttributeSetDefine
+{
+    // public StringName AttributeSetCreator
+    m_AttributeSetCreator : StringName;
+    // public std::vector<GameplayAttribute, std::allocator<GameplayAttribute>> Attributes
+    m_Attributes : StdVector<GameplayAttribute>;
 }
 // Abilities define custom gameplay logic that can be activated by players or external game logic
 // GameplayAbilityDefine
@@ -679,16 +647,6 @@ class AbilityTriggerData
     // public EGameplayAbilityTriggerSource TriggerSource
     m_TriggerSource : EGameplayAbilityTriggerSource;
 }
-// GameplayAbilityActorInfo
-// Cached data associated with an Actor using an Ability.
-// -Initialized from an AActor* in InitFromActor
-// -Abilities use this to know what to actor upon. E.g., instead of being coupled to a specific actor class.
-// -These are generally passed around as pointers to support polymorphism.
-// -Projects can override UAbilitySystemGlobals::AllocAbilityActorInfo to override the default struct type that is created.
-// GameplayAbilityActorInfo
-class GameplayAbilityActorInfo
-{
-}
 // An activatable ability spec, hosted on the ability system component. This defines both what the ability is (what class, what level, input binding etc)
 // and also holds runtime state that must be kept outside of the ability being instanced/activated.
 // GameplayAbilitySpec
@@ -701,12 +659,43 @@ class GameplayAbilitySpec
     // InputID, if bound to an input
     // public int32 InputID
     m_InputID : int32;
+    // public entity SourceObject
+    m_SourceObject : entt_entity;
     // Count of how many times this ability has been activated
     // public uint8 ActiveCount
     m_ActiveCount : uint8;
     // Tags that this ability has. These are replicated and can be used for GE source tags
     // public GameplayTagContainer DynamicAbilityTags
     m_DynamicAbilityTags : GameplayTagContainer;
+}
+// Abilities define custom gameplay logic that can be activated by players or external game logic
+// GameplayAbility
+class GameplayAbility
+{
+    // public GameplayAbilityDefine const * Define
+    m_Define : GameplayAbilityDefine;
+}
+// GameplayAbilityActorInfo
+// Cached data associated with an Actor using an Ability.
+// -Initialized from an AActor* in InitFromActor
+// -Abilities use this to know what to actor upon. E.g., instead of being coupled to a specific actor class.
+// -These are generally passed around as pointers to support polymorphism.
+// -Projects can override UAbilitySystemGlobals::AllocAbilityActorInfo to override the default struct type that is created.
+// GameplayAbilityActorInfo
+class GameplayAbilityActorInfo
+{
+}
+// GameplayAbilityActivationInfo
+// Data tied to a specific activation of an ability.
+// -Tell us whether we are the authority, if we are predicting, confirmed, etc.
+// -Holds current and previous PredictionKey
+// -Generally not meant to be subclassed in projects.
+// -Passed around by value since the struct is small.
+// GameplayAbilityActivationInfo
+class GameplayAbilityActivationInfo
+{
+    // public EGameplayAbilityActivationMode ActivationMode
+    m_ActivationMode : EGameplayAbilityActivationMode;
 }
 // Metadata for a tag-based Gameplay Event, that can activate other abilities or run ability-specific logic
 // GameplayEventData
@@ -756,17 +745,42 @@ class GameplayAbilityTargetDataHandle
 class GameplayAbilityTargetData
 {
 }
-// GameplayAbilityActivationInfo
-// Data tied to a specific activation of an ability.
-// -Tell us whether we are the authority, if we are predicting, confirmed, etc.
-// -Holds current and previous PredictionKey
-// -Generally not meant to be subclassed in projects.
-// -Passed around by value since the struct is small.
-// GameplayAbilityActivationInfo
-class GameplayAbilityActivationInfo
+// AbilityTask
+// Base class for ability-level tasks. Lifecycle mirrors UAbilityTask:
+// 1. Create factory allocates the task and calls InitTask + AddAbilityTask
+// 2. Activate() is called by PreActivate batch after all tasks are created — registers delegates / starts timers / begins work
+// 3. Subclasses may use TimerManager (preferred) or polling to do work
+// 4. EndTask() marks the task finished and fires OnK2_OnTaskEnd
+// 5. OnDestroy() is called when the owning ability ends or task is cleaned up
+// 6. ReadyForDestroy() schedules removal from the active task list
+// Inherits: standalone class (does NOT inherit from any GameplayTask)
+// AbilityTask
+class AbilityTask
 {
-    // public EGameplayAbilityActivationMode ActivationMode
-    m_ActivationMode : EGameplayAbilityActivationMode;
+    // BlueprintCallable: ends the task from script
+    // public virtual void K2_EndTask()
+    K2_EndTask() : void;
+    // BlueprintImplementableEvent: script callback fired when the task ends
+    // public std::function<void (*)()> OnK2_OnTaskEnd
+    m_OnK2_OnTaskEnd : () => void| undefined;
+    // public static StringName ScriptFunctionCategory
+    static s_ScriptFunctionCategory : StringName;
+}
+// ActiveGameplayEffectHandle
+class ActiveGameplayEffectHandle
+{
+    // public int32 Handle
+    m_Handle : int32;
+    // public bool bPassedFiltersAndWasExecuted
+    m_bPassedFiltersAndWasExecuted : boolean;
+}
+// FGameplayEffectQuery
+// Query struct for flexible active GameplayEffect filtering.
+// All match fields are optional — empty/default fields are skipped.
+// Multiple non-empty criteria combine with AND logic.
+// FGameplayEffectQuery
+class FGameplayEffectQuery
+{
 }
 // GameplayEffectCue
 class GameplayEffectCue
@@ -794,29 +808,6 @@ class FGameplayModifierEvaluatedData
     m_ModifierOp : EGameplayModOpType;
     // public float Magnitude
     m_Magnitude : float;
-}
-// FGameplayEffectQuery
-// Query struct for flexible active GameplayEffect filtering.
-// All match fields are optional — empty/default fields are skipped.
-// Multiple non-empty criteria combine with AND logic.
-// FGameplayEffectQuery
-class FGameplayEffectQuery
-{
-}
-// ScriptFunction factory type for creating ability tasks, analogous to GameplayAbilityCreator
-// AbilityTaskCreator
-class AbilityTaskCreator
-    extends ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__
-{
-    // public AbilityTaskCreator(std::function<AbilityTask * (*)(GameplayAbility * _0, AbilitySystemComponent * _1)> func)
-    constructor(func_0 : (_0 : GameplayAbility, _1 : AbilitySystemComponent) => AbilityTask| undefined);
-}
-// ScriptFunction<AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1)>
-class ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__
-    extends ScriptFunctionBase
-{
-    // public ScriptFunction(std::function<AbilityTask * (*)(GameplayAbility * _0, AbilitySystemComponent * _1)> func)
-    constructor(func_0 : (_0 : GameplayAbility, _1 : AbilitySystemComponent) => AbilityTask| undefined);
 }
 // AttributeMetaData
 class AttributeMetaData
@@ -880,6 +871,21 @@ class GameplayAbilitySpecDef
     // public EGameplayEffectGrantedAbilityRemovePolicy RemovalPolicy
     m_RemovalPolicy : EGameplayEffectGrantedAbilityRemovePolicy;
 }
+// ScriptFunction factory type for creating ability tasks, analogous to GameplayAbilityCreator
+// AbilityTaskCreator
+class AbilityTaskCreator
+    extends ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__
+{
+    // public AbilityTaskCreator(std::function<AbilityTask * (*)(GameplayAbility * _0, AbilitySystemComponent * _1)> func)
+    constructor(func_0 : (_0 : GameplayAbility, _1 : AbilitySystemComponent) => AbilityTask| undefined);
+}
+// ScriptFunction<AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1)>
+class ScriptFunction_AbilityTask__GameplayAbility__0_AbilitySystemComponent__1__
+    extends ScriptFunctionBase
+{
+    // public ScriptFunction(std::function<AbilityTask * (*)(GameplayAbility * _0, AbilitySystemComponent * _1)> func)
+    constructor(func_0 : (_0 : GameplayAbility, _1 : AbilitySystemComponent) => AbilityTask| undefined);
+}
 // Base class for gameplay cue notifies (simplified)
 // GameplayCueNotify_Static
 class GameplayCueNotify_Static
@@ -932,8 +938,10 @@ class GameplayAbilitySystem
 }
 // AbilityTask_Repeat
 // Repeatedly fires an action callback at a specified time interval.
-// Tick accumulates time and fires OnPerformAction on each interval boundary.
+// First iteration fires immediately in Activate; remaining iterations
+// are scheduled via TimerManager::SetRepeatingTimer.
 // Ends after MaxIterations actions have been performed.
+// Fires OnFinished when all iterations complete.
 // AbilityTask_Repeat
 class AbilityTask_Repeat
     extends AbilityTask
@@ -950,32 +958,47 @@ class AbilityTask_Repeat
     // Callback fired on each iteration. Parameter: current iteration index (0-based).
     // public std::function<void (*)(int _0)> OnPerformAction
     m_OnPerformAction : (_0 : int) => void| undefined;
+    // Callback fired when all iterations have completed. Parameter: total iterations performed.
+    // public std::function<void (*)(int _0)> OnFinished
+    m_OnFinished : (_0 : int) => void| undefined;
 }
 // AbilityTask_SpawnActor
-// Spawns an actor defined by ActorDefine at the given location.
-// Tick runs once, delegates to the game spawn system, fires OnSpawnComplete
-// with the spawned entity, and ends the task.
+// Spawns a Techno (Unit/Building/Infantry/Aircraft) defined by TechnoTypeClass
+// at the given location with the given facing direction.
+// Uses the two-phase spawn pattern: CreateObject → Unlimbo.
+// Activate() performs the spawn immediately and ends the task.
+// Fires OnSpawnComplete with the spawned entity on success,
+// or OnSpawnFailed on failure.
+// Mirrors UAbilityTask_SpawnActor::BeginSpawningActor/FinishSpawningActor.
 // AbilityTask_SpawnActor
 class AbilityTask_SpawnActor
     extends AbilityTask
 {
     // Create and register a new SpawnActor task
-    // public static AbilityTask_SpawnActor * Create(GameplayAbility * Ability, GameplayAbilityDefine * Define, Vector3D<int> Location)
-    static Create(Ability_0 : GameplayAbility, Define_1 : GameplayAbilityDefine, Location_2 : Vector3D) : AbilityTask_SpawnActor;
-    // Definition of the actor to spawn
-    // public GameplayAbilityDefine * ActorDefine
-    m_ActorDefine : GameplayAbilityDefine;
-    // World location at which to spawn the actor
+    // public static AbilityTask_SpawnActor * Create(GameplayAbility * Ability, TechnoTypeClass * Type, Vector3D<int> Location, uint8 Direction = 0)
+    static Create(Ability_0 : GameplayAbility, Type_1 : TechnoTypeClass, Location_2 : Vector3D, Direction_3 : uint8) : AbilityTask_SpawnActor;
+    // Type of the Techno to spawn
+    // public TechnoTypeClass * ActorType
+    m_ActorType : TechnoTypeClass;
+    // World location at which to spawn the Techno
     // public Vector3D<int> SpawnLocation
     m_SpawnLocation : Vector3D;
-    // Callback fired when the actor is spawned. Parameter: spawned entity.
+    // Facing direction (0-255, where 64 = East, 128 = South, 192 = West)
+    // public uint8 SpawnDirection
+    m_SpawnDirection : uint8;
+    // Callback fired when the Techno is spawned successfully. Parameter: spawned entity.
     // public std::function<void (*)(entity _0)> OnSpawnComplete
     m_OnSpawnComplete : (_0 : entt_entity) => void| undefined;
+    // Callback fired when the spawn fails (e.g. invalid type, blocked cell, no owner house).
+    // public std::function<void (*)()> OnSpawnFailed
+    m_OnSpawnFailed : () => void| undefined;
 }
 // AbilityTask_WaitAttributeChange
 // Waits for a specific gameplay attribute's value to change on the owning ASC.
-// Polls in Tick using ASC::GetNumericAttribute and fires OnAttributeChanged
-// when the value differs from the last known value.
+// Currently polls in Tick using ASC::GetGameplayAttributeValue and fires
+// OnAttributeChanged when the value differs from the last known value.
+// TODO: Refactor to event-driven using ASC::GetGameplayAttributeValueChangeDelegate
+// when the delegate infrastructure is available. See UAbilityTask_WaitAttributeChange.
 // AbilityTask_WaitAttributeChange
 class AbilityTask_WaitAttributeChange
     extends AbilityTask
@@ -995,27 +1018,23 @@ class AbilityTask_WaitAttributeChange
 }
 // AbilityTask_WaitDelay
 // Waits for a specified duration, then fires OnFinish and ends the task.
-// The duration is level-scalable via FScalableFloat.
 // AbilityTask_WaitDelay
 class AbilityTask_WaitDelay
     extends AbilityTask
 {
     // Create and register a new WaitDelay task
-    // public static AbilityTask_WaitDelay * Create(GameplayAbility * Ability, float Duration)
-    static Create(Ability_0 : GameplayAbility, Duration_1 : float) : AbilityTask_WaitDelay;
-    // Duration to wait before finishing (level-scaled)
-    // public FScalableFloat Duration
-    m_Duration : FScalableFloat;
-    // Time elapsed so far, accumulated by Tick
-    // public float ElapsedTime
-    m_ElapsedTime : float;
+    // public static AbilityTask_WaitDelay * Create(GameplayAbility * Ability, float Time)
+    static Create(Ability_0 : GameplayAbility, Time_1 : float) : AbilityTask_WaitDelay;
+    // Wait time in game seconds
+    // public float Time
+    m_Time : float;
     // Callback fired when the delay completes
     // public std::function<void (*)()> OnFinish
     m_OnFinish : () => void| undefined;
 }
 // AbilityTask_WaitGameplayEffectApplied
 // Waits for a GameplayEffect matching the given query to be applied to the owning ASC.
-// Uses ASC::OnGameplayEffectAppliedDelegateToSelf to register the callback.
+// Registers callback on ASC::OnGameplayEffectAppliedDelegateToSelf in Activate().
 // Fires OnEffectApplied when a matching effect is applied.
 // AbilityTask_WaitGameplayEffectApplied
 class AbilityTask_WaitGameplayEffectApplied
@@ -1036,8 +1055,9 @@ class AbilityTask_WaitGameplayEffectApplied
 }
 // AbilityTask_WaitGameplayEffectRemoved
 // Waits for a specific active GameplayEffect to be removed from the owning ASC.
-// Uses FActiveGameplayEffectEvents::OnRemoved via ASC::GetActiveEffectEventSet.
+// Registers callback on the effect's removal delegate in Activate().
 // Fires OnEffectRemoved when the tracked effect is removed.
+// Fires OnInvalidHandle if the handle is invalid on activation.
 // AbilityTask_WaitGameplayEffectRemoved
 class AbilityTask_WaitGameplayEffectRemoved
     extends AbilityTask
@@ -1052,56 +1072,84 @@ class AbilityTask_WaitGameplayEffectRemoved
     // Callback fired when the tracked effect is removed
     // public std::function<void (*)()> OnEffectRemoved
     m_OnEffectRemoved : () => void| undefined;
+    // Callback fired if the handle was invalid on activation
+    // public std::function<void (*)()> OnInvalidHandle
+    m_OnInvalidHandle : () => void| undefined;
 }
 // AbilityTask_WaitGameplayEvent
 // Waits for a specific gameplay event (tag + payload) to be fired on the owning ASC.
-// Uses ASC::AddGameplayEventTagContainerDelegate to register the callback.
+// Registers callback on ASC's event delegate in Activate().
 // Fires OnEventReceived when the event occurs.
 // AbilityTask_WaitGameplayEvent
 class AbilityTask_WaitGameplayEvent
     extends AbilityTask
 {
     // Create and register a new WaitGameplayEvent task
-    // public static AbilityTask_WaitGameplayEvent * Create(GameplayAbility * Ability, GameplayTag const& InEventTag, bool bOnlyTriggerOnce)
-    static Create(Ability_0 : GameplayAbility, InEventTag_1 : GameplayTag, bOnlyTriggerOnce_2 : boolean) : AbilityTask_WaitGameplayEvent;
+    // public static AbilityTask_WaitGameplayEvent * Create(GameplayAbility * Ability, GameplayTag const& InEventTag, bool bOnlyTriggerOnce, bool bOnlyMatchExact = false)
+    static Create(Ability_0 : GameplayAbility, InEventTag_1 : GameplayTag, bOnlyTriggerOnce_2 : boolean, bOnlyMatchExact_3 : boolean) : AbilityTask_WaitGameplayEvent;
     // Tag of the gameplay event to wait for
     // public GameplayTag EventTag
     m_EventTag : GameplayTag;
     // If true, EndTask after the first event
     // public bool bOnlyTriggerOnce
     m_bOnlyTriggerOnce : boolean;
+    // If true, match only the exact tag; if false, match tag and its children
+    // public bool bOnlyMatchExact
+    m_bOnlyMatchExact : boolean;
     // Callback fired when the event is received
     // public std::function<void (*)(GameplayEventData const& _0)> OnEventReceived
     m_OnEventReceived : (_0 : GameplayEventData) => void| undefined;
 }
-// AbilityTask_WaitGameplayTag
-// Waits for a specific gameplay tag to be added or removed on the owning ASC.
-// Uses ASC::RegisterAndCallGameplayTagEvent to register the callback.
-// Fires OnTagChanged when the tag count changes.
-// AbilityTask_WaitGameplayTag
-class AbilityTask_WaitGameplayTag
+// AbilityTask_WaitGameplayTagAdded
+// Waits for a specific gameplay tag to be added to the owning ASC.
+// Registers callback on ASC::RegisterGameplayTagEvent in Activate().
+// Checks initial state: if the tag is already present, fires immediately.
+// Mirrors UAbilityTask_WaitGameplayTagAdded.
+// AbilityTask_WaitGameplayTagAdded
+class AbilityTask_WaitGameplayTagAdded
     extends AbilityTask
 {
-    // Create and register a new WaitGameplayTag task
-    // public static AbilityTask_WaitGameplayTag * Create(GameplayAbility * Ability, GameplayTag const& InTag, bool bOnlyTriggerOnce, bool bTriggerOnAdd)
-    static Create(Ability_0 : GameplayAbility, InTag_1 : GameplayTag, bOnlyTriggerOnce_2 : boolean, bTriggerOnAdd_3 : boolean) : AbilityTask_WaitGameplayTag;
-    // Tag to watch for add/remove events
+    // Create and register a new WaitGameplayTagAdded task
+    // public static AbilityTask_WaitGameplayTagAdded * Create(GameplayAbility * Ability, GameplayTag const& InTag, bool bOnlyTriggerOnce)
+    static Create(Ability_0 : GameplayAbility, InTag_1 : GameplayTag, bOnlyTriggerOnce_2 : boolean) : AbilityTask_WaitGameplayTagAdded;
+    // Tag to watch for add events
     // public GameplayTag Tag
     m_Tag : GameplayTag;
-    // If true, EndTask after the first tag event
+    // If true, EndTask after the first tag add
     // public bool bOnlyTriggerOnce
     m_bOnlyTriggerOnce : boolean;
-    // If true, trigger on tag add. If false, trigger only on tag remove.
-    // public bool bTriggerOnAdd
-    m_bTriggerOnAdd : boolean;
-    // Callback fired when the tag status changes. Parameters: tag, bAdded
-    // public std::function<void (*)(GameplayTag const& _0, bool _1)> OnTagChanged
-    m_OnTagChanged : (_0 : GameplayTag, _1 : boolean) => void| undefined;
+    // Callback fired when the tag is added
+    // public std::function<void (*)()> OnTagAdded
+    m_OnTagAdded : () => void| undefined;
+}
+// AbilityTask_WaitGameplayTagRemoved
+// Waits for a specific gameplay tag to be removed from the owning ASC.
+// Registers callback on ASC::RegisterGameplayTagEvent in Activate().
+// Checks initial state: if the tag is already absent, fires immediately.
+// Mirrors UAbilityTask_WaitGameplayTagRemoved.
+// AbilityTask_WaitGameplayTagRemoved
+class AbilityTask_WaitGameplayTagRemoved
+    extends AbilityTask
+{
+    // Create and register a new WaitGameplayTagRemoved task
+    // public static AbilityTask_WaitGameplayTagRemoved * Create(GameplayAbility * Ability, GameplayTag const& InTag, bool bOnlyTriggerOnce)
+    static Create(Ability_0 : GameplayAbility, InTag_1 : GameplayTag, bOnlyTriggerOnce_2 : boolean) : AbilityTask_WaitGameplayTagRemoved;
+    // Tag to watch for remove events
+    // public GameplayTag Tag
+    m_Tag : GameplayTag;
+    // If true, EndTask after the first tag remove
+    // public bool bOnlyTriggerOnce
+    m_bOnlyTriggerOnce : boolean;
+    // Callback fired when the tag is removed
+    // public std::function<void (*)()> OnTagRemoved
+    m_OnTagRemoved : () => void| undefined;
 }
 // AbilityTask_WaitInput
 // Waits for input press and/or release on the owning ability's InputID.
 // Polls in Tick by checking the ability spec's InputPressed state.
-// Fires OnInputPress and/or OnInputRelease callbacks as configured.
+// TODO: Refactor to delegate-driven using ASC::AbilityReplicatedEventDelegate
+// when available. See UAbilityTask_WaitInputPress/Release for reference.
+// Note: Frame-sync project, so no replication is needed.
 // AbilityTask_WaitInput
 class AbilityTask_WaitInput
     extends AbilityTask
@@ -1140,13 +1188,16 @@ class AbilityTask_WaitTargetData
     // Callback fired when target data is ready
     // public std::function<void (*)(GameplayAbilityTargetDataHandle const& _0)> OnTargetDataReady
     m_OnTargetDataReady : (_0 : GameplayAbilityTargetDataHandle) => void| undefined;
+    // Callback fired when targeting is cancelled
+    // public std::function<void (*)()> OnTargetDataCancelled
+    m_OnTargetDataCancelled : () => void| undefined;
 }
 // CustomAttributeSet
 class CustomAttributeSet
     extends AttributeSet
 {
-    // public CustomAttributeSet()
-    constructor();
+    // public static CustomAttributeSet * Create()
+    static Create() : CustomAttributeSet;
     // public std::function<bool (*)(FGameplayEffectModCallbackData * _0)> OnK2_PreGameplayEffectExecute
     m_OnK2_PreGameplayEffectExecute : (_0 : FGameplayEffectModCallbackData) => boolean| undefined;
     // public std::function<void (*)(FGameplayEffectModCallbackData const * _0)> OnK2_PostGameplayEffectExecute
@@ -1165,8 +1216,8 @@ class CustomAttributeSet
 class CustomGameplayAbility
     extends GameplayAbility
 {
-    // public CustomGameplayAbility()
-    constructor();
+    // public static CustomGameplayAbility * Create()
+    static Create() : CustomGameplayAbility;
     // public void K2_CancelAbility()
     K2_CancelAbility() : void;
     // public bool K2_CommitAbility()
@@ -1533,12 +1584,15 @@ enum EGameplayModOpType {
 // Describes how a GameplayAbility will be instanced when executed
 // EGameplayAbilityInstancingPolicy
 enum EGameplayAbilityInstancingPolicy {
+    // This ability is never instanced. Anything that executes the ability is operating on the CDO.
+    // NonInstanced = 
+    NonInstanced = 0,
     // This ability can only be instanced once per actor. Every execution will use the same instance
     // InstancedPerActor = 
-    InstancedPerActor = 0,
+    InstancedPerActor = 1,
     // This ability is instanced each time it is executed. Each activation gets a new instance
     // InstancedPerExecution = 
-    InstancedPerExecution = 1,
+    InstancedPerExecution = 2,
 }
 // EGameplayAbilityTriggerSource
 enum EGameplayAbilityTriggerSource {
@@ -1570,6 +1624,16 @@ enum EGameplayAbilityActivationMode {
     // We tried to activate it, and server told us we couldn't (even though we thought we could)
     // Rejected = 
     Rejected = 4,
+}
+// Whether to consider pending-remove specs when finding an ability spec
+// EConsiderPending
+enum EConsiderPending {
+    // Skip specs marked PendingRemove
+    // No = 
+    No = 0,
+    // Include specs marked PendingRemove
+    // Yes = 
+    Yes = 1,
 }
 // Enumeration for ways a single GameplayEffect asset can stack.
 // EGameplayEffectStackingType
@@ -1616,16 +1680,6 @@ enum EGameplayEffectStackingExpirationPolicy {
     // The duration of the gameplay effect is refreshed. This essentially makes the effect infinite in duration. This can be used to manually handle stack decrements via OnStackCountChange callback
     // RefreshDuration = 
     RefreshDuration = 2,
-}
-// Whether to consider pending-remove specs when finding an ability spec
-// EConsiderPending
-enum EConsiderPending {
-    // Skip specs marked PendingRemove
-    // No = 
-    No = 0,
-    // Include specs marked PendingRemove
-    // Yes = 
-    Yes = 1,
 }
 // Describes what happens when a granting GameplayEffect is removed
 // EGameplayEffectGrantedAbilityRemovePolicy

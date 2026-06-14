@@ -57,6 +57,14 @@ public:
 	// Cancel ALL timers immediately.
 	void ClearAllTimers();
 
+	// Schedule a callback to fire on the very next Tick(). Semantically equivalent
+	// to SetTimer(Callback, 0.0f) but explicit about the "next tick" intent.
+	TimerHandle SetTimerForNextTick(std::function<void()> Callback);
+
+	// Total number of Tick() calls processed. Incremented at the start of each Tick
+	// before any timer callbacks fire.
+	uint32_t GetFrameCount() const { return FrameCount; }
+
 private:
 	struct TimerEntry
 	{
@@ -75,4 +83,5 @@ private:
 	std::vector<TimerEntry> PendingTimerAdds;
 	uint32_t NextHandleId = 1;
 	bool bIsProcessingCallbacks = false;
+	uint32_t FrameCount = 0;
 };
