@@ -60,6 +60,21 @@ GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, Ga
 	if (!creatorFunc) {
 		return nullptr;
 	}
+
+    // When no owning component is given, the ability is a global template (like a Class Default Object):
+    // create it once per creator name and return the cached instance on subsequent calls.
+    // When a component is given, always create a fresh per-actor instance and skip the cache.
+    if (!component) {
+        static std::unordered_map<StringName, GameplayAbility*> GlobalAbilityCache;
+        auto it = GlobalAbilityCache.find(name);
+        if (it != GlobalAbilityCache.end()) {
+            return it->second;
+        }
+        GameplayAbility* Ability = (*creatorFunc)(define, component);
+        GlobalAbilityCache[name] = Ability;
+        return Ability;
+    }
+
 	return (*creatorFunc)(define, component);
 }
 
