@@ -47,7 +47,7 @@ target("XkeinExt")
     add_rules("codegen-cpp")
 
     add_deps("YrExtCore", "JoltPhysics", "Wwise", "puerts", "gainput")
-    add_packages("cppzmq", "stb", "msgpack-cxx", "taskflow")
+    add_packages("cppzmq", "stb", "msgpack-cxx", "taskflow", "rmlui")
 
     add_headerfiles("src/audio/**.h", "src/physics/**.h", "src/render/**.h", "src/scripting/**.h", "src/input/**.h")
     add_files("src/audio/**.cpp", "src/physics/**.cpp", "src/render/**.cpp", "src/scripting/**.cpp", "src/input/**.cpp")

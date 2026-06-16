@@ -8,6 +8,7 @@ add_requires("cppzmq")
 add_requires("asmjit")
 add_requires("zydis")
 add_requires("taskflow")
+add_requires("rmlui")
 
 includes("3rdparty/YRpp.lua")
 includes("3rdparty/entt.lua")

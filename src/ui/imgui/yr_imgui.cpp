@@ -12,7 +12,7 @@
 #include <CommCtrl.h>
 #include "yr/event/windows_event.h"
 
-HWND GetGameHwnd() {
+inline HWND GetGameHwnd() {
     return Game::hWnd;
 }
 

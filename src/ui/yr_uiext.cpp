@@ -3,6 +3,7 @@
 #include "yr/event/general_event.h"
 #include "yr/event/ui_event.h"
 #include "ui/imgui/yr_imgui.h"
+#include "ui/rmlui/rmlui.h"
 #include <Unsorted.h>
 #include "runtime/logger/logger.h"
 #include <thread>
@@ -84,30 +85,39 @@ void YrExtUIModule::InitUIModule()
     if (gYrExtConfig->rawData.value("enable_imgui_module", false)) {
         imguiThread = std::make_unique<ImGuiThread>();
     }
+    if (gYrExtConfig->rawData.value("enable_rmlui_module", false)) {
+        YrRmlUi::Init();
+    }
 }
 
 void YrExtUIModule::DestroyUIModule()
 {
     imguiThread.reset();
+    YrRmlUi::Destory();
 }
 
 void YrExtUIModule::UIMainThread()
 {
-    if (!imguiThread)
-        return;
-    if (!ImGui::GetCurrentContext())
-        return;
     ZoneScopedN("UI Module Tick");
-    ImGui::GetIO().MouseDrawCursor = true;
-    if (YrImGui::gWindows.size() > 0)
+
+    if (imguiThread && ImGui::GetCurrentContext())
     {
-        isMainThread = true;
-        YrImGui::Render();
+        ImGui::GetIO().MouseDrawCursor = true;
+        if (YrImGui::gWindows.size() > 0)
+        {
+            isMainThread = true;
+            YrImGui::Render();
+        }
+        else if (isMainThread)
+        {
+            YrImGui::Render();
+            isMainThread = false;
+        }
     }
-    else if (isMainThread)
+
+    if (YrRmlUi::gContexts.size() > 0)
     {
-        YrImGui::Render();
-        isMainThread = false;
+        YrRmlUi::Render();
     }
 }
 
