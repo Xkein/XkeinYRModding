@@ -20,6 +20,10 @@ public:
 
     // 检查序列化后大小
     static size_t GetSerializedSize(const FramePacket& packet);
+
+    // === WorldInitPacket 序列化（开局全量同步） ===
+    static void SerializeWorldInit(const WorldInitPacket& packet, std::vector<uint8_t>& out);
+    static size_t GetWorldInitSerializedSize(const WorldInitPacket& packet);
 };
 
 // === 线格式定义 ===

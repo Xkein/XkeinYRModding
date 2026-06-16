@@ -24,6 +24,8 @@ inline static Quaternion GetObjectRotation(AbstractClass* pYrObject)
         case AbstractType::Unit:
         {
             FootClass* pFoot = static_cast<FootClass*>(pYrObject);
+            if (!pFoot->Locomotor || !pFoot->GetCell())
+                return Quaternion{0,0,0,1};
             VoxelIndexKey indexKey;
             indexKey.MainVoxel.RampType = pFoot->GetCell()->SlopeIndex;
             Matrix3D matrix =  pFoot->Locomotor->Draw_Matrix(&indexKey);

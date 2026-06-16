@@ -77,6 +77,13 @@ inline void FramePacketSerializer::Serialize(const FramePacket& packet, std::vec
         out.insert(out.end(), p, p + size);
     };
     auto push32 = [&](uint32_t v) { push(&v, 4); };
+    auto push16 = [&](uint16_t v) { push(&v, 2); };
+
+    // Magic + Version (协议校验)
+    constexpr uint32_t MAGIC = 0x59525248; // "YRRH"
+    constexpr uint16_t VERSION = 1;
+    push32(MAGIC);
+    push16(VERSION);
 
     push32(packet.FrameNumber);
     push(&packet.GameSpeed, 4);
@@ -108,12 +115,94 @@ inline void FramePacketSerializer::Serialize(const FramePacket& packet, std::vec
 
 inline size_t FramePacketSerializer::GetSerializedSize(const FramePacket& packet)
 {
-    size_t size = 4 + 4; // FrameNumber + GameSpeed
+    size_t size = 4 + 2; // Magic + Version
+    size += 4 + 4; // FrameNumber + GameSpeed
     size += 4 + packet.NewEntityIDs.size() * 4;
     size += 4 + packet.RemovedEntityIDs.size() * 4;
     size += 4 + packet.ChangedEntities.size() * 64; // SyncedEntity = 64 bytes
     size += 4;
     for (const auto& [hash, name] : packet.NewAssetNames)
         size += 4 + 2 + name.size();
+    return size;
+}
+
+// === WorldInitPacket 序列化 ===
+//
+// 线格式:
+//   [uint32_t] Magic "YRRH"
+//   [uint16_t] Version
+//   [uint16_t] MapName length
+//   [N × char] MapName
+//   [int32_t]  Theater
+//   [int32_t]  MapWidth, MapHeight
+//   [int32_t]  CellWidth, CellHeight
+//   [uint32_t] Tiles count
+//   [N × IsoTileInit] Tiles (48 bytes each: 4+4+4+4+32)
+//   [uint32_t] InitialEntities count
+//   [N × SyncedEntity] InitialEntities
+//   [uint32_t] Cells count
+//   [N × CellInit] Cells
+
+inline void FramePacketSerializer::SerializeWorldInit(const WorldInitPacket& packet, std::vector<uint8_t>& out)
+{
+    auto push = [&](const void* data, size_t size) {
+        const uint8_t* p = static_cast<const uint8_t*>(data);
+        out.insert(out.end(), p, p + size);
+    };
+    auto push32 = [&](uint32_t v) { push(&v, 4); };
+    auto push16 = [&](uint16_t v) { push(&v, 2); };
+
+    // Magic + Version (协议校验)
+    constexpr uint32_t MAGIC = 0x59525248; // "YRRH"
+    constexpr uint16_t VERSION = 1;
+    push32(MAGIC);
+    push16(VERSION);
+
+    // MapName
+    uint16_t nameLen = static_cast<uint16_t>(packet.MapName.size());
+    push(&nameLen, 2);
+    push(packet.MapName.data(), nameLen);
+
+    // Theater + Map bounds + Cell size
+    push(&packet.Theater, 4);
+    push(&packet.MapWidth, 4);
+    push(&packet.MapHeight, 4);
+    push(&packet.CellWidth, 4);
+    push(&packet.CellHeight, 4);
+
+    // Tiles
+    push32(static_cast<uint32_t>(packet.Tiles.size()));
+    for (const auto& tile : packet.Tiles) {
+        push(&tile.CellX, 4);
+        push(&tile.CellY, 4);
+        push(&tile.Height, 4);
+        push(&tile.TileTypeIndex, 4);
+        push(tile.TileFileName, 32);
+    }
+
+    // InitialEntities (复用 SyncedEntity 定长序列化)
+    push32(static_cast<uint32_t>(packet.InitialEntities.size()));
+    for (const auto& se : packet.InitialEntities)
+        SerializeEntity(se, out);
+
+    // Cells
+    push32(static_cast<uint32_t>(packet.Cells.size()));
+    for (const auto& cell : packet.Cells) {
+        push(&cell.CellX, 4);
+        push(&cell.CellY, 4);
+        uint8_t flags = (cell.Revealed ? 1 : 0) | (cell.Fogged ? 2 : 0);
+        push(&flags, 1);
+    }
+}
+
+inline size_t FramePacketSerializer::GetWorldInitSerializedSize(const WorldInitPacket& packet)
+{
+    size_t size = 0;
+    size += 4 + 2;                                   // Magic + Version
+    size += 2 + packet.MapName.size();              // MapName
+    size += 4 * 5;                                   // Theater + 4 int32s
+    size += 4 + packet.Tiles.size() * (4 + 4 + 4 + 4 + 32); // Tiles (48 bytes each)
+    size += 4 + packet.InitialEntities.size() * 64;  // Entities (64 bytes each)
+    size += 4 + packet.Cells.size() * (4 + 4 + 1);   // Cells (9 bytes each)
     return size;
 }

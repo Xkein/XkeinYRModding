@@ -1,6 +1,8 @@
 #include "render/backend/render_backend.h"
 #include "render/preprocessor/shp_converter.h"
 #include "render/sync/frame_packet_serializer.h"
+#include "render/sync/render_sync_hooks.h"
+#include "render/sync/aux_data_collector.h"
 #include "physics/yr_tools.h"
 #include "runtime/logger/logger.h"
 #include "runtime/ecs/entt.h"
@@ -26,14 +28,19 @@
 #include <ParticleClass.h>
 #include <ParticleSystemClass.h>
 #include <IsometricTileClass.h>
+#include <IsometricTileTypeClass.h>
 #include <OverlayClass.h>
 #include <SmudgeClass.h>
 #include <VeinholeMonsterClass.h>
 #include <HouseClass.h>
 #include <TechnoClass.h>
 #include <TechnoTypeClass.h>
+#include <CellClass.h>
+#include <MapClass.h>
 #include <StageClass.h>
+#include <ScenarioClass.h>
 #include <Facing.h>
+#include <ConvertClass.h>
 
 #include <cstring>
 
@@ -199,8 +206,17 @@ std::string SyncDataCollector::GetAssetFilename(AbstractClass* obj) const
         }
     }
 
-    // 回退：用 WhatAmI + AbstractClass 自身 ID
-    return std::to_string(static_cast<int>(at)) + "_" + std::to_string(reinterpret_cast<uintptr_t>(obj));
+    // IsometricTileClass: 使用 IsometricTileType::FileName (TMP 文件)
+    if (at == AbstractType::Isotile) {
+        auto* pTile = static_cast<IsometricTileClass*>(obj);
+        if (pTile->Type && pTile->Type->FileName[0])
+            // FileName[0xE] 可能不以 null 结尾，需用 strnlen
+            return std::string(pTile->Type->FileName,
+                              strnlen(pTile->Type->FileName, sizeof(pTile->Type->FileName)));
+    }
+
+    // 回退：无法匹配时返回空字符串，UE5 端据此判断实体无对应资产
+    return "";
 }
 
 
@@ -229,9 +245,11 @@ int32_t SyncDataCollector::GetCurrentFrame(AbstractClass* obj) const
     if (pTechno) {
         auto* pFoot = generic_cast<FootClass*>(obj);
         if (pFoot) {
-            // TODO: 逆向获取 BodyType 帧索引
-            // BodyType 帧索引: Body[ToA(GetRealFacing())].Frame
-            // FootClass 的 FrameIndex 由 WalkedFramesSoFar / WalkRate 计算
+            // 行走帧 = WalkedFramesSoFar / WalkRate（FootClass 位于 TechnoTypeClass）
+            auto* pTT = pTechno->GetTechnoType();
+            if (pTT && pTT->WalkRate > 0) {
+                return pFoot->WalkedFramesSoFar / pTT->WalkRate;
+            }
             return 0;
         }
         // 建筑等无行走动画的 Techno
@@ -268,8 +286,15 @@ uint8_t SyncDataCollector::GetPlayerIndex(AbstractClass* obj) const
 
     if (obj->WhatAmI() == AbstractType::Anim) {
         auto* pAnim = static_cast<AnimClass*>(obj);
-        if (pAnim->OwnerObject)
-            return static_cast<uint8_t>(reinterpret_cast<HouseClass*>(pAnim->OwnerObject)->ArrayIndex);
+        if (pAnim->OwnerObject) {
+            // OwnerObject 可能是 HouseClass 或 TechnoClass，需要先检查类型
+            if (pAnim->OwnerObject->WhatAmI() == AbstractType::House)
+                return static_cast<uint8_t>(static_cast<HouseClass*>(pAnim->OwnerObject)->ArrayIndex);
+            // 如果是 TechnoClass，通过其 Owner 获取玩家
+            auto* pOwnerTechno = generic_cast<TechnoClass*>(pAnim->OwnerObject);
+            if (pOwnerTechno && pOwnerTechno->Owner)
+                return static_cast<uint8_t>(pOwnerTechno->Owner->ArrayIndex);
+        }
         return 0;
     }
 
@@ -293,10 +318,13 @@ static int32_t GetRemapIndex(AbstractClass* obj)
     LightConvertClass* pLc = pObj->GetRemapColour();
     if (!pLc) return 0;
 
-    // RemapIndex = ColorSchemeIndex
-    // LightConvertClass 目前没有直接暴露 ColorSchemeIndex，
-    // 需要逆向确认
-    return 0; // TODO
+    // 在 LightConvertClass::Array 中查找索引作为 RemapIndex
+    auto& arr = *LightConvertClass::Array;
+    for (int i = 0; i < arr.Count; ++i) {
+        if (arr.Items[i] == pLc)
+            return i;
+    }
+    return 0;
 }
 
 
@@ -312,9 +340,13 @@ static int32_t GetBrightness(AbstractClass* obj)
     auto* pCell = pObj->GetCell();
     if (!pCell) return 1000;
 
-    // 亮度取决于 Cell 光照强度，需要逆向确认映射
-    // 默认 1000 = 正常亮度
-    return 1000; // TODO
+    // 亮度取决于 Cell 光照强度
+    // 正常亮度 = 1000，范围 0~2000
+    // TODO: 逆向 CellClass::CalculateLightSourceLighting 计算精确亮度
+    // 当前回退: 使用 Cell 的 LightConvert 初始化强度
+    // CellClass::InitLightConvert 的 nIntensity 参数 (0x10000 = 正常)
+    // 缩放: Intensity / 65536 * 1000
+    return 1000; // TODO: 逆向 Cell 光照计算
 }
 
 
@@ -393,7 +425,10 @@ void SyncDataCollector::CollectEntity(SyncComponent& com)
         se.RotW        == com.lastSnapshot.RotW &&
         se.FrameIndex  == com.lastSnapshot.FrameIndex &&
         se.Facing      == com.lastSnapshot.Facing &&
-        se.PlayerIndex == com.lastSnapshot.PlayerIndex)
+        se.PlayerIndex == com.lastSnapshot.PlayerIndex &&
+        se.RemapIndex  == com.lastSnapshot.RemapIndex &&
+        se.Brightness  == com.lastSnapshot.Brightness &&
+        se.Visual      == com.lastSnapshot.Visual)
     {
         return; // 无变化，不发送
     }
@@ -413,7 +448,11 @@ void SyncDataCollector::CollectFrameData()
     if (!IsUE5Enabled())
         return;
 
-    _framePacket.Clear();
+    // 只清变更数据和新增资产名，保留生命周期列表（NewEntityIDs/RemovedEntityIDs
+    // 由 OnEntityCreated/OnEntityDestroyed 回调提前写入）
+    _framePacket.ChangedEntities.clear();
+    _framePacket.NewAssetNames.clear();
+    _framePacket.FrameNumber = _currentFrame++;
 
     // 遍历所有 SyncComponent
     gEntt->view<SyncComponent>().each([this](SyncComponent& com) {
@@ -426,22 +465,27 @@ void SyncDataCollector::CollectFrameData()
 
 bool SyncDataCollector::SendFrameData()
 {
-    if (_framePacket.IsEmpty())
+    if (!_ue5Connected || _framePacket.IsEmpty())
         return true;
 
     // 序列化 FramePacket
-    static std::vector<uint8_t> serializedBuf;
-    serializedBuf.clear();
-    FramePacketSerializer::Serialize(_framePacket, serializedBuf);
+    _serializeBuffer.clear();
+    FramePacketSerializer::Serialize(_framePacket, _serializeBuffer);
 
-    if (serializedBuf.empty())
+    if (_serializeBuffer.empty())
         return true;
 
     int bytesWritten = _channel.WriteFrame(
-        serializedBuf.data(),
-        static_cast<uint32_t>(serializedBuf.size()));
+        _serializeBuffer.data(),
+        static_cast<uint32_t>(_serializeBuffer.size()));
 
-    return bytesWritten >= 0;
+    if (bytesWritten >= 0) {
+        // 发送成功后清理生命周期ID（已发送）
+        _framePacket.NewEntityIDs.clear();
+        _framePacket.RemovedEntityIDs.clear();
+        return true;
+    }
+    return false;
 }
 
 
@@ -450,6 +494,164 @@ bool SyncDataCollector::SendFrameData()
 bool SyncDataCollector::IsUE5Enabled() const
 {
     return gYrExtConfig && gYrExtConfig->IsUe5RenderEnabled();
+}
+
+
+// === 开局全量同步：收集 WorldInitPacket ===
+
+void SyncDataCollector::CollectWorldInitData(WorldInitPacket& packet)
+{
+    auto* pMap = MapClass::Instance;
+    if (!pMap)
+        return;
+
+    // 地图基本信息
+    if (auto* pScenario = ScenarioClass::Instance) {
+        packet.MapName = pScenario->FileName;
+        packet.Theater = static_cast<int32_t>(pScenario->Theater);
+    }
+
+    const auto& mapRect = pMap->MapRect;
+    packet.MapWidth   = mapRect.Width;
+    packet.MapHeight  = mapRect.Height;
+    packet.CellWidth  = 256;  // 每个 Cell 256 leptons
+    packet.CellHeight = 256;
+
+    // 遍历所有 Cell，收集地形数据
+    pMap->CellIteratorReset();
+
+    CellClass* pCell;
+    while ((pCell = pMap->CellIteratorNext()) != nullptr)
+    {
+        if (!pCell || pCell == &MapClass::InvalidCell)
+            continue;
+
+        IsoTileInit tileInit{};
+        tileInit.CellX = pCell->MapCoords.X;
+        tileInit.CellY = pCell->MapCoords.Y;
+        tileInit.TileTypeIndex = pCell->IsoTileTypeIndex;
+
+        // 高度: Level * 256 (LevelHeight)
+        tileInit.Height = static_cast<float>(pCell->GetLevel() * 256);
+
+        // TMP 文件名（从 IsometricTileTypeClass 获取）
+        if (pCell->IsoTileTypeIndex >= 0 &&
+            pCell->IsoTileTypeIndex < IsometricTileTypeClass::Array->Count)
+        {
+            auto* pIsoTileType = IsometricTileTypeClass::Array->Items[pCell->IsoTileTypeIndex];
+            if (pIsoTileType && pIsoTileType->FileName[0])
+            {
+                strncpy_s(tileInit.TileFileName, sizeof(tileInit.TileFileName),
+                          pIsoTileType->FileName, sizeof(tileInit.TileFileName) - 1);
+            }
+        }
+
+        packet.Tiles.push_back(tileInit);
+
+        // Cell 迷雾状态
+        CellInit cellInit{};
+        cellInit.CellX    = pCell->MapCoords.X;
+        cellInit.CellY    = pCell->MapCoords.Y;
+        cellInit.Revealed = !pCell->IsShrouded();
+        cellInit.Fogged   = pCell->IsFogged();
+        packet.Cells.push_back(cellInit);
+    }
+}
+
+void SyncDataCollector::CollectWorldInitEntities(WorldInitPacket& packet)
+{
+    // 遍历 ECS，收集所有初始实体
+    gEntt->view<SyncComponent>().each([this, &packet](SyncComponent& com) {
+        AbstractClass* pObj = com.yrObject;
+        if (!pObj) return;
+
+        SyncedEntity se{};
+        se.EntityID = com.entityID;
+        se.Type     = MapAbstractType(pObj->WhatAmI());
+
+        std::string assetName = GetAssetFilename(pObj);
+        se.AssetNameHash = SHPConverter::HashFilename(assetName);
+
+        CoordStruct coord = GetObjectCoords(pObj);
+        Quaternion   quat = GetObjectRotation(pObj);
+        se.PosX = static_cast<float>(coord.X);
+        se.PosY = static_cast<float>(coord.Y);
+        se.PosZ = static_cast<float>(coord.Z);
+        se.RotX = static_cast<float>(quat.X);
+        se.RotY = static_cast<float>(quat.Y);
+        se.RotZ = static_cast<float>(quat.Z);
+        se.RotW = static_cast<float>(quat.W);
+
+        se.FrameIndex   = GetCurrentFrame(pObj);
+        se.Facing       = GetFacing(pObj);
+        se.PlayerIndex  = GetPlayerIndex(pObj);
+        se.RemapIndex   = GetRemapIndex(pObj);
+        se.Brightness   = GetBrightness(pObj);
+        se.Visual       = EVisualType::Normal;
+
+        com.lastSnapshot  = se;
+        com.snapshotValid = true;
+
+        packet.InitialEntities.push_back(se);
+    });
+}
+
+void SyncDataCollector::CollectAndSendWorldInit()
+{
+    if (!IsUE5Enabled())
+        return;
+
+    WorldInitPacket worldPacket;
+    CollectWorldInitData(worldPacket);
+    CollectWorldInitEntities(worldPacket);
+
+    // 序列化并发送
+    _serializeBuffer.clear();
+    FramePacketSerializer::SerializeWorldInit(worldPacket, _serializeBuffer);
+
+    if (_serializeBuffer.empty())
+        return;
+
+    // 通过控制通道发信号：即将发送全量同步数据
+    _channel.SetControlFlag(1);
+
+    // 分块发送（大数据可能超过 Ring Buffer 容量）
+    // 每块末尾标记是否还有后续块
+    constexpr uint32_t MAX_CHUNK_SIZE = 1024 * 1024; // 1MB per chunk
+    const uint8_t* dataPtr = _serializeBuffer.data();
+    uint32_t remaining = static_cast<uint32_t>(_serializeBuffer.size());
+
+    int chunkIndex = 0;
+    while (remaining > 0) {
+        uint32_t chunkSize = (remaining > MAX_CHUNK_SIZE) ? MAX_CHUNK_SIZE : remaining;
+
+        // 在每块数据前加一个标记: [uint32_t chunkIndex][uint32_t totalSize][uint8_t isLast]
+        std::vector<uint8_t> chunk;
+        chunk.reserve(chunkSize + 12);
+        auto push32 = [&](uint32_t v) { chunk.push_back(v & 0xFF); chunk.push_back((v>>8) & 0xFF); chunk.push_back((v>>16) & 0xFF); chunk.push_back((v>>24) & 0xFF); };
+
+        push32(static_cast<uint32_t>(chunkIndex));
+        push32(static_cast<uint32_t>(_serializeBuffer.size()));
+        chunk.push_back(remaining <= MAX_CHUNK_SIZE ? 1 : 0);
+
+        chunk.insert(chunk.end(), dataPtr, dataPtr + chunkSize);
+
+        int written = _channel.WriteFrame(chunk.data(), static_cast<uint32_t>(chunk.size()));
+        if (written < 0) {
+            gLogger->warn("UE5 render sync: WorldInit chunk {} write failed", chunkIndex);
+            break;
+        }
+
+        dataPtr += chunkSize;
+        remaining -= chunkSize;
+        chunkIndex++;
+    }
+
+    // 发送完成信号
+    _channel.SetControlFlag(2);
+    gLogger->info("UE5 render sync: WorldInit sent ({} tiles, {} entities, {} cells, {} chunks)",
+                  worldPacket.Tiles.size(), worldPacket.InitialEntities.size(),
+                  worldPacket.Cells.size(), chunkIndex);
 }
 
 
@@ -484,9 +686,12 @@ public:
 
     void Tick()
     {
+        collector.UpdateConnectionStatus();
         collector.CollectFrameData();
         collector.SendFrameData();
     }
+
+    SyncDataCollector& GetCollector() { return collector; }
 
 private:
     SyncDataCollector collector;
@@ -513,10 +718,16 @@ public:
     {
         _impl->Tick();
     }
+    SyncDataCollector& GetCollector();
 
 private:
     RenderBackendImpl* _impl = nullptr;
 };
+
+inline SyncDataCollector& RenderBackend::GetCollector()
+{
+    return _impl->GetCollector();
+}
 
 // === 全局实例 ===
 
@@ -538,6 +749,20 @@ void TickRenderBackend()
 
 void ShutdownRenderBackend()
 {
+    // 卸载渲染 Hook，避免 DLL 卸载后 Hook 函数指针悬空
+    RenderSyncHooks::RemoveHooks();
+    AuxDataCollector::RemoveHooks();
+
     delete gRenderBackend;
     gRenderBackend = nullptr;
+}
+
+void SendWorldInit()
+{
+    if (gRenderBackend)
+    {
+        // 通过 RenderBackend facade 无法直接调用 Collector
+        // 这里做一个临时的静态访问
+        gRenderBackend->GetCollector().CollectAndSendWorldInit();
+    }
 }

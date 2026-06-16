@@ -89,11 +89,13 @@ struct FramePacket {
 
 // === 开局全量同步 ===
 
+#pragma pack(push, 1)
 struct IsoTileInit
 {
     int32_t CellX, CellY;
-    float   Height;           // 来自 TMP（TODO: 逆向后补充）
-    int32_t TileTypeIndex;
+    float   Height;           // Z 坐标 (Lepton)，来自 CellClass::Level * 256
+    int32_t TileTypeIndex;    // IsometricTileTypeClass 数组索引
+    char    TileFileName[32]; // TMP 文件名（如 "Tile00.tem"），用于 UE5 端查找对应素材
 };
 
 struct CellInit
@@ -102,6 +104,7 @@ struct CellInit
     bool    Revealed;
     bool    Fogged;
 };
+#pragma pack(pop)
 
 struct WorldInitPacket
 {

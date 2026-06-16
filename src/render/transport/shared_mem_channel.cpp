@@ -54,8 +54,8 @@ int SharedMemChannel::WriteFrame(const void* data, uint32_t size)
     uint32_t bufSize   = _header->bufferSize;
 
     // 检查 Ring Buffer 可用空间
-    uint32_t writeIdx = _header->writeOffset % bufSize;
-    uint32_t readIdx  = _header->readOffset % bufSize;
+    uint32_t writeIdx = _header->GetWriteOffset() % bufSize;
+    uint32_t readIdx  = _header->GetReadOffset() % bufSize;
 
     uint32_t used;
     if (writeIdx >= readIdx)
@@ -81,8 +81,8 @@ int SharedMemChannel::WriteFrame(const void* data, uint32_t size)
         memcpy(dataBuf, static_cast<const uint8_t*>(data) + remaining, size - remaining);
     }
 
-    _header->writeOffset += totalSize;
-    _header->frameCount++;
+    _header->SetWriteOffset(_header->GetWriteOffset() + totalSize);
+    _header->SetFrameCount(_header->GetFrameCount() + 1);
     return static_cast<int>(totalSize);
 }
 
@@ -102,10 +102,10 @@ void SharedMemChannel::CloseWriter()
 void SharedMemChannel::SetControlFlag(uint32_t flag)
 {
     if (_header)
-        _header->controlFlag = flag;
+        _header->SetControlFlag(flag);
 }
 
 uint32_t SharedMemChannel::GetControlFlag() const
 {
-    return _header ? _header->controlFlag : 0;
+    return _header ? _header->GetControlFlag() : 0;
 }

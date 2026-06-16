@@ -38,6 +38,9 @@ public:
     // 发送当前帧数据到共享内存
     bool SendFrameData();
 
+    // 开局全量同步：收集 WorldInitPacket 并发送
+    void CollectAndSendWorldInit();
+
     // 是否启用 UE5 渲染前端
     bool IsUE5Enabled() const;
 
@@ -47,6 +50,9 @@ public:
 
     // 获取共享内存通道（供 RenderBackendImpl 初始化使用）
     SharedMemChannel& GetChannel() { return _channel; }
+
+    // 更新 UE5 连接状态
+    void UpdateConnectionStatus() { _ue5Connected = (_channel.IsWriterOpen()); }
 
     // 更新 EntityID 计数
     static uint32_t AllocEntityID_Static();
@@ -67,8 +73,16 @@ private:
     // 获取所属玩家
     uint8_t GetPlayerIndex(AbstractClass* obj) const;
 
+    // 开局全量同步：遍历所有 Cell，收集地形数据
+    void CollectWorldInitData(WorldInitPacket& packet);
+
+    // 开局全量同步：遍历 ECS，收集所有初始实体
+    void CollectWorldInitEntities(WorldInitPacket& packet);
+
     SharedMemChannel _channel;
     FramePacket      _framePacket;
+    uint32_t         _currentFrame = 0;
+    std::vector<uint8_t> _serializeBuffer;  // 序列化缓冲，避免 static 共用
 
     // 已发送过的资产文件名集合（按 AssetNameHash）
     std::unordered_set<uint32_t> _knownAssetNames;
@@ -82,3 +96,4 @@ private:
 void InitRenderBackend();
 void TickRenderBackend();
 void ShutdownRenderBackend();
+void SendWorldInit();  // 开局全量同步（在游戏场景加载完成后调用）

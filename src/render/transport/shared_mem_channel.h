@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 
@@ -18,15 +19,29 @@
 constexpr const wchar_t* SHARED_MEM_NAME = L"YRRenderer_FrameData";
 constexpr size_t         SHARED_MEM_SIZE = 16 * 1024 * 1024; // 16MB
 
+// 使用 std::atomic 保证跨进程内存可见性
+// memory_order_relaxed 在 x86 上零开销，足够单写单读场景
 struct SharedMemHeader
 {
-    volatile uint32_t writeOffset;
-    volatile uint32_t readOffset;
-    uint32_t          bufferSize;
-    volatile uint32_t frameCount;
-    volatile uint32_t controlFlag;
+    std::atomic<uint32_t> writeOffset;
+    std::atomic<uint32_t> readOffset;
+    uint32_t              bufferSize;
+    std::atomic<uint32_t> frameCount;
+    std::atomic<uint32_t> controlFlag;
 
     uint8_t* DataPtr() { return reinterpret_cast<uint8_t*>(this) + sizeof(SharedMemHeader); }
+
+    // 辅助: 原子读取
+    uint32_t GetWriteOffset() const { return writeOffset.load(std::memory_order_relaxed); }
+    uint32_t GetReadOffset() const  { return readOffset.load(std::memory_order_relaxed); }
+    uint32_t GetFrameCount() const  { return frameCount.load(std::memory_order_relaxed); }
+    uint32_t GetControlFlag() const { return controlFlag.load(std::memory_order_relaxed); }
+
+    // 辅助: 原子写入
+    void SetWriteOffset(uint32_t v) { writeOffset.store(v, std::memory_order_relaxed); }
+    void SetReadOffset(uint32_t v)  { readOffset.store(v, std::memory_order_relaxed); }
+    void SetFrameCount(uint32_t v)  { frameCount.store(v, std::memory_order_relaxed); }
+    void SetControlFlag(uint32_t v) { controlFlag.store(v, std::memory_order_relaxed); }
 };
 
 class SharedMemChannel
@@ -43,6 +58,9 @@ public:
 
     // gamemd 端：关闭写入端
     void CloseWriter();
+
+    // 检查写入端是否已初始化
+    bool IsWriterOpen() const { return _isWriter && _header != nullptr; }
 
     // 设置控制标志（握手/全量同步请求）
     void   SetControlFlag(uint32_t flag);
