@@ -202,6 +202,9 @@ class GameplayAbility
 	/** Returns true if this ability can be activated right now. Has no side effects */
 	virtual bool CanActivateAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
         const GameplayTagContainer* SourceTags = nullptr, const GameplayTagContainer* TargetTags = nullptr, GameplayTagContainer* OptionalRelevantTags = nullptr) const;
+
+    /** Called before CanActivateAbility when TriggerEventData is non-null. Returns true if this ability should respond to the event. */
+    virtual bool ShouldAbilityRespondToEvent(const GameplayAbilityActorInfo* ActorInfo, const GameplayEventData* TriggerEventData) const;
     
 	/** Actually activate ability, do not call this directly */
 	virtual void ActivateAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,

@@ -63,13 +63,29 @@ bool GameplayAbility::CanActivateAbility(const GameplayAbilitySpecHandle Handle,
         return false;
     }
     
-    // Check source tags against required/blocked tags
-    // Note: full implementation would check against ASC's owned tags
+    // Check all tag requirements (required/blocked tags for activation, source, target)
+    if (!DoesAbilitySatisfyTagRequirements(*ActorInfo->AbilitySystemCom))
+    {
+        return false;
+    }
+
+    // Check if this ability's input binding is currently blocked
+    const GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo);
+    if (Spec && Spec->InputID >= 0 && ActorInfo->AbilitySystemCom->IsAbilityInputBlocked(Spec->InputID))
+    {
+        return false;
+    }
+
     if (!K2_CanActivateAbility(*ActorInfo, Handle, OptionalRelevantTags))
     {
         return false;
     }
 
+    return true;
+}
+
+bool GameplayAbility::ShouldAbilityRespondToEvent(const GameplayAbilityActorInfo* ActorInfo, const GameplayEventData* TriggerEventData) const
+{
     return true;
 }
 
@@ -102,6 +118,11 @@ void GameplayAbility::PreActivate(const GameplayAbilitySpecHandle Handle, const 
         CurrentEventData = *TriggerEventData;
     }
 
+    if (Comp)
+    {
+        Comp->NotifyAbilityActivated(Handle, this);
+    }
+
     if (Comp && Define)
     {
         if (bIsBlockingOtherAbilities && !Define->BlockAbilitiesWithTag.IsEmpty())
@@ -123,8 +144,16 @@ void GameplayAbility::PreActivate(const GameplayAbilitySpecHandle Handle, const 
         }
     }
 
-    // Call the derived implementation
-    ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+    // Spec's active count must be incremented after applying block/cancel tags,
+    // otherwise the ability runs the risk of cancelling itself before it fully activates.
+    if (Comp)
+    {
+        GameplayAbilitySpec* Spec = Comp->FindAbilitySpecFromHandle(Handle);
+        if (Spec && Spec->ActiveCount < UINT8_MAX)
+        {
+            Spec->ActiveCount++;
+        }
+    }
 }
 
 void GameplayAbility::CallActivateAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,
@@ -132,6 +161,7 @@ void GameplayAbility::CallActivateAbility(const GameplayAbilitySpecHandle Handle
     const GameplayEventData* TriggerEventData)
 {
     PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+    ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool GameplayAbility::CommitAbility(const GameplayAbilitySpecHandle Handle, const GameplayAbilityActorInfo* ActorInfo,

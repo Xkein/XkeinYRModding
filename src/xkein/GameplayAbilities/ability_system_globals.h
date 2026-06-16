@@ -17,6 +17,9 @@ struct AbilitySystemGlobals
     PROPERTY()
     std::vector<AttributeSetDefine*> DefaultAttributeSets;
 
+    PROPERTY()
+    GameplayTag ActivateFailCanActivateAbilityTag; // [GAS] ActivateFailCanActivateAbilityTag=Ability.ActivateFail
+
     /** Curve tables loaded from [CurveTable.XXX] INI sections, keyed by table name.
      *  Each curve maps ability level (int32) → value (float).
      *  Uses unordered_map since StringName has std::hash but no operator<. */

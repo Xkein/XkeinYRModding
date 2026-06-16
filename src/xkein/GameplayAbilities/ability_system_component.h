@@ -310,6 +310,27 @@ public:
 	FUNCTION()
 	bool TryActivateAbility(GameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation = true);
 
+	/** 
+	 * Internal entry point for attempting to activate an ability.
+	 * Called by TryActivateAbility and TriggerAbilityFromGameplayEvent after initial checks.
+	 * @param Handle The ability spec handle to activate
+	 * @param TriggerEventData Optional event data passed from TriggerAbilityFromGameplayEvent
+	 * @return True if activation was attempted successfully
+	 */
+	bool InternalTryActivateAbility(GameplayAbilitySpecHandle Handle, const GameplayEventData* TriggerEventData = nullptr);
+
+	/** 
+	 * Activates an ability using a gameplay event as the trigger.
+	 * BlueprintCallable — scripts can trigger abilities via events.
+	 * Internally calls InternalTryActivateAbility after event validation.
+	 * @param Handle The ability spec handle to activate
+	 * @param TriggerEventData Event data containing instigator, target, context, etc.
+	 * @param bAllowRemoteActivation Whether to allow remote activation
+	 * @return True if activation was successfully initiated
+	 */
+	FUNCTION()
+	bool TriggerAbilityFromGameplayEvent(GameplayAbilitySpecHandle Handle, const GameplayEventData* TriggerEventData, bool bAllowRemoteActivation = true);
+
 	/**
 	 * Apply a gameplay effect to a target ability system component
 	 * This is the main entry point for applying effects
@@ -732,6 +753,13 @@ protected:
 
 	/** Tags that block ability activation on this ASC */
 	GameplayTagCountContainer BlockedAbilityTags;
+
+	/** 
+	 * Tags applied to the owner when InternalTryActivateAbility fails.
+	 * Used for feedback/debugging — e.g. a "Cooldown" tag when activation is blocked by cooldown.
+	 * Not networked, not saved — runtime only.
+	 */
+	GameplayTagContainer InternalTryActivateAbilityFailureTags;
 
 	std::vector<GameplayAbility*> AllReplicatedInstancedAbilities;
 

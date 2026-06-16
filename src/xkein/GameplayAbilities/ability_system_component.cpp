@@ -248,7 +248,7 @@ int32 AbilitySystemComponent::HandleGameplayEvent(const GameplayTag& EventTag, [
     {
         for (const auto& Handle : It->second)
         {
-            if (TryActivateAbility(Handle, true))
+            if (TriggerAbilityFromGameplayEvent(Handle, Payload))
             {
                 NumActivated++;
             }
@@ -573,81 +573,153 @@ void AbilitySystemComponent::MarkAbilitySpecDirty(GameplayAbilitySpec& Spec, boo
 bool AbilitySystemComponent::TryActivateAbility(GameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation)
 {
 	// Find the spec by handle
-	GameplayAbilitySpec* FoundSpec = nullptr;
-	for (auto& Spec : ActivatableAbilities)
-	{
-		if (Spec.Handle == AbilityToActivate)
-		{
-			FoundSpec = &Spec;
-			break;
-		}
-	}
-	
-	if (!FoundSpec || !FoundSpec->Ability)
+	GameplayAbilitySpec* Spec = FindAbilitySpecFromHandle(AbilityToActivate);
+	if (!Spec || !Spec->Ability)
 	{
 		return false;
 	}
 
-	// Check InputID blocking
-	if (FoundSpec->InputID >= 0 && IsAbilityInputBlocked(FoundSpec->InputID))
+	// Don't activate abilities that are pending removal or marked for removal after activation
+	if (Spec->PendingRemove || Spec->RemoveAfterActivation)
 	{
-		GameplayTagContainer FailureTags;
-		NotifyAbilityFailed(AbilityToActivate, FoundSpec->Ability, FailureTags);
 		return false;
 	}
 
-	// Check if ability tags are blocked
-	if (FoundSpec->Ability->Define)
+	// Build ActorInfo and validate
+	GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
+	if (ActorInfo.Owner == entt::null || ActorInfo.Avatar == entt::null)
 	{
-		if (AreAbilityTagsBlocked(FoundSpec->Ability->Define->AbilityTags))
-		{
-			GameplayTagContainer FailureTags = FoundSpec->Ability->Define->AbilityTags;
-			NotifyAbilityFailed(AbilityToActivate, FoundSpec->Ability, FailureTags);
-			return false;
-		}
+		return false;
 	}
-	
-	GameplayAbility* Ability = FoundSpec->Ability;
 
-    // For InstancedPerExecution, create a new instance for each activation
-    if (Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerExecution)
+	// Delegate to internal activation
+	return InternalTryActivateAbility(AbilityToActivate, nullptr);
+}
+
+bool AbilitySystemComponent::InternalTryActivateAbility(GameplayAbilitySpecHandle Handle, const GameplayEventData* TriggerEventData)
+{
+    // Validate handle
+    if (!Handle.IsValid())
     {
-        GameplayAbility* Instance = CreateNewInstanceOfAbility(*FoundSpec, Ability);
-        if (Instance)
-        {
-            Ability = Instance;
-        }
-    }
-    
-    // Build ActorInfo
-    GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
-    
-    // Check if ability can be activated
-    if (!Ability->CanActivateAbility(AbilityToActivate, &ActorInfo))
-    {
-        // Broadcast failure with reason tags
-        GameplayTagContainer FailureTags;
-        if (Ability->Define && !Ability->Define->ActivationRequiredTags.IsEmpty())
-        {
-            FailureTags = Ability->Define->ActivationRequiredTags;
-        }
-        NotifyAbilityFailed(AbilityToActivate, Ability, FailureTags);
+        gLogger->error("InternalTryActivateAbility: invalid Handle");
         return false;
     }
-    
-    // Create activation info (authority mode for single-player)
+
+    // Reset failure tags
+    InternalTryActivateAbilityFailureTags.GameplayTags.clear();
+
+    // Find the spec by handle
+    GameplayAbilitySpec* Spec = FindAbilitySpecFromHandle(Handle);
+    if (!Spec)
+    {
+        gLogger->error("InternalTryActivateAbility: spec not found for Handle");
+        return false;
+    }
+
+    // Lock ability list to defer removals during this activation
+    ABILITYLIST_SCOPE_LOCK();
+
+    // Build ActorInfo
+    GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
+
+    // Validate ActorInfo
+    if (ActorInfo.Owner == entt::null || ActorInfo.Avatar == entt::null)
+    {
+        gLogger->error("InternalTryActivateAbility: invalid Owner or Avatar");
+        return false;
+    }
+
+    // Validate ability
+    if (!Spec->Ability)
+    {
+        gLogger->error("InternalTryActivateAbility: spec has no Ability");
+        return false;
+    }
+
+    // Get ability source: instance if available, otherwise the CDO
+    GameplayAbility* InstancedAbility = Spec->GetPrimaryInstance();
+    GameplayAbility* AbilitySource = InstancedAbility ? InstancedAbility : Spec->Ability;
+
+    // If triggered by an event, check if this ability should respond to it
+    if (TriggerEventData != nullptr)
+    {
+        if (!AbilitySource->ShouldAbilityRespondToEvent(&ActorInfo, TriggerEventData))
+        {
+            NotifyAbilityFailed(Handle, AbilitySource, InternalTryActivateAbilityFailureTags);
+            return false;
+        }
+    }
+
+    // CanActivateAbility check with source/target tags from event data
+    {
+        const GameplayTagContainer* SourceTags = TriggerEventData ? &TriggerEventData->InstigatorTags : nullptr;
+        const GameplayTagContainer* TargetTags = TriggerEventData ? &TriggerEventData->TargetTags : nullptr;
+
+        if (!AbilitySource->CanActivateAbility(Handle, &ActorInfo, SourceTags, TargetTags, &InternalTryActivateAbilityFailureTags))
+        {
+            // If no failure tags were set by CanActivateAbility, add the default ActivateFail tag from globals
+            if (InternalTryActivateAbilityFailureTags.IsEmpty())
+            {
+                auto* globals = IniComponentLoader::GetGlobalIniComponent<AbilitySystemGlobals>();
+                if (globals && globals->ActivateFailCanActivateAbilityTag.IsValid())
+                {
+                    InternalTryActivateAbilityFailureTags.AddTag(globals->ActivateFailCanActivateAbilityTag);
+                }
+            }
+            NotifyAbilityFailed(Handle, AbilitySource, InternalTryActivateAbilityFailureTags);
+            return false;
+        }
+    }
+
+    // InstancedPerActor + already active: check retrigger or reject duplicate activation
+    if (AbilitySource->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor && Spec->IsActive())
+    {
+        // If retrigger is enabled and there's an existing instance, end it so it can be reused
+        if (Spec->Ability->Define && Spec->Ability->Define->bRetriggerInstancedAbility && InstancedAbility)
+        {
+            InstancedAbility->EndAbility(Handle, &ActorInfo, InstancedAbility->GetCurrentActivationInfo(), false, false);
+        }
+        else
+        {
+            // Reject duplicate activation of an already-active InstancedPerActor ability
+            NotifyAbilityFailed(Handle, AbilitySource, InternalTryActivateAbilityFailureTags);
+            return false;
+        }
+    }
+
+    // InstancedPerActor requires an instance to be present
+    if (AbilitySource->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor && !InstancedAbility)
+    {
+        NotifyAbilityFailed(Handle, AbilitySource, InternalTryActivateAbilityFailureTags);
+        return false;
+    }
+
+    // Setup ActivationInfo (authority mode for single-player lockstep)
     GameplayAbilityActivationInfo ActivationInfo;
     ActivationInfo.ActivationMode = EGameplayAbilityActivationMode::Authority;
-    
+
+    // InstancedPerExecution: create a new instance for each activation
+    if (AbilitySource->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerExecution)
+    {
+        GameplayAbility* Instance = CreateNewInstanceOfAbility(*Spec, Spec->Ability);
+        if (Instance)
+        {
+            AbilitySource = Instance;
+        }
+    }
+
     // Call the ability
-    Ability->CallActivateAbility(AbilityToActivate, &ActorInfo, ActivationInfo, nullptr, nullptr);
-    
-    FoundSpec->ActiveCount++;
-    
-    // Broadcast activation success
-    NotifyAbilityActivated(AbilityToActivate, Ability);
-    
+    AbilitySource->CallActivateAbility(Handle, &ActorInfo, ActivationInfo, nullptr, TriggerEventData);
+
+    // Mark dirty so listeners re-evaluate
+    MarkAbilitySpecDirty(*Spec);
+
     return true;
+}
+
+bool AbilitySystemComponent::TriggerAbilityFromGameplayEvent(GameplayAbilitySpecHandle Handle, const GameplayEventData* TriggerEventData, bool bAllowRemoteActivation)
+{
+    return InternalTryActivateAbility(Handle, TriggerEventData);
 }
 
 void AbilitySystemComponent::CancelAbility(GameplayAbility* Ability)
