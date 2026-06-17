@@ -2,20 +2,11 @@
 #include "core/reflection/reflection.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
+#include "xkein/GameplayAbilities/gameplay_cue_notify_define.h"
 #include "audio/audio.h"
 #include <entt/entity/fwd.hpp>
 #include <AnimClass.h>
 #include <GeneralStructures.h>
-
-/** Event type for gameplay cues */
-ENUM()
-enum EGameplayCueEvent : int
-{
-    OnActive,     // Cue activated (persistent effects begin)
-    WhileActive,  // Cue is active (per-frame for persistent)
-    Executed,     // One-shot execution (instant effects)
-    Removed       // Cue removed (persistent effects end)
-};
 
 /** Simple gameplay cue parameters, mirroring UE5.5 FGameplayCueParameters */
 CLASS(BindJs)
@@ -107,17 +98,10 @@ CLASS(BindJs)
 class GameplayCueNotify_Static
 {
 public:
-    /** Wwise audio event name to post on execute/active */
-    PROPERTY()
-    StringName WwiseEventName;
+    /** Configuration define. Set by InitFromDefine. Runtime reads config from here. */
+    const GameplayCueNotifyDefine_Static* Define = nullptr;
 
-    /** Animation type to spawn on execute (one-shot burst) */
-    PROPERTY()
-    AnimTypeClass* BurstAnim = nullptr;
-
-    /** If false, ignore duplicate OnActive events (UE parity: bAllowMultipleOnActiveEvents) */
-    PROPERTY()
-    bool bAllowMultipleOnActiveEvents = true;
+    void InitFromDefine(const GameplayCueNotifyDefine_Static* In) { Define = In; }
 
     /** One-shot execution: play audio + spawn visual. Called for Instant GE cues. */
     virtual void OnExecute(const GameplayTag& CueTag, const GameplayCueParameters& Params)
@@ -128,7 +112,7 @@ public:
     /** Cue activated (persistent effect begins). Same as OnExecute for Stateless. */
     virtual void OnActive(const GameplayTag& CueTag, const GameplayCueParameters& Params)
     {
-        if (bAllowMultipleOnActiveEvents)
+        if (Define ? Define->bAllowMultipleOnActiveEvents : true)
             PlayEffects(Params);
     }
 
@@ -142,34 +126,30 @@ public:
         return new GameplayCueNotify_Static();
     }
 
-    /** Does this notify handle this event type? Default: true. Override to filter. */
-    virtual bool HandlesEvent(EGameplayCueEvent EventType) const { return true; }
-
-    /** If true, prevents parent tag fallback when this notify handles the event.
-     *  If false, parent notifies ALSO run after this one. */
-    PROPERTY()
-    bool IsOverride = false;
-
-    /** Tag this notify is activated by (set during INI loading / registration) */
-    PROPERTY()
-    GameplayTag GameplayCueTag;
+    /** Does this notify handle this event type? Delegated to Define. */
+    virtual bool HandlesEvent(EGameplayCueEvent EventType) const
+    {
+        return Define ? Define->HandlesEvent(EventType) : true;
+    }
 
 private:
     void PlayEffects(const GameplayCueParameters& Params)
     {
         // Post Wwise audio event
-        if (!WwiseEventName.IsEmpty())
+        auto& wwiseName = Define ? Define->WwiseEventName : StringName();
+        if (!wwiseName.IsEmpty())
         {
-            auto eventID = AudioSystem::GetIDFromString(WwiseEventName.c_str());
+            auto eventID = AudioSystem::GetIDFromString(wwiseName.c_str());
             if (eventID != AK_INVALID_UNIQUE_ID)
                 AudioSystem::PostEvent(eventID, AudioSystem::GetNextGameObjId());
         }
 
         // Spawn one-shot animation
-        if (BurstAnim)
+        auto* burstAnim = Define ? Define->BurstAnim : nullptr;
+        if (burstAnim)
         {
             // AnimClass(AnimTypeClass*, CoordStruct, loopDelay=0, loopCount=1, flags=0x600, forceZAdjust=0, reverse=false)
-            auto* anim = new AnimClass(BurstAnim, Params.Location, 0, 1, 0x600, 0, false);
+            auto* anim = new AnimClass(burstAnim, Params.Location, 0, 1, 0x600, 0, false);
             if (anim)
                 anim->Start();
         }
@@ -183,30 +163,19 @@ CLASS(BindJs)
 class GameplayCueNotify_Actor
 {
 public:
-    /** Animation type for one-shot burst (OnBurst callback) */
-    PROPERTY()
-    AnimTypeClass* BurstAnim = nullptr;
+    /** Configuration define. Set by InitFromDefine. */
+    const GameplayCueNotifyDefine_Actor* Define = nullptr;
 
-    /** Animation type for persistent looping (OnBecomeRelevant → OnCeaseRelevant) */
-    PROPERTY()
-    AnimTypeClass* LoopingAnim = nullptr;
+    void InitFromDefine(const GameplayCueNotifyDefine_Actor* In) { Define = In; }
 
     /** Currently managed AnimClass instance. Created on OnBecomeRelevant,
      *  destroyed (nullptr) on OnCeaseRelevant. Subclasses can extend. */
     AnimClass* SpawnedAnimEntity = nullptr;
 
-    /** If true, auto-destroy this actor after OnCeaseRelevant completes */
-    PROPERTY()
-    bool bAutoDestroyOnRemove = true;
-
     /** Gating: prevent duplicate OnActive events */
-    PROPERTY()
-    bool bAllowMultipleOnActiveEvents = true;
     bool bHasHandledOnActiveEvent = false;
 
     /** Gating: prevent duplicate WhileActive events */
-    PROPERTY()
-    bool bAllowMultipleWhileActiveEvents = true;
     bool bHasHandledWhileActiveEvent = false;
 
     /** Gating: prevent duplicate OnRemove events */
@@ -232,20 +201,11 @@ public:
     PROPERTY()
     std::function<void(EGameplayCueEvent, const GameplayCueParameters&)> OnK2_HandleGameplayCue;
 
-    /** Does this notify handle this event type? Default: true. */
-    virtual bool HandlesEvent(EGameplayCueEvent EventType) const { return true; }
-
-    /** If true, prevents parent tag fallback. If false, parent notifies ALSO run. */
-    PROPERTY()
-    bool IsOverride = false;
-
-    /** Tag this notify is activated by */
-    PROPERTY()
-    GameplayTag GameplayCueTag;
-
-    /** Delay before auto-destroy after OnRemove (seconds). 0 = immediate. */
-    PROPERTY()
-    float AutoDestroyDelay = 0.0f;
+    /** Does this notify handle this event type? Delegated to Define. */
+    virtual bool HandlesEvent(EGameplayCueEvent EventType) const
+    {
+        return Define ? Define->HandlesEvent(EventType) : true;
+    }
 
     // ========================================================================
     // Lifecycle callbacks
@@ -254,9 +214,10 @@ public:
     /** One-shot burst: spawn a single AnimClass from BurstAnim */
     virtual void OnBurst(const GameplayTag& CueTag, const GameplayCueParameters& Params)
     {
-        if (BurstAnim)
+        auto* burstAnim = Define ? Define->BurstAnim : nullptr;
+        if (burstAnim)
         {
-            auto* anim = new AnimClass(BurstAnim, Params.Location, 0, 1, 0x600, 0, false);
+            auto* anim = new AnimClass(burstAnim, Params.Location, 0, 1, 0x600, 0, false);
             if (anim) anim->Start();
             // Note: this is a one-shot — we don't store it in SpawnedAnimEntity
         }
@@ -266,13 +227,14 @@ public:
      *  Creates persistent AnimClass from LoopingAnim. */
     virtual void OnBecomeRelevant(const GameplayTag& CueTag, const GameplayCueParameters& Params)
     {
-        if (bHasHandledOnActiveEvent && !bAllowMultipleOnActiveEvents)
+        if (bHasHandledOnActiveEvent && Define && !Define->bAllowMultipleOnActiveEvents)
             return;
         bHasHandledOnActiveEvent = true;
 
-        if (LoopingAnim)
+        auto* loopingAnim = Define ? Define->LoopingAnim : nullptr;
+        if (loopingAnim)
         {
-            SpawnedAnimEntity = new AnimClass(LoopingAnim, Params.Location, 0, -1, 0x600, 0, false);
+            SpawnedAnimEntity = new AnimClass(loopingAnim, Params.Location, 0, -1, 0x600, 0, false);
             if (SpawnedAnimEntity)
                 SpawnedAnimEntity->Start();
         }

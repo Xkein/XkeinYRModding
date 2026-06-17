@@ -1,42 +1,12 @@
 #include "ability_system_globals.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include "xkein/GameplayAbilities/gameplay_cue_manager.h"
-#include "xkein/GameplayAbilities/custom_gameplay_cue.h"
 
 #include <unordered_map>
 #include <vector>
 
 StringName GameplayAbilitySystem::ScriptFunctionCategoryAbility = "GameplayAbility";
 StringName GameplayAbilitySystem::ScriptFunctionCategoryAttributeSet = "AttributeSet";
-StringName GameplayAbilitySystem::ScriptFunctionCategoryCue = "GameplayCue";
-
-// Register custom cue notify factories for JS scripting
-static bool bCustomCueStaticRegistered = []() {
-    ScriptFunctionRegister::RegisterFunction(
-        GameplayAbilitySystem::ScriptFunctionCategoryCue,
-        "CustomCueNotify_Static",
-        new GameplayCueStaticCreator([]() -> GameplayCueNotify_Static* { return new CustomGameplayCueNotify_Static(); })
-    );
-    return true;
-}();
-
-static bool bCustomCueBurstLatentRegistered = []() {
-    ScriptFunctionRegister::RegisterFunction(
-        GameplayAbilitySystem::ScriptFunctionCategoryCue,
-        "CustomCueNotify_BurstLatent",
-        new GameplayCueActorCreator([]() -> GameplayCueNotify_Actor* { return new CustomGameplayCueNotify_BurstLatent(); })
-    );
-    return true;
-}();
-
-static bool bCustomCueLoopingRegistered = []() {
-    ScriptFunctionRegister::RegisterFunction(
-        GameplayAbilitySystem::ScriptFunctionCategoryCue,
-        "CustomCueNotify_Looping",
-        new GameplayCueActorCreator([]() -> GameplayCueNotify_Actor* { return new CustomGameplayCueNotify_Looping(); })
-    );
-    return true;
-}();
 
 void GameplayAbilitySystem::Tick()
 {
@@ -98,24 +68,6 @@ AttributeSet* GameplayAbilitySystem::CreateAttributeSet(const StringName& name, 
 GameplayCueManager* GameplayAbilitySystem::GetCueManager()
 {
     return GameplayCueManager::Get();
-}
-
-GameplayCueNotify_Static* GameplayAbilitySystem::CreateCueStatic(const StringName& name)
-{
-    GameplayCueStaticCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayCueStaticCreator>(ScriptFunctionCategoryCue, name);
-    if (!creatorFunc) {
-        return nullptr;
-    }
-    return (*creatorFunc)();
-}
-
-GameplayCueNotify_Actor* GameplayAbilitySystem::CreateCueActor(const StringName& name)
-{
-    GameplayCueActorCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayCueActorCreator>(ScriptFunctionCategoryCue, name);
-    if (!creatorFunc) {
-        return nullptr;
-    }
-    return (*creatorFunc)();
 }
 
 #include "yr/yr_all_events.h"

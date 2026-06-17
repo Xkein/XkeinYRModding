@@ -6,6 +6,7 @@
 #include <map>
 
 class AbilitySystemComponent;
+class GameplayCueNotifyDefine;
 
 /** One entry in the GameplayCueSet lookup table */
 struct GameplayCueNotifyData
@@ -13,8 +14,8 @@ struct GameplayCueNotifyData
     /** The gameplay tag this notify responds to */
     GameplayTag GameplayCueTag;
     
-    /** Factory name for the notify class (registered via ScriptFunction) */
-    StringName GameplayCueNotifyObj;
+    /** Direct pointer to the notify define instance (set by AfterLoadIni) */
+    GameplayCueNotifyDefine* DefinePtr = nullptr;
     
     /** Index of parent data for hierarchical fallback, -1 if none */
     int32 ParentDataIdx = -1;
@@ -30,6 +31,9 @@ struct GameplayCueSet
     /** Acceleration map: GameplayTag → index into GameplayCueData.
      *  Built by BuildAccelerationMap_Internal() with parent fallback. */
     std::map<GameplayTag, int32> GameplayCueDataMap;
+    
+    /** Lazy rebuild flag. Set to true in AddCueNotify, cleared after BuildAccelerationMap_Internal(). */
+    bool bNeedsRebuild = true;
     
     /** Main dispatch: look up CueTag and route to the appropriate notify.
      *  Falls back through ParentDataIdx chain if a notify doesn't handle the event. */

@@ -1,5 +1,5 @@
 #include "gameplay_cue_set.h"
-#include "ability_system_globals.h"
+#include "xkein/GameplayAbilities/gameplay_cue_notify_define.h"
 #include "ability_system_component.h"
 
 void GameplayCueSet::AddCueNotify(const GameplayCueNotifyData& Data)
@@ -86,64 +86,78 @@ void GameplayCueSet::HandleGameplayCue(AbilitySystemComponent* ASC, const Gamepl
     entt::entity TargetEntity = entt::null;
     if (ASC) TargetEntity = ASC->Owner;
 
-    // Step 3: Walk the ParentDataIdx chain WITH IsOverride control (UE: HandleGameplayCueNotify_Internal)
+    // Step 3: Walk the ParentDataIdx chain with DefinePtr dispatch (UE: HandleGameplayCueNotify_Internal)
     while (dataIdx >= 0)
     {
         const GameplayCueNotifyData& data = GameplayCueData[dataIdx];
 
+        if (!data.DefinePtr)
+        {
+            dataIdx = data.ParentDataIdx;
+            continue;
+        }
+
         // Set MatchedTagName for stacking guard use
         const_cast<GameplayCueParameters&>(Params).MatchedTagName = data.GameplayCueTag;
 
-        // --- Static path: CDO dispatch (UE: lines 296-311) ---
-        GameplayCueNotify_Static* nonInstancedCue = GameplayAbilitySystem::CreateCueStatic(data.GameplayCueNotifyObj);
-        if (nonInstancedCue && nonInstancedCue->HandlesEvent(EventType))
+        // --- Static path: non-instanced dispatch via static define (UE: lines 296-311) ---
+        if (auto* staticDefine = dynamic_cast<GameplayCueNotifyDefine_Static*>(data.DefinePtr))
         {
-            switch (EventType)
+            if (staticDefine->HandlesEvent(EventType))
             {
-                case EGameplayCueEvent::Executed:
-                    nonInstancedCue->OnExecute(CueTag, Params); break;
-                case EGameplayCueEvent::OnActive:
-                case EGameplayCueEvent::WhileActive:
-                    nonInstancedCue->OnActive(CueTag, Params); break;
-                case EGameplayCueEvent::Removed:
-                    nonInstancedCue->OnRemove(CueTag, Params); break;
-            }
+                GameplayCueNotify_Static nonInstancedCue;
+                nonInstancedCue.InitFromDefine(staticDefine);
 
-            // IsOverride: stop parent fallback if true (UE: lines 302-304)
-            if (!nonInstancedCue->IsOverride)
-                dataIdx = data.ParentDataIdx;
-            else
-                return;
-            continue;
+                switch (EventType)
+                {
+                    case EGameplayCueEvent::Executed:
+                        nonInstancedCue.OnExecute(CueTag, Params); break;
+                    case EGameplayCueEvent::OnActive:
+                    case EGameplayCueEvent::WhileActive:
+                        nonInstancedCue.OnActive(CueTag, Params); break;
+                    case EGameplayCueEvent::Removed:
+                        nonInstancedCue.OnRemove(CueTag, Params); break;
+                }
+
+                // IsOverride: stop parent fallback if true (UE: lines 302-304)
+                if (!staticDefine->IsOverride)
+                    dataIdx = data.ParentDataIdx;
+                else
+                    return;
+                continue;
+            }
+        }
+        // --- Actor path: instanced dispatch via actor define (UE: lines 313-349) ---
+        else if (auto* actorDefine = dynamic_cast<GameplayCueNotifyDefine_Actor*>(data.DefinePtr))
+        {
+            if (actorDefine->HandlesEvent(EventType))
+            {
+                auto* instancedCue = new GameplayCueNotify_Actor();
+                instancedCue->InitFromDefine(actorDefine);
+
+                // Central dispatch through HandleGameplayCue (handles gating, stacking, K2, auto-destroy internally)
+                instancedCue->HandleGameplayCue(TargetEntity, EventType, Params);
+
+                // Executed-then-Remove shortcut (UE: lines 316-319, 338-341)
+                bool bShouldDestroy = (EventType == EGameplayCueEvent::Executed && 
+                                       !Params.bGameplayEffectActive && 
+                                       actorDefine->bAutoDestroyOnRemove);
+                if (bShouldDestroy)
+                {
+                    instancedCue->HandleGameplayCue(TargetEntity, EGameplayCueEvent::Removed, Params);
+                }
+
+                // IsOverride: stop parent fallback if true (UE: lines 333-335)
+                if (!actorDefine->IsOverride)
+                    dataIdx = data.ParentDataIdx;
+                else
+                    return;
+                continue;
+            }
         }
 
-        // --- Actor path: centralized HandleGameplayCue dispatch (UE: lines 313-349) ---
-        GameplayCueNotify_Actor* instancedCue = GameplayAbilitySystem::CreateCueActor(data.GameplayCueNotifyObj);
-        if (instancedCue && instancedCue->HandlesEvent(EventType))
-        {
-            // Central dispatch through HandleGameplayCue (handles gating, stacking, K2, auto-destroy internally)
-            instancedCue->HandleGameplayCue(TargetEntity, EventType, Params);
-
-            // Executed-then-Remove shortcut (UE: lines 316-319, 338-341)
-            bool bShouldDestroy = (EventType == EGameplayCueEvent::Executed && 
-                                   !Params.bGameplayEffectActive && 
-                                   instancedCue->bAutoDestroyOnRemove);
-            if (bShouldDestroy)
-            {
-                instancedCue->HandleGameplayCue(TargetEntity, EGameplayCueEvent::Removed, Params);
-            }
-
-            // IsOverride: stop parent fallback if true (UE: lines 333-335)
-            if (!instancedCue->IsOverride)
-                dataIdx = data.ParentDataIdx;
-            else
-                return;
-            continue;
-        }
-
-        // Neither factory matched for this entry — try parent (fallback chain)
-        // (UE pattern: if notify exists but doesn't HandlesEvent, fall through to parent;
-        //  the `continue` above is reached only when the notify doesn't handle this event type)
+        // Neither define type handled this event — try parent (fallback chain)
+        // (UE pattern: if notify exists but doesn't HandlesEvent, fall through to parent)
         dataIdx = data.ParentDataIdx;
     }
 }

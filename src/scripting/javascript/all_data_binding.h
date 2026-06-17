@@ -15,7 +15,6 @@
 #include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_effect_removed.h"
 #include "xkein/GameplayAbilities/ability_task/ability_task_wait_input.h"
 #include "xkein/GameplayAbilities/ability_task/ability_task_wait_target_data.h"
-#include "xkein/GameplayAbilities/gameplay_cue_manager.h"
 #include "xkein/GameplayAbilities/gameplay_cue_notify_static.h"
 #include "xkein/GameplayAbilities/gameplay_cue_notify_actor.h"
 #include "xkein/GameplayAbilities/custom_gameplay_cue.h"
@@ -49,6 +48,11 @@ UsingCppType(GameplayEffectComponent);
 UsingCppType(GameplayCueNotify_Static);
 UsingCppType(GameplayCueNotify_Actor);
 UsingCppType(GameplayCueParameters);
+UsingCppType(GameplayCueNotifyDefine);
+UsingCppType(GameplayCueNotifyDefine_Static);
+UsingCppType(GameplayCueNotifyDefine_Burst);
+UsingCppType(GameplayCueNotifyDefine_Actor);
+UsingCppType(GameplayCueNotifyDefine_BurstLatent);
 UsingCppType(GameplayCueNotify_Burst);
 UsingCppType(GameplayCueNotify_BurstLatent);
 UsingCppType(GameplayCueNotify_Looping);
@@ -102,8 +106,6 @@ UsingCppType(GameplayAbilityTargetActor_Radius);
 UsingCppType(GameplayAbilityTargetActor_GroundTrace);
 UsingCppType(GameplayAbilityTargetActor_ActorPlacement);
 UsingCppType(GameplayAbilityWorldReticle);
-UsingCppType(GameplayCueStaticCreator);
-UsingCppType(GameplayCueActorCreator);
 UsingCppType(GameplayTagQuery);
 UsingCppType(GameplayTagRequirements);
 UsingCppType(AbilityTask);

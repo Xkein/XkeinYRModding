@@ -1,9 +1,5 @@
 #include "gameplay_cue_manager.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
-#include "xkein/GameplayAbilities/ability_system_globals.h"
-#include "scripting/common/script_function.h"
-#include <CCINIClass.h>
-#include <cstring>
 
 GameplayCueManager* GameplayCueManager::Get()
 {
@@ -43,79 +39,14 @@ void GameplayCueManager::HandleGameplayCue(AbilitySystemComponent* ASC, const Ga
     bIsHandlingCue = false;
 }
 
-void GameplayCueManager::AddCueNotify(const GameplayTag& Tag, GameplayCueNotify_Static* Cue)
+void GameplayCueManager::AddCueNotify(const GameplayTag&, GameplayCueNotify_Static*)
 {
-    if (!Cue) return;
-    StaticCues[Tag].push_back(Cue);
-    
-    // Register with CueSet (Task 22 will call BuildAccelerationMap after INI loading)
 }
 
-void GameplayCueManager::AddCueNotify(const GameplayTag& Tag, GameplayCueNotify_Actor* Cue)
+void GameplayCueManager::AddCueNotify(const GameplayTag&, GameplayCueNotify_Actor*)
 {
-    if (!Cue) return;
-    ActorCues[Tag].push_back(Cue);
 }
 
-void GameplayCueManager::AfterLoadIni(IniReader& parser, const char* pSection, const char* pKey)
+void GameplayCueManager::AfterLoadIni(IniReader&, const char*, const char*)
 {
-    CCINIClass* pIni = parser.GetIni();
-    if (!pIni) return;
-
-    for (auto* pSec = pIni->Sections.First(); pSec && pSec->IsValid(); pSec = pSec->Next())
-    {
-        const char* sectionName = pSec->Name;
-        if (!sectionName) continue;
-
-        // Match sections starting with "GameplayCue."
-        if (strncmp(sectionName, "GameplayCue.", 12) != 0) continue;
-
-        GameplayTag tag;
-        tag.TagName = StringName(sectionName + 12); // skip "GameplayCue." prefix
-        if (!tag.IsValid()) continue;
-
-        // Read StaticNotify list (comma-separated factory names)
-        std::vector<StringName> staticNames;
-        if (parser.Read(sectionName, "StaticNotify", staticNames))
-        {
-            for (const auto& name : staticNames)
-            {
-                GameplayCueNotify_Static* cue = GameplayAbilitySystem::CreateCueStatic(name);
-                if (cue)
-                {
-                    AddCueNotify(tag, cue);
-                }
-
-                // Register to RuntimeCueSet for tag-based lookup with parent fallback
-                GameplayCueNotifyData data;
-                data.GameplayCueTag = tag;
-                data.GameplayCueNotifyObj = name;
-                data.ParentDataIdx = -1;
-                RuntimeCueSet.AddCueNotify(data);
-            }
-        }
-
-        // Read ActorNotify list (comma-separated factory names)
-        std::vector<StringName> actorNames;
-        if (parser.Read(sectionName, "ActorNotify", actorNames))
-        {
-            for (const auto& name : actorNames)
-            {
-                GameplayCueNotify_Actor* cue = GameplayAbilitySystem::CreateCueActor(name);
-                if (cue)
-                {
-                    AddCueNotify(tag, cue);
-                }
-
-                // Register to RuntimeCueSet for tag-based lookup with parent fallback
-                GameplayCueNotifyData data;
-                data.GameplayCueTag = tag;
-                data.GameplayCueNotifyObj = name;
-                data.ParentDataIdx = -1;
-                RuntimeCueSet.AddCueNotify(data);
-            }
-        }
-    }
-
-    RuntimeCueSet.BuildAccelerationMap_Internal();
 }

@@ -6,6 +6,7 @@
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec_handle.h"
 #include "xkein/GameplayAbilities/active_gameplay_effect_handle.h"
+#include "xkein/GameplayAbilities/gameplay_cue_notify_define.h"
 #include <entt/signal/sigh.hpp>
 #include <map>
 #include <memory>
@@ -747,9 +748,6 @@ private:
     /** Internal storage of active effects */
 	std::vector<ActiveGameplayEffect*> Effects;
 };
-
-// Forward-declare EGameplayCueEvent (defined in gameplay_cue.h)
-enum EGameplayCueEvent : int;
 
 /** Trigger gameplay cues for a GameplayEffect. Typically called after Instant GE execution. */
 void TriggerGameplayCues(const GameplayEffect* Effect, const GameplayEffectSpec& Spec,

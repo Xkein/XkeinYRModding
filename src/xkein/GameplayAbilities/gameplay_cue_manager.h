@@ -2,13 +2,10 @@
 #include "core/reflection/reflection.h"
 #include "yr/component/ini_component.h"
 #include "yr/parse/ini_reader.h"
-#include "scripting/common/script_function.h"
 #include "xkein/GameplayAbilities/gameplay_cue.h"
 #include "xkein/GameplayAbilities/gameplay_cue_set.h"
 #include "xkein/GameplayAbilities/gameplay_cue_translator.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
-#include <map>
-#include <vector>
 
 class AbilitySystemComponent;
 
@@ -19,12 +16,6 @@ struct GameplayCueManager
 {
     /** Access the global instance (registered via IniComponentLoader::GetGlobalIniComponent) */
     static GameplayCueManager* Get();
-
-    /** Map of tag → registered static cue notify instances */
-    std::map<GameplayTag, std::vector<GameplayCueNotify_Static*>> StaticCues;
-
-    /** Map of tag → registered actor-based cue notify instances */
-    std::map<GameplayTag, std::vector<GameplayCueNotify_Actor*>> ActorCues;
 
     /** The runtime cue set that handles tag-to-notify lookup and dispatch.
      *  Replaces direct map iteration in HandleGameplayCue. */
@@ -56,19 +47,4 @@ struct GameplayCueManager
     void AfterLoadIni(IniReader& parser, const char* pSection, const char* pKey);
 };
 
-/** Script function creator for static gameplay cue notifies.
- *  Registered factories allow creating cue notify instances by name from INI. */
-CLASS(BindJs)
-struct GameplayCueStaticCreator : public ScriptFunction<GameplayCueNotify_Static*()>
-{
-    FUNCTION()
-    GameplayCueStaticCreator(std::function<GameplayCueNotify_Static*()> func) : ScriptFunction(func) { }
-};
 
-/** Script function creator for actor-based gameplay cue notifies. */
-CLASS(BindJs)
-struct GameplayCueActorCreator : public ScriptFunction<GameplayCueNotify_Actor*()>
-{
-    FUNCTION()
-    GameplayCueActorCreator(std::function<GameplayCueNotify_Actor*()> func) : ScriptFunction(func) { }
-};

@@ -9,10 +9,10 @@
 void GameplayCueNotify_Actor::HandleGameplayCue(entt::entity TargetEntity, EGameplayCueEvent EventType, const GameplayCueParameters& Params)
 {
     // --- Event gating (UE: GameplayCueNotify_Actor.cpp:225-241) ---
-    if (EventType == EGameplayCueEvent::OnActive && !bAllowMultipleOnActiveEvents && bHasHandledOnActiveEvent)
+    if (EventType == EGameplayCueEvent::OnActive && Define && !Define->bAllowMultipleOnActiveEvents && bHasHandledOnActiveEvent)
         return;
 
-    if (EventType == EGameplayCueEvent::WhileActive && !bAllowMultipleWhileActiveEvents && bHasHandledWhileActiveEvent)
+    if (EventType == EGameplayCueEvent::WhileActive && Define && !Define->bAllowMultipleWhileActiveEvents && bHasHandledWhileActiveEvent)
         return;
 
     if (EventType == EGameplayCueEvent::Removed && bHasHandledOnRemoveEvent)
@@ -39,7 +39,7 @@ void GameplayCueNotify_Actor::HandleGameplayCue(entt::entity TargetEntity, EGame
     switch (EventType)
     {
     case EGameplayCueEvent::OnActive:
-        OnBecomeRelevant(GameplayCueTag, Params);
+        OnBecomeRelevant(Define ? Define->GameplayCueTag : GameplayTag(), Params);
         bHasHandledOnActiveEvent = true;
         break;
 
@@ -47,21 +47,21 @@ void GameplayCueNotify_Actor::HandleGameplayCue(entt::entity TargetEntity, EGame
         // WhileActive: call OnBecomeRelevant if not already handled by OnActive
         if (!bHasHandledWhileActiveEvent)
         {
-            OnBecomeRelevant(GameplayCueTag, Params);
+            OnBecomeRelevant(Define ? Define->GameplayCueTag : GameplayTag(), Params);
             bHasHandledWhileActiveEvent = true;
         }
         break;
 
     case EGameplayCueEvent::Executed:
-        OnBurst(GameplayCueTag, Params);
+        OnBurst(Define ? Define->GameplayCueTag : GameplayTag(), Params);
         break;
 
     case EGameplayCueEvent::Removed:
         bHasHandledOnRemoveEvent = true;
-        OnCeaseRelevant(GameplayCueTag, Params);
+        OnCeaseRelevant(Define ? Define->GameplayCueTag : GameplayTag(), Params);
 
         // Auto-destroy after remove (UE: lines 282-293)
-        if (bAutoDestroyOnRemove)
+        if (Define && Define->bAutoDestroyOnRemove)
         {
             GameplayCueFinishedCallback();
         }

@@ -6,7 +6,6 @@
 #include "xkein/GameplayAbilities/gameplay_ability.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
-#include "xkein/GameplayAbilities/gameplay_cue.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include <cstring>
 #include <unordered_map>
@@ -85,20 +84,12 @@ public:
     static StringName ScriptFunctionCategoryAbility;
 	PROPERTY()
     static StringName ScriptFunctionCategoryAttributeSet;
-	PROPERTY()
-    static StringName ScriptFunctionCategoryCue;
 
     static GameplayAbility* CreateAbility(const StringName& name, GameplayAbilityDefine* define, AbilitySystemComponent* component);
     static AttributeSet* CreateAttributeSet(const StringName& name, AttributeSetDefine* define, AbilitySystemComponent* component);
 
     /** Access the global GameplayCueManager singleton */
     static struct GameplayCueManager* GetCueManager();
-
-    /** Create a static cue notify instance by factory name */
-    static GameplayCueNotify_Static* CreateCueStatic(const StringName& name);
-
-    /** Create an actor-based cue notify instance by factory name */
-    static GameplayCueNotify_Actor* CreateCueActor(const StringName& name);
 
     FUNCTION()
     static inline AbilitySystemComponent* GetAbilitySystemComponent(entt::entity entity) {

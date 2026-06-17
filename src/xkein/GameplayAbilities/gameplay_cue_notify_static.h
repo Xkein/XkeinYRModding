@@ -44,12 +44,6 @@ public:
         }
     }
 
-    /** Burst only handles Executed events (one-shot), not OnActive/WhileActive/Removed */
-    virtual bool HandlesEvent(EGameplayCueEvent EventType) const override
-    {
-        return EventType == EGameplayCueEvent::Executed;
-    }
-
     FUNCTION()
     static GameplayCueNotify_Burst* CreateInstance()
     {

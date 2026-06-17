@@ -121,7 +121,7 @@ public:
 	
 	/** How the ability is instanced when executed. This limits what an ability can do in its implementation. */
 	PROPERTY()
-	EGameplayAbilityInstancingPolicy InstancingPolicy;
+	EGameplayAbilityInstancingPolicy InstancingPolicy {EGameplayAbilityInstancingPolicy::InstancedPerActor};
 	
 	/** if true, and trying to activate an already active instanced ability, end it and re-trigger it. */
 	PROPERTY()

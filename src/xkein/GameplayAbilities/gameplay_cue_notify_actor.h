@@ -13,12 +13,6 @@ CLASS(BindJs)
 class GameplayCueNotify_BurstLatent : public GameplayCueNotify_Actor
 {
 public:
-    /** BurstLatent only handles Executed events (one-shot with latent actions) */
-    virtual bool HandlesEvent(EGameplayCueEvent EventType) const override
-    {
-        return EventType == EGameplayCueEvent::Executed;
-    }
-
     /** JS-scriptable OnBurst callback (BlueprintImplementableEvent pattern).
      *  Called when this burst cue fires. Script can override for custom behavior. */
     PROPERTY()
