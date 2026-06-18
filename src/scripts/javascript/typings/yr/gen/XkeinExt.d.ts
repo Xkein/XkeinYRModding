@@ -541,6 +541,16 @@ class AbilitySystemComponent
     // If bAllowRemoteActivation is true, it will remotely activate local/server abilities, if false it will only try to locally activate the ability
     // public bool TryActivateAbility(GameplayAbilitySpecHandle AbilityToActivate, bool bAllowRemoteActivation = true)
     TryActivateAbility(AbilityToActivate_0 : GameplayAbilitySpecHandle, bAllowRemoteActivation_1 : boolean) : boolean;
+    // Activates an ability using a gameplay event as the trigger.
+    // BlueprintCallable — scripts can trigger abilities via events.
+    // Internally calls InternalTryActivateAbility after event validation.
+    // 
+    // @param Handle The ability spec handle to activate
+    // @param TriggerEventData Event data containing instigator, target, context, etc.
+    // @param bAllowRemoteActivation Whether to allow remote activation
+    // @return True if activation was successfully initiated
+    // public bool TriggerAbilityFromGameplayEvent(GameplayAbilitySpecHandle Handle, GameplayEventData const * TriggerEventData, bool bAllowRemoteActivation = true)
+    TriggerAbilityFromGameplayEvent(Handle_0 : GameplayAbilitySpecHandle, TriggerEventData_1 : GameplayEventData, bAllowRemoteActivation_2 : boolean) : boolean;
     // Attempt to activate an ability by its CDO class
     // public bool TryActivateAbilityByDefine(GameplayAbilityDefine * AbilityDefine, bool bAllowRemoteActivation = true)
     TryActivateAbilityByDefine(AbilityDefine_0 : GameplayAbilityDefine, bAllowRemoteActivation_1 : boolean) : boolean;
@@ -862,6 +872,58 @@ class AttributeMetaData
     // public bool CanStack
     m_CanStack : boolean;
 }
+// Base define for gameplay cue notifies. Provides shared config fields.
+// Each [GameplayCue.X] INI section auto-loads as a derived type via $Type.
+// GameplayCueNotifyDefine
+class GameplayCueNotifyDefine
+{
+    // public GameplayTag GameplayCueTag
+    m_GameplayCueTag : GameplayTag;
+    // public bool IsOverride
+    m_IsOverride : boolean;
+}
+// Static (non-instanced, one-shot) cue notify define.
+// GameplayCueNotifyDefine_Static
+class GameplayCueNotifyDefine_Static
+    extends GameplayCueNotifyDefine
+{
+    // public StringName WwiseEventName
+    m_WwiseEventName : StringName;
+    // public AnimTypeClass * BurstAnim
+    m_BurstAnim : AnimTypeClass;
+    // public bool bAllowMultipleOnActiveEvents
+    m_bAllowMultipleOnActiveEvents : boolean;
+}
+// Burst (one-shot, Executed-only) cue notify define. Extends Static.
+// GameplayCueNotifyDefine_Burst
+class GameplayCueNotifyDefine_Burst
+    extends GameplayCueNotifyDefine_Static
+{
+}
+// Actor (instanced, stateful) cue notify define.
+// GameplayCueNotifyDefine_Actor
+class GameplayCueNotifyDefine_Actor
+    extends GameplayCueNotifyDefine
+{
+    // public AnimTypeClass * BurstAnim
+    m_BurstAnim : AnimTypeClass;
+    // public AnimTypeClass * LoopingAnim
+    m_LoopingAnim : AnimTypeClass;
+    // public bool bAutoDestroyOnRemove
+    m_bAutoDestroyOnRemove : boolean;
+    // public float AutoDestroyDelay
+    m_AutoDestroyDelay : float;
+    // public bool bAllowMultipleOnActiveEvents
+    m_bAllowMultipleOnActiveEvents : boolean;
+    // public bool bAllowMultipleWhileActiveEvents
+    m_bAllowMultipleWhileActiveEvents : boolean;
+}
+// BurstLatent (one-shot, Executed-only) instanced cue notify define. Extends Actor.
+// GameplayCueNotifyDefine_BurstLatent
+class GameplayCueNotifyDefine_BurstLatent
+    extends GameplayCueNotifyDefine_Actor
+{
+}
 // GameplayAbilityTargetData_SingleTargetHit
 // Stores the result of a single trace/query hit:
 // the world-space hit location and the entity that was hit.
@@ -935,22 +997,6 @@ class GameplayCueNotify_Static
     // Factory method for ScriptFunction registration
     // public static GameplayCueNotify_Static * CreateInstance()
     static CreateInstance() : GameplayCueNotify_Static;
-    // Wwise audio event name to post on execute/active
-    // public StringName WwiseEventName
-    m_WwiseEventName : StringName;
-    // Animation type to spawn on execute (one-shot burst)
-    // public AnimTypeClass * BurstAnim
-    m_BurstAnim : AnimTypeClass;
-    // If false, ignore duplicate OnActive events (UE parity: bAllowMultipleOnActiveEvents)
-    // public bool bAllowMultipleOnActiveEvents
-    m_bAllowMultipleOnActiveEvents : boolean;
-    // If true, prevents parent tag fallback when this notify handles the event.
-    // If false, parent notifies ALSO run after this one.
-    // public bool IsOverride
-    m_IsOverride : boolean;
-    // Tag this notify is activated by (set during INI loading / registration)
-    // public GameplayTag GameplayCueTag
-    m_GameplayCueTag : GameplayTag;
 }
 // Instanced (stateful) gameplay cue notify. Extend this for cues that need to
 // own and manage visual entities (AnimClass) over their lifetime.
@@ -961,33 +1007,9 @@ class GameplayCueNotify_Actor
     // Factory method for ScriptFunction registration
     // public static GameplayCueNotify_Actor * CreateInstance()
     static CreateInstance() : GameplayCueNotify_Actor;
-    // Animation type for one-shot burst (OnBurst callback)
-    // public AnimTypeClass * BurstAnim
-    m_BurstAnim : AnimTypeClass;
-    // Animation type for persistent looping (OnBecomeRelevant → OnCeaseRelevant)
-    // public AnimTypeClass * LoopingAnim
-    m_LoopingAnim : AnimTypeClass;
-    // If true, auto-destroy this actor after OnCeaseRelevant completes
-    // public bool bAutoDestroyOnRemove
-    m_bAutoDestroyOnRemove : boolean;
-    // Gating: prevent duplicate OnActive events
-    // public bool bAllowMultipleOnActiveEvents
-    m_bAllowMultipleOnActiveEvents : boolean;
-    // Gating: prevent duplicate WhileActive events
-    // public bool bAllowMultipleWhileActiveEvents
-    m_bAllowMultipleWhileActiveEvents : boolean;
     // Generic K2 handler (BlueprintImplementableEvent) — called for every event type before specific dispatch
     // public std::function<void (*)(EGameplayCueEvent _0, GameplayCueParameters const& _1)> OnK2_HandleGameplayCue
     m_OnK2_HandleGameplayCue : (_0 : EGameplayCueEvent, _1 : GameplayCueParameters) => void| undefined;
-    // If true, prevents parent tag fallback. If false, parent notifies ALSO run.
-    // public bool IsOverride
-    m_IsOverride : boolean;
-    // Tag this notify is activated by
-    // public GameplayTag GameplayCueTag
-    m_GameplayCueTag : GameplayTag;
-    // Delay before auto-destroy after OnRemove (seconds). 0 = immediate.
-    // public float AutoDestroyDelay
-    m_AutoDestroyDelay : float;
 }
 // GameplayAbilityCreator
 class GameplayAbilityCreator
@@ -1026,8 +1048,6 @@ class GameplayAbilitySystem
     static s_ScriptFunctionCategoryAbility : StringName;
     // public static StringName ScriptFunctionCategoryAttributeSet
     static s_ScriptFunctionCategoryAttributeSet : StringName;
-    // public static StringName ScriptFunctionCategoryCue
-    static s_ScriptFunctionCategoryCue : StringName;
 }
 // AbilityTask_Repeat
 // Repeatedly fires an action callback at a specified time interval.
@@ -1536,37 +1556,6 @@ class GameplayAbilityWorldReticle
     m_bIsTargetValid : boolean;
     // public Vector3D<int> ReticleLocation
     m_ReticleLocation : Vector3D;
-}
-// Script function creator for static gameplay cue notifies.
-// Registered factories allow creating cue notify instances by name from INI.
-// GameplayCueStaticCreator
-class GameplayCueStaticCreator
-    extends ScriptFunction_GameplayCueNotify_Static____
-{
-    // public GameplayCueStaticCreator(std::function<GameplayCueNotify_Static * (*)()> func)
-    constructor(func_0 : () => GameplayCueNotify_Static| undefined);
-}
-// ScriptFunction<GameplayCueNotify_Static * ()>
-class ScriptFunction_GameplayCueNotify_Static____
-    extends ScriptFunctionBase
-{
-    // public ScriptFunction(std::function<GameplayCueNotify_Static * (*)()> func)
-    constructor(func_0 : () => GameplayCueNotify_Static| undefined);
-}
-// Script function creator for actor-based gameplay cue notifies.
-// GameplayCueActorCreator
-class GameplayCueActorCreator
-    extends ScriptFunction_GameplayCueNotify_Actor____
-{
-    // public GameplayCueActorCreator(std::function<GameplayCueNotify_Actor * (*)()> func)
-    constructor(func_0 : () => GameplayCueNotify_Actor| undefined);
-}
-// ScriptFunction<GameplayCueNotify_Actor * ()>
-class ScriptFunction_GameplayCueNotify_Actor____
-    extends ScriptFunctionBase
-{
-    // public ScriptFunction(std::function<GameplayCueNotify_Actor * (*)()> func)
-    constructor(func_0 : () => GameplayCueNotify_Actor| undefined);
 }
 // Base class for gameplay effect magnitude calculations that can capture
 // and act on multiple attributes. Subclass and override GetAttributeCaptureDefinitions()
