@@ -57,10 +57,10 @@ inline void CreateEntity(T* pObject)
     entt::entity entity = gEntt->create();
     extMap[pObject]     = entity;
     gEntt->emplace<YrEntityComponent<T>>(entity, pObject);
-    //if constexpr (std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>)
-    //{
-    //    gLogger->info("yr_entity::CreateEntity: create entity ({} - {})", (void*)pObject, (int)pObject->WhatAmI());
-    //}
+	if constexpr (std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>)
+	{
+		gEntt->emplace<YrEntityAbstractComponent>(entity, pObject);
+	}
 }
 
 template<typename T>
@@ -432,6 +432,21 @@ void load(Archive& ar, YrEntityComponent<T>& data)
     Serialization::Load(ar, data.yrObject);
 };
 
+inline void prologue(SERIALIZATION_INPUT_ARCHIVE& ar, YrEntityAbstractComponent const&) { }
+inline void prologue(SERIALIZATION_OUTPUT_ARCHIVE& ar, YrEntityAbstractComponent const&) { }
+inline void epilogue(SERIALIZATION_INPUT_ARCHIVE& ar, YrEntityAbstractComponent const&) { }
+inline void epilogue(SERIALIZATION_OUTPUT_ARCHIVE& ar, YrEntityAbstractComponent const&) { }
+template<class Archive>
+void save(Archive& ar, YrEntityAbstractComponent const& data)
+{
+    Serialization::Save(ar, data.yrObject);
+};
+template<class Archive>
+void load(Archive& ar, YrEntityAbstractComponent& data)
+{
+    Serialization::Load(ar, data.yrObject);
+};
+
 template<typename T>
 void YrEntityComponentLoadDeferredProcess()
 {
@@ -504,4 +519,5 @@ void yr_entity::Init()
     Serialization::RegisterSerialization<YrEntityComponent<WarheadTypeClass>>();
     // Serialization::RegisterSerialization<YrEntityComponent<ThemeControl>>();
     Serialization::RegisterSerialization<YrEntityComponent<MouseClass>>();
+    Serialization::RegisterSerialization<YrEntityAbstractComponent>();
 }

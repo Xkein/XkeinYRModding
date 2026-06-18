@@ -103,7 +103,7 @@ namespace _core_detail_
 } // namespace _core_detail_
 
 template<auto Candidate, typename Type>
-auto register_func(entt::meta_factory<Type>& factory, const entt::id_type id)
+FORCEINLINE auto register_func(entt::meta_factory<Type>& factory, const entt::id_type id)
 {
     if constexpr (is_fastcall_v<Candidate> || is_stdcall_v<Candidate>)
     {
@@ -116,7 +116,7 @@ auto register_func(entt::meta_factory<Type>& factory, const entt::id_type id)
 }
 
 template<auto Data, typename Type>
-auto& meta_getter_array_klass(Type& klass)
+FORCEINLINE auto& meta_getter_array_klass(Type& klass)
 {
     static_assert(std::is_member_object_pointer_v<decltype(Data)>, "not member object");
     using array_type = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<decltype(Data), Type &>>>;
@@ -124,34 +124,34 @@ auto& meta_getter_array_klass(Type& klass)
     return reinterpret_cast<std_array_type&>(std::invoke(Data, klass));
 }
 template<auto Data, typename Type>
-auto meta_getter_array_static()
+FORCEINLINE auto meta_getter_array_static()
 {
     static_assert(!std::is_member_object_pointer_v<decltype(Data)>, "not member object");
     return *Data;
 }
 
 template<auto Data, typename Type>
-auto register_member(entt::meta_factory<Type>& factory, const entt::id_type id)
+FORCEINLINE auto register_member(entt::meta_factory<Type>& factory, const entt::id_type id)
 {
     static_assert(std::is_member_object_pointer_v<decltype(Data)>, "not member object");
     using data_type = std::invoke_result_t<decltype(Data), Type&>;
     if constexpr (std::is_move_assignable_v<data_type>)
     {
-        return factory.data<Data, entt::as_ref_t>(id);
+        return factory.template data<Data, entt::as_ref_t>(id);
     }
     else
     {
         if constexpr (std::is_copy_assignable_v<data_type>)
         {
-            return factory.data<nullptr, Data, entt::as_ref_t>(id);
+            return factory.template data<nullptr, Data, entt::as_ref_t>(id);
         }
         else if constexpr (std::is_array_v<std::remove_reference_t<data_type>>)
         {
-            return factory.data<nullptr, meta_getter_array_klass<Data, Type>, entt::as_ref_t>(id);
+            return factory.template data<nullptr, meta_getter_array_klass<Data, Type>, entt::as_ref_t>(id);
         }
         else
         {
-            return factory.data<nullptr, Data, entt::as_ref_t>(id);
+            return factory.template data<nullptr, Data, entt::as_ref_t>(id);
         }
     }
 
@@ -159,24 +159,24 @@ auto register_member(entt::meta_factory<Type>& factory, const entt::id_type id)
 }
 
 template<auto Data, typename Type>
-auto register_field(entt::meta_factory<Type>& factory, const entt::id_type id)
+FORCEINLINE auto register_field(entt::meta_factory<Type>& factory, const entt::id_type id)
 {
     static_assert(!std::is_member_object_pointer_v<decltype(Data)>, "unexpected member object!");
     using data_type = std::remove_pointer_t<decltype(Data)>;
     if constexpr (is_constexpr_var<Data>) {
-        return factory.data<Data, entt::as_cref_t>(id);
+        return factory.template data<Data, entt::as_cref_t>(id);
     }
     else if constexpr (std::is_array_v<std::remove_reference_t<data_type>>)
     {
-        return factory.data<Data, entt::as_ref_t>(id);
+        return factory.template data<Data, entt::as_ref_t>(id);
     }
     else {
-        return factory.data<Data, entt::as_ref_t>(id);
+        return factory.template data<Data, entt::as_ref_t>(id);
     }
 }
 
 template<auto Data, typename Type>
-auto register_data(entt::meta_factory<Type>& factory, const entt::id_type id)
+FORCEINLINE auto register_data(entt::meta_factory<Type>& factory, const entt::id_type id)
 {
     if constexpr (std::is_member_object_pointer_v<decltype(Data)>)
     {
@@ -200,7 +200,7 @@ ClassMeta* GetOrAddClassMeta()
 }
 
 template<typename From, typename To>
-void register_ref_convertion() {
+FORCEINLINE void register_ref_convertion() {
     constexpr auto conv = +[](const void *instance) {
         return entt::forward_as_meta(*static_cast<To*>(const_cast<From*>(static_cast<const From *>(instance))));
     };

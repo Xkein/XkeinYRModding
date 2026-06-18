@@ -3,6 +3,25 @@ declare module "YrExtCore" {
 import { $Ref } from "puerts";
 import { CDTimerClass, AbstractClass, AbstractTypeClass, CCINIClass, LandType, Action, AircraftClass, AircraftTypeClass, AnimClass, AnimTypeClass, BuildingClass, BuildingTypeClass, BulletClass, BulletTypeClass, DamageState, DirType, FireError, GadgetClass, GadgetFlag, HouseClass, HouseTypeClass, InfantryClass, InfantryTypeClass, IStream, KeyModifier, MissionClass, ObjectClass, RulesClass, SuperClass, SuperWeaponTypeClass, TActionClass, TechnoClass, TechnoTypeClass, TerrainClass, TerrainTypeClass, TriggerClass, UnitClass, UnitTypeClass, Vector3D, WarheadTypeClass, WeaponTypeClass, ThemeClass, ThemeControl, Vector2D, AbstractType, FootClass, PassengersClass } from "YRpp";
 import { AKRESULT } from "Wwise";
+// StringName
+class StringName
+{
+    // public StringName(char const * Str)
+    constructor(Str_0 : string);
+    // public char const * c_str() const
+    c_str() : string;
+    // public unsigned int GetId() const
+    GetId() : unsigned_int;
+    // High-performance check for empty/uninitialized state
+    // public bool IsEmpty() const
+    IsEmpty() : boolean;
+}
+// YrEntityAbstractComponent
+class YrEntityAbstractComponent
+{
+    // public AbstractClass * yrObject
+    m_yrObject : AbstractClass;
+}
 // IniReader
 class IniReader
 {
@@ -15,18 +34,18 @@ class IniReader
     // public char const * value() const
     value() : string;
     // public unsigned int max_size() const
-    max_size() : number;
+    max_size() : unsigned_int;
     // public bool empty() const
     empty() : boolean;
     // basic string reader
     // public unsigned int ReadString(char const * pSection, char const * pKey)
-    ReadString(pSection_0 : string, pKey_1 : string) : number;
+    ReadString(pSection_0 : string, pKey_1 : string) : unsigned_int;
 }
 // IniComponentLoader
 class IniComponentLoader
 {
     // public static void RegisterAbstractTypeLoadingFunc(AbstractType targetType, std::function<void (*)(IniReader * _0, AbstractTypeClass * _1)> loadingFunc)
-    static RegisterAbstractTypeLoadingFunc(targetType_0 : AbstractType, loadingFunc_1 : (_0 : IniReader, _1 : AbstractTypeClass) => void) : void;
+    static RegisterAbstractTypeLoadingFunc(targetType_0 : AbstractType, loadingFunc_1 : (_0 : IniReader, _1 : AbstractTypeClass) => void| undefined) : void;
 }
 // YrHookOverrideReturn<void>
 class YrHookOverrideReturn_void_
@@ -248,11 +267,11 @@ class YrBulletConstructEvent
     // public TechnoClass * pOwner
     m_pOwner : TechnoClass;
     // public int damage
-    m_damage : number;
+    m_damage : int;
     // public WarheadTypeClass * pWarhead
     m_pWarhead : WarheadTypeClass;
     // public int speed
-    m_speed : number;
+    m_speed : int;
     // public bool bright
     m_bright : boolean;
 }
@@ -586,9 +605,9 @@ class YrGadgetInputEvent
     // public DWORD * pKey
     m_pKey : DWORD;
     // public int mouseX
-    m_mouseX : number;
+    m_mouseX : int;
     // public int mouseY
-    m_mouseY : number;
+    m_mouseY : int;
     // public bool forceRedraw
     m_forceRedraw : boolean;
     // public GadgetFlag flags
@@ -678,7 +697,7 @@ class YrMissionExecuteEvent
 class YrHookOverrideReturn_int_
 {
     // public void OverrideReturn(int val)
-    OverrideReturn(val_0 : number) : void;
+    OverrideReturn(val_0 : int) : void;
 }
 // YrObjectReceiveDamageEvent
 class YrObjectReceiveDamageEvent
@@ -687,9 +706,9 @@ class YrObjectReceiveDamageEvent
     // public ObjectClass * pObject
     m_pObject : ObjectClass;
     // public ref_wrapper<int> pDamage
-    m_pDamage : $Ref<number>;
+    m_pDamage : $Ref<int>;
     // public int DistanceFromEpicenter
-    m_DistanceFromEpicenter : number;
+    m_DistanceFromEpicenter : int;
     // public WarheadTypeClass * pWH
     m_pWH : WarheadTypeClass;
     // public ObjectClass * Attacker
@@ -780,7 +799,7 @@ class YrObjectGetFLHEvent
     // public Vector3D<int> * pDest
     m_pDest : Vector3D;
     // public int idxWeapon
-    m_idxWeapon : number;
+    m_idxWeapon : int;
     // public Vector3D<int> BaseCoords
     m_BaseCoords : Vector3D;
 }
@@ -960,7 +979,7 @@ class YrTechnoFireEvent
     // public AbstractClass * pTarget
     m_pTarget : AbstractClass;
     // public int nWeaponIndex
-    m_nWeaponIndex : number;
+    m_nWeaponIndex : int;
 }
 // YrHookOverrideReturn<BulletClass *>
 class YrHookOverrideReturn_BulletClass__
@@ -986,7 +1005,7 @@ class YrTechnoGetFireErrorEvent
     // public AbstractClass * pTarget
     m_pTarget : AbstractClass;
     // public int weaponIndex
-    m_weaponIndex : number;
+    m_weaponIndex : int;
     // public bool ignoreRange
     m_ignoreRange : boolean;
 }
@@ -1183,7 +1202,7 @@ class YrThemePlayEvent
     // public ThemeClass * theme
     m_theme : ThemeClass;
     // public int index
-    m_index : number;
+    m_index : int;
 }
 // YrThemeStopEvent
 class YrThemeStopEvent
@@ -1366,11 +1385,11 @@ class YrWndProcEvent
     // public HWND__ * hWnd
     m_hWnd : HWND__;
     // public unsigned int uMsg
-    m_uMsg : number;
+    m_uMsg : unsigned_int;
     // public unsigned int wParam
-    m_wParam : number;
+    m_wParam : unsigned_int;
     // public long lParam
-    m_lParam : number;
+    m_lParam : long;
 }
 // YrMainWndProcEvent
 class YrMainWndProcEvent
@@ -1381,7 +1400,7 @@ class YrMainWndProcEvent
 class YrHookOverrideReturn_long_
 {
     // public void OverrideReturn(long val)
-    OverrideReturn(val_0 : number) : void;
+    OverrideReturn(val_0 : long) : void;
 }
 // YrBootEvent
 class YrBootEvent
@@ -1406,7 +1425,7 @@ class VariantEventPack
     // public VariantEventPack(CustomEventType customType)
     constructor(customType_0 : CustomEventType);
     // public bool SetData(void * data, uint8 size)
-    SetData(data_0 : ArrayBuffer, size_1 : number) : boolean;
+    SetData(data_0 : ArrayBuffer, size_1 : uint8) : boolean;
     // public void * GetData()
     GetData() : ArrayBuffer;
 }
@@ -1420,20 +1439,20 @@ class EventPack_unsignedchar_99__
     m_IsExecuted : boolean;
     // value from FRAMEINFO pack in Extract_Compressed_Events
     // public char HouseIndex
-    m_HouseIndex : number;
+    m_HouseIndex : char;
     // as above
     // public uint32 Frame
-    m_Frame : number;
+    m_Frame : uint32;
     // public CustomEventType CustomType
     m_CustomType : CustomEventType;
     // public uint8 Size
-    m_Size : number;
+    m_Size : uint8;
 }
 // NetPackDispatch
 class NetPackDispatch
 {
     // public static void RegisterVariantEvent(CustomEventType type, std::basic_string<char, std::char_traits<char>, std::allocator<char>> eventName, std::function<void (*)(VariantEventPack * _0)> execute)
-    static RegisterVariantEvent(type_0 : CustomEventType, eventName_1 : string, execute_2 : (_0 : VariantEventPack) => void) : void;
+    static RegisterVariantEvent(type_0 : CustomEventType, eventName_1 : string, execute_2 : (_0 : VariantEventPack) => void| undefined) : void;
     // public static void AddVariantEvent(VariantEventPack& eventPack)
     static AddVariantEvent(eventPack_0 : VariantEventPack) : void;
 }
@@ -1453,7 +1472,7 @@ class Serialization
     // public static void SaveKey(char const * key, std::basic_string<char, std::char_traits<char>, std::allocator<char>> val)
     static SaveKey(key_0 : string, val_1 : string) : void;
     // public static void RegisterStepHandler(ESerializationStep step, std::function<void (*)()> handler)
-    static RegisterStepHandler(step_0 : ESerializationStep, handler_1 : () => void) : void;
+    static RegisterStepHandler(step_0 : ESerializationStep, handler_1 : () => void| undefined) : void;
 }
 // YrHelper
 class YrHelper
@@ -1464,7 +1483,9 @@ class YrHelper
 
 class YrExtCore {
     // int const EventPackMaxDataSize = sizeof(EventPackRaw)-offsetof(EventPackRaw,Custom.Data)
-    static s_EventPackMaxDataSize : number;
+    static s_EventPackMaxDataSize : int;
+    // YrEntityAbstractComponent * GetYrAbstractComponent(entity entity)
+    static GetYrAbstractComponent(entity_0 : entt_entity) : YrEntityAbstractComponent;
     // std::basic_string<char, std::char_traits<char>, std::allocator<char>> GetStackTrace()
     static GetStackTrace() : string;
 }

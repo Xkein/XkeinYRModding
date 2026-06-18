@@ -24,9 +24,25 @@ rule("codegen-cpp")
         local auto_gendir = common_tool.get_auto_gendir(target:name())
         local gendir = path.absolute(path.join(auto_gendir, "codegen"))
         local header_list = {}
-        for _, headerfile in ipairs(target:headerfiles()) do
-            table.insert(header_list, path.absolute(headerfile))
+        local header_set = {}
+        local function add_headerfiles(source_target)
+            for _, headerfile in ipairs(source_target:headerfiles()) do
+                local abs_headerfile = path.absolute(headerfile)
+                if not header_set[abs_headerfile] then
+                    header_set[abs_headerfile] = true
+                    table.insert(header_list, abs_headerfile)
+                end
+            end
         end
+        add_headerfiles(target)
+        if target:name() == "YrExtCore" then
+            import("core.project.project")
+            local core_target = project.target("Core")
+            assert(core_target, "codegen-cpp: YrExtCore cannot find Core target")
+            -- YrExtCore is a special case: codegen also scans Core headers.
+            add_headerfiles(core_target)
+        end
+        table.sort(header_list)
 
         local templates = extraconf.templates or common_tool.get_default_templates()
         local template_dir = path.join(os.projectdir(), "src/template")

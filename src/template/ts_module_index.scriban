@@ -66,6 +66,9 @@ import { CDTimerClass, AbstractClass, AbstractTypeClass, CCINIClass, LandType, A
 {{- if module_name != "Wwise"}}
 import { AKRESULT } from "Wwise";
 {{- end }}
+{{- if module_name != "YrExtCore"}}
+import { StringName } from "YrExtCore";
+{{- end }}
 {{- end }}
 
 {{- for klass in module_classes }}

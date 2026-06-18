@@ -1,6 +1,146 @@
 #pragma once
 #include "scripting/javascript/yr_data_bindings.h"
 #ifndef __HEADER_TOOL__
+#include "xkein/GameplayAbilities/ability_system_component.h"
+#include "xkein/GameplayAbilities/ability_system_globals.h"
+#include "xkein/GameplayAbilities/gameplay_effect_execution_calculation.h"
+#include "xkein/GameplayAbilities/gameplay_mod_magnitude_calculation.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_repeat.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_spawn_actor.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_attribute_change.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_delay.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_effect_applied.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_event.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_tag.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_gameplay_effect_removed.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_input.h"
+#include "xkein/GameplayAbilities/ability_task/ability_task_wait_target_data.h"
+#include "xkein/GameplayAbilities/gameplay_cue_notify_static.h"
+#include "xkein/GameplayAbilities/gameplay_cue_notify_actor.h"
+#include "xkein/GameplayAbilities/custom_gameplay_cue.h"
+#include "xkein/GameplayAbilities/gameplay_ability_target_actor.h"
+#include "xkein/GameplayAbilities/gameplay_ability_world_reticle.h"
+#include "xkein/GameplayAbilities/gameplay_effect_types.h"
+#include "xkein/GameplayAbilities/custom_gameplay_ability.h"
+#include "xkein/GameplayAbilities/custom_attribute_set.h"
+
+UsingCppType(ActiveGameplayEffectHandle);
+UsingCppType(ActiveGameplayEffectsContainer);
+UsingCppType(AttributeSet);
+UsingCppType(CustomAttributeSet);
+UsingCppType(CustomGameplayAbility);
+UsingCppType(AttributeSetDefine);
+UsingCppType(AttributeMetaData);
+UsingCppType(AbilityTriggerData);
+UsingCppType(AbilitySystemComponent);
+UsingCppType(AbilitySystemComponentType);
+UsingCppType(GameplayAbility);
+UsingCppType(GameplayAbilityDefine);
+UsingCppType(GameplayAbilitySystem);
+UsingCppType(GameplayAttribute);
+UsingCppType(GameplayAttributeData);
+UsingCppType(GameplayAbilityTargetData);
+UsingCppType(GameplayAbilityTargetDataHandle);
+UsingCppType(GameplayAbilitySpecDef);
+UsingCppType(GameplayEventData);
+UsingCppType(GameplayEffect);
+UsingCppType(GameplayEffectComponent);
+UsingCppType(GameplayCueNotify_Static);
+UsingCppType(GameplayCueNotify_Actor);
+UsingCppType(GameplayCueParameters);
+UsingCppType(GameplayCueNotifyDefine);
+UsingCppType(GameplayCueNotifyDefine_Static);
+UsingCppType(GameplayCueNotifyDefine_Burst);
+UsingCppType(GameplayCueNotifyDefine_Actor);
+UsingCppType(GameplayCueNotifyDefine_BurstLatent);
+UsingCppType(GameplayCueNotify_Burst);
+UsingCppType(GameplayCueNotify_BurstLatent);
+UsingCppType(GameplayCueNotify_Looping);
+UsingCppType(GameplayCueNotify_BurstEffects);
+UsingCppType(GameplayCueNotify_LoopingEffects);
+UsingCppType(CustomGameplayCueNotify_Static);
+UsingCppType(CustomGameplayCueNotify_BurstLatent);
+UsingCppType(CustomGameplayCueNotify_Looping);
+UsingCppType(GameplayTag);
+UsingCppType(GameplayTagContainer);
+UsingCppType(GameplayAbilitySpec);
+UsingCppType(GameplayAbilitySpecHandle);
+UsingCppType(GameplayAbilityActorInfo);
+UsingCppType(GameplayAbilityActivationInfo);
+
+UsingStdVector(AttributeSet);
+UsingStdVector(AttributeSet*);
+UsingStdVector(AttributeSetDefine*);
+UsingStdVector(AbilityTriggerData);
+UsingStdVector(GameplayTag);
+UsingStdVector(GameplayTag*);
+UsingStdVector(GameplayAttribute);
+UsingStdVector(GameplayAbility);
+UsingStdVector(GameplayAbility*);
+UsingStdVector(GameplayAbilityDefine*);
+UsingStdVector(GameplayAbilitySpec);
+UsingStdVector(GameplayEffect);
+UsingStdVector(GameplayEffect*);
+UsingStdVector(GameplayEffectCue*);
+UsingStdVector(GameplayEffectComponent*);
+UsingStdVector(GameplayEffectExecutionDefinition);
+UsingStdVector(GameplayModifierInfo);
+
+UsingCppType(GameplayAbilityTargetData_SingleTargetHit);
+UsingCppType(GameplayAbilityTargetData_ActorArray);
+UsingCppType(GameplayAbilityTargetData_LocationInfo);
+UsingCppType(AbilityTask_Repeat);
+UsingCppType(AbilityTask_SpawnActor);
+UsingCppType(AbilityTask_WaitAttributeChange);
+UsingCppType(AbilityTask_WaitDelay);
+UsingCppType(AbilityTask_WaitGameplayEffectApplied);
+UsingCppType(AbilityTask_WaitGameplayEvent);
+UsingCppType(AbilityTask_WaitGameplayTagAdded);
+UsingCppType(AbilityTask_WaitGameplayTagRemoved);
+UsingCppType(AbilityTask_WaitGameplayEffectRemoved);
+UsingCppType(AbilityTask_WaitInput);
+UsingCppType(AbilityTask_WaitTargetData);
+UsingCppType(GameplayAbilityTargetActor);
+UsingCppType(GameplayAbilityTargetActor_LineTrace);
+UsingCppType(GameplayAbilityTargetActor_Radius);
+UsingCppType(GameplayAbilityTargetActor_GroundTrace);
+UsingCppType(GameplayAbilityTargetActor_ActorPlacement);
+UsingCppType(GameplayAbilityWorldReticle);
+UsingCppType(GameplayTagQuery);
+UsingCppType(GameplayTagRequirements);
+UsingCppType(AbilityTask);
+UsingCppType(AbilityTaskCreator);
+UsingCppType(GameplayAbilityCreator);
+UsingCppType(AttributeSetCreator);
+UsingCppType(GameplayEffectSpec);
+UsingCppType(GameplayEffectCue);
+UsingCppType(FGameplayEffectQuery);
+UsingCppType(FScalableFloat);
+UsingCppType(GameplayEffectCalculation);
+UsingCppType(GameplayEffectExecutionCalculation);
+UsingCppType(GameplayEffectExecutionDefinition);
+UsingCppType(FGameplayEffectModCallbackData);
+UsingCppType(FGameplayModifierEvaluatedData);
+UsingCppType(GameplayModMagnitudeCalculation);
+UsingCppType(GameplayModifierInfo);
+UsingCppType(GameplayEffectModifierMagnitude);
+UsingCppType(GameplayEffectAttributeCaptureDefinition);
+UsingCppType(FGameplayEffectCustomExecutionParameters);
+UsingCppType(FGameplayEffectCustomExecutionOutput);
+UsingCppType(AttributeBasedFloat);
+UsingCppType(CustomCalculationBasedFloat);
+UsingCppType(SetByCallerFloat);
+UsingCppType(ScriptFunction<GameplayAbility * (GameplayAbilityDefine * _0, AbilitySystemComponent * _1)>);
+UsingCppType(ScriptFunction<AttributeSet * (AttributeSetDefine * _0, AbilitySystemComponent * _1)>);
+UsingCppType(ScriptFunction<AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1)>);
+UsingCppType(ScriptFunction<GameplayCueNotify_Static * ()>);
+UsingCppType(ScriptFunction<GameplayCueNotify_Actor * ()>);
+
+UsingStdVector(GameplayEffectAttributeCaptureDefinition);
+UsingStdVector(entt::entity);
+UsingStdVector(StringName);
+UsingStdVector(AnimTypeClass*);
+
 #include "scripting/javascript/js_events.h"
 UsingCppTypeWithRefCache(JsGameEvents);
 UsingCppTypeWithRefCache(JsPhysicsEvents);
@@ -9,6 +149,13 @@ UsingCppTypeWithRefCache(JsEventOnDtor);
 UsingCppTypeWithRefCache(JsEvents);
 #include "scripting/javascript/js_cpp_helper.h"
 UsingCppTypeWithRefCache(JsCppHelper);
+
+#include "scripting/common/script_function.h"
+UsingCppType(ScriptFunctionBase);
+UsingCppType(ScriptFunctionRegister);
+
+#include "core/string/string_name.h"
+UsingCppType(StringName);
 
 #include "audio/audio.h"
 UsingCppType(WwiseSoundBankRef);
@@ -36,6 +183,9 @@ MuteFunctionPtr(std::remove_pointer_t<gainput::FilterFunc_T>);
 UsingCppType(XkeinTools);
 UsingCppType(QueryVolume);
 UsingCppType(QuerySphere);
+
+#include "yr/api/yr_entity.h"
+UsingCppType(YrEntityAbstractComponent);
 
 #include "yr/parse/ini_reader.h"
 UsingCppType(IniReader);

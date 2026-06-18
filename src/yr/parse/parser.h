@@ -2,6 +2,7 @@
 #ifndef __HEADER_TOOL__
 #include "runtime/logger/logger.h"
 #include "core/reflection/reflection.h"
+#include "core/string/string_name.h"
 #include "yr/debug_util.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -19,6 +20,8 @@ namespace detail
     {
         using NotImplement = void;
     };
+
+    YREXTCORE_API void* TryFindPolymorphicAutoLoad(const entt::type_info& baseType, const char* sectionName);
 
     template<typename T>
     concept parser_has_implement = requires(T a) {
@@ -157,6 +160,16 @@ namespace detail
         }
     };
 
+    template<>
+    struct Parser<StringName>
+    {
+        static bool Read(std::string_view str, StringName& result)
+        {
+            result = StringName(str);
+            return true;
+        }
+    };
+
     template<size_t Size>
     struct Parser<char[Size]>
     {
@@ -230,6 +243,10 @@ namespace detail
                     if (func)
                     {
                         ptr = func.invoke({}, copied_str.data()).cast<T*>();
+                    }
+                    else if (void* polyPtr = TryFindPolymorphicAutoLoad(entt::type_id<T>(), copied_str.data()))
+                    {
+                        ptr = static_cast<T*>(polyPtr);
                     }
                     else {
                         gLogger->error("could not parse {}: it is not auto load!", typeid(T).name());

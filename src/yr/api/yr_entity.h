@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/reflection/reflection.h"
 #include "runtime/ecs/entt.h"
 
 class AbstractClass;
@@ -8,6 +9,13 @@ template<typename T>
 struct YrEntityComponent
 {
     T* yrObject;
+};
+
+CLASS(BindJs)
+struct YrEntityAbstractComponent
+{
+    PROPERTY()
+    AbstractClass* yrObject;
 };
 
 namespace yr_entity
@@ -42,4 +50,9 @@ inline entt::meta_type GetYrClassMeta(AbstractClass const* pAbstract) {
 }
 inline entt::meta_type GetYrClassMeta(size_t whatAmI){
     return yr_entity::GetYrClassMeta(whatAmI);
+}
+
+FUNCTION(BindJs)
+inline YrEntityAbstractComponent* GetYrAbstractComponent(entt::entity entity) {
+    return gEntt->try_get<YrEntityAbstractComponent>(entity);
 }

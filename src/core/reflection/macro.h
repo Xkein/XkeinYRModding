@@ -12,5 +12,7 @@
 
 #define GENERATED_BODY(type_name) \
     friend class __Gen_Type_##type_name; \
+    friend void __Gen_Type_##type_name##__Register(); \
+    friend void __JsRegister_##type_name(); \
 
 
