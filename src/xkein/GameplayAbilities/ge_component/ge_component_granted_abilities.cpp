@@ -92,6 +92,8 @@ void GrantedAbilitiesGEComponent::GrantAbilities(ActiveGameplayEffectHandle Acti
         GameplayAbilitySpec AbilitySpec(AbilityConfig.Ability, Level);
         AbilitySpec.InputID = AbilityConfig.InputID;
         AbilitySpec.SetByCallerTagMagnitudes = ActiveGESpec.SetByCallerMagnitudes;
+        // @deprecated: Also copy name-based magnitudes
+        AbilitySpec.SetByCallerNameMagnitudes = ActiveGESpec.SetByCallerNameMagnitudes;
         AbilitySpec.GameplayEffectHandle = ActiveGEHandle;
 
         ASC->GiveAbility(AbilitySpec);

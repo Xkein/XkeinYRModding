@@ -85,6 +85,8 @@ UsingStdVector(GameplayEffectCue*);
 UsingStdVector(GameplayEffectComponent*);
 UsingStdVector(GameplayEffectExecutionDefinition);
 UsingStdVector(GameplayModifierInfo);
+UsingStdVector(FConditionalGameplayEffect);
+UsingStdVector(FGameplayEffectExecutionScopedModifierInfo);
 
 UsingCppType(GameplayAbilityTargetData_SingleTargetHit);
 UsingCppType(GameplayAbilityTargetData_ActorArray);
@@ -121,6 +123,8 @@ UsingCppType(GameplayEffectExecutionCalculation);
 UsingCppType(GameplayEffectExecutionDefinition);
 UsingCppType(FGameplayEffectModCallbackData);
 UsingCppType(FGameplayModifierEvaluatedData);
+UsingCppType(FGameplayEffectExecutionScopedModifierInfo);
+UsingCppType(FConditionalGameplayEffect);
 UsingCppType(GameplayModMagnitudeCalculation);
 UsingCppType(GameplayModifierInfo);
 UsingCppType(GameplayEffectModifierMagnitude);

@@ -106,7 +106,9 @@ struct GameplayAbilitySpecDef
 	GameplayAbilitySpecDef()
 		: LevelScalableFloat(1.0f), RemovalPolicy(EGameplayEffectGrantedAbilityRemovePolicy::CancelAbilityImmediately),
 		InputID(-1), SourceObject(entt::null)
-	{}
+	{
+		SetByCallerTagMagnitudes.clear();
+	}
 
 	/** The ability to grant */
 	PROPERTY()
@@ -126,6 +128,9 @@ struct GameplayAbilitySpecDef
 	/** Policy for what happens when the granting GE is removed */
 	PROPERTY()
 	EGameplayEffectGrantedAbilityRemovePolicy RemovalPolicy;
+
+	/** SetByCaller magnitudes keyed by tag (propagated from granting GE) */
+	std::map<GameplayTag, float> SetByCallerTagMagnitudes;
 };
 
 /**
@@ -185,8 +190,12 @@ struct GameplayAbilitySpec
 	PROPERTY()
 	ActiveGameplayEffectHandle GameplayEffectHandle;
 
-	/** Passed on SetByCaller magnitudes if this ability was granted by a GE */
+	/** Passed on SetByCaller magnitudes if this ability was granted by a GE (by tag) */
 	std::map<GameplayTag, float> SetByCallerTagMagnitudes;
+
+	/** Passed on SetByCaller magnitudes if this ability was granted by a GE (by name) */
+	// @deprecated
+	std::map<StringName, float> SetByCallerNameMagnitudes;
 
 	/** InputID, if bound to an input */
 	PROPERTY()

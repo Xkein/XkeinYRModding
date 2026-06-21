@@ -18,7 +18,8 @@ struct FGameplayEffectQuery
     /** Match by specific GameplayEffect definition. nullptr matches all. */
     const GameplayEffect* EffectDef = nullptr;
 
-    /** Match effects whose captured source tags contain all of these (parent hierarchy match). */
+    /** Match effects whose captured source tags contain all of these (parent hierarchy match).
+     *  When bSourceTagsMatchAny is true, uses HasAny instead of HasAll. */
     GameplayTagContainer SourceTags;
 
     /** Match effects whose captured target tags contain all of these (parent hierarchy match). */
@@ -32,6 +33,25 @@ struct FGameplayEffectQuery
 
     /** Complex tag query for the owning ASC. nullptr skips this check. */
     const GameplayTagQuery* OwningTagQuery = nullptr;
+
+    // ============================================================
+    // Phase 7: Enhanced filtering
+    // ============================================================
+
+    /** If true, SourceTags uses HasAny matching instead of HasAll. */
+    bool bSourceTagsMatchAny = false;
+
+    /** Match effects whose definition's asset tags match these tags (checked via Def->GetAssetTags()). */
+    GameplayTagContainer EffectTagsToMatch;
+
+    /** If true, EffectTagsToMatch uses HasAny matching; otherwise uses HasAll. */
+    bool bEffectTagsMatchAny = false;
+
+    /** Custom match delegate for project-specific filter logic. Called after all other checks pass. */
+    std::function<bool(const ActiveGameplayEffect&)> CustomMatchDelegate;
+
+    /** Ignore these specific effect handles during matching. */
+    std::vector<ActiveGameplayEffectHandle> IgnoreHandles;
 
     /** Check if an active gameplay effect matches this query */
     bool Matches(const ActiveGameplayEffect& ActiveGE) const;
@@ -47,13 +67,77 @@ struct FGameplayEffectQuery
             && !TargetTags.IsValid()
             && !GrantedTags.IsValid()
             && ModifyingAttribute.AttributeName.IsEmpty()
-            && OwningTagQuery == nullptr;
+            && OwningTagQuery == nullptr
+            && !EffectTagsToMatch.IsValid()
+            && !CustomMatchDelegate
+            && IgnoreHandles.empty();
+    }
+
+    // ============================================================
+    // Static factory methods
+    // ============================================================
+
+    /** Create a query that matches effects whose captured source tags contain ANY of the given tags. */
+    static FGameplayEffectQuery MakeQuery_MatchAnyOwningTags(const GameplayTagContainer& Tags)
+    {
+        FGameplayEffectQuery Query;
+        Query.SourceTags = Tags;
+        Query.bSourceTagsMatchAny = true;
+        return Query;
+    }
+
+    /** Create a query that matches effects whose captured source tags contain ALL of the given tags. */
+    static FGameplayEffectQuery MakeQuery_MatchAllOwningTags(const GameplayTagContainer& Tags)
+    {
+        FGameplayEffectQuery Query;
+        Query.SourceTags = Tags;
+        Query.bSourceTagsMatchAny = false;
+        return Query;
+    }
+
+    /** Create a query that matches effects whose definition's asset tags contain ANY of the given tags. */
+    static FGameplayEffectQuery MakeQuery_MatchAnyEffectTags(const GameplayTagContainer& Tags)
+    {
+        FGameplayEffectQuery Query;
+        Query.EffectTagsToMatch = Tags;
+        Query.bEffectTagsMatchAny = true;
+        return Query;
+    }
+
+    /** Create a query that matches effects whose definition's asset tags contain ALL of the given tags. */
+    static FGameplayEffectQuery MakeQuery_MatchAllEffectTags(const GameplayTagContainer& Tags)
+    {
+        FGameplayEffectQuery Query;
+        Query.EffectTagsToMatch = Tags;
+        Query.bEffectTagsMatchAny = false;
+        return Query;
     }
 };
 
 inline bool FGameplayEffectQuery::Matches(const ActiveGameplayEffect& ActiveGE) const
 {
-    return Matches(ActiveGE.Spec);
+    // Check IgnoreHandles
+    if (!IgnoreHandles.empty())
+    {
+        for (const auto& IgnoreHandle : IgnoreHandles)
+        {
+            if (IgnoreHandle == ActiveGE.Handle)
+                return false;
+        }
+    }
+
+    // Check spec-level criteria
+    if (!Matches(ActiveGE.Spec))
+        return false;
+
+    // Check CustomMatchDelegate
+    if (CustomMatchDelegate)
+    {
+        if (!CustomMatchDelegate(ActiveGE))
+            return false;
+    }
+
+    return true;
 }
 
 inline bool FGameplayEffectQuery::Matches(const GameplayEffectSpec& Spec) const
@@ -62,9 +146,20 @@ inline bool FGameplayEffectQuery::Matches(const GameplayEffectSpec& Spec) const
     if (EffectDef != nullptr && Spec.Def != EffectDef)
         return false;
 
-    // SourceTags check — captured source tags must have all query source tags
-    if (SourceTags.IsValid() && !Spec.CapturedSourceTags.HasAll(SourceTags))
-        return false;
+    // SourceTags check — captured source tags must have all/any query source tags
+    if (SourceTags.IsValid())
+    {
+        if (bSourceTagsMatchAny)
+        {
+            if (!Spec.CapturedSourceTags.HasAny(SourceTags))
+                return false;
+        }
+        else
+        {
+            if (!Spec.CapturedSourceTags.HasAll(SourceTags))
+                return false;
+        }
+    }
 
     // TargetTags check — captured target tags must have all query target tags
     if (TargetTags.IsValid() && !Spec.CapturedTargetTags.HasAll(TargetTags))
@@ -88,6 +183,24 @@ inline bool FGameplayEffectQuery::Matches(const GameplayEffectSpec& Spec) const
         }
         if (!bFoundAttribute)
             return false;
+    }
+
+    // EffectTagsToMatch check — match against the effect definition's cached asset tags
+    if (EffectTagsToMatch.IsValid())
+    {
+        if (!Spec.Def)
+            return false;
+
+        if (bEffectTagsMatchAny)
+        {
+            if (!Spec.Def->GetAssetTags().HasAny(EffectTagsToMatch))
+                return false;
+        }
+        else
+        {
+            if (!Spec.Def->GetAssetTags().HasAll(EffectTagsToMatch))
+                return false;
+        }
     }
 
     // GrantedTags and OwningTagQuery are ASC-level checks — handled by

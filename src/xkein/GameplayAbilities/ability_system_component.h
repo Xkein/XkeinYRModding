@@ -360,6 +360,16 @@ public:
 	/** Apply an in-place modifier to an attribute (no GE, no checks) */
 	void ApplyModToAttribute(const GameplayAttribute& Attribute, EGameplayModOpType ModifierOp, float ModifierMagnitude);
 
+	/** Directly update a numerical attribute's current value (called by aggregator evaluation).
+	 *  Bypasses the modifier pipeline — sets the final computed value after aggregator evaluation.
+	 *  Calls PreAttributeChange (for clamping) and PostAttributeChange on the owning attribute set.
+	 *  @param Attribute The attribute to update
+	 *  @param NewValue The new current value
+	 *  @param Effect Optional gameplay effect context (can be nullptr)
+	 *  @param bIsNetUpdate Whether this is a network update (false in lockstep) */
+	void InternalUpdateNumericalAttribute(const GameplayAttribute& Attribute, float NewValue,
+		const class GameplayEffect* Effect = nullptr, bool bIsNetUpdate = false);
+
 	/** Get the current numeric value of an attribute */
 	float GetNumericAttribute(const GameplayAttribute& Attribute) const;
 
@@ -518,14 +528,48 @@ public:
 	/** Get the duration of a specific active gameplay effect by handle */
 	float GetGameplayEffectDuration(ActiveGameplayEffectHandle Handle) const;
 
-	/** Update a single SetByCaller magnitude on an active effect */
+	/** Update a single SetByCaller magnitude on an active effect by tag */
 	void UpdateActiveGameplayEffectSetByCallerMagnitude(ActiveGameplayEffectHandle Handle, GameplayTag DataTag, float NewMagnitude);
 
-	/** Update multiple SetByCaller magnitudes on an active effect */
+	/** Update a single SetByCaller magnitude on an active effect by name */
+	// @deprecated
+	void UpdateActiveGameplayEffectSetByCallerMagnitude(ActiveGameplayEffectHandle Handle, StringName DataName, float NewMagnitude);
+
+	/** Update multiple SetByCaller tag magnitudes on an active effect */
 	void UpdateActiveGameplayEffectSetByCallerMagnitudes(ActiveGameplayEffectHandle Handle, const std::map<GameplayTag, float>& NewMagnitudes);
+
+	/** Update multiple SetByCaller name magnitudes on an active effect */
+	// @deprecated
+	void UpdateActiveGameplayEffectSetByCallerMagnitudes(ActiveGameplayEffectHandle Handle, const std::map<StringName, float>& NewMagnitudes);
 
 	/** Set the level of an active gameplay effect */
 	void SetActiveGameplayEffectLevel(ActiveGameplayEffectHandle Handle, int32 NewLevel);
+
+	// ============================================================
+	// Script-layer SetByCaller API (Phase 7)
+	// ============================================================
+
+	/**
+	 * Assign a SetByCaller magnitude by DataName on the spec of an active gameplay effect.
+	 * Script-accessible (BindJs). Looks up the active effect by handle and calls
+	 * SetSetByCallerMagnitude on its spec.
+	 * @param Handle    Handle to the active gameplay effect
+	 * @param DataName  The DataName key for the SetByCaller value
+	 * @param Magnitude The magnitude value to assign
+	 */
+	FUNCTION()
+	void AssignSetByCallerMagnitude(ActiveGameplayEffectHandle Handle, StringName DataName, float Magnitude);
+
+	/**
+	 * Assign a SetByCaller magnitude by DataTag on the spec of an active gameplay effect.
+	 * Script-accessible (BindJs). Looks up the active effect by handle and calls
+	 * SetSetByCallerMagnitude on its spec.
+	 * @param Handle    Handle to the active gameplay effect
+	 * @param DataTag   The GameplayTag key for the SetByCaller value
+	 * @param Magnitude The magnitude value to assign
+	 */
+	FUNCTION()
+	void AssignTagSetByCallerMagnitude(ActiveGameplayEffectHandle Handle, GameplayTag DataTag, float Magnitude);
 
 	/** Set whether an active gameplay effect is inhibited (temporarily disabled).
 	 *  Delegates to ActiveGameplayEffectsContainer::SetActiveGameplayEffectInhibit and fires inhibit callbacks. */

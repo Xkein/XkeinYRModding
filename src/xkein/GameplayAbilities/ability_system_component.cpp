@@ -1,6 +1,8 @@
 #include "ability_system_component.h"
 #include "xkein/GameplayAbilities/ability_system_globals.h"
 #include "xkein/GameplayAbilities/gameplay_cue_manager.h"
+#include "xkein/GameplayAbilities/gameplay_effect_aggregator.h"
+#include "xkein/GameplayAbilities/gameplay_effect_execution_calculation.h"
 #include <core/tool/container.h>
 #include "core/string/string_name.h"
 #include <core/string/string_tool.h>
@@ -785,9 +787,8 @@ bool AbilitySystemComponent::CanApplyAttributeModifiers(const GameplayEffect* Ga
 
     GameplayEffectSpec Spec;
     Spec.Def = GameplayEffect;
-    Spec.Level = static_cast<int32>(Level);
     Spec.EffectContext = EffectContext;
-    Spec.CalculateModifierMagnitudes();
+    Spec.SetLevel(Level);
 
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); ++i)
     {
@@ -808,7 +809,7 @@ bool AbilitySystemComponent::CanApplyAttributeModifiers(const GameplayEffect* Ga
                 }
             }
 
-            float CostValue = (i < Spec.ModifierMagnitudes.size()) ? Spec.ModifierMagnitudes[i] : 0.0f;
+            float CostValue = (i < Spec.Modifiers.size()) ? Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;
 
             if (CurrentValue + CostValue < 0.0f)
             {
@@ -994,6 +995,7 @@ struct AggregatedModifiers
 };
 
 /** Collect all modifiers affecting a given attribute from active effects */
+// [[deprecated("Use FAggregator instead")]]
 static AggregatedModifiers CollectModifiersForAttribute(
     AbilitySystemComponent* ASC, 
     const GameplayAttribute& TargetAttribute)
@@ -1012,8 +1014,8 @@ static AggregatedModifiers CollectModifiersForAttribute(
             if (Modifier.Attribute.AttributeName != TargetAttribute.AttributeName)
                 continue;
             
-            float Magnitude = (i < Effect->Spec.ModifierMagnitudes.size()) 
-                ? Effect->Spec.ModifierMagnitudes[i] : 0.0f;
+            float Magnitude = (i < Effect->Spec.Modifiers.size()) 
+                ? Effect->Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;
             
             switch (Modifier.ModifierOp)
             {
@@ -1046,6 +1048,7 @@ static AggregatedModifiers CollectModifiersForAttribute(
 }
 
 /** Calculate the final value of an attribute given base value and aggregated modifiers */
+// [[deprecated("Use FAggregator instead")]]
 static float CalculateFinalAttributeValue(float BaseValue, const AggregatedModifiers& Mods)
 {
     if (Mods.bHasOverride)
@@ -1124,7 +1127,7 @@ static void ExecuteInstantEffect(AbilitySystemComponent* Target, const GameplayE
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
     {
         const auto& Modifier = Spec.Def->Modifiers[i];
-        float Magnitude = (i < Spec.ModifierMagnitudes.size()) ? Spec.ModifierMagnitudes[i] : 0.0f;
+        float Magnitude = (i < Spec.Modifiers.size()) ? Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;
         
         // Build evaluated data for pre/post callbacks
         FGameplayModifierEvaluatedData EvalData;
@@ -1152,21 +1155,268 @@ static void ExecuteInstantEffect(AbilitySystemComponent* Target, const GameplayE
     }
 }
 
+// ============================================================
+// ActiveGameplayEffectsContainer — New Mod Execution Pipeline
+// ============================================================
+
+bool ActiveGameplayEffectsContainer::InternalExecuteMod(
+    const GameplayEffectSpec& Spec, const FGameplayModifierEvaluatedData& ModEvalData)
+{
+    if (!Owner) return false;
+    
+    // Step 1: Locate the AttributeSet that owns this attribute (by owner name)
+    AttributeSet* TargetAttrSet = nullptr;
+    for (auto* AttrSet : Owner->SpawnedAttributes)
+    {
+        if (AttrSet && AttrSet->FindAttributeData(&ModEvalData.Attribute))
+        {
+            TargetAttrSet = AttrSet;
+            break;
+        }
+    }
+    if (!TargetAttrSet) return false;
+    
+    // Step 2: Build callback data and call PreGameplayEffectExecute
+    FGameplayEffectModCallbackData CallbackData(&Spec, ModEvalData, Owner);
+    if (!TargetAttrSet->PreGameplayEffectExecute(CallbackData))
+        return false;
+    
+    // Step 3: Apply modifier via StaticExecModOnBaseValue + SetBaseValue
+    GameplayAttributeData* AttrData = TargetAttrSet->FindAttributeData(&ModEvalData.Attribute);
+    if (!AttrData) return false;
+    
+    float OldBase = AttrData->GetBaseValue();
+    float NewBase = FAggregator::StaticExecModOnBaseValue(OldBase, ModEvalData.ModifierOp, ModEvalData.Magnitude);
+    
+    // Update the attribute's base value
+    TargetAttrSet->PreAttributeBaseChange(ModEvalData.Attribute, NewBase);
+    TargetAttrSet->PreAttributeChange(ModEvalData.Attribute, NewBase);
+    AttrData->SetBaseValue(NewBase);
+    TargetAttrSet->PostAttributeChange(ModEvalData.Attribute, OldBase, NewBase);
+    TargetAttrSet->PostAttributeBaseChange(ModEvalData.Attribute, OldBase, NewBase);
+    
+    // Step 4: Sync the aggregator's base value if an aggregator exists for this attribute
+    // This ensures the aggregator dirtied system fires and updates CurrentValue
+    // through the aggregate pipeline (which re-evaluates all ongoing modifiers)
+    auto AggIt = AttributeAggregatorMap.find(ModEvalData.Attribute);
+    if (AggIt != AttributeAggregatorMap.end())
+    {
+        AggIt->second->SetBaseValue(NewBase, true);
+    }
+    
+    // Step 5: Call PostGameplayEffectExecute
+    TargetAttrSet->PostGameplayEffectExecute(CallbackData);
+    
+    return true;
+}
+
+void ActiveGameplayEffectsContainer::ExecuteActiveEffectsFrom(
+    const GameplayEffectSpec& Spec, AbilitySystemComponent* TargetASC)
+{
+    if (!Spec.Def || !TargetASC) return;
+    
+    // Step 1: Process modifiers via InternalExecuteMod
+    for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
+    {
+        const auto& Modifier = Spec.Def->Modifiers[i];
+        float Magnitude = (i < Spec.Modifiers.size()) ? Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;
+        
+        FGameplayModifierEvaluatedData EvalData;
+        EvalData.Attribute = Modifier.Attribute;
+        EvalData.ModifierOp = Modifier.ModifierOp;
+        EvalData.Magnitude = Magnitude;
+        EvalData.IsValid = true;
+        
+        InternalExecuteMod(Spec, EvalData);
+    }
+    
+    // Step 2: Process custom executions and their output modifiers
+    for (const auto& ExecutionDef : Spec.Def->Executions)
+    {
+        // Build execution parameters from the spec
+        FGameplayEffectCustomExecutionParameters ExecParams;
+        ExecParams.OwningSpec = &Spec;
+        ExecParams.TargetASC = TargetASC;
+        ExecParams.SourceASC = Spec.EffectContext.Data
+            ? Spec.EffectContext.Data->InstigatorAbilitySystemComponent
+            : nullptr;
+        ExecParams.PassedInTags = ExecutionDef.PassedInTags;
+        
+        FGameplayEffectCustomExecutionOutput ExecOutput;
+        
+        // Execute the calculation class if one is assigned to this execution definition
+        if (ExecutionDef.CalculationClass)
+        {
+            ExecutionDef.CalculationClass->Execute(ExecParams, ExecOutput);
+        }
+        else
+        {
+            // Fallback: search source ASC's abilities for execution calculations
+            bool bExecuted = false;
+            auto TryExecute = [&](AbilitySystemComponent* ASC) -> bool
+            {
+                if (!ASC) return false;
+                for (const auto& AbilitySpec : ASC->ActivatableAbilities)
+                {
+                    if (!AbilitySpec.Ability) continue;
+                    auto* ExecCalc = dynamic_cast<GameplayEffectExecutionCalculation*>(AbilitySpec.Ability);
+                    if (ExecCalc)
+                    {
+                        ExecCalc->Execute(ExecParams, ExecOutput);
+                        return true;
+                    }
+                }
+                return false;
+            };
+            bExecuted = TryExecute(ExecParams.SourceASC);
+            if (!bExecuted) TryExecute(TargetASC);
+        }
+        
+        // Apply output modifiers from the execution
+        for (const auto& OutputMod : ExecOutput.OutputModifiers)
+        {
+            if (OutputMod.IsValid)
+            {
+                InternalExecuteMod(Spec, OutputMod);
+            }
+        }
+        
+        // Apply scoped calculation modifiers from the execution definition
+        // These are inline modifiers that get evaluated and applied directly
+        for (const auto& ScopedMod : ExecutionDef.CalculationModifiers)
+        {
+            float Magnitude = 0.0f;
+            ScopedMod.ModifierMagnitude.AttemptCalculateMagnitude(Spec, Magnitude, false, 0.0f);
+            
+            FGameplayModifierEvaluatedData EvalData;
+            EvalData.Attribute = ScopedMod.CapturedAttribute.AttributeToCapture;
+            EvalData.ModifierOp = ScopedMod.ModifierOp;
+            EvalData.Magnitude = Magnitude;
+            EvalData.IsValid = true;
+            
+            InternalExecuteMod(Spec, EvalData);
+        }
+        
+        // Step 3: Process conditional gameplay effects from this execution definition
+        // (only if the execution calculation did not handle them internally)
+        if (!ExecOutput.bTriggerConditionalGE)
+        {
+            for (const auto& ConditionalGE : ExecutionDef.ConditionalGameplayEffects)
+            {
+                if (!ConditionalGE.EffectClass) continue;
+                
+                // Check if source tags meet the conditional effect's requirements
+                if (!ConditionalGE.CanApply(Spec.CapturedSourceTags))
+                    continue;
+                
+                // Create context and spec for the conditional effect
+                GameplayEffectContextHandle ConditionalContext;
+                if (Spec.EffectContext.Data)
+                {
+                    ConditionalContext.Data = std::make_shared<GameplayEffectContext>(
+                        Spec.EffectContext.Data->Duplicate());
+                }
+                
+                GameplayEffectSpec ConditionalSpec = ConditionalGE.CreateSpec(
+                    ConditionalContext, static_cast<float>(Spec.Level));
+                
+                // Check the conditional GE's application queries and CanApply
+                bool bCanApply = ConditionalGE.EffectClass->CanApply(
+                    TargetASC->ActiveGameplayEffects, ConditionalSpec);
+                if (bCanApply)
+                {
+                    TargetASC->ApplyGameplayEffectToTarget(ConditionalGE.EffectClass, TargetASC,
+                        ConditionalContext.Data ? *ConditionalContext.Data : GameplayEffectContext());
+                }
+            }
+        }
+    }
+    
+    // Step 4: Trigger gameplay cues
+    if (Spec.Def->GameplayCues.size() > 0)
+    {
+        TriggerGameplayCues(Spec.Def, Spec, TargetASC, EGameplayCueEvent::Executed);
+    }
+}
+
+void ActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModifiers(
+    ActiveGameplayEffect& ActiveGE)
+{
+    const GameplayEffectSpec& Spec = ActiveGE.Spec;
+    if (!Spec.Def) return;
+    
+    // Register each modifier with the attribute aggregator system
+    for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
+    {
+        const GameplayModifierInfo& ModInfo = Spec.Def->Modifiers[i];
+        float EvalMagnitude = (i < Spec.ModifierMagnitudes.size())
+            ? Spec.ModifierMagnitudes[i]
+            : 0.0f;
+        
+        // Find or create an aggregator for this modifier's attribute
+        std::shared_ptr<FAggregator>& Aggregator = FindOrCreateAttributeAggregator(ModInfo.Attribute);
+        if (!Aggregator) continue;
+        
+        // Default to Channel0; future: support EvaluationChannelSettings per modifier
+        constexpr EGameplayModEvaluationChannel DefaultChannel = EGameplayModEvaluationChannel::Channel0;
+        
+        Aggregator->AddAggregatorMod(
+            EvalMagnitude,
+            ModInfo.ModifierOp,
+            DefaultChannel,
+            &ModInfo.SourceTags,
+            &ModInfo.TargetTags,
+            false, // bIsPredicted — always false in lockstep
+            ActiveGE.Handle
+        );
+    }
+}
+
+void ActiveGameplayEffectsContainer::UpdateAllAggregatorModMagnitudes(
+    ActiveGameplayEffect& ActiveGE)
+{
+    const GameplayEffectSpec& Spec = ActiveGE.Spec;
+    if (!Spec.Def) return;
+    
+    // Update each modifier's aggregator mod with the recalculated magnitude
+    for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
+    {
+        const GameplayModifierInfo& ModInfo = Spec.Def->Modifiers[i];
+        
+        // Find existing aggregator for this attribute (don't create if doesn't exist)
+        auto AggIt = AttributeAggregatorMap.find(ModInfo.Attribute);
+        if (AggIt == AttributeAggregatorMap.end()) continue;
+        
+        FAggregator* Aggregator = AggIt->second.get();
+        if (!Aggregator) continue;
+        
+        // UpdateAggregatorMod removes old mods for this handle and re-adds
+        // with the recalculated magnitude from the spec.
+        Aggregator->UpdateAggregatorMod(
+            ActiveGE.Handle,
+            ModInfo.Attribute,
+            Spec,
+            false, // bWasLocallyGenerated — always false in lockstep
+            ActiveGE.Handle
+        );
+    }
+}
+
 ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
     GameplayEffect* Effect, AbilitySystemComponent* Target, const GameplayEffectContext& Context)
 {
     if (!Effect || !Target) return ActiveGameplayEffectHandle();
     
-    // Create the spec
+    // Step 1: Create the spec — Initialize sets Def, context, level, duration, period,
+    //         and calls CalculateModifierMagnitudes (which fills ModifierMagnitudes + Modifiers)
     GameplayEffectSpec Spec;
-    Spec.Def = Effect;
-    Spec.Level = Context.AbilityLevel;
-    Spec.EffectContext.Data = std::make_unique<GameplayEffectContext>(Context);
+    {
+        GameplayEffectContextHandle CtxHandle;
+        CtxHandle.Data = std::make_shared<GameplayEffectContext>(Context);
+        Spec.Initialize(Effect, CtxHandle, static_cast<float>(Context.AbilityLevel));
+    }
     
-    // Calculate modifier magnitudes
-    Spec.CalculateModifierMagnitudes();
-    
-    // Step 0: Check application queries (immunity, etc.) registered by active effects on the target
+    // Step 2: Check application queries (immunity, etc.) registered by active effects on the target
     for (const auto& Query : Target->GameplayEffectApplicationQueries)
     {
         if (!Query.CheckFn(Target->ActiveGameplayEffects, Spec))
@@ -1175,33 +1425,46 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
         }
     }
 
-    // Step 1: Component pre-apply check
+    // Step 3: Component pre-apply check (GameplayEffectComponents)
     if (!Effect->CanApply(Target->ActiveGameplayEffects, Spec))
     {
         return ActiveGameplayEffectHandle();
     }
     
-    // Step 2: Branch based on duration policy
+    // Step 4: Verify all modifier attributes exist on the target's attribute sets
+    for (const auto& Modifier : Effect->Modifiers)
+    {
+        bool bFound = false;
+        for (const auto* AttrSet : Target->SpawnedAttributes)
+        {
+            if (AttrSet && AttrSet->FindAttributeData(&Modifier.Attribute))
+            {
+                bFound = true;
+                break;
+            }
+        }
+        if (!bFound)
+        {
+            // Attribute not found on target — skip this effect application
+            return ActiveGameplayEffectHandle();
+        }
+    }
+    
+    // Step 5: Branch based on duration policy
     switch (Effect->DurationPolicy)
     {
     case EGameplayEffectDurationType::Instant:
     {
-        // Execute modifiers
-        ExecuteInstantEffect(Target, Spec);
+        // Execute all modifiers, custom executions, conditional GEs, and gameplay cues
+        Target->ActiveGameplayEffects.ExecuteActiveEffectsFrom(Spec, Target);
         
-        // Notify components of execution
+        // Notify components of execution (after modifiers are applied)
         Effect->OnExecuted(Target->ActiveGameplayEffects, Spec);
-        
-        // Trigger gameplay cues for Instant GE
-        if (Effect->GameplayCues.size() > 0)
-        {
-            TriggerGameplayCues(Effect, Spec, Target, EGameplayCueEvent::Executed);
-        }
         
         // Notify components of application
         Effect->OnApplied(Target->ActiveGameplayEffects, Spec, *Target);
         
-        // Broadcast application delegate
+        // Broadcast application delegate (invalid handle for instant)
         Target->OnGameplayEffectAppliedDelegateToTarget.publish(Target, Spec, ActiveGameplayEffectHandle(-1));
         
         return ActiveGameplayEffectHandle(-1);
@@ -1210,14 +1473,12 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
     case EGameplayEffectDurationType::Infinite:
     case EGameplayEffectDurationType::HasDuration:
     {
-        // Add as active effect
+        // Add as active effect — creates the ActiveGameplayEffect and stores it in the container
         ActiveGameplayEffectHandle Handle = Target->ActiveGameplayEffects.Add(Target, Spec);
         
-        // Apply modifiers to current value for duration effects
-        ExecuteInstantEffect(Target, Spec);
-        
-        // Call InternalOnActiveGameplayEffectAdded which invokes OnAddedToActiveContainer
-        // and sets inhibit state based on the return value
+        // InternalOnActiveGameplayEffectAdded invokes OnAddedToActiveContainer (GE component callbacks),
+        // conditionally calls AddActiveGameplayEffectGrantedTagsAndModifiers (aggregator registration),
+        // and sets inhibit state based on the return value.
         ActiveGameplayEffect* ActiveGE = Target->ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
         if (ActiveGE)
         {
@@ -1247,9 +1508,8 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToSelf(
         // Build spec for delegate broadcasting
         GameplayEffectSpec Spec;
         Spec.Def = Effect;
-        Spec.Level = Context.AbilityLevel;
+        Spec.SetLevel(static_cast<float>(Context.AbilityLevel));
         Spec.EffectContext.Data = std::make_unique<GameplayEffectContext>(Context);
-        Spec.CalculateModifierMagnitudes();
 
         // Broadcast self-applied delegate
         OnGameplayEffectAppliedDelegateToSelf.publish(this, Spec, Handle);
@@ -1269,11 +1529,14 @@ GameplayEffectSpec AbilitySystemComponent::MakeOutgoingSpec(GameplayEffect* Effe
 {
     GameplayEffectSpec Spec;
     Spec.Def = Effect;
-    Spec.Level = static_cast<int32>(Level);
     if (AbilitySpec)
     {
         Spec.CapturedSourceTags = AbilitySpec->DynamicAbilityTags;
+        Spec.SetByCallerMagnitudes = AbilitySpec->SetByCallerTagMagnitudes;
+        // @deprecated: Also copy name-based magnitudes for backward compatibility
+        Spec.SetByCallerNameMagnitudes = AbilitySpec->SetByCallerNameMagnitudes;
     }
+    Spec.SetLevel(Level);
     return Spec;
 }
 
@@ -1293,20 +1556,8 @@ bool AbilitySystemComponent::RemoveActiveGameplayEffect(ActiveGameplayEffectHand
     ActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
     if (!Effect) return false;
 
-    if (StacksToRemove < 0 || StacksToRemove >= Effect->StackCount)
-    {
-        // Remove entire effect
-        ActiveGameplayEffects.Remove(Handle);
-    }
-    else
-    {
-        // Reduce stack count
-        Effect->StackCount -= StacksToRemove;
-        if (Effect->StackCount <= 0)
-        {
-            ActiveGameplayEffects.Remove(Handle);
-        }
-    }
+    // InternalRemoveActiveGameplayEffect handles both full and partial removal
+    ActiveGameplayEffects.InternalRemoveActiveGameplayEffect(Handle, StacksToRemove, true);
 
     return true;
 }
@@ -1380,6 +1631,34 @@ void AbilitySystemComponent::ApplyModToAttribute(const GameplayAttribute& Attrib
         ::ApplyModifierToAttribute(AttrSet, Attribute, ModifierMagnitude, ModifierOp);
 
         AttrSet->PostGameplayEffectExecute(CallbackData);
+    }
+}
+
+void AbilitySystemComponent::InternalUpdateNumericalAttribute(const GameplayAttribute& Attribute, float NewValue,
+    [[maybe_unused]] const GameplayEffect* Effect, [[maybe_unused]] bool bIsNetUpdate)
+{
+    // Skip net updates in lockstep (no replication)
+    if (bIsNetUpdate)
+    {
+        return;
+    }
+
+    for (auto* AttrSet : SpawnedAttributes)
+    {
+        GameplayAttributeData* Data = AttrSet->FindAttributeData(&Attribute);
+        if (Data)
+        {
+            float OldValue = Data->GetCurrentValue();
+
+            // Allow the attribute set to clamp/modify the new value before applying
+            AttrSet->PreAttributeChange(Attribute, NewValue);
+
+            Data->SetCurrentValue(NewValue);
+
+            // Notify of the change
+            AttrSet->PostAttributeChange(Attribute, OldValue, NewValue);
+            return;
+        }
     }
 }
 
@@ -1636,7 +1915,8 @@ ActiveGameplayEffectHandle ActiveGameplayEffectsContainer::Add(AbilitySystemComp
     auto* NewEffect = new ActiveGameplayEffect();
     NewEffect->Spec = Spec;
     NewEffect->Handle = ActiveGameplayEffectHandle::GenerateNewHandle(OwningASC);
-    NewEffect->LastPeriodExecuteTime = NewEffect->StartWorldTime;
+    NewEffect->StartWorldTime = CurrentWorldTime; // Absolute start time against accumulated world clock
+    NewEffect->LastPeriodExecuteTime = 0.0f; // Start period timer from 0 (independent of start time)
     Effects.push_back(NewEffect);
 
     // Create per-effect event set for delegate tracking
@@ -1669,67 +1949,57 @@ ActiveGameplayEffectHandle ActiveGameplayEffectsContainer::Add(AbilitySystemComp
 
 void ActiveGameplayEffectsContainer::Remove(ActiveGameplayEffectHandle Handle, bool bPrematureRemoval)
 {
-    // Fire OnRemoved delegate and clean up event set before removing from the list
+    ActiveGameplayEffect* Effect = GetActiveGameplayEffect(Handle);
+    if (!Effect) return;
+
+    // If InternalOnActiveGameplayEffectRemoved hasn't been called yet, call it now.
+    // This ensures all callers (Tick expired, stack overflow, etc.) get the full lifecycle.
+    if (!Effect->bIsPendingRemove)
+    {
+        FGameplayEffectRemovalInfo RemovalInfo;
+        RemovalInfo.ActiveEffect = Effect;
+        RemovalInfo.bPrematureRemoval = bPrematureRemoval;
+        RemovalInfo.StackCount = Effect->StackCount;
+        RemovalInfo.EffectContext = Effect->Spec.EffectContext;
+        InternalOnActiveGameplayEffectRemoved(*Effect, RemovalInfo);
+    }
+
+    // Clean up event set (broadcast already happened in InternalOnActiveGameplayEffectRemoved)
     if (Owner)
     {
-        auto EventIt = Owner->ActiveEffectEventSets.find(Handle);
-        if (EventIt != Owner->ActiveEffectEventSets.end())
-        {
-            ActiveGameplayEffect* Effect = GetActiveGameplayEffect(Handle);
-            if (Effect)
-            {
-                FGameplayEffectRemovalInfo RemovalInfo;
-                RemovalInfo.ActiveEffect = Effect;
-                RemovalInfo.bPrematureRemoval = bPrematureRemoval;
-                RemovalInfo.StackCount = Effect->StackCount;
-                RemovalInfo.EffectContext = Effect->Spec.EffectContext;
-                EventIt->second.OnRemoved.publish(RemovalInfo);
-            }
-            Owner->ActiveEffectEventSets.erase(EventIt);
-        }
+        Owner->ActiveEffectEventSets.erase(Handle);
+    }
 
-        // Trigger Removed cues BEFORE effect is removed from the list
-        if (ActiveGameplayEffect* RemovingEffect = GetActiveGameplayEffect(Handle))
+    // Trigger Removed cues BEFORE effect is removed from the list
+    if (Effect->Spec.Def && Effect->Spec.Def->GameplayCues.size() > 0 && Owner)
+    {
+        GameplayCueParameters Params;
+        Params.bGameplayEffectActive = false;
+        Owner->InitDefaultGameplayCueParameters(Params);
+
+        for (auto* Cue : Effect->Spec.Def->GameplayCues)
         {
-            const GameplayEffect* Def = RemovingEffect->Spec.Def;
-            if (Def && Def->GameplayCues.size() > 0)
+            if (!Cue || Cue->GameplayCueTags.IsEmpty()) continue;
+            for (auto& CueTag : Cue->GameplayCueTags.GameplayTags)
             {
-                GameplayCueParameters Params;
-                Params.bGameplayEffectActive = false;
-                Owner->InitDefaultGameplayCueParameters(Params);
-                
-                for (auto* Cue : Def->GameplayCues)
-                {
-                    if (!Cue || Cue->GameplayCueTags.IsEmpty()) continue;
-                    for (auto& CueTag : Cue->GameplayCueTags.GameplayTags)
-                    {
-                        if (CueTag.IsValid())
-                            Owner->RemoveGameplayCue(CueTag);
-                    }
-                }
+                if (CueTag.IsValid())
+                    Owner->RemoveGameplayCue(CueTag);
             }
         }
     }
 
-    auto It = std::remove_if(Effects.begin(), Effects.end(), 
-        [&Handle, this, bPrematureRemoval](ActiveGameplayEffect* Effect) {
-            if (Effect && Effect->Handle == Handle)
+    // Remove from vector and delete
+    auto It = std::remove_if(Effects.begin(), Effects.end(),
+        [Handle](ActiveGameplayEffect* E) {
+            if (E && E->Handle == Handle)
             {
                 // Release delegate connections
-                if (Effect->OnRemovedDelegateHandle)
-                    Effect->OnRemovedDelegateHandle.release();
-                if (Effect->OnInhibitionChangedDelegateHandle)
-                    Effect->OnInhibitionChangedDelegateHandle.release();
+                if (E->OnRemovedDelegateHandle)
+                    E->OnRemovedDelegateHandle.release();
+                if (E->OnInhibitionChangedDelegateHandle)
+                    E->OnInhibitionChangedDelegateHandle.release();
 
-                if (Effect->Spec.Def)
-                {
-                    FGameplayEffectRemovalInfo RemovalInfo;
-                    RemovalInfo.bPrematureRemoval = bPrematureRemoval;
-                    RemovalInfo.StackCount = Effect->StackCount;
-                    RemovalInfo.EffectContext = Effect->Spec.EffectContext;
-                    Effect->Spec.Def->OnRemovedFromActiveContainer(*this, *Effect, RemovalInfo);
-                }
-                delete Effect;
+                delete E;
                 return true;
             }
             return false;
@@ -1760,7 +2030,11 @@ void ActiveGameplayEffectsContainer::RemoveAll()
 
 void ActiveGameplayEffectsContainer::Tick(float DeltaTime)
 {
-    std::vector<ActiveGameplayEffectHandle> ExpiredEffects;
+    // Advance accumulated world time
+    float OldWorldTime = CurrentWorldTime;
+    CurrentWorldTime += DeltaTime;
+    
+    std::vector<ActiveGameplayEffectHandle> DurationEffects;
     std::vector<std::pair<ActiveGameplayEffect*, ActiveGameplayEffectHandle>> PeriodicExecEffects;
     
     for (auto* Effect : Effects)
@@ -1769,54 +2043,48 @@ void ActiveGameplayEffectsContainer::Tick(float DeltaTime)
         
         const auto* Def = Effect->Spec.Def;
         
-        // Handle duration-based effects expiry
+        // Handle duration-based effects: track time and broadcast change
         if (Def->DurationPolicy == EGameplayEffectDurationType::HasDuration)
         {
-            float OldTimeRemaining = Effect->GetTimeRemaining(0.0f);
-            Effect->StartWorldTime += DeltaTime; // Accumulate elapsed time
-            float NewTimeRemaining = Effect->GetTimeRemaining(0.0f);
-
-            // Fire OnTimeChanged delegate if time changed
-            if (OldTimeRemaining != NewTimeRemaining && Owner)
+            DurationEffects.push_back(Effect->Handle);
+            
+            // Broadcast OnTimeChanged with pre/post tick times
+            if (Owner)
             {
-                auto EventIt = Owner->ActiveEffectEventSets.find(Effect->Handle);
-                if (EventIt != Owner->ActiveEffectEventSets.end())
+                float OldTimeRemaining = Effect->GetTimeRemaining(OldWorldTime);
+                float NewTimeRemaining = Effect->GetTimeRemaining(CurrentWorldTime);
+                if (OldTimeRemaining != NewTimeRemaining)
                 {
-                    EventIt->second.OnTimeChanged.publish(Effect->Handle, NewTimeRemaining, OldTimeRemaining);
+                    auto EventIt = Owner->ActiveEffectEventSets.find(Effect->Handle);
+                    if (EventIt != Owner->ActiveEffectEventSets.end())
+                    {
+                        EventIt->second.OnTimeChanged.publish(Effect->Handle, NewTimeRemaining, OldTimeRemaining);
+                    }
                 }
-            }
-
-            if (NewTimeRemaining <= 0.0f)
-            {
-                ExpiredEffects.push_back(Effect->Handle);
-                continue;
             }
         }
         
-        // Handle periodic effects
-        if (Def->Period > 0.0f)
+        // Handle periodic effects (cumulative tracking from Phase 0)
+        if (Def->Period > GameplayEffectConstants::NO_PERIOD)
         {
             Effect->LastPeriodExecuteTime += DeltaTime;
-            float TimeSinceLastPeriod = Effect->LastPeriodExecuteTime - Effect->StartWorldTime;
-            // Check if a full period has elapsed
-            float PeriodDuration = Def->Period;
-            if (TimeSinceLastPeriod >= PeriodDuration)
+            if (Effect->LastPeriodExecuteTime >= Def->Period)
             {
                 PeriodicExecEffects.push_back({Effect, Effect->Handle});
-                Effect->LastPeriodExecuteTime = Effect->StartWorldTime; // Reset period timer
+                Effect->LastPeriodExecuteTime -= Def->Period; // Keep remainder, don't reset to 0
             }
         }
     }
     
-    // Execute periodic effects and broadcast delegates
+    // Execute periodic effects using the new pipeline (not ExecuteInstantEffect)
     for (const auto& [Effect, Handle] : PeriodicExecEffects)
     {
         if (Effect && Effect->Spec.Def && Owner)
         {
-            // Execute instant effect modifiers
-            ExecuteInstantEffect(Owner, Effect->Spec);
+            // Use ExecuteActiveEffectsFrom instead of ExecuteInstantEffect
+            ExecuteActiveEffectsFrom(Effect->Spec, Owner);
             
-            // Broadcast periodic execution �?both self and target delegates fire
+            // Broadcast periodic execution — both self and target delegates fire
             // since active effects are always on the owning ASC
             Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.publish(Owner, Effect->Spec, Handle);
             Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.publish(Owner, Effect->Spec, Handle);
@@ -1829,13 +2097,110 @@ void ActiveGameplayEffectsContainer::Tick(float DeltaTime)
         }
     }
     
-    // Remove expired effects
-    for (const auto& Handle : ExpiredEffects)
+    // Check expiry for all duration-based effects (via CheckDuration, not inline)
+    for (const auto& Handle : DurationEffects)
     {
-        Remove(Handle, false);
+        CheckDuration(Handle, CurrentWorldTime);
     }
 }
 
+// ============================================================
+// Container Lifecycle Methods
+// ============================================================
+
+void ActiveGameplayEffectsContainer::CheckDuration(ActiveGameplayEffectHandle Handle, float CurrentTime)
+{
+    ActiveGameplayEffect* Effect = GetActiveGameplayEffect(Handle);
+    if (!Effect || !Effect->Spec.Def) return;
+    
+    const auto* Def = Effect->Spec.Def;
+    if (Def->DurationPolicy != EGameplayEffectDurationType::HasDuration) return;
+    
+    float Duration = Effect->Spec.GetDuration();
+    if (Duration < GameplayEffectConstants::INSTANT_APPLICATION) return; // Infinite
+    
+    // Check expiry: StartWorldTime + Duration <= CurrentTime
+    if (Effect->StartWorldTime + Duration > CurrentTime) return; // Not expired
+    
+    // Effect has expired — execute last period tick if close to period boundary
+    if (Def->Period > GameplayEffectConstants::NO_PERIOD)
+    {
+        float TimeUntilNextPeriod = Def->Period - Effect->LastPeriodExecuteTime;
+        if (TimeUntilNextPeriod <= 0.1f && Owner)
+        {
+            ExecuteActiveEffectsFrom(Effect->Spec, Owner);
+            Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.publish(Owner, Effect->Spec, Handle);
+            Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.publish(Owner, Effect->Spec, Handle);
+            
+            if (Def->GameplayCues.size() > 0)
+            {
+                TriggerGameplayCues(Def, Effect->Spec, Owner, EGameplayCueEvent::Executed);
+            }
+        }
+    }
+    
+    // Branch by StackExpirationPolicy
+    switch (Def->StackExpirationPolicy)
+    {
+    case EGameplayEffectStackingExpirationPolicy::ClearEntireStack:
+        Remove(Handle, false);
+        break;
+        
+    case EGameplayEffectStackingExpirationPolicy::RemoveSingleStackAndRefreshDuration:
+    {
+        int32 OldCount = Effect->StackCount;
+        Effect->StackCount--;
+        if (Effect->StackCount <= 0)
+        {
+            Remove(Handle, false);
+        }
+        else
+        {
+            Effect->StartWorldTime = CurrentTime;
+            Effect->LastPeriodExecuteTime = 0.0f;
+            OnStackCountChange(*Effect, OldCount, Effect->StackCount);
+        }
+        break;
+    }
+    
+    case EGameplayEffectStackingExpirationPolicy::RefreshDuration:
+        Effect->StartWorldTime = CurrentTime;
+        break;
+    }
+}
+
+void ActiveGameplayEffectsContainer::OnStackCountChange(ActiveGameplayEffect& Effect, int32 OldCount, int32 NewCount)
+{
+    if (!Owner) return;
+    
+    // Update Spec.StackCount
+    Effect.Spec.SetStackCount(NewCount);
+    
+    // Broadcast EventSet->OnStackChanged(Handle, NewCount, OldCount)
+    auto EventIt = Owner->ActiveEffectEventSets.find(Effect.Handle);
+    if (EventIt != Owner->ActiveEffectEventSets.end())
+    {
+        EventIt->second.OnStackChanged.publish(Effect.Handle, NewCount, OldCount);
+    }
+}
+
+void ActiveGameplayEffectsContainer::OnDurationChange(ActiveGameplayEffect& Effect, float OldTimeRemaining)
+{
+    if (!Owner) return;
+    
+    float Duration = Effect.Spec.GetDuration();
+    if (Duration < GameplayEffectConstants::INSTANT_APPLICATION) return; // Infinite
+    
+    float NewTimeRemaining = Effect.GetTimeRemaining(CurrentWorldTime);
+    
+    // Broadcast EventSet->OnTimeChanged(Handle, NewTime, OldTime)
+    auto EventIt = Owner->ActiveEffectEventSets.find(Effect.Handle);
+    if (EventIt != Owner->ActiveEffectEventSets.end())
+    {
+        EventIt->second.OnTimeChanged.publish(Effect.Handle, NewTimeRemaining, OldTimeRemaining);
+    }
+}
+    
 // ============================================================
 // Stacking logic
 // ============================================================
@@ -1954,7 +2319,7 @@ void ActiveGameplayEffectsContainer::ApplyStackingLogic(GameplayEffectSpec& Spec
     // Refresh duration per policy
     if (Def->StackDurationRefreshPolicy == EGameplayEffectStackingDurationPolicy::RefreshOnSuccessfulApplication)
     {
-        Existing->StartWorldTime = 0.0f; // Will be set by caller to current time
+        Existing->StartWorldTime = CurrentWorldTime; // Refresh to current accumulated time
     }
     
     // Reset period per policy  
@@ -2039,22 +2404,6 @@ void AbilitySystemComponent::DecrementAbilityListLock()
 }
 
 // ============================================================
-// ActiveGameplayEffectsContainer::InternalOnActiveGameplayEffectAdded
-// ============================================================
-
-void ActiveGameplayEffectsContainer::InternalOnActiveGameplayEffectAdded(ActiveGameplayEffect& Effect)
-{
-    const GameplayEffect* EffectDef = Effect.Spec.Def;
-    if (!EffectDef) return;
-
-    bool bShouldBeActive = EffectDef->OnAddedToActiveContainer(*this, Effect);
-
-    // Effect starts inhibited, then we toggle based on the component results
-    Effect.bIsInhibited = true;
-    SetActiveGameplayEffectInhibit(Effect.Handle, !bShouldBeActive);
-}
-
-// ============================================================
 // ActiveGameplayEffectsContainer::SetActiveGameplayEffectInhibit
 // ============================================================
 
@@ -2076,6 +2425,78 @@ void ActiveGameplayEffectsContainer::SetActiveGameplayEffectInhibit(ActiveGamepl
             EventIt->second.OnInhibitionChanged.publish(Handle, bInhibit);
         }
     }
+}
+
+// ============================================================
+// Attribute Aggregator System
+// ============================================================
+
+std::shared_ptr<FAggregator>& ActiveGameplayEffectsContainer::FindOrCreateAttributeAggregator(const GameplayAttribute& Attribute)
+{
+    // Look up existing aggregator
+    auto It = AttributeAggregatorMap.find(Attribute);
+    if (It != AttributeAggregatorMap.end())
+    {
+        return It->second;
+    }
+
+    // Create new aggregator with the attribute's current base value
+    float BaseValue = Owner ? Owner->GetNumericAttributeBase(Attribute) : 0.0f;
+    auto Agg = std::make_shared<FAggregator>(BaseValue);
+
+    // Bind OnDirty -> OnAggregatorDirtyForwarder
+    entt::sink sink{ Agg->OnDirty };
+    sink.connect<&ActiveGameplayEffectsContainer::OnAggregatorDirtyForwarder>(*this);
+
+    // Store reverse mapping for callback dispatch
+    AggregatorToAttributeMap[Agg.get()] = Attribute;
+
+    auto InsertResult = AttributeAggregatorMap.emplace(Attribute, std::move(Agg));
+    return InsertResult.first->second;
+}
+
+void ActiveGameplayEffectsContainer::CleanupAttributeAggregator(const GameplayAttribute& Attribute)
+{
+    auto It = AttributeAggregatorMap.find(Attribute);
+    if (It != AttributeAggregatorMap.end())
+    {
+        // Remove reverse mapping
+        if (auto* Agg = It->second.get())
+        {
+            AggregatorToAttributeMap.erase(Agg);
+        }
+        AttributeAggregatorMap.erase(It);
+    }
+}
+
+void ActiveGameplayEffectsContainer::OnAggregatorDirtyForwarder(FAggregator* Aggregator)
+{
+    // Look up the attribute from the reverse map
+    auto It = AggregatorToAttributeMap.find(Aggregator);
+    if (It != AggregatorToAttributeMap.end())
+    {
+        OnAttributeAggregatorDirty(Aggregator, It->second);
+    }
+}
+
+void ActiveGameplayEffectsContainer::OnAttributeAggregatorDirty(FAggregator* Aggregator, const GameplayAttribute& Attribute)
+{
+    if (!Owner)
+    {
+        return;
+    }
+
+    // Construct evaluation parameters from current source/target tags
+    FAggregatorEvaluateParameters Params;
+    Params.SourceTags = &Owner->GetOwnedGameplayTags();
+    Params.TargetTags = &Owner->GetOwnedGameplayTags();
+
+    // Evaluate the aggregator to get the new value
+    float NewValue = Aggregator->Evaluate(Params);
+
+    // Update the attribute's current value on the owning ASC
+    // Note: NetUpdateID tracking and ReverseEvaluate are skipped for lockstep
+    Owner->InternalUpdateNumericalAttribute(Attribute, NewValue, nullptr, false);
 }
 
 // ============================================================
@@ -2242,74 +2663,46 @@ float AbilitySystemComponent::GetNumericAttributeChecked(GameplayAttribute Attri
 
 float AbilitySystemComponent::GetFilteredAttributeValue(GameplayAttribute Attribute, GameplayTagRequirements& Requirements, GameplayTagContainer& OutSourceTags)
 {
-	// Collect modifiers only from effects whose captured tags satisfy the requirements
-	float BaseValue = 0.0f;
-	bool bFoundBase = false;
-
-    // Find base value first
+	// Verify the attribute exists
+	bool bFound = false;
 	for (const auto* AttrSet : SpawnedAttributes)
 	{
-		const auto* Data = AttrSet->FindAttributeData(&Attribute);
-		if (Data)
+		if (AttrSet->FindAttributeData(&Attribute))
 		{
-			BaseValue = Data->GetBaseValue();
-			bFoundBase = true;
+			bFound = true;
 			break;
 		}
 	}
+	if (!bFound) return 0.0f;
 
-	if (!bFoundBase) return 0.0f;
+	// Get the aggregator for this attribute (contains all active modifiers with their tag requirements)
+	auto& Aggregator = ActiveGameplayEffects.FindOrCreateAttributeAggregator(Attribute);
 
-	AggregatedModifiers FilteredMods;
+	// Build evaluation parameters: exclude effects whose captured source tags do NOT satisfy the requirements
+	FAggregatorEvaluateParameters Params;
 	for (auto* Effect : ActiveGameplayEffects.GetAllActiveEffects())
 	{
 		if (!Effect || !Effect->Spec.Def || Effect->bIsInhibited) continue;
 
-		// Check if effect's source tags satisfy the tag requirements
 		if (!Requirements.RequirementsMet(Effect->Spec.CapturedSourceTags))
+		{
+			// Skip this effect's modifiers by adding its handle to the ignore list
+			Params.IgnoreHandles.push_back(Effect->Handle);
 			continue;
+		}
 
 		// Collect source tags from matching effects
 		for (const auto& Tag : Effect->Spec.CapturedSourceTags.GameplayTags)
 			OutSourceTags.AddTag(Tag);
-
-		for (size_t i = 0; i < Effect->Spec.Def->Modifiers.size(); i++)
-		{
-			const auto& Modifier = Effect->Spec.Def->Modifiers[i];
-			if (Modifier.Attribute.AttributeName != Attribute.AttributeName)
-				continue;
-
-			float Magnitude = (i < Effect->Spec.ModifierMagnitudes.size())
-				? Effect->Spec.ModifierMagnitudes[i] : 0.0f;
-
-			switch (Modifier.ModifierOp)
-			{
-			case EGameplayModOpType::AddBase:
-				FilteredMods.SumAddBase += Magnitude;
-				break;
-			case EGameplayModOpType::MultiplyAdditive:
-				FilteredMods.SumMultiplyAdditive += Magnitude;
-				break;
-			case EGameplayModOpType::DivideAdditive:
-				FilteredMods.SumDivideAdditive += Magnitude;
-				break;
-			case EGameplayModOpType::MultiplyCompound:
-				FilteredMods.ProductMultiplyCompound *= Magnitude;
-				break;
-			case EGameplayModOpType::AddFinal:
-				FilteredMods.SumAddFinal += Magnitude;
-				break;
-			case EGameplayModOpType::Override:
-				FilteredMods.bHasOverride = true;
-				FilteredMods.OverrideValue = Magnitude;
-				break;
-			default:
-				break;
-			}
-		}
 	}
 
-	return CalculateFinalAttributeValue(BaseValue, FilteredMods);
+	// FAggregator::Evaluate handles:
+	// - Modifier qualification (SourceTagReqs/TargetTagReqs checks via FAggregatorMod::UpdateQualifies)
+	// - IgnoreHandles exclusion
+	// - Override mod (first qualifying override wins and returns immediately)
+	// - Full modifier formula: ((Base + SumAddBase) * (1+SumMultiplyAdditive) / (1+SumDivideAdditive) * ProdMultiplyCompound) + SumAddFinal
+	// - Multi-channel evaluation (Channel0..Channel9)
+	return Aggregator->Evaluate(Params);
 }
 
 // ============================================================
@@ -2571,7 +2964,7 @@ int32 AbilitySystemComponent::GetGameplayEffectCount(GameplayEffect* Effect, Abi
 
 		if (ActiveGE->Spec.Def != Effect) continue;
 
-		if (bEnforceOnGoingCheck && ActiveGE->GetTimeRemaining(0.0f) <= 0.0f
+		if (bEnforceOnGoingCheck && ActiveGE->GetTimeRemaining(0.0f) <= GameplayEffectConstants::INSTANT_APPLICATION
 			&& ActiveGE->Spec.Def->DurationPolicy == EGameplayEffectDurationType::HasDuration)
 			continue;
 
@@ -2590,12 +2983,12 @@ int32 AbilitySystemComponent::GetGameplayEffectCount(GameplayEffect* Effect, Abi
 float AbilitySystemComponent::GetGameplayEffectDuration(ActiveGameplayEffectHandle Handle) const
 {
 	const ActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
-	if (!Effect || !Effect->Spec.Def) return 0.0f;
+	if (!Effect || !Effect->Spec.Def) return GameplayEffectConstants::INSTANT_APPLICATION;
 
 	if (Effect->Spec.Def->DurationPolicy == EGameplayEffectDurationType::Instant)
-		return -1.0f;
+		return GameplayEffectConstants::INFINITE_DURATION;
 	if (Effect->Spec.Def->DurationPolicy == EGameplayEffectDurationType::Infinite)
-		return -1.0f;
+		return GameplayEffectConstants::INFINITE_DURATION;
 
 	return Effect->Spec.GetDuration();
 }
@@ -2605,7 +2998,28 @@ void AbilitySystemComponent::UpdateActiveGameplayEffectSetByCallerMagnitude(
 {
 	ActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
 	if (!Effect) return;
-	Effect->Spec.SetByCallerMagnitudes[DataTag] = NewMagnitude;
+	
+	// Step 2: Update the SetByCaller magnitude on the spec
+	Effect->Spec.SetSetByCallerMagnitude(DataTag, NewMagnitude);
+	
+	// Step 3: Recalculate all modifier magnitudes (SetByCaller values feed into magnitude calculation)
+	Effect->Spec.CalculateModifierMagnitudes();
+	
+	// Step 4: Update all aggregator mod magnitudes to reflect the new evaluated values
+	// This triggers OnDirty on each aggregator -> OnAttributeAggregatorDirty -> attribute update
+	ActiveGameplayEffects.UpdateAllAggregatorModMagnitudes(*Effect);
+}
+
+void AbilitySystemComponent::UpdateActiveGameplayEffectSetByCallerMagnitude(
+	ActiveGameplayEffectHandle Handle, StringName DataName, float NewMagnitude)
+{
+	// @deprecated
+	ActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
+	if (!Effect) return;
+	
+	Effect->Spec.SetSetByCallerMagnitude(DataName, NewMagnitude);
+	Effect->Spec.CalculateModifierMagnitudes();
+	ActiveGameplayEffects.UpdateAllAggregatorModMagnitudes(*Effect);
 }
 
 void AbilitySystemComponent::UpdateActiveGameplayEffectSetByCallerMagnitudes(
@@ -2613,10 +3027,50 @@ void AbilitySystemComponent::UpdateActiveGameplayEffectSetByCallerMagnitudes(
 {
 	ActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
 	if (!Effect) return;
+	
 	for (const auto& [Tag, Magnitude] : NewMagnitudes)
 	{
-		Effect->Spec.SetByCallerMagnitudes[Tag] = Magnitude;
+		Effect->Spec.SetSetByCallerMagnitude(Tag, Magnitude);
 	}
+	
+	Effect->Spec.CalculateModifierMagnitudes();
+	ActiveGameplayEffects.UpdateAllAggregatorModMagnitudes(*Effect);
+}
+
+void AbilitySystemComponent::UpdateActiveGameplayEffectSetByCallerMagnitudes(
+	ActiveGameplayEffectHandle Handle, const std::map<StringName, float>& NewMagnitudes)
+{
+	// @deprecated
+	ActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
+	if (!Effect) return;
+	
+	for (const auto& [Name, Magnitude] : NewMagnitudes)
+	{
+		Effect->Spec.SetSetByCallerMagnitude(Name, Magnitude);
+	}
+	
+	Effect->Spec.CalculateModifierMagnitudes();
+	ActiveGameplayEffects.UpdateAllAggregatorModMagnitudes(*Effect);
+}
+
+void AbilitySystemComponent::AssignSetByCallerMagnitude(ActiveGameplayEffectHandle Handle, StringName DataName, float Magnitude)
+{
+	ActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
+	if (!Effect) return;
+
+	Effect->Spec.SetSetByCallerMagnitude(DataName, Magnitude);
+	Effect->Spec.CalculateModifierMagnitudes();
+	ActiveGameplayEffects.UpdateAllAggregatorModMagnitudes(*Effect);
+}
+
+void AbilitySystemComponent::AssignTagSetByCallerMagnitude(ActiveGameplayEffectHandle Handle, GameplayTag DataTag, float Magnitude)
+{
+	ActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
+	if (!Effect) return;
+
+	Effect->Spec.SetSetByCallerMagnitude(DataTag, Magnitude);
+	Effect->Spec.CalculateModifierMagnitudes();
+	ActiveGameplayEffects.UpdateAllAggregatorModMagnitudes(*Effect);
 }
 
 void AbilitySystemComponent::SetActiveGameplayEffectLevel(ActiveGameplayEffectHandle Handle, int32 NewLevel)
@@ -2645,8 +3099,8 @@ float AbilitySystemComponent::GetGameplayEffectMagnitude(ActiveGameplayEffectHan
 		if (Modifier.Attribute.AttributeName == Attribute.AttributeName
 			&& Modifier.Attribute.AttributeOwner == Attribute.AttributeOwner)
 		{
-			return (i < Effect->Spec.ModifierMagnitudes.size())
-				? Effect->Spec.ModifierMagnitudes[i] : 0.0f;
+			return (i < Effect->Spec.Modifiers.size())
+				? Effect->Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;
 		}
 	}
 	return 0.0f;

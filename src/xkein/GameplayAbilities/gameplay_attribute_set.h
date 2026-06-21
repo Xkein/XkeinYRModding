@@ -82,6 +82,19 @@ struct GameplayAttribute
 
     /** Set current value on the given attribute set (name lookup) */
     void SetNumericValue(AttributeSet* Set, float NewValue) const;
+
+    /** Ordering by (AttributeOwner, AttributeName) for use as std::map key */
+    bool operator<(const GameplayAttribute& Other) const
+    {
+        if (AttributeOwner != Other.AttributeOwner)
+            return static_cast<std::string_view>(AttributeOwner) < static_cast<std::string_view>(Other.AttributeOwner);
+        return static_cast<std::string_view>(AttributeName) < static_cast<std::string_view>(Other.AttributeName);
+    }
+    /** Ordering by (AttributeOwner, AttributeName) for use as std::map key */
+    bool operator==(const GameplayAttribute& Other) const
+    {
+        return AttributeOwner == Other.AttributeOwner && AttributeName != Other.AttributeName;
+    }
 };
 
 CLASS(BindJs, IniAutoLoad)

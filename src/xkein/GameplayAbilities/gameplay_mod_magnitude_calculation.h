@@ -1,28 +1,12 @@
 #pragma once
 #include "core/reflection/reflection.h"
+#include "xkein/GameplayAbilities/gameplay_effect_aggregator.h"
 #include "xkein/GameplayAbilities/gameplay_effect_calculation.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include <functional>
 #include <optional>
 
 class AbilitySystemComponent;
-
-/**
- * Parameters passed to attribute evaluation routines to filter which modifiers contribute.
- * SourceTags and TargetTags are used to filter modifiers from specific GE sources/targets.
- */
-struct FAggregatorEvaluateParameters
-{
-	const GameplayTagContainer* SourceTags = nullptr;
-	const GameplayTagContainer* TargetTags = nullptr;
-	bool IncludePredictiveMods = false;
-
-	/** Optional tag filter used to find a specific applied source tag on searched modifiers */
-	std::optional<GameplayTag> AppliedSourceTagFilter;
-
-	/** Optional tag filter used to find a specific applied target tag on searched modifiers */
-	std::optional<GameplayTag> AppliedTargetTagFilter;
-};
 
 /**
  * Base class for auto-generated magnitude calculations that compute
@@ -78,4 +62,32 @@ public:
 	 */
 	PROPERTY()
 	std::function<float(const GameplayEffectSpec&)> OnK2_CalculateBaseMagnitude;
+
+	// ============================================================
+	// SetByCaller helpers (Phase 7)
+	// ============================================================
+
+	/**
+	 * Get a SetByCaller magnitude from the given spec by tag.
+	 * Convenience wrapper around Spec.GetSetByCallerMagnitude(Tag, true, 0.f).
+	 * @param Spec The gameplay effect spec to query
+	 * @param Tag  The tag key to look up
+	 * @return The SetByCaller magnitude, or 0.f if not found
+	 */
+	float GetSetByCallerMagnitudeByTag(const GameplayEffectSpec& Spec, const GameplayTag& Tag) const
+	{
+		return Spec.GetSetByCallerMagnitude(Tag, true, 0.f);
+	}
+
+	/**
+	 * Get a SetByCaller magnitude from the given spec by data name.
+	 * Convenience wrapper around Spec.GetSetByCallerMagnitude(Name, true, 0.f).
+	 * @param Spec The gameplay effect spec to query
+	 * @param Name The data name key to look up
+	 * @return The SetByCaller magnitude, or 0.f if not found
+	 */
+	float GetSetByCallerMagnitudeByName(const GameplayEffectSpec& Spec, const StringName& Name) const
+	{
+		return Spec.GetSetByCallerMagnitude(Name, true, 0.f);
+	}
 };

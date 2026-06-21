@@ -12,8 +12,22 @@
 #include <memory>
 
 struct FGameplayEffectRemovalInfo;
+struct FGameplayModifierEvaluatedData;
 struct ActiveGameplayEffect;
 struct ActiveGameplayEffectsContainer;
+
+/** Constants shared across GameplayEffect system */
+struct GameplayEffectConstants
+{
+    /** Duration of an instant GE */
+    static constexpr float INSTANT_APPLICATION = 0.0f;
+    /** Duration of an infinite GE */
+    static constexpr float INFINITE_DURATION = -1.0f;
+    /** Period value for non-periodic GEs */
+    static constexpr float NO_PERIOD = 0.0f;
+    /** Invalid level */
+    static constexpr float INVALID_LEVEL = -1.0f;
+};
 
 /** Handle to a specific row in a curve table, used for level-scaled float lookups */
 struct CurveTableRowHandle
@@ -55,6 +69,9 @@ struct GameplayEffect;
 struct GameplayEffectSpec;
 struct GameplayEffectContext;
 struct GameplayEffectContextHandle;
+struct FAggregator;
+struct FAggregatorEvaluateParameters;
+class GameplayEffectExecutionCalculation;
 
 /** Gameplay effect duration policies */
 ENUM(BindJs)
@@ -262,10 +279,11 @@ struct AttributeBasedFloat final
 	 *			It is the responsibility of the caller to verify that the spec is properly setup before calling this function.
 	 *			
 	 * @param InRelevantSpec	Gameplay effect spec providing the backing attribute capture
+	 * @param EvalParams		Optional evaluation parameters for tag filtering on modifiers
 	 *	
 	 * @return Evaluated magnitude based upon the spec & calculation policy
 	 */
-	float CalculateMagnitude(const GameplayEffectSpec& InRelevantSpec) const;
+	float CalculateMagnitude(const GameplayEffectSpec& InRelevantSpec, const FAggregatorEvaluateParameters* EvalParams = nullptr) const;
 
 	/** Coefficient to the attribute calculation */
 	PROPERTY()
@@ -304,8 +322,9 @@ struct SetByCallerFloat
 	SetByCallerFloat() {}
 
 	/** The Name the caller (code or blueprint) will use to set this magnitude by. */
+	// @deprecated Use DataTag instead
 	PROPERTY()
-	std::string_view DataName;
+	StringName DataName;
 
 	PROPERTY()
 	GameplayTag DataTag;
@@ -335,6 +354,24 @@ struct GameplayEffectModifierMagnitude final
 	/** Magnitude value represented by a SetByCaller magnitude */
 	PROPERTY()
 	SetByCallerFloat SetByCallerMagnitude;
+
+	/**
+	 * Attempt to calculate the magnitude value for this modifier given a gameplay effect spec.
+	 *
+	 * @param Spec                  The gameplay effect spec providing context (level, tags, set-by-caller values)
+	 * @param OutValue              [out] The calculated magnitude, or 0.0f on failure
+	 * @param WarnIfSetByCallerFail If true and SetByCaller value is not found, log a warning
+	 * @param DefaultSetbyCaller    Default value to use if SetByCaller lookup fails
+	 *
+	 * @return True if the magnitude was successfully calculated, false otherwise
+	 */
+	bool AttemptCalculateMagnitude(const GameplayEffectSpec& Spec, float& OutValue, bool WarnIfSetByCallerFail = true, float DefaultSetbyCaller = 0.0f) const;
+
+	/**
+	 * Get the best available name for a SetByCaller magnitude.
+	 * If DataTag is valid, returns the tag's name; otherwise falls back to DataName.
+	 */
+	void GetSetByCallerDataNameIfPossible(StringName& Name) const;
 };
 
 
@@ -374,6 +411,98 @@ struct GameplayModifierInfo
 };
 
 
+/** Aggregator type for scoped modifier info — determines how magnitude is evaluated */
+ENUM(BindJs)
+enum class EGameplayEffectExecutionScopedModifierAggregatorType : uint8
+{
+	/** Magnitude is backed by a captured attribute value from source or target */
+	CapturedAttributeBacked,
+	/** Magnitude is transient and evaluated directly from the modifier magnitude (no attribute capture) */
+	Transient
+};
+
+/**
+ * Struct representing a scoped modifier info within a gameplay effect execution.
+ * Defines additional modifiers that are scoped to the execution, backed by captured attributes.
+ */
+CLASS(BindJs)
+struct FGameplayEffectExecutionScopedModifierInfo final
+{
+	/** Captured attribute that backs this modifier (used with CapturedAttributeBacked aggregator type) */
+	PROPERTY()
+	GameplayEffectAttributeCaptureDefinition CapturedAttribute;
+
+	/** How the magnitude is determined — CapturedAttributeBacked evaluates from captured attribute, Transient uses the modifier magnitude directly */
+	PROPERTY()
+	EGameplayEffectExecutionScopedModifierAggregatorType AggregatorType = EGameplayEffectExecutionScopedModifierAggregatorType::Transient;
+
+	/** The operation type for this modifier (Add, Multiply, Override, etc.) */
+	PROPERTY()
+	EGameplayModOpType ModifierOp = EGameplayModOpType::Additive;
+
+	/** Magnitude of the modifier, evaluated using the usual GameplayEffectModifierMagnitude pipeline */
+	PROPERTY()
+	GameplayEffectModifierMagnitude ModifierMagnitude;
+
+	/** Source tag requirements: if specified, this modifier only applies when source has these tags */
+	PROPERTY()
+	GameplayTagRequirements SourceTags;
+
+	/** Target tag requirements: if specified, this modifier only applies when target has these tags */
+	PROPERTY()
+	GameplayTagRequirements TargetTags;
+};
+
+/** Policy for how conditional gameplay effects are removed when the parent effect ends */
+ENUM(BindJs)
+enum class EConditionalGameplayEffectRemovalPolicy : uint8
+{
+	/** The conditional effect manages its own lifetime (default — no special removal logic) */
+	GrantedEffectControlsOwnLifetime,
+	/** The conditional effect is actively removed when the granting/parent effect ends */
+	RemoveGrantedEffectOnEnd
+};
+
+/**
+ * Struct representing a conditional gameplay effect within an execution definition.
+ * Wraps a GameplayEffect* with source tag requirements and removal policy.
+ */
+CLASS(BindJs)
+struct FConditionalGameplayEffect final
+{
+	/** The gameplay effect class to apply conditionally */
+	PROPERTY()
+	GameplayEffect* EffectClass = nullptr;
+
+	/** Source tags required for this conditional effect to apply — checked via CanApply() */
+	PROPERTY()
+	GameplayTagContainer RequiredSourceTags;
+
+	/** How this conditional effect is removed when the parent effect ends */
+	PROPERTY()
+	EConditionalGameplayEffectRemovalPolicy RemovalPolicy = EConditionalGameplayEffectRemovalPolicy::GrantedEffectControlsOwnLifetime;
+
+	/** Number of stacks to remove when the parent effect is removed (only meaningful with RemoveGrantedEffectOnEnd policy) */
+	PROPERTY()
+	int32 StackCountToRemove = 1;
+
+	/**
+	 * Check if this conditional effect can apply given the source tags.
+	 * The effect can apply if RequiredSourceTags are empty or all are present in SourceTags.
+	 * @param SourceTags Tags from the source ASC to check against RequiredSourceTags
+	 * @return True if the required source tags are met
+	 */
+	bool CanApply(const GameplayTagContainer& SourceTags) const;
+
+	/**
+	 * Create a GameplayEffectSpec for this conditional effect.
+	 * @param InContext Effect context to use (typically duplicated from the parent spec's context)
+	 * @param InLevel   Level for the spawned spec
+	 * @return A fully initialized GameplayEffectSpec
+	 */
+	GameplayEffectSpec CreateSpec(const GameplayEffectContextHandle& InContext, float InLevel) const;
+};
+
 /** 
  * Struct representing the definition of a custom execution for a gameplay effect.
  * Custom executions run special logic from an outside class each time the gameplay effect executes.
@@ -385,9 +514,17 @@ struct GameplayEffectExecutionDefinition
 	PROPERTY()
 	GameplayTagContainer PassedInTags;
 
+	/** The execution calculation class to run (may be null — uses OnK2_Execute script fallback) */
+	PROPERTY()
+	GameplayEffectExecutionCalculation* CalculationClass = nullptr;
+
+	/** Additional modifiers scoped to this execution, computed from captured attributes at execution time */
+	PROPERTY()
+	std::vector<FGameplayEffectExecutionScopedModifierInfo> CalculationModifiers;
+
 	/** Other Gameplay Effects that will be applied to the target of this execution if the execution is successful */
 	PROPERTY()
-	std::vector<GameplayEffect*> ConditionalGameplayEffects;
+	std::vector<FConditionalGameplayEffect> ConditionalGameplayEffects;
 };
 
 CLASS(BindJs)
@@ -527,6 +664,32 @@ struct GameplayEffect final
 	 * Iterates all GEComponents and calls their OnGameplayEffectApplied.
 	 */
 	void OnApplied(ActiveGameplayEffectsContainer& ActiveGEContainer, GameplayEffectSpec& Spec, AbilitySystemComponent& OwningASC) const;
+
+	// ============================================================
+	// Cached Tag Accessors (Phase 7)
+	// ============================================================
+
+	/** Build CachedAssetTags, CachedGrantedTags, CachedBlockedAbilityTags from GEComponents. */
+	void BuildCachedTags() const;
+
+	/** Get the effect's own asset tags (from AssetTagsGEComponent). Returns empty container if none set. */
+	const GameplayTagContainer& GetAssetTags() const { return CachedAssetTags; }
+
+	/** Get the tags this effect grants to the target (from TargetTagsGEComponent). Returns empty container if none set. */
+	const GameplayTagContainer& GetGrantedTags() const { return CachedGrantedTags; }
+
+	/** Get the tags this effect uses to block abilities (from BlockAbilityTagsGEComponent). Returns empty container if none set. */
+	const GameplayTagContainer& GetBlockedAbilityTags() const { return CachedBlockedAbilityTags; }
+
+private:
+	/** Cached asset tags collected from AssetTagsGEComponent during OnAddedToActiveContainer. Built once, not dynamic. */
+	mutable GameplayTagContainer CachedAssetTags;
+
+	/** Cached granted tags collected from TargetTagsGEComponent during OnAddedToActiveContainer. Built once, not dynamic. */
+	mutable GameplayTagContainer CachedGrantedTags;
+
+	/** Cached blocked ability tags collected from BlockAbilityTagsGEComponent during OnAddedToActiveContainer. Built once, not dynamic. */
+	mutable GameplayTagContainer CachedBlockedAbilityTags;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(GameplayEffect);
 
@@ -583,6 +746,16 @@ struct GameplayEffectContextHandle
 	std::shared_ptr<GameplayEffectContext> Data;
 };
 
+/**
+ * FModifierSpec is the evaluated modifier spec.
+ * Each entry corresponds to a modifier in the Def's modifier array,
+ * storing the final evaluated magnitude for that modifier.
+ */
+struct FModifierSpec
+{
+    float EvaluatedMagnitude = 0.0f;
+};
+
 CLASS(BindJs)
 struct GameplayEffectSpec
 {
@@ -604,31 +777,85 @@ struct GameplayEffectSpec
     PROPERTY()
 	GameplayTagContainer CapturedTargetTags;
 
-	/** SetByCaller magnitudes */
+	/** SetByCaller magnitudes (keyed by tag) */
 	std::map<GameplayTag, float> SetByCallerMagnitudes;
 
-	/** Pre-calculated modifier magnitudes, in same order as Def->Modifiers */
+	/** SetByCaller magnitudes keyed by name (DataName) */
+	// @deprecated Use SetByCallerMagnitudes (tag-based) instead
+	std::map<StringName, float> SetByCallerNameMagnitudes;
+
+	/** Pre-calculated modifier magnitudes, in same order as Def->Modifiers (compute buffer) */
 	std::vector<float> ModifierMagnitudes;
 
-	/** Calculate all modifier magnitudes from Def */
+	/** Independent duration storage */
+	float Duration = 0.0f;
+
+	/** Independent period storage */
+	float Period = 0.0f;
+
+	/** Evaluated modifier magnitudes (primary storage, same order as Def->Modifiers) */
+	std::vector<FModifierSpec> Modifiers;
+
+	/** Tags that are dynamically granted by this effect at runtime (not from Def) */
+	GameplayTagContainer DynamicGrantedTags;
+
+	/** Current stack count */
+	int32 StackCount = 1;
+
+	/** If true, Duration will not be recalculated by SetLevel */
+	bool bDurationLocked = false;
+
+	/** Calculate all modifier magnitudes from Def into both ModifierMagnitudes and Modifiers */
 	void CalculateModifierMagnitudes();
 
-	/** Get the computed duration of this effect */
-	float GetDuration() const
-	{
-		if (!Def) return 0.0f;
-		if (Def->DurationPolicy == EGameplayEffectDurationType::Instant) return -1.0f; // No duration
-		if (Def->DurationPolicy == EGameplayEffectDurationType::Infinite) return -1.0f; // Infinite
-		// For HasDuration, return the first modifier magnitude (duration magnitude)
-		if (!ModifierMagnitudes.empty()) return ModifierMagnitudes[0];
-		return 0.0f;
-	}
+	/** Set duration and optionally lock it */
+	void SetDuration(float NewDuration, bool bLockDuration = false);
 
-	/** Get the period of this effect */
-	float GetPeriod() const
-	{
-		return Def ? Def->Period : FScalableFloat(0.0f);
-	}
+	/** Get the independent duration value */
+	float GetDuration() const { return Duration; }
+
+	/** Get the independent period value */
+	float GetPeriod() const { return Period; }
+
+	/** Set level and recalculate Duration/Period/ModifierMagnitudes */
+	void SetLevel(float InLevel);
+
+	/** Get current level */
+	float GetLevel() const { return static_cast<float>(Level); }
+
+	/** Attempt to compute duration from the Def's duration magnitude */
+	bool AttemptCalculateDurationFromDef(float& OutDuration) const;
+
+	/** Set stack count */
+	void SetStackCount(int32 NewCount) { StackCount = NewCount; }
+
+	/** Get stack count */
+	int32 GetStackCount() const { return StackCount; }
+
+	/** Initialize spec with Def, context, and level (recalculates Duration/Period/Modifiers) */
+	void Initialize(const GameplayEffect* InDef, const GameplayEffectContextHandle& InContext, float InLevel);
+
+	// ---- SetByCaller API ----
+
+	/** Set a SetByCaller magnitude by DataName */
+	// @deprecated
+	void SetSetByCallerMagnitude(StringName DataName, float Magnitude);
+
+	/** Set a SetByCaller magnitude by DataTag */
+	void SetSetByCallerMagnitude(GameplayTag DataTag, float Magnitude);
+
+	/** Get a SetByCaller magnitude by DataName */
+	// @deprecated
+	float GetSetByCallerMagnitude(StringName DataName, bool WarnIfNotFound = true, float DefaultIfNotFound = 0.0f) const;
+
+	/** Get a SetByCaller magnitude by DataTag */
+	float GetSetByCallerMagnitude(GameplayTag DataTag, bool WarnIfNotFound = true, float DefaultIfNotFound = 0.0f) const;
+
+	/** Copy SetByCaller magnitudes from another spec (copies both maps) */
+	void CopySetByCallerMagnitudes(const GameplayEffectSpec& OriginalSpec);
+
+	/** Merge SetByCaller tag magnitudes into this spec (only adds missing keys) */
+	void MergeSetByCallerMagnitudes(const std::map<GameplayTag, float>& Magnitudes);
 };
 
 
@@ -668,11 +895,14 @@ struct ActiveGameplayEffect
 	/** Delegate handle for the OnInhibitionChanged event (used by GE components to unregister) */
 	entt::connection OnInhibitionChangedDelegateHandle;
 
+	/** True after InternalOnActiveGameplayEffectRemoved has been called, to prevent duplicate lifecycle in Remove() */
+	bool bIsPendingRemove = false;
+
 	/** Get time remaining based on current world time */
 	float GetTimeRemaining(float CurrentWorldTime) const
 	{
 		float Duration = Spec.GetDuration();
-		if (Duration < 0.0f) return -1.0f; // Infinite
+		if (Duration < GameplayEffectConstants::INSTANT_APPLICATION) return GameplayEffectConstants::INFINITE_DURATION; // Infinite
 		return Duration - (CurrentWorldTime - StartWorldTime);
 	}
 
@@ -680,7 +910,7 @@ struct ActiveGameplayEffect
 	float GetEndTime() const
 	{
 		float Duration = Spec.GetDuration();
-		if (Duration < 0.0f) return -1.0f;
+		if (Duration < GameplayEffectConstants::INSTANT_APPLICATION) return GameplayEffectConstants::INFINITE_DURATION;
 		return Duration + StartWorldTime;
 	}
 };
@@ -744,9 +974,151 @@ struct ActiveGameplayEffectsContainer
      */
     void InternalOnActiveGameplayEffectAdded(ActiveGameplayEffect& Effect);
 
+    /**
+     * Called after an ActiveGameplayEffect is removed (full removal).
+     * Removes aggregator mods, calls GEComponent OnRemoved, cleans up granted abilities,
+     * and broadcasts the OnRemoved event.
+     */
+    void InternalOnActiveGameplayEffectRemoved(ActiveGameplayEffect& Effect, const FGameplayEffectRemovalInfo& RemovalInfo);
+
+    /**
+     * High-level removal entry point for active effects.
+     * Handles partial removal (stack decrement) and full removal lifecycle.
+     * For full removal: calls InternalOnActiveGameplayEffectRemoved then internal cleanup.
+     * @param Handle The active effect handle to remove
+     * @param StacksToRemove Number of stacks to remove (0 or less = full removal)
+     * @param bPrematureRemoval Whether this is a forced removal (vs natural expiry)
+     */
+    void InternalRemoveActiveGameplayEffect(ActiveGameplayEffectHandle Handle, int32 StacksToRemove, bool bPrematureRemoval);
+
+    // ============================================================
+    // Modifier Execution Pipeline
+    // ============================================================
+
+    /**
+     * Execute a single modifier on the appropriate AttributeSet with Pre/Post callbacks.
+     * Locates the AttributeSet by ModEvalData.Attribute's owner, calls PreGameplayEffectExecute,
+     * applies the mod via FAggregator::StaticExecModOnBaseValue + SetBaseValue on the attribute data,
+     * then calls PostGameplayEffectExecute.
+     * @param Spec      The spec providing modifier evaluation context
+     * @param ModEvalData The evaluated modifier data (attribute, op, magnitude)
+     * @return True if the modifier was applied (not blocked by PreGameplayEffectExecute)
+     */
+    bool InternalExecuteMod(const GameplayEffectSpec& Spec, const FGameplayModifierEvaluatedData& ModEvalData);
+
+    /**
+     * Execute all modifiers, custom executions, and conditional GEs from a GameplayEffect spec.
+     * This is the primary execution path for INSTANT effects.
+     * 1. For each modifier in Def->Modifiers: calls InternalExecuteMod
+     * 2. For each execution in Def->Executions: creates ExecutionParameters, calls
+     *    GameplayEffectExecutionCalculation::Execute, applies output modifiers
+     * 3. For each conditional GE in executions: checks CanApply, creates spec, applies to self
+     * 4. Triggers GameplayCues with Executed event
+     * @param Spec      The gameplay effect spec to execute from
+     * @param TargetASC The target ASC receiving the effect
+     */
+    void ExecuteActiveEffectsFrom(const GameplayEffectSpec& Spec, AbilitySystemComponent* TargetASC);
+
+    // ============================================================
+    // ActiveEffect Modifier Registration (for Duration/Infinite effects)
+    // ============================================================
+
+    /**
+     * Register all modifiers from an ActiveGameplayEffect with the attribute aggregator system.
+     * For each modifier in Spec.Def->Modifiers: finds or creates an attribute aggregator,
+     * then calls AddAggregatorMod with the evaluated magnitude, op, channel, tag reqs.
+     * This is called for Duration/Infinite effects after Add() to register ongoing modifiers.
+     * @param ActiveGE The active effect whose modifiers to register
+     */
+    void AddActiveGameplayEffectGrantedTagsAndModifiers(ActiveGameplayEffect& ActiveGE);
+
+    /**
+     * Unregister all modifiers from an ActiveGameplayEffect with the attribute aggregator system.
+     * Inverse of AddActiveGameplayEffectGrantedTagsAndModifiers.
+     * For each modifier in Spec.Def->Modifiers: finds the attribute aggregator,
+     * then calls RemoveAggregatorMod with the active effect handle.
+     * This is called when an effect is removed to unregister ongoing modifiers.
+     * @param ActiveGE The active effect whose modifiers to unregister
+     */
+    void RemoveActiveGameplayEffectGrantedTagsAndModifiers(ActiveGameplayEffect& ActiveGE);
+
+    /**
+     * Recalculate all modifier magnitudes and update aggregator mods for an active effect.
+     * Called after SetByCaller magnitude updates or level changes to keep modifier channels
+     * in sync with the spec's recalculated magnitudes.
+     * Iterates each modifier in the spec, finds the aggregator, and calls UpdateAggregatorMod.
+     * @param ActiveGE The active effect to update
+     */
+    void UpdateAllAggregatorModMagnitudes(ActiveGameplayEffect& ActiveGE);
+
+    // ============================================================
+    // Container Lifecycle Methods (Duration, Stack, Callbacks)
+    // ============================================================
+
+    /**
+     * Check if an active gameplay effect has expired and handle its expiration
+     * according to the StackExpirationPolicy.
+     * Called each Tick for duration-based effects.
+     * @param Handle        The active effect handle to check
+     * @param CurrentTime   The current accumulated world time
+     */
+    void CheckDuration(ActiveGameplayEffectHandle Handle, float CurrentTime);
+
+    /**
+     * Handle a stack count change for an active effect.
+     * Updates Spec.StackCount and broadcasts the OnStackChanged event.
+     * @param Effect    The active effect whose stack changed
+     * @param OldCount  The previous stack count
+     * @param NewCount  The new stack count
+     */
+    void OnStackCountChange(ActiveGameplayEffect& Effect, int32 OldCount, int32 NewCount);
+
+    /**
+     * Handle a duration change for an active effect.
+     * Broadcasts the OnTimeChanged event with the current time remaining.
+     * @param Effect            The active effect whose duration changed
+     * @param OldTimeRemaining  The time remaining before the change
+     */
+    void OnDurationChange(ActiveGameplayEffect& Effect, float OldTimeRemaining);
+
+    // ============================================================
+    // Attribute Aggregator System
+    // ============================================================
+
+    /**
+     * Find or create an attribute aggregator for the given attribute.
+     * Creates a new FAggregator with BaseValue from the Owner ASC's attribute base value,
+     * binds OnDirty -> OnAttributeAggregatorDirty, and inserts into the map.
+     */
+    std::shared_ptr<FAggregator>& FindOrCreateAttributeAggregator(const GameplayAttribute& Attribute);
+
+    /**
+     * Remove an attribute aggregator from the map when no longer needed.
+     * Disconnects the dirty callback and erases the entry.
+     */
+    void CleanupAttributeAggregator(const GameplayAttribute& Attribute);
+
+    /**
+     * Called when an aggregator's value changes.
+     * Evaluates the aggregator with current source/target tags and updates the attribute.
+     */
+    void OnAttributeAggregatorDirty(FAggregator* Aggregator, const GameplayAttribute& Attribute);
+
 private:
+    /** Accumulated world time, incremented each Tick for duration tracking */
+    float CurrentWorldTime = 0.0f;
+
+    /** Map of gameplay attributes to shared aggregator pointers */
+    std::map<GameplayAttribute, std::shared_ptr<FAggregator>> AttributeAggregatorMap;
+
+    /** Reverse map: aggregator pointer -> attribute, for OnDirty callback dispatch */
+    std::map<FAggregator*, GameplayAttribute> AggregatorToAttributeMap;
+
+    /** Forwarding callback for aggregator OnDirty events (looks up attribute via reverse map) */
+    void OnAggregatorDirtyForwarder(FAggregator* Aggregator);
+
     /** Internal storage of active effects */
-	std::vector<ActiveGameplayEffect*> Effects;
+    std::vector<ActiveGameplayEffect*> Effects;
 };
 
 /** Trigger gameplay cues for a GameplayEffect. Typically called after Instant GE execution. */
