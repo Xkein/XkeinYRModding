@@ -124,19 +124,47 @@ bool IniComponentLoader::Load(IniReader& parser, const char* pSection, const cha
 
     bool hasLoader = false;
     bool success = false;
+
+    // Recursively load base classes' INI first (from root to derived)
+    // This ensures inherited INI properties are loaded for each level in the hierarchy.
+    entt::meta_type type = entt::resolve<T>();
+    if (type)
+    {
+        auto loadBases = [&](auto& self, entt::meta_type metaType) -> void {
+            for (auto&& [_, baseType] : metaType.base())
+            {
+                // Recurse into grandparent first
+                self(self, baseType);
+
+                // Load this base type's own INI properties
+                entt::meta_func baseFunc = baseType.func("__LoadIniComponent"_hs);
+                if (baseFunc)
+                {
+                    hasLoader = true;
+                    // Cast the derived reference to the base type via entt meta system
+                    entt::meta_any ref = entt::meta_any{std::ref(value)};
+                    if (entt::meta_any baseRef = ref.allow_cast(baseType); baseRef)
+                    {
+                        success |= baseFunc.invoke(std::move(baseRef), parser, pSection).template cast<bool>();
+                    }
+                }
+            }
+        };
+        loadBases(loadBases, type);
+    }
+
     if constexpr (IsParserImplemented<T>)
     {
         hasLoader = true;
-        success = parser.Read(pSection, pKey, value);
+        success |= parser.Read(pSection, pKey, value);
     }
-    entt::meta_type type = entt::resolve<T>();
     if (type)
     {
         entt::meta_func func = type.func("__LoadIniComponent"_hs);
         if (func)
         {
             hasLoader = true;
-            success = func.invoke(value, parser, pSection).cast<bool>();
+            success |= func.invoke(value, parser, pSection).cast<bool>();
         }
     }
     if (success) {
