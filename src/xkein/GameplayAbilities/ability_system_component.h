@@ -90,6 +90,16 @@ struct FActiveGameplayEffectEvents
 	FOnActiveGameplayEffectInhibitionChanged OnInhibitionChanged;
 };
 
+/** Data passed to attribute value change delegates */
+struct FOnAttributeChangeData
+{
+    GameplayAttribute Attribute;
+    float OldValue = 0.0f;
+    float NewValue = 0.0f;
+};
+
+/** Delegate for when an attribute's numerical value changes */
+using FOnGameplayAttributeValueChange = TMulticastDelegate<void(const FOnAttributeChangeData&)>;
 
 CLASS(BindJs, IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass], AutoSavegame, Swizzleable)
 struct AbilitySystemComponentType final
@@ -369,6 +379,9 @@ public:
 	 *  @param bIsNetUpdate Whether this is a network update (false in lockstep) */
 	void InternalUpdateNumericalAttribute(const GameplayAttribute& Attribute, float NewValue,
 		const class GameplayEffect* Effect = nullptr, bool bIsNetUpdate = false);
+
+	/** Get the delegate for attribute value change notifications (creates if not exists) */
+	FOnGameplayAttributeValueChange& GetGameplayAttributeValueChangeDelegate(const GameplayAttribute& Attribute);
 
 	/** Get the current numeric value of an attribute */
 	float GetNumericAttribute(const GameplayAttribute& Attribute) const;
@@ -784,6 +797,9 @@ protected:
 
 	/** Generic delegate that fires on ANY tag count change (for RegisterGenericGameplayTagEvent) */
 	FOnGameplayEffectTagCountChanged OnGenericTagCountChanged;
+
+	/** Map of attribute to delegate for attribute value change notifications */
+	std::map<GameplayAttribute, FOnGameplayAttributeValueChange> AttributeValueChangeDelegates;
 
 	/** Generic gameplay event callbacks, keyed by event tag.
 	 *  Stores std::function callbacks dispatched in HandleGameplayEvent. */

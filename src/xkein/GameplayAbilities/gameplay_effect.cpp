@@ -10,6 +10,7 @@
 #include "xkein/GameplayAbilities/gameplay_cue.h"
 #include "xkein/GameplayAbilities/gameplay_mod_magnitude_calculation.h"
 #include <map>
+#include <algorithm>
 
 class AbilitySystemComponent;
 
@@ -63,6 +64,11 @@ void GameplayEffectSpec::CalculateModifierMagnitudes()
             EvalMagnitude = 0.0f;
         }
         
+        // NOTE: bFactorInStackCount multiplier is NOT applied here.
+        // The multiplier is applied at aggregator registration time
+        // (AddActiveGameplayEffectGrantedTagsAndModifiers / UpdateAggregatorMod).
+        // Storing unmultiplied values ensures instant effects (which always
+        // have StackCount=1) get the correct magnitude.
         ModifierMagnitudes[i] = EvalMagnitude;
         Modifiers[i].EvaluatedMagnitude = EvalMagnitude;
     }
@@ -178,6 +184,47 @@ bool GameplayEffectSpec::AttemptCalculateDurationFromDef(float& OutDuration) con
     return false;
 }
 
+bool GameplayEffectSpec::AttemptCalculateMaxDurationFromDef(float& OutDuration) const
+{
+    if (!Def) return false;
+
+    if (Def->DurationPolicy == EGameplayEffectDurationType::Instant)
+    {
+        OutDuration = GameplayEffectConstants::INSTANT_APPLICATION;
+        return true;
+    }
+    if (Def->DurationPolicy == EGameplayEffectDurationType::Infinite)
+    {
+        OutDuration = GameplayEffectConstants::INFINITE_DURATION;
+        return true;
+    }
+
+    // HasDuration - compute from MaxDurationMagnitude
+    if (Def->DurationPolicy == EGameplayEffectDurationType::HasDuration)
+    {
+        switch (Def->MaxDurationMagnitude.MagnitudeCalculationType)
+        {
+        case EGameplayEffectMagnitudeCalculation::ScalableFloat:
+            OutDuration = Def->MaxDurationMagnitude.ScalableFloatMagnitude.GetValueAtLevel(Level);
+            return true;
+        case EGameplayEffectMagnitudeCalculation::AttributeBased:
+            OutDuration = Def->MaxDurationMagnitude.AttributeBasedMagnitude.CalculateMagnitude(*this);
+            return true;
+        case EGameplayEffectMagnitudeCalculation::SetByCaller:
+        {
+            auto It = SetByCallerMagnitudes.find(Def->MaxDurationMagnitude.SetByCallerMagnitude.DataTag);
+            OutDuration = (It != SetByCallerMagnitudes.end()) ? It->second : 0.0f;
+            return true;
+        }
+        case EGameplayEffectMagnitudeCalculation::CustomCalculationClass:
+            OutDuration = Def->MaxDurationMagnitude.CustomMagnitude.Coefficient.GetValueAtLevel(Level);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void GameplayEffectSpec::SetLevel(float InLevel)
 {
     Level = static_cast<int32>(InLevel);
@@ -189,6 +236,17 @@ void GameplayEffectSpec::SetLevel(float InLevel)
         if (AttemptCalculateDurationFromDef(NewDuration))
         {
             Duration = NewDuration;
+        }
+
+        // Apply MaxDuration clamp (only for HasDuration: Instant returns 0, Infinite returns -1, both skipped by > 0 check)
+        float NewMaxDuration;
+        if (AttemptCalculateMaxDurationFromDef(NewMaxDuration))
+        {
+            MaxDuration = NewMaxDuration;
+            if (MaxDuration > 0.0f && Duration > MaxDuration)
+            {
+                Duration = MaxDuration;
+            }
         }
     }
 
@@ -267,24 +325,107 @@ void GameplayEffectSpec::MergeSetByCallerMagnitudes(const std::map<GameplayTag, 
     }
 }
 
+// ---- ModifiedAttributes API ----
+
+FGameplayEffectModifiedAttribute* GameplayEffectSpec::GetModifiedAttribute(const GameplayAttribute& Attribute)
+{
+    for (auto& Entry : ModifiedAttributes)
+    {
+        if (Entry.Attribute.AttributeName == Attribute.AttributeName)
+            return &Entry;
+    }
+    return nullptr;
+}
+
+FGameplayEffectModifiedAttribute* GameplayEffectSpec::AddModifiedAttribute(const GameplayAttribute& Attribute)
+{
+    ModifiedAttributes.push_back({});
+    FGameplayEffectModifiedAttribute& Entry = ModifiedAttributes.back();
+    Entry.Attribute = Attribute;
+    Entry.TotalMagnitude = 0.0f;
+    return &Entry;
+}
+
 // ============================================================
 // AttributeBasedFloat
 // ============================================================
 
 float AttributeBasedFloat::CalculateMagnitude(const GameplayEffectSpec& InRelevantSpec, const FAggregatorEvaluateParameters* EvalParams) const
 {
-    // Simplified implementation - returns the formula without attribute capture
-    // (Coefficient * (PreMultiplyAdditiveValue + [Eval'd Attribute Value])) + PostMultiplyAdditiveValue
-    // For now, uses 0 as the attribute value since capture system is not yet implemented
-    float AttributeValue = 0.0f;
-
-    // When EvalParams is provided, tag filters are available for the future full attribute capture system
+    // Build evaluation parameters from provided EvalParams or spec's captured tags
+    FAggregatorEvaluateParameters Params;
     if (EvalParams)
     {
-        // EvalParams->SourceTags and EvalParams->TargetTags can be used to filter
-        // which modifiers contribute to the captured attribute value
+        Params = *EvalParams;
+    }
+    else
+    {
+        // When called without EvalParams (e.g. from Duration/MaxDuration calculation),
+        // use the spec's captured tags as default filter context
+        Params.SourceTags = &InRelevantSpec.CapturedSourceTags;
+        Params.TargetTags = &InRelevantSpec.CapturedTargetTags;
     }
 
+    // Resolve the actual attribute value through the capture system
+    float AttributeValue = 0.0f;
+    bool bCaptureValid = false;
+
+    // Determine which ASC to query based on the capture source
+    AbilitySystemComponent* SourceASC = nullptr;
+    if (BackingAttribute.AttributeSource == EGameplayEffectAttributeCaptureSource::Source)
+    {
+        // Source capture: use the instigator's ASC from the spec's effect context
+        if (InRelevantSpec.EffectContext.Data)
+        {
+            SourceASC = InRelevantSpec.EffectContext.Data->InstigatorAbilitySystemComponent;
+        }
+    }
+    else
+    {
+        // Target capture: the target ASC is not stored on the spec itself.
+        // Callers with target ASC access should provide capture specs via the spec's
+        // capture container (not yet implemented on GameplayEffectSpec).
+        gLogger->warn("AttributeBasedFloat::CalculateMagnitude: Target capture not supported without capture spec container. "
+            "BackingAttribute '{}' requires target ASC.", BackingAttribute.AttributeToCapture.AttributeName.c_str());
+    }
+
+    if (SourceASC)
+    {
+        // Find the aggregator for the backing attribute from the ASC's aggregator map
+        auto& Aggregator = SourceASC->ActiveGameplayEffects.FindOrCreateAttributeAggregator(BackingAttribute.AttributeToCapture);
+        if (Aggregator)
+        {
+            switch (AttributeCalculationType)
+            {
+            case EAttributeBasedFloatCalculationType::AttributeMagnitude:
+                AttributeValue = Aggregator->Evaluate(Params);
+                break;
+            case EAttributeBasedFloatCalculationType::AttributeBaseValue:
+                AttributeValue = Aggregator->GetBaseValue();
+                break;
+            case EAttributeBasedFloatCalculationType::AttributeBonusMagnitude:
+                AttributeValue = Aggregator->EvaluateBonus(Params);
+                break;
+            default:
+                AttributeValue = 0.0f;
+                break;
+            }
+            bCaptureValid = true;
+        }
+        else
+        {
+            gLogger->warn("AttributeBasedFloat::CalculateMagnitude: No aggregator found for attribute '{}'.",
+                BackingAttribute.AttributeToCapture.AttributeName.c_str());
+        }
+    }
+
+    if (!bCaptureValid)
+    {
+        gLogger->warn("AttributeBasedFloat::CalculateMagnitude: No valid capture for attribute '{}'. Using 0.0f.",
+            BackingAttribute.AttributeToCapture.AttributeName.c_str());
+    }
+
+    // Apply the formula: Coefficient * (PreMultiplyAdditiveValue + AttributeValue) + PostMultiplyAdditiveValue
     return Coefficient * (PreMultiplyAdditiveValue + AttributeValue) + PostMultiplyAdditiveValue;
 }
 
@@ -592,6 +733,12 @@ void ActiveGameplayEffectsContainer::InternalOnActiveGameplayEffectAdded(ActiveG
     const GameplayEffect* EffectDef = Effect.Spec.Def;
     if (!EffectDef) return;
 
+    // Register in SourceStackingMap for O(log n) AggregateBySource stacking lookup
+    if (EffectDef->StackingType == EGameplayEffectStackingType::AggregateBySource)
+    {
+        SourceStackingMap[EffectDef].push_back(Effect.Handle);
+    }
+
     // Step 1: Call OnAddedToActiveContainer which iterates GEComponents.
     // This handles tag granting (TargetTagsGEComponent), ability blocking, immunity registration, etc.
     bool bShouldBeActive = EffectDef->OnAddedToActiveContainer(*this, Effect);
@@ -649,6 +796,24 @@ void ActiveGameplayEffectsContainer::InternalOnActiveGameplayEffectRemoved(
         }
     }
 
+    // Remove from SourceStackingMap if AggregateBySource
+    {
+        auto MapIt = SourceStackingMap.find(EffectDef);
+        if (MapIt != SourceStackingMap.end())
+        {
+            auto& Handles = MapIt->second;
+            auto RemoveIt = std::remove(Handles.begin(), Handles.end(), Effect.Handle);
+            if (RemoveIt != Handles.end())
+            {
+                Handles.erase(RemoveIt, Handles.end());
+                if (Handles.empty())
+                {
+                    SourceStackingMap.erase(MapIt);
+                }
+            }
+        }
+    }
+
     Effect.bIsPendingRemove = true;
 }
 
@@ -691,4 +856,76 @@ void ActiveGameplayEffectsContainer::InternalRemoveActiveGameplayEffect(
 
     // Delegate to Remove() for the actual vector cleanup and cue removal
     Remove(Handle, bPrematureRemoval);
+}
+
+// ============================================================
+// ActiveGameplayEffectsContainer Query Methods
+// ============================================================
+
+std::vector<ActiveGameplayEffectHandle> ActiveGameplayEffectsContainer::GetActiveEffects(const FGameplayEffectQuery& Query) const
+{
+    std::vector<ActiveGameplayEffectHandle> Results;
+    for (const auto* Effect : Effects)
+    {
+        if (!Effect) continue;
+        if (!Query.Matches(*Effect))
+            continue;
+        Results.push_back(Effect->Handle);
+    }
+    return Results;
+}
+
+std::vector<float> ActiveGameplayEffectsContainer::GetActiveEffectsTimeRemaining(const FGameplayEffectQuery& Query) const
+{
+    std::vector<float> Results;
+    for (const auto* Effect : Effects)
+    {
+        if (!Effect) continue;
+        if (!Query.Matches(*Effect))
+            continue;
+        Results.push_back(Effect->GetTimeRemaining(CurrentWorldTime));
+    }
+    return Results;
+}
+
+std::vector<float> ActiveGameplayEffectsContainer::GetActiveEffectsDuration(const FGameplayEffectQuery& Query) const
+{
+    std::vector<float> Results;
+    for (const auto* Effect : Effects)
+    {
+        if (!Effect) continue;
+        if (!Query.Matches(*Effect))
+            continue;
+        Results.push_back(Effect->Spec.GetDuration());
+    }
+    return Results;
+}
+
+int32 ActiveGameplayEffectsContainer::GetActiveEffectCount(const FGameplayEffectQuery& Query, bool bEnforceOnGoingCheck) const
+{
+    int32 Count = 0;
+    for (const auto* Effect : Effects)
+    {
+        if (!Effect) continue;
+        if (bEnforceOnGoingCheck && Effect->bIsInhibited)
+            continue;
+        if (!Query.Matches(*Effect))
+            continue;
+        Count += Effect->StackCount;
+    }
+    return Count;
+}
+
+const GameplayTagContainer* ActiveGameplayEffectsContainer::GetGameplayEffectSourceTagsFromHandle(ActiveGameplayEffectHandle Handle) const
+{
+    const ActiveGameplayEffect* Effect = GetActiveGameplayEffect(Handle);
+    if (!Effect) return nullptr;
+    return &Effect->Spec.CapturedSourceTags;
+}
+
+const GameplayTagContainer* ActiveGameplayEffectsContainer::GetGameplayEffectTargetTagsFromHandle(ActiveGameplayEffectHandle Handle) const
+{
+    const ActiveGameplayEffect* Effect = GetActiveGameplayEffect(Handle);
+    if (!Effect) return nullptr;
+    return &Effect->Spec.CapturedTargetTags;
 }

@@ -14,6 +14,16 @@
 struct FGameplayEffectRemovalInfo;
 struct FGameplayModifierEvaluatedData;
 struct ActiveGameplayEffect;
+
+/** Struct used to track the magnitude of a gameplay effect modifier that was applied to an attribute */
+struct FGameplayEffectModifiedAttribute
+{
+    PROPERTY()
+    GameplayAttribute Attribute;
+
+    PROPERTY()
+    float TotalMagnitude = 0.0f;
+};
 struct ActiveGameplayEffectsContainer;
 
 /** Constants shared across GameplayEffect system */
@@ -106,6 +116,9 @@ enum class EGameplayEffectStackingDurationPolicy : uint8
 
 	/** The duration of the effect will never be refreshed */
 	NeverRefresh,
+
+	/** The duration of the effect will be extended by the remaining duration of the existing stack */
+	ExtendDuration = 2,
 };
 
 /** Enumeration of policies for dealing with the period of a gameplay effect while stacking */
@@ -235,6 +248,10 @@ struct GameplayEffectAttributeCaptureDefinition final
 	/** Source of the gameplay attribute */
 	PROPERTY()
 	EGameplayEffectAttributeCaptureSource AttributeSource;
+
+	/** Whether this attribute should be snapshotted at the time of effect application (true) or live (false) */
+	PROPERTY()
+	bool bSnapshot = false;
 };
 
 CLASS(BindJs)
@@ -561,6 +578,10 @@ struct GameplayEffect final
     PROPERTY()
 	GameplayEffectModifierMagnitude DurationMagnitude;
 
+    /** Upper bound on the computed duration. If > 0, Duration is clamped to this value. */
+    PROPERTY()
+	GameplayEffectModifierMagnitude MaxDurationMagnitude;
+
     PROPERTY()
 	FScalableFloat Period;
 
@@ -629,6 +650,10 @@ struct GameplayEffect final
 	/** If true, the entire stack of the effect will be cleared once it overflows */
 	PROPERTY()
 	bool bClearStackOnOverflow;
+
+	/** If true, modifier magnitude is multiplied by the current stack count (UE5 GAS bFactorInStackCount) */
+	PROPERTY()
+	bool bFactorInStackCount = false;
 
 	/** If true, GameplayCues will only be triggered for the first instance in a stacking GameplayEffect. */
 	PROPERTY()
@@ -790,6 +815,9 @@ struct GameplayEffectSpec
 	/** Independent duration storage */
 	float Duration = 0.0f;
 
+	/** Clamped max duration computed from Def->MaxDurationMagnitude. 0 = no clamp. */
+	float MaxDuration = 0.0f;
+
 	/** Independent period storage */
 	float Period = 0.0f;
 
@@ -798,6 +826,12 @@ struct GameplayEffectSpec
 
 	/** Tags that are dynamically granted by this effect at runtime (not from Def) */
 	GameplayTagContainer DynamicGrantedTags;
+
+	/** Runtime-only asset tags that describe the effect spec itself (distinct from DynamicGrantedTags) */
+	GameplayTagContainer DynamicAssetTags;
+
+	/** Tracked attributes modified by this spec (read-only log, not used in calculations) */
+	std::vector<FGameplayEffectModifiedAttribute> ModifiedAttributes;
 
 	/** Current stack count */
 	int32 StackCount = 1;
@@ -825,6 +859,9 @@ struct GameplayEffectSpec
 
 	/** Attempt to compute duration from the Def's duration magnitude */
 	bool AttemptCalculateDurationFromDef(float& OutDuration) const;
+
+	/** Attempt to compute max duration from the Def's MaxDurationMagnitude */
+	bool AttemptCalculateMaxDurationFromDef(float& OutDuration) const;
 
 	/** Set stack count */
 	void SetStackCount(int32 NewCount) { StackCount = NewCount; }
@@ -856,6 +893,31 @@ struct GameplayEffectSpec
 
 	/** Merge SetByCaller tag magnitudes into this spec (only adds missing keys) */
 	void MergeSetByCallerMagnitudes(const std::map<GameplayTag, float>& Magnitudes);
+
+	// ---- DynamicAssetTags API ----
+
+	/** Add a single dynamic asset tag to this effect spec */
+	void AddDynamicAssetTag(const GameplayTag& TagToAdd) { DynamicAssetTags.AddTag(TagToAdd); }
+
+	/** Append all tags from a container to this effect spec's dynamic asset tags */
+	void AppendDynamicAssetTags(const GameplayTagContainer& TagsToAppend)
+	{
+		for (const auto& Tag : TagsToAppend.GameplayTags)
+		{
+			DynamicAssetTags.AddTag(Tag);
+		}
+	}
+
+	/** Get the dynamic asset tags for this effect spec (const reference) */
+	const GameplayTagContainer& GetDynamicAssetTags() const { return DynamicAssetTags; }
+
+	// ---- ModifiedAttributes API ----
+
+	/** Find existing modified attribute entry for the given attribute, or return nullptr */
+	FGameplayEffectModifiedAttribute* GetModifiedAttribute(const GameplayAttribute& Attribute);
+
+	/** Add a new modified attribute entry (always creates new, even if one exists) */
+	FGameplayEffectModifiedAttribute* AddModifiedAttribute(const GameplayAttribute& Attribute);
 };
 
 
@@ -1082,6 +1144,46 @@ struct ActiveGameplayEffectsContainer
     void OnDurationChange(ActiveGameplayEffect& Effect, float OldTimeRemaining);
 
     // ============================================================
+    // Query Methods (FGameplayEffectQuery-based filtering)
+    // ============================================================
+
+    /**
+     * Get all active effect handles that match the given query.
+     * Iterates all effects and collects handles where Query.Matches() returns true.
+     */
+    std::vector<ActiveGameplayEffectHandle> GetActiveEffects(const FGameplayEffectQuery& Query) const;
+
+    /**
+     * Get time remaining for all active effects that match the given query.
+     * Returns GetTimeRemaining(CurrentWorldTime) for each matching effect.
+     */
+    std::vector<float> GetActiveEffectsTimeRemaining(const FGameplayEffectQuery& Query) const;
+
+    /**
+     * Get total duration for all active effects that match the given query.
+     * Returns Spec.GetDuration() for each matching effect.
+     */
+    std::vector<float> GetActiveEffectsDuration(const FGameplayEffectQuery& Query) const;
+
+    /**
+     * Count active effects matching the given query (multiplied by stack count).
+     * @param bEnforceOnGoingCheck If true, only count effects that are not inhibited.
+     */
+    int32 GetActiveEffectCount(const FGameplayEffectQuery& Query, bool bEnforceOnGoingCheck = true) const;
+
+    /**
+     * Get the captured source tags for an active gameplay effect by handle.
+     * Returns nullptr if the handle is not found.
+     */
+    const GameplayTagContainer* GetGameplayEffectSourceTagsFromHandle(ActiveGameplayEffectHandle Handle) const;
+
+    /**
+     * Get the captured target tags for an active gameplay effect by handle.
+     * Returns nullptr if the handle is not found.
+     */
+    const GameplayTagContainer* GetGameplayEffectTargetTagsFromHandle(ActiveGameplayEffectHandle Handle) const;
+
+    // ============================================================
     // Attribute Aggregator System
     // ============================================================
 
@@ -1119,6 +1221,9 @@ private:
 
     /** Internal storage of active effects */
     std::vector<ActiveGameplayEffect*> Effects;
+
+    /** Map of effect definition to vector of active handles, for O(log n) AggregateBySource stacking lookup */
+    std::map<const GameplayEffect*, std::vector<ActiveGameplayEffectHandle>> SourceStackingMap;
 };
 
 /** Trigger gameplay cues for a GameplayEffect. Typically called after Instant GE execution. */

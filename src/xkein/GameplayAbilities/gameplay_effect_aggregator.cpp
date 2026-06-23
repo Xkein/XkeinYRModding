@@ -253,6 +253,47 @@ void FAggregatorModChannelContainer::EvaluateQualificationForAllMods(
     }
 }
 
+float FAggregatorModChannelContainer::EvaluateWithBaseToChannel(float InlineBaseValue,
+    EGameplayModEvaluationChannel FinalChannel,
+    const FAggregatorEvaluateParameters& Parameters) const
+{
+    float ComputedValue = InlineBaseValue;
+
+    // std::map is ordered by key, so channels are evaluated in numeric order.
+    // Stop before reaching FinalChannel (exclusive).
+    for (const auto& [ChannelEnum, CurChannel] : ModChannelsMap)
+    {
+        if (ChannelEnum >= FinalChannel)
+        {
+            break;
+        }
+        ComputedValue = CurChannel.EvaluateWithBase(ComputedValue, Parameters);
+    }
+
+    return ComputedValue;
+}
+
+void FAggregatorModChannelContainer::GatherMods(const FAggregatorEvaluateParameters& Params,
+    std::map<EGameplayModEvaluationChannel, std::vector<FAggregatorMod>>& OutModMap) const
+{
+    // All mods should have been qualified by the caller (FAggregator::GatherMods).
+    // Access Mods member via friendship: FAggregatorModChannel befriends this container.
+    for (const auto& [ChannelEnum, CurChannel] : ModChannelsMap)
+    {
+        std::vector<FAggregatorMod>& ChannelMods = OutModMap[ChannelEnum];
+        for (const auto& ModList : CurChannel.Mods)
+        {
+            for (const FAggregatorMod& Mod : ModList)
+            {
+                if (Mod.Qualifies())
+                {
+                    ChannelMods.push_back(Mod);
+                }
+            }
+        }
+    }
+}
+
 // ========================================================================
 // FAggregator
 // ========================================================================
@@ -349,9 +390,17 @@ void FAggregator::UpdateAggregatorMod(ActiveGameplayEffectHandle ActiveHandle,
 
                 FAggregatorModChannel& ModChannel = ModChannels.FindOrAddModChannel(Channel);
 
-                const float Magnitude = (ModIdx < Spec.ModifierMagnitudes.size())
+                float Magnitude = (ModIdx < Spec.ModifierMagnitudes.size())
                     ? Spec.ModifierMagnitudes[ModIdx]
                     : 0.0f;
+
+                // Apply bFactorInStackCount multiplier if configured.
+                // Spec.ModifierMagnitudes stores raw (unmultiplied) values;
+                // the multiplication happens here at aggregator registration time.
+                if (Spec.Def->bFactorInStackCount && Spec.GetStackCount() > 1)
+                {
+                    Magnitude *= static_cast<float>(Spec.GetStackCount());
+                }
 
                 ModChannel.AddMod(Magnitude, ModDef.ModifierOp,
                     &ModDef.SourceTags, &ModDef.TargetTags,
@@ -407,6 +456,21 @@ void FAggregator::TakeSnapshotOf(const FAggregator& AggToSnapshot)
 void FAggregator::AddModsFrom(const FAggregator& SourceAggregator)
 {
     ModChannels.AddModsFrom(SourceAggregator.ModChannels);
+}
+
+float FAggregator::EvaluateWithBaseToChannel(float InlineBaseValue,
+    EGameplayModEvaluationChannel FinalChannel,
+    const FAggregatorEvaluateParameters& Parameters) const
+{
+    EvaluateQualificationForAllMods(Parameters);
+    return ModChannels.EvaluateWithBaseToChannel(InlineBaseValue, FinalChannel, Parameters);
+}
+
+void FAggregator::GatherMods(const FAggregatorEvaluateParameters& Params,
+    std::map<EGameplayModEvaluationChannel, std::vector<FAggregatorMod>>& OutModMap) const
+{
+    EvaluateQualificationForAllMods(Params);
+    ModChannels.GatherMods(Params, OutModMap);
 }
 
 void FAggregator::AddDependent(ActiveGameplayEffectHandle Handle)
@@ -555,6 +619,99 @@ void FGameplayEffectAttributeCaptureSpec::UnregisterLinkedAggregatorCallback(
     }
 }
 
+bool FGameplayEffectAttributeCaptureSpec::AttemptCalculateAttributeMagnitudeUpToChannel(
+    const FAggregatorEvaluateParameters& Params, EGameplayModEvaluationChannel FinalChannel,
+    float& OutValue) const
+{
+    if (!HasValidCapture())
+    {
+        OutValue = 0.0f;
+        return false;
+    }
+
+    OutValue = AttributeAggregator.Get()->EvaluateWithBaseToChannel(
+        AttributeAggregator.Get()->GetBaseValue(), FinalChannel, Params);
+    return true;
+}
+
+bool FGameplayEffectAttributeCaptureSpec::AttemptCalculateAttributeMagnitudeWithBase(
+    const FAggregatorEvaluateParameters& Params, float InBaseValue, float& OutValue) const
+{
+    if (!HasValidCapture())
+    {
+        OutValue = 0.0f;
+        return false;
+    }
+
+    OutValue = AttributeAggregator.Get()->EvaluateWithBase(InBaseValue, Params);
+    return true;
+}
+
+bool FGameplayEffectAttributeCaptureSpec::AttemptCalculateAttributeContributionMagnitude(
+    const FAggregatorEvaluateParameters& Params, ActiveGameplayEffectHandle ActiveHandle,
+    float& OutBonusMagnitude) const
+{
+    if (!HasValidCapture())
+    {
+        OutBonusMagnitude = 0.0f;
+        return false;
+    }
+
+    OutBonusMagnitude = AttributeAggregator.Get()->EvaluateContribution(Params, ActiveHandle);
+    return true;
+}
+
+bool FGameplayEffectAttributeCaptureSpec::AttemptGetAttributeAggregatorSnapshot(
+    FAggregator& OutAggregator) const
+{
+    if (!HasValidCapture())
+    {
+        return false;
+    }
+
+    OutAggregator.TakeSnapshotOf(*AttributeAggregator.Get());
+    return true;
+}
+
+bool FGameplayEffectAttributeCaptureSpec::AttemptAddAggregatorModsToAggregator(
+    FAggregator& OutAggregatorToAddTo) const
+{
+    if (!HasValidCapture())
+    {
+        return false;
+    }
+
+    OutAggregatorToAddTo.AddModsFrom(*AttributeAggregator.Get());
+    return true;
+}
+
+bool FGameplayEffectAttributeCaptureSpec::AttemptGatherAttributeMods(
+    const FAggregatorEvaluateParameters& Params,
+    std::map<EGameplayModEvaluationChannel, std::vector<FAggregatorMod>>& OutModMap) const
+{
+    if (!HasValidCapture())
+    {
+        return false;
+    }
+
+    AttributeAggregator.Get()->GatherMods(Params, OutModMap);
+    return !OutModMap.empty();
+}
+
+void FGameplayEffectAttributeCaptureSpec::SwapAggregator(FAggregatorRef From, FAggregatorRef To)
+{
+    if (AttributeAggregator.Get() == From.Get())
+    {
+        AttributeAggregator = To;
+    }
+}
+
+bool FGameplayEffectAttributeCaptureSpec::ShouldRefreshLinkedAggregator(
+    const FAggregator* ChangedAggregator) const
+{
+    return HasValidCapture() && AttributeAggregator.Get() == ChangedAggregator;
+}
+
 // ========================================================================
 // FGameplayEffectAttributeCaptureSpecContainer
 // ========================================================================
@@ -663,5 +820,36 @@ void FGameplayEffectAttributeCaptureSpecContainer::UnregisterLinkedAggregatorCal
     for (const auto& Spec : TargetAttributes)
     {
         Spec.UnregisterLinkedAggregatorCallback(ASC, Handle);
+    }
+}
+
+bool FGameplayEffectAttributeCaptureSpecContainer::HasNonSnapshottedAttributes() const
+{
+    for (const auto& Spec : SourceAttributes)
+    {
+        if (!Spec.BackingDefinition.bSnapshot)
+        {
+            return true;
+        }
+    }
+    for (const auto& Spec : TargetAttributes)
+    {
+        if (!Spec.BackingDefinition.bSnapshot)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void FGameplayEffectAttributeCaptureSpecContainer::SwapAggregator(FAggregatorRef From, FAggregatorRef To)
+{
+    for (auto& Spec : SourceAttributes)
+    {
+        Spec.SwapAggregator(From, To);
+    }
+    for (auto& Spec : TargetAttributes)
+    {
+        Spec.SwapAggregator(From, To);
     }
 }

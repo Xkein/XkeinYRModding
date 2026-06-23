@@ -1207,6 +1207,15 @@ bool ActiveGameplayEffectsContainer::InternalExecuteMod(
     // Step 5: Call PostGameplayEffectExecute
     TargetAttrSet->PostGameplayEffectExecute(CallbackData);
     
+    // Step 6: Track modified attribute (read-only log, not used in calculations)
+    GameplayEffectSpec& MutableSpec = const_cast<GameplayEffectSpec&>(Spec);
+    FGameplayEffectModifiedAttribute* ModifiedAttr = MutableSpec.GetModifiedAttribute(ModEvalData.Attribute);
+    if (!ModifiedAttr)
+    {
+        ModifiedAttr = MutableSpec.AddModifiedAttribute(ModEvalData.Attribute);
+    }
+    ModifiedAttr->TotalMagnitude += ModEvalData.Magnitude;
+    
     return true;
 }
 
@@ -1353,6 +1362,11 @@ void ActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModifi
             ? Spec.ModifierMagnitudes[i]
             : 0.0f;
         
+        // Apply stack count multiplier if configured (UE5 GAS bFactorInStackCount)
+        const float FinalMagnitude = (Spec.Def->bFactorInStackCount && ActiveGE.StackCount > 1)
+            ? EvalMagnitude * static_cast<float>(ActiveGE.StackCount)
+            : EvalMagnitude;
+
         // Find or create an aggregator for this modifier's attribute
         std::shared_ptr<FAggregator>& Aggregator = FindOrCreateAttributeAggregator(ModInfo.Attribute);
         if (!Aggregator) continue;
@@ -1361,7 +1375,7 @@ void ActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModifi
         constexpr EGameplayModEvaluationChannel DefaultChannel = EGameplayModEvaluationChannel::Channel0;
         
         Aggregator->AddAggregatorMod(
-            EvalMagnitude,
+            FinalMagnitude,
             ModInfo.ModifierOp,
             DefaultChannel,
             &ModInfo.SourceTags,
@@ -1375,30 +1389,29 @@ void ActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModifi
 void ActiveGameplayEffectsContainer::UpdateAllAggregatorModMagnitudes(
     ActiveGameplayEffect& ActiveGE)
 {
-    const GameplayEffectSpec& Spec = ActiveGE.Spec;
-    if (!Spec.Def) return;
+    if (!ActiveGE.Spec.Def) return;
     
-    // Update each modifier's aggregator mod with the recalculated magnitude
+    const GameplayEffectSpec& Spec = ActiveGE.Spec;
+    
+    // UE5 pattern: collect unique attributes first (via TSet equivalent)
+    // so each attribute's aggregator is only updated once, preventing
+    // multiple RemoveAggregatorMod calls from clearing other modifiers
+    // on the same attribute.
+    std::set<GameplayAttribute> UniqueAttributes;
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
     {
-        const GameplayModifierInfo& ModInfo = Spec.Def->Modifiers[i];
-        
-        // Find existing aggregator for this attribute (don't create if doesn't exist)
-        auto AggIt = AttributeAggregatorMap.find(ModInfo.Attribute);
+        UniqueAttributes.insert(Spec.Def->Modifiers[i].Attribute);
+    }
+    
+    for (const GameplayAttribute& Attr : UniqueAttributes)
+    {
+        auto AggIt = AttributeAggregatorMap.find(Attr);
         if (AggIt == AttributeAggregatorMap.end()) continue;
         
         FAggregator* Aggregator = AggIt->second.get();
         if (!Aggregator) continue;
         
-        // UpdateAggregatorMod removes old mods for this handle and re-adds
-        // with the recalculated magnitude from the spec.
-        Aggregator->UpdateAggregatorMod(
-            ActiveGE.Handle,
-            ModInfo.Attribute,
-            Spec,
-            false, // bWasLocallyGenerated — always false in lockstep
-            ActiveGE.Handle
-        );
+        Aggregator->UpdateAggregatorMod(ActiveGE.Handle, Attr, Spec, false, ActiveGE.Handle);
     }
 }
 
@@ -1591,9 +1604,9 @@ void AbilitySystemComponent::RemoveActiveEffects(const FGameplayEffectQuery& Que
 			if (!bHasMatchingGranted) continue;
 		}
 
-		if (Query.OwningTagQuery)
+		if (!Query.OwningTagQuery.IsEmpty())
 		{
-			if (!Query.OwningTagQuery->Matches(GetOwnedGameplayTags()))
+			if (!Query.OwningTagQuery.Matches(GetOwnedGameplayTags()))
 				continue;
 		}
 
@@ -1657,6 +1670,18 @@ void AbilitySystemComponent::InternalUpdateNumericalAttribute(const GameplayAttr
 
             // Notify of the change
             AttrSet->PostAttributeChange(Attribute, OldValue, NewValue);
+
+            // Broadcast attribute value change delegate
+            auto DelegateIt = AttributeValueChangeDelegates.find(Attribute);
+            if (DelegateIt != AttributeValueChangeDelegates.end())
+            {
+                FOnAttributeChangeData ChangeData;
+                ChangeData.Attribute = Attribute;
+                ChangeData.OldValue = OldValue;
+                ChangeData.NewValue = NewValue;
+                DelegateIt->second.publish(ChangeData);
+            }
+
             return;
         }
     }
@@ -1824,9 +1849,9 @@ std::vector<ActiveGameplayEffectHandle> AbilitySystemComponent::GetActiveEffects
 			if (!bHasMatchingGranted) continue;
 		}
 
-		if (Query.OwningTagQuery)
+		if (!Query.OwningTagQuery.IsEmpty())
 		{
-			if (!Query.OwningTagQuery->Matches(GetOwnedGameplayTags()))
+			if (!Query.OwningTagQuery.Matches(GetOwnedGameplayTags()))
 				continue;
 		}
 
@@ -2222,13 +2247,24 @@ ActiveGameplayEffect* ActiveGameplayEffectsContainer::FindStackableActiveGamepla
         switch (Spec.Def->StackingType)
         {
         case EGameplayEffectStackingType::AggregateBySource:
-            // Stack with same source
-            if (Effect->Spec.EffectContext.Data && Spec.EffectContext.Data &&
-                Effect->Spec.EffectContext.Data->Instigator == Spec.EffectContext.Data->Instigator)
+        {
+            // Use SourceStackingMap for O(log n) lookup by Def pointer,
+            // then filter by instigator to find the matching source's stack
+            auto MapIt = SourceStackingMap.find(Spec.Def);
+            if (MapIt != SourceStackingMap.end())
             {
-                return Effect;
+                for (const auto& Handle : MapIt->second)
+                {
+                    ActiveGameplayEffect* ActiveGE = GetActiveGameplayEffect(Handle);
+                    if (ActiveGE && ActiveGE->Spec.EffectContext.Data && Spec.EffectContext.Data &&
+                        ActiveGE->Spec.EffectContext.Data->Instigator == Spec.EffectContext.Data->Instigator)
+                    {
+                        return ActiveGE;
+                    }
+                }
             }
             break;
+        }
             
         case EGameplayEffectStackingType::AggregateByTarget:
             // Any instance of same effect stacks
@@ -2320,6 +2356,17 @@ void ActiveGameplayEffectsContainer::ApplyStackingLogic(GameplayEffectSpec& Spec
     if (Def->StackDurationRefreshPolicy == EGameplayEffectStackingDurationPolicy::RefreshOnSuccessfulApplication)
     {
         Existing->StartWorldTime = CurrentWorldTime; // Refresh to current accumulated time
+    }
+    else if (Def->StackDurationRefreshPolicy == EGameplayEffectStackingDurationPolicy::ExtendDuration)
+    {
+        // Cache remaining time before overwriting StartWorldTime (UE5 GAS pattern)
+        float CarryOverDuration = Existing->GetTimeRemaining(CurrentWorldTime);
+        Existing->StartWorldTime = CurrentWorldTime;
+        if (CarryOverDuration > 0.0f)
+        {
+            // Extend duration by the remaining time from the previous stack
+            Existing->Spec.SetDuration(Existing->Spec.GetDuration() + CarryOverDuration);
+        }
     }
     
     // Reset period per policy  
@@ -2703,6 +2750,11 @@ float AbilitySystemComponent::GetFilteredAttributeValue(GameplayAttribute Attrib
 	// - Full modifier formula: ((Base + SumAddBase) * (1+SumMultiplyAdditive) / (1+SumDivideAdditive) * ProdMultiplyCompound) + SumAddFinal
 	// - Multi-channel evaluation (Channel0..Channel9)
 	return Aggregator->Evaluate(Params);
+}
+
+FOnGameplayAttributeValueChange& AbilitySystemComponent::GetGameplayAttributeValueChangeDelegate(const GameplayAttribute& Attribute)
+{
+	return AttributeValueChangeDelegates[Attribute];
 }
 
 // ============================================================

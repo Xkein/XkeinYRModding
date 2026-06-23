@@ -3,9 +3,6 @@
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
 
-// Forward declaration for GameplayTagQuery (not yet implemented in the project)
-struct GameplayTagQuery;
-
 /**
  * FGameplayEffectQuery
  * Query struct for flexible active GameplayEffect filtering.
@@ -31,8 +28,10 @@ struct FGameplayEffectQuery
     /** Match effects that modify this specific attribute (checks Def->Modifiers). */
     GameplayAttribute ModifyingAttribute;
 
-    /** Complex tag query for the owning ASC. nullptr skips this check. */
-    const GameplayTagQuery* OwningTagQuery = nullptr;
+    /** Tag query for the owning ASC. Empty query skips this check.
+     *  At the ActiveGE level, checked against DynamicGrantedTags.
+     *  At the ASC level, checked against GetOwnedGameplayTags(). */
+    GameplayTagQuery OwningTagQuery;
 
     // ============================================================
     // Phase 7: Enhanced filtering
@@ -46,6 +45,22 @@ struct FGameplayEffectQuery
 
     /** If true, EffectTagsToMatch uses HasAny matching; otherwise uses HasAll. */
     bool bEffectTagsMatchAny = false;
+
+    // ============================================================
+    // Phase 9: GameplayTagQuery dimensions
+    // ============================================================
+
+    /** Tag query against effect definition's asset tags. Superset of EffectTagsToMatch.
+     *  Empty query (= IsEmpty()) skips this check. */
+    GameplayTagQuery EffectTagQuery;
+
+    /** Tag query against captured source tags. Superset of SourceTags.
+     *  Empty query (= IsEmpty()) skips this check. */
+    GameplayTagQuery SourceTagQuery;
+
+    /** Tag query against source's aggregate tags (captured source tags snapshot).
+     *  Empty query (= IsEmpty()) skips this check. */
+    GameplayTagQuery SourceAggregateTagQuery;
 
     /** Custom match delegate for project-specific filter logic. Called after all other checks pass. */
     std::function<bool(const ActiveGameplayEffect&)> CustomMatchDelegate;
@@ -67,8 +82,11 @@ struct FGameplayEffectQuery
             && !TargetTags.IsValid()
             && !GrantedTags.IsValid()
             && ModifyingAttribute.AttributeName.IsEmpty()
-            && OwningTagQuery == nullptr
+            && OwningTagQuery.IsEmpty()
             && !EffectTagsToMatch.IsValid()
+            && EffectTagQuery.IsEmpty()
+            && SourceTagQuery.IsEmpty()
+            && SourceAggregateTagQuery.IsEmpty()
             && !CustomMatchDelegate
             && IgnoreHandles.empty();
     }
@@ -112,6 +130,22 @@ struct FGameplayEffectQuery
         Query.bEffectTagsMatchAny = false;
         return Query;
     }
+
+    /** Create a query that matches effects whose dynamic granted tags do NOT contain any of the given tags.
+     *  Evaluated against ActiveGE.Spec.DynamicGrantedTags via OwningTagQuery. */
+    static FGameplayEffectQuery MakeQuery_MatchNoOwningTags(const GameplayTagContainer& Tags)
+    {
+        FGameplayEffectQuery Query;
+        GameplayTagQuery Q;
+        Q.TagTokens = Tags.GameplayTags;
+        FGameplayTagQueryExpression Expr;
+        Expr.ExprType = EGameplayTagQueryExprType::NoTagsMatch;
+        Expr.StartIndex = 0;
+        Expr.Count = static_cast<int32>(Q.TagTokens.size());
+        Q.Expressions.push_back(Expr);
+        Query.OwningTagQuery = Q;
+        return Query;
+    }
 };
 
 inline bool FGameplayEffectQuery::Matches(const ActiveGameplayEffect& ActiveGE) const
@@ -129,6 +163,13 @@ inline bool FGameplayEffectQuery::Matches(const ActiveGameplayEffect& ActiveGE) 
     // Check spec-level criteria
     if (!Matches(ActiveGE.Spec))
         return false;
+
+    // OwningTagQuery check — expression-tree evaluation against dynamic granted tags
+    if (!OwningTagQuery.IsEmpty())
+    {
+        if (!OwningTagQuery.Matches(ActiveGE.Spec.DynamicGrantedTags))
+            return false;
+    }
 
     // Check CustomMatchDelegate
     if (CustomMatchDelegate)
@@ -201,6 +242,29 @@ inline bool FGameplayEffectQuery::Matches(const GameplayEffectSpec& Spec) const
             if (!Spec.Def->GetAssetTags().HasAll(EffectTagsToMatch))
                 return false;
         }
+    }
+
+    // EffectTagQuery check — expression-tree evaluation against asset tags (superset of EffectTagsToMatch)
+    if (!EffectTagQuery.IsEmpty())
+    {
+        if (!Spec.Def)
+            return false;
+        if (!EffectTagQuery.Matches(Spec.Def->GetAssetTags()))
+            return false;
+    }
+
+    // SourceTagQuery check — expression-tree evaluation against captured source tags (superset of SourceTags)
+    if (!SourceTagQuery.IsEmpty())
+    {
+        if (!SourceTagQuery.Matches(Spec.CapturedSourceTags))
+            return false;
+    }
+
+    // SourceAggregateTagQuery check — expression-tree evaluation against captured source tags
+    if (!SourceAggregateTagQuery.IsEmpty())
+    {
+        if (!SourceAggregateTagQuery.Matches(Spec.CapturedSourceTags))
+            return false;
     }
 
     // GrantedTags and OwningTagQuery are ASC-level checks — handled by

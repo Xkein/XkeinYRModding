@@ -239,6 +239,8 @@ struct GameplayTagQuery
     /** Build a query that matches when ALL of InTags are present */
     static GameplayTagQuery MakeQuery_MatchAllTagsMatch(const GameplayTagContainer& InTags);
 
+    friend struct FGameplayEffectQuery;
+
 private:
     bool EvaluateExpression(int32 ExprIndex, const GameplayTagContainer& Container) const;
 

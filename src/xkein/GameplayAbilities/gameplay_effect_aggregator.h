@@ -191,6 +191,20 @@ struct FAggregatorModChannelContainer
      */
     void AddModsFrom(const FAggregatorModChannelContainer& Other);
 
+    /**
+     * Evaluate channels in numeric order up to (but not including) FinalChannel.
+     * Each channel's output becomes the next channel's base value.
+     */
+    float EvaluateWithBaseToChannel(float InlineBaseValue, EGameplayModEvaluationChannel FinalChannel,
+        const FAggregatorEvaluateParameters& Parameters) const;
+
+    /**
+     * For each channel, collect qualifying modifiers into the output map.
+     * Modifiers are first qualified against Params before being collected.
+     */
+    void GatherMods(const FAggregatorEvaluateParameters& Params,
+        std::map<EGameplayModEvaluationChannel, std::vector<FAggregatorMod>>& OutModMap) const;
+
     /** Run UpdateQualifies on every modifier across all channels */
     void EvaluateQualificationForAllMods(const FAggregatorEvaluateParameters& Parameters) const;
 
@@ -273,6 +287,20 @@ struct FAggregator : public std::enable_shared_from_this<FAggregator>
      * Evaluate the aggregator with an arbitrary base value instead of the internal one.
      */
     float EvaluateWithBase(float InlineBaseValue, const FAggregatorEvaluateParameters& Parameters) const;
+
+    /**
+     * Evaluate channels in numeric order up to (but not including) FinalChannel.
+     * Each channel's output becomes the next channel's base value.
+     */
+    float EvaluateWithBaseToChannel(float InlineBaseValue, EGameplayModEvaluationChannel FinalChannel,
+        const FAggregatorEvaluateParameters& Parameters) const;
+
+    /**
+     * For each channel, collect qualifying modifiers into the output map.
+     * Modifiers are first qualified against Params before being collected.
+     */
+    void GatherMods(const FAggregatorEvaluateParameters& Params,
+        std::map<EGameplayModEvaluationChannel, std::vector<FAggregatorMod>>& OutModMap) const;
 
     /**
      * Evaluate the "bonus" portion: final value minus base value.
@@ -406,6 +434,27 @@ struct FGameplayEffectAttributeCaptureSpec
     bool AttemptCalculateAttributeMagnitude(const FAggregatorEvaluateParameters& Params, float& OutValue) const;
 
     /**
+     * Evaluate the attribute's magnitude through channels up to (but not including) FinalChannel.
+     * Useful when a calculation needs the intermediate value before certain channels have been applied.
+     * @param Params Parameters controlling which modifiers qualify
+     * @param FinalChannel The last channel to evaluate (exclusive)
+     * @param OutValue [out] The evaluated magnitude up to FinalChannel
+     * @return True if evaluation succeeded (capture is valid)
+     */
+    bool AttemptCalculateAttributeMagnitudeUpToChannel(const FAggregatorEvaluateParameters& Params,
+        EGameplayModEvaluationChannel FinalChannel, float& OutValue) const;
+
+    /**
+     * Evaluate the attribute's magnitude using an arbitrary base value instead of the internal one.
+     * @param Params Parameters controlling which modifiers qualify
+     * @param InBaseValue The base value to use instead of the aggregator's stored base
+     * @param OutValue [out] The evaluated magnitude
+     * @return True if evaluation succeeded (capture is valid)
+     */
+    bool AttemptCalculateAttributeMagnitudeWithBase(const FAggregatorEvaluateParameters& Params,
+        float InBaseValue, float& OutValue) const;
+
+    /**
      * Get the attribute's base value (without modifiers).
      * @param OutValue [out] The base value
      * @return True if successful
@@ -419,6 +468,54 @@ struct FGameplayEffectAttributeCaptureSpec
      * @return True if successful
      */
     bool AttemptCalculateAttributeBonusMagnitude(const FAggregatorEvaluateParameters& Params, float& OutValue) const;
+
+    /**
+     * Evaluate how much a specific active gameplay effect contributes to the final magnitude.
+     * Computed as: Evaluate(all) - Evaluate(excluding the given handle).
+     * @param Params Parameters controlling which modifiers qualify
+     * @param ActiveHandle The active GE handle to isolate
+     * @param OutBonusMagnitude [out] The contribution of the specified GE
+     * @return True if evaluation succeeded (capture is valid)
+     */
+    bool AttemptCalculateAttributeContributionMagnitude(const FAggregatorEvaluateParameters& Params,
+        ActiveGameplayEffectHandle ActiveHandle, float& OutBonusMagnitude) const;
+
+    /**
+     * Take a full snapshot (deep copy) of the linked aggregator into OutAggregator.
+     * The snapshot is independent and will not reflect future changes to the source aggregator.
+     * @param OutAggregator [out] The aggregator to receive the snapshot
+     * @return True if the capture is valid and the snapshot was taken
+     */
+    bool AttemptGetAttributeAggregatorSnapshot(FAggregator& OutAggregator) const;
+
+    /**
+     * Copy all modifiers from the linked aggregator into OutAggregatorToAddTo.
+     * @param OutAggregatorToAddTo The target aggregator to receive the modifiers
+     * @return True if the capture is valid and mods were added
+     */
+    bool AttemptAddAggregatorModsToAggregator(FAggregator& OutAggregatorToAddTo) const;
+
+    /**
+     * Gather all qualifying modifiers into a channel-indexed map.
+     * @param Params Parameters controlling which modifiers qualify
+     * @param OutModMap [out] Map from channel to qualifying modifiers
+     * @return True if the capture is valid and mods were gathered (map non-empty)
+     */
+    bool AttemptGatherAttributeMods(const FAggregatorEvaluateParameters& Params,
+        std::map<EGameplayModEvaluationChannel, std::vector<FAggregatorMod>>& OutModMap) const;
+
+    /**
+     * If the current AttributeAggregator matches From, swap it to To.
+     * Used during aggregator relocation (e.g. when a gameplay effect transitions between ASCs).
+     */
+    void SwapAggregator(FAggregatorRef From, FAggregatorRef To);
+
+    /**
+     * Check whether the given ChangedAggregator is the one this spec references.
+     * Used to determine if a callback notification should trigger a spec refresh.
+     * @return True if ChangedAggregator matches the spec's linked aggregator
+     */
+    bool ShouldRefreshLinkedAggregator(const FAggregator* ChangedAggregator) const;
 
     /**
      * Register a dependent gameplay effect handle on the linked aggregator.
@@ -468,6 +565,13 @@ struct FGameplayEffectAttributeCaptureSpecContainer
     const FGameplayEffectAttributeCaptureSpec* FindCaptureSpecByDefinition(const GameplayEffectAttributeCaptureDefinition& Def) const;
 
     /**
+     * Check if any captured attribute spec is non-snapshotted (live).
+     * Non-snapshotted attributes read from the aggregator in real time.
+     * @return True if at least one capture definition has bSnapshot=false
+     */
+    bool HasNonSnapshottedAttributes() const;
+
+    /**
      * Check if all given definitions have valid captured specs.
      * @param Defs Definitions to check
      * @return True if all definitions have valid captures
@@ -479,6 +583,12 @@ struct FGameplayEffectAttributeCaptureSpecContainer
 
     /** Unregister linked aggregator callbacks for all captured specs */
     void UnregisterLinkedAggregatorCallbacks(AbilitySystemComponent* ASC, ActiveGameplayEffectHandle Handle) const;
+
+    /**
+     * Swap aggregator references across all captured specs.
+     * If a spec's AttributeAggregator matches From, it is replaced with To.
+     */
+    void SwapAggregator(FAggregatorRef From, FAggregatorRef To);
 
     /** Captured attributes from the source (caster) */
     std::vector<FGameplayEffectAttributeCaptureSpec> SourceAttributes;
