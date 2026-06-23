@@ -29,7 +29,7 @@ target("YrExtCore")
     set_languages("cxxlatest")
     add_rules("codegen-cpp")
     add_deps("Core", "YRpp")
-    add_packages("asmjit", "zydis", { public = true })
+    add_packages("asmjit", "zydis", "dobby_local", { public = true })
     if has_config("enable_hook_try_except") then
         add_defines("ENABLE_HOOK_TRY_EXCEPT")
     end
