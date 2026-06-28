@@ -179,7 +179,8 @@ if (initSoundBankNames && initSoundBankNames.length) {
     global.__globalSoundBanks = globalSoundBanks;
 }
 let audio_component_add = (yrObject, entity) => {
-    if (!yrObject.m_Type.audioConfig)
+    let audioConfig = (0, ini_helper_1.GetIniComponent)(AudioConfig, yrObject.m_Type);
+    if (!audioConfig)
         return;
     if (!entity)
         entity = XkeinExt_1.JsCppHelper.GetEntityByYrObject(yrObject);
@@ -231,7 +232,7 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectUnlimboChec
     let yrObject = E.m_pObject;
     if (!yrObject.m_Type)
         return;
-    let audioConfig = yrObject.m_Type.audioConfig;
+    let audioConfig = (0, ini_helper_1.GetIniComponent)(AudioConfig, yrObject.m_Type);
     if (audioConfig && audioConfig.createEvent) {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.createEvent, yrObject.audioComponent.m_akGameObjId);
     }
@@ -240,7 +241,7 @@ game_event_1.gameEvents.registerHookEventHandler(YrExtCore_1.YrObjectLimboChecke
     let yrObject = E.m_pObject;
     if (!yrObject.m_Type)
         return;
-    let audioConfig = yrObject.m_Type.audioConfig;
+    let audioConfig = (0, ini_helper_1.GetIniComponent)(AudioConfig, yrObject.m_Type);
     if (audioConfig && audioConfig.removeEvent) {
         XkeinExt_1.AudioSystem.PostEvent(audioConfig.removeEvent, yrObject.audioComponent.m_akGameObjId);
     }
