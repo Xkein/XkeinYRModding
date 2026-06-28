@@ -21,17 +21,16 @@ void AbilityTask_WaitGameplayEffectApplied::Activate()
 {
 	if (ASC)
 	{
-		entt::sink sink{ASC->OnGameplayEffectAppliedDelegateToSelf};
-		DelegateConnection = sink.connect<&AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf>(*this);
+		OnAppliedHandle = ASC->OnGameplayEffectAppliedDelegateToSelf.Add<&AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf>(*this);
 	}
 }
 
 void AbilityTask_WaitGameplayEffectApplied::OnDestroy(bool bOwnerFinished)
 {
 	// Disconnect from ASC delegate
-	if (DelegateConnection)
+	if (OnAppliedHandle.IsValid())
 	{
-		DelegateConnection.release();
+		ASC->OnGameplayEffectAppliedDelegateToSelf.Remove(OnAppliedHandle);
 	}
 
 	if (!bFinished)

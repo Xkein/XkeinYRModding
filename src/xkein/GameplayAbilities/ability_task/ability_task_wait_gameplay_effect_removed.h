@@ -2,7 +2,7 @@
 #include "ability_task.h"
 #include "xkein/GameplayAbilities/active_gameplay_effect_handle.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
-#include <entt/signal/sigh.hpp>
+#include "core/tool/delegate.h"
 
 /**
  * AbilityTask_WaitGameplayEffectRemoved
@@ -37,8 +37,8 @@ public:
 	std::function<void()> OnInvalidHandle;
 
 private:
-	/** Connection to the active effect's OnRemoved delegate */
-	entt::connection DelegateConnection;
+	/** Handle to the active effect's OnRemoved delegate */
+	FDelegateHandle OnRemovedHandle;
 
 	/** Whether the delegate was successfully registered */
 	bool bRegistered = false;

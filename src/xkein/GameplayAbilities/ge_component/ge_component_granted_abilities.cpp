@@ -1,7 +1,6 @@
 #include "ge_component_granted_abilities.h"
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
-#include <entt/signal/sigh.hpp>
 
 bool GrantedAbilitiesGEComponent::OnActiveGameplayEffectAdded(
     ActiveGameplayEffectsContainer& Container,
@@ -13,10 +12,8 @@ bool GrantedAbilitiesGEComponent::OnActiveGameplayEffectAdded(
         auto* EventSet = Container.Owner->GetActiveEffectEventSet(Effect.Handle);
         if (EventSet)
         {
-            entt::sink sink{EventSet->OnRemoved};
-            Effect.OnRemovedDelegateHandle = sink.connect<&GrantedAbilitiesGEComponent::OnActiveGameplayEffectRemoved>(*this);
-            entt::sink sink2{EventSet->OnInhibitionChanged};
-            Effect.OnInhibitionChangedDelegateHandle = sink2.connect<&GrantedAbilitiesGEComponent::OnInhibitionChanged>(*this);
+            Effect.OnRemovedDelegateHandle = EventSet->OnRemoved.Add<&GrantedAbilitiesGEComponent::OnActiveGameplayEffectRemoved>(*this);
+            Effect.OnInhibitionChangedDelegateHandle = EventSet->OnInhibitionChanged.Add<&GrantedAbilitiesGEComponent::OnInhibitionChanged>(*this);
         }
 
         GrantAbilities(Effect.Handle);

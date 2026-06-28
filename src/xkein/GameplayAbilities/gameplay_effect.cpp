@@ -792,7 +792,7 @@ void ActiveGameplayEffectsContainer::InternalOnActiveGameplayEffectRemoved(
         auto EventIt = Owner->ActiveEffectEventSets.find(Effect.Handle);
         if (EventIt != Owner->ActiveEffectEventSets.end())
         {
-            EventIt->second.OnRemoved.publish(RemovalInfo);
+            EventIt->second.OnRemoved.Broadcast(RemovalInfo);
         }
     }
 
@@ -839,7 +839,7 @@ void ActiveGameplayEffectsContainer::InternalRemoveActiveGameplayEffect(
             auto EventIt = Owner->ActiveEffectEventSets.find(Handle);
             if (EventIt != Owner->ActiveEffectEventSets.end())
             {
-                EventIt->second.OnStackChanged.publish(Handle, Effect->StackCount, OldCount);
+                EventIt->second.OnStackChanged.Broadcast(Handle, Effect->StackCount, OldCount);
             }
         }
         return;

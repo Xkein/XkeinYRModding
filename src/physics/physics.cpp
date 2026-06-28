@@ -167,9 +167,9 @@ JPH::ValidateResult ContactListenerImpl::OnContactValidate(const JPH::Body& inBo
     return result;
 }
 
-entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)> gSignalOnCollisionEnter;
-entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)> gSignalOnCollisionPersist;
-entt::sigh<void(const PhysicsCollisionRemoveResult&)> gSignalOnCollisionExit;
+TMulticastDelegate<void(const PhysicsCollisionAddAndPersistResult&)> Physics::mOnCollisionEnter;
+TMulticastDelegate<void(const PhysicsCollisionAddAndPersistResult&)> Physics::mOnCollisionPersist;
+TMulticastDelegate<void(const PhysicsCollisionRemoveResult&)> Physics::mOnCollisionExit;
 
 void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
 {
@@ -185,7 +185,7 @@ void OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JP
     result.point = ToCoord(inManifold.GetWorldSpaceContactPointOn1(0));
     result.normal = ToVector3f(inManifold.mWorldSpaceNormal);
 
-    gSignalOnCollisionEnter.publish(result);
+    Physics::mOnCollisionEnter.Broadcast(result);
 }
 
 void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
@@ -202,7 +202,7 @@ void OnContactPersisted(const JPH::Body& inBody1, const JPH::Body& inBody2, cons
     result.point = ToCoord(inManifold.GetWorldSpaceContactPointOn1(0));
     result.normal = ToVector3f(inManifold.mWorldSpaceNormal);
     
-    gSignalOnCollisionPersist.publish(result);
+    Physics::mOnCollisionPersist.Broadcast(result);
 }
 
 void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
@@ -217,7 +217,7 @@ void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair)
     result.com1 = com1;
     result.com2 = com2;
 
-    gSignalOnCollisionExit.publish(result);
+    Physics::mOnCollisionExit.Broadcast(result);
 }
 
 void ContactListenerImpl::OnContactAdded(const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold, JPH::ContactSettings& ioSettings)
@@ -318,9 +318,21 @@ XKEINEXT_API JPH::ObjectLayerPairFilter* gObjectLayerPairFilter = nullptr;
 
 XKEINEXT_API TerrainBody* Physics::gTerrainBody = nullptr;
 
-XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)>>* Physics::gOnCollisionEnter;
-XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)>>* Physics::gOnCollisionPersist;
-XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionRemoveResult&)>>* Physics::gOnCollisionExit;
+XKEINEXT_API TMulticastDelegateRegistration<void(const PhysicsCollisionAddAndPersistResult&)>& Physics::GetOnCollisionEnter()
+{
+    static TMulticastDelegateRegistration<void(const PhysicsCollisionAddAndPersistResult&)> reg{mOnCollisionEnter};
+    return reg;
+}
+XKEINEXT_API TMulticastDelegateRegistration<void(const PhysicsCollisionAddAndPersistResult&)>& Physics::GetOnCollisionPersist()
+{
+    static TMulticastDelegateRegistration<void(const PhysicsCollisionAddAndPersistResult&)> reg{mOnCollisionPersist};
+    return reg;
+}
+XKEINEXT_API TMulticastDelegateRegistration<void(const PhysicsCollisionRemoveResult&)>& Physics::GetOnCollisionExit()
+{
+    static TMulticastDelegateRegistration<void(const PhysicsCollisionRemoveResult&)> reg{mOnCollisionExit};
+    return reg;
+}
 
 static constexpr uint cNumBodies             = 10240;
 static constexpr uint cNumBodyMutexes        = 0; // Autodetect
@@ -361,21 +373,16 @@ void Physics::Init()
     gObjectVsBroadPhaseLayerFilter = new ObjectVsBroadPhaseLayerFilterImpl();
     gObjectLayerPairFilter         = new ObjectLayerPairFilterImpl();
 
-    gOnCollisionEnter = new entt::sink{gSignalOnCollisionEnter};
-    gOnCollisionPersist = new entt::sink{gSignalOnCollisionPersist};
-    gOnCollisionExit = new entt::sink{gSignalOnCollisionExit};
+    // TMulticastDelegate members are ready to use — no sink creation needed
 
     gLogger->info("physics module inited.");
 }
 
 void Physics::Destroy()
 {
-    gOnCollisionEnter->disconnect();
-    delete gOnCollisionEnter;
-    gOnCollisionPersist->disconnect();
-    delete gOnCollisionPersist;
-    gOnCollisionExit->disconnect();
-    delete gOnCollisionExit;
+    mOnCollisionEnter.Clear();
+    mOnCollisionPersist.Clear();
+    mOnCollisionExit.Clear();
 
     delete gBroadPhaseLayerInterface;
     delete gObjectVsBroadPhaseLayerFilter;

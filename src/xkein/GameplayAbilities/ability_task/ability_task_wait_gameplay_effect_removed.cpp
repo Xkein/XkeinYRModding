@@ -38,8 +38,7 @@ void AbilityTask_WaitGameplayEffectRemoved::Activate()
 		FActiveGameplayEffectEvents* Events = ASC->GetActiveEffectEventSet(EffectHandle);
 		if (Events)
 		{
-			entt::sink sink{Events->OnRemoved};
-			DelegateConnection = sink.connect<&AbilityTask_WaitGameplayEffectRemoved::OnEffectRemovedCallback>(*this);
+			OnRemovedHandle = Events->OnRemoved.Add<&AbilityTask_WaitGameplayEffectRemoved::OnEffectRemovedCallback>(*this);
 			bRegistered = true;
 		}
 	}
@@ -53,10 +52,15 @@ void AbilityTask_WaitGameplayEffectRemoved::Activate()
 
 void AbilityTask_WaitGameplayEffectRemoved::OnDestroy(bool bOwnerFinished)
 {
-	// Disconnect from active effect delegate
-	if (DelegateConnection)
+	// Remove from active effect delegate
+	if (OnRemovedHandle.IsValid() && ASC)
 	{
-		DelegateConnection.release();
+		FActiveGameplayEffectEvents* Events = ASC->GetActiveEffectEventSet(EffectHandle);
+		if (Events)
+		{
+			Events->OnRemoved.Remove(OnRemovedHandle);
+		}
+		OnRemovedHandle.Reset();
 	}
 
 	if (!bFinished)

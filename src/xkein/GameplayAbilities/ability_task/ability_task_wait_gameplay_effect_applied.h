@@ -1,7 +1,7 @@
 #pragma once
 #include "ability_task.h"
 #include "xkein/GameplayAbilities/gameplay_effect_query.h"
-#include <entt/signal/sigh.hpp>
+#include "core/tool/delegate.h"
 
 /**
  * AbilityTask_WaitGameplayEffectApplied
@@ -34,8 +34,8 @@ public:
 	std::function<void(const GameplayEffectSpec&)> OnEffectApplied;
 
 private:
-	/** Connection to the ASC's OnGameplayEffectAppliedDelegateToSelf delegate */
-	entt::connection DelegateConnection;
+	/** Handle to the ASC's OnGameplayEffectAppliedDelegateToSelf delegate */
+	FDelegateHandle OnAppliedHandle;
 
 	/** Prevents re-entrancy in the callback (mirrors UE's Locked flag) */
 	bool bLocked = false;

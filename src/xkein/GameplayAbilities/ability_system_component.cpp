@@ -267,11 +267,11 @@ void AbilitySystemComponent::NotifyTagCountChanged(const GameplayTag& Tag, int32
     auto It = GameplayTagEventMap.find(Tag);
     if (It != GameplayTagEventMap.end())
     {
-        It->second.publish(Tag, NewCount);
+        It->second.Broadcast(Tag, NewCount);
     }
 
     // Dispatch generic tag count changed delegate
-    OnGenericTagCountChanged.publish(Tag, NewCount);
+    OnGenericTagCountChanged.Broadcast(Tag, NewCount);
 
     // Dispatch filtered callbacks (EventType-aware)
     auto FilterIt = FilteredTagCallbacks.find(Tag);
@@ -543,10 +543,9 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 			{
 				FOnGameplayEffectTagCountChanged& CountChangedEvent = RegisterGameplayTagEvent(EventTag);
 				// Add a tag change callback if there isn't one already
-				if (CountChangedEvent.empty())
+				if (!CountChangedEvent.IsBound())
 				{
-					entt::sink sink{CountChangedEvent};
-					sink.connect<&AbilitySystemComponent::NotifyTagCountChanged>(*this);
+					CountChangedEvent.Add<&AbilitySystemComponent::NotifyTagCountChanged>(*this);
 				}
 			}
 		}
@@ -565,7 +564,7 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 
 void AbilitySystemComponent::MarkAbilitySpecDirty(GameplayAbilitySpec& Spec, bool WasAddOrRemove)
 {
-    AbilitySpecDirtiedCallbacks.publish(Spec);
+    AbilitySpecDirtiedCallbacks.Broadcast(Spec);
 }
 
 // ============================================================
@@ -846,17 +845,17 @@ void AbilitySystemComponent::NotifyAbilityCommit(GameplayAbility* Ability)
         }
     }
     
-    AbilityCommittedCallbacks.publish(FoundHandle, Ability);
+    AbilityCommittedCallbacks.Broadcast(FoundHandle, Ability);
 }
 
 void AbilitySystemComponent::NotifyAbilityActivated(const GameplayAbilitySpecHandle Handle, GameplayAbility* Ability)
 {
-    AbilityActivatedCallbacks.publish(Handle, Ability);
+    AbilityActivatedCallbacks.Broadcast(Handle, Ability);
 }
 
 void AbilitySystemComponent::NotifyAbilityFailed(const GameplayAbilitySpecHandle Handle, GameplayAbility* Ability, const GameplayTagContainer& FailureReason)
 {
-    AbilityFailedCallbacks.publish(Ability, FailureReason);
+    AbilityFailedCallbacks.Broadcast(Ability, FailureReason);
 }
 
 void AbilitySystemComponent::NotifyAbilityEnded(GameplayAbilitySpecHandle Handle, GameplayAbility* Ability, bool bWasCancelled)
@@ -881,7 +880,7 @@ void AbilitySystemComponent::NotifyAbilityEnded(GameplayAbilitySpecHandle Handle
         Spec->ActiveCount--;
     }
 
-    AbilityEndedCallbacks.publish(Ability);
+    AbilityEndedCallbacks.Broadcast(Ability);
 
     // For InstancedPerExecution, mark for deletion
     if (Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerExecution)
@@ -1471,7 +1470,7 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
         Effect->OnApplied(Target->ActiveGameplayEffects, Spec, *Target);
         
         // Broadcast application delegate (invalid handle for instant)
-        Target->OnGameplayEffectAppliedDelegateToTarget.publish(Target, Spec, ActiveGameplayEffectHandle(-1));
+        Target->OnGameplayEffectAppliedDelegateToTarget.Broadcast(Target, Spec, ActiveGameplayEffectHandle(-1));
         
         return ActiveGameplayEffectHandle(-1);
     }
@@ -1495,7 +1494,7 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
         Effect->OnApplied(Target->ActiveGameplayEffects, Spec, *Target);
         
         // Broadcast application delegate
-        Target->OnGameplayEffectAppliedDelegateToTarget.publish(Target, Spec, Handle);
+        Target->OnGameplayEffectAppliedDelegateToTarget.Broadcast(Target, Spec, Handle);
         
         return Handle;
     }
@@ -1518,13 +1517,13 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToSelf(
         Spec.EffectContext.Data = std::make_unique<GameplayEffectContext>(Context);
 
         // Broadcast self-applied delegate
-        OnGameplayEffectAppliedDelegateToSelf.publish(this, Spec, Handle);
+        OnGameplayEffectAppliedDelegateToSelf.Broadcast(this, Spec, Handle);
 
         // For duration/infinite effects, also broadcast active effect added
         if (Effect && (Effect->DurationPolicy == EGameplayEffectDurationType::Infinite ||
                        Effect->DurationPolicy == EGameplayEffectDurationType::HasDuration))
         {
-            OnActiveGameplayEffectAddedDelegateToSelf.publish(this, Spec, Handle);
+            OnActiveGameplayEffectAddedDelegateToSelf.Broadcast(this, Spec, Handle);
         }
     }
 
@@ -1672,7 +1671,7 @@ void AbilitySystemComponent::InternalUpdateNumericalAttribute(const GameplayAttr
                 ChangeData.Attribute = Attribute;
                 ChangeData.OldValue = OldValue;
                 ChangeData.NewValue = NewValue;
-                DelegateIt->second.publish(ChangeData);
+                DelegateIt->second.Broadcast(ChangeData);
             }
 
             return;
@@ -2011,11 +2010,9 @@ void ActiveGameplayEffectsContainer::Remove(ActiveGameplayEffectHandle Handle, b
         [Handle](ActiveGameplayEffect* E) {
             if (E && E->Handle == Handle)
             {
-                // Release delegate connections
-                if (E->OnRemovedDelegateHandle)
-                    E->OnRemovedDelegateHandle.release();
-                if (E->OnInhibitionChangedDelegateHandle)
-                    E->OnInhibitionChangedDelegateHandle.release();
+                // Reset delegate handles
+                E->OnRemovedDelegateHandle.Reset();
+                E->OnInhibitionChangedDelegateHandle.Reset();
 
                 delete E;
                 return true;
@@ -2076,7 +2073,7 @@ void ActiveGameplayEffectsContainer::Tick(float DeltaTime)
                     auto EventIt = Owner->ActiveEffectEventSets.find(Effect->Handle);
                     if (EventIt != Owner->ActiveEffectEventSets.end())
                     {
-                        EventIt->second.OnTimeChanged.publish(Effect->Handle, NewTimeRemaining, OldTimeRemaining);
+                        EventIt->second.OnTimeChanged.Broadcast(Effect->Handle, NewTimeRemaining, OldTimeRemaining);
                     }
                 }
             }
@@ -2104,8 +2101,8 @@ void ActiveGameplayEffectsContainer::Tick(float DeltaTime)
             
             // Broadcast periodic execution — both self and target delegates fire
             // since active effects are always on the owning ASC
-            Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.publish(Owner, Effect->Spec, Handle);
-            Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.publish(Owner, Effect->Spec, Handle);
+            Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.Broadcast(Owner, Effect->Spec, Handle);
+            Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.Broadcast(Owner, Effect->Spec, Handle);
 
             // Trigger Executed GameplayCues for periodic effects
             if (Effect->Spec.Def->GameplayCues.size() > 0)
@@ -2147,8 +2144,8 @@ void ActiveGameplayEffectsContainer::CheckDuration(ActiveGameplayEffectHandle Ha
         if (TimeUntilNextPeriod <= 0.1f && Owner)
         {
             ExecuteActiveEffectsFrom(Effect->Spec, Owner);
-            Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.publish(Owner, Effect->Spec, Handle);
-            Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.publish(Owner, Effect->Spec, Handle);
+            Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.Broadcast(Owner, Effect->Spec, Handle);
+            Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.Broadcast(Owner, Effect->Spec, Handle);
             
             if (Def->GameplayCues.size() > 0)
             {
@@ -2198,7 +2195,7 @@ void ActiveGameplayEffectsContainer::OnStackCountChange(ActiveGameplayEffect& Ef
     auto EventIt = Owner->ActiveEffectEventSets.find(Effect.Handle);
     if (EventIt != Owner->ActiveEffectEventSets.end())
     {
-        EventIt->second.OnStackChanged.publish(Effect.Handle, NewCount, OldCount);
+        EventIt->second.OnStackChanged.Broadcast(Effect.Handle, NewCount, OldCount);
     }
 }
 
@@ -2215,7 +2212,7 @@ void ActiveGameplayEffectsContainer::OnDurationChange(ActiveGameplayEffect& Effe
     auto EventIt = Owner->ActiveEffectEventSets.find(Effect.Handle);
     if (EventIt != Owner->ActiveEffectEventSets.end())
     {
-        EventIt->second.OnTimeChanged.publish(Effect.Handle, NewTimeRemaining, OldTimeRemaining);
+        EventIt->second.OnTimeChanged.Broadcast(Effect.Handle, NewTimeRemaining, OldTimeRemaining);
     }
 }
     
@@ -2341,7 +2338,7 @@ void ActiveGameplayEffectsContainer::ApplyStackingLogic(GameplayEffectSpec& Spec
         auto EventIt = Owner->ActiveEffectEventSets.find(Existing->Handle);
         if (EventIt != Owner->ActiveEffectEventSets.end())
         {
-            EventIt->second.OnStackChanged.publish(Existing->Handle, Existing->StackCount, OldCount);
+            EventIt->second.OnStackChanged.Broadcast(Existing->Handle, Existing->StackCount, OldCount);
         }
     }
     
@@ -2462,7 +2459,7 @@ void ActiveGameplayEffectsContainer::SetActiveGameplayEffectInhibit(ActiveGamepl
         auto EventIt = Owner->ActiveEffectEventSets.find(Handle);
         if (EventIt != Owner->ActiveEffectEventSets.end())
         {
-            EventIt->second.OnInhibitionChanged.publish(Handle, bInhibit);
+            EventIt->second.OnInhibitionChanged.Broadcast(Handle, bInhibit);
         }
     }
 }
@@ -2485,8 +2482,7 @@ std::shared_ptr<FAggregator>& ActiveGameplayEffectsContainer::FindOrCreateAttrib
     auto Agg = std::make_shared<FAggregator>(BaseValue);
 
     // Bind OnDirty -> OnAggregatorDirtyForwarder
-    entt::sink sink{ Agg->OnDirty };
-    sink.connect<&ActiveGameplayEffectsContainer::OnAggregatorDirtyForwarder>(*this);
+    Agg->OnDirty.Add<&ActiveGameplayEffectsContainer::OnAggregatorDirtyForwarder>(*this);
 
     // Store reverse mapping for callback dispatch
     AggregatorToAttributeMap[Agg.get()] = Attribute;
@@ -3334,7 +3330,7 @@ void AbilitySystemComponent::ModifyActiveEffectStartTime(ActiveGameplayEffectHan
 	auto EventIt = ActiveEffectEventSets.find(Handle);
 	if (EventIt != ActiveEffectEventSets.end())
 	{
-		EventIt->second.OnTimeChanged.publish(Handle, NewTimeRemaining, OldTimeRemaining);
+		EventIt->second.OnTimeChanged.Broadcast(Handle, NewTimeRemaining, OldTimeRemaining);
 	}
 }
 

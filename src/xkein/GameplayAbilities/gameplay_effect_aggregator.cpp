@@ -496,7 +496,7 @@ void FAggregator::BroadcastOnDirty()
         return;
     }
 
-    OnDirty.publish(this);
+    OnDirty.Broadcast(this);
 
     // Notify dependents that this aggregator has changed.
     // In full UE, this looks up the owning ASC and calls OnMagnitudeDependencyChange.

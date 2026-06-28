@@ -7,7 +7,6 @@
 #include "xkein/GameplayAbilities/gameplay_ability_spec_handle.h"
 #include "xkein/GameplayAbilities/active_gameplay_effect_handle.h"
 #include "xkein/GameplayAbilities/gameplay_cue_notify_define.h"
-#include <entt/signal/sigh.hpp>
 #include <map>
 #include <memory>
 
@@ -952,10 +951,10 @@ struct ActiveGameplayEffect
 	std::vector<GameplayAbilitySpecHandle> GrantedAbilityHandles;
 
 	/** Delegate handle for the OnRemoved event (used by GE components to unregister) */
-	entt::connection OnRemovedDelegateHandle;
+	FDelegateHandle OnRemovedDelegateHandle;
 
 	/** Delegate handle for the OnInhibitionChanged event (used by GE components to unregister) */
-	entt::connection OnInhibitionChangedDelegateHandle;
+	FDelegateHandle OnInhibitionChangedDelegateHandle;
 
 	/** True after InternalOnActiveGameplayEffectRemoved has been called, to prevent duplicate lifecycle in Remove() */
 	bool bIsPendingRemove = false;

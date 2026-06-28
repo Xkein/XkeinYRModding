@@ -139,7 +139,7 @@ struct GameplayTagContainer
 };
 
 /** Delegate for tag change events */
-using FOnGameplayTagCountChanged = TDelegate<void(const GameplayTag&, int32 NewCount)>;
+using FOnGameplayTagCountChanged = TMulticastDelegate<void(const GameplayTag&, int32 NewCount)>;
 
 /**
  * Structure for inheritable tag containers.

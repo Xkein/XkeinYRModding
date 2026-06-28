@@ -1,10 +1,10 @@
 #pragma once
 
 #include "core/reflection/reflection.h"
+#include "core/tool/delegate.h"
 #include "physics/jolt/jolt.h"
 #include "physics/physics_component.h"
 #include <jolt/Physics/Collision/ContactListener.h>
-#include <entt/signal/sigh.hpp>
 
 class TerrainBody;
 class PhysicsCollisionAddAndPersistResult;
@@ -41,9 +41,14 @@ public:
 
     static XKEINEXT_API TerrainBody* gTerrainBody;
 
-    static XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)>>* gOnCollisionEnter;
-    static XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionAddAndPersistResult&)>>* gOnCollisionPersist;
-    static XKEINEXT_API entt::sink<entt::sigh<void(const PhysicsCollisionRemoveResult&)>>* gOnCollisionExit;
+    static XKEINEXT_API TMulticastDelegateRegistration<void(const PhysicsCollisionAddAndPersistResult&)>& GetOnCollisionEnter();
+    static XKEINEXT_API TMulticastDelegateRegistration<void(const PhysicsCollisionAddAndPersistResult&)>& GetOnCollisionPersist();
+    static XKEINEXT_API TMulticastDelegateRegistration<void(const PhysicsCollisionRemoveResult&)>& GetOnCollisionExit();
+
+    // Internal signal storage — public for access from free functions in physics.cpp
+    static TMulticastDelegate<void(const PhysicsCollisionAddAndPersistResult&)> mOnCollisionEnter;
+    static TMulticastDelegate<void(const PhysicsCollisionAddAndPersistResult&)> mOnCollisionPersist;
+    static TMulticastDelegate<void(const PhysicsCollisionRemoveResult&)> mOnCollisionExit;
 };
 
 extern XKEINEXT_API JPH::JobSystem*		                gJobSystem;

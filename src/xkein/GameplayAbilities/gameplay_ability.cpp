@@ -281,7 +281,7 @@ void GameplayAbility::CancelAbility(const GameplayAbilitySpecHandle Handle, cons
 
     if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
     {
-        Spec->OnGameplayAbilityCancelled.publish();
+        Spec->OnGameplayAbilityCancelled.Execute();
     }
 
     // End the ability but don't replicate it separately, we replicate the CancelAbility call directly
@@ -349,7 +349,7 @@ void GameplayAbility::EndAbility(const GameplayAbilitySpecHandle Handle, const G
     // Broadcast end delegate on the spec
     if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
     {
-        Spec->OnGameplayAbilityEnded.publish(Spec);
+        Spec->OnGameplayAbilityEnded.Execute(Spec);
     }
 
     if (GetInstancingPolicy() != EGameplayAbilityInstancingPolicy::NonInstanced)

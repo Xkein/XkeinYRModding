@@ -49,9 +49,9 @@ struct EnttInvokerDtor
 
 void JsEvents::Init()
 {
-    Physics::gOnCollisionEnter->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionEnter);
-    Physics::gOnCollisionPersist->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionPersist);
-    Physics::gOnCollisionExit->CONNECT_BEHAVIOR(JsEvents::physics.onCollisionExit);
+    Physics::GetOnCollisionEnter().Add<&JsEvents::_Invoker<decltype(JsEvents::physics.onCollisionEnter)>::Invoke>(&JsEvents::physics.onCollisionEnter);
+    Physics::GetOnCollisionPersist().Add<&JsEvents::_Invoker<decltype(JsEvents::physics.onCollisionPersist)>::Invoke>(&JsEvents::physics.onCollisionPersist);
+    Physics::GetOnCollisionExit().Add<&JsEvents::_Invoker<decltype(JsEvents::physics.onCollisionExit)>::Invoke>(&JsEvents::physics.onCollisionExit);
 
     ENTT_CONNECT_EVENTS(AircraftClass, aircraft);
     ENTT_CONNECT_EVENTS(AircraftTypeClass, aircraftType);
@@ -71,9 +71,9 @@ void JsEvents::Init()
 
 void JsEvents::Shutdown()
 {
-    Physics::gOnCollisionEnter->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionEnter);
-    Physics::gOnCollisionPersist->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionPersist);
-    Physics::gOnCollisionExit->DISCONNECT_BEHAVIOR(JsEvents::physics.onCollisionExit);
+    Physics::GetOnCollisionEnter().RemoveAll(&JsEvents::physics.onCollisionEnter);
+    Physics::GetOnCollisionPersist().RemoveAll(&JsEvents::physics.onCollisionPersist);
+    Physics::GetOnCollisionExit().RemoveAll(&JsEvents::physics.onCollisionExit);
 
     ENTT_DISCONNECT_EVENTS(AircraftClass, aircraft);
     ENTT_DISCONNECT_EVENTS(AircraftTypeClass, aircraftType);
