@@ -28,6 +28,7 @@ GameplayAbility* GameplayAbilitySystem::CreateAbility(const StringName& name, Ga
     }
 	GameplayAbilityCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<GameplayAbilityCreator>(ScriptFunctionCategoryAbility, name);
 	if (!creatorFunc) {
+        gLogger->error("[GAS] could not create ability {}, no creator!", define->AbilityCreator.c_str());
 		return nullptr;
 	}
 
@@ -60,6 +61,7 @@ AttributeSet* GameplayAbilitySystem::CreateAttributeSet(const StringName& name, 
     }
 	AttributeSetCreator* creatorFunc = ScriptFunctionRegister::GetFunctionAs<AttributeSetCreator>(ScriptFunctionCategoryAttributeSet, name);
 	if (!creatorFunc) {
+        gLogger->error("[GAS] could not create attribute set {}, no creator!", define->AttributeSetCreator.c_str());
 		return nullptr;
 	}
 	return (*creatorFunc)(define, component);

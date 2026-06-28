@@ -56,11 +56,11 @@ inline void CreateEntity(T* pObject)
     auto&        extMap = GetExtMap<T>();
     entt::entity entity = gEntt->create();
     extMap[pObject]     = entity;
-    gEntt->emplace<YrEntityComponent<T>>(entity, pObject);
 	if constexpr (std::is_base_of_v<AbstractClass, std::remove_const_t<std::remove_pointer_t<T>>>)
 	{
 		gEntt->emplace<YrEntityAbstractComponent>(entity, pObject);
 	}
+    gEntt->emplace<YrEntityComponent<T>>(entity, pObject);
 }
 
 template<typename T>

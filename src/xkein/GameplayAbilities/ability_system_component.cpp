@@ -32,9 +32,10 @@ void AbilitySystemComponent::OnEntityConstruct(entt::registry& reg, entt::entity
     if (typeCom)
     {
         AbilitySystemComponent& com = reg.emplace<AbilitySystemComponent>(entity);
-        com.InitializeFromType(typeCom);
         com.Owner = entity;
         com.Avatar = entity;
+        com.AbilityActorInfo = GameplayAbilityActorInfo::InitFromActor(com.Owner, com.Avatar, &com);
+        com.InitializeFromType(typeCom);
     }
 }
 
@@ -557,8 +558,7 @@ void AbilitySystemComponent::OnGiveAbility(GameplayAbilitySpec& Spec)
 	{
 		if (Instance)
 		{
-			GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
-			Instance->OnGiveAbility(&ActorInfo, Spec);
+			Instance->OnGiveAbility(&AbilityActorInfo, Spec);
 		}
 	}
 }
@@ -587,9 +587,8 @@ bool AbilitySystemComponent::TryActivateAbility(GameplayAbilitySpecHandle Abilit
 		return false;
 	}
 
-	// Build ActorInfo and validate
-	GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
-	if (ActorInfo.Owner == entt::null || ActorInfo.Avatar == entt::null)
+	// Validate AbilityActorInfo
+	if (AbilityActorInfo.Owner == entt::null || AbilityActorInfo.Avatar == entt::null)
 	{
 		return false;
 	}
@@ -621,11 +620,8 @@ bool AbilitySystemComponent::InternalTryActivateAbility(GameplayAbilitySpecHandl
     // Lock ability list to defer removals during this activation
     ABILITYLIST_SCOPE_LOCK();
 
-    // Build ActorInfo
-    GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
-
-    // Validate ActorInfo
-    if (ActorInfo.Owner == entt::null || ActorInfo.Avatar == entt::null)
+    // Validate AbilityActorInfo
+    if (AbilityActorInfo.Owner == entt::null || AbilityActorInfo.Avatar == entt::null)
     {
         gLogger->error("InternalTryActivateAbility: invalid Owner or Avatar");
         return false;
@@ -645,7 +641,7 @@ bool AbilitySystemComponent::InternalTryActivateAbility(GameplayAbilitySpecHandl
     // If triggered by an event, check if this ability should respond to it
     if (TriggerEventData != nullptr)
     {
-        if (!AbilitySource->ShouldAbilityRespondToEvent(&ActorInfo, TriggerEventData))
+        if (!AbilitySource->ShouldAbilityRespondToEvent(&AbilityActorInfo, TriggerEventData))
         {
             NotifyAbilityFailed(Handle, AbilitySource, InternalTryActivateAbilityFailureTags);
             return false;
@@ -657,7 +653,7 @@ bool AbilitySystemComponent::InternalTryActivateAbility(GameplayAbilitySpecHandl
         const GameplayTagContainer* SourceTags = TriggerEventData ? &TriggerEventData->InstigatorTags : nullptr;
         const GameplayTagContainer* TargetTags = TriggerEventData ? &TriggerEventData->TargetTags : nullptr;
 
-        if (!AbilitySource->CanActivateAbility(Handle, &ActorInfo, SourceTags, TargetTags, &InternalTryActivateAbilityFailureTags))
+        if (!AbilitySource->CanActivateAbility(Handle, &AbilityActorInfo, SourceTags, TargetTags, &InternalTryActivateAbilityFailureTags))
         {
             // If no failure tags were set by CanActivateAbility, add the default ActivateFail tag from globals
             if (InternalTryActivateAbilityFailureTags.IsEmpty())
@@ -679,7 +675,7 @@ bool AbilitySystemComponent::InternalTryActivateAbility(GameplayAbilitySpecHandl
         // If retrigger is enabled and there's an existing instance, end it so it can be reused
         if (Spec->Ability->Define && Spec->Ability->Define->bRetriggerInstancedAbility && InstancedAbility)
         {
-            InstancedAbility->EndAbility(Handle, &ActorInfo, InstancedAbility->GetCurrentActivationInfo(), false, false);
+            InstancedAbility->EndAbility(Handle, &AbilityActorInfo, InstancedAbility->GetCurrentActivationInfo(), false, false);
         }
         else
         {
@@ -711,7 +707,7 @@ bool AbilitySystemComponent::InternalTryActivateAbility(GameplayAbilitySpecHandl
     }
 
     // Call the ability
-    AbilitySource->CallActivateAbility(Handle, &ActorInfo, ActivationInfo, nullptr, TriggerEventData);
+    AbilitySource->CallActivateAbility(Handle, &AbilityActorInfo, ActivationInfo, nullptr, TriggerEventData);
 
     // Mark dirty so listeners re-evaluate
     MarkAbilitySpecDirty(*Spec);
@@ -728,14 +724,12 @@ void AbilitySystemComponent::CancelAbility(GameplayAbility* Ability)
 {
     if (!Ability) return;
     
-    GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
-    
     for (auto& Spec : ActivatableAbilities)
     {
         if (Spec.Ability == Ability && Spec.Ability)
         {
             GameplayAbilityActivationInfo ActivationInfo;
-            Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
+            Spec.Ability->CancelAbility(Spec.Handle, &AbilityActorInfo, ActivationInfo, true);
             break;
         }
     }
@@ -950,8 +944,7 @@ void AbilitySystemComponent::OnRemoveAbility(GameplayAbilitySpec& Spec)
     {
         if (Instance)
         {
-            GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
-            Instance->OnRemoveAbility(&ActorInfo, Spec);
+            Instance->OnRemoveAbility(&AbilityActorInfo, Spec);
         }
     }
 
@@ -2887,9 +2880,8 @@ void AbilitySystemComponent::CancelAbilityHandle(GameplayAbilitySpecHandle Handl
 	GameplayAbilitySpec* Spec = FindAbilitySpecFromHandle(Handle);
 	if (Spec && Spec->Ability)
 	{
-		GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 		GameplayAbilityActivationInfo ActivationInfo;
-		Spec->Ability->CancelAbility(Spec->Handle, &ActorInfo, ActivationInfo, true);
+		Spec->Ability->CancelAbility(Spec->Handle, &AbilityActorInfo, ActivationInfo, true);
 	}
 }
 
@@ -2933,9 +2925,8 @@ void AbilitySystemComponent::CancelAbilities(const GameplayTagContainer* WithTag
 			if (bHasExcluded) continue;
 		}
 
-		GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 		GameplayAbilityActivationInfo ActivationInfo;
-		Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
+		Spec.Ability->CancelAbility(Spec.Handle, &AbilityActorInfo, ActivationInfo, true);
 	}
 }
 
@@ -2949,9 +2940,8 @@ void AbilitySystemComponent::CancelAllAbilities(GameplayAbility* Ignore)
 		if (!Spec.Ability || Spec.Ability == Ignore) continue;
 		if (!Spec.IsActive()) continue;
 
-		GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 		GameplayAbilityActivationInfo ActivationInfo;
-		Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
+		Spec.Ability->CancelAbility(Spec.Handle, &AbilityActorInfo, ActivationInfo, true);
 	}
 }
 
@@ -3381,9 +3371,8 @@ void AbilitySystemComponent::ClearAllAbilities()
 		{
 			if (Spec.IsActive() && Spec.Ability)
 			{
-				GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 				GameplayAbilityActivationInfo ActivationInfo;
-				Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
+				Spec.Ability->CancelAbility(Spec.Handle, &AbilityActorInfo, ActivationInfo, true);
 			}
 			Spec.PendingRemove = true;
 		}
@@ -3400,9 +3389,8 @@ void AbilitySystemComponent::ClearAllAbilitiesWithInputID(int32 InputID)
 		{
 			if (Spec.IsActive() && Spec.Ability)
 			{
-				GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 				GameplayAbilityActivationInfo ActivationInfo;
-				Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
+				Spec.Ability->CancelAbility(Spec.Handle, &AbilityActorInfo, ActivationInfo, true);
 			}
 			Spec.PendingRemove = true;
 		}
@@ -3417,9 +3405,8 @@ void AbilitySystemComponent::ClearAbility(GameplayAbilitySpecHandle Handle)
 		{
 			if (Spec.IsActive() && Spec.Ability)
 			{
-				GameplayAbilityActorInfo ActorInfo = GameplayAbilityActorInfo::InitFromActor(Owner, Avatar, this);
 				GameplayAbilityActivationInfo ActivationInfo;
-				Spec.Ability->CancelAbility(Spec.Handle, &ActorInfo, ActivationInfo, true);
+				Spec.Ability->CancelAbility(Spec.Handle, &AbilityActorInfo, ActivationInfo, true);
 			}
 			Spec.PendingRemove = true;
 			return;

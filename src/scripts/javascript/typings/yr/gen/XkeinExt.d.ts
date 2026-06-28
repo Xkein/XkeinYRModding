@@ -322,6 +322,9 @@ class GameplayEffect
     m_DurationPolicy : EGameplayEffectDurationType;
     // public GameplayEffectModifierMagnitude DurationMagnitude
     m_DurationMagnitude : GameplayEffectModifierMagnitude;
+    // Upper bound on the computed duration. If > 0, Duration is clamped to this value.
+    // public GameplayEffectModifierMagnitude MaxDurationMagnitude
+    m_MaxDurationMagnitude : GameplayEffectModifierMagnitude;
     // public FScalableFloat Period
     m_Period : FScalableFloat;
     // If true, the effect executes on application and then at every period interval. If false, no execution occurs until the first period elapses.
@@ -369,6 +372,9 @@ class GameplayEffect
     // If true, the entire stack of the effect will be cleared once it overflows
     // public bool bClearStackOnOverflow
     m_bClearStackOnOverflow : boolean;
+    // If true, modifier magnitude is multiplied by the current stack count (UE5 GAS bFactorInStackCount)
+    // public bool bFactorInStackCount
+    m_bFactorInStackCount : boolean;
     // If true, GameplayCues will only be triggered for the first instance in a stacking GameplayEffect.
     // public bool bSuppressStackingCues
     m_bSuppressStackingCues : boolean;
@@ -428,87 +434,17 @@ class AttributeBasedFloat
     // public GameplayTagContainer TargetTagFilter
     m_TargetTagFilter : GameplayTagContainer;
 }
-// Struct defining gameplay attribute capture options for gameplay effects
-// GameplayEffectAttributeCaptureDefinition
-class GameplayEffectAttributeCaptureDefinition
+// ActiveGameplayEffectHandle
+class ActiveGameplayEffectHandle
 {
-    // Gameplay attribute to capture
-    // public GameplayAttribute AttributeToCapture
-    m_AttributeToCapture : GameplayAttribute;
-    // Source of the gameplay attribute
-    // public EGameplayEffectAttributeCaptureSource AttributeSource
-    m_AttributeSource : EGameplayEffectAttributeCaptureSource;
+    // public int32 Handle
+    m_Handle : int32;
+    // public bool bPassedFiltersAndWasExecuted
+    m_bPassedFiltersAndWasExecuted : boolean;
 }
-// CustomCalculationBasedFloat
-class CustomCalculationBasedFloat
-{
-    // Coefficient to the custom calculation
-    // public FScalableFloat Coefficient
-    m_Coefficient : FScalableFloat;
-    // Additive value to the attribute calculation, added in before the coefficient applies
-    // public FScalableFloat PreMultiplyAdditiveValue
-    m_PreMultiplyAdditiveValue : FScalableFloat;
-    // Additive value to the attribute calculation, added in after the coefficient applies
-    // public FScalableFloat PostMultiplyAdditiveValue
-    m_PostMultiplyAdditiveValue : FScalableFloat;
-}
-// Struct for holding SetBytCaller data
-// SetByCallerFloat
-class SetByCallerFloat
-{
-    // The Name the caller (code or blueprint) will use to set this magnitude by.
-    // public std::basic_string_view<char, std::char_traits<char>> DataName
-    m_DataName : any;
-    // public GameplayTag DataTag
-    m_DataTag : GameplayTag;
-}
-// GameplayModifierInfo
-// Tells us "Who/What we" modify
-// Does not tell us how exactly
-// GameplayModifierInfo
-class GameplayModifierInfo
-{
-    // The Attribute we modify or the GE we modify modifies.
-    // public GameplayAttribute Attribute
-    m_Attribute : GameplayAttribute;
-    // The numeric operation of this modifier: Override, Add, Multiply, etc
-    // When multiple modifiers aggregate together, the equation is:
-    // ((BaseValue + AddBase) * MultiplyAdditive / DivideAdditive * MultiplyCompound) + AddFinal
-    // public EGameplayModOpType ModifierOp
-    m_ModifierOp : EGameplayModOpType;
-    // Magnitude of the modifier
-    // public GameplayEffectModifierMagnitude ModifierMagnitude
-    m_ModifierMagnitude : GameplayEffectModifierMagnitude;
-    // public GameplayTagRequirements SourceTags
-    m_SourceTags : GameplayTagRequirements;
-    // public GameplayTagRequirements TargetTags
-    m_TargetTags : GameplayTagRequirements;
-}
-// Struct representing the definition of a custom execution for a gameplay effect.
-// Custom executions run special logic from an outside class each time the gameplay effect executes.
-// GameplayEffectExecutionDefinition
-class GameplayEffectExecutionDefinition
-{
-    // These tags are passed into the execution as is, and may be used to do conditional logic
-    // public GameplayTagContainer PassedInTags
-    m_PassedInTags : GameplayTagContainer;
-    // Other Gameplay Effects that will be applied to the target of this execution if the execution is successful
-    // public std::vector<GameplayEffect *, std::allocator<GameplayEffect *>> ConditionalGameplayEffects
-    m_ConditionalGameplayEffects : StdVector<GameplayEffect>;
-}
-// Base class for GameplayEffect components.
-// Components add modular behavior to GameplayEffects by hooking into lifecycle events.
-// Simplified version of UE5's UGameplayEffectComponent.
-// GameplayEffectComponent
-class GameplayEffectComponent
-{
-}
-// ActiveGameplayEffectsContainer
-class ActiveGameplayEffectsContainer
-{
-}
-// Interface for objects that can receive gameplay cue events.
-// Implemented by AbilitySystemComponent and potentially by target actors.
+// ========================================================================
+// FGameplayEffectAttributeCaptureSpec
+// ========================================================================
 // AbilitySystemComponent
 class AbilitySystemComponent
     extends IGameplayCueInterface
@@ -554,6 +490,24 @@ class AbilitySystemComponent
     // Attempt to activate an ability by its CDO class
     // public bool TryActivateAbilityByDefine(GameplayAbilityDefine * AbilityDefine, bool bAllowRemoteActivation = true)
     TryActivateAbilityByDefine(AbilityDefine_0 : GameplayAbilityDefine, bAllowRemoteActivation_1 : boolean) : boolean;
+    // Assign a SetByCaller magnitude by DataName on the spec of an active gameplay effect.
+    // Script-accessible (BindJs). Looks up the active effect by handle and calls
+    // SetSetByCallerMagnitude on its spec.
+    // 
+    // @param Handle Handle to the active gameplay effect
+    // @param DataName The DataName key for the SetByCaller value
+    // @param Magnitude The magnitude value to assign
+    // public void AssignSetByCallerMagnitude(ActiveGameplayEffectHandle Handle, StringName DataName, float Magnitude)
+    AssignSetByCallerMagnitude(Handle_0 : ActiveGameplayEffectHandle, DataName_1 : StringName, Magnitude_2 : float) : void;
+    // Assign a SetByCaller magnitude by DataTag on the spec of an active gameplay effect.
+    // Script-accessible (BindJs). Looks up the active effect by handle and calls
+    // SetSetByCallerMagnitude on its spec.
+    // 
+    // @param Handle Handle to the active gameplay effect
+    // @param DataTag The GameplayTag key for the SetByCaller value
+    // @param Magnitude The magnitude value to assign
+    // public void AssignTagSetByCallerMagnitude(ActiveGameplayEffectHandle Handle, GameplayTag DataTag, float Magnitude)
+    AssignTagSetByCallerMagnitude(Handle_0 : ActiveGameplayEffectHandle, DataTag_1 : GameplayTag, Magnitude_2 : float) : void;
     // The actor that owns this component logically
     // public entity Owner
     m_Owner : entt_entity;
@@ -716,14 +670,6 @@ class GameplayAbilitySpec
     // public GameplayTagContainer DynamicAbilityTags
     m_DynamicAbilityTags : GameplayTagContainer;
 }
-// ActiveGameplayEffectHandle
-class ActiveGameplayEffectHandle
-{
-    // public int32 Handle
-    m_Handle : int32;
-    // public bool bPassedFiltersAndWasExecuted
-    m_bPassedFiltersAndWasExecuted : boolean;
-}
 // Metadata for a tag-based Gameplay Event, that can activate other abilities or run ability-specific logic
 // GameplayEventData
 class GameplayEventData
@@ -825,12 +771,201 @@ class AttributeSetDefine
     // public std::vector<GameplayAttribute, std::allocator<GameplayAttribute>> Attributes
     m_Attributes : StdVector<GameplayAttribute>;
 }
+// ActiveGameplayEffectsContainer
+class ActiveGameplayEffectsContainer
+{
+}
+// Evaluated modifier data used by calculation classes and delegate callbacks
+// FGameplayModifierEvaluatedData
+class FGameplayModifierEvaluatedData
+{
+    // public GameplayAttribute Attribute
+    m_Attribute : GameplayAttribute;
+    // public EGameplayModOpType ModifierOp
+    m_ModifierOp : EGameplayModOpType;
+    // public float Magnitude
+    m_Magnitude : float;
+}
 // FGameplayEffectQuery
 // Query struct for flexible active GameplayEffect filtering.
 // All match fields are optional — empty/default fields are skipped.
 // Multiple non-empty criteria combine with AND logic.
 // FGameplayEffectQuery
 class FGameplayEffectQuery
+{
+}
+// Struct defining gameplay attribute capture options for gameplay effects
+// GameplayEffectAttributeCaptureDefinition
+class GameplayEffectAttributeCaptureDefinition
+{
+    // Gameplay attribute to capture
+    // public GameplayAttribute AttributeToCapture
+    m_AttributeToCapture : GameplayAttribute;
+    // Source of the gameplay attribute
+    // public EGameplayEffectAttributeCaptureSource AttributeSource
+    m_AttributeSource : EGameplayEffectAttributeCaptureSource;
+    // Whether this attribute should be snapshotted at the time of effect application (true) or live (false)
+    // public bool bSnapshot
+    m_bSnapshot : boolean;
+}
+// CustomCalculationBasedFloat
+class CustomCalculationBasedFloat
+{
+    // Coefficient to the custom calculation
+    // public FScalableFloat Coefficient
+    m_Coefficient : FScalableFloat;
+    // Additive value to the attribute calculation, added in before the coefficient applies
+    // public FScalableFloat PreMultiplyAdditiveValue
+    m_PreMultiplyAdditiveValue : FScalableFloat;
+    // Additive value to the attribute calculation, added in after the coefficient applies
+    // public FScalableFloat PostMultiplyAdditiveValue
+    m_PostMultiplyAdditiveValue : FScalableFloat;
+}
+// Struct for holding SetBytCaller data
+// SetByCallerFloat
+class SetByCallerFloat
+{
+    // The Name the caller (code or blueprint) will use to set this magnitude by. 
+    // 
+    // @deprecated Use DataTag instead
+    // public StringName DataName
+    m_DataName : StringName;
+    // public GameplayTag DataTag
+    m_DataTag : GameplayTag;
+}
+// GameplayModifierInfo
+// Tells us "Who/What we" modify
+// Does not tell us how exactly
+// GameplayModifierInfo
+class GameplayModifierInfo
+{
+    // The Attribute we modify or the GE we modify modifies.
+    // public GameplayAttribute Attribute
+    m_Attribute : GameplayAttribute;
+    // The numeric operation of this modifier: Override, Add, Multiply, etc
+    // When multiple modifiers aggregate together, the equation is:
+    // ((BaseValue + AddBase) * MultiplyAdditive / DivideAdditive * MultiplyCompound) + AddFinal
+    // public EGameplayModOpType ModifierOp
+    m_ModifierOp : EGameplayModOpType;
+    // Magnitude of the modifier
+    // public GameplayEffectModifierMagnitude ModifierMagnitude
+    m_ModifierMagnitude : GameplayEffectModifierMagnitude;
+    // public GameplayTagRequirements SourceTags
+    m_SourceTags : GameplayTagRequirements;
+    // public GameplayTagRequirements TargetTags
+    m_TargetTags : GameplayTagRequirements;
+}
+// Struct representing the definition of a custom execution for a gameplay effect.
+// Custom executions run special logic from an outside class each time the gameplay effect executes.
+// GameplayEffectExecutionDefinition
+class GameplayEffectExecutionDefinition
+{
+    // These tags are passed into the execution as is, and may be used to do conditional logic
+    // public GameplayTagContainer PassedInTags
+    m_PassedInTags : GameplayTagContainer;
+    // The execution calculation class to run (may be null — uses OnK2_Execute script fallback)
+    // public GameplayEffectExecutionCalculation * CalculationClass
+    m_CalculationClass : GameplayEffectExecutionCalculation;
+    // Additional modifiers scoped to this execution, computed from captured attributes at execution time
+    // public std::vector<FGameplayEffectExecutionScopedModifierInfo, std::allocator<FGameplayEffectExecutionScopedModifierInfo>> CalculationModifiers
+    m_CalculationModifiers : StdVector<FGameplayEffectExecutionScopedModifierInfo>;
+    // Other Gameplay Effects that will be applied to the target of this execution if the execution is successful
+    // public std::vector<FConditionalGameplayEffect, std::allocator<FConditionalGameplayEffect>> ConditionalGameplayEffects
+    m_ConditionalGameplayEffects : StdVector<FConditionalGameplayEffect>;
+}
+// Base class for gameplay effect custom execution calculations.
+// Override Execute() in a native subclass or bind OnK2_Execute in script
+// to implement custom execution logic that runs when a gameplay effect
+// carrying this execution definition is applied to a target.
+// Has full access to both source and target ASC through the execution parameters,
+// and can produce any number of output modifiers.
+// GameplayEffectExecutionCalculation
+class GameplayEffectExecutionCalculation
+    extends GameplayEffectCalculation
+{
+    // Script-side callback for custom execution logic.
+    // If set, this is called by Execute() in preference to the virtual.
+    // Signature: void(const FGameplayEffectCustomExecutionParameters
+    // &
+    // Params, FGameplayEffectCustomExecutionOutput
+    // &
+    // Output)
+    // public std::function<void (*)(FGameplayEffectCustomExecutionParameters const& _0, FGameplayEffectCustomExecutionOutput& _1)> OnK2_Execute
+    m_OnK2_Execute : (_0 : FGameplayEffectCustomExecutionParameters, _1 : FGameplayEffectCustomExecutionOutput) => void| undefined;
+}
+// Base class for gameplay effect magnitude calculations that can capture
+// and act on multiple attributes. Subclass and override GetAttributeCaptureDefinitions()
+// to declare which attributes are needed for the calculation.
+// GameplayEffectCalculation
+class GameplayEffectCalculation
+{
+    // Attributes that this calculation needs to capture from source/target
+    // public std::vector<GameplayEffectAttributeCaptureDefinition, std::allocator<GameplayEffectAttributeCaptureDefinition>> RelevantAttributesToCapture
+    m_RelevantAttributesToCapture : StdVector<GameplayEffectAttributeCaptureDefinition>;
+}
+// Parameters passed into a GameplayEffectExecutionCalculation's Execute() method.
+// Provides read access to the owning spec and both ability system components,
+// plus any tags or handles that should be ignored during evaluation.
+// All pointers are non-owning — the lifetime is managed externally.
+// FGameplayEffectCustomExecutionParameters
+class FGameplayEffectCustomExecutionParameters
+{
+}
+// Output structure produced by a GameplayEffectExecutionCalculation's Execute() method.
+// Can contain any number of output modifiers that get applied to the target,
+// and flags indicating whether conditional GEs, stack counts, or gameplay cues
+// were handled manually by the execution.
+// FGameplayEffectCustomExecutionOutput
+class FGameplayEffectCustomExecutionOutput
+{
+}
+// Struct representing a scoped modifier info within a gameplay effect execution.
+// Defines additional modifiers that are scoped to the execution, backed by captured attributes.
+// FGameplayEffectExecutionScopedModifierInfo
+class FGameplayEffectExecutionScopedModifierInfo
+{
+    // Captured attribute that backs this modifier (used with CapturedAttributeBacked aggregator type)
+    // public GameplayEffectAttributeCaptureDefinition CapturedAttribute
+    m_CapturedAttribute : GameplayEffectAttributeCaptureDefinition;
+    // How the magnitude is determined — CapturedAttributeBacked evaluates from captured attribute, Transient uses the modifier magnitude directly
+    // public EGameplayEffectExecutionScopedModifierAggregatorType AggregatorType
+    m_AggregatorType : EGameplayEffectExecutionScopedModifierAggregatorType;
+    // The operation type for this modifier (Add, Multiply, Override, etc.)
+    // public EGameplayModOpType ModifierOp
+    m_ModifierOp : EGameplayModOpType;
+    // Magnitude of the modifier, evaluated using the usual GameplayEffectModifierMagnitude pipeline
+    // public GameplayEffectModifierMagnitude ModifierMagnitude
+    m_ModifierMagnitude : GameplayEffectModifierMagnitude;
+    // Source tag requirements: if specified, this modifier only applies when source has these tags
+    // public GameplayTagRequirements SourceTags
+    m_SourceTags : GameplayTagRequirements;
+    // Target tag requirements: if specified, this modifier only applies when target has these tags
+    // public GameplayTagRequirements TargetTags
+    m_TargetTags : GameplayTagRequirements;
+}
+// Struct representing a conditional gameplay effect within an execution definition.
+// Wraps a GameplayEffect* with source tag requirements and removal policy.
+// FConditionalGameplayEffect
+class FConditionalGameplayEffect
+{
+    // The gameplay effect class to apply conditionally
+    // public GameplayEffect * EffectClass
+    m_EffectClass : GameplayEffect;
+    // Source tags required for this conditional effect to apply — checked via CanApply()
+    // public GameplayTagContainer RequiredSourceTags
+    m_RequiredSourceTags : GameplayTagContainer;
+    // How this conditional effect is removed when the parent effect ends
+    // public EConditionalGameplayEffectRemovalPolicy RemovalPolicy
+    m_RemovalPolicy : EConditionalGameplayEffectRemovalPolicy;
+    // Number of stacks to remove when the parent effect is removed (only meaningful with RemoveGrantedEffectOnEnd policy)
+    // public int32 StackCountToRemove
+    m_StackCountToRemove : int32;
+}
+// Base class for GameplayEffect components.
+// Components add modular behavior to GameplayEffects by hooking into lifecycle events.
+// Simplified version of UE5's UGameplayEffectComponent.
+// GameplayEffectComponent
+class GameplayEffectComponent
 {
 }
 // GameplayEffectCue
@@ -848,17 +983,6 @@ class GameplayEffectCue
     // Tags passed to the gameplay cue handler when this cue is activated
     // public GameplayTagContainer GameplayCueTags
     m_GameplayCueTags : GameplayTagContainer;
-}
-// Evaluated modifier data used by calculation classes and delegate callbacks
-// FGameplayModifierEvaluatedData
-class FGameplayModifierEvaluatedData
-{
-    // public GameplayAttribute Attribute
-    m_Attribute : GameplayAttribute;
-    // public EGameplayModOpType ModifierOp
-    m_ModifierOp : EGameplayModOpType;
-    // public float Magnitude
-    m_Magnitude : float;
 }
 // AttributeMetaData
 class AttributeMetaData
@@ -1557,52 +1681,6 @@ class GameplayAbilityWorldReticle
     // public Vector3D<int> ReticleLocation
     m_ReticleLocation : Vector3D;
 }
-// Base class for gameplay effect magnitude calculations that can capture
-// and act on multiple attributes. Subclass and override GetAttributeCaptureDefinitions()
-// to declare which attributes are needed for the calculation.
-// GameplayEffectCalculation
-class GameplayEffectCalculation
-{
-    // Attributes that this calculation needs to capture from source/target
-    // public std::vector<GameplayEffectAttributeCaptureDefinition, std::allocator<GameplayEffectAttributeCaptureDefinition>> RelevantAttributesToCapture
-    m_RelevantAttributesToCapture : StdVector<GameplayEffectAttributeCaptureDefinition>;
-}
-// Parameters passed into a GameplayEffectExecutionCalculation's Execute() method.
-// Provides read access to the owning spec and both ability system components,
-// plus any tags or handles that should be ignored during evaluation.
-// All pointers are non-owning — the lifetime is managed externally.
-// FGameplayEffectCustomExecutionParameters
-class FGameplayEffectCustomExecutionParameters
-{
-}
-// Output structure produced by a GameplayEffectExecutionCalculation's Execute() method.
-// Can contain any number of output modifiers that get applied to the target,
-// and flags indicating whether conditional GEs, stack counts, or gameplay cues
-// were handled manually by the execution.
-// FGameplayEffectCustomExecutionOutput
-class FGameplayEffectCustomExecutionOutput
-{
-}
-// Base class for gameplay effect custom execution calculations.
-// Override Execute() in a native subclass or bind OnK2_Execute in script
-// to implement custom execution logic that runs when a gameplay effect
-// carrying this execution definition is applied to a target.
-// Has full access to both source and target ASC through the execution parameters,
-// and can produce any number of output modifiers.
-// GameplayEffectExecutionCalculation
-class GameplayEffectExecutionCalculation
-    extends GameplayEffectCalculation
-{
-    // Script-side callback for custom execution logic.
-    // If set, this is called by Execute() in preference to the virtual.
-    // Signature: void(const FGameplayEffectCustomExecutionParameters
-    // &
-    // Params, FGameplayEffectCustomExecutionOutput
-    // &
-    // Output)
-    // public std::function<void (*)(FGameplayEffectCustomExecutionParameters const& _0, FGameplayEffectCustomExecutionOutput& _1)> OnK2_Execute
-    m_OnK2_Execute : (_0 : FGameplayEffectCustomExecutionParameters, _1 : FGameplayEffectCustomExecutionOutput) => void| undefined;
-}
 // Base class for auto-generated magnitude calculations that compute
 // a modifier's magnitude from a captured attribute.
 // Subclass and override CalculateBaseMagnitude() or bind OnK2_CalculateBaseMagnitude
@@ -1703,77 +1781,6 @@ enum EGameplayEffectMagnitudeCalculation {
     // SetByCaller = 
     SetByCaller = 3,
 }
-// Enumeration for options of where to capture gameplay attributes from for gameplay effects.
-// EGameplayEffectAttributeCaptureSource
-enum EGameplayEffectAttributeCaptureSource {
-    // Source (caster) of the gameplay effect.
-    // Source = 
-    Source = 0,
-    // Target (recipient) of the gameplay effect.
-    // Target = 
-    Target = 1,
-}
-// Enumeration outlining the possible attribute based float calculation policies.
-// EAttributeBasedFloatCalculationType
-enum EAttributeBasedFloatCalculationType {
-    // Use the final evaluated magnitude of the attribute.
-    // AttributeMagnitude = 
-    AttributeMagnitude = 0,
-    // Use the base value of the attribute.
-    // AttributeBaseValue = 
-    AttributeBaseValue = 1,
-    // Use the "bonus" evaluated magnitude of the attribute: Equivalent to (FinalMag - BaseValue).
-    // AttributeBonusMagnitude = 
-    AttributeBonusMagnitude = 2,
-}
-// Enumeration of policies for dealing with the period of a gameplay effect when inhibition is removed
-// EGameplayEffectPeriodInhibitionRemovedPolicy
-enum EGameplayEffectPeriodInhibitionRemovedPolicy {
-    // Does not reset. The period timing will continue as if the inhibition hadn't occurred.
-    // NeverReset = 
-    NeverReset = 0,
-    // Resets the period. The next execution will occur one full period from when inhibition is removed.
-    // ResetPeriod = 
-    ResetPeriod = 1,
-    // Executes immediately and resets the period.
-    // ExecuteAndResetPeriod = 
-    ExecuteAndResetPeriod = 2,
-}
-// Defines the ways that mods will modify attributes. Values of the same type are aggregated, and then applied in the following equation:
-// ((BaseValue + AddBase) * MultiplyAdditive / DivideAdditive * MultiplyCompound) + AddFinal
-// EGameplayModOpType
-enum EGameplayModOpType {
-    // Adds to the Base value. This happens first, before all other mods are considered.
-    // AddBase = 
-    AddBase = 0,
-    // Multipliers are added together first, then multiplied against prev result. E.g. 50% + 50% = 100% in values is 1.5 + 1.5 = 2.0.
-    // MultiplyAdditive = 
-    MultiplyAdditive = 1,
-    // Divisors are added together, then divided against the prev result. E.g. 1/2 + 1/2 = 1/3 in values is 2 + 2 = 3.
-    // DivideAdditive = 
-    DivideAdditive = 2,
-    // Multiply the prev result by this value. E.g. two values of 1.5 compounded: 1.5 * 1.5 = 2.25.
-    // MultiplyCompound = 4
-    MultiplyCompound = 4,
-    // Add this value to the final computed result.
-    // AddFinal = 
-    AddFinal = 5,
-    // This must always be the last value (used in iteration code).
-    // Max = 
-    Max = 6,
-    // Backwards compat name
-    // Additive = 0
-    Additive = 0,
-    // Backwards compat name
-    // Multiplicitive = 1
-    Multiplicitive = 1,
-    // Backwards compat name
-    // Division = 2
-    Division = 2,
-    // Override the value, regardless of what the computation provides.
-    // Override = 3
-    Override = 3,
-}
 // Describes how a GameplayAbility will be instanced when executed
 // EGameplayAbilityInstancingPolicy
 enum EGameplayAbilityInstancingPolicy {
@@ -1818,6 +1825,41 @@ enum EGameplayAbilityActivationMode {
     // Rejected = 
     Rejected = 4,
 }
+// Defines the ways that mods will modify attributes. Values of the same type are aggregated, and then applied in the following equation:
+// ((BaseValue + AddBase) * MultiplyAdditive / DivideAdditive * MultiplyCompound) + AddFinal
+// EGameplayModOpType
+enum EGameplayModOpType {
+    // Adds to the Base value. This happens first, before all other mods are considered.
+    // AddBase = 
+    AddBase = 0,
+    // Multipliers are added together first, then multiplied against prev result. E.g. 50% + 50% = 100% in values is 1.5 + 1.5 = 2.0.
+    // MultiplyAdditive = 
+    MultiplyAdditive = 1,
+    // Divisors are added together, then divided against the prev result. E.g. 1/2 + 1/2 = 1/3 in values is 2 + 2 = 3.
+    // DivideAdditive = 
+    DivideAdditive = 2,
+    // Multiply the prev result by this value. E.g. two values of 1.5 compounded: 1.5 * 1.5 = 2.25.
+    // MultiplyCompound = 4
+    MultiplyCompound = 4,
+    // Add this value to the final computed result.
+    // AddFinal = 
+    AddFinal = 5,
+    // This must always be the last value (used in iteration code).
+    // Max = 
+    Max = 6,
+    // Backwards compat name
+    // Additive = 0
+    Additive = 0,
+    // Backwards compat name
+    // Multiplicitive = 1
+    Multiplicitive = 1,
+    // Backwards compat name
+    // Division = 2
+    Division = 2,
+    // Override the value, regardless of what the computation provides.
+    // Override = 3
+    Override = 3,
+}
 // Whether to consider pending-remove specs when finding an ability spec
 // EConsiderPending
 enum EConsiderPending {
@@ -1827,6 +1869,62 @@ enum EConsiderPending {
     // Include specs marked PendingRemove
     // Yes = 
     Yes = 1,
+}
+// Enumeration for options of where to capture gameplay attributes from for gameplay effects.
+// EGameplayEffectAttributeCaptureSource
+enum EGameplayEffectAttributeCaptureSource {
+    // Source (caster) of the gameplay effect.
+    // Source = 
+    Source = 0,
+    // Target (recipient) of the gameplay effect.
+    // Target = 
+    Target = 1,
+}
+// Enumeration outlining the possible attribute based float calculation policies.
+// EAttributeBasedFloatCalculationType
+enum EAttributeBasedFloatCalculationType {
+    // Use the final evaluated magnitude of the attribute.
+    // AttributeMagnitude = 
+    AttributeMagnitude = 0,
+    // Use the base value of the attribute.
+    // AttributeBaseValue = 
+    AttributeBaseValue = 1,
+    // Use the "bonus" evaluated magnitude of the attribute: Equivalent to (FinalMag - BaseValue).
+    // AttributeBonusMagnitude = 
+    AttributeBonusMagnitude = 2,
+}
+// Enumeration of policies for dealing with the period of a gameplay effect when inhibition is removed
+// EGameplayEffectPeriodInhibitionRemovedPolicy
+enum EGameplayEffectPeriodInhibitionRemovedPolicy {
+    // Does not reset. The period timing will continue as if the inhibition hadn't occurred.
+    // NeverReset = 
+    NeverReset = 0,
+    // Resets the period. The next execution will occur one full period from when inhibition is removed.
+    // ResetPeriod = 
+    ResetPeriod = 1,
+    // Executes immediately and resets the period.
+    // ExecuteAndResetPeriod = 
+    ExecuteAndResetPeriod = 2,
+}
+// Aggregator type for scoped modifier info — determines how magnitude is evaluated
+// EGameplayEffectExecutionScopedModifierAggregatorType
+enum EGameplayEffectExecutionScopedModifierAggregatorType {
+    // Magnitude is backed by a captured attribute value from source or target
+    // CapturedAttributeBacked = 
+    CapturedAttributeBacked = 0,
+    // Magnitude is transient and evaluated directly from the modifier magnitude (no attribute capture)
+    // Transient = 
+    Transient = 1,
+}
+// Policy for how conditional gameplay effects are removed when the parent effect ends
+// EConditionalGameplayEffectRemovalPolicy
+enum EConditionalGameplayEffectRemovalPolicy {
+    // The conditional effect manages its own lifetime (default — no special removal logic)
+    // GrantedEffectControlsOwnLifetime = 
+    GrantedEffectControlsOwnLifetime = 0,
+    // The conditional effect is actively removed when the granting/parent effect ends
+    // RemoveGrantedEffectOnEnd = 
+    RemoveGrantedEffectOnEnd = 1,
 }
 // Enumeration for ways a single GameplayEffect asset can stack.
 // EGameplayEffectStackingType
@@ -1850,6 +1948,9 @@ enum EGameplayEffectStackingDurationPolicy {
     // The duration of the effect will never be refreshed
     // NeverRefresh = 
     NeverRefresh = 1,
+    // The duration of the effect will be extended by the remaining duration of the existing stack
+    // ExtendDuration = 2
+    ExtendDuration = 2,
 }
 // Enumeration of policies for dealing with the period of a gameplay effect while stacking
 // EGameplayEffectStackingPeriodPolicy

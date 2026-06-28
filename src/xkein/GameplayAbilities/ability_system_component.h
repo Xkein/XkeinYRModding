@@ -140,6 +140,9 @@ public:
 	PROPERTY()
 	AbilitySystemComponentType* Type;
 
+    /** Cached ability actor info — shared across all abilities, aligned with UE5's AbilityActorInfo pattern */
+    GameplayAbilityActorInfo AbilityActorInfo;
+
 	void InitializeFromType(AbilitySystemComponentType* InType);
 
 	/** Per-frame tick: advances ActiveGameplayEffects and AbilityTasks */

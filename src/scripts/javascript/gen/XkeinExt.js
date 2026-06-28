@@ -29,13 +29,7 @@ exports.GameplayEffect = puerts.loadCPPType("GameplayEffect")
 exports.GameplayEffectModifierMagnitude = puerts.loadCPPType("GameplayEffectModifierMagnitude")
 exports.FScalableFloat = puerts.loadCPPType("FScalableFloat")
 exports.AttributeBasedFloat = puerts.loadCPPType("AttributeBasedFloat")
-exports.GameplayEffectAttributeCaptureDefinition = puerts.loadCPPType("GameplayEffectAttributeCaptureDefinition")
-exports.CustomCalculationBasedFloat = puerts.loadCPPType("CustomCalculationBasedFloat")
-exports.SetByCallerFloat = puerts.loadCPPType("SetByCallerFloat")
-exports.GameplayModifierInfo = puerts.loadCPPType("GameplayModifierInfo")
-exports.GameplayEffectExecutionDefinition = puerts.loadCPPType("GameplayEffectExecutionDefinition")
-exports.GameplayEffectComponent = puerts.loadCPPType("GameplayEffectComponent")
-exports.ActiveGameplayEffectsContainer = puerts.loadCPPType("ActiveGameplayEffectsContainer")
+exports.ActiveGameplayEffectHandle = puerts.loadCPPType("ActiveGameplayEffectHandle")
 exports.AbilitySystemComponent = puerts.loadCPPType("AbilitySystemComponent")
 exports.GameplayCueParameters = puerts.loadCPPType("GameplayCueParameters")
 exports.GameplayAbility = puerts.loadCPPType("GameplayAbility")
@@ -43,7 +37,6 @@ exports.GameplayAbilityDefine = puerts.loadCPPType("GameplayAbilityDefine")
 exports.AbilityTriggerData = puerts.loadCPPType("AbilityTriggerData")
 exports.GameplayAbilityActorInfo = puerts.loadCPPType("GameplayAbilityActorInfo")
 exports.GameplayAbilitySpec = puerts.loadCPPType("GameplayAbilitySpec")
-exports.ActiveGameplayEffectHandle = puerts.loadCPPType("ActiveGameplayEffectHandle")
 exports.GameplayEventData = puerts.loadCPPType("GameplayEventData")
 exports.GameplayAbilityTargetDataHandle = puerts.loadCPPType("GameplayAbilityTargetDataHandle")
 exports.GameplayAbilityTargetData = puerts.loadCPPType("GameplayAbilityTargetData")
@@ -51,9 +44,22 @@ exports.GameplayAbilityActivationInfo = puerts.loadCPPType("GameplayAbilityActiv
 exports.AbilityTask = puerts.loadCPPType("AbilityTask")
 exports.AbilitySystemComponentType = puerts.loadCPPType("AbilitySystemComponentType")
 exports.AttributeSetDefine = puerts.loadCPPType("AttributeSetDefine")
-exports.FGameplayEffectQuery = puerts.loadCPPType("FGameplayEffectQuery")
-exports.GameplayEffectCue = puerts.loadCPPType("GameplayEffectCue")
+exports.ActiveGameplayEffectsContainer = puerts.loadCPPType("ActiveGameplayEffectsContainer")
 exports.FGameplayModifierEvaluatedData = puerts.loadCPPType("FGameplayModifierEvaluatedData")
+exports.FGameplayEffectQuery = puerts.loadCPPType("FGameplayEffectQuery")
+exports.GameplayEffectAttributeCaptureDefinition = puerts.loadCPPType("GameplayEffectAttributeCaptureDefinition")
+exports.CustomCalculationBasedFloat = puerts.loadCPPType("CustomCalculationBasedFloat")
+exports.SetByCallerFloat = puerts.loadCPPType("SetByCallerFloat")
+exports.GameplayModifierInfo = puerts.loadCPPType("GameplayModifierInfo")
+exports.GameplayEffectExecutionDefinition = puerts.loadCPPType("GameplayEffectExecutionDefinition")
+exports.GameplayEffectExecutionCalculation = puerts.loadCPPType("GameplayEffectExecutionCalculation")
+exports.GameplayEffectCalculation = puerts.loadCPPType("GameplayEffectCalculation")
+exports.FGameplayEffectCustomExecutionParameters = puerts.loadCPPType("FGameplayEffectCustomExecutionParameters")
+exports.FGameplayEffectCustomExecutionOutput = puerts.loadCPPType("FGameplayEffectCustomExecutionOutput")
+exports.FGameplayEffectExecutionScopedModifierInfo = puerts.loadCPPType("FGameplayEffectExecutionScopedModifierInfo")
+exports.FConditionalGameplayEffect = puerts.loadCPPType("FConditionalGameplayEffect")
+exports.GameplayEffectComponent = puerts.loadCPPType("GameplayEffectComponent")
+exports.GameplayEffectCue = puerts.loadCPPType("GameplayEffectCue")
 exports.AttributeMetaData = puerts.loadCPPType("AttributeMetaData")
 exports.GameplayCueNotifyDefine = puerts.loadCPPType("GameplayCueNotifyDefine")
 exports.GameplayCueNotifyDefine_Static = puerts.loadCPPType("GameplayCueNotifyDefine_Static")
@@ -100,10 +106,6 @@ exports.GameplayAbilityTargetActor_Radius = puerts.loadCPPType("GameplayAbilityT
 exports.GameplayAbilityTargetActor_GroundTrace = puerts.loadCPPType("GameplayAbilityTargetActor_GroundTrace")
 exports.GameplayAbilityTargetActor_ActorPlacement = puerts.loadCPPType("GameplayAbilityTargetActor_ActorPlacement")
 exports.GameplayAbilityWorldReticle = puerts.loadCPPType("GameplayAbilityWorldReticle")
-exports.GameplayEffectCalculation = puerts.loadCPPType("GameplayEffectCalculation")
-exports.FGameplayEffectCustomExecutionParameters = puerts.loadCPPType("FGameplayEffectCustomExecutionParameters")
-exports.FGameplayEffectCustomExecutionOutput = puerts.loadCPPType("FGameplayEffectCustomExecutionOutput")
-exports.GameplayEffectExecutionCalculation = puerts.loadCPPType("GameplayEffectExecutionCalculation")
 exports.GameplayModMagnitudeCalculation = puerts.loadCPPType("GameplayModMagnitudeCalculation")
 exports.QueryVolume = puerts.loadCPPType("QueryVolume")
 exports.QuerySphere = puerts.loadCPPType("QuerySphere")
@@ -134,40 +136,6 @@ exports.EGameplayEffectMagnitudeCalculation = (function () {
     EGameplayEffectMagnitudeCalculation[EGameplayEffectMagnitudeCalculation["SetByCaller"] = 3] = "SetByCaller";
     return EGameplayEffectMagnitudeCalculation;
 })();
-exports.EGameplayEffectAttributeCaptureSource = (function () {
-    let EGameplayEffectAttributeCaptureSource = {}
-    EGameplayEffectAttributeCaptureSource[EGameplayEffectAttributeCaptureSource["Source"] = 0] = "Source";
-    EGameplayEffectAttributeCaptureSource[EGameplayEffectAttributeCaptureSource["Target"] = 1] = "Target";
-    return EGameplayEffectAttributeCaptureSource;
-})();
-exports.EAttributeBasedFloatCalculationType = (function () {
-    let EAttributeBasedFloatCalculationType = {}
-    EAttributeBasedFloatCalculationType[EAttributeBasedFloatCalculationType["AttributeMagnitude"] = 0] = "AttributeMagnitude";
-    EAttributeBasedFloatCalculationType[EAttributeBasedFloatCalculationType["AttributeBaseValue"] = 1] = "AttributeBaseValue";
-    EAttributeBasedFloatCalculationType[EAttributeBasedFloatCalculationType["AttributeBonusMagnitude"] = 2] = "AttributeBonusMagnitude";
-    return EAttributeBasedFloatCalculationType;
-})();
-exports.EGameplayEffectPeriodInhibitionRemovedPolicy = (function () {
-    let EGameplayEffectPeriodInhibitionRemovedPolicy = {}
-    EGameplayEffectPeriodInhibitionRemovedPolicy[EGameplayEffectPeriodInhibitionRemovedPolicy["NeverReset"] = 0] = "NeverReset";
-    EGameplayEffectPeriodInhibitionRemovedPolicy[EGameplayEffectPeriodInhibitionRemovedPolicy["ResetPeriod"] = 1] = "ResetPeriod";
-    EGameplayEffectPeriodInhibitionRemovedPolicy[EGameplayEffectPeriodInhibitionRemovedPolicy["ExecuteAndResetPeriod"] = 2] = "ExecuteAndResetPeriod";
-    return EGameplayEffectPeriodInhibitionRemovedPolicy;
-})();
-exports.EGameplayModOpType = (function () {
-    let EGameplayModOpType = {}
-    EGameplayModOpType[EGameplayModOpType["AddBase"] = 0] = "AddBase";
-    EGameplayModOpType[EGameplayModOpType["MultiplyAdditive"] = 1] = "MultiplyAdditive";
-    EGameplayModOpType[EGameplayModOpType["DivideAdditive"] = 2] = "DivideAdditive";
-    EGameplayModOpType[EGameplayModOpType["MultiplyCompound"] = 4] = "MultiplyCompound";
-    EGameplayModOpType[EGameplayModOpType["AddFinal"] = 5] = "AddFinal";
-    EGameplayModOpType[EGameplayModOpType["Max"] = 6] = "Max";
-    EGameplayModOpType[EGameplayModOpType["Additive"] = 0] = "Additive";
-    EGameplayModOpType[EGameplayModOpType["Multiplicitive"] = 1] = "Multiplicitive";
-    EGameplayModOpType[EGameplayModOpType["Division"] = 2] = "Division";
-    EGameplayModOpType[EGameplayModOpType["Override"] = 3] = "Override";
-    return EGameplayModOpType;
-})();
 exports.EGameplayAbilityInstancingPolicy = (function () {
     let EGameplayAbilityInstancingPolicy = {}
     EGameplayAbilityInstancingPolicy[EGameplayAbilityInstancingPolicy["NonInstanced"] = 0] = "NonInstanced";
@@ -191,11 +159,57 @@ exports.EGameplayAbilityActivationMode = (function () {
     EGameplayAbilityActivationMode[EGameplayAbilityActivationMode["Rejected"] = 4] = "Rejected";
     return EGameplayAbilityActivationMode;
 })();
+exports.EGameplayModOpType = (function () {
+    let EGameplayModOpType = {}
+    EGameplayModOpType[EGameplayModOpType["AddBase"] = 0] = "AddBase";
+    EGameplayModOpType[EGameplayModOpType["MultiplyAdditive"] = 1] = "MultiplyAdditive";
+    EGameplayModOpType[EGameplayModOpType["DivideAdditive"] = 2] = "DivideAdditive";
+    EGameplayModOpType[EGameplayModOpType["MultiplyCompound"] = 4] = "MultiplyCompound";
+    EGameplayModOpType[EGameplayModOpType["AddFinal"] = 5] = "AddFinal";
+    EGameplayModOpType[EGameplayModOpType["Max"] = 6] = "Max";
+    EGameplayModOpType[EGameplayModOpType["Additive"] = 0] = "Additive";
+    EGameplayModOpType[EGameplayModOpType["Multiplicitive"] = 1] = "Multiplicitive";
+    EGameplayModOpType[EGameplayModOpType["Division"] = 2] = "Division";
+    EGameplayModOpType[EGameplayModOpType["Override"] = 3] = "Override";
+    return EGameplayModOpType;
+})();
 exports.EConsiderPending = (function () {
     let EConsiderPending = {}
     EConsiderPending[EConsiderPending["No"] = 0] = "No";
     EConsiderPending[EConsiderPending["Yes"] = 1] = "Yes";
     return EConsiderPending;
+})();
+exports.EGameplayEffectAttributeCaptureSource = (function () {
+    let EGameplayEffectAttributeCaptureSource = {}
+    EGameplayEffectAttributeCaptureSource[EGameplayEffectAttributeCaptureSource["Source"] = 0] = "Source";
+    EGameplayEffectAttributeCaptureSource[EGameplayEffectAttributeCaptureSource["Target"] = 1] = "Target";
+    return EGameplayEffectAttributeCaptureSource;
+})();
+exports.EAttributeBasedFloatCalculationType = (function () {
+    let EAttributeBasedFloatCalculationType = {}
+    EAttributeBasedFloatCalculationType[EAttributeBasedFloatCalculationType["AttributeMagnitude"] = 0] = "AttributeMagnitude";
+    EAttributeBasedFloatCalculationType[EAttributeBasedFloatCalculationType["AttributeBaseValue"] = 1] = "AttributeBaseValue";
+    EAttributeBasedFloatCalculationType[EAttributeBasedFloatCalculationType["AttributeBonusMagnitude"] = 2] = "AttributeBonusMagnitude";
+    return EAttributeBasedFloatCalculationType;
+})();
+exports.EGameplayEffectPeriodInhibitionRemovedPolicy = (function () {
+    let EGameplayEffectPeriodInhibitionRemovedPolicy = {}
+    EGameplayEffectPeriodInhibitionRemovedPolicy[EGameplayEffectPeriodInhibitionRemovedPolicy["NeverReset"] = 0] = "NeverReset";
+    EGameplayEffectPeriodInhibitionRemovedPolicy[EGameplayEffectPeriodInhibitionRemovedPolicy["ResetPeriod"] = 1] = "ResetPeriod";
+    EGameplayEffectPeriodInhibitionRemovedPolicy[EGameplayEffectPeriodInhibitionRemovedPolicy["ExecuteAndResetPeriod"] = 2] = "ExecuteAndResetPeriod";
+    return EGameplayEffectPeriodInhibitionRemovedPolicy;
+})();
+exports.EGameplayEffectExecutionScopedModifierAggregatorType = (function () {
+    let EGameplayEffectExecutionScopedModifierAggregatorType = {}
+    EGameplayEffectExecutionScopedModifierAggregatorType[EGameplayEffectExecutionScopedModifierAggregatorType["CapturedAttributeBacked"] = 0] = "CapturedAttributeBacked";
+    EGameplayEffectExecutionScopedModifierAggregatorType[EGameplayEffectExecutionScopedModifierAggregatorType["Transient"] = 1] = "Transient";
+    return EGameplayEffectExecutionScopedModifierAggregatorType;
+})();
+exports.EConditionalGameplayEffectRemovalPolicy = (function () {
+    let EConditionalGameplayEffectRemovalPolicy = {}
+    EConditionalGameplayEffectRemovalPolicy[EConditionalGameplayEffectRemovalPolicy["GrantedEffectControlsOwnLifetime"] = 0] = "GrantedEffectControlsOwnLifetime";
+    EConditionalGameplayEffectRemovalPolicy[EConditionalGameplayEffectRemovalPolicy["RemoveGrantedEffectOnEnd"] = 1] = "RemoveGrantedEffectOnEnd";
+    return EConditionalGameplayEffectRemovalPolicy;
 })();
 exports.EGameplayEffectStackingType = (function () {
     let EGameplayEffectStackingType = {}
@@ -208,6 +222,7 @@ exports.EGameplayEffectStackingDurationPolicy = (function () {
     let EGameplayEffectStackingDurationPolicy = {}
     EGameplayEffectStackingDurationPolicy[EGameplayEffectStackingDurationPolicy["RefreshOnSuccessfulApplication"] = 0] = "RefreshOnSuccessfulApplication";
     EGameplayEffectStackingDurationPolicy[EGameplayEffectStackingDurationPolicy["NeverRefresh"] = 1] = "NeverRefresh";
+    EGameplayEffectStackingDurationPolicy[EGameplayEffectStackingDurationPolicy["ExtendDuration"] = 2] = "ExtendDuration";
     return EGameplayEffectStackingDurationPolicy;
 })();
 exports.EGameplayEffectStackingPeriodPolicy = (function () {
