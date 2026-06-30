@@ -21,6 +21,7 @@
 
 AbilitySystemComponent::~AbilitySystemComponent()
 {
+    // gLogger->warn("ASC destructed! Owner={}, Type={}", (uint32)Owner, static_cast<ObjectClass*>(GetYrAbstractComponent(Owner)->yrObject)->GetType()->ID);
     RemoveAllGameplayCues();
 }
 

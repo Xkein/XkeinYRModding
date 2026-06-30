@@ -101,7 +101,7 @@ struct FOnAttributeChangeData
 /** Delegate for when an attribute's numerical value changes */
 using FOnGameplayAttributeValueChange = TMulticastDelegate<void(const FOnAttributeChangeData&)>;
 
-CLASS(BindJs, IniComponent, ComponentTarget = [TechnoTypeClass, BulletTypeClass, TerrainTypeClass, AnimTypeClass], AutoSavegame, Swizzleable)
+CLASS(BindJs, IniComponent, ComponentTarget = [TechnoTypeClass], AutoSavegame, Swizzleable)
 struct AbilitySystemComponentType final
 {
 	PROPERTY(IniField = "ASC.Attributes")
@@ -115,7 +115,7 @@ struct AbilitySystemComponentType final
 };
 IMPL_YR_SERIALIZE_SWIZZLE(AbilitySystemComponentType);
 
-CLASS(BindJs, ComponentTarget = [TechnoClass, BulletClass, TerrainClass, AnimClass], AutoSavegame)
+CLASS(BindJs, ComponentTarget = [TechnoClass], AutoSavegame)
 class AbilitySystemComponent : public IGameplayCueInterface, public IGameplayTagAssetInterface
 {
 	friend struct ActiveGameplayEffectsContainer;
@@ -128,6 +128,9 @@ public:
         OnEntityConstruct(reg, entity, pYrObject, pYrObject->Type);
     }
 
+    AbilitySystemComponent() = default;
+    AbilitySystemComponent(const AbilitySystemComponent&) = default;
+    AbilitySystemComponent(AbilitySystemComponent&&) = default;
 	/** Destructor — ensures all pending gameplay cues are removed with Removed events */
 	~AbilitySystemComponent();
 	
