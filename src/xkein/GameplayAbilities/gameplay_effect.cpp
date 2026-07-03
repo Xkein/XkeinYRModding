@@ -58,7 +58,7 @@ void GameplayEffectSpec::CalculateModifierMagnitudes()
     {
         float EvalMagnitude = 0.0f;
         
-        if (!Def->Modifiers[i].ModifierMagnitude.AttemptCalculateMagnitude(*this, EvalMagnitude, true, 0.0f))
+        if (!Def->Modifiers[i]->ModifierMagnitude.AttemptCalculateMagnitude(*this, EvalMagnitude, true, 0.0f))
         {
             gLogger->warn("CalculateModifierMagnitudes: Failed to calculate magnitude for modifier {}", i);
             EvalMagnitude = 0.0f;
@@ -711,10 +711,10 @@ void ActiveGameplayEffectsContainer::RemoveActiveGameplayEffectGrantedTagsAndMod
     // Remove each modifier from the attribute aggregator system
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
     {
-        const GameplayModifierInfo& ModInfo = Spec.Def->Modifiers[i];
+        const GameplayModifierInfo* ModInfo = Spec.Def->Modifiers[i];
 
         // Find existing aggregator for this attribute (don't create if doesn't exist)
-        auto AggIt = AttributeAggregatorMap.find(ModInfo.Attribute);
+        auto AggIt = AttributeAggregatorMap.find(ModInfo->Attribute);
         if (AggIt == AttributeAggregatorMap.end()) continue;
 
         FAggregator* Aggregator = AggIt->second.get();

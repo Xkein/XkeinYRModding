@@ -237,7 +237,7 @@ enum EGameplayModOpType : int
 };
 
 /** Struct defining gameplay attribute capture options for gameplay effects */
-CLASS(BindJs)
+CLASS(BindJs, IniComponent, IniAutoLoad)
 struct GameplayEffectAttributeCaptureDefinition final
 {
 	/** Gameplay attribute to capture */
@@ -253,7 +253,7 @@ struct GameplayEffectAttributeCaptureDefinition final
 	bool bSnapshot = false;
 };
 
-CLASS(BindJs)
+CLASS(BindJs, IniComponent, IniAutoLoad)
 struct CustomCalculationBasedFloat final
 {
 	// PROPERTY()
@@ -276,7 +276,7 @@ struct CustomCalculationBasedFloat final
  * Struct representing a float whose magnitude is dictated by a backing attribute and a calculation policy, follows basic form of:
  * (Coefficient * (PreMultiplyAdditiveValue + [Eval'd Attribute Value According to Policy])) + PostMultiplyAdditiveValue
  */
-CLASS(BindJs)
+CLASS(BindJs, IniComponent, IniAutoLoad)
 struct AttributeBasedFloat final
 {
 	/** Constructor */
@@ -396,7 +396,7 @@ struct GameplayEffectModifierMagnitude final
  *	Tells us "Who/What we" modify
  *	Does not tell us how exactly
  */
-CLASS(BindJs)
+CLASS(BindJs, IniComponent, IniAutoLoad)
 struct GameplayModifierInfo
 {
 	/** The Attribute we modify or the GE we modify modifies. */
@@ -593,7 +593,7 @@ struct GameplayEffect final
 	
 	/** Array of modifiers that will affect the target of this effect */
 	PROPERTY()
-	std::vector<GameplayModifierInfo> Modifiers;
+	std::vector<GameplayModifierInfo*> Modifiers;
 
 	/** Array of executions that will affect the target of this effect */
 	PROPERTY()

@@ -382,8 +382,8 @@ void FAggregator::UpdateAggregatorMod(ActiveGameplayEffectHandle ActiveHandle,
         const auto& DefModifiers = Spec.Def->Modifiers;
         for (size_t ModIdx = 0; ModIdx < DefModifiers.size(); ++ModIdx)
         {
-            const GameplayModifierInfo& ModDef = DefModifiers[ModIdx];
-            if (ModDef.Attribute == Attribute)
+            const GameplayModifierInfo* ModDef = DefModifiers[ModIdx];
+            if (ModDef->Attribute == Attribute)
             {
                 // Default to Channel0; full UE supports EvaluationChannelSettings per modifier
                 const EGameplayModEvaluationChannel Channel = EGameplayModEvaluationChannel::Channel0;
@@ -402,8 +402,8 @@ void FAggregator::UpdateAggregatorMod(ActiveGameplayEffectHandle ActiveHandle,
                     Magnitude *= static_cast<float>(Spec.GetStackCount());
                 }
 
-                ModChannel.AddMod(Magnitude, ModDef.ModifierOp,
-                    &ModDef.SourceTags, &ModDef.TargetTags,
+                ModChannel.AddMod(Magnitude, ModDef->ModifierOp,
+                    &ModDef->SourceTags, &ModDef->TargetTags,
                     bWasLocallyGenerated, InHandle);
             }
         }

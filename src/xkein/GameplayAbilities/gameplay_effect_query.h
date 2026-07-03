@@ -213,10 +213,10 @@ inline bool FGameplayEffectQuery::Matches(const GameplayEffectSpec& Spec) const
             return false;
 
         bool bFoundAttribute = false;
-        for (const auto& Modifier : Spec.Def->Modifiers)
+        for (const auto* Modifier : Spec.Def->Modifiers)
         {
-            if (Modifier.Attribute.AttributeName == ModifyingAttribute.AttributeName
-                && Modifier.Attribute.AttributeOwner == ModifyingAttribute.AttributeOwner)
+            if (Modifier->Attribute.AttributeName == ModifyingAttribute.AttributeName
+                && Modifier->Attribute.AttributeOwner == ModifyingAttribute.AttributeOwner)
             {
                 bFoundAttribute = true;
                 break;

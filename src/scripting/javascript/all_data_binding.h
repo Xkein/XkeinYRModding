@@ -85,6 +85,7 @@ UsingStdVector(GameplayEffectCue*);
 UsingStdVector(GameplayEffectComponent*);
 UsingStdVector(GameplayEffectExecutionDefinition);
 UsingStdVector(GameplayModifierInfo);
+UsingStdVector(GameplayModifierInfo*);
 UsingStdVector(FConditionalGameplayEffect);
 UsingStdVector(FGameplayEffectExecutionScopedModifierInfo);
 

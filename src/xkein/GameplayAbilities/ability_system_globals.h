@@ -187,6 +187,30 @@ namespace detail
         }
     };
 
+    // Parser for SetByCallerFloat: reads a single GameplayTag into DataTag
+    template<>
+    struct Parser<SetByCallerFloat>
+    {
+        static bool Read(std::string_view str, SetByCallerFloat& result)
+        {
+            return ::Parser<GameplayTag>::Read(str, result.DataTag);
+        }
+    };
+
+    // Parser for GameplayAttribute: parses "OwnerName.AttributeName" format
+    template<>
+    struct Parser<GameplayAttribute>
+    {
+        static bool Read(std::string_view str, GameplayAttribute& result)
+        {
+            auto dotPos = str.rfind('.');
+            if (dotPos == std::string_view::npos) return false;
+            result.AttributeOwner = StringName(str.substr(0, dotPos));
+            result.AttributeName = StringName(str.substr(dotPos + 1));
+            return true;
+        }
+    };
+
     // Parser for GameplayTagQuery: comma-separated tag list creates an AnyTagsMatch query
     template<>
     struct Parser<GameplayTagQuery>

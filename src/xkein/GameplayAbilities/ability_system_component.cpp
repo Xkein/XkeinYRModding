@@ -786,17 +786,17 @@ bool AbilitySystemComponent::CanApplyAttributeModifiers(const GameplayEffect* Ga
 
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); ++i)
     {
-        const auto& ModDef = Spec.Def->Modifiers[i];
+        const auto* ModDef = Spec.Def->Modifiers[i];
 
-        if (ModDef.ModifierOp == EGameplayModOpType::Additive)
+        if (ModDef->ModifierOp == EGameplayModOpType::Additive)
         {
-            if (!ModDef.Attribute.IsValid())
+            if (!ModDef->Attribute.IsValid())
                 continue;
 
             float CurrentValue = 0.0f;
             for (const auto* AttrSet : SpawnedAttributes)
             {
-                const auto* Data = AttrSet->FindAttributeData(&ModDef.Attribute);
+                const auto* Data = AttrSet->FindAttributeData(&ModDef->Attribute);
                 if (Data)
                 {
                     CurrentValue += Data->GetCurrentValue();
@@ -1001,16 +1001,16 @@ static AggregatedModifiers CollectModifiersForAttribute(
         
         for (size_t i = 0; i < Effect->Spec.Def->Modifiers.size(); i++)
         {
-            const auto& Modifier = Effect->Spec.Def->Modifiers[i];
+            const auto* Modifier = Effect->Spec.Def->Modifiers[i];
             
             // Check if this modifier targets our attribute
-            if (Modifier.Attribute.AttributeName != TargetAttribute.AttributeName)
+            if (Modifier->Attribute.AttributeName != TargetAttribute.AttributeName)
                 continue;
             
             float Magnitude = (i < Effect->Spec.Modifiers.size()) 
                 ? Effect->Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;
             
-            switch (Modifier.ModifierOp)
+            switch (Modifier->ModifierOp)
             {
             case EGameplayModOpType::AddBase:
                 Result.SumAddBase += Magnitude;
@@ -1119,13 +1119,13 @@ static void ExecuteInstantEffect(AbilitySystemComponent* Target, const GameplayE
     
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
     {
-        const auto& Modifier = Spec.Def->Modifiers[i];
+        const auto* Modifier = Spec.Def->Modifiers[i];
         float Magnitude = (i < Spec.Modifiers.size()) ? Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;
         
         // Build evaluated data for pre/post callbacks
         FGameplayModifierEvaluatedData EvalData;
-        EvalData.Attribute = Modifier.Attribute;
-        EvalData.ModifierOp = Modifier.ModifierOp;
+        EvalData.Attribute = Modifier->Attribute;
+        EvalData.ModifierOp = Modifier->ModifierOp;
         EvalData.Magnitude = Magnitude;
         EvalData.IsValid = true;
         
@@ -1133,7 +1133,7 @@ static void ExecuteInstantEffect(AbilitySystemComponent* Target, const GameplayE
         for (auto* AttrSet : Target->SpawnedAttributes)
         {
             // Only process attribute sets that actually contain this attribute
-            if (!AttrSet->FindAttributeData(&Modifier.Attribute))
+            if (!AttrSet->FindAttributeData(&Modifier->Attribute))
                 continue;
             
             FGameplayEffectModCallbackData CallbackData(&Spec, EvalData, Target);
@@ -1141,7 +1141,7 @@ static void ExecuteInstantEffect(AbilitySystemComponent* Target, const GameplayE
             if (!AttrSet->PreGameplayEffectExecute(CallbackData))
                 continue;
             
-            ApplyModifierToAttribute(AttrSet, Modifier.Attribute, Magnitude, Modifier.ModifierOp);
+            ApplyModifierToAttribute(AttrSet, Modifier->Attribute, Magnitude, Modifier->ModifierOp);
             
             AttrSet->PostGameplayEffectExecute(CallbackData);
         }
@@ -1220,12 +1220,12 @@ void ActiveGameplayEffectsContainer::ExecuteActiveEffectsFrom(
     // Step 1: Process modifiers via InternalExecuteMod
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
     {
-        const auto& Modifier = Spec.Def->Modifiers[i];
+        const auto* Modifier = Spec.Def->Modifiers[i];
         float Magnitude = (i < Spec.Modifiers.size()) ? Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;
         
         FGameplayModifierEvaluatedData EvalData;
-        EvalData.Attribute = Modifier.Attribute;
-        EvalData.ModifierOp = Modifier.ModifierOp;
+        EvalData.Attribute = Modifier->Attribute;
+        EvalData.ModifierOp = Modifier->ModifierOp;
         EvalData.Magnitude = Magnitude;
         EvalData.IsValid = true;
         
@@ -1350,7 +1350,7 @@ void ActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModifi
     // Register each modifier with the attribute aggregator system
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
     {
-        const GameplayModifierInfo& ModInfo = Spec.Def->Modifiers[i];
+        const GameplayModifierInfo* ModInfo = Spec.Def->Modifiers[i];
         float EvalMagnitude = (i < Spec.ModifierMagnitudes.size())
             ? Spec.ModifierMagnitudes[i]
             : 0.0f;
@@ -1361,7 +1361,7 @@ void ActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModifi
             : EvalMagnitude;
 
         // Find or create an aggregator for this modifier's attribute
-        std::shared_ptr<FAggregator>& Aggregator = FindOrCreateAttributeAggregator(ModInfo.Attribute);
+        std::shared_ptr<FAggregator>& Aggregator = FindOrCreateAttributeAggregator(ModInfo->Attribute);
         if (!Aggregator) continue;
         
         // Default to Channel0; future: support EvaluationChannelSettings per modifier
@@ -1369,10 +1369,10 @@ void ActiveGameplayEffectsContainer::AddActiveGameplayEffectGrantedTagsAndModifi
         
         Aggregator->AddAggregatorMod(
             FinalMagnitude,
-            ModInfo.ModifierOp,
+            ModInfo->ModifierOp,
             DefaultChannel,
-            &ModInfo.SourceTags,
-            &ModInfo.TargetTags,
+            &ModInfo->SourceTags,
+            &ModInfo->TargetTags,
             false, // bIsPredicted — always false in lockstep
             ActiveGE.Handle
         );
@@ -1393,7 +1393,7 @@ void ActiveGameplayEffectsContainer::UpdateAllAggregatorModMagnitudes(
     std::set<GameplayAttribute> UniqueAttributes;
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
     {
-        UniqueAttributes.insert(Spec.Def->Modifiers[i].Attribute);
+        UniqueAttributes.insert(Spec.Def->Modifiers[i]->Attribute);
     }
     
     for (const GameplayAttribute& Attr : UniqueAttributes)
@@ -1443,7 +1443,7 @@ ActiveGameplayEffectHandle AbilitySystemComponent::ApplyGameplayEffectToTarget(
         bool bFound = false;
         for (const auto* AttrSet : Target->SpawnedAttributes)
         {
-            if (AttrSet && AttrSet->FindAttributeData(&Modifier.Attribute))
+            if (AttrSet && AttrSet->FindAttributeData(&Modifier->Attribute))
             {
                 bFound = true;
                 break;
@@ -3134,9 +3134,9 @@ float AbilitySystemComponent::GetGameplayEffectMagnitude(ActiveGameplayEffectHan
 
 	for (size_t i = 0; i < Effect->Spec.Def->Modifiers.size(); i++)
 	{
-		const auto& Modifier = Effect->Spec.Def->Modifiers[i];
-		if (Modifier.Attribute.AttributeName == Attribute.AttributeName
-			&& Modifier.Attribute.AttributeOwner == Attribute.AttributeOwner)
+		const auto* Modifier = Effect->Spec.Def->Modifiers[i];
+		if (Modifier->Attribute.AttributeName == Attribute.AttributeName
+			&& Modifier->Attribute.AttributeOwner == Attribute.AttributeOwner)
 		{
 			return (i < Effect->Spec.Modifiers.size())
 				? Effect->Spec.Modifiers[i].EvaluatedMagnitude : 0.0f;

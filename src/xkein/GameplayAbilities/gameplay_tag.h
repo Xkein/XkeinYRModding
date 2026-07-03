@@ -252,7 +252,7 @@ private:
 };
 
 /** Encapsulate require and ignore tags */
-CLASS(BindJs)
+CLASS(BindJs, IniComponent, IniAutoLoad)
 struct GameplayTagRequirements
 {
 	/** All of these tags must be present */
