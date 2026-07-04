@@ -25,6 +25,7 @@
 #include "xkein/GameplayAbilities/custom_attribute_set.h"
 
 UsingCppType(ActiveGameplayEffectHandle);
+UsingCppType(ActiveGameplayEffect);
 UsingCppType(ActiveGameplayEffectsContainer);
 UsingCppType(AttributeSet);
 UsingCppType(CustomAttributeSet);
@@ -82,6 +83,7 @@ UsingStdVector(GameplayAbility);
 UsingStdVector(GameplayAbility*);
 UsingStdVector(GameplayAbilityDefine*);
 UsingStdVector(GameplayAbilitySpec);
+UsingStdVector(GameplayAbilitySpecHandle);
 UsingStdVector(GameplayEffect);
 UsingStdVector(GameplayEffect*);
 UsingStdVector(GameplayEffectCue*);
@@ -407,6 +409,8 @@ UsingTMulticastDelegate(void(AbilitySystemComponent*, const GameplayEffectSpec&,
 UsingTMulticastDelegate(void(const GameplayAbility*, const GameplayTagContainer&));
 UsingTMulticastDelegate(void(GameplayAbility*));
 UsingTMulticastDelegate(void(const GameplayAbilitySpecHandle, GameplayAbility*));
+UsingTMulticastDelegate(void(const GameplayAbilitySpec&));
+UsingTMulticastDelegate(void(const GameplayEffectSpec&, const ActiveGameplayEffect*));
 UsingTMulticastDelegate(void(const GameplayTag&, int32));
 UsingTMulticastDelegate(void(ActiveGameplayEffectHandle, int32, int32));
 UsingTMulticastDelegate(void(ActiveGameplayEffectHandle, float, float));

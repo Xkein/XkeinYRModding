@@ -353,7 +353,7 @@ class GameplayEffect
     m_StackingType : EGameplayEffectStackingType;
     // Stack limit for StackingType
     // public int32 StackLimitCount
-    m_StackLimitCount : int32;
+    m_StackLimitCount : int;
     // Policy for how the effect duration should be refreshed while stacking
     // public EGameplayEffectStackingDurationPolicy StackDurationRefreshPolicy
     m_StackDurationRefreshPolicy : EGameplayEffectStackingDurationPolicy;
@@ -438,7 +438,7 @@ class AttributeBasedFloat
 class ActiveGameplayEffectHandle
 {
     // public int32 Handle
-    m_Handle : int32;
+    m_Handle : int;
     // public bool bPassedFiltersAndWasExecuted
     m_bPassedFiltersAndWasExecuted : boolean;
 }
@@ -530,6 +530,40 @@ class AbilitySystemComponent
     // Contains all of the gameplay effects that are currently active on this component
     // public ActiveGameplayEffectsContainer ActiveGameplayEffects
     m_ActiveGameplayEffects : ActiveGameplayEffectsContainer;
+    // Delegate called when an immunity component blocks a gameplay effect.
+    // Parameters: (blocked spec, immunity-providing active effect)
+    // public TMulticastDelegate<void (*)(GameplayEffectSpec const& _0, ActiveGameplayEffect const * _1), FNotThreadSafeDelegateMode> OnImmunityBlockGameplayEffectDelegate
+    m_OnImmunityBlockGameplayEffectDelegate : TMulticastDelegate<(_0 : GameplayEffectSpec, _1 : ActiveGameplayEffect) => void| undefined>;
+    // Called when a GameplayEffect is applied to self
+    // public TMulticastDelegate<void (*)(AbilitySystemComponent * _0, GameplayEffectSpec const& _1, ActiveGameplayEffectHandle _2), FNotThreadSafeDelegateMode> OnGameplayEffectAppliedDelegateToSelf
+    m_OnGameplayEffectAppliedDelegateToSelf : TMulticastDelegate<(_0 : AbilitySystemComponent, _1 : GameplayEffectSpec, _2 : ActiveGameplayEffectHandle) => void| undefined>;
+    // Called when a GameplayEffect is applied to a target (by this ASC)
+    // public TMulticastDelegate<void (*)(AbilitySystemComponent * _0, GameplayEffectSpec const& _1, ActiveGameplayEffectHandle _2), FNotThreadSafeDelegateMode> OnGameplayEffectAppliedDelegateToTarget
+    m_OnGameplayEffectAppliedDelegateToTarget : TMulticastDelegate<(_0 : AbilitySystemComponent, _1 : GameplayEffectSpec, _2 : ActiveGameplayEffectHandle) => void| undefined>;
+    // Called when an active GameplayEffect is added to self (duration/infinite only)
+    // public TMulticastDelegate<void (*)(AbilitySystemComponent * _0, GameplayEffectSpec const& _1, ActiveGameplayEffectHandle _2), FNotThreadSafeDelegateMode> OnActiveGameplayEffectAddedDelegateToSelf
+    m_OnActiveGameplayEffectAddedDelegateToSelf : TMulticastDelegate<(_0 : AbilitySystemComponent, _1 : GameplayEffectSpec, _2 : ActiveGameplayEffectHandle) => void| undefined>;
+    // Called when a periodic GameplayEffect executes on self
+    // public TMulticastDelegate<void (*)(AbilitySystemComponent * _0, GameplayEffectSpec const& _1, ActiveGameplayEffectHandle _2), FNotThreadSafeDelegateMode> OnPeriodicGameplayEffectExecuteDelegateOnSelf
+    m_OnPeriodicGameplayEffectExecuteDelegateOnSelf : TMulticastDelegate<(_0 : AbilitySystemComponent, _1 : GameplayEffectSpec, _2 : ActiveGameplayEffectHandle) => void| undefined>;
+    // Called when a periodic GameplayEffect executes on a target
+    // public TMulticastDelegate<void (*)(AbilitySystemComponent * _0, GameplayEffectSpec const& _1, ActiveGameplayEffectHandle _2), FNotThreadSafeDelegateMode> OnPeriodicGameplayEffectExecuteDelegateOnTarget
+    m_OnPeriodicGameplayEffectExecuteDelegateOnTarget : TMulticastDelegate<(_0 : AbilitySystemComponent, _1 : GameplayEffectSpec, _2 : ActiveGameplayEffectHandle) => void| undefined>;
+    // Called when an ability activation fails, with failure reason tags
+    // public TMulticastDelegate<void (*)(GameplayAbility const * _0, GameplayTagContainer const& _1), FNotThreadSafeDelegateMode> AbilityFailedCallbacks
+    m_AbilityFailedCallbacks : TMulticastDelegate<(_0 : GameplayAbility, _1 : GameplayTagContainer) => void| undefined>;
+    // Called when an ability ends
+    // public TMulticastDelegate<void (*)(GameplayAbility * _0), FNotThreadSafeDelegateMode> AbilityEndedCallbacks
+    m_AbilityEndedCallbacks : TMulticastDelegate<(_0 : GameplayAbility) => void| undefined>;
+    // Called when an ability is activated
+    // public TMulticastDelegate<void (*)(GameplayAbilitySpecHandle _0, GameplayAbility * _1), FNotThreadSafeDelegateMode> AbilityActivatedCallbacks
+    m_AbilityActivatedCallbacks : TMulticastDelegate<(_0 : GameplayAbilitySpecHandle, _1 : GameplayAbility) => void| undefined>;
+    // Called when an ability is committed (cost paid, cooldown started)
+    // public TMulticastDelegate<void (*)(GameplayAbilitySpecHandle _0, GameplayAbility * _1), FNotThreadSafeDelegateMode> AbilityCommittedCallbacks
+    m_AbilityCommittedCallbacks : TMulticastDelegate<(_0 : GameplayAbilitySpecHandle, _1 : GameplayAbility) => void| undefined>;
+    // Called when an ability spec is marked dirty
+    // public TMulticastDelegate<void (*)(GameplayAbilitySpec const& _0), FNotThreadSafeDelegateMode> AbilitySpecDirtiedCallbacks
+    m_AbilitySpecDirtiedCallbacks : TMulticastDelegate<(_0 : GameplayAbilitySpec) => void| undefined>;
 }
 // Simple gameplay cue parameters, mirroring UE5.5 FGameplayCueParameters
 // GameplayCueParameters
@@ -558,13 +592,13 @@ class GameplayCueParameters
     m_SourceObject : entt_entity;
     // Level of the gameplay effect that triggered this cue
     // public int32 GameplayEffectLevel
-    m_GameplayEffectLevel : int32;
+    m_GameplayEffectLevel : int;
     // Level of the ability that triggered this cue
     // public int32 AbilityLevel
-    m_AbilityLevel : int32;
+    m_AbilityLevel : int;
     // Physical material from hit result (UE parity)
     // public int32 PhysicalMaterial
-    m_PhysicalMaterial : int32;
+    m_PhysicalMaterial : int;
     // Component/entity to attach spawned effects to (UE parity)
     // public entity TargetAttachComponent
     m_TargetAttachComponent : entt_entity;
@@ -660,7 +694,7 @@ class GameplayAbilitySpec
     m_GameplayEffectHandle : ActiveGameplayEffectHandle;
     // InputID, if bound to an input
     // public int32 InputID
-    m_InputID : int32;
+    m_InputID : int;
     // public entity SourceObject
     m_SourceObject : entt_entity;
     // Count of how many times this ability has been activated
@@ -778,6 +812,24 @@ class AttributeSetDefine
 // ActiveGameplayEffectsContainer
 class ActiveGameplayEffectsContainer
 {
+}
+// ActiveGameplayEffect
+class ActiveGameplayEffect
+{
+    // public GameplayEffectSpec Spec
+    m_Spec : GameplayEffectSpec;
+    // World time when this effect was started
+    // public float StartWorldTime
+    m_StartWorldTime : float;
+    // Current stack count
+    // public int32 StackCount
+    m_StackCount : int;
+    // True if this effect is inhibited (temporarily disabled)
+    // public bool bIsInhibited
+    m_bIsInhibited : boolean;
+    // Handles of Gameplay Abilities that were granted to the target by this Active Gameplay Effect
+    // public std::vector<GameplayAbilitySpecHandle, std::allocator<GameplayAbilitySpecHandle>> GrantedAbilityHandles
+    m_GrantedAbilityHandles : StdVector<GameplayAbilitySpecHandle>;
 }
 // Evaluated modifier data used by calculation classes and delegate callbacks
 // FGameplayModifierEvaluatedData
@@ -963,7 +1015,7 @@ class FConditionalGameplayEffect
     m_RemovalPolicy : EConditionalGameplayEffectRemovalPolicy;
     // Number of stacks to remove when the parent effect is removed (only meaningful with RemoveGrantedEffectOnEnd policy)
     // public int32 StackCountToRemove
-    m_StackCountToRemove : int32;
+    m_StackCountToRemove : int;
 }
 // Base class for GameplayEffect components.
 // Components add modular behavior to GameplayEffects by hooking into lifecycle events.
@@ -1097,7 +1149,7 @@ class GameplayAbilitySpecDef
     m_LevelScalableFloat : FScalableFloat;
     // Input ID to activate this ability with
     // public int32 InputID
-    m_InputID : int32;
+    m_InputID : int;
     // Policy for what happens when the granting GE is removed
     // public EGameplayEffectGrantedAbilityRemovePolicy RemovalPolicy
     m_RemovalPolicy : EGameplayEffectGrantedAbilityRemovePolicy;
@@ -1189,10 +1241,10 @@ class AbilityTask_Repeat
 {
     // Create and register a new Repeat task
     // public static AbilityTask_Repeat * Create(GameplayAbility * Ability, int32 MaxIterations, float Interval)
-    static Create(Ability_0 : GameplayAbility, MaxIterations_1 : int32, Interval_2 : float) : AbilityTask_Repeat;
+    static Create(Ability_0 : GameplayAbility, MaxIterations_1 : int, Interval_2 : float) : AbilityTask_Repeat;
     // Maximum number of times to perform the action
     // public int32 MaxIterations
-    m_MaxIterations : int32;
+    m_MaxIterations : int;
     // Time in seconds between each iteration
     // public float IntervalBetweenIterations
     m_IntervalBetweenIterations : float;
@@ -1397,10 +1449,10 @@ class AbilityTask_WaitInput
 {
     // Create and register a new WaitInput task
     // public static AbilityTask_WaitInput * Create(GameplayAbility * Ability, int32 InputID, bool bTriggerOnPress, bool bTriggerOnRelease)
-    static Create(Ability_0 : GameplayAbility, InputID_1 : int32, bTriggerOnPress_2 : boolean, bTriggerOnRelease_3 : boolean) : AbilityTask_WaitInput;
+    static Create(Ability_0 : GameplayAbility, InputID_1 : int, bTriggerOnPress_2 : boolean, bTriggerOnRelease_3 : boolean) : AbilityTask_WaitInput;
     // InputID to watch. Should match the ability's bound InputID.
     // public int32 InputID
-    m_InputID : int32;
+    m_InputID : int;
     // If true, fire OnInputPress when input is pressed
     // public bool bTriggerOnPress
     m_bTriggerOnPress : boolean;
@@ -1784,6 +1836,22 @@ enum EGameplayEffectMagnitudeCalculation {
     // This magnitude will be set explicitly by the code/blueprint that creates the spec.
     // SetByCaller = 
     SetByCaller = 3,
+}
+// Event type for gameplay cues
+// EGameplayCueEvent
+enum EGameplayCueEvent {
+    // Cue activated (persistent effects begin)
+    // OnActive = 
+    OnActive = 0,
+    // Cue is active (per-frame for persistent)
+    // WhileActive = 
+    WhileActive = 1,
+    // One-shot execution (instant effects)
+    // Executed = 
+    Executed = 2,
+    // Cue removed (persistent effects end)
+    // Removed = 
+    Removed = 3,
 }
 // Describes how a GameplayAbility will be instanced when executed
 // EGameplayAbilityInstancingPolicy

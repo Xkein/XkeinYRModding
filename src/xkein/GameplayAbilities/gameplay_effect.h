@@ -920,7 +920,7 @@ struct GameplayEffectSpec
 };
 
 
-CLASS()
+CLASS(BindJs)
 struct ActiveGameplayEffect
 {
 	ActiveGameplayEffect() : StartWorldTime(0.0f), StackCount(1), bIsInhibited(false), LastPeriodExecuteTime(0.0f) {}

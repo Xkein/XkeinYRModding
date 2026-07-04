@@ -6,7 +6,7 @@
 class IniReader;
 
 /** Event type for gameplay cues */
-ENUM()
+ENUM(BindJs)
 enum EGameplayCueEvent : int
 {
     OnActive,     // Cue activated (persistent effects begin)

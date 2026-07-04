@@ -682,6 +682,7 @@ public:
 
 	/** Delegate called when an immunity component blocks a gameplay effect.
 	 *  Parameters: (blocked spec, immunity-providing active effect) */
+	PROPERTY()
 	FImmunityBlockGE OnImmunityBlockGameplayEffectDelegate;
 
 	// ============================================================
@@ -689,33 +690,43 @@ public:
 	// ============================================================
 
 	/** Called when a GameplayEffect is applied to self */
+	PROPERTY()
 	FOnGameplayEffectAppliedDelegate OnGameplayEffectAppliedDelegateToSelf;
 
 	/** Called when a GameplayEffect is applied to a target (by this ASC) */
+	PROPERTY()
 	FOnGameplayEffectAppliedDelegate OnGameplayEffectAppliedDelegateToTarget;
 
 	/** Called when an active GameplayEffect is added to self (duration/infinite only) */
+	PROPERTY()
 	FOnGameplayEffectAppliedDelegate OnActiveGameplayEffectAddedDelegateToSelf;
 
 	/** Called when a periodic GameplayEffect executes on self */
+	PROPERTY()
 	FOnGameplayEffectAppliedDelegate OnPeriodicGameplayEffectExecuteDelegateOnSelf;
 
 	/** Called when a periodic GameplayEffect executes on a target */
+	PROPERTY()
 	FOnGameplayEffectAppliedDelegate OnPeriodicGameplayEffectExecuteDelegateOnTarget;
 
 	/** Called when an ability activation fails, with failure reason tags */
+	PROPERTY()
 	FAbilityFailedDelegate AbilityFailedCallbacks;
 
 	/** Called when an ability ends */
+	PROPERTY()
 	FAbilityEnded AbilityEndedCallbacks;
 
 	/** Called when an ability is activated */
+	PROPERTY()
 	FGenericAbilityDelegate AbilityActivatedCallbacks;
 
 	/** Called when an ability is committed (cost paid, cooldown started) */
+	PROPERTY()
 	FGenericAbilityDelegate AbilityCommittedCallbacks;
 
 	/** Called when an ability spec is marked dirty */
+	PROPERTY()
 	FAbilitySpecDirtied AbilitySpecDirtiedCallbacks;
 
 	// ============================================================

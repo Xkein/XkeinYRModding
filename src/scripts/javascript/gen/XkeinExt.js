@@ -45,6 +45,7 @@ exports.AbilityTask = puerts.loadCPPType("AbilityTask")
 exports.AbilitySystemComponentType = puerts.loadCPPType("AbilitySystemComponentType")
 exports.AttributeSetDefine = puerts.loadCPPType("AttributeSetDefine")
 exports.ActiveGameplayEffectsContainer = puerts.loadCPPType("ActiveGameplayEffectsContainer")
+exports.ActiveGameplayEffect = puerts.loadCPPType("ActiveGameplayEffect")
 exports.FGameplayModifierEvaluatedData = puerts.loadCPPType("FGameplayModifierEvaluatedData")
 exports.FGameplayEffectQuery = puerts.loadCPPType("FGameplayEffectQuery")
 exports.GameplayEffectAttributeCaptureDefinition = puerts.loadCPPType("GameplayEffectAttributeCaptureDefinition")
@@ -135,6 +136,14 @@ exports.EGameplayEffectMagnitudeCalculation = (function () {
     EGameplayEffectMagnitudeCalculation[EGameplayEffectMagnitudeCalculation["CustomCalculationClass"] = 2] = "CustomCalculationClass";
     EGameplayEffectMagnitudeCalculation[EGameplayEffectMagnitudeCalculation["SetByCaller"] = 3] = "SetByCaller";
     return EGameplayEffectMagnitudeCalculation;
+})();
+exports.EGameplayCueEvent = (function () {
+    let EGameplayCueEvent = {}
+    EGameplayCueEvent[EGameplayCueEvent["OnActive"] = 0] = "OnActive";
+    EGameplayCueEvent[EGameplayCueEvent["WhileActive"] = 1] = "WhileActive";
+    EGameplayCueEvent[EGameplayCueEvent["Executed"] = 2] = "Executed";
+    EGameplayCueEvent[EGameplayCueEvent["Removed"] = 3] = "Removed";
+    return EGameplayCueEvent;
 })();
 exports.EGameplayAbilityInstancingPolicy = (function () {
     let EGameplayAbilityInstancingPolicy = {}

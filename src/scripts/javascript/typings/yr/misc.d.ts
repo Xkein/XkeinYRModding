@@ -31,6 +31,9 @@ type entt_entity = number;
 type EventTypeExt = number;
 type CustomEventType = number;
 
+// temp
+declare class IGameplayCueInterface {}
+
 declare class StdVector<T> {
     push_back(item: T): void;
     pop_back(): void;
@@ -38,4 +41,32 @@ declare class StdVector<T> {
     clear(): void;
     empty(): boolean;
     at(index: number): T;
+}
+
+declare class FDelegateHandle {
+    Id: bigint;
+    IsValid(): boolean;
+    Reset(): void;
+}
+
+declare class TDelegate<TCallback extends (...args: any[]) => any> {
+    Bind(fn: TCallback): void;
+    IsBound(): boolean;
+    Unbind(): void;
+    Execute(...args: Parameters<TCallback>): ReturnType<TCallback>;
+    ExecuteIfBound(...args: Parameters<TCallback>): void;
+}
+
+declare class TMulticastDelegate<TCallback extends (...args: any[]) => void> {
+    Add(fn: TCallback): FDelegateHandle;
+    Remove(handle: FDelegateHandle): boolean;
+    Clear(): void;
+    IsBound(): boolean;
+}
+
+declare class TMulticastDelegateRegistration<TCallback extends (...args: any[]) => void> {
+    Add(fn: TCallback): FDelegateHandle;
+    Remove(handle: FDelegateHandle): boolean;
+    Clear(): void;
+    IsBound(): boolean;
 }
