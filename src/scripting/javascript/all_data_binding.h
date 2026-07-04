@@ -127,6 +127,8 @@ UsingCppType(FScalableFloat);
 UsingCppType(GameplayEffectCalculation);
 UsingCppType(GameplayEffectExecutionCalculation);
 UsingCppType(GameplayEffectExecutionDefinition);
+UsingCppType(GameplayEffectContextHandle);
+UsingCppType(GameplayEffectContext);
 UsingCppType(FGameplayEffectModCallbackData);
 UsingCppType(FGameplayModifierEvaluatedData);
 UsingCppType(FGameplayEffectExecutionScopedModifierInfo);

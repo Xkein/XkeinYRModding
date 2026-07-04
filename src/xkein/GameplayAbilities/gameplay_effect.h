@@ -717,7 +717,7 @@ private:
 };
 IMPL_YR_SERIALIZE_SWIZZLE(GameplayEffect);
 
-CLASS()
+CLASS(BindJs)
 struct GameplayEffectContext
 {
 	/** Instigator actor, the actor that owns the ability system component */
@@ -765,9 +765,14 @@ struct GameplayEffectContext
 	GameplayEffectContext Duplicate() const;
 };
 
+CLASS(BindJs)
 struct GameplayEffectContextHandle
 {
-	std::shared_ptr<GameplayEffectContext> Data;
+    PROPERTY()
+    std::shared_ptr<GameplayEffectContext> Data;
+
+    FUNCTION()
+    static GameplayEffectContextHandle Create() { return GameplayEffectContextHandle(); }
 };
 
 /**

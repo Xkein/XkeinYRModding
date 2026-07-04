@@ -356,15 +356,18 @@ public:
 	 * @param Context Context information (instigator, level, etc.)
 	 * @return Handle to the active effect (invalid for instant effects)
 	 */
+	FUNCTION()
 	ActiveGameplayEffectHandle ApplyGameplayEffectToTarget(GameplayEffect* Effect, AbilitySystemComponent* Target, const GameplayEffectContext& Context);
 
 	/** Apply a gameplay effect to self */
+	FUNCTION()
 	ActiveGameplayEffectHandle ApplyGameplayEffectToSelf(GameplayEffect* Effect, const GameplayEffectContext& Context);
 
 	/** Create an outgoing gameplay effect spec ready to be applied. AbilitySpec is optional for copying source tags. */
 	GameplayEffectSpec MakeOutgoingSpec(GameplayEffect* Effect, float Level, const GameplayAbilitySpec* AbilitySpec = nullptr) const;
 
 	/** Create an effect context for this ASC's owner */
+	FUNCTION()
 	GameplayEffectContextHandle MakeEffectContext() const;
 
 	/** Remove an active gameplay effect by handle. StacksToRemove=-1 removes all stacks */
@@ -403,12 +406,15 @@ public:
 	void InitDefaultGameplayCueParameters(GameplayCueParameters& Parameters);
 
 	/** Execute a one-shot gameplay cue */
+	FUNCTION()
 	void ExecuteGameplayCue(const GameplayTag& CueTag, const GameplayCueParameters& Params = GameplayCueParameters());
 
 	/** Add a persistent gameplay cue */
+	FUNCTION()
 	void AddGameplayCue(const GameplayTag& CueTag, const GameplayCueParameters& Params = GameplayCueParameters());
 
 	/** Remove a persistent gameplay cue */
+	FUNCTION()
 	void RemoveGameplayCue(const GameplayTag& CueTag);
 
 	/** Remove all active persistent gameplay cues from this ASC */

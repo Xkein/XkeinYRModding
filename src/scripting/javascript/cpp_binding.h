@@ -3,6 +3,7 @@
 #include "core/tool/ref_wrapper.h"
 #include "core/tool/delegate.h"
 #include "core/string/string_tool.h"
+#include "core/tool/type_traits.hpp"
 #include <ScriptBackend.hpp>
 #include <DataTransfer.h>
 #include <PuertsNamespaceDef.h>
@@ -359,6 +360,20 @@ namespace PUERTS_NAMESPACE
             }
         };
 
+        template<typename T>
+        struct Converter<std::shared_ptr<T>>
+        {
+            static v8::Local<v8::Value> toScript(v8::Local<v8::Context> context, const std::shared_ptr<T>& value)
+            {
+                return Converter<T*>::toScript(context, value.get());
+            }
+
+            static bool accept(v8::Local<v8::Context> context, const v8::Local<v8::Value>& value)
+            {
+                return Converter<T*>::accept(context, value);
+            }
+        };
+
         template<>
         struct Converter<LARGE_INTEGER>
         {
@@ -437,6 +452,15 @@ namespace PUERTS_NAMESPACE
         }
     };
 
+    template<typename T>
+    struct ScriptTypeName<std::shared_ptr<T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("std::shared_ptr<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
     template<>
     struct ScriptTypeName<LARGE_INTEGER>
     {
@@ -464,6 +488,7 @@ FORCEINLINE void MakePropertyCheck(PUERTS_NAMESPACE::ClassDefineBuilder<T, API, 
         using data_type = std::invoke_result_t<decltype(Data), T&>;
         constexpr bool is_readonly = !std::is_move_assignable_v<data_type>
             || std::is_same_v<data_type, std::string_view&>
+            || is_shared_ptr_v<data_type>
             || std::is_same_v<data_type, const char*&>;
         if constexpr (!is_readonly)
         {
