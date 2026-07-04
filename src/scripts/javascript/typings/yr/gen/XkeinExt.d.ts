@@ -333,7 +333,7 @@ class GameplayEffect
     // public EGameplayEffectPeriodInhibitionRemovedPolicy PeriodicInhibitionPolicy
     m_PeriodicInhibitionPolicy : EGameplayEffectPeriodInhibitionRemovedPolicy;
     // Array of modifiers that will affect the target of this effect
-    // public std::vector<GameplayModifierInfo, std::allocator<GameplayModifierInfo>> Modifiers
+    // public std::vector<GameplayModifierInfo *, std::allocator<GameplayModifierInfo *>> Modifiers
     m_Modifiers : StdVector<GameplayModifierInfo>;
     // Array of executions that will affect the target of this effect
     // public std::vector<GameplayEffectExecutionDefinition, std::allocator<GameplayEffectExecutionDefinition>> Executions
@@ -669,6 +669,10 @@ class GameplayAbilitySpec
     // Tags that this ability has. These are replicated and can be used for GE source tags
     // public GameplayTagContainer DynamicAbilityTags
     m_DynamicAbilityTags : GameplayTagContainer;
+    // public TDelegate<void (*)(GameplayAbilitySpec * _0)> OnGameplayAbilityEnded
+    m_OnGameplayAbilityEnded : TDelegate<(_0 : GameplayAbilitySpec) => void| undefined>;
+    // public TDelegate<void (*)()> OnGameplayAbilityCancelled
+    m_OnGameplayAbilityCancelled : TDelegate<() => void| undefined>;
 }
 // Metadata for a tag-based Gameplay Event, that can activate other abilities or run ability-specific logic
 // GameplayEventData

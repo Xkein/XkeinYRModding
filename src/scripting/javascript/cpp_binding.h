@@ -1,6 +1,8 @@
 #pragma once
 #ifndef __HEADER_TOOL__
 #include "core/tool/ref_wrapper.h"
+#include "core/tool/delegate.h"
+#include "core/string/string_tool.h"
 #include <ScriptBackend.hpp>
 #include <DataTransfer.h>
 #include <PuertsNamespaceDef.h>
@@ -238,6 +240,40 @@ struct JsFinalizeBuilder<T, typename std::enable_if_t<std::is_convertible_v<T*, 
         return nullptr;                                                                              \
     }                                                                                                \
 };                                                                                                   \
+}
+
+#define UsingTDelegate(FUNC) UsingContainer(TDelegate<FUNC>)                                            \
+namespace PUERTS_NAMESPACE                                                                              \
+{                                                                                                       \
+    template<>                                                                                          \
+    struct ScriptTypeName<TDelegate<FUNC>>                                                              \
+    {                                                                                                   \
+        static constexpr auto value() {                                                                 \
+            return internal::Literal("TDelegate<") + internal::Literal(#FUNC) + internal::Literal(">"); \
+        }                                                                                               \
+    };                                                                                                  \
+}
+#define UsingTMulticastDelegate(FUNC)       UsingContainer(TMulticastDelegate<FUNC>)                             \
+namespace PUERTS_NAMESPACE                                                                                       \
+{                                                                                                                \
+    template<>                                                                                                   \
+    struct ScriptTypeName<TMulticastDelegate<FUNC>>                                                              \
+    {                                                                                                            \
+        static constexpr auto value() {                                                                          \
+            return internal::Literal("TMulticastDelegate<") + internal::Literal(#FUNC) + internal::Literal(">"); \
+        }                                                                                                        \
+    };                                                                                                           \
+}
+#define UsingTMulticastDelegateRegistration(FUNC) UsingContainer(TMulticastDelegateRegistration<FUNC>)           \
+namespace PUERTS_NAMESPACE                                                                                       \
+{                                                                                                                \
+    template<>                                                                                                   \
+    struct ScriptTypeName<TMulticastDelegateRegistration<FUNC>>                                                              \
+    {                                                                                                            \
+        static constexpr auto value() {                                                                          \
+            return internal::Literal("TMulticastDelegateRegistration<") + internal::Literal(#FUNC) + internal::Literal(">"); \
+        }                                                                                                        \
+    };                                                                                                           \
 }
 
 namespace PUERTS_NAMESPACE
@@ -974,4 +1010,7 @@ UsingCppType(HINSTANCE);
 #ifndef UsingCppType
     #define UsingCppType(CLS)
 #endif // !UsingCPPType
+#define UsingTDelegate(FUNC)
+#define UsingTMulticastDelegate(FUNC)
+#define UsingTMulticastDelegateRegistration(FUNC)
 #endif

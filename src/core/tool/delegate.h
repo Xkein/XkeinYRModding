@@ -102,6 +102,11 @@ public:
         m_storage = std_function_t(std::forward<Func>(func));
     }
 
+    /** Non-template bridge for Puerts JS binding. */
+    void BindStdFunction(std::function<Ret(Args...)> func) {
+        BindLambda(std::move(func));
+    }
+
     /** Invoke the delegate. Asserts if unbound (matching entt::delegate behavior). */
     Ret Execute(Args... args) const
     {
@@ -341,6 +346,11 @@ public:
         return handle;
     }
 
+    /** Non-template bridge for Puerts JS binding. */
+    FDelegateHandle AddStdFunction(std::function<Ret(Args...)> func) {
+        return AddLambda(std::move(func));
+    }
+
     // ── Remove / RemoveAll / Clear ──────────────────────────────────────
 
     /** Remove a single listener by handle. Returns true if found and removed. */
@@ -451,6 +461,11 @@ public:
 
     template<typename Func>
     FDelegateHandle AddLambda(Func&& f) { return m_delegate->AddLambda(std::forward<Func>(f)); }
+
+    /** Non-template bridge for Puerts JS binding. */
+    FDelegateHandle AddStdFunction(std::function<Ret(Args...)> func) {
+        return m_delegate->AddLambda(std::move(func));
+    }
 
     bool Remove(FDelegateHandle h) { return m_delegate->Remove(h); }
 

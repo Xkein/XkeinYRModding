@@ -39,6 +39,8 @@ UsingCppType(GameplayAbilityDefine);
 UsingCppType(GameplayAbilitySystem);
 UsingCppType(GameplayAttribute);
 UsingCppType(GameplayAttributeData);
+UsingCppType(FGameplayEffectRemovalInfo);
+UsingCppType(FOnAttributeChangeData);
 UsingCppType(GameplayAbilityTargetData);
 UsingCppType(GameplayAbilityTargetDataHandle);
 UsingCppType(GameplayAbilitySpecDef);
@@ -67,6 +69,7 @@ UsingCppType(GameplayAbilitySpec);
 UsingCppType(GameplayAbilitySpecHandle);
 UsingCppType(GameplayAbilityActorInfo);
 UsingCppType(GameplayAbilityActivationInfo);
+UsingCppType(FAggregator);
 
 UsingStdVector(AttributeSet);
 UsingStdVector(AttributeSet*);
@@ -393,5 +396,26 @@ UsingCppType(YrBootEvent);
 UsingCppType(YrTerminateEvent);
 UsingCppType(YrAfterCreateWindoweEvent);
 UsingCppType(YrAfterSetCooperativeLevelEvent);
+
+// ── Delegate bindings ──────────────────────────────────
+UsingCppType(FDelegateHandle);
+
+UsingTDelegate(void(GameplayAbilitySpec*));
+UsingTDelegate(void());
+
+UsingTMulticastDelegate(void(AbilitySystemComponent*, const GameplayEffectSpec&, ActiveGameplayEffectHandle));
+UsingTMulticastDelegate(void(const GameplayAbility*, const GameplayTagContainer&));
+UsingTMulticastDelegate(void(GameplayAbility*));
+UsingTMulticastDelegate(void(const GameplayAbilitySpecHandle, GameplayAbility*));
+UsingTMulticastDelegate(void(const GameplayTag&, int32));
+UsingTMulticastDelegate(void(ActiveGameplayEffectHandle, int32, int32));
+UsingTMulticastDelegate(void(ActiveGameplayEffectHandle, float, float));
+UsingTMulticastDelegate(void(ActiveGameplayEffectHandle, bool));
+UsingTMulticastDelegate(void(const FGameplayEffectRemovalInfo&));
+UsingTMulticastDelegate(void(const FOnAttributeChangeData&));
+UsingTMulticastDelegate(void(FAggregator*));
+
+UsingTMulticastDelegateRegistration(void(AbilitySystemComponent*, const GameplayEffectSpec&, ActiveGameplayEffectHandle));
+UsingTMulticastDelegateRegistration(void(const GameplayAbility*, const GameplayTagContainer&));
 
 #endif

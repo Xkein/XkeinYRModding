@@ -227,8 +227,10 @@ struct GameplayAbilitySpec
 	/** If true, this ability should be removed as soon as it finishes executing */
 	bool RemoveAfterActivation = false;
 
+	PROPERTY()
     TDelegate<void(GameplayAbilitySpec*)> OnGameplayAbilityEnded;
 
+	PROPERTY()
     TDelegate<void()> OnGameplayAbilityCancelled;
 
 	bool IsActive() const { return ActiveCount > 0; }

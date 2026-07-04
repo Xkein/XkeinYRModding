@@ -131,6 +131,16 @@
         if string.starts_with($unwrap_name, "std::vector<")
             ret "StdVector<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ">"
         end
+        # TDelegate<T>
+        if string.starts_with($unwrap_name, "TDelegate<")
+            ret "TDelegate<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ">"
+        end
+        if string.starts_with($unwrap_name, "TMulticastDelegate<")
+            ret "TMulticastDelegate<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ">"
+        end
+        if string.starts_with($unwrap_name, "TMulticastDelegateRegistration<")
+            ret "TMulticastDelegateRegistration<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ">"
+        end
         # script function type
         if string.starts_with($unwrap_name, "ScriptFunction<")
             ret httype.unwrap_class($unwrap).identifier
