@@ -571,6 +571,21 @@ struct GameplayEffectCue final
 CLASS(BindJs, IniComponent, IniAutoLoad, AutoSavegame, Swizzleable)
 struct GameplayEffect final
 {
+	GameplayEffect()
+		: DurationPolicy(EGameplayEffectDurationType::Instant)
+		, bExecutePeriodicEffectOnApplication(true)
+		, PeriodicInhibitionPolicy(EGameplayEffectPeriodInhibitionRemovedPolicy::NeverReset)
+		, bRequireModifierSuccessToTriggerCues(true)
+		, StackingType(EGameplayEffectStackingType::None)
+		, StackLimitCount(0)
+		, StackDurationRefreshPolicy(EGameplayEffectStackingDurationPolicy::RefreshOnSuccessfulApplication)
+		, StackPeriodResetPolicy(EGameplayEffectStackingPeriodPolicy::ResetOnSuccessfulApplication)
+		, StackExpirationPolicy(EGameplayEffectStackingExpirationPolicy::ClearEntireStack)
+		, bDenyOverflowApplication(false)
+		, bClearStackOnOverflow(false)
+		, bSuppressStackingCues(false)
+	{}
+
     PROPERTY()
 	EGameplayEffectDurationType DurationPolicy;
 

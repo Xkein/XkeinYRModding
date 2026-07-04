@@ -1216,6 +1216,9 @@ void ActiveGameplayEffectsContainer::ExecuteActiveEffectsFrom(
     const GameplayEffectSpec& Spec, AbilitySystemComponent* TargetASC)
 {
     if (!Spec.Def || !TargetASC) return;
+
+    bool ModifierSuccessfullyExecuted = false;
+    bool GameplayCuesWereManuallyHandled = false;
     
     // Step 1: Process modifiers via InternalExecuteMod
     for (size_t i = 0; i < Spec.Def->Modifiers.size(); i++)
@@ -1229,7 +1232,7 @@ void ActiveGameplayEffectsContainer::ExecuteActiveEffectsFrom(
         EvalData.Magnitude = Magnitude;
         EvalData.IsValid = true;
         
-        InternalExecuteMod(Spec, EvalData);
+        if (InternalExecuteMod(Spec, EvalData)) ModifierSuccessfullyExecuted = true;
     }
     
     // Step 2: Process custom executions and their output modifiers
@@ -1274,12 +1277,16 @@ void ActiveGameplayEffectsContainer::ExecuteActiveEffectsFrom(
             if (!bExecuted) TryExecute(TargetASC);
         }
         
+        // Check if the execution calculation handled gameplay cues internally
+        if (ExecOutput.bHandledGameplayCuesManually)
+            GameplayCuesWereManuallyHandled = true;
+        
         // Apply output modifiers from the execution
         for (const auto& OutputMod : ExecOutput.OutputModifiers)
         {
             if (OutputMod.IsValid)
             {
-                InternalExecuteMod(Spec, OutputMod);
+                if (InternalExecuteMod(Spec, OutputMod)) ModifierSuccessfullyExecuted = true;
             }
         }
         
@@ -1296,7 +1303,7 @@ void ActiveGameplayEffectsContainer::ExecuteActiveEffectsFrom(
             EvalData.Magnitude = Magnitude;
             EvalData.IsValid = true;
             
-            InternalExecuteMod(Spec, EvalData);
+            if (InternalExecuteMod(Spec, EvalData)) ModifierSuccessfullyExecuted = true;
         }
         
         // Step 3: Process conditional gameplay effects from this execution definition
@@ -1334,8 +1341,17 @@ void ActiveGameplayEffectsContainer::ExecuteActiveEffectsFrom(
         }
     }
     
-    // Step 4: Trigger gameplay cues
-    if (Spec.Def->GameplayCues.size() > 0)
+    // Step 4: Trigger gameplay cues (gated by bRequireModifierSuccessToTriggerCues)
+    const bool bHasModifiers = Spec.Def->Modifiers.size() > 0;
+    const bool bHasExecutions = Spec.Def->Executions.size() > 0;
+    const bool bHasModifiersOrExecutions = bHasModifiers || bHasExecutions;
+    bool InvokeGameplayCueExecute = (!bHasModifiersOrExecutions) || !Spec.Def->bRequireModifierSuccessToTriggerCues;
+    if (bHasModifiersOrExecutions && ModifierSuccessfullyExecuted)
+        InvokeGameplayCueExecute = true;
+    if (GameplayCuesWereManuallyHandled)
+        InvokeGameplayCueExecute = false;
+
+    if (InvokeGameplayCueExecute && Spec.Def->GameplayCues.size() > 0)
     {
         TriggerGameplayCues(Spec.Def, Spec, TargetASC, EGameplayCueEvent::Executed);
     }
@@ -2461,6 +2477,25 @@ void ActiveGameplayEffectsContainer::SetActiveGameplayEffectInhibit(ActiveGamepl
         if (EventIt != Owner->ActiveEffectEventSets.end())
         {
             EventIt->second.OnInhibitionChanged.Broadcast(Handle, bInhibit);
+        }
+    }
+
+    // Handle PeriodicInhibitionPolicy on inhibit-resume
+    if (!bInhibit && Effect->Spec.Def)
+    {
+        float Period = Effect->Spec.Def->Period;
+        if (Period > GameplayEffectConstants::NO_PERIOD &&
+            Effect->Spec.Def->PeriodicInhibitionPolicy != EGameplayEffectPeriodInhibitionRemovedPolicy::NeverReset)
+        {
+            if (Effect->Spec.Def->PeriodicInhibitionPolicy == EGameplayEffectPeriodInhibitionRemovedPolicy::ExecuteAndResetPeriod)
+            {
+                // Execute immediately and reset the period timer
+                ExecuteActiveEffectsFrom(Effect->Spec, Owner);
+                Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.Broadcast(Owner, Effect->Spec, Handle);
+                Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.Broadcast(Owner, Effect->Spec, Handle);
+            }
+            // ResetPeriod and ExecuteAndResetPeriod both reset the timer
+            Effect->LastPeriodExecuteTime = 0.0f;
         }
     }
 }

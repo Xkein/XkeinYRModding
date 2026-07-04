@@ -750,6 +750,14 @@ void ActiveGameplayEffectsContainer::InternalOnActiveGameplayEffectAdded(ActiveG
 
         // Step 3: Uninhibit the effect (activate it)
         SetActiveGameplayEffectInhibit(Effect.Handle, false);
+
+        // Step 4: If bExecutePeriodicEffectOnApplication is true and period > 0, execute immediately on application
+        if (EffectDef->bExecutePeriodicEffectOnApplication && EffectDef->Period > GameplayEffectConstants::NO_PERIOD)
+        {
+            ExecuteActiveEffectsFrom(Effect.Spec, Owner);
+            Owner->OnPeriodicGameplayEffectExecuteDelegateOnSelf.Broadcast(Owner, Effect.Spec, Effect.Handle);
+            Owner->OnPeriodicGameplayEffectExecuteDelegateOnTarget.Broadcast(Owner, Effect.Spec, Effect.Handle);
+        }
     }
     else
     {

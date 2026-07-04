@@ -93,7 +93,7 @@ struct GameplayAttribute
     /** Ordering by (AttributeOwner, AttributeName) for use as std::map key */
     bool operator==(const GameplayAttribute& Other) const
     {
-        return AttributeOwner == Other.AttributeOwner && AttributeName != Other.AttributeName;
+        return AttributeOwner == Other.AttributeOwner && AttributeName == Other.AttributeName;
     }
 };
 
