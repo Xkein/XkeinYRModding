@@ -22,6 +22,7 @@ void RegisterTDelegate()
     auto builder = PUERTS_NAMESPACE::DefineClass<Del>();
     builder.Constructor<>();
     builder.Method("Bind", MakeFunction(&Del::BindStdFunction));
+    // builder.Method("BindScriptFunction", MakeFunction(&Del::BindScriptFunction));
     builder.Method("IsBound", MakeFunction(&Del::IsBound));
     builder.Method("Unbind", MakeFunction(&Del::Unbind));
 
@@ -39,9 +40,24 @@ void RegisterTMulticastDelegate()
     auto builder = PUERTS_NAMESPACE::DefineClass<Del>();
     builder.Constructor<>();
     builder.Method("Add", MakeFunction(&Del::AddStdFunction));
+    // builder.Method("AddScriptFunction", MakeFunction(&Del::AddScriptFunction));
     builder.Method("Remove", MakeFunction(&Del::Remove));
     builder.Method("Clear", MakeFunction(&Del::Clear));
     builder.Method("IsBound", MakeFunction(&Del::IsBound));
+    builder.Register();
+}
+
+// ── TDelegateRegistration (no Execute) ───────────────────
+template<typename Func>
+void RegisterTDelegateRegistration()
+{
+    using Del = TDelegateRegistration<Func>;
+    auto builder = PUERTS_NAMESPACE::DefineClass<Del>();
+    builder.Constructor<>();
+    builder.Method("Bind", MakeFunction(&Del::BindStdFunction));
+    // builder.Method("BindScriptFunction", MakeFunction(&Del::BindScriptFunction));
+    builder.Method("IsBound", MakeFunction(&Del::IsBound));
+    builder.Method("Unbind", MakeFunction(&Del::Unbind));
     builder.Register();
 }
 
@@ -53,6 +69,7 @@ void RegisterTMulticastDelegateRegistration()
     auto builder = PUERTS_NAMESPACE::DefineClass<Del>();
     builder.Constructor<>();
     builder.Method("Add", MakeFunction(&Del::AddStdFunction));
+    // builder.Method("AddScriptFunction", MakeFunction(&Del::AddScriptFunction));
     builder.Method("Remove", MakeFunction(&Del::Remove));
     builder.Method("Clear", MakeFunction(&Del::Clear));
     builder.Method("IsBound", MakeFunction(&Del::IsBound));
@@ -67,6 +84,10 @@ void __JsRegister_Delegates()
     // TDelegate
     RegisterTDelegate<void(GameplayAbilitySpec*)>();
     RegisterTDelegate<void()>();
+
+    // TDelegateRegistration
+    RegisterTDelegateRegistration<void(GameplayAbilitySpec*)>();
+    RegisterTDelegateRegistration<void()>();
 
     // TMulticastDelegate
     

@@ -254,6 +254,17 @@ namespace PUERTS_NAMESPACE                                                      
         }                                                                                               \
     };                                                                                                  \
 }
+#define UsingTDelegateRegistration(FUNC) UsingContainer(TDelegateRegistration<FUNC>)           \
+namespace PUERTS_NAMESPACE                                                                                       \
+{                                                                                                                \
+    template<>                                                                                                   \
+    struct ScriptTypeName<TDelegateRegistration<FUNC>>                                                              \
+    {                                                                                                            \
+        static constexpr auto value() {                                                                          \
+            return internal::Literal("TDelegateRegistration<") + internal::Literal(#FUNC) + internal::Literal(">"); \
+        }                                                                                                        \
+    };                                                                                                           \
+}
 #define UsingTMulticastDelegate(FUNC)       UsingContainer(TMulticastDelegate<FUNC>)                             \
 namespace PUERTS_NAMESPACE                                                                                       \
 {                                                                                                                \

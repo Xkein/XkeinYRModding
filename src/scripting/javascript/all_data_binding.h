@@ -162,7 +162,7 @@ UsingCppTypeWithRefCache(JsEvents);
 #include "scripting/javascript/js_cpp_helper.h"
 UsingCppTypeWithRefCache(JsCppHelper);
 
-#include "scripting/common/script_function.h"
+#include "core/tool/script_function.h"
 UsingCppType(ScriptFunctionBase);
 UsingCppType(ScriptFunctionRegister);
 
@@ -406,6 +406,9 @@ UsingCppType(FDelegateHandle);
 
 UsingTDelegate(void(GameplayAbilitySpec*));
 UsingTDelegate(void());
+
+UsingTDelegateRegistration(void(GameplayAbilitySpec*));
+UsingTDelegateRegistration(void());
 
 UsingTMulticastDelegate(void(AbilitySystemComponent*, const GameplayEffectSpec&, ActiveGameplayEffectHandle));
 UsingTMulticastDelegate(void(const GameplayAbility*, const GameplayTagContainer&));

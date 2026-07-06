@@ -1,7 +1,7 @@
 #pragma once
 #include "core/reflection/reflection.h"
 #include "xkein/GameplayAbilities/ge_component/ge_component.h"
-#include "scripting/common/script_function.h"
+#include "core/tool/script_function.h"
 
 /**
  * Custom application requirement type.

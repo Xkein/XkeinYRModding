@@ -1,6 +1,6 @@
 #pragma once
 #include "core/reflection/reflection.h"
-#include "scripting/common/script_function.h"
+#include "core/tool/script_function.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec_handle.h"
 #include "xkein/GameplayAbilities/gameplay_ability.h"
 #include <functional>

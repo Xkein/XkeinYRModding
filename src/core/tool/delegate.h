@@ -2,6 +2,7 @@
 
 #include "core/reflection/reflection.h"
 #include "runtime/platform/platform.h"
+#include "runtime/logger/logger.h"
 #include <entt/signal/sigh.hpp>
 #include <functional>
 #include <variant>
@@ -11,6 +12,15 @@
 #include <vector>
 #include <utility>
 #include <type_traits>
+#include <cstdint>
+#include <string>
+
+#include <cereal/cereal.hpp>
+#include <cereal/details/util.hpp>
+#include "core/tool/script_function.h"
+
+// ─── Serialization version ─────────────────────────────────────────────
+constexpr int kSerializationVersion = 1;
 
 /**
  * FDelegateHandle — Opaque handle for delegate registration.
@@ -66,7 +76,20 @@ class TDelegate<Ret(Args...)>
 {
     using entt_delegate_t = entt::delegate<Ret(Args...)>;
     using std_function_t  = std::function<Ret(Args...)>;
-    using storage_t       = std::variant<std::monostate, entt_delegate_t, std_function_t>;
+
+    /** ScriptFunction binding — stores only FuncId, no cached pointer. */
+    struct FScriptFunctionBinding
+    {
+        uint64_t FuncId = 0;
+
+        bool IsValid() const { return FuncId != 0; }
+        bool IsBound() const
+        {
+            return ScriptFunctionRegister::GetFunctionById(FuncId) != nullptr;
+        }
+    };
+
+    using storage_t = std::variant<std::monostate, entt_delegate_t, std_function_t, FScriptFunctionBinding>;
 
     storage_t m_storage;
 
@@ -107,6 +130,30 @@ public:
         BindLambda(std::move(func));
     }
 
+    /** Bind a ScriptFunction by name — stores only FuncId, no cached pointer. */
+    void BindScriptFunction(const StringName& category, const StringName& funcName)
+    {
+        auto* sf = ScriptFunctionRegister::GetFunctionAs<ScriptFunction<Ret(Args...)>>(
+            category, funcName);
+        if (sf)
+        {
+            m_storage = FScriptFunctionBinding{
+                ScriptFunctionRegister::GetId(category, funcName)
+            };
+        }
+    }
+
+    /** Bind a ScriptFunction by pointer — stores only FuncId, no cached pointer. */
+    void BindScriptFunction(ScriptFunction<Ret(Args...)>* sf)
+    {
+        if (sf)
+        {
+            m_storage = FScriptFunctionBinding{
+                ScriptFunctionRegister::GetId(sf->category, sf->name)
+            };
+        }
+    }
+
     /** Invoke the delegate. Asserts if unbound (matching entt::delegate behavior). */
     Ret Execute(Args... args) const
     {
@@ -135,6 +182,27 @@ public:
             else
             {
                 return (*func)(std::forward<Args>(args)...);
+            }
+        }
+
+        // ScriptFunction variant — resolve by FuncId at call time (no cached ptr)
+        if (auto* binding = std::get_if<FScriptFunctionBinding>(&m_storage))
+        {
+            auto* sf = static_cast<ScriptFunction<Ret(Args...)>*>(
+                ScriptFunctionRegister::GetFunctionById(binding->FuncId));
+            if (!sf)
+            {
+                if constexpr (std::is_void_v<Ret>) { return; }
+                else { return Ret{}; }
+            }
+            if constexpr (std::is_void_v<Ret>)
+            {
+                (*sf)(std::forward<Args>(args)...);
+                return;
+            }
+            else
+            {
+                return (*sf)(std::forward<Args>(args)...);
             }
         }
 
@@ -167,6 +235,54 @@ public:
     void Unbind()
     {
         m_storage = std::monostate{};
+    }
+
+    // ── cereal Serialization ────────────────────────────────────────────
+    // Manual variant-index-based strategy.
+    // entt::delegate and std::function are not cereal-serializable;
+    // we discriminate by variant index and serialize accordingly.
+
+    template<class Archive>
+    void save(Archive& ar) const {
+        ar(cereal::make_nvp("Version", kSerializationVersion));
+        switch (m_storage.index()) {
+            case 0: // monostate — unbound
+                ar(cereal::make_nvp("Type", ""));
+                break;
+            case 1: // entt_delegate — not serializable
+            case 2: // std_function — not serializable
+                gLogger->warn("TDelegate: non-ScriptFunction binding skipped during save. "
+                            "Use BindScriptFunction() for serializable callbacks.");
+                // Write "Unsupported" marker — load becomes monostate
+                ar(cereal::make_nvp("Type", "Unsupported"));
+                break;
+            case 3: // FScriptFunctionBinding
+                ar(cereal::make_nvp("Type", "ScriptFunction"));
+                ar(cereal::make_nvp("FuncId",
+                    std::get<FScriptFunctionBinding>(m_storage).FuncId));
+                break;
+            default:
+                ar(cereal::make_nvp("Type", ""));
+                break;
+        }
+    }
+
+    template<class Archive>
+    void load(Archive& ar) {
+        int version = 0;
+        ar(cereal::make_nvp("Version", version));
+        // Future: check version compatibility here
+
+        std::string type;
+        ar(cereal::make_nvp("Type", type));
+        if (type == "ScriptFunction") {
+            uint64_t funcId = 0;
+            ar(cereal::make_nvp("FuncId", funcId));
+            m_storage = FScriptFunctionBinding{funcId};
+        } else {
+            // Empty / unknown / Unsupported → monostate (unbound)
+            m_storage = std::monostate{};
+        }
     }
 };
 
@@ -210,9 +326,17 @@ class TMulticastDelegate<Ret(Args...), TPolicy>
         const void*      instance = nullptr; // nullptr for free functions
     };
 
+    /** ScriptFunction listener — stores only FuncId, no cached pointer. */
+    struct FScriptFunctionListener
+    {
+        FDelegateHandle Handle;
+        uint64_t        FuncId;
+    };
+
     signal_t                                                    m_signal;
     std::unordered_map<FDelegateHandle, FConnectionEntry>       m_connections;
     std::vector<std::pair<FDelegateHandle, std::function<Ret(Args...)>>> m_lambdaListeners;
+    std::vector<FScriptFunctionListener>                        m_scriptFunctionListeners;
     std::atomic<uint64>                                         m_nextHandle{1};
     mutable std::mutex                                          m_mutex;
 
@@ -243,6 +367,7 @@ public:
         : m_signal(other.m_signal)
         , m_connections()  // intentionally empty
         , m_lambdaListeners(other.m_lambdaListeners)
+        , m_scriptFunctionListeners() // intentionally empty (like m_connections)
         , m_nextHandle{1}
     {}
 
@@ -251,6 +376,7 @@ public:
         : m_signal(std::move(other.m_signal))
         , m_connections()   // connections refer to other's signal — invalid after move
         , m_lambdaListeners(std::move(other.m_lambdaListeners))
+        , m_scriptFunctionListeners(std::move(other.m_scriptFunctionListeners))
         , m_nextHandle{1}
     {}
 
@@ -263,6 +389,7 @@ public:
             m_signal = other.m_signal;
             m_connections.clear();          // connections not copied
             m_lambdaListeners = other.m_lambdaListeners;
+            m_scriptFunctionListeners.clear(); // intentionally empty (like m_connections)
             m_nextHandle = 1;
         }
         return *this;
@@ -277,6 +404,7 @@ public:
             m_signal = std::move(other.m_signal);
             m_connections.clear();          // stale connections discarded
             m_lambdaListeners = std::move(other.m_lambdaListeners);
+            m_scriptFunctionListeners = std::move(other.m_scriptFunctionListeners);
             m_nextHandle = 1;
         }
         return *this;
@@ -351,6 +479,36 @@ public:
         return AddLambda(std::move(func));
     }
 
+    // ── AddScriptFunction: ScriptFunction binding (FuncId only) ──────────
+
+    /** Bind a ScriptFunction by name — stores only FuncId, no cached pointer. */
+    FDelegateHandle AddScriptFunction(const StringName& category, const StringName& funcName)
+    {
+        auto lock = GetScopedLock();
+        auto* sf = ScriptFunctionRegister::GetFunctionAs<ScriptFunction<Ret(Args...)>>(
+            category, funcName);
+        if (!sf) return FDelegateHandle{};
+        auto handle = GenerateNextHandle();
+        m_scriptFunctionListeners.push_back(FScriptFunctionListener{
+            handle,
+            ScriptFunctionRegister::GetId(category, funcName)
+        });
+        return handle;
+    }
+
+    /** Bind a ScriptFunction by pointer — stores only FuncId, no cached pointer. */
+    FDelegateHandle AddScriptFunction(ScriptFunction<Ret(Args...)>* sf)
+    {
+        auto lock = GetScopedLock();
+        if (!sf) return FDelegateHandle{};
+        auto handle = GenerateNextHandle();
+        m_scriptFunctionListeners.push_back(FScriptFunctionListener{
+            handle,
+            ScriptFunctionRegister::GetId(sf->category, sf->name)
+        });
+        return handle;
+    }
+
     // ── Remove / RemoveAll / Clear ──────────────────────────────────────
 
     /** Remove a single listener by handle. Returns true if found and removed. */
@@ -374,6 +532,10 @@ public:
                 return true;
             }
         }
+
+        auto removed = std::erase_if(m_scriptFunctionListeners,
+            [handle](const FScriptFunctionListener& l) { return l.Handle == handle; });
+        if (removed > 0) return true;
 
         return false;
     }
@@ -399,7 +561,7 @@ public:
         // Lambda listeners cannot be matched by instance — skip them.
     }
 
-    /** Remove every listener (entt + lambda). */
+    /** Remove every listener (entt + lambda + script). */
     void Clear()
     {
         auto lock = GetScopedLock();
@@ -407,11 +569,12 @@ public:
         sink.disconnect();
         m_connections.clear();
         m_lambdaListeners.clear();
+        m_scriptFunctionListeners.clear();
     }
 
     // ── Broadcast ───────────────────────────────────────────────────────
 
-    /** Fire all listeners: entt signal first, then side-channel lambdas. */
+    /** Fire all listeners: entt signal, then side-channel lambdas, then script functions. */
     void Broadcast(Args... args)
     {
         auto lock = GetScopedLock();
@@ -419,6 +582,15 @@ public:
         for (auto& [_, func] : m_lambdaListeners)
         {
             func(args...);
+        }
+        // Snapshot iteration — safe against self-remove during iteration
+        auto snapshot = m_scriptFunctionListeners;
+        for (auto& listener : snapshot)
+        {
+            auto* sf = static_cast<ScriptFunction<Ret(Args...)>*>(
+                ScriptFunctionRegister::GetFunctionById(listener.FuncId));
+            if (!sf) continue;
+            (*sf)(args...);
         }
     }
 
@@ -428,7 +600,32 @@ public:
     [[nodiscard]] bool IsBound() const
     {
         auto lock = GetScopedLock();
-        return !m_signal.empty() || !m_lambdaListeners.empty();
+        return !m_signal.empty()
+            || !m_lambdaListeners.empty()
+            || !m_scriptFunctionListeners.empty();
+    }
+
+    // ── Serialization ───────────────────────────────────────────────────
+
+    template<class Archive>
+    void saveConnections(Archive& ar) const
+    {
+        std::vector<uint64_t> funcIds;
+        for (auto& l : m_scriptFunctionListeners)
+            funcIds.push_back(l.FuncId);
+        ar(cereal::make_nvp("ScriptFunctionListeners", funcIds));
+    }
+
+    template<class Archive>
+    void loadConnections(Archive& ar)
+    {
+        std::vector<uint64_t> funcIds;
+        ar(cereal::make_nvp("ScriptFunctionListeners", funcIds));
+        for (auto funcId : funcIds)
+        {
+            auto handle = GenerateNextHandle();
+            m_scriptFunctionListeners.push_back(FScriptFunctionListener{handle, funcId});
+        }
     }
 };
 
@@ -467,6 +664,16 @@ public:
         return m_delegate->AddLambda(std::move(func));
     }
 
+    /** Bind a ScriptFunction by name. */
+    FDelegateHandle AddScriptFunction(const StringName& category, const StringName& funcName) {
+        return m_delegate->AddScriptFunction(category, funcName);
+    }
+
+    /** Bind a ScriptFunction by pointer. */
+    FDelegateHandle AddScriptFunction(ScriptFunction<Ret(Args...)>* sf) {
+        return m_delegate->AddScriptFunction(sf);
+    }
+
     bool Remove(FDelegateHandle h) { return m_delegate->Remove(h); }
 
     void RemoveAll(const void* i) { return m_delegate->RemoveAll(i); }
@@ -500,6 +707,21 @@ public:
 
     template<typename Func>
     void BindLambda(Func&& f) { m_delegate->BindLambda(std::forward<Func>(f)); }
+
+    /** Non-template bridge for Puerts JS binding. */
+    void BindStdFunction(std::function<Ret(Args...)> func) {
+        m_delegate->BindStdFunction(std::move(func));
+    }
+
+    /** Bind a ScriptFunction by name. */
+    void BindScriptFunction(const StringName& category, const StringName& funcName) {
+        m_delegate->BindScriptFunction(category, funcName);
+    }
+
+    /** Bind a ScriptFunction by pointer. */
+    void BindScriptFunction(ScriptFunction<Ret(Args...)>* sf) {
+        m_delegate->BindScriptFunction(sf);
+    }
 
     [[nodiscard]] bool IsBound() const { return m_delegate->IsBound(); }
 

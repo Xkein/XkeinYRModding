@@ -6,6 +6,15 @@
 std::unordered_map<StringName, std::unordered_map<StringName, ScriptFunctionBase*>> GScriptFunctions;
 std::unordered_map<StringName, std::vector<std::function<ScriptFunctionBase*(const StringName& name)>>> GScriptFunctionLoaders;
 
+namespace {
+    std::unordered_map<uint64_t, ScriptFunctionBase*> GFuncIdMap;
+}
+
+uint64_t ScriptFunctionRegister::GetId(const StringName& category, const StringName& name)
+{
+    return (static_cast<uint64_t>(category.GetId()) << 32) | name.GetId();
+}
+
 void ScriptFunctionRegister::RegisterFunction(const StringName& category, const StringName& name, ScriptFunctionBase* func)
 {
     if (!func || category.IsEmpty() || name.IsEmpty())
@@ -14,7 +23,9 @@ void ScriptFunctionRegister::RegisterFunction(const StringName& category, const 
     }
 
     func->name = name;
+    func->category = category;
     GScriptFunctions[category][func->name] = func;
+    GFuncIdMap[GetId(category, name)] = func;
 }
 
 void ScriptFunctionRegister::RegisterLoader(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader)
@@ -60,5 +71,15 @@ ScriptFunctionBase* ScriptFunctionRegister::GetFunction(const StringName& catego
         }
     }
 
+    return nullptr;
+}
+
+ScriptFunctionBase* ScriptFunctionRegister::GetFunctionById(uint64_t funcId)
+{
+    const auto it = GFuncIdMap.find(funcId);
+    if (it != GFuncIdMap.end())
+    {
+        return it->second;
+    }
     return nullptr;
 }

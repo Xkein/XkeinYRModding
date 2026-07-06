@@ -4,6 +4,7 @@
 #include "runtime/platform/platform.h"
 #include "core/string/string_name.h"
 #include "runtime/logger/logger.h"
+#include <cstdint>
 #include <functional>
 #include <string>
 
@@ -12,6 +13,9 @@ struct ScriptFunctionBase
 {
     PROPERTY()
     StringName name;
+
+    PROPERTY()
+    StringName category;
 };
 
 CLASS(BindJs)
@@ -29,13 +33,19 @@ class ScriptFunctionRegister
 public:
     
     FUNCTION()
-    static void RegisterFunction(const StringName& category, const StringName& name, ScriptFunctionBase* func);
+    CORE_API static void RegisterFunction(const StringName& category, const StringName& name, ScriptFunctionBase* func);
     
     FUNCTION()
-    static void RegisterLoader(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader);
+    CORE_API static void RegisterLoader(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader);
     
     FUNCTION()
-    static ScriptFunctionBase* GetFunction(const StringName& category, const StringName& name);
+    CORE_API static ScriptFunctionBase* GetFunction(const StringName& category, const StringName& name);
+
+    FUNCTION()
+    CORE_API static uint64_t GetId(const StringName& category, const StringName& name);
+
+    FUNCTION()
+    CORE_API static ScriptFunctionBase* GetFunctionById(uint64_t funcId);
 
     template<typename TScriptFunction>
     static TScriptFunction* GetFunctionAs(const StringName& category, const StringName& name)

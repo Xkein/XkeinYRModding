@@ -2,7 +2,7 @@
 #include "core/reflection/reflection.h"
 #include "yr/parse/parser.h"
 #include "yr/component/ini_component.h"
-#include "scripting/common/script_function.h"
+#include "core/tool/script_function.h"
 #include "xkein/GameplayAbilities/gameplay_ability.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
