@@ -509,7 +509,7 @@ static void Test_TMulticastDelegate_NotThreadSafe()
     }
 
     // Copy construct: signal deep-copied; entt connections NOT preserved;
-    // lambda listeners ARE preserved.
+    // lambda listeners NOT preserved (may dangle on ref-capture).
     {
         ResetCounter();
         TMulticastDelegate<void()> src;
@@ -523,18 +523,18 @@ static void Test_TMulticastDelegate_NotThreadSafe()
         // Source still works
         assert(src.IsBound());
 
-        // Destination is bound (lambda listeners copied)
-        assert(dest.IsBound() && "Copy should preserve IsBound via lambda listeners");
+        // Destination is NOT bound (connections and lambdas not copied)
+        assert(!dest.IsBound() && "Copy should NOT preserve IsBound (lambdas not copied)");
 
         // Destination Broadcast: IncCounter (entt) should NOT fire
-        // (entt connections not preserved on copy), but lambda should fire.
+        // (entt connections not preserved on copy), and no lambdas either.
         ResetCounter();
         srcLambdaCount = 0;
         dest.Broadcast();
         // IncCounter is entt-bound, connections not preserved → 0
-        // lambdaCount IS copied → 1
+        // lambda listeners are NOT copied either → 0
         assert(g_TestCounter == 0 && "Entt connections are not preserved on copy");
-        assert(srcLambdaCount == 1 && "Lambda listeners are preserved on copy");
+        assert(srcLambdaCount == 0 && "Lambda listeners are NOT preserved on copy");
 
         // Source Broadcast still works fully
         ResetCounter();
@@ -555,7 +555,7 @@ static void Test_TMulticastDelegate_NotThreadSafe()
 
         ResetCounter();
         dest.Broadcast();
-        // Same semantics as copy construct: entt not preserved, lambdas not affected
+        // Same semantics as copy construct: entt not preserved, lambdas not copied
         assert(g_TestCounter == 0);
     }
 

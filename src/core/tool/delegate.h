@@ -192,6 +192,8 @@ public:
                 ScriptFunctionRegister::GetFunctionById(binding->FuncId));
             if (!sf)
             {
+                gLogger->warn("TDelegate::Execute: ScriptFunction (FuncId={}) not found. "
+                              "The function may have been unregistered.", binding->FuncId);
                 if constexpr (std::is_void_v<Ret>) { return; }
                 else { return Ret{}; }
             }
@@ -271,7 +273,10 @@ public:
     void load(Archive& ar) {
         int version = 0;
         ar(cereal::make_nvp("Version", version));
-        // Future: check version compatibility here
+        if (version > kSerializationVersion) {
+            gLogger->warn("TDelegate serialization: saved version {} > current version {}. "
+                          "Data may be incompatible.", version, kSerializationVersion);
+        }
 
         std::string type;
         ar(cereal::make_nvp("Type", type));
@@ -349,13 +354,14 @@ class TMulticastDelegate<Ret(Args...), TPolicy>
     /** RAII lock — only acquires for FThreadSafeDelegateMode. */
     [[nodiscard]] auto GetScopedLock() const
     {
+        using lock_t = std::unique_lock<std::mutex>;
         if constexpr (std::is_same_v<TPolicy, FThreadSafeDelegateMode>)
         {
-            return std::unique_lock<std::mutex>(m_mutex);
+            return lock_t(m_mutex);
         }
         else
         {
-            return std::unique_lock<std::mutex>(); // no-op for non-threadsafe
+            return lock_t(); // no-op for non-threadsafe
         }
     }
 
@@ -366,7 +372,7 @@ public:
     TMulticastDelegate(const TMulticastDelegate& other)
         : m_signal(other.m_signal)
         , m_connections()  // intentionally empty
-        , m_lambdaListeners(other.m_lambdaListeners)
+        , m_lambdaListeners()    // intentionally empty — lambdas may capture-ref to source
         , m_scriptFunctionListeners() // intentionally empty (like m_connections)
         , m_nextHandle{1}
     {}
@@ -388,7 +394,7 @@ public:
             auto lock = GetScopedLock();
             m_signal = other.m_signal;
             m_connections.clear();          // connections not copied
-            m_lambdaListeners = other.m_lambdaListeners;
+            m_lambdaListeners.clear();         // was: m_lambdaListeners = other.m_lambdaListeners
             m_scriptFunctionListeners.clear(); // intentionally empty (like m_connections)
             m_nextHandle = 1;
         }
@@ -519,6 +525,8 @@ public:
         auto connIt = m_connections.find(handle);
         if (connIt != m_connections.end())
         {
+            // entt::connection::release() internally calls disconnect(signal)
+            // to remove the listener from the signal AND resets tracking.
             connIt->second.connection.release();
             m_connections.erase(connIt);
             return true;
@@ -578,14 +586,20 @@ public:
     void Broadcast(Args... args)
     {
         auto lock = GetScopedLock();
+        // WARNING: Modifying this delegate (Add/Remove/Clear) during Broadcast
+        // is undefined behavior. The entt signal does not support re-entrant
+        // modification during publish().
         m_signal.publish(args...);
-        for (auto& [_, func] : m_lambdaListeners)
+
+        // Snapshot iteration — safe against self-remove during iteration
+        auto lambdaSnapshot = m_lambdaListeners;
+        for (auto& [_, func] : lambdaSnapshot)
         {
             func(args...);
         }
-        // Snapshot iteration — safe against self-remove during iteration
-        auto snapshot = m_scriptFunctionListeners;
-        for (auto& listener : snapshot)
+
+        auto scriptSnapshot = m_scriptFunctionListeners;
+        for (auto& listener : scriptSnapshot)
         {
             auto* sf = static_cast<ScriptFunction<Ret(Args...)>*>(
                 ScriptFunctionRegister::GetFunctionById(listener.FuncId));

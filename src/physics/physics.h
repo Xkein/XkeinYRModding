@@ -45,7 +45,13 @@ public:
     static XKEINEXT_API TMulticastDelegateRegistration<void(const PhysicsCollisionAddAndPersistResult&)>& GetOnCollisionPersist();
     static XKEINEXT_API TMulticastDelegateRegistration<void(const PhysicsCollisionRemoveResult&)>& GetOnCollisionExit();
 
-    // Internal signal storage — public for access from free functions in physics.cpp
+private:
+    friend void OnContactAdded(const JPH::Body&, const JPH::Body&,
+                                const JPH::ContactManifold&, JPH::ContactSettings&);
+    friend void OnContactPersisted(const JPH::Body&, const JPH::Body&,
+                                   const JPH::ContactManifold&, JPH::ContactSettings&);
+    friend void OnContactRemoved(const JPH::SubShapeIDPair&);
+
     static TMulticastDelegate<void(const PhysicsCollisionAddAndPersistResult&)> mOnCollisionEnter;
     static TMulticastDelegate<void(const PhysicsCollisionAddAndPersistResult&)> mOnCollisionPersist;
     static TMulticastDelegate<void(const PhysicsCollisionRemoveResult&)> mOnCollisionExit;
