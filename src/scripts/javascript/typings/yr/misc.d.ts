@@ -1,3 +1,5 @@
+/// <reference path = "index.d.ts"/>
+import { ScriptFunctionBase } from "YrExtCore";
 
 
 declare var convertCPPType: (cppType: any, instance: any) => any;
@@ -69,4 +71,9 @@ declare class TMulticastDelegateRegistration<TCallback extends (...args: any[]) 
     Remove(handle: FDelegateHandle): boolean;
     Clear(): void;
     IsBound(): boolean;
+}
+
+declare class ScriptFunction<TFunc extends (...args: any[]) => any>
+    extends ScriptFunctionBase {
+    constructor(func: TFunc | undefined);
 }

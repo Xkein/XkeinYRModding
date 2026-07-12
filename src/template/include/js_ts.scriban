@@ -143,7 +143,7 @@
         end
         # script function type
         if string.starts_with($unwrap_name, "ScriptFunction<")
-            ret httype.unwrap_class($unwrap).identifier
+            ret "ScriptFunction<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ">"
         end
         # template class
         for generic_type in generic_types

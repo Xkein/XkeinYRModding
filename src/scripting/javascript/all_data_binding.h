@@ -142,11 +142,11 @@ UsingCppType(FGameplayEffectCustomExecutionOutput);
 UsingCppType(AttributeBasedFloat);
 UsingCppType(CustomCalculationBasedFloat);
 UsingCppType(SetByCallerFloat);
-UsingCppType(ScriptFunction<GameplayAbility * (GameplayAbilityDefine * _0, AbilitySystemComponent * _1)>);
-UsingCppType(ScriptFunction<AttributeSet * (AttributeSetDefine * _0, AbilitySystemComponent * _1)>);
-UsingCppType(ScriptFunction<AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1)>);
-UsingCppType(ScriptFunction<GameplayCueNotify_Static * ()>);
-UsingCppType(ScriptFunction<GameplayCueNotify_Actor * ()>);
+UsingScriptFunction(GameplayAbility * (GameplayAbilityDefine * _0, AbilitySystemComponent * _1));
+UsingScriptFunction(AttributeSet * (AttributeSetDefine * _0, AbilitySystemComponent * _1));
+UsingScriptFunction(AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1));
+UsingScriptFunction(GameplayCueNotify_Static * ());
+UsingScriptFunction(GameplayCueNotify_Actor * ());
 
 UsingStdVector(GameplayEffectAttributeCaptureDefinition);
 UsingStdVector(entt::entity);

@@ -13,6 +13,9 @@
 #include <optional>
 #include <comdef.h>
 
+#define UsingScriptFunction(FUNC) \
+    UsingCppType(ScriptFunction<FUNC>)
+
 #define UsingContainer(CLS) __DefObjectType(CLS) __DefCDataPointerConverter(CLS)
 
 #define UsingArray(CLS)                                                                             \
@@ -1046,6 +1049,7 @@ UsingCppType(HINSTANCE);
 #ifndef UsingCppType
     #define UsingCppType(CLS)
 #endif // !UsingCPPType
+#define UsingScriptFunction(FUNC)
 #define UsingTDelegate(FUNC)
 #define UsingTMulticastDelegate(FUNC)
 #define UsingTMulticastDelegateRegistration(FUNC)

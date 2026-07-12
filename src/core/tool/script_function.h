@@ -18,11 +18,9 @@ struct ScriptFunctionBase
     StringName category;
 };
 
-CLASS(BindJs)
 template<typename TFunc>
 struct ScriptFunction : public ScriptFunctionBase, public std::function<TFunc>
 {
-    FUNCTION()
     ScriptFunction(std::function<TFunc> func) : ScriptFunctionBase(), std::function<TFunc>(std::move(func)) { }
 
 };

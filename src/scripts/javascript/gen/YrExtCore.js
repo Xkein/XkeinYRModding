@@ -1,5 +1,7 @@
 
 exports.StringName = puerts.loadCPPType("StringName")
+exports.ScriptFunctionBase = puerts.loadCPPType("ScriptFunctionBase")
+exports.ScriptFunctionRegister = puerts.loadCPPType("ScriptFunctionRegister")
 exports.YrEntityAbstractComponent = puerts.loadCPPType("YrEntityAbstractComponent")
 exports.IniReader = puerts.loadCPPType("IniReader")
 exports.IniComponentLoader = puerts.loadCPPType("IniComponentLoader")
