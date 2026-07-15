@@ -107,7 +107,7 @@ struct AbilityTriggerData
 
 
 /** Abilities define custom gameplay logic that can be activated by players or external game logic */
-CLASS(BindJs, IniComponent, IniAutoLoad)
+CLASS(BindJs, IniComponent, IniAutoLoad, Swizzleable)
 class GameplayAbilityDefine
 {
 	
@@ -180,12 +180,15 @@ public:
 	GameplayTagContainer TargetBlockedTags;
 };
 
+IMPL_YR_SERIALIZE_SWIZZLE(GameplayAbilityDefine);
+
 /** Abilities define custom gameplay logic that can be activated by players or external game logic */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class GameplayAbility
 {
+	GENERATED_BODY(GameplayAbility);
     public:
-	PROPERTY()
+	PROPERTY(Savegame)
 	const GameplayAbilityDefine* Define;
 
 	virtual void InitFromDefine(GameplayAbilityDefine* AbilityDefine);
@@ -362,9 +365,11 @@ protected:
     GameplayAbilitySpecHandle CurrentSpecHandle;
 
 	/** True if this ability is currently active */
+	PROPERTY(Savegame)
 	bool bIsActive = false;
 
 	/** True if this ability is in the process of ending (prevents re-entrancy) */
+	PROPERTY(Savegame)
 	bool bIsAbilityEnding = false;
 
 	/** True if this ability is blocking other abilities from activating */
@@ -374,6 +379,7 @@ protected:
 	bool bIsCancelable = false;
 
 	/** Active ability tasks owned by this ability. Cleaned up in EndAbility. */
+	PROPERTY(Savegame)
 	std::vector<AbilityTask*> ActiveTasks;
 
 	/** Gameplay cues added by this ability, tracked for automatic cleanup when the ability ends */
@@ -386,4 +392,5 @@ protected:
 	mutable std::vector<std::function<void()>> WaitingToExecute;
 
 };
+IMPL_YR_SERIALIZE_SWIZZLE(GameplayAbility);
 

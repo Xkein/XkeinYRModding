@@ -37,9 +37,9 @@ void AbilityTask_SpawnActor::Activate()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnSpawnFailed)
+			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed();
+				OnSpawnFailed.Execute();
 			}
 		}
 		EndTask();
@@ -52,9 +52,9 @@ void AbilityTask_SpawnActor::Activate()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnSpawnFailed)
+			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed();
+				OnSpawnFailed.Execute();
 			}
 		}
 		EndTask();
@@ -75,9 +75,9 @@ void AbilityTask_SpawnActor::Activate()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnSpawnFailed)
+			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed();
+				OnSpawnFailed.Execute();
 			}
 		}
 		EndTask();
@@ -91,9 +91,9 @@ void AbilityTask_SpawnActor::Activate()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnSpawnFailed)
+			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed();
+				OnSpawnFailed.Execute();
 			}
 		}
 		EndTask();
@@ -109,9 +109,9 @@ void AbilityTask_SpawnActor::Activate()
 
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnSpawnFailed)
+			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed();
+				OnSpawnFailed.Execute();
 			}
 		}
 		EndTask();
@@ -123,11 +123,23 @@ void AbilityTask_SpawnActor::Activate()
 
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		if (OnSpawnComplete)
+		if (OnSpawnComplete.IsBound())
 		{
-			OnSpawnComplete(SpawnedEntity);
+			OnSpawnComplete.Execute(SpawnedEntity);
 		}
 	}
 
 	EndTask();
+}
+
+void AbilityTask_SpawnActor::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	// SpawnActor is an instant task — Activate() spawns synchronously and
+	// calls EndTask. If the task was already activated and not finished at
+	// save time (unlikely for an instant task), schedule cleanup.
+	if (bActivated && !bFinished)
+	{
+		ReadyForDestroy();
+	}
 }

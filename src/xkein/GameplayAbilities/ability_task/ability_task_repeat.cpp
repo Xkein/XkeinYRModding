@@ -15,18 +15,18 @@ void AbilityTask_Repeat::Activate()
 	// Fire the first action immediately (existing behavior preserved)
 	if (CurrentIteration < MaxIterations)
 	{
-		if (ShouldBroadcastAbilityTaskDelegates() && OnPerformAction)
+		if (ShouldBroadcastAbilityTaskDelegates() && OnPerformAction.IsBound())
 		{
-			OnPerformAction(CurrentIteration);
+			OnPerformAction.Execute(CurrentIteration);
 		}
 		CurrentIteration++;
 	}
 
 	if (CurrentIteration >= MaxIterations)
 	{
-		if (ShouldBroadcastAbilityTaskDelegates() && OnFinished)
+		if (ShouldBroadcastAbilityTaskDelegates() && OnFinished.IsBound())
 		{
-			OnFinished(CurrentIteration);
+			OnFinished.Execute(CurrentIteration);
 		}
 		EndTask();
 		return;
@@ -44,17 +44,17 @@ void AbilityTask_Repeat::OnTimerTick()
 	if (bFinished || CurrentIteration >= MaxIterations)
 		return;
 
-	if (ShouldBroadcastAbilityTaskDelegates() && OnPerformAction)
-	{
-		OnPerformAction(CurrentIteration);
-	}
-	CurrentIteration++;
+		if (ShouldBroadcastAbilityTaskDelegates() && OnPerformAction.IsBound())
+		{
+			OnPerformAction.Execute(CurrentIteration);
+		}
+		CurrentIteration++;
 
 	if (CurrentIteration >= MaxIterations)
 	{
-		if (ShouldBroadcastAbilityTaskDelegates() && OnFinished)
+		if (ShouldBroadcastAbilityTaskDelegates() && OnFinished.IsBound())
 		{
-			OnFinished(CurrentIteration);
+			OnFinished.Execute(CurrentIteration);
 		}
 		EndTask();
 		ReadyForDestroy();
@@ -68,4 +68,21 @@ void AbilityTask_Repeat::OnDestroy(bool bOwnerFinished)
 		ASC->GetTimerManager().ClearTimer(RepeatTimerHandle);
 	}
 	AbilityTask::OnDestroy(bOwnerFinished);
+}
+
+void AbilityTask_Repeat::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	if (bFinished || !ASC)
+	{
+		return;
+	}
+
+	// Re-register repeating timer for remaining iterations.
+	// CurrentIteration is saved, so we resume from where we left off.
+	if (CurrentIteration < MaxIterations)
+	{
+		RepeatTimerHandle = ASC->GetTimerManager().SetRepeatingTimer(
+			[this]() { OnTimerTick(); }, IntervalBetweenIterations);
+	}
 }

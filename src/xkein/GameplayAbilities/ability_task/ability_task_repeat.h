@@ -1,5 +1,6 @@
 #pragma once
 #include "ability_task.h"
+#include "core/tool/delegate.h"
 #include "xkein/misc/timer_manager.h"
 
 /**
@@ -11,9 +12,10 @@
  * Ends after MaxIterations actions have been performed.
  * Fires OnFinished when all iterations complete.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_Repeat : public AbilityTask
 {
+	GENERATED_BODY(AbilityTask_Repeat);
 public:
 	/** Create and register a new Repeat task */
 	FUNCTION()
@@ -21,29 +23,33 @@ public:
 
 	virtual void Activate() override;
 
+	virtual void LoadDeferred() override;
+
 	/** Maximum number of times to perform the action */
-	PROPERTY()
+	PROPERTY(Savegame)
 	int32 MaxIterations = 1;
 
 	/** Time in seconds between each iteration */
-	PROPERTY()
+	PROPERTY(Savegame)
 	float IntervalBetweenIterations = 0.0f;
 
 	/** Callback fired on each iteration. Parameter: current iteration index (0-based). */
-	PROPERTY()
-	std::function<void(int32)> OnPerformAction;
+	PROPERTY(Savegame)
+	TDelegate<void(int32)> OnPerformAction;
 
 	/** Callback fired when all iterations have completed. Parameter: total iterations performed. */
-	PROPERTY()
-	std::function<void(int32)> OnFinished;
+	PROPERTY(Savegame)
+	TDelegate<void(int32)> OnFinished;
 
 	/** Cancel pending timer on destruction */
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
 private:
 	/** Current iteration count (0-based, increments after each fire) */
+	PROPERTY(Savegame)
 	int32 CurrentIteration = 0;
 
 	void OnTimerTick();
 	TimerHandle RepeatTimerHandle;
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_Repeat);

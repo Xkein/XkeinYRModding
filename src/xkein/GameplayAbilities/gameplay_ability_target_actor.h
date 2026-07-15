@@ -4,7 +4,7 @@
 #include <YRMathVector.h>
 #include <GeneralStructures.h>
 #include "xkein/GameplayAbilities/gameplay_ability_target_types.h"
-#include <functional>
+#include "core/tool/delegate.h"
 
 class GameplayAbility;
 
@@ -50,8 +50,8 @@ public:
 
 	/** Callback fired when target data is ready (either instant or after confirmation).
 	 *  Consumed by AbilityTask_WaitTargetData or the owning ability. */
-	PROPERTY()
-	std::function<void(const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
+	PROPERTY(Savegame)
+	TDelegate<void(const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
 
 // protected:
 	/** The ability that owns this target actor. Set by StartTargeting. */

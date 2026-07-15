@@ -4,7 +4,7 @@
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
 #include "xkein/GameplayAbilities/active_gameplay_effect_handle.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
-#include <functional>
+#include "core/tool/delegate.h"
 #include <vector>
 
 class AbilitySystemComponent;
@@ -102,6 +102,6 @@ public:
 	 * If set, this is called by Execute() in preference to the virtual.
 	 * Signature: void(const FGameplayEffectCustomExecutionParameters& Params, FGameplayEffectCustomExecutionOutput& Output)
 	 */
-	PROPERTY()
-	std::function<void(const FGameplayEffectCustomExecutionParameters&, FGameplayEffectCustomExecutionOutput&)> OnK2_Execute;
+	PROPERTY(Savegame)
+	TDelegate<void(const FGameplayEffectCustomExecutionParameters&, FGameplayEffectCustomExecutionOutput&)> OnK2_Execute;
 };

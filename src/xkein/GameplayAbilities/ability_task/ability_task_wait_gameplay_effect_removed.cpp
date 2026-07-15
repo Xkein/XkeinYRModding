@@ -23,9 +23,9 @@ void AbilityTask_WaitGameplayEffectRemoved::Activate()
 		// Handle is invalid — broadcast and end immediately
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnInvalidHandle)
+			if (OnInvalidHandle.IsBound())
 			{
-				OnInvalidHandle();
+				OnInvalidHandle.Execute();
 			}
 		}
 		EndTask();
@@ -78,11 +78,38 @@ void AbilityTask_WaitGameplayEffectRemoved::OnEffectRemovedCallback(const FGamep
 
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		if (OnEffectRemoved)
+		if (OnEffectRemoved.IsBound())
 		{
-			OnEffectRemoved();
+			OnEffectRemoved.Execute();
 		}
 	}
 
 	EndTask();
+}
+
+void AbilityTask_WaitGameplayEffectRemoved::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	if (bFinished || !ASC)
+	{
+		return;
+	}
+
+	// Re-register removal callback if the effect handle is still valid
+	if (!EffectHandle.IsValid())
+	{
+		return;
+	}
+
+	FActiveGameplayEffectEvents* Events = ASC->GetActiveEffectEventSet(EffectHandle);
+	if (Events)
+	{
+		OnRemovedHandle = Events->OnRemoved.Add<&AbilityTask_WaitGameplayEffectRemoved::OnEffectRemovedCallback>(*this);
+		bRegistered = true;
+	}
+	else
+	{
+		// The effect was already removed — treat as removed
+		OnEffectRemovedCallback(FGameplayEffectRemovalInfo());
+	}
 }

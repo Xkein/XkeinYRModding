@@ -1,8 +1,7 @@
 #pragma once
 #include "xkein/GameplayAbilities/gameplay_ability.h"
-#include <functional>
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class CustomGameplayAbility : public GameplayAbility
 {
 public:
@@ -14,39 +13,39 @@ public:
     bool K2_CanActivateAbility(const GameplayAbilityActorInfo& ActorInfo, const GameplayAbilitySpecHandle Handle,
         GameplayTagContainer* OptionalRelevantTags) const override
     {
-        if (OnK2CanActivateAbility)
+        if (OnK2CanActivateAbility.IsBound())
         {
-            return OnK2CanActivateAbility(ActorInfo, Handle, OptionalRelevantTags);
+            return OnK2CanActivateAbility.Execute(ActorInfo, Handle, OptionalRelevantTags);
         }
         return true;
     }
 
     void K2_OnActivateAbility(const GameplayEventData* TriggerEventData) override
     {
-        if (TriggerEventData && OnK2ActivateAbilityFromEvent)
+        if (TriggerEventData && OnK2ActivateAbilityFromEvent.IsBound())
         {
-            OnK2ActivateAbilityFromEvent(*TriggerEventData);
+            OnK2ActivateAbilityFromEvent.Execute(*TriggerEventData);
             return;
         }
-        if (OnK2ActivateAbility)
+        if (OnK2ActivateAbility.IsBound())
         {
-            OnK2ActivateAbility();
+            OnK2ActivateAbility.Execute();
         }
     }
 
     void K2_OnCommitExecute() override
     {
-        if (OnK2CommitExecute)
+        if (OnK2CommitExecute.IsBound())
         {
-            OnK2CommitExecute();
+            OnK2CommitExecute.Execute();
         }
     }
 
     void K2_OnEndAbility(bool bWasCancelled) override
     {
-        if (OnK2OnEndAbility)
+        if (OnK2OnEndAbility.IsBound())
         {
-            OnK2OnEndAbility(bWasCancelled);
+            OnK2OnEndAbility.Execute(bWasCancelled);
         }
     }
 
@@ -108,18 +107,19 @@ public:
         EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
     }
 
-    PROPERTY()
-    std::function<bool(GameplayAbilityActorInfo, GameplayAbilitySpecHandle, GameplayTagContainer*)> OnK2CanActivateAbility;
+    PROPERTY(Savegame)
+    TDelegate<bool(GameplayAbilityActorInfo, GameplayAbilitySpecHandle, GameplayTagContainer*)> OnK2CanActivateAbility;
 
-    PROPERTY()
-    std::function<void()> OnK2ActivateAbility;
+    PROPERTY(Savegame)
+    TDelegate<void()> OnK2ActivateAbility;
 
-    PROPERTY()
-    std::function<void(const GameplayEventData&)> OnK2ActivateAbilityFromEvent;
+    PROPERTY(Savegame)
+    TDelegate<void(const GameplayEventData&)> OnK2ActivateAbilityFromEvent;
 
-    PROPERTY()
-    std::function<void()> OnK2CommitExecute;
+    PROPERTY(Savegame)
+    TDelegate<void()> OnK2CommitExecute;
 
-    PROPERTY()
-    std::function<void(bool)> OnK2OnEndAbility;
+    PROPERTY(Savegame)
+    TDelegate<void(bool)> OnK2OnEndAbility;
 };
+IMPL_YR_SERIALIZE_SWIZZLE(CustomGameplayAbility);

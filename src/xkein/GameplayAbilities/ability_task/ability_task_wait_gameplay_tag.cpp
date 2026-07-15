@@ -33,9 +33,9 @@ void AbilityTask_WaitGameplayTagAdded::Activate()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnTagAdded)
+			if (OnTagAdded.IsBound())
 			{
-				OnTagAdded();
+				OnTagAdded.Execute();
 			}
 		}
 		if (bOnlyTriggerOnce)
@@ -82,9 +82,9 @@ void AbilityTask_WaitGameplayTagAdded::OnTagCountChanged(const GameplayTag& InTa
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnTagAdded)
+			if (OnTagAdded.IsBound())
 			{
-				OnTagAdded();
+				OnTagAdded.Execute();
 			}
 		}
 
@@ -127,9 +127,9 @@ void AbilityTask_WaitGameplayTagRemoved::Activate()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnTagRemoved)
+			if (OnTagRemoved.IsBound())
 			{
-				OnTagRemoved();
+				OnTagRemoved.Execute();
 			}
 		}
 		if (bOnlyTriggerOnce)
@@ -176,9 +176,9 @@ void AbilityTask_WaitGameplayTagRemoved::OnTagCountChanged(const GameplayTag& In
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnTagRemoved)
+			if (OnTagRemoved.IsBound())
 			{
-				OnTagRemoved();
+				OnTagRemoved.Execute();
 			}
 		}
 
@@ -187,4 +187,48 @@ void AbilityTask_WaitGameplayTagRemoved::OnTagCountChanged(const GameplayTag& In
 			EndTask();
 		}
 	}
+}
+
+void AbilityTask_WaitGameplayTagAdded::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	if (bFinished || !ASC)
+	{
+		return;
+	}
+
+	// Re-register for tag count changes. RegisterAndCallGameplayTagEvent
+	// also fires the callback immediately if the tag is already present,
+	// mirroring Activate()'s initial-state check.
+	DelegateHandle = ASC->RegisterAndCallGameplayTagEvent(
+		Tag,
+		[this](const GameplayTag& InTag, int32 NewCount)
+		{
+			OnTagCountChanged(InTag, NewCount);
+		},
+		EGameplayTagEventType::NewOrRemoved
+	);
+	bRegisteredCallback = true;
+}
+
+void AbilityTask_WaitGameplayTagRemoved::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	if (bFinished || !ASC)
+	{
+		return;
+	}
+
+	// Re-register for tag count changes. RegisterAndCallGameplayTagEvent
+	// also fires the callback immediately if the tag is already absent,
+	// mirroring Activate()'s initial-state check.
+	DelegateHandle = ASC->RegisterAndCallGameplayTagEvent(
+		Tag,
+		[this](const GameplayTag& InTag, int32 NewCount)
+		{
+			OnTagCountChanged(InTag, NewCount);
+		},
+		EGameplayTagEventType::NewOrRemoved
+	);
+	bRegisteredCallback = true;
 }

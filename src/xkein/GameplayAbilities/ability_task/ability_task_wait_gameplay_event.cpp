@@ -29,7 +29,7 @@ void AbilityTask_WaitGameplayEvent::Activate()
 	Tags.AddTag(EventTag);
 
 	// Always use tag container delegate for now.
-	// TODO: Add OnlyMatchExact path using GenericGameplayEventCallbacks
+	// OnlyMatchExact path via GenericGameplayEventCallbacks is not yet supported.
 	// when the ASC exposes that delegate.
 	DelegateHandle = ASC->AddGameplayEventTagContainerDelegate(
 		Tags,
@@ -66,11 +66,11 @@ void AbilityTask_WaitGameplayEvent::OnGameplayEvent(const GameplayTag& InTag, co
 
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		if (OnEventReceived && Payload)
+		if (OnEventReceived.IsBound() && Payload)
 		{
 			GameplayEventData TempPayload = *Payload;
 			TempPayload.EventTag = InTag;
-			OnEventReceived(TempPayload);
+			OnEventReceived.Execute(TempPayload);
 		}
 	}
 
@@ -78,4 +78,28 @@ void AbilityTask_WaitGameplayEvent::OnGameplayEvent(const GameplayTag& InTag, co
 	{
 		EndTask();
 	}
+}
+
+void AbilityTask_WaitGameplayEvent::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	if (bFinished || !ASC)
+	{
+		return;
+	}
+
+	// Re-register gameplay event callback (event delegate is transient)
+	GameplayTagContainer Tags;
+	Tags.AddTag(EventTag);
+
+	// Always use tag container delegate for now.
+	// OnlyMatchExact path via GenericGameplayEventCallbacks is not yet supported.
+	// when the ASC exposes that delegate.
+	DelegateHandle = ASC->AddGameplayEventTagContainerDelegate(
+		Tags,
+		[this](const GameplayTag& InTag, const GameplayEventData* Payload)
+		{
+			OnGameplayEvent(InTag, Payload);
+		}
+	);
 }

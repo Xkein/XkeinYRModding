@@ -1,5 +1,6 @@
 #pragma once
 #include "ability_task.h"
+#include "core/tool/delegate.h"
 #include "xkein/misc/timer_manager.h"
 
 /**
@@ -12,7 +13,7 @@
  * when available. See UAbilityTask_WaitInputPress/Release for reference.
  * Note: Frame-sync project, so no replication is needed.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_WaitInput : public AbilityTask
 {
 public:
@@ -22,26 +23,27 @@ public:
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void LoadDeferred() override;
 
 	/** InputID to watch. Should match the ability's bound InputID. */
-	PROPERTY()
+	PROPERTY(Savegame)
 	int32 InputID = -1;
 
 	/** If true, fire OnInputPress when input is pressed */
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bTriggerOnPress = true;
 
 	/** If true, fire OnInputRelease when input is released */
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bTriggerOnRelease = false;
 
 	/** Callback fired when input is pressed */
-	PROPERTY()
-	std::function<void()> OnInputPress;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnInputPress;
 
 	/** Callback fired when input is released */
-	PROPERTY()
-	std::function<void()> OnInputRelease;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnInputRelease;
 
 private:
 	void OnPollInput();
@@ -52,3 +54,4 @@ private:
 	/** Repeating timer handle for per-frame input polling */
 	TimerHandle PollTimerHandle;
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_WaitInput);

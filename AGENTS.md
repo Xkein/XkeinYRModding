@@ -63,7 +63,7 @@ BlueprintCallable，也就是专供蓝图的节点，直接给函数添加FUNCTI
 BlueprintImplementableEvent，也就是蓝图可以实现的事件，使用std::function<>（不要套using type）的成员处理，比如
 ```code
     PROPERTY()
-    std::function<void()> OnK2_ActivateAbility;
+    TDelegate<void()> OnK2_ActivateAbility;
 ```
 
 

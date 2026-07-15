@@ -24,8 +24,8 @@ inline void epilogue(SERIALIZATION_INPUT_ARCHIVE& ar, Class const&) { } \
 inline void epilogue(SERIALIZATION_OUTPUT_ARCHIVE& ar, Class const&) { } \
 
 #define IMPL_YR_SERIALIZE_SWIZZLE(Class) \
-template<class Archive> \
-void serialize(Archive& ar, Class*& data) = delete; \
+template<class Archive> void serialize(Archive& ar, Class*& data) = delete; \
+template<class Archive> void serialize(Archive& ar, Class const*& data) = delete; \
 REMOVE_SERIALIZE_BRACKET(Class*); \
 template<class Archive> \
 void save(Archive& ar, Class* const& data) { \
@@ -35,6 +35,15 @@ template<class Archive> \
 void load(Archive& ar, Class*& data) { \
     ar(reinterpret_cast<uint&>(data)); \
     SwizzleManagerClass::Instance->Swizzle(&reinterpret_cast<void*&>(data)); \
+} \
+template<class Archive> \
+void save(Archive& ar, Class const* const& data) { \
+    ar(reinterpret_cast<uint>(data)); \
+} \
+template<class Archive> \
+void load(Archive& ar, Class const*& data) { \
+    ar(reinterpret_cast<uint&>(data)); \
+    SwizzleManagerClass::Instance->Swizzle(&reinterpret_cast<void*&>((Class*&)data)); \
 }
 
 template<class Archive, typename T>

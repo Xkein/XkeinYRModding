@@ -59,9 +59,9 @@ void AbilityTask_WaitInput::OnPollInput()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnInputPress)
+			if (OnInputPress.IsBound())
 			{
-				OnInputPress();
+				OnInputPress.Execute();
 			}
 		}
 	}
@@ -70,9 +70,9 @@ void AbilityTask_WaitInput::OnPollInput()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnInputRelease)
+			if (OnInputRelease.IsBound())
 			{
-				OnInputRelease();
+				OnInputRelease.Execute();
 			}
 		}
 	}
@@ -87,4 +87,27 @@ void AbilityTask_WaitInput::OnDestroy(bool bOwnerFinished)
 		ASC->GetTimerManager().ClearTimer(PollTimerHandle);
 	}
 	AbilityTask::OnDestroy(bOwnerFinished);
+}
+
+void AbilityTask_WaitInput::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	if (bFinished || !ASC)
+	{
+		return;
+	}
+
+	// Re-initialize pressed state to avoid false edge detection after load
+	if (AbilityInstance)
+	{
+		GameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromClass(AbilityInstance);
+		if (Spec)
+		{
+			bWasPressed = (Spec->InputPressed != 0);
+		}
+	}
+
+	// TimerManager is transient — the repeating poll timer was lost on load.
+	// Re-register per-frame polling.
+	ASC->GetTimerManager().SetRepeatingTimer([this]() { OnPollInput(); }, 0.0f);
 }

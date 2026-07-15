@@ -1,5 +1,6 @@
 #pragma once
 #include "ability_task.h"
+#include "core/tool/delegate.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec.h"
 
@@ -10,7 +11,7 @@
  * Registers callback on ASC's event delegate in Activate().
  * Fires OnEventReceived when the event occurs.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_WaitGameplayEvent : public AbilityTask
 {
 public:
@@ -20,22 +21,23 @@ public:
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void LoadDeferred() override;
 
 	/** Tag of the gameplay event to wait for */
-	PROPERTY()
+	PROPERTY(Savegame)
 	GameplayTag EventTag;
 
 	/** If true, EndTask after the first event */
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bOnlyTriggerOnce = true;
 
 	/** If true, match only the exact tag; if false, match tag and its children */
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bOnlyMatchExact = false;
 
 	/** Callback fired when the event is received */
-	PROPERTY()
-	std::function<void(const GameplayEventData&)> OnEventReceived;
+	PROPERTY(Savegame)
+	TDelegate<void(const GameplayEventData&)> OnEventReceived;
 
 private:
 	/** Handle for the registered delegate, used to unregister on destruction */
@@ -44,3 +46,4 @@ private:
 	/** Internal callback invoked by ASC when the gameplay event fires */
 	void OnGameplayEvent(const GameplayTag& InTag, const GameplayEventData* Payload);
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_WaitGameplayEvent);

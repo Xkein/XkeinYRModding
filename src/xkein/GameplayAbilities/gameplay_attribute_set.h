@@ -106,7 +106,7 @@ struct AttributeSetDefine
     std::vector<GameplayAttribute> Attributes;
 };
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AttributeSet
 {
 public:
@@ -141,10 +141,17 @@ public:
     /** Called after a base value modification. OldValue is pre-modification, NewValue is final. */
     virtual void PostAttributeBaseChange(const GameplayAttribute& Attribute, float OldValue, float NewValue) const {}
 
+    /** Serialize AttributeDataMap by name (pointer keys can't be swizzled — GameplayAttribute is not an AbstractClass). */
+    void SaveDeferred();
+
+    /** Rebuild AttributeDataMap from serialized name-keyed data, resolving pointers via FindAttribute. */
+    void LoadDeferred();
+
 private:
     /** Actual attribute data storage (attribute ptr -> data) */
     std::map<const GameplayAttribute*, GameplayAttributeData> AttributeDataMap;
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AttributeSet);
 
 
 CLASS(BindJs)

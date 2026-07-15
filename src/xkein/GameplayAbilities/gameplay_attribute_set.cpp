@@ -1,5 +1,10 @@
 #include "gameplay_attribute_set.h"
 
+#include <cereal/cereal.hpp>
+#include <cereal/types/tuple.hpp>
+#include <tuple>
+#include <vector>
+
 GameplayAttribute::GameplayAttribute() {}
 
 float GameplayAttribute::GetNumericValue(const AttributeSet* Set) const
@@ -79,3 +84,47 @@ const GameplayAttribute* AttributeSet::FindAttribute(StringName AttributeName, S
 AttributeMetaData::AttributeMetaData()
     : BaseValue(0.0f), MinValue(0.0f), MaxValue(1.0f), CanStack(false)
 {}
+
+void AttributeSet::SaveDeferred()
+{
+    SerializeContext* context = Serialization::GetCurrentContext();
+    if (!context || !context->outputArchive) return;
+
+    // AttributeDataMap uses const GameplayAttribute* keys that can't be swizzled
+    // (GameplayAttribute is not an AbstractClass), so we serialize by name and
+    // rebuild the map on load via FindAttribute.
+    // std::string is used instead of StringName because cereal has no serializer for StringName.
+    std::vector<std::tuple<std::string, std::string, float, float>> serializedData;
+    for (const auto& [attrPtr, attrData] : AttributeDataMap)
+    {
+        if (attrPtr)
+        {
+            serializedData.emplace_back(
+                std::string(static_cast<std::string_view>(attrPtr->AttributeName)),
+                std::string(static_cast<std::string_view>(attrPtr->AttributeOwner)),
+                attrData.GetBaseValue(),
+                attrData.GetCurrentValue());
+        }
+    }
+    Serialization::Serialize(cereal::make_nvp("AttributeData", serializedData));
+}
+
+void AttributeSet::LoadDeferred()
+{
+    SerializeContext* context = Serialization::GetCurrentContext();
+    if (!context || !context->inputArchive) return;
+
+    std::vector<std::tuple<std::string, std::string, float, float>> serializedData;
+    Serialization::Serialize(cereal::make_nvp("AttributeData", serializedData));
+
+    for (const auto& [attrName, attrOwner, baseValue, currentValue] : serializedData)
+    {
+        const GameplayAttribute* attr = FindAttribute(StringName(attrName), StringName(attrOwner));
+        if (attr)
+        {
+            GameplayAttributeData& data = AttributeDataMap[attr];
+            data.SetBaseValue(baseValue);
+            data.SetCurrentValue(currentValue);
+        }
+    }
+}

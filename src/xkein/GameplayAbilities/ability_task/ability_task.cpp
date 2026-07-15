@@ -16,9 +16,9 @@ void AbilityTask::EndTask()
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
 		// Fire BlueprintImplementableEvent callback
-		if (OnK2_OnTaskEnd)
+		if (OnK2_OnTaskEnd.IsBound())
 		{
-			OnK2_OnTaskEnd();
+			OnK2_OnTaskEnd.Execute();
 		}
 	}
 }
@@ -69,4 +69,30 @@ AbilityTask* AbilityTask::CreateTask(GameplayAbility* Ability, StringName TaskNa
 		Ability->AddAbilityTask(Task);
 	}
 	return Task;
+}
+
+void AbilityTask::LoadDeferred()
+{
+	// Runs after all objects are loaded and swizzle fixup is complete.
+	// ASC and AbilityInstance pointers are now valid (swizzled).
+	if (bFinished)
+	{
+		ReadyForDestroy();
+		return;
+	}
+	if (ASC && bActivated && AbilityInstance)
+	{
+		// Re-register with the owning ability's ActiveTasks if not already present.
+		// The list may already contain this task if the ability was saved with it.
+		auto& tasks = AbilityInstance->GetActiveTasks();
+		bool found = false;
+		for (auto* t : tasks)
+		{
+			if (t == this) { found = true; break; }
+		}
+		if (!found)
+		{
+			tasks.push_back(this);
+		}
+	}
 }

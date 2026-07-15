@@ -65,9 +65,9 @@ void AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf(AbilitySystemC
 
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		if (OnEffectApplied)
+		if (OnEffectApplied.IsBound())
 		{
-			OnEffectApplied(Spec);
+			OnEffectApplied.Execute(Spec);
 		}
 	}
 
@@ -77,4 +77,16 @@ void AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf(AbilitySystemC
 	{
 		EndTask();
 	}
+}
+
+void AbilityTask_WaitGameplayEffectApplied::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	if (bFinished || !ASC)
+	{
+		return;
+	}
+
+	// Re-register on ASC's effect-applied delegate (transient, lost on load)
+	OnAppliedHandle = ASC->OnGameplayEffectAppliedDelegateToSelf.Add<&AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf>(*this);
 }

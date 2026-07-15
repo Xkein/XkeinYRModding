@@ -12,7 +12,7 @@
  * Fires OnEffectRemoved when the tracked effect is removed.
  * Fires OnInvalidHandle if the handle is invalid on activation.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_WaitGameplayEffectRemoved : public AbilityTask
 {
 public:
@@ -23,18 +23,19 @@ public:
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void LoadDeferred() override;
 
 	/** Handle of the active gameplay effect to watch for removal */
-	PROPERTY()
+	PROPERTY(Savegame)
 	ActiveGameplayEffectHandle EffectHandle;
 
 	/** Callback fired when the tracked effect is removed */
-	PROPERTY()
-	std::function<void()> OnEffectRemoved;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnEffectRemoved;
 
 	/** Callback fired if the handle was invalid on activation */
-	PROPERTY()
-	std::function<void()> OnInvalidHandle;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnInvalidHandle;
 
 private:
 	/** Handle to the active effect's OnRemoved delegate */
@@ -46,3 +47,4 @@ private:
 	/** Internal callback invoked when the active effect is removed */
 	void OnEffectRemovedCallback(const FGameplayEffectRemovalInfo& Info);
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_WaitGameplayEffectRemoved);

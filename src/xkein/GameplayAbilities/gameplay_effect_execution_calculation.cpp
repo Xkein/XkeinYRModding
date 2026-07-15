@@ -4,9 +4,9 @@ void GameplayEffectExecutionCalculation::Execute(
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
-	if (OnK2_Execute)
+	if (OnK2_Execute.IsBound())
 	{
-		OnK2_Execute(ExecutionParams, OutExecutionOutput);
+		OnK2_Execute.Execute(ExecutionParams, OutExecutionOutput);
 		return;
 	}
 

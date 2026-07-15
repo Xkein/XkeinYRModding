@@ -198,8 +198,8 @@ public:
     virtual void ReuseAfterRecycle() {}
 
     /** Generic K2 handler (BlueprintImplementableEvent) — called for every event type before specific dispatch */
-    PROPERTY()
-    std::function<void(EGameplayCueEvent, const GameplayCueParameters&)> OnK2_HandleGameplayCue;
+    PROPERTY(Savegame)
+    TDelegate<void(EGameplayCueEvent, const GameplayCueParameters&)> OnK2_HandleGameplayCue;
 
     /** Does this notify handle this event type? Delegated to Define. */
     virtual bool HandlesEvent(EGameplayCueEvent EventType) const

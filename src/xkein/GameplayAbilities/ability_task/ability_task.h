@@ -1,6 +1,7 @@
 #pragma once
 #include "core/reflection/reflection.h"
 #include "core/tool/script_function.h"
+#include "core/tool/delegate.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec_handle.h"
 #include "xkein/GameplayAbilities/gameplay_ability.h"
 #include <functional>
@@ -19,10 +20,15 @@ class AbilitySystemComponent;
  *   6. ReadyForDestroy() schedules removal from the active task list
  *
  * Inherits: standalone class (does NOT inherit from any GameplayTask)
+ *
+ * Instances are pointed-to by GameplayAbility::ActiveTasks
+ * (vector<AbilityTask*>), so the serialization system can swizzle pointers
+ * back to these tasks on load.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask
 {
+	GENERATED_BODY(AbilityTask);
 public:
 	virtual ~AbilityTask() = default;
 
@@ -60,13 +66,22 @@ public:
 	/** Initialize task with owning ASC, ability handle, and ability instance */
 	void InitTask(AbilitySystemComponent& InASC, GameplayAbilitySpecHandle InHandle, GameplayAbility* InAbility);
 
+	/** Called by the serialization system AFTER all objects are loaded and
+	 *  swizzle fixup is complete. ASC and AbilityInstance pointers are valid
+	 *  at this point. Re-registers this task with its owning ability's
+	 *  ActiveTasks list, or marks it for destruction if it was already
+	 *  finished when the save was taken.
+	 *  NOTE: NOT LoadEpilogue — that runs DURING object load, before swizzle,
+	 *  so ASC/AbilityInstance would still be stale pointers there. */
+	virtual void LoadDeferred();
+
 	/** BlueprintCallable: ends the task from script */
 	FUNCTION()
 	virtual void K2_EndTask();
 
 	/** BlueprintImplementableEvent: script callback fired when the task ends */
-	PROPERTY()
-	std::function<void()> OnK2_OnTaskEnd;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnK2_OnTaskEnd;
 
 	/** Static factory: creates a task by name, initializes it, and registers it with the ASC.
 	 *  Uses ScriptFunction pattern (TaskCreator) for script-registered constructors. */
@@ -102,22 +117,27 @@ protected:
 	 */
 	bool ShouldBroadcastAbilityTaskDelegates() const;
 
-	/** Owning AbilitySystemComponent */
+	/** Owning AbilitySystemComponent. Swizzled on load. */
+	PROPERTY(Savegame)
 	AbilitySystemComponent* ASC = nullptr;
 
 	/** Handle of the owning ability spec */
+	PROPERTY(Savegame)
 	GameplayAbilitySpecHandle AbilityHandle;
 
-	/** The owning ability instance */
+	/** The owning ability instance. Swizzled on load. */
+	PROPERTY(Savegame)
 	GameplayAbility* AbilityInstance = nullptr;
 
 	/** True after EndTask() has been called */
+	PROPERTY(Savegame)
 	bool bFinished = false;
 
 	/** True after ReadyForDestroy() has been called; task will be removed on next TickTasks pass */
 	bool bReadyForDestroy = false;
 
 	/** True after Activate() has been called. Set by TickTasks activation pass. */
+	PROPERTY(Savegame)
 	bool bActivated = false;
 };
 
@@ -128,3 +148,4 @@ struct AbilityTaskCreator : public ScriptFunction<AbilityTask*(GameplayAbility*,
 	FUNCTION()
 	AbilityTaskCreator(std::function<AbilityTask*(GameplayAbility*, AbilitySystemComponent*)> func) : ScriptFunction(func) { }
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask);

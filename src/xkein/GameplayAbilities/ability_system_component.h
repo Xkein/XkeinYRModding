@@ -115,7 +115,7 @@ struct AbilitySystemComponentType final
 };
 IMPL_YR_SERIALIZE_SWIZZLE(AbilitySystemComponentType);
 
-CLASS(BindJs, ComponentTarget = [TechnoClass], AutoSavegame)
+CLASS(BindJs, ComponentTarget = [TechnoClass], AutoSavegame, Swizzleable)
 class AbilitySystemComponent : public IGameplayCueInterface, public IGameplayTagAssetInterface
 {
 	friend struct ActiveGameplayEffectsContainer;
@@ -135,12 +135,12 @@ public:
 	~AbilitySystemComponent();
 	
 	/** The actor that owns this component logically */
-    PROPERTY()
+    PROPERTY(Savegame)
     entt::entity Owner;
 	/** The actor that is the physical representation used for abilities. Can be NULL */
-    PROPERTY()
+    PROPERTY(Savegame)
     entt::entity Avatar;
-	PROPERTY()
+	PROPERTY(Savegame)
 	AbilitySystemComponentType* Type;
 
     /** Cached ability actor info — shared across all abilities, aligned with UE5's AbilityActorInfo pattern */
@@ -169,7 +169,6 @@ public:
 	 *	without an AbilitySystemComponent. For example an ability could be written to execute on a StaticMeshActor. As long as the ability doesn't require 
 	 *	instancing or anything else that the AbilitySystemComponent would provide, then it doesn't need the component to function.
 	 */
-    PROPERTY()
 	std::vector<GameplayAbilitySpec> ActivatableAbilities;
 
     /** Lock counter for ability list scoped locks. While > 0, ability removals are deferred. */
@@ -193,11 +192,11 @@ public:
     bool bSuppressGrantAbility = false;
     
 	/** List of attribute sets */
-	PROPERTY()
+	PROPERTY(Savegame)
 	std::vector<AttributeSet*>	SpawnedAttributes;
     
 	/** Contains all of the gameplay effects that are currently active on this component */
-	PROPERTY()
+	PROPERTY(Savegame)
 	ActiveGameplayEffectsContainer ActiveGameplayEffects;
 
 	/** Timer manager for ability tasks (delayed callbacks, repeating timers) */
@@ -688,7 +687,7 @@ public:
 
 	/** Delegate called when an immunity component blocks a gameplay effect.
 	 *  Parameters: (blocked spec, immunity-providing active effect) */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FImmunityBlockGE OnImmunityBlockGameplayEffectDelegate;
 
 	// ============================================================
@@ -696,43 +695,43 @@ public:
 	// ============================================================
 
 	/** Called when a GameplayEffect is applied to self */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FOnGameplayEffectAppliedDelegate OnGameplayEffectAppliedDelegateToSelf;
 
 	/** Called when a GameplayEffect is applied to a target (by this ASC) */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FOnGameplayEffectAppliedDelegate OnGameplayEffectAppliedDelegateToTarget;
 
 	/** Called when an active GameplayEffect is added to self (duration/infinite only) */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FOnGameplayEffectAppliedDelegate OnActiveGameplayEffectAddedDelegateToSelf;
 
 	/** Called when a periodic GameplayEffect executes on self */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FOnGameplayEffectAppliedDelegate OnPeriodicGameplayEffectExecuteDelegateOnSelf;
 
 	/** Called when a periodic GameplayEffect executes on a target */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FOnGameplayEffectAppliedDelegate OnPeriodicGameplayEffectExecuteDelegateOnTarget;
 
 	/** Called when an ability activation fails, with failure reason tags */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FAbilityFailedDelegate AbilityFailedCallbacks;
 
 	/** Called when an ability ends */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FAbilityEnded AbilityEndedCallbacks;
 
 	/** Called when an ability is activated */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FGenericAbilityDelegate AbilityActivatedCallbacks;
 
 	/** Called when an ability is committed (cost paid, cooldown started) */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FGenericAbilityDelegate AbilityCommittedCallbacks;
 
 	/** Called when an ability spec is marked dirty */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FAbilitySpecDirtied AbilitySpecDirtiedCallbacks;
 
 	// ============================================================
@@ -859,3 +858,4 @@ private:
 	/** Container of gameplay cue tags currently active on this ASC (for IsGameplayCueActive / RemoveAllGameplayCues) */
 	ActiveGameplayCueContainer ActiveGameplayCues;
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilitySystemComponent);

@@ -1,7 +1,8 @@
 #pragma once
 #include "xkein/GameplayAbilities/gameplay_attribute_set.h"
+#include "core/tool/delegate.h"
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class CustomAttributeSet : public AttributeSet
 {
 public:
@@ -12,68 +13,69 @@ public:
     
     bool PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data) override
     {
-        if (OnK2_PreGameplayEffectExecute)
+        if (OnK2_PreGameplayEffectExecute.IsBound())
         {
-            return OnK2_PreGameplayEffectExecute(&Data);
+            return OnK2_PreGameplayEffectExecute.Execute(&Data);
         }
         return true;
     }
 
     void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override
     {
-        if (OnK2_PostGameplayEffectExecute)
+        if (OnK2_PostGameplayEffectExecute.IsBound())
         {
-            OnK2_PostGameplayEffectExecute(&Data);
+            OnK2_PostGameplayEffectExecute.Execute(&Data);
         }
     }
 
     void PreAttributeChange(const GameplayAttribute& Attribute, float& NewValue) override
     {
-        if (OnK2_PreAttributeChange)
+        if (OnK2_PreAttributeChange.IsBound())
         {
-            OnK2_PreAttributeChange(Attribute, NewValue);
+            OnK2_PreAttributeChange.Execute(Attribute, NewValue);
         }
     }
 
     void PostAttributeChange(const GameplayAttribute& Attribute, float OldValue, float NewValue) override
     {
-        if (OnK2_PostAttributeChange)
+        if (OnK2_PostAttributeChange.IsBound())
         {
-            OnK2_PostAttributeChange(Attribute, OldValue, NewValue);
+            OnK2_PostAttributeChange.Execute(Attribute, OldValue, NewValue);
         }
     }
 
     void PreAttributeBaseChange(const GameplayAttribute& Attribute, float& NewValue) const override
     {
-        if (OnK2_PreAttributeBaseChange)
+        if (OnK2_PreAttributeBaseChange.IsBound())
         {
-            OnK2_PreAttributeBaseChange(Attribute, NewValue);
+            OnK2_PreAttributeBaseChange.Execute(Attribute, NewValue);
         }
     }
 
     void PostAttributeBaseChange(const GameplayAttribute& Attribute, float OldValue, float NewValue) const override
     {
-        if (OnK2_PostAttributeBaseChange)
+        if (OnK2_PostAttributeBaseChange.IsBound())
         {
-            OnK2_PostAttributeBaseChange(Attribute, OldValue, NewValue);
+            OnK2_PostAttributeBaseChange.Execute(Attribute, OldValue, NewValue);
         }
     }
 
-    PROPERTY()
-    std::function<bool(FGameplayEffectModCallbackData*)> OnK2_PreGameplayEffectExecute;
+    PROPERTY(Savegame)
+    TDelegate<bool(FGameplayEffectModCallbackData*)> OnK2_PreGameplayEffectExecute;
 
-    PROPERTY()
-    std::function<void(const FGameplayEffectModCallbackData*)> OnK2_PostGameplayEffectExecute;
+    PROPERTY(Savegame)
+    TDelegate<void(const FGameplayEffectModCallbackData*)> OnK2_PostGameplayEffectExecute;
 
-    PROPERTY()
-    std::function<void(const GameplayAttribute&, float&)> OnK2_PreAttributeChange;
+    PROPERTY(Savegame)
+    TDelegate<void(const GameplayAttribute&, float&)> OnK2_PreAttributeChange;
 
-    PROPERTY()
-    std::function<void(const GameplayAttribute&, float, float)> OnK2_PostAttributeChange;
+    PROPERTY(Savegame)
+    TDelegate<void(const GameplayAttribute&, float, float)> OnK2_PostAttributeChange;
 
-    PROPERTY()
-    std::function<void(const GameplayAttribute&, float&)> OnK2_PreAttributeBaseChange;
+    PROPERTY(Savegame)
+    TDelegate<void(const GameplayAttribute&, float&)> OnK2_PreAttributeBaseChange;
 
-    PROPERTY()
-    std::function<void(const GameplayAttribute&, float, float)> OnK2_PostAttributeBaseChange;
+    PROPERTY(Savegame)
+    TDelegate<void(const GameplayAttribute&, float, float)> OnK2_PostAttributeBaseChange;
 };
+IMPL_YR_SERIALIZE_SWIZZLE(CustomAttributeSet);

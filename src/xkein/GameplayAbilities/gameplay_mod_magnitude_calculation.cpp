@@ -3,9 +3,9 @@
 
 float GameplayModMagnitudeCalculation::CalculateBaseMagnitude(const GameplayEffectSpec& Spec) const
 {
-	if (OnK2_CalculateBaseMagnitude)
+	if (OnK2_CalculateBaseMagnitude.IsBound())
 	{
-		return OnK2_CalculateBaseMagnitude(Spec);
+		return OnK2_CalculateBaseMagnitude.Execute(Spec);
 	}
 
 	// Base implementation returns 0 — subclasses override

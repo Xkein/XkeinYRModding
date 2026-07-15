@@ -175,12 +175,15 @@ struct GameplayAbilitySpec
 	GameplayAbilitySpec(GameplayAbility* InAbility, int32 InLevel = 1);
 
 	/** Handle for outside sources to refer to this spec by */
+    PROPERTY(Savegame)
     GameplayAbilitySpecHandle Handle;
 
 	/** Ability of the spec (Always the CDO. This should be const but too many things modify it currently) */
+    PROPERTY(Savegame)
     GameplayAbility* Ability;
 
 	/** Level of Ability */
+    PROPERTY(Savegame)
     int Level;
 
 	/**
@@ -198,7 +201,7 @@ struct GameplayAbilitySpec
 	std::map<StringName, float> SetByCallerNameMagnitudes;
 
 	/** InputID, if bound to an input */
-	PROPERTY()
+	PROPERTY(Savegame)
 	int32 InputID = -1;
 
 	PROPERTY()
@@ -218,7 +221,7 @@ struct GameplayAbilitySpec
 	uint8 bActivateOnce : 1;
 
 	/** Tags that this ability has. These are replicated and can be used for GE source tags */
-	PROPERTY()
+	PROPERTY(Savegame)
 	GameplayTagContainer DynamicAbilityTags;
 
 	/** Data for a gameplay event that triggered this ability */
@@ -227,10 +230,10 @@ struct GameplayAbilitySpec
 	/** If true, this ability should be removed as soon as it finishes executing */
 	bool RemoveAfterActivation = false;
 
-	PROPERTY()
+	PROPERTY(Savegame)
     TDelegate<void(GameplayAbilitySpec*)> OnGameplayAbilityEnded;
 
-	PROPERTY()
+	PROPERTY(Savegame)
     TDelegate<void()> OnGameplayAbilityCancelled;
 
 	bool IsActive() const { return ActiveCount > 0; }
@@ -255,9 +258,11 @@ struct GameplayAbilitySpec
 	}
 
 	/** Instances that are not replicated (for ReplicateNo abilities) */
+	PROPERTY(Savegame)
 	std::vector<GameplayAbility*> NonReplicatedInstances;
 
 	/** Instances that are replicated */
+	PROPERTY(Savegame)
 	std::vector<GameplayAbility*> ReplicatedInstances;
 };
 

@@ -10,7 +10,7 @@
  * Registers callback on ASC::OnGameplayEffectAppliedDelegateToSelf in Activate().
  * Fires OnEffectApplied when a matching effect is applied.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_WaitGameplayEffectApplied : public AbilityTask
 {
 public:
@@ -20,18 +20,19 @@ public:
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void LoadDeferred() override;
 
 	/** Source tag requirements to filter which effects trigger the callback */
-	PROPERTY()
+	PROPERTY(Savegame)
 	FGameplayEffectQuery SourceTagRequirements;
 
 	/** If true, EndTask after the first matching effect is applied */
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bTriggerOnce = true;
 
 	/** Callback fired when a matching effect is applied. Parameter: effect spec. */
-	PROPERTY()
-	std::function<void(const GameplayEffectSpec&)> OnEffectApplied;
+	PROPERTY(Savegame)
+	TDelegate<void(const GameplayEffectSpec&)> OnEffectApplied;
 
 private:
 	/** Handle to the ASC's OnGameplayEffectAppliedDelegateToSelf delegate */
@@ -43,3 +44,4 @@ private:
 	/** Internal callback invoked by ASC when any effect is applied to self */
 	void OnEffectAppliedToSelf(AbilitySystemComponent* Target, const GameplayEffectSpec& Spec, ActiveGameplayEffectHandle Handle);
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_WaitGameplayEffectApplied);

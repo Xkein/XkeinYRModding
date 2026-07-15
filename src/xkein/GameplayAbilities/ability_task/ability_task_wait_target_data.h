@@ -1,5 +1,6 @@
 #pragma once
 #include "ability_task.h"
+#include "core/tool/delegate.h"
 #include "xkein/GameplayAbilities/gameplay_ability_spec.h"
 
 /**
@@ -10,7 +11,7 @@
  * target data is received (called externally by the TargetActor).
  * The task does not Tick; it waits for an external call to TargetDataReceived.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_WaitTargetData : public AbilityTask
 {
 public:
@@ -26,11 +27,14 @@ public:
 	 *  Fires OnTargetDataCancelled and ends the task. */
 	void TargetDataCancelled();
 
+	virtual void LoadDeferred() override;
+
 	/** Callback fired when target data is ready */
-	PROPERTY()
-	std::function<void(const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
+	PROPERTY(Savegame)
+	TDelegate<void(const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
 
 	/** Callback fired when targeting is cancelled */
-	PROPERTY()
-	std::function<void()> OnTargetDataCancelled;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnTargetDataCancelled;
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_WaitTargetData);

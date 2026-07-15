@@ -1,5 +1,6 @@
 #pragma once
 #include "ability_task.h"
+#include "core/tool/delegate.h"
 #include "xkein/GameplayAbilities/gameplay_tag.h"
 #include "xkein/GameplayAbilities/gameplay_effect_types.h"
 
@@ -11,7 +12,7 @@
  * Checks initial state: if the tag is already present, fires immediately.
  * Mirrors UAbilityTask_WaitGameplayTagAdded.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_WaitGameplayTagAdded : public AbilityTask
 {
 public:
@@ -21,18 +22,19 @@ public:
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void LoadDeferred() override;
 
 	/** Tag to watch for add events */
-	PROPERTY()
+	PROPERTY(Savegame)
 	GameplayTag Tag;
 
 	/** If true, EndTask after the first tag add */
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bOnlyTriggerOnce = false;
 
 	/** Callback fired when the tag is added */
-	PROPERTY()
-	std::function<void()> OnTagAdded;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnTagAdded;
 
 private:
 	/** Handle for the registered delegate, used to unregister on destruction */
@@ -44,6 +46,7 @@ private:
 	/** Internal callback invoked by ASC when the tag count changes */
 	void OnTagCountChanged(const GameplayTag& InTag, int32 NewCount);
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_WaitGameplayTagAdded);
 
 /**
  * AbilityTask_WaitGameplayTagRemoved
@@ -53,7 +56,7 @@ private:
  * Checks initial state: if the tag is already absent, fires immediately.
  * Mirrors UAbilityTask_WaitGameplayTagRemoved.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_WaitGameplayTagRemoved : public AbilityTask
 {
 public:
@@ -63,18 +66,19 @@ public:
 
 	virtual void Activate() override;
 	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void LoadDeferred() override;
 
 	/** Tag to watch for remove events */
-	PROPERTY()
+	PROPERTY(Savegame)
 	GameplayTag Tag;
 
 	/** If true, EndTask after the first tag remove */
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bOnlyTriggerOnce = false;
 
 	/** Callback fired when the tag is removed */
-	PROPERTY()
-	std::function<void()> OnTagRemoved;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnTagRemoved;
 
 private:
 	/** Handle for the registered delegate, used to unregister on destruction */
@@ -86,3 +90,4 @@ private:
 	/** Internal callback invoked by ASC when the tag count changes */
 	void OnTagCountChanged(const GameplayTag& InTag, int32 NewCount);
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_WaitGameplayTagRemoved);

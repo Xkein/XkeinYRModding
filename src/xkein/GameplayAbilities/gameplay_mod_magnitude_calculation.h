@@ -3,7 +3,7 @@
 #include "xkein/GameplayAbilities/gameplay_effect_aggregator.h"
 #include "xkein/GameplayAbilities/gameplay_effect_calculation.h"
 #include "xkein/GameplayAbilities/gameplay_effect.h"
-#include <functional>
+#include "core/tool/delegate.h"
 #include <optional>
 
 class AbilitySystemComponent;
@@ -60,8 +60,8 @@ public:
 	 * If set, this is called by CalculateBaseMagnitude in preference to the virtual.
 	 * Signature: float(const GameplayEffectSpec& Spec)
 	 */
-	PROPERTY()
-	std::function<float(const GameplayEffectSpec&)> OnK2_CalculateBaseMagnitude;
+	PROPERTY(Savegame)
+	TDelegate<float(const GameplayEffectSpec&)> OnK2_CalculateBaseMagnitude;
 
 	// ============================================================
 	// SetByCaller helpers (Phase 7)

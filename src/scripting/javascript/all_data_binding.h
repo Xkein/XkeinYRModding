@@ -93,6 +93,7 @@ UsingStdVector(GameplayModifierInfo);
 UsingStdVector(GameplayModifierInfo*);
 UsingStdVector(FConditionalGameplayEffect);
 UsingStdVector(FGameplayEffectExecutionScopedModifierInfo);
+UsingStdVector(AbilityTask*);
 
 UsingCppType(GameplayAbilityTargetData_SingleTargetHit);
 UsingCppType(GameplayAbilityTargetData_ActorArray);
@@ -406,6 +407,22 @@ UsingCppType(FDelegateHandle);
 
 UsingTDelegate(void(GameplayAbilitySpec*));
 UsingTDelegate(void());
+UsingTDelegate(bool(GameplayAbilityActorInfo, GameplayAbilitySpecHandle, GameplayTagContainer*));
+UsingTDelegate(void(const GameplayEventData&));
+UsingTDelegate(void(bool));
+UsingTDelegate(bool(FGameplayEffectModCallbackData*));
+UsingTDelegate(void(const FGameplayEffectModCallbackData*));
+UsingTDelegate(void(const GameplayAttribute&, float&));
+UsingTDelegate(void(const GameplayAttribute&, float, float));
+UsingTDelegate(void(EGameplayCueEvent, const GameplayCueParameters&));
+UsingTDelegate(void(const GameplayTag&, const GameplayCueParameters&));
+UsingTDelegate(void(const FGameplayEffectCustomExecutionParameters&, FGameplayEffectCustomExecutionOutput&));
+UsingTDelegate(void(const GameplayEffectSpec&));
+UsingTDelegate(float(const GameplayEffectSpec&));
+UsingTDelegate(void(const GameplayAbilityTargetDataHandle&));
+UsingTDelegate(void(entt::entity));
+UsingTDelegate(void(int32));
+UsingTDelegate(void(float));
 
 UsingTDelegateRegistration(void(GameplayAbilitySpec*));
 UsingTDelegateRegistration(void());

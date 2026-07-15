@@ -63,9 +63,9 @@ void AbilityTask_WaitAttributeChange::OnPollAttribute()
 
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			if (OnAttributeChanged)
+			if (OnAttributeChanged.IsBound())
 			{
-				OnAttributeChanged(CurrentValue);
+				OnAttributeChanged.Execute(CurrentValue);
 			}
 		}
 
@@ -89,4 +89,18 @@ void AbilityTask_WaitAttributeChange::OnDestroy(bool bOwnerFinished)
 	}
 
 	AbilityTask::OnDestroy(bOwnerFinished);
+}
+
+void AbilityTask_WaitAttributeChange::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	if (bFinished || !ASC)
+	{
+		return;
+	}
+
+	// TimerManager is transient — the repeating poll timer was lost on load.
+	// Re-register per-frame polling. The first poll after load will re-establish
+	// the LastKnownValue baseline (bInitialized is transient, resets to false).
+	ASC->GetTimerManager().SetRepeatingTimer([this]() { OnPollAttribute(); }, 0.0f);
 }

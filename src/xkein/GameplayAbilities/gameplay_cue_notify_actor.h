@@ -2,21 +2,20 @@
 #include "xkein/GameplayAbilities/gameplay_cue.h"
 #include "xkein/GameplayAbilities/gameplay_cue_notify_static.h"
 #include <AnimTypeClass.h>
-#include <functional>
 
 /** Instanced, one-shot gameplay cue with support for latent actions (delays, callbacks).
  *  Since it is instanced (extends Actor), it can hold state for timed operations like
  *  auto-destroying after animation playback completes.
  *  
- *  JS bindable: OnK2_OnBurst std::function follows CustomGameplayAbility pattern. */
-CLASS(BindJs)
+ *  JS bindable: OnK2_OnBurst TDelegate follows CustomGameplayAbility pattern. */
+CLASS(BindJs, AutoSavegame)
 class GameplayCueNotify_BurstLatent : public GameplayCueNotify_Actor
 {
 public:
     /** JS-scriptable OnBurst callback (BlueprintImplementableEvent pattern).
      *  Called when this burst cue fires. Script can override for custom behavior. */
-    PROPERTY()
-    std::function<void(const GameplayTag&, const GameplayCueParameters&)> OnK2_OnBurst;
+    PROPERTY(Savegame)
+    TDelegate<void(const GameplayTag&, const GameplayCueParameters&)> OnK2_OnBurst;
 
     /** Animation type to spawn on burst */
     PROPERTY()
@@ -38,8 +37,8 @@ public:
         }
 
         // Fire JS callback if bound
-        if (OnK2_OnBurst)
-            OnK2_OnBurst(CueTag, Params);
+        if (OnK2_OnBurst.IsBound())
+            OnK2_OnBurst.Execute(CueTag, Params);
     }
 
     /** Factory method for ScriptFunction registration */

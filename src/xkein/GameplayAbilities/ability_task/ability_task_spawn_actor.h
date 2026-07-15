@@ -1,5 +1,6 @@
 #pragma once
 #include "ability_task.h"
+#include "core/tool/delegate.h"
 #include "xkein/GameplayAbilities/gameplay_ability.h"
 #include <entt/entity/fwd.hpp>
 #include <YRMathVector.h>
@@ -19,7 +20,7 @@ class TechnoTypeClass;
  *
  * Mirrors UAbilityTask_SpawnActor::BeginSpawningActor/FinishSpawningActor.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, Swizzleable)
 class AbilityTask_SpawnActor : public AbilityTask
 {
 public:
@@ -29,23 +30,26 @@ public:
 
 	virtual void Activate() override;
 
+	virtual void LoadDeferred() override;
+
 	/** Type of the Techno to spawn */
-	PROPERTY()
+	PROPERTY(Savegame)
 	TechnoTypeClass* ActorType = nullptr;
 
 	/** World location at which to spawn the Techno */
-	PROPERTY()
+	PROPERTY(Savegame)
 	CoordStruct SpawnLocation;
 
 	/** Facing direction (0-255, where 64 = East, 128 = South, 192 = West) */
-	PROPERTY()
+	PROPERTY(Savegame)
 	uint8 SpawnDirection = 0;
 
 	/** Callback fired when the Techno is spawned successfully. Parameter: spawned entity. */
-	PROPERTY()
-	std::function<void(entt::entity)> OnSpawnComplete;
+	PROPERTY(Savegame)
+	TDelegate<void(entt::entity)> OnSpawnComplete;
 
 	/** Callback fired when the spawn fails (e.g. invalid type, blocked cell, no owner house). */
-	PROPERTY()
-	std::function<void()> OnSpawnFailed;
+	PROPERTY(Savegame)
+	TDelegate<void()> OnSpawnFailed;
 };
+IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_SpawnActor);

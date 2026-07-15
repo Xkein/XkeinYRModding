@@ -24,13 +24,21 @@ void AbilityTask_WaitTargetData::TargetDataReceived(const GameplayAbilityTargetD
 
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		if (OnTargetDataReady)
+		if (OnTargetDataReady.IsBound())
 		{
-			OnTargetDataReady(Data);
+			OnTargetDataReady.Execute(Data);
 		}
 	}
 
 	EndTask();
+}
+
+void AbilityTask_WaitTargetData::LoadDeferred()
+{
+	AbilityTask::LoadDeferred();
+	// No special action — this task is event-driven from external callers
+	// (TargetActor). The callbacks are serialized as TDelegates, so they
+	// survive load and will fire when TargetDataReceived/Cancelled is called.
 }
 
 void AbilityTask_WaitTargetData::TargetDataCancelled()
@@ -42,9 +50,9 @@ void AbilityTask_WaitTargetData::TargetDataCancelled()
 
 	if (ShouldBroadcastAbilityTaskDelegates())
 	{
-		if (OnTargetDataCancelled)
+		if (OnTargetDataCancelled.IsBound())
 		{
-			OnTargetDataCancelled();
+			OnTargetDataCancelled.Execute();
 		}
 	}
 
