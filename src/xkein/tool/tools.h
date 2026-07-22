@@ -3,6 +3,11 @@
 #include "yr/component/component.h"
 #include <FootClass.h>
 
+class AnimTypeClass;
+class WarheadTypeClass;
+class HouseClass;
+class SuperWeaponTypeClass;
+
 ENUM(BindJs)
 enum QueryFlags : unsigned int {
     Infantry = 1 << 1,
@@ -64,8 +69,45 @@ public:
     FUNCTION()
     YREXTCORE_API static BulletClass* LaunchWeaponToPosition(WeaponTypeClass* weapon, TechnoClass* owner, CoordStruct const& launchPos, CoordStruct const& targetPos);
 
-    // FUNCTION()
-    // YREXTCORE_API static bool KillMindControl(TechnoClass* obj);
+    // --- Mind Control ---
+    FUNCTION()
+    YREXTCORE_API static bool CaptureUnit(TechnoClass* controller, TechnoClass* target);
+    FUNCTION()
+    YREXTCORE_API static bool FreeUnit(TechnoClass* controller, TechnoClass* target);
+    FUNCTION()
+    YREXTCORE_API static void FreeAllUnits(TechnoClass* controller);
+
+    // --- Animation ---
+    FUNCTION()
+    YREXTCORE_API static AnimClass* CreateAnimation(AnimTypeClass* type, CoordStruct location, int loopCount = 1);
+    FUNCTION()
+    YREXTCORE_API static AnimClass* CreateAnimationOnObject(AnimTypeClass* type, ObjectClass* target, int loopCount = 1);
+
+    // --- Rank ---
+    FUNCTION()
+    YREXTCORE_API static void SetRank(TechnoClass* obj, Rank rank);
+
+    // --- Spawn Manager ---
+    FUNCTION()
+    YREXTCORE_API static void KillAllSpawns(TechnoClass* carrier);
+    FUNCTION()
+    YREXTCORE_API static void SetSpawnTarget(TechnoClass* carrier, AbstractClass* target);
+    FUNCTION()
+    YREXTCORE_API static int GetAliveSpawnCount(TechnoClass* carrier);
+
+    // --- Damage ---
+    FUNCTION()
+    YREXTCORE_API static DamageState ApplyDamage(ObjectClass* obj, int damage, WarheadTypeClass* warhead, TechnoClass* attacker = nullptr);
+    FUNCTION()
+    YREXTCORE_API static void KillObject(ObjectClass* obj, TechnoClass* killer = nullptr);
+
+    // --- Super Weapon ---
+    FUNCTION()
+    YREXTCORE_API static void FireSuperWeapon(HouseClass* house, SuperWeaponTypeClass* superWeapon, CellStruct cell);
+    FUNCTION()
+    YREXTCORE_API static bool GrantSuperWeapon(HouseClass* house, SuperWeaponTypeClass* superWeapon, bool oneTime = true);
+    FUNCTION()
+    YREXTCORE_API static void SetSuperWeaponCharge(HouseClass* house, SuperWeaponTypeClass* superWeapon, int percentage);
 };
 
 

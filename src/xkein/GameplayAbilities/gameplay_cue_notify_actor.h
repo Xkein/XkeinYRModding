@@ -31,7 +31,7 @@ public:
         // Default: spawn one-shot AnimClass
         if (BurstAnim)
         {
-            SpawnedAnimEntity = new AnimClass(BurstAnim, Params.Location, 0, 1, 0x600, 0, false);
+            SpawnedAnimEntity = GameCreate<AnimClass>(BurstAnim, Params.Location, 0, 1, 0x600, 0, false);
             if (SpawnedAnimEntity)
                 SpawnedAnimEntity->Start();
         }
@@ -105,7 +105,7 @@ public:
         {
             if (animType)
             {
-                auto* anim = new AnimClass(animType, Params.Location, 0, 1, 0x600, 0, false);
+                auto* anim = GameCreate<AnimClass>(animType, Params.Location, 0, 1, 0x600, 0, false);
                 if (anim) anim->Start();
             }
         }
@@ -113,7 +113,7 @@ public:
         // Start looping effects (persistent)
         if (LoopingEffects.LoopingAnim)
         {
-            SpawnedAnimEntity = new AnimClass(LoopingEffects.LoopingAnim, Params.Location,
+            SpawnedAnimEntity = GameCreate<AnimClass>(LoopingEffects.LoopingAnim, Params.Location,
                                                0, -1, 0x600, 0, false);
             if (SpawnedAnimEntity)
                 SpawnedAnimEntity->Start();
@@ -128,7 +128,7 @@ public:
         {
             if (animType)
             {
-                auto* anim = new AnimClass(animType, Params.Location, 0, 1, 0x600, 0, false);
+                auto* anim = GameCreate<AnimClass>(animType, Params.Location, 0, 1, 0x600, 0, false);
                 if (anim) anim->Start();
             }
         }
@@ -143,7 +143,7 @@ public:
         {
             if (animType)
             {
-                auto* anim = new AnimClass(animType, Params.Location, 0, 1, 0x600, 0, false);
+                auto* anim = GameCreate<AnimClass>(animType, Params.Location, 0, 1, 0x600, 0, false);
                 if (anim) anim->Start();
             }
         }

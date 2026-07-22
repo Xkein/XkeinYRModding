@@ -7,6 +7,11 @@
 #include <AircraftClass.h>
 #include <TerrainClass.h>
 #include "tools.h"
+#include <AnimClass.h>
+#include <SpawnManagerClass.h>
+#include <HouseClass.h>
+#include <SuperClass.h>
+#include <Memory.h>
 
 ObjectClass* XkeinTools::FindFirstTarget(QueryVolume const* query)
 {
@@ -138,11 +143,131 @@ BulletClass* XkeinTools::LaunchWeaponToPosition(WeaponTypeClass* weapon, TechnoC
     return bullet;
 }
 
-// bool XkeinTools::KillMindControl(TechnoClass* obj)
-// {
-    
-//     return false;
-// }
+// ===== Mind Control =====
+
+bool XkeinTools::CaptureUnit(TechnoClass* controller, TechnoClass* target)
+{
+    if (!controller->CaptureManager)
+        return false;
+    return controller->CaptureManager->CaptureUnit(target);
+}
+
+bool XkeinTools::FreeUnit(TechnoClass* controller, TechnoClass* target)
+{
+    if (!controller->CaptureManager)
+        return false;
+    return controller->CaptureManager->FreeUnit(target);
+}
+
+void XkeinTools::FreeAllUnits(TechnoClass* controller)
+{
+    if (controller->CaptureManager)
+        controller->CaptureManager->FreeAll();
+}
+
+// ===== Animation =====
+// 注意：CreateAnimationOnObject 不检查 target 非空（遵循现有约定）
+// 若 target 为空，target->GetCoords() 会立即 crash，调用方需确保有效
+
+AnimClass* XkeinTools::CreateAnimation(AnimTypeClass* type, CoordStruct location, int loopCount)
+{
+    return GameCreate<AnimClass>(type, location, 0, loopCount, 0x600, 0, false);
+}
+
+AnimClass* XkeinTools::CreateAnimationOnObject(AnimTypeClass* type, ObjectClass* target, int loopCount)
+{
+    AnimClass* anim = GameCreate<AnimClass>(type, target->GetCoords(), 0, loopCount, 0x600, 0, false);
+    anim->SetOwnerObject(target);
+    return anim;
+}
+
+// ===== Rank =====
+
+void XkeinTools::SetRank(TechnoClass* obj, Rank rank)
+{
+    switch (rank) {
+    case Rank::Rookie:
+        obj->Veterancy.SetRookie();
+        break;
+    case Rank::Veteran:
+        obj->Veterancy.SetVeteran();
+        break;
+    case Rank::Elite:
+        obj->Veterancy.SetElite();
+        break;
+    default:
+        break;
+    }
+}
+
+// ===== Spawn Manager =====
+
+void XkeinTools::KillAllSpawns(TechnoClass* carrier)
+{
+    if (carrier->SpawnManager)
+        carrier->SpawnManager->KillNodes();
+}
+
+void XkeinTools::SetSpawnTarget(TechnoClass* carrier, AbstractClass* target)
+{
+    if (carrier->SpawnManager)
+        carrier->SpawnManager->SetTarget(target);
+}
+
+int XkeinTools::GetAliveSpawnCount(TechnoClass* carrier)
+{
+    return carrier->SpawnManager ? carrier->SpawnManager->CountAliveSpawns() : 0;
+}
+
+// ===== Damage =====
+
+DamageState XkeinTools::ApplyDamage(ObjectClass* obj, int damage, WarheadTypeClass* warhead, TechnoClass* attacker)
+{
+    HouseClass* attackingHouse = attacker ? attacker->GetOwningHouse() : nullptr;
+    return obj->ReceiveDamage(&damage, 0, warhead, attacker, false, false, attackingHouse);
+}
+
+void XkeinTools::KillObject(ObjectClass* obj, TechnoClass* killer)
+{
+    // 用足够大的伤害值触发死亡（2倍血量 + 10000 padding 以应对弹头 Verses < 100% 的情况）
+    // 游戏内部会自动处理 RegisterDestruction/Destroy
+    int lethalDamage = (obj->Health > 0 ? obj->Health : 0) * 2 + 10000;
+    WarheadTypeClass* wh = RulesClass::Instance->C4Warhead;
+    HouseClass* attackingHouse = killer ? killer->GetOwningHouse() : nullptr;
+    obj->ReceiveDamage(&lethalDamage, 0, wh, killer, true, false, attackingHouse);
+}
+
+// ===== Super Weapon =====
+
+void XkeinTools::FireSuperWeapon(HouseClass* house, SuperWeaponTypeClass* superWeapon, CellStruct cell)
+{
+    for (int i = 0; i < house->Supers.Count; i++) {
+        if (house->Supers[i] && house->Supers[i]->Type == superWeapon) {
+            house->Supers[i]->Launch(cell, false);
+            return;
+        }
+    }
+}
+
+bool XkeinTools::GrantSuperWeapon(HouseClass* house, SuperWeaponTypeClass* superWeapon, bool oneTime)
+{
+    for (int i = 0; i < house->Supers.Count; i++) {
+        if (house->Supers[i] && house->Supers[i]->Type == superWeapon) {
+            return house->Supers[i]->Grant(oneTime, true, false);
+        }
+    }
+    return false;
+}
+
+void XkeinTools::SetSuperWeaponCharge(HouseClass* house, SuperWeaponTypeClass* superWeapon, int percentage)
+{
+    for (int i = 0; i < house->Supers.Count; i++) {
+        if (house->Supers[i] && house->Supers[i]->Type == superWeapon) {
+            house->Supers[i]->SetCharge(std::clamp(percentage, 0, 100));
+            return;
+        }
+    }
+}
 
 DEFINE_YR_HOOK_EVENT_LISTENER(YrLogicBeginUpdateEvent) {
 

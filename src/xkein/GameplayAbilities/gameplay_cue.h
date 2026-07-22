@@ -7,6 +7,7 @@
 #include <entt/entity/fwd.hpp>
 #include <AnimClass.h>
 #include <GeneralStructures.h>
+#include <Memory.h>
 
 /** Simple gameplay cue parameters, mirroring UE5.5 FGameplayCueParameters */
 CLASS(BindJs)
@@ -149,7 +150,7 @@ private:
         if (burstAnim)
         {
             // AnimClass(AnimTypeClass*, CoordStruct, loopDelay=0, loopCount=1, flags=0x600, forceZAdjust=0, reverse=false)
-            auto* anim = new AnimClass(burstAnim, Params.Location, 0, 1, 0x600, 0, false);
+            auto* anim = GameCreate<AnimClass>(burstAnim, Params.Location, 0, 1, 0x600, 0, false);
             if (anim)
                 anim->Start();
         }
@@ -217,7 +218,7 @@ public:
         auto* burstAnim = Define ? Define->BurstAnim : nullptr;
         if (burstAnim)
         {
-            auto* anim = new AnimClass(burstAnim, Params.Location, 0, 1, 0x600, 0, false);
+            auto* anim = GameCreate<AnimClass>(burstAnim, Params.Location, 0, 1, 0x600, 0, false);
             if (anim) anim->Start();
             // Note: this is a one-shot — we don't store it in SpawnedAnimEntity
         }
@@ -234,7 +235,7 @@ public:
         auto* loopingAnim = Define ? Define->LoopingAnim : nullptr;
         if (loopingAnim)
         {
-            SpawnedAnimEntity = new AnimClass(loopingAnim, Params.Location, 0, -1, 0x600, 0, false);
+            SpawnedAnimEntity = GameCreate<AnimClass>(loopingAnim, Params.Location, 0, -1, 0x600, 0, false);
             if (SpawnedAnimEntity)
                 SpawnedAnimEntity->Start();
         }

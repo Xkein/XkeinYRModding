@@ -38,7 +38,7 @@ public:
         {
             if (animType)
             {
-                auto* anim = new AnimClass(animType, Params.Location, 0, 1, 0x600, 0, false);
+                auto* anim = GameCreate<AnimClass>(animType, Params.Location, 0, 1, 0x600, 0, false);
                 if (anim) anim->Start();
             }
         }
