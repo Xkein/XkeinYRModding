@@ -143,11 +143,6 @@ UsingCppType(FGameplayEffectCustomExecutionOutput);
 UsingCppType(AttributeBasedFloat);
 UsingCppType(CustomCalculationBasedFloat);
 UsingCppType(SetByCallerFloat);
-UsingScriptFunction(GameplayAbility * (GameplayAbilityDefine * _0, AbilitySystemComponent * _1));
-UsingScriptFunction(AttributeSet * (AttributeSetDefine * _0, AbilitySystemComponent * _1));
-UsingScriptFunction(AbilityTask * (GameplayAbility * _0, AbilitySystemComponent * _1));
-UsingScriptFunction(GameplayCueNotify_Static * ());
-UsingScriptFunction(GameplayCueNotify_Actor * ());
 
 UsingStdVector(GameplayEffectAttributeCaptureDefinition);
 UsingStdVector(entt::entity);
@@ -443,5 +438,45 @@ UsingTMulticastDelegate(void(FAggregator*));
 
 UsingTMulticastDelegateRegistration(void(AbilitySystemComponent*, const GameplayEffectSpec&, ActiveGameplayEffectHandle));
 UsingTMulticastDelegateRegistration(void(const GameplayAbility*, const GameplayTagContainer&));
+
+// ScriptFunction<Func> types used by delegate method signatures (BindScriptFunction/AddScriptFunction)
+// These must be registered so puerts can resolve ScriptFunction<Func>* parameter types at compile time.
+// Each entry here corresponds to a delegate function signature used in delegate_binding.cpp.
+UsingScriptFunction(GameplayAbility* (GameplayAbilityDefine*, AbilitySystemComponent*));
+UsingScriptFunction(AttributeSet* (AttributeSetDefine*, AbilitySystemComponent*));
+UsingScriptFunction(AbilityTask* (GameplayAbility*, AbilitySystemComponent*));
+UsingScriptFunction(GameplayCueNotify_Static* ());
+UsingScriptFunction(GameplayCueNotify_Actor* ());
+UsingScriptFunction(void(GameplayAbilitySpec*));
+UsingScriptFunction(void());
+UsingScriptFunction(bool(GameplayAbilityActorInfo, GameplayAbilitySpecHandle, GameplayTagContainer*));
+UsingScriptFunction(void(const GameplayEventData&));
+UsingScriptFunction(void(bool));
+UsingScriptFunction(bool(FGameplayEffectModCallbackData*));
+UsingScriptFunction(void(const FGameplayEffectModCallbackData*));
+UsingScriptFunction(void(const GameplayAttribute&, float&));
+UsingScriptFunction(void(const GameplayAttribute&, float, float));
+UsingScriptFunction(void(EGameplayCueEvent, const GameplayCueParameters&));
+UsingScriptFunction(void(const GameplayTag&, const GameplayCueParameters&));
+UsingScriptFunction(void(const FGameplayEffectCustomExecutionParameters&, FGameplayEffectCustomExecutionOutput&));
+UsingScriptFunction(void(const GameplayEffectSpec&));
+UsingScriptFunction(float(const GameplayEffectSpec&));
+UsingScriptFunction(void(const GameplayAbilityTargetDataHandle&));
+UsingScriptFunction(void(entt::entity));
+UsingScriptFunction(void(int32));
+UsingScriptFunction(void(float));
+UsingScriptFunction(void(AbilitySystemComponent*, const GameplayEffectSpec&, ActiveGameplayEffectHandle));
+UsingScriptFunction(void(const GameplayAbility*, const GameplayTagContainer&));
+UsingScriptFunction(void(GameplayAbility*));
+UsingScriptFunction(void(const GameplayAbilitySpecHandle, GameplayAbility*));
+UsingScriptFunction(void(const GameplayAbilitySpec&));
+UsingScriptFunction(void(const GameplayEffectSpec&, const ActiveGameplayEffect*));
+UsingScriptFunction(void(const GameplayTag&, int32));
+UsingScriptFunction(void(ActiveGameplayEffectHandle, int32, int32));
+UsingScriptFunction(void(ActiveGameplayEffectHandle, float, float));
+UsingScriptFunction(void(ActiveGameplayEffectHandle, bool));
+UsingScriptFunction(void(const FGameplayEffectRemovalInfo&));
+UsingScriptFunction(void(const FOnAttributeChangeData&));
+UsingScriptFunction(void(FAggregator*));
 
 #endif

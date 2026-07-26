@@ -25,6 +25,7 @@ type long_double = number;
 type uint8 = number;
 type uint32 = number;
 type int32 = number;
+type uint64 = number;
 
 type entt_entity = number;
 
@@ -41,32 +42,4 @@ declare class StdVector<T> {
     clear(): void;
     empty(): boolean;
     at(index: number): T;
-}
-
-declare class FDelegateHandle {
-    Id: bigint;
-    IsValid(): boolean;
-    Reset(): void;
-}
-
-declare class TDelegate<TCallback extends (...args: any[]) => any> {
-    Bind(fn: TCallback): void;
-    IsBound(): boolean;
-    Unbind(): void;
-    Execute(...args: Parameters<TCallback>): ReturnType<TCallback>;
-    ExecuteIfBound(...args: Parameters<TCallback>): void;
-}
-
-declare class TMulticastDelegate<TCallback extends (...args: any[]) => void> {
-    Add(fn: TCallback): FDelegateHandle;
-    Remove(handle: FDelegateHandle): boolean;
-    Clear(): void;
-    IsBound(): boolean;
-}
-
-declare class TMulticastDelegateRegistration<TCallback extends (...args: any[]) => void> {
-    Add(fn: TCallback): FDelegateHandle;
-    Remove(handle: FDelegateHandle): boolean;
-    Clear(): void;
-    IsBound(): boolean;
 }
