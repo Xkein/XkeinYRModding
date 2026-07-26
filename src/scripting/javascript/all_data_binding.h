@@ -149,6 +149,9 @@ UsingStdVector(entt::entity);
 UsingStdVector(StringName);
 UsingStdVector(AnimTypeClass*);
 
+#include "xkein/GameplayAbilities/yr_gas.h"
+UsingCppType(YrAttributeSet);
+
 #include "scripting/javascript/js_events.h"
 UsingCppTypeWithRefCache(JsGameEvents);
 UsingCppTypeWithRefCache(JsPhysicsEvents);

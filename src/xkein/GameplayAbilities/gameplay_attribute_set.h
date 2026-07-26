@@ -63,6 +63,8 @@ CLASS(BindJs)
 struct GameplayAttribute
 {
     GameplayAttribute();
+    GameplayAttribute(StringName InAttributeOwner, StringName InAttributeName)
+        : AttributeOwner(InAttributeOwner), AttributeName(InAttributeName) {}
 
     PROPERTY()
     StringName AttributeName;
@@ -201,11 +203,9 @@ public:
 /** Creates a static function that returns a GameplayAttribute for the given property.
  *  Uses StringName lookup: AttributeName = #PropertyName, AttributeOwner = #ClassName. */
 #define GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
-    static GameplayAttribute Get##PropertyName##Attribute() \
+    static const GameplayAttribute& Get##PropertyName##Attribute() \
     { \
-        GameplayAttribute Attr; \
-        Attr.AttributeName = StringName(#PropertyName); \
-        Attr.AttributeOwner = StringName(#ClassName); \
+        static GameplayAttribute Attr(StringName(#ClassName), StringName(#PropertyName)); \
         return Attr; \
     }
 
