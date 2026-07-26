@@ -1,5 +1,5 @@
-import { AbilitySystemComponent, GameplayAbility, GameplayAbilityDefine, GameplayAbilityCreator, ScriptFunctionRegister, AttributeSet, AttributeSetDefine, AttributeSetCreator, GameplayAbilitySystem, AbilityTask, GameplayCueNotify_Static, AbilityTaskCreator } from "XkeinExt";
-import { StringName } from "YrExtCore";
+import { AbilitySystemComponent, GameplayAbility, GameplayAbilityDefine, GameplayAbilityCreator, AttributeSet, AttributeSetDefine, AttributeSetCreator, GameplayAbilitySystem, AbilityTask, GameplayCueNotify_Static, AbilityTaskCreator } from "XkeinExt";
+import { ScriptFunctionRegister, StringName } from "YrExtCore";
 
 const persistentObjs : any[] = [];
 

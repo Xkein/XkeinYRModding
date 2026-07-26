@@ -113,9 +113,9 @@
         if $mapped_type
             ret $mapped_type
         end
-        # get function type
-        if is_function_type(type)
-            ret "(" + ((type.parameters | array.each do; ret $"{$0.name} : {get_ts_type($0.type)}"; end) | array.join ", ") + ") => " + get_ts_type(type.return_type) + "| undefined"
+        # get function type (use $unwrap to handle typedef/pointer wrapping)
+        if is_function_type($unwrap)
+            ret "(" + (($unwrap.parameters | array.each do; ret $"{(string.empty($0.name) ? "_" : $0.name)} : {get_ts_type($0.type)}"; end) | array.join ", ") + ") => " + get_ts_type($unwrap.return_type) + "| undefined"
         end
         # special template class
         if string.starts_with($unwrap_name, "ref_wrapper<")

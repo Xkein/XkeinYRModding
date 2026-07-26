@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setupGas = setupGas;
 const XkeinExt_1 = require("XkeinExt");
+const YrExtCore_1 = require("YrExtCore");
 const persistentObjs = [];
 function abilityLoader(name) {
     const m = require(name.c_str());
@@ -28,7 +29,7 @@ function taskLoader(name) {
     }
 }
 function setupGas() {
-    XkeinExt_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, abilityLoader);
-    XkeinExt_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, attributeSetLoader);
-    XkeinExt_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.AbilityTask.s_ScriptFunctionCategory, taskLoader);
+    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, abilityLoader);
+    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, attributeSetLoader);
+    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.AbilityTask.s_ScriptFunctionCategory, taskLoader);
 }
