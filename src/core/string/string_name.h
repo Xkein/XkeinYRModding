@@ -103,6 +103,18 @@ public:
     }
 
     friend struct std::hash<StringName>;
+    
+    template<class Archive>
+    void save(Archive& ar) const {
+        ar(*NameStr);
+    }
+
+    template<class Archive>
+    void load(Archive& ar) {
+        std::string str;
+        ar(str);
+        *this = StringName(str);
+    }
 };
 
 namespace std {
