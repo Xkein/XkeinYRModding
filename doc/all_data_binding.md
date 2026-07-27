@@ -20,7 +20,8 @@
 3. **新增 `TDelegateRegistration<FUNC>` / `TMulticastDelegateRegistration<FUNC>`** → 同上，配对加 `UsingT*Registration(FUNC)` 和 `RegisterT*Registration<FUNC>()`。
 4. **新增 `ScriptFunction<FUNC>`**（即给委托 `BindScriptFunction` / `AddScriptFunction` 用的脚本函数包装）→ 加 `UsingScriptFunction(FUNC)`，并且其 `FUNC` 签名通常对应一个已登记的 `UsingTDelegate(FUNC)`。
 5. **在暴露给 JS 的签名中用到 `std::vector<T>`** → 加 `UsingStdVector(T)`。
-6. **在暴露给 JS 的签名中用到 `TDelegate<T>` / `TMulticastDelegate<T>` 作为参数/返回值/属性类型** → 必须在文件中先 `UsingTDelegate(T)` / `UsingTMulticastDelegate(T)`，否则绑定代码无法编译。
+6. **在暴露给 JS 的签名中用到 `std::map<K, V>`** → 加 `UsingStdMap(K, V)`。
+7. **在暴露给 JS 的签名中用到 `TDelegate<T>` / `TMulticastDelegate<T>` 作为参数/返回值/属性类型** → 必须在文件中先 `UsingTDelegate(T)` / `UsingTMulticastDelegate(T)`，否则绑定代码无法编译。
 
 ## 什么时候**不**需要往里面加东西
 
@@ -88,6 +89,7 @@
 | --- | --- |
 | `UsingCppType(CLS)` | 登记普通 C++ 类型，生成 `ScriptTypeName` / `CDataPointerConverter`。 |
 | `UsingStdVector(CLS)` | 登记 `std::vector<CLS>`（展开为 `UsingContainer(std::vector<CLS>)`）。 |
+| `UsingStdMap(KEY, VALUE)` | 登记 `std::map<KEY, VALUE>`（展开为 `UsingContainer(std::map<KEY, VALUE>)`）。 |
 | `UsingTDelegate(FUNC)` | 登记 `TDelegate<FUNC>`。**必须**与 `delegate_binding.cpp` 的 `RegisterTDelegate<FUNC>()` 一一对应。 |
 | `UsingTMulticastDelegate(FUNC)` | 登记 `TMulticastDelegate<FUNC>`。**必须**与 `RegisterTMulticastDelegate<FUNC>()` 一一对应。 |
 | `UsingTDelegateRegistration(FUNC)` | 登记 `TDelegateRegistration<FUNC>`。配对 `RegisterTDelegateRegistration<FUNC>()`。 |
@@ -103,5 +105,6 @@
 - [ ] 把声明放在 `#ifndef __HEADER_TOOL__` 之内。
 - [ ] 若是委托 / `ScriptFunction`，已在 [delegate_binding.cpp](file:///d:/Dev/proj/YR/XkeinYRModding/src/scripting/javascript/delegate_binding.cpp) 的 `__JsRegister_Delegates()` 加了配对的 `RegisterT*<FUNC>()`。
 - [ ] 若是 `std::vector<T>`，确认 `T` 本身也已 `UsingCppType` 登记。
+- [ ] 若是 `std::map<K, V>`，确认 `K` 和 `V` 本身也已 `UsingCppType` 登记。
 - [ ] 不重复登记（YR 原生类已在 [yr_data_bindings.h](file:///d:/Dev/proj/YR/XkeinYRModding/src/scripting/javascript/yr_data_bindings.h) 处理）。
 - [ ] 不要在这里写 `CLASS()`、`PROPERTY()`、`FUNCTION()` 反射宏 —— 那是 CppHeaderTool 的事，本文件只服务 puerts。

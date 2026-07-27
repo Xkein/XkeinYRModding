@@ -43,3 +43,12 @@ declare class StdVector<T> {
     empty(): boolean;
     at(index: number): T;
 }
+
+declare class StdMap<K, V> {
+    size(): number;
+    clear(): void;
+    empty(): boolean;
+    at(key: K): V;
+    erase(key: K): number;
+    count(key: K): number;
+}

@@ -11,6 +11,7 @@
 #include <core/reflection/reflection.h>
 #include <core/macro.h>
 #include <optional>
+#include <map>
 #include <comdef.h>
 
 #define UsingScriptFunction(FUNC) \
@@ -198,10 +199,16 @@ namespace PUERTS_NAMESPACE                                                      
 #define UsingCppTypeWithRefConverter(CLS) UsingCppType(CLS) UsingReferenceConverter(CLS)
 
 #define UsingNamespace(NS) \
-class __NS__ {}; \
-UsingCppType(__NS__);
+class __##NS##__ {}; \
+UsingCppType(__##NS##__);
 
 #define UsingStdVector(CLS) UsingContainer(std::vector<CLS>)
+
+#define __UsingStdMap(TKEY, TVALUE, TYPEDEF) \
+typedef std::map<TKEY, TVALUE> TYPEDEF; \
+UsingContainer(TYPEDEF)
+
+#define UsingStdMap(TKEY, TVALUE) __UsingStdMap(TKEY, TVALUE, CONCAT(__StdMap__, CONCAT(__LINE__, __COUNTER__)));
 
 // to pass compile but not use function pointer
 #define MuteFunctionPtr(CLS)                                                                       \
@@ -463,6 +470,15 @@ namespace PUERTS_NAMESPACE
         static constexpr auto value()
         {
             return internal::Literal("std::vector<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
+        }
+    };
+
+    template<typename K, typename V>
+    struct ScriptTypeName<std::map<K, V>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("std::map<") + ScriptTypeNameWithNamespace<K>::value() + internal::Literal(", ") + ScriptTypeNameWithNamespace<V>::value() + internal::Literal(">");
         }
     };
 

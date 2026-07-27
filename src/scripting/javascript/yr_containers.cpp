@@ -256,6 +256,19 @@ void RegisterStdVector()
     builder.Register();
 }
 
+template<typename TKey, typename TValue>
+void RegisterStdMap()
+{
+    auto builder = PUERTS_NAMESPACE::DefineClass<std::map<TKey, TValue>>();
+    MakeMethodCheck<&std::map<TKey, TValue>::size>(builder, "size");
+    MakeMethodCheck<&std::map<TKey, TValue>::clear>(builder, "clear");
+    MakeMethodCheck<&std::map<TKey, TValue>::empty>(builder, "empty");
+    MakeMethodCheck<static_cast<TValue& (std::map<TKey, TValue>::*)(const TKey&)>(&std::map<TKey, TValue>::at)>(builder, "at");
+    MakeMethodCheck<static_cast<size_t(std::map<TKey, TValue>::*)(const TKey&)>(&std::map<TKey, TValue>::erase)>(builder, "erase");
+    MakeMethodCheck<static_cast<size_t(std::map<TKey, TValue>::*)(const TKey&) const>(&std::map<TKey, TValue>::count)>(builder, "count");
+    builder.Register();
+}
+
 
 #define REGISTER_DYNAMIC_VECTOR_CLASS(CLS) \
     RegisterVectorClass<CLS>(); \
@@ -390,6 +403,9 @@ void __JsRegister_YrContainers()
     RegisterStdVector<GameplayModifierInfo>();
     RegisterStdVector<GameplayEffectAttributeCaptureDefinition>();
     RegisterStdVector<entt::entity>();
+
+    RegisterStdMap<GameplayTag, float>();
+    RegisterStdMap<StringName, float>();
 }
 
 GLOBAL_INVOKE_ON_CTOR(__JsRegister_YrContainers);

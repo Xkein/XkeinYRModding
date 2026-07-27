@@ -149,6 +149,9 @@ UsingStdVector(entt::entity);
 UsingStdVector(StringName);
 UsingStdVector(AnimTypeClass*);
 
+UsingStdMap(GameplayTag, float);
+UsingStdMap(StringName, float);
+
 #include "xkein/GameplayAbilities/yr_gas.h"
 UsingCppType(YrAttributeSet);
 
