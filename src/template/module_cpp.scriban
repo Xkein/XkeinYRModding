@@ -134,9 +134,12 @@ static bool LoadIni_{{klass.identifier}}({{klass.full_name}}& iniComponent, IniR
 {{- end }}
 
 {{- if is_savegame }}
+// Cereal entry point: found by ADL when cereal serializes this type directly
+// (e.g. as STL container element). Also called by Serialization::Save/Load
+// when count_output_serializers > 0.
+// Delegates field serialization to Serialization::Serialize (entt meta bridge).
 template<typename Archive>
-void Serialize_{{klass.identifier}}(Archive& ar, {{klass.full_name}}& data) {
-    ar.startNode();
+void serialize(Archive& ar, {{klass.full_name}}& data) {
     Serialization::CallPrologue(ar, data);
     std::string typeName = entt::type_id<{{klass.full_name}}>().name().data();
     // Serialization::Serialize(cereal::make_nvp("$type", typeName));
@@ -155,6 +158,12 @@ void Serialize_{{klass.identifier}}(Archive& ar, {{klass.full_name}}& data) {
         Serialization::Serialize(cereal::make_nvp("{{property.name}}", data.{{property.name}}));
     {{- end }}
     Serialization::CallEpilogue(ar, data);
+}
+    
+template<typename Archive>
+void Serialize_{{klass.identifier}}(Archive& ar, {{klass.full_name}}& data) {
+    ar.startNode();
+    serialize(ar, data);
     ar.finishNode();
 }
 

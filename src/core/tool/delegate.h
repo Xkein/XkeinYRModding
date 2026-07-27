@@ -42,6 +42,13 @@ struct FDelegateHandle
         static std::atomic<uint64> Counter{1};
         return FDelegateHandle{Counter++};
     }
+
+    // ── cereal Serialization ────────────────────────────────────────────
+    // Used as key in std::map, needs direct cereal serialize.
+    template<class Archive>
+    void serialize(Archive& ar) {
+        ar(cereal::make_nvp("Id", Id));
+    }
 };
 
 namespace std {
@@ -619,10 +626,13 @@ public:
             || !m_scriptFunctionListeners.empty();
     }
 
-    // ── Serialization ───────────────────────────────────────────────────
+    // ── cereal Serialization ────────────────────────────────────────────
+    // Only ScriptFunction listeners are serializable (stored as FuncId).
+    // entt::sigh connections and std::function lambdas are not serializable;
+    // they are dropped on save and must be re-registered after load.
 
     template<class Archive>
-    void saveConnections(Archive& ar) const
+    void save(Archive& ar) const
     {
         std::vector<uint64_t> funcIds;
         for (auto& l : m_scriptFunctionListeners)
@@ -631,7 +641,7 @@ public:
     }
 
     template<class Archive>
-    void loadConnections(Archive& ar)
+    void load(Archive& ar)
     {
         std::vector<uint64_t> funcIds;
         ar(cereal::make_nvp("ScriptFunctionListeners", funcIds));

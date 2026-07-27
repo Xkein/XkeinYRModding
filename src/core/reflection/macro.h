@@ -14,6 +14,7 @@
     friend class __Gen_Type_##type_name; \
     friend void __Gen_Type_##type_name##__Register(); \
     friend void __JsRegister_##type_name(); \
-    template<typename Archive> friend void Serialize_##type_name(Archive& ar, type_name& data);
+    template<typename Archive> friend void Serialize_##type_name(Archive& ar, type_name& data); \
+    template<typename Archive> friend void serialize(Archive& ar, type_name& data);
 
 
