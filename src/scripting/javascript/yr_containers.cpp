@@ -260,12 +260,29 @@ template<typename TKey, typename TValue>
 void RegisterStdMap()
 {
     auto builder = PUERTS_NAMESPACE::DefineClass<std::map<TKey, TValue>>();
-    MakeMethodCheck<&std::map<TKey, TValue>::size>(builder, "size");
-    MakeMethodCheck<&std::map<TKey, TValue>::clear>(builder, "clear");
-    MakeMethodCheck<&std::map<TKey, TValue>::empty>(builder, "empty");
+    // MSVC: std::map inherits from std::_Tree, so &std::map::size etc. resolve
+    // to std::_Tree member pointers. Use static_cast to force std::map as the
+    // class type so SelfGetter uses Converter<std::map*> (defined by UsingContainer).
+    MakeMethodCheck<static_cast<size_t (std::map<TKey, TValue>::*)() const>(&std::map<TKey, TValue>::size)>(builder, "size");
+    MakeMethodCheck<static_cast<void (std::map<TKey, TValue>::*)()>(&std::map<TKey, TValue>::clear)>(builder, "clear");
+    MakeMethodCheck<static_cast<bool (std::map<TKey, TValue>::*)() const>(&std::map<TKey, TValue>::empty)>(builder, "empty");
     MakeMethodCheck<static_cast<TValue& (std::map<TKey, TValue>::*)(const TKey&)>(&std::map<TKey, TValue>::at)>(builder, "at");
     MakeMethodCheck<static_cast<size_t(std::map<TKey, TValue>::*)(const TKey&)>(&std::map<TKey, TValue>::erase)>(builder, "erase");
     MakeMethodCheck<static_cast<size_t(std::map<TKey, TValue>::*)(const TKey&) const>(&std::map<TKey, TValue>::count)>(builder, "count");
+    builder.Register();
+}
+
+template<typename T>
+void RegisterStdSet()
+{
+    auto builder = PUERTS_NAMESPACE::DefineClass<std::set<T>>();
+    // MSVC: std::set inherits from std::_Tree, same as std::map. Use static_cast
+    // to force std::set as the class type (see RegisterStdMap comment above).
+    MakeMethodCheck<static_cast<size_t (std::set<T>::*)() const>(&std::set<T>::size)>(builder, "size");
+    MakeMethodCheck<static_cast<void (std::set<T>::*)()>(&std::set<T>::clear)>(builder, "clear");
+    MakeMethodCheck<static_cast<bool (std::set<T>::*)() const>(&std::set<T>::empty)>(builder, "empty");
+    MakeMethodCheck<static_cast<size_t(std::set<T>::*)(const T&)>(&std::set<T>::erase)>(builder, "erase");
+    MakeMethodCheck<static_cast<size_t(std::set<T>::*)(const T&) const>(&std::set<T>::count)>(builder, "count");
     builder.Register();
 }
 
@@ -406,6 +423,9 @@ void __JsRegister_YrContainers()
 
     RegisterStdMap<GameplayTag, float>();
     RegisterStdMap<StringName, float>();
+    RegisterStdMap<GameplayTag, int32>();
+
+    RegisterStdSet<int32>();
 }
 
 GLOBAL_INVOKE_ON_CTOR(__JsRegister_YrContainers);

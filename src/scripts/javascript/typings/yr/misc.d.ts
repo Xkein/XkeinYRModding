@@ -52,3 +52,11 @@ declare class StdMap<K, V> {
     erase(key: K): number;
     count(key: K): number;
 }
+
+declare class StdSet<T> {
+    size(): number;
+    clear(): void;
+    empty(): boolean;
+    erase(item: T): number;
+    count(item: T): number;
+}

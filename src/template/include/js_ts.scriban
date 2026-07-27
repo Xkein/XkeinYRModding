@@ -135,6 +135,10 @@
         if string.starts_with($unwrap_name, "std::map<")
             ret "StdMap<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ", " + get_ts_type($unwrap.template_specialized_arguments[1].arg_as_type) + ">"
         end
+        # std::set<T>
+        if string.starts_with($unwrap_name, "std::set<")
+            ret "StdSet<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ">"
+        end
         # TDelegate<T>
         if string.starts_with($unwrap_name, "TDelegate<")
             ret "TDelegate<" + get_ts_type($unwrap.template_specialized_arguments[0].arg_as_type) + ">"

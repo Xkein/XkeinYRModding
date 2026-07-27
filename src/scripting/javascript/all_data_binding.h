@@ -27,6 +27,11 @@
 UsingCppType(ActiveGameplayEffectHandle);
 UsingCppType(ActiveGameplayEffect);
 UsingCppType(ActiveGameplayEffectsContainer);
+UsingCppType(ActiveGameplayCue);
+UsingCppType(ActiveGameplayCueContainer);
+UsingCppType(GameplayTagCountContainer);
+UsingCppType(FGameplayEffectModifiedAttribute);
+UsingCppType(FModifierSpec);
 UsingCppType(AttributeSet);
 UsingCppType(CustomAttributeSet);
 UsingCppType(CustomGameplayAbility);
@@ -94,6 +99,10 @@ UsingStdVector(GameplayModifierInfo*);
 UsingStdVector(FConditionalGameplayEffect);
 UsingStdVector(FGameplayEffectExecutionScopedModifierInfo);
 UsingStdVector(AbilityTask*);
+UsingStdVector(ActiveGameplayCue);
+UsingStdVector(FGameplayEffectModifiedAttribute);
+UsingStdVector(FModifierSpec);
+UsingStdVector(float);
 
 UsingCppType(GameplayAbilityTargetData_SingleTargetHit);
 UsingCppType(GameplayAbilityTargetData_ActorArray);
@@ -151,6 +160,9 @@ UsingStdVector(AnimTypeClass*);
 
 UsingStdMap(GameplayTag, float);
 UsingStdMap(StringName, float);
+UsingStdMap(GameplayTag, int32);
+
+UsingStdSet(int32);
 
 #include "xkein/GameplayAbilities/yr_gas.h"
 UsingCppType(YrAttributeSet);

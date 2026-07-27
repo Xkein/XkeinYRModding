@@ -12,6 +12,7 @@
 #include <core/macro.h>
 #include <optional>
 #include <map>
+#include <set>
 #include <comdef.h>
 
 #define UsingScriptFunction(FUNC) \
@@ -203,6 +204,8 @@ class __##NS##__ {}; \
 UsingCppType(__##NS##__);
 
 #define UsingStdVector(CLS) UsingContainer(std::vector<CLS>)
+
+#define UsingStdSet(CLS) UsingContainer(std::set<CLS>)
 
 #define __UsingStdMap(TKEY, TVALUE, TYPEDEF) \
 typedef std::map<TKEY, TVALUE> TYPEDEF; \
@@ -479,6 +482,15 @@ namespace PUERTS_NAMESPACE
         static constexpr auto value()
         {
             return internal::Literal("std::map<") + ScriptTypeNameWithNamespace<K>::value() + internal::Literal(", ") + ScriptTypeNameWithNamespace<V>::value() + internal::Literal(">");
+        }
+    };
+
+    template<typename T>
+    struct ScriptTypeName<std::set<T>>
+    {
+        static constexpr auto value()
+        {
+            return internal::Literal("std::set<") + ScriptTypeNameWithNamespace<T>::value() + internal::Literal(">");
         }
     };
 
