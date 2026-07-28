@@ -9,3 +9,5 @@
 /// <reference path="gen/XkeinExt.d.ts" />
 /// <reference path="scriptable.d.ts" />
 /// <reference path="misc.d.ts" />
+/// <reference path="../puerts/index.d.ts" />
+/// <reference path="../cpp/index.d.ts" />
