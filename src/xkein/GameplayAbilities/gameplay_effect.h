@@ -15,12 +15,13 @@ struct FGameplayModifierEvaluatedData;
 struct ActiveGameplayEffect;
 
 /** Struct used to track the magnitude of a gameplay effect modifier that was applied to an attribute */
+CLASS(BindJs, AutoSavegame)
 struct FGameplayEffectModifiedAttribute
 {
-    PROPERTY()
+    PROPERTY(Savegame)
     GameplayAttribute Attribute;
 
-    PROPERTY()
+    PROPERTY(Savegame)
     float TotalMagnitude = 0.0f;
 };
 struct ActiveGameplayEffectsContainer;
@@ -732,19 +733,19 @@ private:
 };
 IMPL_YR_SERIALIZE_SWIZZLE(GameplayEffect);
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct GameplayEffectContext
 {
 	/** Instigator actor, the actor that owns the ability system component */
-	PROPERTY()
+	PROPERTY(Savegame)
 	entt::entity Instigator;
 
 	/** The physical actor that actually did the damage, can be a weapon or projectile */
-	PROPERTY()
+	PROPERTY(Savegame)
 	entt::entity EffectCauser;
 
 	/** The ability CDO that is responsible for this effect context (replicated) */
-	PROPERTY()
+	PROPERTY(Savegame)
 	GameplayAbility* AbilityCDO;
 
 	/** The ability instance that is responsible for this effect context (NOT replicated) */
@@ -752,11 +753,11 @@ struct GameplayEffectContext
 	GameplayAbility* AbilityInstanceNotReplicated;
 	
 	/** The level this was executed at */
-	PROPERTY()
+	PROPERTY(Savegame)
 	int32 AbilityLevel;
 
 	/** Object this effect was created from, can be an actor or static object. Useful to bind an effect to a gameplay object */
-	PROPERTY()
+	PROPERTY(Savegame)
 	entt::entity SourceObject;
 	
 	/** The ability system component that's bound to instigator */
@@ -764,23 +765,25 @@ struct GameplayEffectContext
 	AbilitySystemComponent* InstigatorAbilitySystemComponent;
 
 	/** Actors referenced by this context */
-	PROPERTY()
+	PROPERTY(Savegame)
 	std::vector<entt::entity> Actors;
 
 	/** Trace information - may be nullptr in many cases */
 	// TSharedPtr<FHitResult>	HitResult;
 
 	/** Stored origin, may be invalid if bHasWorldOrigin is false */
-	PROPERTY()
+	PROPERTY(Savegame)
 	CoordStruct	WorldOrigin;
 
-	PROPERTY()
-	uint8 bHasWorldOrigin:1;
+	// NOTE: was `uint8 bHasWorldOrigin:1` (bitfield) — changed to plain uint8
+	// because cereal cannot serialize bitfields (they are not lvalues).
+	PROPERTY(Savegame)
+	uint8 bHasWorldOrigin = 0;
 
 	GameplayEffectContext Duplicate() const;
 };
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, AllPublicSavegame)
 struct GameplayEffectContextHandle
 {
     PROPERTY()
@@ -795,67 +798,83 @@ struct GameplayEffectContextHandle
  * Each entry corresponds to a modifier in the Def's modifier array,
  * storing the final evaluated magnitude for that modifier.
  */
+CLASS(BindJs, AutoSavegame)
 struct FModifierSpec
 {
+    PROPERTY(Savegame)
     float EvaluatedMagnitude = 0.0f;
 };
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct GameplayEffectSpec
 {
 	/** The gameplay effect definition this spec was created from */
-    PROPERTY()
+    PROPERTY(Savegame)
 	const GameplayEffect* Def = nullptr;
 
 	/** Level of the effect */
+	PROPERTY(Savegame)
 	int32 Level = 1;
 
 	/** Context from when the effect was created */
+	PROPERTY(Savegame)
 	GameplayEffectContextHandle EffectContext;
 
 	/** Tags captured from the source at the time of creation */
-    PROPERTY()
+    PROPERTY(Savegame)
 	GameplayTagContainer CapturedSourceTags;
 
 	/** Tags captured from the target at the time of creation */
-    PROPERTY()
+    PROPERTY(Savegame)
 	GameplayTagContainer CapturedTargetTags;
 
 	/** SetByCaller magnitudes (keyed by tag) */
+	PROPERTY(Savegame)
 	std::map<GameplayTag, float> SetByCallerMagnitudes;
 
 	/** SetByCaller magnitudes keyed by name (DataName) */
 	// @deprecated Use SetByCallerMagnitudes (tag-based) instead
+	PROPERTY(Savegame)
 	std::map<StringName, float> SetByCallerNameMagnitudes;
 
 	/** Pre-calculated modifier magnitudes, in same order as Def->Modifiers (compute buffer) */
+	PROPERTY(Savegame)
 	std::vector<float> ModifierMagnitudes;
 
 	/** Independent duration storage */
+	PROPERTY(Savegame)
 	float Duration = 0.0f;
 
 	/** Clamped max duration computed from Def->MaxDurationMagnitude. 0 = no clamp. */
+	PROPERTY(Savegame)
 	float MaxDuration = 0.0f;
 
 	/** Independent period storage */
+	PROPERTY(Savegame)
 	float Period = 0.0f;
 
 	/** Evaluated modifier magnitudes (primary storage, same order as Def->Modifiers) */
+	PROPERTY(Savegame)
 	std::vector<FModifierSpec> Modifiers;
 
 	/** Tags that are dynamically granted by this effect at runtime (not from Def) */
+	PROPERTY(Savegame)
 	GameplayTagContainer DynamicGrantedTags;
 
 	/** Runtime-only asset tags that describe the effect spec itself (distinct from DynamicGrantedTags) */
+	PROPERTY(Savegame)
 	GameplayTagContainer DynamicAssetTags;
 
 	/** Tracked attributes modified by this spec (read-only log, not used in calculations) */
+	PROPERTY(Savegame)
 	std::vector<FGameplayEffectModifiedAttribute> ModifiedAttributes;
 
 	/** Current stack count */
+	PROPERTY(Savegame)
 	int32 StackCount = 1;
 
 	/** If true, Duration will not be recalculated by SetLevel */
+	PROPERTY(Savegame)
 	bool bDurationLocked = false;
 
 	/** Calculate all modifier magnitudes from Def into both ModifierMagnitudes and Modifiers */
@@ -940,43 +959,45 @@ struct GameplayEffectSpec
 };
 
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct ActiveGameplayEffect
 {
 	ActiveGameplayEffect() : StartWorldTime(0.0f), StackCount(1), bIsInhibited(false), LastPeriodExecuteTime(0.0f) {}
 
 	/** Globally unique ID for identify this active gameplay effect. Can be used to look up owner. Not networked. */
+	PROPERTY(Savegame)
 	ActiveGameplayEffectHandle Handle;
 
-	PROPERTY()
+	PROPERTY(Savegame)
 	GameplayEffectSpec Spec;
-	
+
 	/** World time when this effect was started */
-	PROPERTY()
+	PROPERTY(Savegame)
 	float StartWorldTime;
 
 	/** Current stack count */
-	PROPERTY()
+	PROPERTY(Savegame)
 	int32 StackCount;
 
 	/** True if this effect is inhibited (temporarily disabled) */
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bIsInhibited;
 
 	/** World time when the last period was executed (for periodic effects) */
+	PROPERTY(Savegame)
 	float LastPeriodExecuteTime;
-	
+
 	/** Handles of Gameplay Abilities that were granted to the target by this Active Gameplay Effect */
-	PROPERTY()
+	PROPERTY(Savegame)
 	std::vector<GameplayAbilitySpecHandle> GrantedAbilityHandles;
 
-	/** Delegate handle for the OnRemoved event (used by GE components to unregister) */
+	/** Delegate handle for the OnRemoved event (transient — not valid after load) */
 	FDelegateHandle OnRemovedDelegateHandle;
 
-	/** Delegate handle for the OnInhibitionChanged event (used by GE components to unregister) */
+	/** Delegate handle for the OnInhibitionChanged event (transient — not valid after load) */
 	FDelegateHandle OnInhibitionChangedDelegateHandle;
 
-	/** True after InternalOnActiveGameplayEffectRemoved has been called, to prevent duplicate lifecycle in Remove() */
+	/** True after InternalOnActiveGameplayEffectRemoved has been called (transient runtime state) */
 	bool bIsPendingRemove = false;
 
 	/** Get time remaining based on current world time */
@@ -997,10 +1018,13 @@ struct ActiveGameplayEffect
 };
 
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct ActiveGameplayEffectsContainer
 {
+    GENERATED_BODY(ActiveGameplayEffectsContainer);
+
     /** Back-pointer to the owning AbilitySystemComponent */
+    PROPERTY(Savegame)
     AbilitySystemComponent* Owner = nullptr;
 
     /** Find an active effect by handle */
@@ -1225,8 +1249,15 @@ struct ActiveGameplayEffectsContainer
      */
     void OnAttributeAggregatorDirty(FAggregator* Aggregator, const GameplayAttribute& Attribute);
 
+    /** Save heap-allocated Effects (not auto-serializable: Effects is a vector of raw owned pointers). */
+    void SaveDeferred();
+
+    /** Load heap-allocated Effects; rebuild SourceStackingMap. */
+    void LoadDeferred();
+
 private:
     /** Accumulated world time, incremented each Tick for duration tracking */
+    PROPERTY(Savegame)
     float CurrentWorldTime = 0.0f;
 
     /** Map of gameplay attributes to shared aggregator pointers */

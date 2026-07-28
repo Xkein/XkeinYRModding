@@ -10,7 +10,7 @@
 #include <Memory.h>
 
 /** Simple gameplay cue parameters, mirroring UE5.5 FGameplayCueParameters */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame, AllSavegame)
 struct GameplayCueParameters
 {
     PROPERTY()
@@ -29,6 +29,7 @@ struct GameplayCueParameters
     CoordStruct Normal;
 
     /** Context handle (not exposed to JS — internal C++ type) */
+    PROPERTY(Savegame)
     GameplayEffectContextHandle EffectContext;
 
     PROPERTY()
@@ -282,20 +283,25 @@ public:
 /** One active gameplay cue tracked by ASC. Multiple entries with same tag are allowed
  *  (from different sources). RemoveCue removes the FIRST matching entry (FIFO).
  *  Stacking guard on Removed: CueNotify_Actor checks if ASC still has the tag before cleanup. */
+CLASS(BindJs, AutoSavegame)
 struct ActiveGameplayCue
 {
     /** The gameplay tag identifying this cue */
+    PROPERTY(Savegame)
     GameplayTag GameplayCueTag;
 
     /** Parameters passed when the cue was added. Used for Removed event replay. */
+    PROPERTY(Savegame)
     GameplayCueParameters Parameters;
 };
 
 /** Container for active gameplay cues on an AbilitySystemComponent.
  *  Replaces std::set<GameplayTag> to support multiple sources per tag (Stacking). */
+CLASS(BindJs, AutoSavegame)
 struct ActiveGameplayCueContainer
 {
     /** List of all currently active gameplay cues. Multiple entries per tag allowed. */
+    PROPERTY(Savegame)
     std::vector<ActiveGameplayCue> GameplayCues;
 
     /** Add a new active cue. Always adds, even if the same tag is already present.

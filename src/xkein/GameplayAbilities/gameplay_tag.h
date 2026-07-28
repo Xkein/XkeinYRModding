@@ -5,7 +5,7 @@
 #include "yr/serialization/serialization.h"
 #include <entt/signal/sigh.hpp>
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct GameplayTag
 {
     bool IsValid() const
@@ -67,11 +67,11 @@ struct GameplayTag
     }
 
     // Tag name - using StringName for pooled string storage and O(1) pointer-based comparison
-    PROPERTY()
+    PROPERTY(Savegame)
     StringName TagName;
 };
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct GameplayTagContainer
 {
 	GameplayTagContainer()
@@ -134,7 +134,7 @@ struct GameplayTagContainer
         return GameplayTags.empty();
     }
 
-    PROPERTY()
+    PROPERTY(Savegame)
 	std::vector<GameplayTag> GameplayTags;
 };
 

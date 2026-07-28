@@ -166,7 +166,7 @@ struct GameplayAbilityActivationInfo
  * An activatable ability spec, hosted on the ability system component. This defines both what the ability is (what class, what level, input binding etc)
  * and also holds runtime state that must be kept outside of the ability being instanced/activated.
  */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct GameplayAbilitySpec
 {
     GameplayAbilitySpec()
@@ -190,21 +190,23 @@ struct GameplayAbilitySpec
 	 * Handle to GE that granted us (usually invalid). FActiveGameplayEffectHandles are not synced across the network and this is valid only on Authority.
 	 * If you need FGameplayAbilitySpec -> FActiveGameplayEffectHandle, then use AbilitySystemComponent::FindActiveGameplayEffectHandle.
 	 */
-	PROPERTY()
+	PROPERTY(Savegame)
 	ActiveGameplayEffectHandle GameplayEffectHandle;
 
 	/** Passed on SetByCaller magnitudes if this ability was granted by a GE (by tag) */
+	PROPERTY(Savegame)
 	std::map<GameplayTag, float> SetByCallerTagMagnitudes;
 
 	/** Passed on SetByCaller magnitudes if this ability was granted by a GE (by name) */
 	// @deprecated
+	PROPERTY(Savegame)
 	std::map<StringName, float> SetByCallerNameMagnitudes;
 
 	/** InputID, if bound to an input */
 	PROPERTY(Savegame)
 	int32 InputID = -1;
 
-	PROPERTY()
+	PROPERTY(Savegame)
 	entt::entity SourceObject;
 
 	/** Count of how many times this ability has been activated */
@@ -228,6 +230,7 @@ struct GameplayAbilitySpec
 	GameplayEventData GameplayEventData;
 
 	/** If true, this ability should be removed as soon as it finishes executing */
+	PROPERTY(Savegame)
 	bool RemoveAfterActivation = false;
 
 	PROPERTY(Savegame)
@@ -262,8 +265,8 @@ struct GameplayAbilitySpec
 	std::vector<GameplayAbility*> NonReplicatedInstances;
 
 	/** Instances that are replicated */
-	PROPERTY(Savegame)
-	std::vector<GameplayAbility*> ReplicatedInstances;
+    PROPERTY(Savegame)
+    std::vector<GameplayAbility*> ReplicatedInstances;
 };
 
 class AbilitySystemComponent;

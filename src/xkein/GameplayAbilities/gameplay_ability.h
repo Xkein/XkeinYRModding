@@ -362,6 +362,7 @@ protected:
 	 */
 	const GameplayAbilityActorInfo* CurrentActorInfo = nullptr;
 	/** For instanced abilities */
+    PROPERTY(Savegame)
     GameplayAbilitySpecHandle CurrentSpecHandle;
 
 	/** True if this ability is currently active */
@@ -383,6 +384,7 @@ protected:
 	std::vector<AbilityTask*> ActiveTasks;
 
 	/** Gameplay cues added by this ability, tracked for automatic cleanup when the ability ends */
+	PROPERTY(Savegame)
 	std::vector<GameplayTag> TrackedGameplayCues;
 
 	/** Lock counter for scope locks. While > 0, EndAbility/CancelAbility calls are deferred to WaitingToExecute. */

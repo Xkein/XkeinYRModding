@@ -3,7 +3,7 @@
 #include "runtime/platform/platform.h"
 
 /** Handle that points to a specific granted ability. These are globally unique */
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct GameplayAbilitySpecHandle {
 	GameplayAbilitySpecHandle() : Handle(0) {}
 
@@ -18,6 +18,7 @@ struct GameplayAbilitySpecHandle {
 	bool operator==(const GameplayAbilitySpecHandle& Other) const { return Handle == Other.Handle; }
 	bool operator<(const GameplayAbilitySpecHandle& Other) const { return Handle < Other.Handle; }
     
+    PROPERTY(Savegame)
     int32 Handle;
 };
 

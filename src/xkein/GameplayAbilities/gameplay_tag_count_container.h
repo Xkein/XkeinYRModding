@@ -11,9 +11,11 @@
  * - Maintain a count map that includes parent tag propagation, so MatchesTag works.
  * - Expose query helpers similar to IGameplayTagAssetInterface usage in ASC.
  */
-CLASS()
+CLASS(BindJs, AutoSavegame)
 struct GameplayTagCountContainer final
 {
+    GENERATED_BODY(GameplayTagCountContainer);
+
     /** Returns explicit tags (no parent expansion). */
     [[nodiscard]] const GameplayTagContainer& GetExplicitGameplayTags() const { return ExplicitTags; }
 
@@ -33,12 +35,15 @@ struct GameplayTagCountContainer final
 
 private:
     /** Explicit tag counts (no parent expansion). */
+    PROPERTY(Savegame)
     std::map<GameplayTag, int32> ExplicitTagCountMap;
 
     /** Full tag counts including parent propagation. */
+    PROPERTY(Savegame)
     std::map<GameplayTag, int32> TagCountMap;
 
     /** Explicit tags with count > 0. */
+    PROPERTY(Savegame)
     GameplayTagContainer ExplicitTags;
 
     /** Internal: recompute TagCountMap for Tag based on ExplicitTagCountMap deltas. */

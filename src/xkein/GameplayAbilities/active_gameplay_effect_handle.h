@@ -4,7 +4,7 @@
 
 class AbilitySystemComponent;
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct ActiveGameplayEffectHandle
 {
 	ActiveGameplayEffectHandle()
@@ -36,9 +36,9 @@ struct ActiveGameplayEffectHandle
 	/** Returns the ability system component that created this handle */
 	AbilitySystemComponent* GetOwningAbilitySystemComponent() const;
 
-	PROPERTY()
+	PROPERTY(Savegame)
 	int32 Handle = -1;
 
-	PROPERTY()
+	PROPERTY(Savegame)
 	bool bPassedFiltersAndWasExecuted = false;
 };

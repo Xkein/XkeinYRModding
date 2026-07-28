@@ -118,6 +118,7 @@ IMPL_YR_SERIALIZE_SWIZZLE(AbilitySystemComponentType);
 CLASS(BindJs, ComponentTarget = [TechnoClass], AutoSavegame, Swizzleable)
 class AbilitySystemComponent : public IGameplayCueInterface, public IGameplayTagAssetInterface
 {
+	GENERATED_BODY(AbilitySystemComponent);
 	friend struct ActiveGameplayEffectsContainer;
 
 
@@ -169,6 +170,7 @@ public:
 	 *	without an AbilitySystemComponent. For example an ability could be written to execute on a StaticMeshActor. As long as the ability doesn't require 
 	 *	instancing or anything else that the AbilitySystemComponent would provide, then it doesn't need the component to function.
 	 */
+	PROPERTY(Savegame)
 	std::vector<GameplayAbilitySpec> ActivatableAbilities;
 
     /** Lock counter for ability list scoped locks. While > 0, ability removals are deferred. */
@@ -831,9 +833,11 @@ protected:
 	std::map<FDelegateHandle, std::vector<GameplayTag>> GameplayEventCallbackHandleMap;
 
 	/** Equivalent to UE's FGameplayTagCountContainer. */
+	PROPERTY(Savegame)
 	GameplayTagCountContainer TagCountContainer;
 
 	/** Tags that block ability activation on this ASC */
+	PROPERTY(Savegame)
 	GameplayTagCountContainer BlockedAbilityTags;
 
 	/** 
@@ -843,6 +847,7 @@ protected:
 	 */
 	GameplayTagContainer InternalTryActivateAbilityFailureTags;
 
+	PROPERTY(Savegame)
 	std::vector<GameplayAbility*> AllReplicatedInstancedAbilities;
 
 	/** Abilities pending deletion (InstancedPerExecution). Processed in Tick. */
@@ -853,9 +858,11 @@ private:
 	std::map<ActiveGameplayEffectHandle, FActiveGameplayEffectEvents> ActiveEffectEventSets;
 
 	/** Input IDs that are currently blocked from ability activation */
+	PROPERTY(Savegame)
 	std::set<int32> BlockedInputIDs;
 
 	/** Container of gameplay cue tags currently active on this ASC (for IsGameplayCueActive / RemoveAllGameplayCues) */
+	PROPERTY(Savegame)
 	ActiveGameplayCueContainer ActiveGameplayCues;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(AbilitySystemComponent);

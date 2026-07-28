@@ -2,7 +2,7 @@
 #include "core/reflection/reflection.h"
 #include "core/string/string_name.h"
 #include "yr/serialization/serialization.h"
- 
+
 class AttributeSet;
 struct FGameplayEffectModCallbackData;
 
@@ -59,19 +59,19 @@ protected:
 };
 
 
-CLASS(BindJs)
+CLASS(BindJs, AutoSavegame)
 struct GameplayAttribute
 {
     GameplayAttribute();
     GameplayAttribute(StringName InAttributeOwner, StringName InAttributeName)
         : AttributeOwner(InAttributeOwner), AttributeName(InAttributeName) {}
 
-    PROPERTY()
+    PROPERTY(Savegame)
     StringName AttributeName;
-    PROPERTY()
+    PROPERTY(Savegame)
     StringName AttributeOwner;
 
-	bool IsValid() const { return !AttributeName.IsEmpty(); }
+    bool IsValid() const { return !AttributeName.IsEmpty(); }
 
     /** Get current value from the given attribute set (name lookup) */
     float GetNumericValue(const AttributeSet* Set) const;

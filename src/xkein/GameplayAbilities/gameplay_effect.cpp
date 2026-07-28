@@ -937,3 +937,55 @@ const GameplayTagContainer* ActiveGameplayEffectsContainer::GetGameplayEffectTar
     if (!Effect) return nullptr;
     return &Effect->Spec.CapturedTargetTags;
 }
+
+// ============================================================
+// ActiveGameplayEffectsContainer deferred save/load
+// ============================================================
+
+void ActiveGameplayEffectsContainer::SaveDeferred()
+{
+    SerializeContext* context = Serialization::GetCurrentContext();
+    if (!context || !context->outputArchive) return;
+
+    // Effects is std::vector<ActiveGameplayEffect*> (heap-allocated, owned by this container).
+    // Cannot auto-serialize: raw owned pointers in a vector.
+    // Serialize count + each effect by value via the generated AutoSavegame serializer.
+    int32 effectCount = (int32)Effects.size();
+    Serialization::Serialize(cereal::make_nvp("EffectCount", effectCount));
+
+    for (ActiveGameplayEffect* Effect : Effects)
+    {
+        Serialization::Serialize(cereal::make_nvp("Effect", *Effect));
+    }
+}
+
+void ActiveGameplayEffectsContainer::LoadDeferred()
+{
+    SerializeContext* context = Serialization::GetCurrentContext();
+    if (!context || !context->inputArchive) return;
+
+    // Clear stale pre-deserialization state
+    for (ActiveGameplayEffect* Effect : Effects)
+    {
+        delete Effect;
+    }
+    Effects.clear();
+    SourceStackingMap.clear();
+
+    int32 effectCount = 0;
+    Serialization::Serialize(cereal::make_nvp("EffectCount", effectCount));
+
+    for (int32 i = 0; i < effectCount; i++)
+    {
+        ActiveGameplayEffect* NewEffect = new ActiveGameplayEffect();
+        Serialization::Serialize(cereal::make_nvp("Effect", *NewEffect));
+        Effects.push_back(NewEffect);
+
+        // Rebuild SourceStackingMap for AggregateBySource lookup
+        const GameplayEffect* Def = NewEffect->Spec.Def;
+        if (Def)
+        {
+            SourceStackingMap[Def].push_back(NewEffect->Handle);
+        }
+    }
+}
