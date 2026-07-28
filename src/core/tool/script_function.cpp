@@ -15,7 +15,7 @@ uint64_t ScriptFunctionRegister::GetId(const StringName& category, const StringN
     return (static_cast<uint64_t>(category.GetId()) << 32) | name.GetId();
 }
 
-void ScriptFunctionRegister::RegisterFunction(const StringName& category, const StringName& name, ScriptFunctionBase* func)
+void ScriptFunctionRegister::RegisterFunction_(const StringName& category, const StringName& name, ScriptFunctionBase* func)
 {
     if (!func || category.IsEmpty() || name.IsEmpty())
     {
@@ -28,7 +28,7 @@ void ScriptFunctionRegister::RegisterFunction(const StringName& category, const 
     GFuncIdMap[GetId(category, name)] = func;
 }
 
-void ScriptFunctionRegister::RegisterLoader(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader)
+void ScriptFunctionRegister::RegisterLoader_(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader)
 {
     if (!loader || category.IsEmpty())
     {

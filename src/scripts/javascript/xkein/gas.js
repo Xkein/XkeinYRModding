@@ -29,7 +29,7 @@ function taskLoader(name) {
     }
 }
 function setupGas() {
-    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, abilityLoader);
-    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, attributeSetLoader);
-    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.AbilityTask.s_ScriptFunctionCategory, taskLoader);
+    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.GameplayAbilitySystem.s_ScriptFunctionCategoryAbility.c_str(), abilityLoader);
+    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet.c_str(), attributeSetLoader);
+    YrExtCore_1.ScriptFunctionRegister.RegisterLoader(XkeinExt_1.AbilityTask.s_ScriptFunctionCategory.c_str(), taskLoader);
 }

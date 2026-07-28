@@ -79,18 +79,18 @@ public:
         return Id;
     }
     
-    // High-performance check for empty/uninitialized state
     FUNCTION()
     bool IsEmpty() const noexcept {
-        // Extremely fast and safe inline check
         return NameStr->empty() && NameStr == StringNamePool::GetEmpty();
     }
 
     // Shared pointer instances pointing to the same interned string will have identical memory addresses.
     // This allows for O(1) pointer comparison just like boost::flyweight.
+    FUNCTION()
     bool operator==(const StringName& Other) const {
         return NameStr.get() == Other.NameStr.get();
     }
+    FUNCTION()
     bool operator!=(const StringName& Other) const {
         return NameStr.get() != Other.NameStr.get();
     }

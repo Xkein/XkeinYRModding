@@ -31,7 +31,7 @@ function taskLoader(name: StringName) {
 }
 
 export function setupGas() {
-    ScriptFunctionRegister.RegisterLoader(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, abilityLoader);
-    ScriptFunctionRegister.RegisterLoader(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, attributeSetLoader);
-    ScriptFunctionRegister.RegisterLoader(AbilityTask.s_ScriptFunctionCategory, taskLoader);
+    ScriptFunctionRegister.RegisterLoader(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility.c_str(), abilityLoader);
+    ScriptFunctionRegister.RegisterLoader(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet.c_str(), attributeSetLoader);
+    ScriptFunctionRegister.RegisterLoader(AbilityTask.s_ScriptFunctionCategory.c_str(), taskLoader);
 }

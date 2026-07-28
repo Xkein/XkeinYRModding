@@ -31,10 +31,14 @@ class ScriptFunctionRegister
 public:
     
     FUNCTION()
-    CORE_API static void RegisterFunction(const StringName& category, const StringName& name, ScriptFunctionBase* func);
+    inline static void RegisterFunction(const char* category, const char* name, ScriptFunctionBase* func) {
+        RegisterFunction_(StringName(category), StringName(name), func);
+    }
     
     FUNCTION()
-    CORE_API static void RegisterLoader(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader);
+    inline static void RegisterLoader(const char* category, std::function<ScriptFunctionBase*(const StringName& name)> loader) {
+        RegisterLoader_(StringName(category), std::move(loader));
+    }
     
     FUNCTION()
     CORE_API static ScriptFunctionBase* GetFunction(const StringName& category, const StringName& name);
@@ -54,4 +58,8 @@ public:
         }
         return nullptr;
     }
+private:
+    CORE_API static void RegisterFunction_(const StringName& category, const StringName& name, ScriptFunctionBase* func);
+    
+    CORE_API static void RegisterLoader_(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader);
 };
