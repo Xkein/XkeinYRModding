@@ -18,6 +18,7 @@ struct FAggregator;
  * Channels are evaluated in order (Channel0 first, Channel9 last), with the output of each
  * channel fed as the base value input to the next channel.
  */
+ENUM(BindJs)
 enum class EGameplayModEvaluationChannel : uint8
 {
     Channel0 = 0,
@@ -37,6 +38,7 @@ enum class EGameplayModEvaluationChannel : uint8
  * Data passed from caller/game code into aggregator evaluation.
  * Controls which modifiers qualify based on source/target tags, handles to ignore, and filter tags.
  */
+CLASS(BindJs)
 struct FAggregatorEvaluateParameters
 {
     FAggregatorEvaluateParameters()
@@ -46,21 +48,27 @@ struct FAggregatorEvaluateParameters
     {}
 
     /** Tags from the source (caster) of the gameplay effect chain */
+    PROPERTY()
     const GameplayTagContainer* SourceTags;
 
     /** Tags from the target (recipient) of the gameplay effect chain */
+    PROPERTY()
     const GameplayTagContainer* TargetTags;
 
     /** Modifiers with any of these handles will be skipped during evaluation */
+    PROPERTY()
     std::vector<ActiveGameplayEffectHandle> IgnoreHandles;
 
     /** If non-empty, a modifier's owning active GE's source tags must match ALL of these */
+    PROPERTY()
     GameplayTagContainer AppliedSourceTagFilter;
 
     /** If non-empty, a modifier's owning active GE's target tags must match ALL of these */
+    PROPERTY()
     GameplayTagContainer AppliedTargetTagFilter;
 
     /** Whether to include predicted modifiers (always false for lockstep) */
+    PROPERTY()
     bool IncludePredictiveMods;
 };
 
@@ -68,27 +76,35 @@ struct FAggregatorEvaluateParameters
  * A single modifier entry stored within an aggregator channel.
  * Holds the evaluated magnitude, tag requirements for qualification, and the owning GE handle.
  */
+CLASS(BindJs)
 struct FAggregatorMod
 {
     /** Magnitude this modifier was last evaluated at */
+    PROPERTY()
     float EvaluatedMagnitude = 0.0f;
 
     /** Tag requirements that must be met on the source for this modifier to apply */
+    PROPERTY()
     const GameplayTagRequirements* SourceTagReqs = nullptr;
 
     /** Tag requirements that must be met on the target for this modifier to apply */
+    PROPERTY()
     const GameplayTagRequirements* TargetTagReqs = nullptr;
 
     /** Handle of the active GameplayEffect we are tied to (may be invalid) */
+    PROPERTY()
     ActiveGameplayEffectHandle ActiveHandle;
 
     /** Whether this modifier is predicted (always false in lockstep RTS) */
+    PROPERTY()
     bool IsPredicted = false;
 
     /** Check if this modifier passed qualification in the most recent UpdateQualifies pass */
+    FUNCTION()
     bool Qualifies() const { return IsQualified; }
 
     /** Externally override qualification (used by custom qualifies functions) */
+    FUNCTION()
     void SetExplicitQualifies(bool NewQualifies) const { IsQualified = NewQualifies; }
 
     /**
@@ -97,6 +113,7 @@ struct FAggregatorMod
      * AppliedSourceTagFilter, AppliedTargetTagFilter.
      * Updates the mutable IsQualified flag.
      */
+    FUNCTION()
     void UpdateQualifies(const FAggregatorEvaluateParameters& Parameters) const;
 
 private:

@@ -111,6 +111,7 @@ UsingStdVector(FGameplayEffectModifiedAttribute);
 UsingStdVector(FModifierSpec);
 UsingStdVector(float);
 UsingStdVector(FAggregatorMod);
+UsingStdVector(ActiveGameplayEffectHandle);
 
 UsingCppType(GameplayAbilityTargetData_SingleTargetHit);
 UsingCppType(GameplayAbilityTargetData_ActorArray);
