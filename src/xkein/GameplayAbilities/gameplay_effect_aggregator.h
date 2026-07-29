@@ -222,6 +222,7 @@ private:
  * Ported from UE 5.8 GAS FAggregator.
  * Uses std::enable_shared_from_this instead of UE's TSharedFromThis.
  */
+CLASS(BindJs)
 struct FAggregator : public std::enable_shared_from_this<FAggregator>
 {
     /** Delegate fired when this aggregator is dirtied (modifiers added/removed or base value changed) */
@@ -233,18 +234,21 @@ struct FAggregator : public std::enable_shared_from_this<FAggregator>
     ~FAggregator();
 
     // ---- Base value access ----
-
+    FUNCTION()
     float GetBaseValue() const { return BaseValue; }
+    FUNCTION()
     void SetBaseValue(float NewBaseValue, bool bBroadcastDirtyEvent = true);
 
     /**
      * Static utility: apply a single modifier operation to a base value and return the result.
      * Used for simple "what if" calculations without an aggregator.
      */
+    FUNCTION()
     static float StaticExecModOnBaseValue(float BaseValue, EGameplayModOpType ModifierOp,
         float EvaluatedMagnitude);
 
     /** Apply a modifier operation to this aggregator's base value and broadcast dirty */
+    FUNCTION()
     void ExecModOnBaseValue(EGameplayModOpType ModifierOp, float EvaluatedMagnitude);
 
     // ---- Modifier management ----
@@ -253,6 +257,7 @@ struct FAggregator : public std::enable_shared_from_this<FAggregator>
      * Add a modifier to this aggregator.
      * Automatically finds or creates the appropriate channel.
      */
+    FUNCTION()
     void AddAggregatorMod(float EvaluatedMagnitude, EGameplayModOpType ModifierOp,
         EGameplayModEvaluationChannel ModifierChannel, const GameplayTagRequirements* SourceTagReqs,
         const GameplayTagRequirements* TargetTagReqs, bool IsPredicted,
@@ -261,6 +266,7 @@ struct FAggregator : public std::enable_shared_from_this<FAggregator>
     /**
      * Remove all modifiers associated with the given handle.
      */
+    FUNCTION()
     void RemoveAggregatorMod(ActiveGameplayEffectHandle ActiveHandle);
 
     /**
@@ -273,6 +279,7 @@ struct FAggregator : public std::enable_shared_from_this<FAggregator>
      * @param bWasLocallyGenerated Whether the mod was locally generated (predicted)
      * @param InHandle          The handle to assign to re-added mods
      */
+    FUNCTION()
     void UpdateAggregatorMod(ActiveGameplayEffectHandle ActiveHandle, const GameplayAttribute& Attribute,
         const GameplayEffectSpec& Spec, bool bWasLocallyGenerated, ActiveGameplayEffectHandle InHandle);
 
@@ -281,17 +288,20 @@ struct FAggregator : public std::enable_shared_from_this<FAggregator>
     /**
      * Evaluate the aggregator: qualify all mods, then evaluate channels with the internal base value.
      */
+    FUNCTION()
     float Evaluate(const FAggregatorEvaluateParameters& Parameters) const;
 
     /**
      * Evaluate the aggregator with an arbitrary base value instead of the internal one.
      */
+    FUNCTION()
     float EvaluateWithBase(float InlineBaseValue, const FAggregatorEvaluateParameters& Parameters) const;
 
     /**
      * Evaluate channels in numeric order up to (but not including) FinalChannel.
      * Each channel's output becomes the next channel's base value.
      */
+    FUNCTION()
     float EvaluateWithBaseToChannel(float InlineBaseValue, EGameplayModEvaluationChannel FinalChannel,
         const FAggregatorEvaluateParameters& Parameters) const;
 
@@ -299,6 +309,7 @@ struct FAggregator : public std::enable_shared_from_this<FAggregator>
      * For each channel, collect qualifying modifiers into the output map.
      * Modifiers are first qualified against Params before being collected.
      */
+    FUNCTION()
     void GatherMods(const FAggregatorEvaluateParameters& Params,
         std::map<EGameplayModEvaluationChannel, std::vector<FAggregatorMod>>& OutModMap) const;
 
@@ -306,35 +317,43 @@ struct FAggregator : public std::enable_shared_from_this<FAggregator>
      * Evaluate the "bonus" portion: final value minus base value.
      * Useful for determining how much modifiers contribute.
      */
+    FUNCTION()
     float EvaluateBonus(const FAggregatorEvaluateParameters& Parameters) const;
 
     /**
      * Evaluate the contribution of a specific active gameplay effect.
      * Computed as: Evaluate(all) - Evaluate(excluding the given handle).
      */
+    FUNCTION()
     float EvaluateContribution(const FAggregatorEvaluateParameters& Parameters,
         ActiveGameplayEffectHandle ActiveHandle) const;
 
     /** Run UpdateQualifies on every modifier in all channels */
+    FUNCTION()
     void EvaluateQualificationForAllMods(const FAggregatorEvaluateParameters& Parameters) const;
 
     // ---- Snapshot / Copy ----
 
     /** Take a snapshot of another aggregator's state (base value + mod channels) */
+    FUNCTION()
     void TakeSnapshotOf(const FAggregator& AggToSnapshot);
 
     /** Copy all modifiers from another aggregator into this one */
+    FUNCTION()
     void AddModsFrom(const FAggregator& SourceAggregator);
 
     // ---- Dependents ----
 
     /** Register a dependent active GE handle (notified when this aggregator changes) */
+    FUNCTION()
     void AddDependent(ActiveGameplayEffectHandle Handle);
 
     /** Unregister a dependent active GE handle */
+    FUNCTION()
     void RemoveDependent(ActiveGameplayEffectHandle Handle);
 
     /** Delegate broadcast when this aggregator is dirtied */
+    FUNCTION()
     FOnAggregatorDirty OnDirty;
 
 private:

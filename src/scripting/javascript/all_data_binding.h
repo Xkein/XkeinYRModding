@@ -81,6 +81,8 @@ UsingCppType(GameplayAbilitySpecHandle);
 UsingCppType(GameplayAbilityActorInfo);
 UsingCppType(GameplayAbilityActivationInfo);
 UsingCppType(FAggregator);
+UsingCppType(FAggregatorMod);
+UsingCppType(FAggregatorEvaluateParameters);
 
 UsingStdVector(AttributeSet);
 UsingStdVector(AttributeSet*);
@@ -108,6 +110,7 @@ UsingStdVector(ActiveGameplayCue);
 UsingStdVector(FGameplayEffectModifiedAttribute);
 UsingStdVector(FModifierSpec);
 UsingStdVector(float);
+UsingStdVector(FAggregatorMod);
 
 UsingCppType(GameplayAbilityTargetData_SingleTargetHit);
 UsingCppType(GameplayAbilityTargetData_ActorArray);
@@ -166,6 +169,7 @@ UsingStdVector(AnimTypeClass*);
 UsingStdMap(GameplayTag, float);
 UsingStdMap(StringName, float);
 UsingStdMap(GameplayTag, int32);
+UsingStdMap(EGameplayModEvaluationChannel, std::vector<FAggregatorMod>);
 
 UsingStdSet(int32);
 
@@ -195,8 +199,8 @@ UsingCppType(AudioSystem);
 UsingCppType(AudioComponent);
 
 #include "physics/physics_component.h"
-UsingCppType(PhysicsComponent)
-UsingCppType(PhysicsTypeComponent)
+UsingCppType(PhysicsComponent);
+UsingCppType(PhysicsTypeComponent);
 #include "physics/physics.h"
 UsingCppType(PhysicsCollisionAddAndPersistResult);
 UsingCppType(PhysicsCollisionRemoveResult);

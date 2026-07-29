@@ -22,3 +22,12 @@ concept is_shared_ptr = requires {
 // Convenience variable template (constexpr bool) matching the concept
 template <typename T>
 inline constexpr bool is_shared_ptr_v = is_shared_ptr<T>;
+
+// Checks if executing 'delete p' on a pointer T* is valid
+template <typename T>
+concept is_deletable = requires(T* p) {
+    delete p;
+};
+
+template <typename T>
+inline constexpr bool is_deletable_v = is_deletable<T>;

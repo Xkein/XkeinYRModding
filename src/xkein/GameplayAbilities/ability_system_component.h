@@ -91,10 +91,14 @@ struct FActiveGameplayEffectEvents
 };
 
 /** Data passed to attribute value change delegates */
+CLASS(BindJs)
 struct FOnAttributeChangeData
 {
+	PROPERTY()
     GameplayAttribute Attribute;
+	PROPERTY()
     float OldValue = 0.0f;
+	PROPERTY()
     float NewValue = 0.0f;
 };
 

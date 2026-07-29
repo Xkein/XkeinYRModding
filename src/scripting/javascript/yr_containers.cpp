@@ -412,18 +412,31 @@ void __JsRegister_YrContainers()
     RegisterStdVector<GameplayAbility*>();
     RegisterStdVector<GameplayAbilityDefine*>();
     RegisterStdVector<GameplayAbilitySpec>();
+    RegisterStdVector<GameplayAbilitySpecHandle>();
     RegisterStdVector<GameplayEffect>();
     RegisterStdVector<GameplayEffect*>();
     RegisterStdVector<GameplayEffectCue*>();
     RegisterStdVector<GameplayEffectComponent*>();
     RegisterStdVector<GameplayEffectExecutionDefinition>();
     RegisterStdVector<GameplayModifierInfo>();
+    RegisterStdVector<GameplayModifierInfo*>();
+    RegisterStdVector<FConditionalGameplayEffect>();
+    RegisterStdVector<FGameplayEffectExecutionScopedModifierInfo>();
+    RegisterStdVector<AbilityTask*>();
+    RegisterStdVector<ActiveGameplayCue>();
+    RegisterStdVector<FGameplayEffectModifiedAttribute>();
+    RegisterStdVector<FModifierSpec>();
+    RegisterStdVector<float>();
+    RegisterStdVector<FAggregatorMod>();
     RegisterStdVector<GameplayEffectAttributeCaptureDefinition>();
     RegisterStdVector<entt::entity>();
+    RegisterStdVector<StringName>();
+    RegisterStdVector<AnimTypeClass*>();
 
     RegisterStdMap<GameplayTag, float>();
     RegisterStdMap<StringName, float>();
     RegisterStdMap<GameplayTag, int32>();
+    RegisterStdMap<EGameplayModEvaluationChannel, std::vector<FAggregatorMod>>();
 
     RegisterStdSet<int32>();
 }

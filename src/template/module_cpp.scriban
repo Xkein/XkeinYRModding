@@ -175,8 +175,10 @@ void {{get_gen_type_name(klass.identifier)}}__Register()
     ClassMeta* classMeta = GetOrAddClassMeta<{{klass.full_name}}>();
     classMeta->name = "{{klass.full_name}}";
 {{ for base in klass.base_classes}}
-    factory.base<{{base.full_display_name}}>();
-    register_ref_convertion<{{base.full_display_name}}, {{klass.full_name}}>();
+    if constexpr (is_deletable_v<{{base.full_display_name}}>) {
+        factory.base<{{base.full_display_name}}>();
+        register_ref_convertion<{{base.full_display_name}}, {{klass.full_name}}>();
+    }
 {{- end }}
 {{ for function in klass.all_functions}}
 {{- $function_name = function.name

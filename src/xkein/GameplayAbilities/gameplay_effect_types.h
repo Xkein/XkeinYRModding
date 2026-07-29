@@ -58,18 +58,22 @@ struct FGameplayEffectModCallbackData
 };
 
 /** Information about a gameplay effect being removed, passed to removal delegate callbacks */
-CLASS()
+CLASS(BindJs)
 struct FGameplayEffectRemovalInfo
 {
     /** The active effect that was removed */
+    PROPERTY()
     const struct ActiveGameplayEffect* ActiveEffect = nullptr;
 
     /** Whether the effect was removed before its natural expiry */
+    PROPERTY()
     bool bPrematureRemoval = false;
 
     /** Stack count at the time of removal */
+    PROPERTY()
     int32 StackCount = 0;
 
     /** Context from when the gameplay effect was applied */
+    PROPERTY()
     GameplayEffectContextHandle EffectContext;
 };
