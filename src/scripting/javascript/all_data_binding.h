@@ -1,6 +1,11 @@
 #pragma once
 #include "scripting/javascript/yr_data_bindings.h"
 #ifndef __HEADER_TOOL__
+
+// ScriptFunction explicit specializations must come before any UsingScriptFunction
+// calls or delegate template usage that would implicitly instantiate them.
+#include "scripting/javascript/script_function_wrappers.h"
+
 #include "xkein/GameplayAbilities/ability_system_component.h"
 #include "xkein/GameplayAbilities/ability_system_globals.h"
 #include "xkein/GameplayAbilities/gameplay_effect_execution_calculation.h"
