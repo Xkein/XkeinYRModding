@@ -238,6 +238,64 @@ class GameplayAbility
 
 	/** Blueprint hook: called when ability ends. bWasCancelled is true if cancelled rather than completed. */
 	virtual void K2_OnEndAbility(bool bWasCancelled) {}
+	
+    FUNCTION()
+    void K2_CancelAbility()
+    {
+        CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+    }
+
+    FUNCTION()
+    bool K2_CommitAbility()
+    {
+        return CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, nullptr);
+    }
+
+    FUNCTION()
+    bool K2_CommitAbilityCooldown()
+    {
+        if (!CheckCooldown(CurrentSpecHandle, CurrentActorInfo, nullptr))
+        {
+            return false;
+        }
+        ApplyCooldown(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+        return true;
+    }
+
+    FUNCTION()
+    bool K2_CommitAbilityCost()
+    {
+        if (!CheckCost(CurrentSpecHandle, CurrentActorInfo, nullptr))
+        {
+            return false;
+        }
+        ApplyCost(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+        return true;
+    }
+
+    FUNCTION()
+    bool K2_CheckAbilityCooldown()
+    {
+        return CheckCooldown(CurrentSpecHandle, CurrentActorInfo, nullptr);
+    }
+
+    FUNCTION()
+    bool K2_CheckAbilityCost()
+    {
+        return CheckCost(CurrentSpecHandle, CurrentActorInfo, nullptr);
+    }
+
+    FUNCTION()
+    void K2_EndAbility()
+    {
+        EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+    }
+
+    FUNCTION()
+    void K2_EndAbilityLocally()
+    {
+        EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
+    }
 
 	/** Returns the cooldown gameplay effect to apply when this ability is committed */
 	virtual GameplayEffect* GetCooldownGameplayEffect() const { return nullptr; }
