@@ -83,23 +83,82 @@ void InitCodeHolder(asmjit::CodeHolder& code)
 
 void EmbedOriginalCode(asmjit::x86::Assembler& assembly, syringe_patch_data* data, std::vector<byte>& originalCode)
 {
-    // fix relative jump or call
-    if (originalCode[0] == 0xE9 || originalCode[0] == 0xE8)
+    // Use Zydis to decode originalCode instruction by instruction.
+    // For near CALL (E8) and near JMP (E9) with rel32, calculate the absolute
+    // destination address and emit via asmjit so the correct relative offset
+    // is generated for the JIT trampoline's runtime location.
+    // All other instructions are embedded as raw bytes.
+
+    if (originalCode.empty())
+        return;
+
+    ZydisDecoder decoder;
+    ZydisDecoderInit(&decoder, ZYDIS_MACHINE_MODE_LONG_COMPAT_32, ZYDIS_STACK_WIDTH_32);
+
+    std::vector<byte> embedBuffer;
+    size_t offset = 0;
+
+    while (offset < originalCode.size())
     {
-        DWORD dest = data->hookAddr + 5 + *(DWORD*)(originalCode.data() + 1);
-        switch (originalCode[0])
+        ZydisDecodedInstruction instruction;
+        ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
+
+        ZyanStatus status = ZydisDecoderDecodeFull(
+            &decoder,
+            originalCode.data() + offset,
+            originalCode.size() - offset,
+            &instruction,
+            operands);
+
+        if (!ZYAN_SUCCESS(status))
         {
-            case 0xE9: // jmp
-                assembly.jmp(dest);
-                originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
-                break;
-            case 0xE8: // call
-                assembly.call(dest);
-                originalCode.erase(originalCode.begin(), originalCode.begin() + 5);
-                break;
+#ifdef DEBUG
+            gLogger->warn("EmbedOriginalCode: Zydis decode failure at offset {}, byte 0x{:02x}",
+                offset, originalCode[offset]);
+#endif
+            embedBuffer.push_back(originalCode[offset]);
+            offset += 1;
+            continue;
         }
+
+        // Check for near CALL (E8 rel32) or near JMP (E9 rel32) — the only
+        // instructions whose relative offset depends on the trampoline address.
+        bool isNearCallOrJmpRel32 =
+            (instruction.mnemonic == ZYDIS_MNEMONIC_CALL ||
+             instruction.mnemonic == ZYDIS_MNEMONIC_JMP)   &&
+            instruction.length == 5                          &&
+            instruction.operand_count_visible == 1           &&
+            operands[0].type == ZYDIS_OPERAND_TYPE_IMMEDIATE &&
+            operands[0].imm.is_relative;
+
+        if (isNearCallOrJmpRel32)
+        {
+            // Absolute destination = instruction_addr + instruction_length + rel32
+            uintptr_t instructionAddr = data->hookAddr + offset;
+            uint32_t absoluteDest = static_cast<uint32_t>(
+                instructionAddr + instruction.length + operands[0].imm.value.s);
+
+            if (instruction.mnemonic == ZYDIS_MNEMONIC_CALL)
+                assembly.call(absoluteDest);
+            else
+                assembly.jmp(absoluteDest);
+
+            // Do NOT put these 5 bytes into the embed buffer
+        }
+        else
+        {
+            // All other instructions: keep the raw bytes in order
+            embedBuffer.insert(embedBuffer.end(),
+                originalCode.data() + offset,
+                originalCode.data() + offset + instruction.length);
+        }
+
+        offset += instruction.length;
     }
-    assembly.embed(originalCode.data(), originalCode.size());
+
+    // Emit all non-relocated raw bytes
+    if (!embedBuffer.empty())
+        assembly.embed(embedBuffer.data(), embedBuffer.size());
 }
 
 void CheckHookRace(syringe_patch_data* data, const char* moduleName)
