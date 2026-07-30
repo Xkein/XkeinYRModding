@@ -19,7 +19,7 @@ void GameplayAbilityTargetActor::ConfirmTargeting()
 {
 	if (OnTargetDataReady.IsBound())
 	{
-		OnTargetDataReady.Execute(TargetDataHandle);
+		OnTargetDataReady.Execute(this, TargetDataHandle);
 	}
 }
 
@@ -98,7 +98,7 @@ void GameplayAbilityTargetActor_LineTrace::StartTargeting(GameplayAbility* Abili
 
 	if (OnTargetDataReady.IsBound())
 	{
-		OnTargetDataReady.Execute(TargetDataHandle);
+		OnTargetDataReady.Execute(this, TargetDataHandle);
 	}
 }
 
@@ -162,7 +162,7 @@ void GameplayAbilityTargetActor_Radius::StartTargeting(GameplayAbility* Ability)
 
 	if (OnTargetDataReady.IsBound())
 	{
-		OnTargetDataReady.Execute(TargetDataHandle);
+		OnTargetDataReady.Execute(this, TargetDataHandle);
 	}
 }
 
@@ -208,7 +208,7 @@ void GameplayAbilityTargetActor_GroundTrace::StartTargeting(GameplayAbility* Abi
 
 	if (OnTargetDataReady.IsBound())
 	{
-		OnTargetDataReady.Execute(TargetDataHandle);
+		OnTargetDataReady.Execute(this, TargetDataHandle);
 	}
 }
 

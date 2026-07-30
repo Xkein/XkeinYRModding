@@ -37,7 +37,7 @@ public:
 
 	/** Callback fired when the attribute value changes. Parameter: new value. */
 	PROPERTY(Savegame)
-	TDelegate<void(float)> OnAttributeChanged;
+	TDelegate<void(AbilityTask_WaitAttributeChange*, float)> OnAttributeChanged;
 
 private:
 	void OnPollAttribute();

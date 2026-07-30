@@ -61,7 +61,7 @@ public:
 	 * Signature: float(const GameplayEffectSpec& Spec)
 	 */
 	PROPERTY(Savegame)
-	TDelegate<float(const GameplayEffectSpec&)> OnK2_CalculateBaseMagnitude;
+	TDelegate<float(GameplayModMagnitudeCalculation*, const GameplayEffectSpec&)> OnK2_CalculateBaseMagnitude;
 
 	// ============================================================
 	// SetByCaller helpers (Phase 7)

@@ -15,7 +15,7 @@ public:
     /** JS-scriptable OnBurst callback (BlueprintImplementableEvent pattern).
      *  Called when this burst cue fires. Script can override for custom behavior. */
     PROPERTY(Savegame)
-    TDelegate<void(const GameplayTag&, const GameplayCueParameters&)> OnK2_OnBurst;
+    TDelegate<void(GameplayCueNotify_BurstLatent*, const GameplayTag&, const GameplayCueParameters&)> OnK2_OnBurst;
 
     /** Animation type to spawn on burst */
     PROPERTY()
@@ -38,7 +38,7 @@ public:
 
         // Fire JS callback if bound
         if (OnK2_OnBurst.IsBound())
-            OnK2_OnBurst.Execute(CueTag, Params);
+            OnK2_OnBurst.Execute(this, CueTag, Params);
     }
 
     /** Factory method for ScriptFunction registration */

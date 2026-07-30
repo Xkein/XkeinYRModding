@@ -35,7 +35,7 @@ void AbilityTask_WaitGameplayTagAdded::Activate()
 		{
 			if (OnTagAdded.IsBound())
 			{
-				OnTagAdded.Execute();
+				OnTagAdded.Execute(this);
 			}
 		}
 		if (bOnlyTriggerOnce)
@@ -84,7 +84,7 @@ void AbilityTask_WaitGameplayTagAdded::OnTagCountChanged(const GameplayTag& InTa
 		{
 			if (OnTagAdded.IsBound())
 			{
-				OnTagAdded.Execute();
+				OnTagAdded.Execute(this);
 			}
 		}
 
@@ -129,7 +129,7 @@ void AbilityTask_WaitGameplayTagRemoved::Activate()
 		{
 			if (OnTagRemoved.IsBound())
 			{
-				OnTagRemoved.Execute();
+				OnTagRemoved.Execute(this);
 			}
 		}
 		if (bOnlyTriggerOnce)
@@ -178,7 +178,7 @@ void AbilityTask_WaitGameplayTagRemoved::OnTagCountChanged(const GameplayTag& In
 		{
 			if (OnTagRemoved.IsBound())
 			{
-				OnTagRemoved.Execute();
+				OnTagRemoved.Execute(this);
 			}
 		}
 

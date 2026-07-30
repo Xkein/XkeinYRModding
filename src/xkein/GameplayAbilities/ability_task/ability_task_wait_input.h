@@ -39,11 +39,11 @@ public:
 
 	/** Callback fired when input is pressed */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnInputPress;
+	TDelegate<void(AbilityTask_WaitInput*)> OnInputPress;
 
 	/** Callback fired when input is released */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnInputRelease;
+	TDelegate<void(AbilityTask_WaitInput*)> OnInputRelease;
 
 private:
 	void OnPollInput();

@@ -103,5 +103,5 @@ public:
 	 * Signature: void(const FGameplayEffectCustomExecutionParameters& Params, FGameplayEffectCustomExecutionOutput& Output)
 	 */
 	PROPERTY(Savegame)
-	TDelegate<void(const FGameplayEffectCustomExecutionParameters&, FGameplayEffectCustomExecutionOutput&)> OnK2_Execute;
+	TDelegate<void(GameplayEffectExecutionCalculation*, const FGameplayEffectCustomExecutionParameters&, FGameplayEffectCustomExecutionOutput&)> OnK2_Execute;
 };

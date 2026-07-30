@@ -65,7 +65,7 @@ void AbilityTask_WaitAttributeChange::OnPollAttribute()
 		{
 			if (OnAttributeChanged.IsBound())
 			{
-				OnAttributeChanged.Execute(CurrentValue);
+				OnAttributeChanged.Execute(this, CurrentValue);
 			}
 		}
 

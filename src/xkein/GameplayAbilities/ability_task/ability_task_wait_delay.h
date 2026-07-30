@@ -29,7 +29,7 @@ public:
 
 	/** Callback fired when the delay completes */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnFinish;
+	TDelegate<void(AbilityTask_WaitDelay*)> OnFinish;
 
 private:
 	void OnTimeFinish();

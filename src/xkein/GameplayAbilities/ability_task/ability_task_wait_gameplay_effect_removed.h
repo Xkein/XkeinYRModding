@@ -31,11 +31,11 @@ public:
 
 	/** Callback fired when the tracked effect is removed */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnEffectRemoved;
+	TDelegate<void(AbilityTask_WaitGameplayEffectRemoved*)> OnEffectRemoved;
 
 	/** Callback fired if the handle was invalid on activation */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnInvalidHandle;
+	TDelegate<void(AbilityTask_WaitGameplayEffectRemoved*)> OnInvalidHandle;
 
 private:
 	/** Handle to the active effect's OnRemoved delegate */

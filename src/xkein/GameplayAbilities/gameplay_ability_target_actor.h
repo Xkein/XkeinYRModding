@@ -51,7 +51,7 @@ public:
 	/** Callback fired when target data is ready (either instant or after confirmation).
 	 *  Consumed by AbilityTask_WaitTargetData or the owning ability. */
 	PROPERTY(Savegame)
-	TDelegate<void(const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
+	TDelegate<void(GameplayAbilityTargetActor*, const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
 
 // protected:
 	/** The ability that owns this target actor. Set by StartTargeting. */

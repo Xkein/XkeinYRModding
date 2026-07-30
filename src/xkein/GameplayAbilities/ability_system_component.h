@@ -18,7 +18,7 @@
 class AbilitySystemComponent;
 
 /** Delegate type for when an immunity component blocks a GameplayEffect */
-using FImmunityBlockGE = TMulticastDelegate<void(const GameplayEffectSpec&, const ActiveGameplayEffect*)>;
+using FImmunityBlockGE = TMulticastDelegate<void(AbilitySystemComponent*, const GameplayEffectSpec&, const ActiveGameplayEffect*)>;
 
 // ============================================================
 // Delegate type aliases for ASC events
@@ -28,34 +28,34 @@ using FImmunityBlockGE = TMulticastDelegate<void(const GameplayEffectSpec&, cons
 using FOnGameplayEffectAppliedDelegate = TMulticastDelegate<void(AbilitySystemComponent*, const GameplayEffectSpec&, ActiveGameplayEffectHandle)>;
 
 /** Delegate for when an ability activation fails, with failure reason tags */
-using FAbilityFailedDelegate = TMulticastDelegate<void(const GameplayAbility*, const GameplayTagContainer&)>;
+using FAbilityFailedDelegate = TMulticastDelegate<void(AbilitySystemComponent*, const GameplayAbility*, const GameplayTagContainer&)>;
 
 /** Delegate for when an ability ends */
-using FAbilityEnded = TMulticastDelegate<void(GameplayAbility*)>;
+using FAbilityEnded = TMulticastDelegate<void(AbilitySystemComponent*, GameplayAbility*)>;
 
 /** Delegate for generic ability events (activate, commit) */
-using FGenericAbilityDelegate = TMulticastDelegate<void(const GameplayAbilitySpecHandle, GameplayAbility*)>;
+using FGenericAbilityDelegate = TMulticastDelegate<void(AbilitySystemComponent*, const GameplayAbilitySpecHandle, GameplayAbility*)>;
 
 /** Delegate for when an ability spec is dirtied */
-using FAbilitySpecDirtied = TMulticastDelegate<void(const GameplayAbilitySpec&)>;
+using FAbilitySpecDirtied = TMulticastDelegate<void(AbilitySystemComponent*, const GameplayAbilitySpec&)>;
 
 /** Delegate for tag count changes from GameplayEffects */
-using FOnGameplayEffectTagCountChanged = TMulticastDelegate<void(const GameplayTag&, int32 NewCount)>;
+using FOnGameplayEffectTagCountChanged = TMulticastDelegate<void(AbilitySystemComponent*, const GameplayTag&, int32 NewCount)>;
 
 /** Delegate for when an active gameplay effect is removed */
-using FOnActiveGameplayEffectRemoved_Info = TMulticastDelegate<void(const FGameplayEffectRemovalInfo&)>;
+using FOnActiveGameplayEffectRemoved_Info = TMulticastDelegate<void(AbilitySystemComponent*, const FGameplayEffectRemovalInfo&)>;
 
 /** Delegate for when an active gameplay effect's stack count changes */
-using FOnActiveGameplayEffectStackChange = TMulticastDelegate<void(ActiveGameplayEffectHandle, int32 NewCount, int32 OldCount)>;
+using FOnActiveGameplayEffectStackChange = TMulticastDelegate<void(AbilitySystemComponent*, ActiveGameplayEffectHandle, int32 NewCount, int32 OldCount)>;
 
 /** Delegate for when an active gameplay effect's time remaining changes */
-using FOnActiveGameplayEffectTimeChange = TMulticastDelegate<void(ActiveGameplayEffectHandle, float NewTime, float OldTime)>;
+using FOnActiveGameplayEffectTimeChange = TMulticastDelegate<void(AbilitySystemComponent*, ActiveGameplayEffectHandle, float NewTime, float OldTime)>;
 
 /** Delegate for when an active gameplay effect's inhibition state changes */
-using FOnActiveGameplayEffectInhibitionChanged = TMulticastDelegate<void(ActiveGameplayEffectHandle, bool bInhibited)>;
+using FOnActiveGameplayEffectInhibitionChanged = TMulticastDelegate<void(AbilitySystemComponent*, ActiveGameplayEffectHandle, bool bInhibited)>;
 
 /** Delegate for generic gameplay events (tag-based with payload) */
-using FGameplayEventMulticastDelegate = TMulticastDelegate<void(const GameplayTag&, const GameplayEventData*)>;
+using FGameplayEventMulticastDelegate = TMulticastDelegate<void(AbilitySystemComponent*, const GameplayTag&, const GameplayEventData*)>;
 
 /** Entry for a filtered tag count callback (EventType-aware) */
 struct FTagCountCallbackEntry
@@ -103,7 +103,7 @@ struct FOnAttributeChangeData
 };
 
 /** Delegate for when an attribute's numerical value changes */
-using FOnGameplayAttributeValueChange = TMulticastDelegate<void(const FOnAttributeChangeData&)>;
+using FOnGameplayAttributeValueChange = TMulticastDelegate<void(AbilitySystemComponent*, const FOnAttributeChangeData&)>;
 
 CLASS(BindJs, IniComponent, ComponentTarget = [TechnoTypeClass], AutoSavegame, Swizzleable)
 struct AbilitySystemComponentType final

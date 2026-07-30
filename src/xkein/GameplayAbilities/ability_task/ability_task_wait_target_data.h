@@ -31,10 +31,10 @@ public:
 
 	/** Callback fired when target data is ready */
 	PROPERTY(Savegame)
-	TDelegate<void(const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
+	TDelegate<void(AbilityTask_WaitTargetData*, const GameplayAbilityTargetDataHandle&)> OnTargetDataReady;
 
 	/** Callback fired when targeting is cancelled */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnTargetDataCancelled;
+	TDelegate<void(AbilityTask_WaitTargetData*)> OnTargetDataCancelled;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_WaitTargetData);

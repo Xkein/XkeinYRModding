@@ -237,7 +237,7 @@ struct GameplayAbilitySpec
     TDelegate<void(GameplayAbilitySpec*)> OnGameplayAbilityEnded;
 
 	PROPERTY(Savegame)
-    TDelegate<void()> OnGameplayAbilityCancelled;
+    TDelegate<void(GameplayAbilitySpec*)> OnGameplayAbilityCancelled;
 
 	bool IsActive() const { return ActiveCount > 0; }
 

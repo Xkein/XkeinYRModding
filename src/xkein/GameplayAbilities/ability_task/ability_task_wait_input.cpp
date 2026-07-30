@@ -61,7 +61,7 @@ void AbilityTask_WaitInput::OnPollInput()
 		{
 			if (OnInputPress.IsBound())
 			{
-				OnInputPress.Execute();
+				OnInputPress.Execute(this);
 			}
 		}
 	}
@@ -72,7 +72,7 @@ void AbilityTask_WaitInput::OnPollInput()
 		{
 			if (OnInputRelease.IsBound())
 			{
-				OnInputRelease.Execute();
+				OnInputRelease.Execute(this);
 			}
 		}
 	}

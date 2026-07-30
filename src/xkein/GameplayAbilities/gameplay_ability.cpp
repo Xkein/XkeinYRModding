@@ -281,7 +281,7 @@ void GameplayAbility::CancelAbility(const GameplayAbilitySpecHandle Handle, cons
 
     if (GameplayAbilitySpec* Spec = FindAbilitySpec(Handle, ActorInfo))
     {
-        Spec->OnGameplayAbilityCancelled.ExecuteIfBound();
+        Spec->OnGameplayAbilityCancelled.ExecuteIfBound(Spec);
     }
 
     // End the ability but don't replicate it separately, we replicate the CancelAbility call directly

@@ -37,7 +37,7 @@ void AbilityTask_WaitDelay::OnTimeFinish()
 	{
 		if (OnFinish.IsBound())
 		{
-			OnFinish.Execute();
+			OnFinish.Execute(this);
 		}
 	}
 	EndTask();

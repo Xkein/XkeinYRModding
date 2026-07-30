@@ -6,7 +6,7 @@ void GameplayEffectExecutionCalculation::Execute(
 {
 	if (OnK2_Execute.IsBound())
 	{
-		OnK2_Execute.Execute(ExecutionParams, OutExecutionOutput);
+		OnK2_Execute.Execute(const_cast<GameplayEffectExecutionCalculation*>(this), ExecutionParams, OutExecutionOutput);
 		return;
 	}
 

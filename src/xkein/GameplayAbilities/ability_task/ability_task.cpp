@@ -18,7 +18,7 @@ void AbilityTask::EndTask()
 		// Fire BlueprintImplementableEvent callback
 		if (OnK2_OnTaskEnd.IsBound())
 		{
-			OnK2_OnTaskEnd.Execute();
+			OnK2_OnTaskEnd.Execute(this);
 		}
 	}
 }

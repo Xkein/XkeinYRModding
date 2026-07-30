@@ -32,7 +32,7 @@ public:
 
 	/** Callback fired when a matching effect is applied. Parameter: effect spec. */
 	PROPERTY(Savegame)
-	TDelegate<void(const GameplayEffectSpec&)> OnEffectApplied;
+	TDelegate<void(AbilityTask_WaitGameplayEffectApplied*, const GameplayEffectSpec&)> OnEffectApplied;
 
 private:
 	/** Handle to the ASC's OnGameplayEffectAppliedDelegateToSelf delegate */

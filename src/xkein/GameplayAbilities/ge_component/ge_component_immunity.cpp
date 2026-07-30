@@ -32,7 +32,7 @@ bool ImmunityGEComponent::OnActiveGameplayEffectAdded(
                     IncomingContainer.GetActiveGameplayEffect(EffectHandle);
 
                 // Trigger the immunity block delegate on the ASC
-                ASC->OnImmunityBlockGameplayEffectDelegate.Broadcast(IncomingSpec, ImmunityActiveGE);
+                ASC->OnImmunityBlockGameplayEffectDelegate.Broadcast(ASC, IncomingSpec, ImmunityActiveGE);
 
                 gLogger->info("ImmunityGEComponent: blocked GE application due to immunity query match");
                 return false; // Block application

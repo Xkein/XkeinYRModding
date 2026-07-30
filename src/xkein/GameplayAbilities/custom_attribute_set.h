@@ -15,7 +15,7 @@ public:
     {
         if (OnK2_PreGameplayEffectExecute.IsBound())
         {
-            return OnK2_PreGameplayEffectExecute.Execute(&Data);
+            return OnK2_PreGameplayEffectExecute.Execute(this, &Data);
         }
         return true;
     }
@@ -24,7 +24,7 @@ public:
     {
         if (OnK2_PostGameplayEffectExecute.IsBound())
         {
-            OnK2_PostGameplayEffectExecute.Execute(&Data);
+            OnK2_PostGameplayEffectExecute.Execute(this, &Data);
         }
     }
 
@@ -32,7 +32,7 @@ public:
     {
         if (OnK2_PreAttributeChange.IsBound())
         {
-            OnK2_PreAttributeChange.Execute(Attribute, NewValue);
+            OnK2_PreAttributeChange.Execute(this, Attribute, NewValue);
         }
     }
 
@@ -40,7 +40,7 @@ public:
     {
         if (OnK2_PostAttributeChange.IsBound())
         {
-            OnK2_PostAttributeChange.Execute(Attribute, OldValue, NewValue);
+            OnK2_PostAttributeChange.Execute(this, Attribute, OldValue, NewValue);
         }
     }
 
@@ -48,7 +48,7 @@ public:
     {
         if (OnK2_PreAttributeBaseChange.IsBound())
         {
-            OnK2_PreAttributeBaseChange.Execute(Attribute, NewValue);
+            OnK2_PreAttributeBaseChange.Execute(const_cast<CustomAttributeSet*>(this), Attribute, NewValue);
         }
     }
 
@@ -56,26 +56,26 @@ public:
     {
         if (OnK2_PostAttributeBaseChange.IsBound())
         {
-            OnK2_PostAttributeBaseChange.Execute(Attribute, OldValue, NewValue);
+            OnK2_PostAttributeBaseChange.Execute(const_cast<CustomAttributeSet*>(this), Attribute, OldValue, NewValue);
         }
     }
 
     PROPERTY(Savegame)
-    TDelegate<bool(FGameplayEffectModCallbackData*)> OnK2_PreGameplayEffectExecute;
+    TDelegate<bool(AttributeSet*, FGameplayEffectModCallbackData*)> OnK2_PreGameplayEffectExecute;
 
     PROPERTY(Savegame)
-    TDelegate<void(const FGameplayEffectModCallbackData*)> OnK2_PostGameplayEffectExecute;
+    TDelegate<void(AttributeSet*, const FGameplayEffectModCallbackData*)> OnK2_PostGameplayEffectExecute;
 
     PROPERTY(Savegame)
-    TDelegate<void(const GameplayAttribute&, float&)> OnK2_PreAttributeChange;
+    TDelegate<void(AttributeSet*, const GameplayAttribute&, float&)> OnK2_PreAttributeChange;
 
     PROPERTY(Savegame)
-    TDelegate<void(const GameplayAttribute&, float, float)> OnK2_PostAttributeChange;
+    TDelegate<void(AttributeSet*, const GameplayAttribute&, float, float)> OnK2_PostAttributeChange;
 
     PROPERTY(Savegame)
-    TDelegate<void(const GameplayAttribute&, float&)> OnK2_PreAttributeBaseChange;
+    TDelegate<void(AttributeSet*, const GameplayAttribute&, float&)> OnK2_PreAttributeBaseChange;
 
     PROPERTY(Savegame)
-    TDelegate<void(const GameplayAttribute&, float, float)> OnK2_PostAttributeBaseChange;
+    TDelegate<void(AttributeSet*, const GameplayAttribute&, float, float)> OnK2_PostAttributeBaseChange;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(CustomAttributeSet);

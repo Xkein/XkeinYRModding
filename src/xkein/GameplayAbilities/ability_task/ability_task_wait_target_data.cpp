@@ -26,7 +26,7 @@ void AbilityTask_WaitTargetData::TargetDataReceived(const GameplayAbilityTargetD
 	{
 		if (OnTargetDataReady.IsBound())
 		{
-			OnTargetDataReady.Execute(Data);
+			OnTargetDataReady.Execute(this, Data);
 		}
 	}
 
@@ -52,7 +52,7 @@ void AbilityTask_WaitTargetData::TargetDataCancelled()
 	{
 		if (OnTargetDataCancelled.IsBound())
 		{
-			OnTargetDataCancelled.Execute();
+			OnTargetDataCancelled.Execute(this);
 		}
 	}
 

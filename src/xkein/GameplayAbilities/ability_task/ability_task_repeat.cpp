@@ -17,7 +17,7 @@ void AbilityTask_Repeat::Activate()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates() && OnPerformAction.IsBound())
 		{
-			OnPerformAction.Execute(CurrentIteration);
+			OnPerformAction.Execute(this, CurrentIteration);
 		}
 		CurrentIteration++;
 	}
@@ -26,7 +26,7 @@ void AbilityTask_Repeat::Activate()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates() && OnFinished.IsBound())
 		{
-			OnFinished.Execute(CurrentIteration);
+			OnFinished.Execute(this, CurrentIteration);
 		}
 		EndTask();
 		return;
@@ -46,7 +46,7 @@ void AbilityTask_Repeat::OnTimerTick()
 
 		if (ShouldBroadcastAbilityTaskDelegates() && OnPerformAction.IsBound())
 		{
-			OnPerformAction.Execute(CurrentIteration);
+			OnPerformAction.Execute(this, CurrentIteration);
 		}
 		CurrentIteration++;
 
@@ -54,7 +54,7 @@ void AbilityTask_Repeat::OnTimerTick()
 	{
 		if (ShouldBroadcastAbilityTaskDelegates() && OnFinished.IsBound())
 		{
-			OnFinished.Execute(CurrentIteration);
+			OnFinished.Execute(this, CurrentIteration);
 		}
 		EndTask();
 		ReadyForDestroy();

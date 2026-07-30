@@ -67,7 +67,7 @@ void AbilityTask_WaitGameplayEffectApplied::OnEffectAppliedToSelf(AbilitySystemC
 	{
 		if (OnEffectApplied.IsBound())
 		{
-			OnEffectApplied.Execute(Spec);
+			OnEffectApplied.Execute(this, Spec);
 		}
 	}
 

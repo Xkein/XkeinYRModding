@@ -34,7 +34,7 @@ public:
 
 	/** Callback fired when the tag is added */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnTagAdded;
+	TDelegate<void(AbilityTask_WaitGameplayTagAdded*)> OnTagAdded;
 
 private:
 	/** Handle for the registered delegate, used to unregister on destruction */
@@ -78,7 +78,7 @@ public:
 
 	/** Callback fired when the tag is removed */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnTagRemoved;
+	TDelegate<void(AbilityTask_WaitGameplayTagRemoved*)> OnTagRemoved;
 
 private:
 	/** Handle for the registered delegate, used to unregister on destruction */

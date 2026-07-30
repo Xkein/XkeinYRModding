@@ -25,7 +25,7 @@ void AbilityTask_WaitGameplayEffectRemoved::Activate()
 		{
 			if (OnInvalidHandle.IsBound())
 			{
-				OnInvalidHandle.Execute();
+				OnInvalidHandle.Execute(this);
 			}
 		}
 		EndTask();
@@ -80,7 +80,7 @@ void AbilityTask_WaitGameplayEffectRemoved::OnEffectRemovedCallback(const FGamep
 	{
 		if (OnEffectRemoved.IsBound())
 		{
-			OnEffectRemoved.Execute();
+			OnEffectRemoved.Execute(this);
 		}
 	}
 

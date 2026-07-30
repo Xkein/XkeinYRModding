@@ -15,7 +15,7 @@ public:
     {
         if (OnK2CanActivateAbility.IsBound())
         {
-            return OnK2CanActivateAbility.Execute(ActorInfo, Handle, OptionalRelevantTags);
+            return OnK2CanActivateAbility.Execute(const_cast<CustomGameplayAbility*>(this), ActorInfo, Handle, OptionalRelevantTags);
         }
         return true;
     }
@@ -24,12 +24,12 @@ public:
     {
         if (TriggerEventData && OnK2ActivateAbilityFromEvent.IsBound())
         {
-            OnK2ActivateAbilityFromEvent.Execute(*TriggerEventData);
+            OnK2ActivateAbilityFromEvent.Execute(this, *TriggerEventData);
             return;
         }
         if (OnK2ActivateAbility.IsBound())
         {
-            OnK2ActivateAbility.Execute();
+            OnK2ActivateAbility.Execute(this);
         }
     }
 
@@ -37,7 +37,7 @@ public:
     {
         if (OnK2CommitExecute.IsBound())
         {
-            OnK2CommitExecute.Execute();
+            OnK2CommitExecute.Execute(this);
         }
     }
 
@@ -45,7 +45,7 @@ public:
     {
         if (OnK2OnEndAbility.IsBound())
         {
-            OnK2OnEndAbility.Execute(bWasCancelled);
+            OnK2OnEndAbility.Execute(this, bWasCancelled);
         }
     }
 
@@ -108,18 +108,18 @@ public:
     }
 
     PROPERTY(Savegame)
-    TDelegate<bool(GameplayAbilityActorInfo, GameplayAbilitySpecHandle, GameplayTagContainer*)> OnK2CanActivateAbility;
+    TDelegate<bool(GameplayAbility*, GameplayAbilityActorInfo, GameplayAbilitySpecHandle, GameplayTagContainer*)> OnK2CanActivateAbility;
 
     PROPERTY(Savegame)
-    TDelegate<void()> OnK2ActivateAbility;
+    TDelegate<void(GameplayAbility*)> OnK2ActivateAbility;
 
     PROPERTY(Savegame)
-    TDelegate<void(const GameplayEventData&)> OnK2ActivateAbilityFromEvent;
+    TDelegate<void(GameplayAbility*, const GameplayEventData&)> OnK2ActivateAbilityFromEvent;
 
     PROPERTY(Savegame)
-    TDelegate<void()> OnK2CommitExecute;
+    TDelegate<void(GameplayAbility*)> OnK2CommitExecute;
 
     PROPERTY(Savegame)
-    TDelegate<void(bool)> OnK2OnEndAbility;
+    TDelegate<void(GameplayAbility*, bool)> OnK2OnEndAbility;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(CustomGameplayAbility);

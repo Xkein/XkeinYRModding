@@ -39,7 +39,7 @@ void AbilityTask_SpawnActor::Activate()
 		{
 			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed.Execute();
+				OnSpawnFailed.Execute(this);
 			}
 		}
 		EndTask();
@@ -54,7 +54,7 @@ void AbilityTask_SpawnActor::Activate()
 		{
 			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed.Execute();
+				OnSpawnFailed.Execute(this);
 			}
 		}
 		EndTask();
@@ -77,7 +77,7 @@ void AbilityTask_SpawnActor::Activate()
 		{
 			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed.Execute();
+				OnSpawnFailed.Execute(this);
 			}
 		}
 		EndTask();
@@ -93,7 +93,7 @@ void AbilityTask_SpawnActor::Activate()
 		{
 			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed.Execute();
+				OnSpawnFailed.Execute(this);
 			}
 		}
 		EndTask();
@@ -111,7 +111,7 @@ void AbilityTask_SpawnActor::Activate()
 		{
 			if (OnSpawnFailed.IsBound())
 			{
-				OnSpawnFailed.Execute();
+				OnSpawnFailed.Execute(this);
 			}
 		}
 		EndTask();
@@ -125,7 +125,7 @@ void AbilityTask_SpawnActor::Activate()
 	{
 		if (OnSpawnComplete.IsBound())
 		{
-			OnSpawnComplete.Execute(SpawnedEntity);
+			OnSpawnComplete.Execute(this, SpawnedEntity);
 		}
 	}
 

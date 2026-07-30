@@ -70,7 +70,7 @@ void AbilityTask_WaitGameplayEvent::OnGameplayEvent(const GameplayTag& InTag, co
 		{
 			GameplayEventData TempPayload = *Payload;
 			TempPayload.EventTag = InTag;
-			OnEventReceived.Execute(TempPayload);
+			OnEventReceived.Execute(this, TempPayload);
 		}
 	}
 

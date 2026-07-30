@@ -46,10 +46,10 @@ public:
 
 	/** Callback fired when the Techno is spawned successfully. Parameter: spawned entity. */
 	PROPERTY(Savegame)
-	TDelegate<void(entt::entity)> OnSpawnComplete;
+	TDelegate<void(AbilityTask_SpawnActor*, entt::entity)> OnSpawnComplete;
 
 	/** Callback fired when the spawn fails (e.g. invalid type, blocked cell, no owner house). */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnSpawnFailed;
+	TDelegate<void(AbilityTask_SpawnActor*)> OnSpawnFailed;
 };
 IMPL_YR_SERIALIZE_SWIZZLE(AbilityTask_SpawnActor);

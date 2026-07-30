@@ -5,6 +5,8 @@
 #include "yr/serialization/serialization.h"
 #include <entt/signal/sigh.hpp>
 
+class AbilitySystemComponent;
+
 CLASS(BindJs, AutoSavegame)
 struct GameplayTag
 {
@@ -139,7 +141,7 @@ struct GameplayTagContainer
 };
 
 /** Delegate for tag change events */
-using FOnGameplayTagCountChanged = TMulticastDelegate<void(const GameplayTag&, int32 NewCount)>;
+using FOnGameplayTagCountChanged = TMulticastDelegate<void(AbilitySystemComponent*, const GameplayTag&, int32 NewCount)>;
 
 /**
  * Structure for inheritable tag containers.

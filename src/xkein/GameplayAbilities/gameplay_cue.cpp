@@ -33,7 +33,7 @@ void GameplayCueNotify_Actor::HandleGameplayCue(entt::entity TargetEntity, EGame
 
     // --- K2 generic handler (BlueprintImplementableEvent equivalent) ---
     if (OnK2_HandleGameplayCue.IsBound())
-        OnK2_HandleGameplayCue.Execute(EventType, Params);
+        OnK2_HandleGameplayCue.Execute(this, EventType, Params);
 
     // --- Dispatch to specific lifecycle callbacks ---
     switch (EventType)

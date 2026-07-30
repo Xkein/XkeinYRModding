@@ -37,7 +37,7 @@ public:
 
 	/** Callback fired when the event is received */
 	PROPERTY(Savegame)
-	TDelegate<void(const GameplayEventData&)> OnEventReceived;
+	TDelegate<void(AbilityTask_WaitGameplayEvent*, const GameplayEventData&)> OnEventReceived;
 
 private:
 	/** Handle for the registered delegate, used to unregister on destruction */

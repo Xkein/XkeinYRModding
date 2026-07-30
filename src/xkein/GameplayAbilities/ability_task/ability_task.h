@@ -81,7 +81,7 @@ public:
 
 	/** BlueprintImplementableEvent: script callback fired when the task ends */
 	PROPERTY(Savegame)
-	TDelegate<void()> OnK2_OnTaskEnd;
+	TDelegate<void(AbilityTask*)> OnK2_OnTaskEnd;
 
 	/** Static factory: creates a task by name, initializes it, and registers it with the ASC.
 	 *  Uses ScriptFunction pattern (TaskCreator) for script-registered constructors. */

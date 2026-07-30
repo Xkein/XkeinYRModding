@@ -35,11 +35,11 @@ public:
 
 	/** Callback fired on each iteration. Parameter: current iteration index (0-based). */
 	PROPERTY(Savegame)
-	TDelegate<void(int32)> OnPerformAction;
+	TDelegate<void(AbilityTask_Repeat*, int32)> OnPerformAction;
 
 	/** Callback fired when all iterations have completed. Parameter: total iterations performed. */
 	PROPERTY(Savegame)
-	TDelegate<void(int32)> OnFinished;
+	TDelegate<void(AbilityTask_Repeat*, int32)> OnFinished;
 
 	/** Cancel pending timer on destruction */
 	virtual void OnDestroy(bool bOwnerFinished) override;
