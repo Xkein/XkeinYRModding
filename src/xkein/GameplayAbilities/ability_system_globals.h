@@ -226,6 +226,36 @@ namespace detail
             return false;
         }
     };
+
+    // Parser for AbilityTriggerData (format: "TriggerTag:TriggerSource")
+    // Example: "Event.Fireball:GameplayEvent" or "Buff.Rage:OwnedTagAdded"
+    // TriggerSource is optional; defaults to GameplayEvent if only tag is given.
+    template<>
+    struct Parser<AbilityTriggerData>
+    {
+        static bool Read(std::string_view str, AbilityTriggerData& result)
+        {
+            auto colonPos = str.find(':');
+            if (colonPos == std::string_view::npos)
+            {
+                // No colon: only tag, default source to GameplayEvent
+                if (::Parser<GameplayTag>::Read(str, result.TriggerTag))
+                {
+                    result.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+                    return true;
+                }
+                return false;
+            }
+
+            std::string_view tagStr    = str.substr(0, colonPos);
+            std::string_view sourceStr = str.substr(colonPos + 1);
+
+            if (!::Parser<GameplayTag>::Read(tagStr, result.TriggerTag))
+                return false;
+
+            return ::Parser<EGameplayAbilityTriggerSource>::Read(sourceStr, result.TriggerSource);
+        }
+    };
 }
 
 template<>

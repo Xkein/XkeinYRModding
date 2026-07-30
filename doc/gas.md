@@ -18,6 +18,7 @@
 14. [快速开始](#14-快速开始)
 15. [已知限制](#15-已知限制)
 16. [委托存档（Delegate Savegame）](#16-委托存档delegate-savegame)
+17. [嵌套结构体 INI 加载](#17-嵌套结构体-ini-加载)
 
 ---
 
@@ -156,9 +157,21 @@ asc.RegisterGameplayTagEvent(tag);  // 返回 FOnGameplayTagCountChanged
 
 支持父子继承的标签容器，计算公式：`Combined = Inherited - Removed + Added`
 
+嵌套结构体支持两种 INI 配置方式（详见 [第 17 节](#17-嵌套结构体-ini-加载)）：
+
 ```ini
-; INI 配置示例
-; 子对象自动继承父对象的标签，然后通过 Added/Removed 调整
+; 方式1：点分键展开（在当前 section 下用 属性名.子字段 读取）
+[Comp_BlockAbility]
+InheritableBlockedAbilityTagsContainer.Added = Ability.Attack
+InheritableBlockedAbilityTagsContainer.Removed = Ability.Safe
+
+; 方式2：section 引用（属性值作为 section 名，去该节下读取子字段）
+[Comp_BlockAbility]
+InheritableBlockedAbilityTagsContainer = MyBlockedTags
+
+[MyBlockedTags]
+Added = Ability.Attack
+Removed = Ability.Safe
 ```
 
 ---
@@ -283,24 +296,35 @@ GameplayAbility（游戏能力）是可以被激活的游戏逻辑单元，包�
 
 ### 4.2 GameplayAbilityDefine（INI 定义字段表）
 
-| 字段 | 类型 | 说明 |
-|---|---|---|
-| AbilityCreator | StringName | 脚本创建器路径 |
-| AbilityTags | GameplayTagContainer | 能力的标签（用于分类和查询） |
-| InstancingPolicy | EGameplayAbilityInstancingPolicy | 实例化策略 |
-| bRetriggerInstancedAbility | bool | 是否允许重复触发 |
-| CostGameplayEffectClass | GameplayEffect* | 消耗（法力/体力） |
-| CooldownGameplayEffectClass | GameplayEffect* | 冷却 |
-| AbilityTriggers | vector\<AbilityTriggerData\> | 触发器列表 |
-| CancelAbilitiesWithTag | GameplayTagContainer | 激活时取消带这些标签的能力 |
-| BlockAbilitiesWithTag | GameplayTagContainer | 激活时阻止带这些标签的能力 |
-| ActivationOwnedTags | GameplayTagContainer | 激活时授予自身的标签 |
-| ActivationRequiredTags | GameplayTagContainer | 激活者必须含有的标签 |
-| ActivationBlockedTags | GameplayTagContainer | 激活者不能含有的标签 |
-| SourceRequiredTags | GameplayTagContainer | 来源必须含有的标签 |
-| SourceBlockedTags | GameplayTagContainer | 来源不能含有的标签 |
-| TargetRequiredTags | GameplayTagContainer | 目标必须含有的标签 |
-| TargetBlockedTags | GameplayTagContainer | 目标不能含有的标签 |
+`GameplayAbilityDefine` 标记为 `IniAutoLoad`，每个 `[Ability_XXX]` section 自动创建一个实例。各字段通过 `Parser<T>` 特化或 `IniComponentLoader` 递归加载，不同类型的 INI 写法不同：
+
+| 字段 | 类型 | INI 写法 | 说明 |
+|---|---|---|---|
+| AbilityCreator | StringName | 脚本路径字符串 | 脚本创建器路径 |
+| AbilityTags | GameplayTagContainer | 逗号分隔标签 | 能力的标签（用于分类和查询） |
+| InstancingPolicy | EGameplayAbilityInstancingPolicy | 枚举名 | 实例化策略 |
+| bRetriggerInstancedAbility | bool | yes/no | 是否允许重复触发 |
+| CostGameplayEffectClass | GameplayEffect* | GE section 名 | 消耗（法力/体力） |
+| CooldownGameplayEffectClass | GameplayEffect* | GE section 名 | 冷却 |
+| AbilityTriggers | vector\<AbilityTriggerData\> | 逗号分隔的 `Tag:Source` | 触发器列表（见 4.5 节） |
+| CancelAbilitiesWithTag | GameplayTagContainer | 逗号分隔标签 | 激活时取消带这些标签的能力 |
+| BlockAbilitiesWithTag | GameplayTagContainer | 逗号分隔标签 | 激活时阻止带这些标签的能力 |
+| ActivationOwnedTags | GameplayTagContainer | 逗号分隔标签 | 激活时授予自身的标签 |
+| ActivationRequiredTags | GameplayTagContainer | 逗号分隔标签 | 激活者必须含有的标签 |
+| ActivationBlockedTags | GameplayTagContainer | 逗号分隔标签 | 激活者不能含有的标签 |
+| SourceRequiredTags | GameplayTagContainer | 逗号分隔标签 | 来源必须含有的标签 |
+| SourceBlockedTags | GameplayTagContainer | 逗号分隔标签 | 来源不能含有的标签 |
+| TargetRequiredTags | GameplayTagContainer | 逗号分隔标签 | 目标必须含有的标签 |
+| TargetBlockedTags | GameplayTagContainer | 逗号分隔标签 | 目标不能含有的标签 |
+
+各类型的加载机制说明：
+
+- **StringName**：通过 `Parser<StringName>` 直接读取字符串值
+- **GameplayTagContainer**：通过 `Parser<GameplayTagContainer>`（定义于 `ability_system_globals.h`）按逗号分割，逐个解析为 `GameplayTag`
+- **EGameplayAbilityInstancingPolicy**：通过泛型 `Parser<T, is_enum>` 自动解析枚举名（如 `NonInstanced`、`InstancedPerActor`、`InstancedPerExecution`）
+- **bool**：通过 `Parser<bool>` 解析（`yes`/`no`/`true`/`false`）
+- **GameplayEffect\***：通过泛型 `Parser<T*>` 解析，INI 值为 GE 的 section 名，内部调用 `IniAutoLoad` 注册的 `__FindOrAllocate` 元函数查找或创建 `GameplayEffect` 实例
+- **vector\<AbilityTriggerData\>**：通过 `Parser<std::vector<T>>` 按逗号分割，每个元素由 `Parser<AbilityTriggerData>`（定义于 `ability_system_globals.h`）按 `Tag:Source` 格式解析，Source 可省略（默认 `GameplayEvent`）
 
 ### 4.3 实例化策略
 
@@ -351,15 +375,30 @@ ability.K2_EndAbilityLocally();
 
 ### 4.5 AbilityTriggerData（触发器）
 
+`AbilityTriggerData` 是一个包含两个字段的结构体：
+
+| 成员 | 类型 | 说明 |
+|---|---|---|
+| TriggerTag | GameplayTag | 响应的标签 |
+| TriggerSource | EGameplayAbilityTriggerSource | 触发源类型 |
+
+触发源枚举值：
+
 | 触发源 | 说明 |
 |---|---|
 | GameplayEvent | 收到 GameplayEvent 时触发，带事件载荷 |
 | OwnedTagAdded | 所有者获得指定标签时触发一次 |
 | OwnedTagPresent | 所有者有指定标签时激活，移除标签时结束 |
 
+INI 格式为 `TriggerTag:TriggerSource`，多个触发器用逗号分隔。`TriggerSource` 可省略，省略时默认为 `GameplayEvent`。
+
 ```ini
 [Ability_Test]
-AbilityTriggers = EventTag1:GameplayEvent, SomeTag:OwnedTagAdded
+; 完整格式：Tag:Source
+AbilityTriggers = Event.Fireball:GameplayEvent, Buff.Rage:OwnedTagAdded
+
+; 省略 Source（默认 GameplayEvent）
+AbilityTriggers = Event.Fireball
 ```
 
 ### 4.6 激活流程
@@ -402,25 +441,62 @@ GameplayEffect（游戏效果，简称 GE）是一个数据驱动的描述符，
 ```ini
 [Effect_Heal]
 DurationPolicy = Instant
-Modifiers = Health:50:AddBase
+Modifiers = Mod_HealHP
+
+[Mod_HealHP]
+Attribute = AttributeSet_Test.Health
+ModifierOp = AddBase
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = 50.0
 
 [Effect_Buff]
 DurationPolicy = HasDuration
-DurationMagnitude = 10.0
-Modifiers = Attack:1.5:MultiplyAdditive
+DurationMagnitude.MagnitudeCalculationType = ScalableFloat
+DurationMagnitude.ScalableFloatMagnitude = 10.0
+Modifiers = Mod_BuffAttack
+
+[Mod_BuffAttack]
+Attribute = AttributeSet_Test.Attack
+ModifierOp = MultiplyAdditive
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = 1.5
 
 [Effect_Poison]
 DurationPolicy = Infinite
 Period = 2.0
 bExecutePeriodicEffectOnApplication = true
-Modifiers = Health:-5:AddBase
+Modifiers = Mod_PoisonDmg
+
+[Mod_PoisonDmg]
+Attribute = AttributeSet_Test.Health
+ModifierOp = AddBase
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = -5.0
 ```
 
 ### 5.3 修改器（Modifier）
 
-INI 中 Modifier 格式：`AttributeName:Magnitude:ModOp`
+`Modifiers` 字段类型为 `std::vector<GameplayModifierInfo*>`（指针数组）。`GameplayModifierInfo` 标记为 `IniComponent, IniAutoLoad`，每个 Modifier 是一个独立的 INI section，通过 section 名引用：
 
-例如：`Health:10:AddBase`、`Attack:1.5:MultiplyAdditive`
+```ini
+[Effect_Heal]
+; 多个 Modifier 用逗号分隔，每个值是一个 section 名
+Modifiers = Mod_HealHP, Mod_HealMP
+
+[Mod_HealHP]
+; Attribute 格式: OwnerName.AttributeName
+Attribute = AttributeSet_Test.Health
+ModifierOp = AddBase
+; ModifierMagnitude 是嵌套 IniComponent，用点分键配置（详见 5.9 节）
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = 50.0
+
+; 可选：来源/目标标签需求（GameplayTagRequirements，支持点分键或 section 引用）
+; SourceTags.RequireTags = Alive
+; TargetTags.IgnoreTags = Invincible
+```
+
+> **注意：** `Modifiers` 是指针数组，通过 section 名引用 `[Mod_XXX]` 节。`Parser<GameplayModifierInfo>`（非指针）虽然存在 `"Attr:Mag:Op"` 组合格式解析，但仅用于值类型场景，不适用于 `Modifiers` 字段的指针数组加载。
 
 ### 5.4 ModOp 类型与计算公式
 
@@ -466,7 +542,13 @@ StackLimitCount = 5
 StackDurationRefreshPolicy = RefreshOnSuccessfulApplication
 StackExpirationPolicy = ClearEntireStack
 bFactorInStackCount = true
-Modifiers = Health:-3:AddBase
+Modifiers = Mod_PoisonDmg
+
+[Mod_PoisonDmg]
+Attribute = AttributeSet_Test.Health
+ModifierOp = AddBase
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = -3.0
 ```
 
 ### 5.6 周期效果（Periodic Effect）
@@ -474,11 +556,18 @@ Modifiers = Health:-3:AddBase
 ```ini
 [Effect_Burn]
 DurationPolicy = HasDuration
-DurationMagnitude = 10.0
+DurationMagnitude.MagnitudeCalculationType = ScalableFloat
+DurationMagnitude.ScalableFloatMagnitude = 10.0
 Period = 1.0                     ; 每秒执行一次
 bExecutePeriodicEffectOnApplication = true  ; 立即执行第一次
 PeriodicInhibitionPolicy = ResetPeriod
-Modifiers = Health:-5:AddBase
+Modifiers = Mod_BurnDmg
+
+[Mod_BurnDmg]
+Attribute = AttributeSet_Test.Health
+ModifierOp = AddBase
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = -5.0
 ```
 
 字段说明：
@@ -491,14 +580,13 @@ Modifiers = Health:-5:AddBase
 
 ### 5.7 等级缩放（ScalableFloat）
 
-```ini
-; 方式1：固定值
-Period = 2.0
+`FScalableFloat` 在 INI 中只能读取一个裸 float 值（通过 `Parser<FScalableFloat>`）：
 
-; 方式2：曲线表
-Period.CurveTableName = BuffDuration
-Period.RowName = Burn
+```ini
+Period = 2.0
 ```
+
+> **限制：** `FScalableFloat` 的 `Curve` 成员（`CurveTableRowHandle` 类型）**没有** `PROPERTY()` 标签，`CurveTableRowHandle` 本身也未接入反射系统。因此 `Period.CurveTableName` 和 `Period.RowName` 等点分键写法**不生效**。曲线表功能需要在代码中手动设置 `Curve` 字段，或通过脚本操作。详见 [第 12 节](#12-curvetable曲线表) 和 [第 15 节](#15-已知限制)。
 
 FScalableFloat 通过 `GetValueAtLevel(int32 Level)` 获取指定等级的值，若有 CurveTable 则线性插值。
 
@@ -508,24 +596,23 @@ FScalableFloat 通过 `GetValueAtLevel(int32 Level)` 获取指定等级的值，
 [Effect_XXX]
 ; 基础
 DurationPolicy = Instant | Infinite | HasDuration
-DurationMagnitude = <ModifierMagnitude>         ; 仅 HasDuration，持续时间
-MaxDurationMagnitude = <ModifierMagnitude>      ; 持续时间上限，防止被延长超过此值
-Period = <FScalableFloat>                       ; 周期
-bExecutePeriodicEffectOnApplication = true
+; DurationMagnitude / MaxDurationMagnitude 是 GameplayEffectModifierMagnitude（IniComponent），
+; 用点分键配置，详见 5.9 节
+DurationMagnitude.MagnitudeCalculationType = ScalableFloat
+DurationMagnitude.ScalableFloatMagnitude = 10.0
+; MaxDurationMagnitude同理（可选）
+Period = 2.0                                    ; FScalableFloat，裸 float
+bExecutePeriodicEffectOnApplication = yes
 PeriodicInhibitionPolicy = NeverReset
 
-; 修改器
-Modifiers = Attr:Magnitude:ModOp, ...
+; 修改器（指针数组，通过 section 名引用）
+Modifiers = Mod_Section1, Mod_Section2
 
-; 执行定义
-Executions = ...
-
-; 组件
-GEComponents = Comp1, Comp2
+; 组件（指针数组，通过 section 名引用，$Type 指定子类型）
+GEComponents = Comp_Section1, Comp_Section2
 
 ; 游戏提示
-GameplayCues = ...
-bRequireModifierSuccessToTriggerCues = true
+bRequireModifierSuccessToTriggerCues = yes
 
 ; 堆叠
 StackingType = None | AggregateBySource | AggregateByTarget
@@ -533,11 +620,106 @@ StackLimitCount = 3
 StackDurationRefreshPolicy = RefreshOnSuccessfulApplication
 StackPeriodResetPolicy = NeverReset
 StackExpirationPolicy = ClearEntireStack
-bDenyOverflowApplication = false
-bClearStackOnOverflow = false
-bFactorInStackCount = false
-bSuppressStackingCues = false
-OverflowEffects = ...
+bDenyOverflowApplication = no
+bClearStackOnOverflow = no
+bFactorInStackCount = no
+bSuppressStackingCues = no
+OverflowEffects = Effect_Overflow1, Effect_Overflow2    ; GE section 名
+```
+
+### 5.9 嵌套字段的点分键写法
+
+GameplayEffect 中部分字段类型为 `IniComponent`（无 Parser 特化），这些字段通过**点分键**在当前 section 下展开子属性。支持多层嵌套，层数无限制。详见 [第 17 节 嵌套结构体 INI 加载](#17-嵌套结构体-ini-加载)。
+
+#### 哪些字段用点分键，哪些不用
+
+| 字段 | 类型 | 加载方式 | INI 写法 |
+|---|---|---|---|
+| DurationPolicy | enum | Parser（枚举名） | `DurationPolicy = HasDuration` |
+| DurationMagnitude | GameplayEffectModifierMagnitude | **点分键**（IniComponent，无 Parser） | `DurationMagnitude.MagnitudeCalculationType = ScalableFloat` |
+| MaxDurationMagnitude | GameplayEffectModifierMagnitude | **点分键** | 同上 |
+| Period | FScalableFloat | Parser（裸 float） | `Period = 2.0` |
+| bExecutePeriodicEffectOnApplication | bool | Parser | `bExecutePeriodicEffectOnApplication = yes` |
+| PeriodicInhibitionPolicy | enum | Parser | `PeriodicInhibitionPolicy = NeverReset` |
+| Modifiers | vector\<GameplayModifierInfo*\> | Parser（指针数组，section 名引用） | `Modifiers = Mod_Section1, Mod_Section2` |
+| GEComponents | vector\<GameplayEffectComponent*\> | Parser（多态指针数组，section 名引用） | `GEComponents = Comp_Section1` |
+| OverflowEffects | vector\<GameplayEffect*\> | Parser（指针数组，section 名引用） | `OverflowEffects = Effect_Overflow1` |
+| StackingType | enum | Parser | `StackingType = AggregateBySource` |
+| StackLimitCount | int32 | Parser | `StackLimitCount = 5` |
+| 各 bool 字段 | bool | Parser | `bFactorInStackCount = yes` |
+
+#### 单层嵌套：DurationMagnitude
+
+`DurationMagnitude` 类型为 `GameplayEffectModifierMagnitude`（IniComponent），其子字段用 `DurationMagnitude.子字段名` 展开：
+
+```ini
+[Effect_Buff]
+DurationPolicy = HasDuration
+; ScalableFloat 方式（ScalableFloatMagnitude 有 Parser，读裸 float）
+DurationMagnitude.MagnitudeCalculationType = ScalableFloat
+DurationMagnitude.ScalableFloatMagnitude = 10.0
+
+; SetByCaller 方式（SetByCallerMagnitude 有 Parser，读 GameplayTag）
+DurationMagnitude.MagnitudeCalculationType = SetByCaller
+DurationMagnitude.SetByCallerMagnitude = Damage.Amount
+```
+
+#### 多层嵌套：DurationMagnitude → AttributeBasedMagnitude → BackingAttribute
+
+当 `MagnitudeCalculationType = AttributeBased` 时，`AttributeBasedMagnitude` 子字段本身也是 IniComponent，继续用点分键展开，形成多层嵌套：
+
+```ini
+[Effect_AttrBased]
+DurationPolicy = HasDuration
+DurationMagnitude.MagnitudeCalculationType = AttributeBased
+; 第2层：AttributeBasedMagnitude 的子字段
+DurationMagnitude.AttributeBasedMagnitude.Coefficient = 1.0
+DurationMagnitude.AttributeBasedMagnitude.PreMultiplyAdditiveValue = 0.0
+DurationMagnitude.AttributeBasedMagnitude.PostMultiplyAdditiveValue = 0.0
+DurationMagnitude.AttributeBasedMagnitude.AttributeCalculationType = AttributeMagnitude
+; 第3层：BackingAttribute（GameplayEffectAttributeCaptureDefinition）的子字段
+DurationMagnitude.AttributeBasedMagnitude.BackingAttribute.AttributeToCapture = AttributeSet_Test.Health
+DurationMagnitude.AttributeBasedMagnitude.BackingAttribute.AttributeSource = Source
+DurationMagnitude.AttributeBasedMagnitude.BackingAttribute.bSnapshot = yes
+; SourceTagFilter / TargetTagFilter 有 Parser（GameplayTagContainer），读逗号分隔标签
+DurationMagnitude.AttributeBasedMagnitude.SourceTagFilter = Buff.Caster
+DurationMagnitude.AttributeBasedMagnitude.TargetTagFilter = Debuff.Target
+```
+
+#### 点分键 vs section 引用
+
+对于 IniComponent 类型的字段（无 Parser），除了点分键展开，也可以用 section 引用方式。两种方式不能混用，详见 [第 17 节](#17-嵌套结构体-ini-加载)：
+
+```ini
+; 方式1：点分键展开（推荐，简洁）
+[Effect_Buff]
+DurationMagnitude.MagnitudeCalculationType = ScalableFloat
+DurationMagnitude.ScalableFloatMagnitude = 10.0
+
+; 方式2：section 引用
+[Effect_Buff]
+DurationMagnitude = MagBuffDuration
+
+[MagBuffDuration]
+MagnitudeCalculationType = ScalableFloat
+ScalableFloatMagnitude = 10.0
+```
+
+#### Modifier 内部的点分键
+
+`GameplayModifierInfo` 本身是 `IniComponent`，其 `ModifierMagnitude` 子字段也是 `IniComponent`，同样支持多层点分键：
+
+```ini
+[Mod_HealHP]
+; 第1层：GameplayModifierInfo 的直接子字段
+Attribute = AttributeSet_Test.Health          ; GameplayAttribute 有 Parser
+ModifierOp = AddBase                          ; enum 有 Parser
+; 第2层：ModifierMagnitude（GameplayEffectModifierMagnitude）的子字段
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = 50.0   ; FScalableFloat 有 Parser
+; SourceTags / TargetTags 是 GameplayTagRequirements（IniComponent），支持点分键
+; SourceTags.RequireTags = Alive
+; SourceTags.IgnoreTags = Invincible
 ```
 
 ---
@@ -572,14 +754,24 @@ AssetTags = Effect.Buff, Effect.Physical
 
 #### 3. BlockAbilityTagsGEComponent — 阻止能力
 
-阻止带有指定标签的能力激活。使用 `FInheritedTagContainer`，支持父子继承（`Combined = Inherited - Removed + Added`）。
+阻止带有指定标签的能力激活。使用 `FInheritedTagContainer`，支持父子继承（`Combined = Inherited - Removed + Added`）。嵌套结构体支持两种 INI 配置方式（详见 [第 17 节](#17-嵌套结构体-ini-加载)）：
 
 ```ini
+; 方式1：点分键展开
 [Comp_BlockAbility]
 $Type = BlockAbilityTagsGEComponent
 InheritableBlockedAbilityTagsContainer.Added = Ability.Attack, Ability.Special
 ; InheritableBlockedAbilityTagsContainer.Removed = Ability.Safe
 ; InheritableBlockedAbilityTagsContainer.Inherited = Ability.Base
+
+; 方式2：section 引用
+[Comp_BlockAbility]
+$Type = BlockAbilityTagsGEComponent
+InheritableBlockedAbilityTagsContainer = MyBlockedTags
+
+[MyBlockedTags]
+Added = Ability.Attack, Ability.Special
+Removed = Ability.Safe
 ```
 
 #### 4. CancelAbilityTagsGEComponent — 取消能力
@@ -595,9 +787,10 @@ CancelMode = CancelOnApply  ; CancelOnApply | CancelOnRemove | CancelBoth
 
 #### 5. TagRequirementsGEComponent — 标签条件
 
-GE 应用前检查目标/来源的标签条件。提供三组独立的 `GameplayTagRequirements`，分别控制应用、持续和移除阶段。每组含 `RequireTags`、`IgnoreTags` 和 `TagQuery`。
+GE 应用前检查目标/来源的标签条件。提供三组独立的 `GameplayTagRequirements`，分别控制应用、持续和移除阶段。每组含 `RequireTags`、`IgnoreTags` 和 `TagQuery`。嵌套结构体支持两种 INI 配置方式（详见 [第 17 节](#17-嵌套结构体-ini-加载)）：
 
 ```ini
+; 方式1：点分键展开
 [Comp_TagReq]
 $Type = TagRequirementsGEComponent
 ApplicationTagRequirements.RequireTags = Alive
@@ -605,6 +798,20 @@ ApplicationTagRequirements.IgnoreTags = Invincible
 ; OngoingTagRequirements.RequireTags = Alive
 ; OngoingTagRequirements.IgnoreTags = Dead
 ; RemovalTagRequirements.RequireTags = Debuff.Cleansable
+
+; 方式2：section 引用
+[Comp_TagReq]
+$Type = TagRequirementsGEComponent
+ApplicationTagRequirements = AppReq
+OngoingTagRequirements = OngoingReq
+
+[AppReq]
+RequireTags = Alive
+IgnoreTags = Invincible
+
+[OngoingReq]
+RequireTags = Alive
+IgnoreTags = Dead
 ```
 
 #### 6. GrantedAbilitiesGEComponent — 授予能力
@@ -1056,11 +1263,15 @@ SetByCaller（由调用者设置）是一种动态数值机制，允许在运行
 ```ini
 ; 在 Effect 中声明使用 SetByCaller
 [Effect_DamageVariable]
-Modifiers = Health:0:AddBase
-; 或单独引用 — 直接写 GameplayTag 名称，无需 "DataTag." 前缀
-[DamageMagnitude]
-MagnitudeCalculationType = SetByCaller
-SetByCallerMagnitude = Damage.Amount
+Modifiers = Mod_DamageVar
+
+[Mod_DamageVar]
+Attribute = AttributeSet_Test.Health
+ModifierOp = AddBase
+; ModifierMagnitude 是嵌套 IniComponent，用点分键配置
+ModifierMagnitude.MagnitudeCalculationType = SetByCaller
+; SetByCallerMagnitude 有 Parser，直接读 GameplayTag 名称
+ModifierMagnitude.SetByCallerMagnitude = Damage.Amount
 ```
 
 SetByCaller 不仅可用于 Modifier，也可用于 Duration 和 MaxDuration。在 `DurationMagnitude` 或 `MaxDurationMagnitude` 中设置 `MagnitudeCalculationType = SetByCaller` 即可。
@@ -1125,20 +1336,24 @@ CurveTable（曲线表）提供等级相关的数值缩放。在 INI 中定义�
 
 ### 12.4 引用曲线表
 
+> **重要限制：** `FScalableFloat` 的 `Curve` 成员（`CurveTableRowHandle` 类型）没有 `PROPERTY()` 标签，且 `FScalableFloat` 有 `Parser<FScalableFloat>` 特化（只读裸 float）。因此以下写法**均不生效**：
+> - `Period.CurveTableName = BuffDuration`（点分键不生效，因为 FScalableFloat 走 Parser 路径）
+> - `ScalableFloatMagnitude.CurveTableName = BuffDuration`（同理，FScalableFloat 在 IniComponent 内部仍走 Parser）
+>
+> 曲线表目前只能通过**代码或脚本**手动设置 `FScalableFloat::Curve.CurveTableName` 字段来使用。INI 中 `FScalableFloat` 字段只能写裸 float 值（如 `Period = 2.0`）。
+
 ```ini
-; 在 FScalableFloat 中引用
+; INI 中只能这样写（裸 float）
 [Effect_LevelBuff]
 DurationPolicy = HasDuration
+Period = 2.0
+```
 
-; 方式1：通过 ModifierMagnitude 引用
-[BuffDuration]
-MagnitudeCalculationType = ScalableFloat
-ScalableFloatMagnitude.CurveTableName = BuffDuration
-ScalableFloatMagnitude.RowName = Duration_PerLevel
-
-; 方式2：直接在字段中引用 Period/数值 的曲线表
-Period.CurveTableName = BuffDuration
-Period.RowName = Burn
+```typescript
+// 通过脚本设置曲线表
+const effect = GameplayEffect.FindOrAllocate("Effect_LevelBuff");
+effect.m_Period.m_Curve.m_CurveTableName = new StringName("BuffDuration");
+// RowName 被读取但未实际用于查找（见下方限制）
 ```
 
 > **当前限制：** `GetValueAtLevel()` 实现中只使用 `CurveTableName` 查找曲线表，`RowName` 被读取但**未实际用于查找**。曲线表的数据结构为 `map<StringName, map<int32, float>>`（表名 → 单条曲线），没有 Row 维度。这意味着每个 `[CurveTable.XXX]` 节只能定义一条曲线。如果多个属性需要不同曲线，请使用不同的 `[CurveTable.XXX]` 节名。
@@ -1204,21 +1419,39 @@ TargetBlockedTags = Ally, Invincible
 ```ini
 [Effect_Heal]
 DurationPolicy = Instant
-Modifiers = Health:30:AddBase
-GameplayCues = ...
+Modifiers = Mod_HealHP
+
+[Mod_HealHP]
+Attribute = AttributeSet_Player.Health
+ModifierOp = AddBase
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = 30.0
 
 [Effect_Slow]
 DurationPolicy = HasDuration
-DurationMagnitude = 5.0
-Modifiers = Speed:-0.5:MultiplyAdditive
+DurationMagnitude.MagnitudeCalculationType = ScalableFloat
+DurationMagnitude.ScalableFloatMagnitude = 5.0
+Modifiers = Mod_SlowSpeed
 Period = 0
 GEComponents = Comp_SlowTag
+
+[Mod_SlowSpeed]
+Attribute = AttributeSet_Player.Speed
+ModifierOp = MultiplyAdditive
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = -0.5
 
 [Effect_Regen]
 DurationPolicy = Infinite
 Period = 1.0
-bExecutePeriodicEffectOnApplication = true
-Modifiers = Health:5:AddBase
+bExecutePeriodicEffectOnApplication = yes
+Modifiers = Mod_RegenHP
+
+[Mod_RegenHP]
+Attribute = AttributeSet_Player.Health
+ModifierOp = AddBase
+ModifierMagnitude.MagnitudeCalculationType = ScalableFloat
+ModifierMagnitude.ScalableFloatMagnitude = 5.0
 ```
 
 ### 13.5 GE 组件
@@ -1230,6 +1463,8 @@ GrantedTags = Buff.Regeneration
 
 [Comp_BlockStun]
 $Type = BlockAbilityTagsGEComponent
+; 可用点分键：InheritableBlockedAbilityTagsContainer.Added = Ability.Stun
+; 也可用 section 引用：InheritableBlockedAbilityTagsContainer = BlockedTagsSection
 InheritableBlockedAbilityTagsContainer.Added = Ability.Stun
 
 [Comp_ChanceHalf]
@@ -1401,7 +1636,10 @@ FOnActiveGameplayEffectInhibitionChanged* ASC.OnGameplayEffectInhibitionChangedD
 - `FScalableFloat` 的 `operator float()` 允许隐式转换，但需要注意当 CurveTable 设置后，直接使用 float 值会忽略曲线表缩放
 - 命名方式（DataName）的 SetByCaller 已经废弃，请优先使用标签方式（DataTag）
 - `AttributeSetDefine` 的 `AttributeSetCreator` 指向脚本路径，目前通过 `ScriptFunctionRegister` 的 loader 模式加载
+- **FScalableFloat CurveTable 无法从 INI 加载**：`FScalableFloat` 的 `Curve` 成员没有 `PROPERTY()` 标签，且有 `Parser<FScalableFloat>` 特化（只读裸 float）。INI 中 `Period.CurveTableName` 等点分键写法不生效，只能写裸 float（如 `Period = 2.0`）。曲线表需通过代码或脚本手动设置（详见 [第 12 节](#12-curvetable曲线表)）
 - **CurveTable RowName 未实现**：`GetValueAtLevel()` 只使用 `CurveTableName` 查找，`RowName` 被读取但未用于查找。每个 `[CurveTable.XXX]` 节只能定义一条曲线（详见 [第 12 节](#12-curvetable曲线表)）
+- **GameplayEffect 的 GameplayCues 字段无法从 INI 加载**：`GameplayEffectCue` 只有 `CLASS(BindJs)`，不是 `IniComponent` / `IniAutoLoad`，也没有 `Parser` 特化。`GameplayCues` 字段（`vector<GameplayEffectCue*>`）的指针解析会失败。Cue 触发应通过 `[GameplayCue.XXX]` INI 定义和 GameplayCueTag 机制实现（详见 [第 9 节](#9-gameplaycue游戏提示)）
+- **GameplayEffect 的 Executions 字段无法从 INI 加载**：`GameplayEffectExecutionDefinition` 只有 `CLASS(BindJs)`，不是 `IniComponent` / `IniAutoLoad`，也没有 `Parser` 特化。`Executions` 字段（`vector<GameplayEffectExecutionDefinition>`）的解析会失败。自定义 Execution 需通过脚本设置
 - `ChanceToApplyGEComponent` 使用 `rand()` 进行概率判定，帧同步环境下可能需要替换为基于种子的确定性随机
 
 ### 15.5 委托回调 API 变更（Breaking Change）
@@ -1522,3 +1760,55 @@ AbilityTask 现在带有 `AutoSavegame` 标记。任务状态会在存档时保�
 | ASC 事件监听（临时） | `AddStdFunction` | 不需要跨存档 |
 | AbilityTask 回调（需跨存档） | `BindScriptFunction` | 任务自动存档，回调也需可存档 |
 | AbilityTask 回调（不跨存档） | `BindStdFunction` | 任务存档后回调丢失，任务完成时无副作用 |
+
+---
+
+## 17. 嵌套结构体 INI 加载
+
+当一个 `IniComponent` 类的属性本身也是 `IniComponent` 结构体（非指针、无 Parser）时，INI 加载支持两种配置方式。加载时先尝试方式1，若未读到数据再尝试方式2。
+
+### 17.1 适用条件
+
+同时满足以下条件的属性支持两种加载方式：
+
+- 属性类型**不是指针**（如 `FInheritedTagContainer`，而非 `GameplayEffect*`）
+- 属性类型**没有 Parser 特化**（如 `GameplayTagRequirements`、`FInheritedTagContainer`）
+- 属性所在类和属性类型都有 `CLASS(IniComponent)` 标签
+
+有 Parser 的类型（如 `GameplayTagContainer`、`FScalableFloat`）和指针类型只走 Parser 路径，从 INI 读取单个字符串值。
+
+### 17.2 方式1：点分键展开
+
+在当前 section 下，用 `属性名.子字段名` 作为 INI key。支持多层嵌套（如 `A.B.C`）。
+
+```ini
+[Comp_BlockAbility]
+$Type = BlockAbilityTagsGEComponent
+InheritableBlockedAbilityTagsContainer.Added = Ability.Attack, Ability.Special
+InheritableBlockedAbilityTagsContainer.Removed = Ability.Safe
+```
+
+### 17.3 方式2：section 引用
+
+将属性值设为一个 section 名，然后去该 section 下用子字段名（无前缀）作为 key 读取。
+
+```ini
+[Comp_BlockAbility]
+$Type = BlockAbilityTagsGEComponent
+InheritableBlockedAbilityTagsContainer = MyBlockedTags
+
+[MyBlockedTags]
+Added = Ability.Attack, Ability.Special
+Removed = Ability.Safe
+```
+
+### 17.4 涉及的嵌套结构体
+
+| 结构体 | 使用场景 | 子字段 |
+|--------|---------|--------|
+| `FInheritedTagContainer` | `BlockAbilityTagsGEComponent.InheritableBlockedAbilityTagsContainer` | `Added`、`Removed`、`CombinedTags` |
+| `GameplayTagRequirements` | `TagRequirementsGEComponent.Application/Ongoing/RemovalTagRequirements` | `RequireTags`、`IgnoreTags`、`TagQuery` |
+
+### 17.5 执行顺序
+
+加载时**先尝试方式1**（点分键），如果当前 section 下没有任何 `属性名.*` 的键被读到，**再尝试方式2**（section 引用）。两种方式不会互相干扰，但不能混用——如果方式1已经成功读到了数据，方式2不会执行。
