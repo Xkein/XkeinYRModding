@@ -117,7 +117,7 @@ is_savegame = get_meta_tag(klass.meta, "AutoSavegame")
 #include "yr/component/ini_component.h"
 #include <GameClasses.h>
 #include <IsometricTileTypeClass.h>
-static bool LoadIni_{{klass.identifier}}({{klass.full_name}}& iniComponent, IniReader& reader, const char* pSection)
+static bool LoadIni_{{klass.identifier}}({{klass.full_name}}& iniComponent, IniReader& reader, const char* pSection, const char* pKey)
 {
     bool success = false;
 {{- for property in klass.properties ; $cpp_field = property.cpp_field
@@ -126,7 +126,10 @@ static bool LoadIni_{{klass.identifier}}({{klass.full_name}}& iniComponent, IniR
     end
     $ini_key = get_meta_value(property.meta, "IniField") ?? property.name
     }}
-    success |= IniComponentLoader::Load(reader, pSection, "{{$ini_key}}", iniComponent.{{property.name}});
+    {
+        std::string key = (pKey && *pKey) ? (std::string(pKey) + ".{{$ini_key}}") : "{{$ini_key}}";
+        success |= IniComponentLoader::Load(reader, pSection, key.c_str(), iniComponent.{{property.name}});
+    }
 {{- end }}
     return success;
 }

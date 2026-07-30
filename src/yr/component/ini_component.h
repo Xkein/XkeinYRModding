@@ -48,7 +48,7 @@ public:
     template<typename T>
     inline static bool Load(IniReader& parser, const char* pSection, const char* pKey, T& value);
 
-    template<typename Type, bool (*Func)(Type&, IniReader&, const char*)>
+    template<typename Type, bool (*Func)(Type&, IniReader&, const char*, const char*)>
     static void RegisterLoader(entt::meta_factory<Type>& factory);
 
     template<typename Type>
@@ -125,47 +125,53 @@ bool IniComponentLoader::Load(IniReader& parser, const char* pSection, const cha
     bool hasLoader = false;
     bool success = false;
 
-    // Recursively load base classes' INI first (from root to derived)
-    // This ensures inherited INI properties are loaded for each level in the hierarchy.
-    entt::meta_type type = entt::resolve<T>();
-    if (type)
+    // 点分键路径：仅在非指针且无 Parser 时走 __LoadIniComponent（递归加载子属性）
+    // 指针类型只走 Parser（原来的方式），不递归进入指针指向对象的子属性
+    if constexpr (!std::is_pointer_v<T> && !IsParserImplemented<T>)
     {
-        auto loadBases = [&](auto& self, entt::meta_type metaType) -> void {
-            for (auto&& [_, baseType] : metaType.base())
-            {
-                // Recurse into grandparent first
-                self(self, baseType);
-
-                // Load this base type's own INI properties
-                entt::meta_func baseFunc = baseType.func("__LoadIniComponent"_hs);
-                if (baseFunc)
+        // Recursively load base classes' INI first (from root to derived)
+        // This ensures inherited INI properties are loaded for each level in the hierarchy.
+        entt::meta_type type = entt::resolve<T>();
+        if (type)
+        {
+            auto loadBases = [&](auto& self, entt::meta_type metaType) -> void {
+                for (auto&& [_, baseType] : metaType.base())
                 {
-                    hasLoader = true;
-                    // Cast the derived reference to the base type via entt meta system
-                    entt::meta_any ref = entt::meta_any{std::ref(value)};
-                    if (entt::meta_any baseRef = ref.allow_cast(baseType); baseRef)
+                    // Recurse into grandparent first
+                    self(self, baseType);
+
+                    // Load this base type's own INI properties
+                    entt::meta_func baseFunc = baseType.func("__LoadIniComponent"_hs);
+                    if (baseFunc)
                     {
-                        success |= baseFunc.invoke(std::move(baseRef), parser, pSection).template cast<bool>();
+                        hasLoader = true;
+                        // Cast the derived reference to the base type via entt meta system
+                        entt::meta_any ref = entt::meta_any{std::ref(value)};
+                        if (entt::meta_any baseRef = ref.allow_cast(baseType); baseRef)
+                        {
+                            success |= baseFunc.invoke(std::move(baseRef), parser, pSection, pKey).template cast<bool>();
+                        }
                     }
                 }
+            };
+            loadBases(loadBases, type);
+        }
+
+        if (type)
+        {
+            entt::meta_func func = type.func("__LoadIniComponent"_hs);
+            if (func)
+            {
+                hasLoader = true;
+                success |= func.invoke(value, parser, pSection, pKey).cast<bool>();
             }
-        };
-        loadBases(loadBases, type);
+        }
     }
 
     if constexpr (IsParserImplemented<T>)
     {
         hasLoader = true;
         success |= parser.Read(pSection, pKey, value);
-    }
-    if (type)
-    {
-        entt::meta_func func = type.func("__LoadIniComponent"_hs);
-        if (func)
-        {
-            hasLoader = true;
-            success |= func.invoke(value, parser, pSection).cast<bool>();
-        }
     }
     if (success) {
         if constexpr (detail::ini_component_has_after<T>) {
@@ -181,7 +187,7 @@ bool IniComponentLoader::Load(IniReader& parser, const char* pSection, const cha
     return false;
 }
 
-template<typename Type, bool (*Func)(Type&, IniReader&, const char*)>
+template<typename Type, bool (*Func)(Type&, IniReader&, const char*, const char*)>
 void IniComponentLoader::RegisterLoader(entt::meta_factory<Type>& factory)
 {
     factory.func<Func>("__LoadIniComponent"_hs);

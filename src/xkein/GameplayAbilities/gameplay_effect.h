@@ -54,10 +54,12 @@ struct CurveTableRowHandle
 CLASS(BindJs)
 struct FScalableFloat
 {
+	PROPERTY()
     float Value = 0.0f;
     CurveTableRowHandle Curve;
 
     FScalableFloat() = default;
+	FUNCTION()
     FScalableFloat(float InValue) : Value(InValue) {}
 
     /** Implicit conversion to float for backward compatibility with existing code */
@@ -69,6 +71,7 @@ struct FScalableFloat
      * Otherwise, looks up the CurveTableName/RowName in AbilitySystemGlobals
      * and linearly interpolates between defined level points.
      */
+	FUNCTION()
     float GetValueAtLevel(int32 Level) const;
 };
 

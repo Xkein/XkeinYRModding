@@ -148,7 +148,7 @@ using FOnGameplayTagCountChanged = TMulticastDelegate<void(AbilitySystemComponen
  * Supports parent-child tag inheritance with Added/Removed operations.
  * Combined = Inherited - Removed + Added
  */
-CLASS()
+CLASS(IniComponent)
 struct FInheritedTagContainer
 {
     /** Combined tags = Inherited - Removed + Added */
