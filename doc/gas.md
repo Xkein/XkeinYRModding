@@ -43,7 +43,7 @@ Attribute  Ability     (Instant/Infinite/
                         (11种子类型)
                            |
                            v
-                      Aggregator
+                      FAggregator
                       (属性聚合器)
 ```
 
@@ -120,7 +120,7 @@ query.Matches(someContainer);
 
 ### 2.5 GameplayTagRequirements（标签需求）
 
-封装 RequireTags（必须含有）和 IgnoreTags（不能含有）：
+封装 RequireTags（必须含有）、IgnoreTags（不能含有）和 TagQuery（表达式树查询）：
 
 ```ini
 ; INI 配置 — 用于 Ability 和 GE 的标签检查
@@ -138,6 +138,7 @@ TargetBlockedTags = Ally.Invincible
 const req = new GameplayTagRequirements();
 req.m_RequireTags = tagContainer;
 req.m_IgnoreTags = otherContainer;
+req.m_TagQuery = GameplayTagQuery.MakeQuery_MatchAnyTagsMatch(container);
 
 req.RequirementsMet(someContainer);  // true/false
 ```
@@ -507,8 +508,8 @@ FScalableFloat 通过 `GetValueAtLevel(int32 Level)` 获取指定等级的值，
 [Effect_XXX]
 ; 基础
 DurationPolicy = Instant | Infinite | HasDuration
-DurationMagnitude = <ModifierMagnitude>         ; 仅 HasDuration
-MaxDurationMagnitude = <ModifierMagnitude>      ; 上限
+DurationMagnitude = <ModifierMagnitude>         ; 仅 HasDuration，持续时间
+MaxDurationMagnitude = <ModifierMagnitude>      ; 持续时间上限，防止被延长超过此值
 Period = <FScalableFloat>                       ; 周期
 bExecutePeriodicEffectOnApplication = true
 PeriodicInhibitionPolicy = NeverReset
@@ -571,95 +572,113 @@ AssetTags = Effect.Buff, Effect.Physical
 
 #### 3. BlockAbilityTagsGEComponent — 阻止能力
 
-阻止带有指定标签的能力激活。
+阻止带有指定标签的能力激活。使用 `FInheritedTagContainer`，支持父子继承（`Combined = Inherited - Removed + Added`）。
 
 ```ini
 [Comp_BlockAbility]
 $Type = BlockAbilityTagsGEComponent
-BlockedAbilityTags = Ability.Attack, Ability.Special
+InheritableBlockedAbilityTagsContainer.Added = Ability.Attack, Ability.Special
+; InheritableBlockedAbilityTagsContainer.Removed = Ability.Safe
+; InheritableBlockedAbilityTagsContainer.Inherited = Ability.Base
 ```
 
 #### 4. CancelAbilityTagsGEComponent — 取消能力
 
-取消正在运行的带有指定标签的能力。
+取消正在运行的带有指定标签的能力。支持通过 `CancelMode` 控制在 GE 应用时、移除时或两者都取消。
 
 ```ini
 [Comp_CancelAbility]
 $Type = CancelAbilityTagsGEComponent
-CancelAbilityTags = Ability.Concentration
+CancelAbilitiesWithTag = Ability.Concentration
+CancelMode = CancelOnApply  ; CancelOnApply | CancelOnRemove | CancelBoth
 ```
 
 #### 5. TagRequirementsGEComponent — 标签条件
 
-GE 应用前检查目标/来源的标签条件。
+GE 应用前检查目标/来源的标签条件。提供三组独立的 `GameplayTagRequirements`，分别控制应用、持续和移除阶段。每组含 `RequireTags`、`IgnoreTags` 和 `TagQuery`。
 
 ```ini
 [Comp_TagReq]
 $Type = TagRequirementsGEComponent
- RequireTags = Alive
- IgnoreTags = Invincible
+ApplicationTagRequirements.RequireTags = Alive
+ApplicationTagRequirements.IgnoreTags = Invincible
+; OngoingTagRequirements.RequireTags = Alive
+; OngoingTagRequirements.IgnoreTags = Dead
+; RemovalTagRequirements.RequireTags = Debuff.Cleansable
 ```
 
 #### 6. GrantedAbilitiesGEComponent — 授予能力
 
-GE 激活时向目标授予能力，移除时收回。
+GE 激活时向目标授予能力，移除时收回。通过 `GrantAbilityConfigs`（`vector<GameplayAbilitySpecDef>`）配置，每项包含 `Ability`、`LevelScalableFloat`、`InputID`、`RemovalPolicy` 等字段。也支持抑制状态变化时自动暂停/恢复。
 
 ```ini
 [Comp_GrantAbility]
 $Type = GrantedAbilitiesGEComponent
-GrantedAbility = Ability_FireBreath:1:0:CancelAbilityImmediately
+GrantAbilityConfigs = Ability_FireBreath:1:0:CancelAbilityImmediately
 ; 格式: AbilityDefine:Level:InputID:RemovalPolicy
 ```
 
 #### 7. ImmunityGEComponent — 免疫
 
-使目标免疫匹配的 GameplayEffect。
+使目标免疫匹配的 GameplayEffect。通过 `ImmunityQueries`（`vector<FGameplayEffectQuery>`）配置，每个 query 支持按 EffectDef、SourceTags、TargetTags、EffectTags 等多维度匹配。
 
 ```ini
 [Comp_Immunity]
 $Type = ImmunityGEComponent
-ImmuneToEffect = Effect_Poison, Effect_Burn
-ImmuneToTagQuery = Debuff.Dot
+ImmunityQueries = Query1, Query2
+; 每个 FGameplayEffectQuery 可配置: EffectDef, SourceTags, TargetTags, EffectTagsToMatch 等
+; 简单用法: 直接指定要免疫的 GE 或标签
 ```
 
 #### 8. ChanceToApplyGEComponent — 概率应用
 
-GE 按概率应用。
+GE 按概率应用。`ChanceToApplyToTarget` 为 `FScalableFloat` 类型，默认 1.0（始终应用），支持曲线表缩放。
 
 ```ini
 [Comp_Chance]
 $Type = ChanceToApplyGEComponent
-ChanceToApply = 0.5  ; 50% 概率
+ChanceToApplyToTarget = 0.5  ; 50% 概率
 ```
 
 #### 9. RemoveOtherGEComponent — 移除其他 GE
 
-GE 激活时移除其他指定 GE。
+GE 激活时移除其他指定 GE。通过 `RemoveGameplayEffectQueries`（`vector<FGameplayEffectQuery>`）配置，支持多维度匹配。
 
 ```ini
 [Comp_RemoveOther]
 $Type = RemoveOtherGEComponent
-RemoveEffects = Effect_Slow, Effect_Weakness
+RemoveGameplayEffectQueries = Query1, Query2
+; 每个 FGameplayEffectQuery 可配置: EffectDef, SourceTags, TargetTags 等
 ```
 
 #### 10. CustomCanApplyGEComponent — 自定义检查
 
-调用脚本函数决定 GE 是否可以应用。
+调用脚本函数决定 GE 是否可以应用。通过 `ApplicationRequirementCreators`（`vector<StringName>`）配置，每个 StringName 指向一个已注册的 ScriptFunction，迭代执行，任一返回 false 则阻止应用。
 
 ```ini
 [Comp_CustomCheck]
 $Type = CustomCanApplyGEComponent
-CustomCanApplyFunction = xkein/gas/can_apply_check
+ApplicationRequirementCreators = xkein/gas/can_apply_check
 ```
 
 #### 11. AdditionalEffectsGEComponent — 连锁效果
 
-GE 激活时额外应用其他 GE。
+GE 激活时额外应用其他 GE。提供 4 个 `vector<GameplayEffect*>` 字段，分别在不同时机触发：
+
+| 字段 | 触发时机 |
+|---|---|
+| `OnApplicationGameplayEffects` | GE 成功应用时 |
+| `OnCompleteAlways` | GE 移除时（无论原因） |
+| `OnCompleteNormal` | GE 自然过期时 |
+| `OnCompletePrematurely` | GE 被强制移除时 |
 
 ```ini
 [Comp_Additional]
 $Type = AdditionalEffectsGEComponent
-AdditionalEffects = Effect_SplashDamage, Effect_Knockback
+OnApplicationGameplayEffects = Effect_SplashDamage
+OnCompleteAlways = Effect_Cleanup
+OnCompleteNormal = Effect_ExpireBonus
+OnCompletePrematurely = Effect_Knockback
 ```
 
 ### 6.3 GEComponent 生命周期钩子
@@ -682,7 +701,7 @@ AbilityTask（能力任务）是 GameplayAbility 内的异步任务单元，管�
 
 **生命周期：** Create → InitTask → Activate → (工作) → EndTask → ReadyForDestroy → 清理
 
-### 7.2 全部 10 种任务
+### 7.2 全部 11 种任务
 
 | 任务 | 说明 | 使用示例 |
 |---|---|---|
@@ -697,6 +716,22 @@ AbilityTask（能力任务）是 GameplayAbility 内的异步任务单元，管�
 | WaitTargetData | 等待目标选择完成 | `WaitTargetData.Create(ability)` |
 | SpawnActor | 在指定位置生成单位 | `SpawnActor.Create(ability, type, loc)` |
 | Repeat | 重复执行回调 | `Repeat.Create(ability, 5, 1.0)` |
+
+各任务的回调委托：
+
+| 任务 | 回调委托 |
+|---|---|
+| WaitDelay | `OnFinish` |
+| WaitGameplayEvent | `OnEventReceived` |
+| WaitGameplayTagAdded | `OnTagAdded` |
+| WaitGameplayTagRemoved | `OnTagRemoved` |
+| WaitGameplayEffectApplied | `OnEffectApplied` |
+| WaitGameplayEffectRemoved | `OnEffectRemoved`, `OnInvalidHandle` |
+| WaitAttributeChange | `OnAttributeChanged` |
+| WaitInput | `OnInputPress`, `OnInputRelease` |
+| WaitTargetData | `OnTargetDataReady`, `OnTargetDataCancelled` |
+| SpawnActor | `OnSpawnComplete`, `OnSpawnFailed` |
+| Repeat | `OnPerformAction`, `OnFinished` |
 
 ### 7.3 任务使用示例
 
@@ -788,12 +823,12 @@ ASC.StartupEffects = Effect_BaseStats, Effect_PassiveRegen
 | OnActiveGameplayEffectAddedDelegateToSelf | (asc, spec, handle) | 持续 GE 添加时 |
 | OnPeriodicGameplayEffectExecuteDelegateOnSelf | (asc, spec, handle) | 周期 GE 对自己执行时 |
 | OnPeriodicGameplayEffectExecuteDelegateOnTarget | (asc, spec, handle) | 周期 GE 对目标执行时 |
-| AbilityFailedCallbacks | (ability, failureTags) | 能力激活失败时 |
-| AbilityEndedCallbacks | (ability) | 能力结束时 |
-| AbilityActivatedCallbacks | (handle, ability) | 能力激活时 |
-| AbilityCommittedCallbacks | (handle, ability) | 能力提交时 |
-| AbilitySpecDirtiedCallbacks | (spec) | 能力 spec 变脏时 |
-| OnImmunityBlockGameplayEffectDelegate | (spec, activeGE) | 免疫阻止 GE 时 |
+| AbilityFailedCallbacks | (asc, ability, failureTags) | 能力激活失败时 |
+| AbilityEndedCallbacks | (asc, ability) | 能力结束时 |
+| AbilityActivatedCallbacks | (asc, handle, ability) | 能力激活时 |
+| AbilityCommittedCallbacks | (asc, handle, ability) | 能力提交时 |
+| AbilitySpecDirtiedCallbacks | (asc, spec) | 能力 spec 变脏时 |
+| OnImmunityBlockGameplayEffectDelegate | (asc, spec, activeGE) | 免疫阻止 GE 时 |
 
 > **存档说明：** ASC 上的 multicast delegate 现在支持存档。使用 `AddScriptFunction(category, name)` 绑定的回调在存档时会保存 FuncId，读档时按 FuncId 恢复绑定。使用 `AddStdFunction(fn)` 绑定的 JS lambda 不可存档，存档时会记录警告并跳过，读档后该绑定丢失。详见[第 16 节 委托存档](#16-委托存档delegate-savegame)。
 
@@ -827,13 +862,36 @@ params.m_GameplayEffectLevel = 1;
 params.m_AbilityLevel = 1;
 ```
 
-### 9.4 三种 Notify 类型
+### 9.4 Notify 类型
 
-| 类型 | 说明 | 是否实例化 |
-|---|---|---|
-| **Static** | 无状态一次性效果（Wwise 事件+动画） | 否 |
-| **Actor** | 有状态持续效果（持有 AnimClass 实例） | 是（每实例） |
-| **Define** | 基于 INI 配置的效果定义 | 取决于定义类型 |
+系统中有两类 Notify：**INI 定义的 Define** 和 **C++ 运行时类**。
+
+#### INI Define 类型（通过 `[GameplayCue.XXX]` 配置）
+
+| 类型 | 说明 |
+|---|---|
+| **GameplayCueNotifyDefine_Static** | 无状态，支持 Wwise 音频 + 动画，响应所有事件 |
+| **GameplayCueNotifyDefine_Burst** | 只响应 Executed 事件 |
+| **GameplayCueNotifyDefine_Actor** | 有状态，支持持续性循环动画（LoopingAnim） |
+| **GameplayCueNotifyDefine_BurstLatent** | 有状态，只响应 Executed，带延迟，继承 Actor |
+
+#### C++ 运行时类
+
+| 类 | 说明 |
+|---|---|
+| **GameplayCueNotify_Static** | 无状态一次性 Cue，`OnExecute()` / `OnActive()` / `OnRemove()` |
+| **GameplayCueNotify_Burst** | 继承 Static，数组化 BurstEffects，覆盖 `OnExecute()` |
+| **GameplayCueNotify_Actor** | 有状态持续 Cue，支持 `OnBurst()` / `OnBecomeRelevant()` / `OnCeaseRelevant()` |
+| **GameplayCueNotify_BurstLatent** | 继承 Actor，带 `OnK2_OnBurst` TDelegate（JS 可重写） |
+| **GameplayCueNotify_Looping** | 继承 Actor，**四阶段效果模型**：ApplicationEffects（应用时）、LoopingEffects（持续中）、RecurringEffects（周期性）、RemovalEffects（移除时） |
+
+#### Custom 脚本变体（带 TDelegate 回调）
+
+| 类 | 可绑定的回调 |
+|---|---|
+| **CustomGameplayCueNotify_Static** | `OnK2_OnExecute`, `OnK2_OnActive`, `OnK2_OnRemove` |
+| **CustomGameplayCueNotify_BurstLatent** | `OnK2_OnBurst` |
+| **CustomGameplayCueNotify_Looping** | `OnK2_OnBurst`, `OnK2_OnBecomeRelevant`, `OnK2_OnCeaseRelevant` |
 
 ### 9.5 INI 配置
 
@@ -868,6 +926,8 @@ asc.IsGameplayCueActive(tag);
 
 ### 9.7 子类型
 
+INI Define 子类型：
+
 | 定义类 | 说明 |
 |---|---|
 | GameplayCueNotifyDefine_Static | 无状态，支持音频+动画 |
@@ -875,40 +935,93 @@ asc.IsGameplayCueActive(tag);
 | GameplayCueNotifyDefine_Actor | 有状态，支持持续性循环动画 |
 | GameplayCueNotifyDefine_BurstLatent | 有状态，只响应 Executed，带延迟 |
 
+C++ 运行时类和 Custom 脚本变体见 [9.4 节](#94-notify-类型)。
+
 ---
 
 ## 10. 属性聚合系统
 
 ### 10.1 概念
 
-Aggregator（属性聚合器）是 GAS 中负责组合所有 Modifier 并计算属性最终值的系统。每个被 GE 修改的属性都有一个对应的 FAggregator。
+FAggregator（属性聚合器）是 GAS 中负责组合所有 Modifier 并计算属性最终值的系统。每个被 GE 修改的属性都有一个对应的 FAggregator。代码移植自 UE 5.8 GAS FAggregator。
 
-### 10.2 计算公式
+### 10.2 通道系统（EGameplayModEvaluationChannel）
 
-```
-最终值 = (BaseValue + Sum_AddBase)
-     × (1 + Sum_MultiplyAdditive)
-     ÷ (1 + Sum_DivideAdditive)
-     × Product_MultiplyCompound
-     + Sum_AddFinal
-```
-
-特殊情况：如果存在 Override 类型的 Modifier，直接返回 Override 值。
-
-### 10.3 计算过程
+FAggregator 使用 **10 个求值通道**（Channel0 ~ Channel9）来分层应用 modifier。通道按数值顺序求值，前一通道的输出作为后一通道的输入。
 
 ```
-GameplayEffectAggregator::EvaluateAttribute
-  ├─ 检查 bHasOverride → 返回 OverrideValue
-  ├─ 从 BaseValue 开始
-  ├─ + Sum_AddBase (所有 AddBase 类 modifier 之和)
-  ├─ × (1 + Sum_MultiplyAdditive) (所有 MultiplyAdditive 类之和)
-  ├─ ÷ (1 + Sum_DivideAdditive) (防止除零)
-  ├─ × Product_MultiplyCompound (所有 MultiplyCompound 类之积)
-  └─ + Sum_AddFinal (所有 AddFinal 类之和)
+BaseValue → Channel0 求值 → Channel1 求值 → ... → Channel9 求值 → 最终值
 ```
 
-### 10.4 聚合器生命周期
+例如：BaseValue = 2，Channel0 有一个 +2 AddBase modifier，则 Channel1 接收到的 base value 为 4。
+
+大多数情况下 modifier 都在 Channel0 上，多通道用于需要分阶段计算的高级场景。
+
+### 10.3 单通道计算公式
+
+每个通道内部的计算公式：
+
+```
+((Base + Sum(AddBase))
+    × (1 + Sum(MultiplyAdditive))
+    ÷ (1 + Sum(DivideAdditive))
+    × Product(MultiplyCompound))
+    + Sum(AddFinal)
+```
+
+特殊情况：如果该通道内存在 Override 类型的 modifier，第一个符合条件的 Override modifier 直接返回，忽略其他计算。
+
+### 10.4 核心组件
+
+| 组件 | 说明 |
+|---|---|
+| `FAggregator` | 核心聚合器，持有 BaseValue 和 ModChannels，提供求值、modifier 管理、快照、依赖跟踪 |
+| `FAggregatorMod` | 单个 modifier 条目，含 EvaluatedMagnitude、SourceTagReqs、TargetTagReqs、ActiveHandle |
+| `FAggregatorModChannel` | 单通道，持有按 ModOp 分类的 modifier 数组，提供 `EvaluateWithBase()` |
+| `FAggregatorModChannelContainer` | 通道容器（map<Channel, ModChannel>），按数值顺序链式求值 |
+| `FAggregatorEvaluateParameters` | 求值参数，控制 modifier 资格（SourceTags、TargetTags、IgnoreHandles、过滤标签） |
+| `FAggregatorRef` | shared_ptr 包装，提供快照语义 |
+| `FScopedAggregatorOnDirtyBatch` | 批量锁，延迟 OnDirty 广播，避免多次 modifier 修改时的冗余重算 |
+
+### 10.5 Modifier 资格检查（Qualification）
+
+每个 modifier 在求值前会经过资格检查（`UpdateQualifies`），基于以下条件判断是否参与计算：
+
+- SourceTagReqs / TargetTagReqs — 来源/目标的标签需求
+- IgnoreHandles — 需要跳过的 GE 句柄
+- AppliedSourceTagFilter / AppliedTargetTagFilter — 应用的来源/目标标签过滤
+- IncludePredictiveMods — 是否包含预测 modifier（帧同步环境下始终为 false）
+
+### 10.6 属性捕获系统（FGameplayEffectAttributeCaptureSpec）
+
+用于 Execution 类型的 GE，在执行时捕获属性值：
+
+- `CaptureAttributes(ASC, CaptureSource)` — 从 ASC 捕获属性，分 Source/Target 两区
+- `AttemptCalculateAttributeMagnitude()` — 计算属性最终值
+- `AttemptCalculateAttributeBaseValue()` — 获取属性基础值
+- `AttemptCalculateAttributeBonusMagnitude()` — 计算 bonus（最终值 - 基础值）
+- `AttemptCalculateAttributeContributionMagnitude()` — 计算指定 GE 的贡献值
+- `AttemptGetAttributeAggregatorSnapshot()` — 获取聚合器快照（深拷贝）
+- 支持 Snapshot（捕获时固定值）和非 Snapshot（实时读取）两种模式
+
+### 10.7 快照与依赖跟踪
+
+- `TakeSnapshotOf()` — 深拷贝另一个聚合器的状态（BaseValue + 所有通道 modifier）
+- `AddDependent(handle)` — 注册依赖的 GE 句柄，当聚合器变化时通知依赖方
+- `OnDirty` 委托 — 聚合器变脏时广播，可被 `FScopedAggregatorOnDirtyBatch` 延迟
+
+### 10.8 计算过程
+
+```
+FAggregator::Evaluate(Parameters)
+  ├─ EvaluateQualificationForAllMods(Parameters) — 更新所有 modifier 的资格
+  └─ ModChannels.EvaluateWithBase(BaseValue, Parameters)
+       ├─ 按 Channel0 → Channel9 顺序遍历
+       ├─ 每个 Channel: 检查 Override → 按公式计算 → 输出作为下个 Channel 的 base
+       └─ 返回最终值
+```
+
+### 10.9 聚合器生命周期
 
 ```
 属性被 GE 修改
@@ -944,11 +1057,13 @@ SetByCaller（由调用者设置）是一种动态数值机制，允许在运行
 ; 在 Effect 中声明使用 SetByCaller
 [Effect_DamageVariable]
 Modifiers = Health:0:AddBase
-; 或单独引用
+; 或单独引用 — 直接写 GameplayTag 名称，无需 "DataTag." 前缀
 [DamageMagnitude]
 MagnitudeCalculationType = SetByCaller
-SetByCallerMagnitude = DataTag.Damage.Amount
+SetByCallerMagnitude = Damage.Amount
 ```
+
+SetByCaller 不仅可用于 Modifier，也可用于 Duration 和 MaxDuration。在 `DurationMagnitude` 或 `MaxDurationMagnitude` 中设置 `MagnitudeCalculationType = SetByCaller` 即可。
 
 ### 11.4 脚本 API
 
@@ -1025,6 +1140,8 @@ ScalableFloatMagnitude.RowName = Duration_PerLevel
 Period.CurveTableName = BuffDuration
 Period.RowName = Burn
 ```
+
+> **当前限制：** `GetValueAtLevel()` 实现中只使用 `CurveTableName` 查找曲线表，`RowName` 被读取但**未实际用于查找**。曲线表的数据结构为 `map<StringName, map<int32, float>>`（表名 → 单条曲线），没有 Row 维度。这意味着每个 `[CurveTable.XXX]` 节只能定义一条曲线。如果多个属性需要不同曲线，请使用不同的 `[CurveTable.XXX]` 节名。
 
 ### 12.5 GetValueAtLevel 行为
 
@@ -1113,11 +1230,11 @@ GrantedTags = Buff.Regeneration
 
 [Comp_BlockStun]
 $Type = BlockAbilityTagsGEComponent
-BlockedAbilityTags = Ability.Stun
+InheritableBlockedAbilityTagsContainer.Added = Ability.Stun
 
 [Comp_ChanceHalf]
 $Type = ChanceToApplyGEComponent
-ChanceToApply = 0.5
+ChanceToApplyToTarget = 0.5
 ```
 
 ### 13.6 [CurveTable.XXX] — 曲线表
@@ -1260,18 +1377,21 @@ GameplayCueNotify 的 CDO（类默认对象）注册机制还没有完全在脚�
 const target = XkeinTools.FindFirstTarget(new QuerySphere(location, radius, QueryFlags.Techno));
 ```
 
-### 15.3 OnGameplayEffectRemoved_InfoDelegate 未暴露给脚本
+### 15.3 Per-Active-Effect 事件委托未暴露给脚本
 
-每个活跃 GE 的按句柄移除回调（`FOnActiveGameplayEffectRemoved_Info`）还没有在脚本层直接暴露。
+每个活跃 GE 有一组按句柄的事件委托（`FActiveGameplayEffectEvents`），包括 `OnRemoved`、`OnStackChanged`、`OnTimeChanged`、`OnInhibitionChanged`，以及 ASC 上的访问器方法（`OnGameplayEffectRemoved_InfoDelegate`、`OnGameplayEffectStackChangeDelegate`、`OnGameplayEffectTimeChangeDelegate`、`OnGameplayEffectInhibitionChangedDelegate`）。这些目前未在脚本层直接暴露。
 
-**影响：** 无法在 TypeScript 中监听某个特定活跃 GE 的移除事件。
+**影响：** 无法在 TypeScript 中监听某个特定活跃 GE 的移除、堆叠变化、时间变化或抑制状态变化事件。
 
 ```cpp
 // C++ API（当前脚本不可达）
 FOnActiveGameplayEffectRemoved_Info* ASC.OnGameplayEffectRemoved_InfoDelegate(Handle);
+FOnActiveGameplayEffectStackChange* ASC.OnGameplayEffectStackChangeDelegate(Handle);
+FOnActiveGameplayEffectTimeChange* ASC.OnGameplayEffectTimeChangeDelegate(Handle);
+FOnActiveGameplayEffectInhibitionChanged* ASC.OnGameplayEffectInhibitionChangedDelegate(Handle);
 ```
 
-**替代方案：** 使用 `OnActiveGameplayEffectAddedDelegateToSelf` 配合 `AbilityTask_WaitGameplayEffectRemoved` 任务来监听特定 GE 的移除。
+**替代方案：** 使用 `OnActiveGameplayEffectAddedDelegateToSelf` 配合 `AbilityTask_WaitGameplayEffectRemoved` 任务来监听特定 GE 的移除。堆叠和时间变化目前无直接替代方案。
 
 ### 15.4 其他注意事项
 
@@ -1281,6 +1401,8 @@ FOnActiveGameplayEffectRemoved_Info* ASC.OnGameplayEffectRemoved_InfoDelegate(Ha
 - `FScalableFloat` 的 `operator float()` 允许隐式转换，但需要注意当 CurveTable 设置后，直接使用 float 值会忽略曲线表缩放
 - 命名方式（DataName）的 SetByCaller 已经废弃，请优先使用标签方式（DataTag）
 - `AttributeSetDefine` 的 `AttributeSetCreator` 指向脚本路径，目前通过 `ScriptFunctionRegister` 的 loader 模式加载
+- **CurveTable RowName 未实现**：`GetValueAtLevel()` 只使用 `CurveTableName` 查找，`RowName` 被读取但未用于查找。每个 `[CurveTable.XXX]` 节只能定义一条曲线（详见 [第 12 节](#12-curvetable曲线表)）
+- `ChanceToApplyGEComponent` 使用 `rand()` 进行概率判定，帧同步环境下可能需要替换为基于种子的确定性随机
 
 ### 15.5 委托回调 API 变更（Breaking Change）
 
