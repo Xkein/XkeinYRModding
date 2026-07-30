@@ -125,15 +125,21 @@ bool IniComponentLoader::Load(IniReader& parser, const char* pSection, const cha
     bool hasLoader = false;
     bool success = false;
 
-    // 点分键路径：仅在非指针且无 Parser 时走 __LoadIniComponent（递归加载子属性）
-    // 指针类型只走 Parser（原来的方式），不递归进入指针指向对象的子属性
+    // 非指针且无 Parser 时走 __LoadIniComponent（递归加载子属性）
+    // 支持两种 INI 配置方式：
+    //   方式1（点分键展开）：Container.SubField = Value（在当前 section 下用 pKey 作为前缀读取）
+    //   方式2（section 引用）：Container = SectionName，然后去 [SectionName] 节下读取子属性
+    // 指针类型只走 Parser，不递归进入指针指向对象的子属性
     if constexpr (!std::is_pointer_v<T> && !IsParserImplemented<T>)
     {
-        // Recursively load base classes' INI first (from root to derived)
-        // This ensures inherited INI properties are loaded for each level in the hierarchy.
         entt::meta_type type = entt::resolve<T>();
-        if (type)
-        {
+
+        // 加载基类和自身的 INI 属性，section/key 可指定
+        auto doLoadIniComponent = [&](const char* section, const char* key) {
+            if (!type) return;
+
+            // Recursively load base classes' INI first (from root to derived)
+            // This ensures inherited INI properties are loaded for each level in the hierarchy.
             auto loadBases = [&](auto& self, entt::meta_type metaType) -> void {
                 for (auto&& [_, baseType] : metaType.base())
                 {
@@ -149,21 +155,35 @@ bool IniComponentLoader::Load(IniReader& parser, const char* pSection, const cha
                         entt::meta_any ref = entt::meta_any{std::ref(value)};
                         if (entt::meta_any baseRef = ref.allow_cast(baseType); baseRef)
                         {
-                            success |= baseFunc.invoke(std::move(baseRef), parser, pSection, pKey).template cast<bool>();
+                            success |= baseFunc.invoke(std::move(baseRef), parser, section, key).template cast<bool>();
                         }
                     }
                 }
             };
             loadBases(loadBases, type);
-        }
 
-        if (type)
-        {
             entt::meta_func func = type.func("__LoadIniComponent"_hs);
             if (func)
             {
                 hasLoader = true;
-                success |= func.invoke(value, parser, pSection, pKey).cast<bool>();
+                success |= func.invoke(value, parser, section, key).cast<bool>();
+            }
+        };
+
+        // 方式1：点分键展开（pKey 作为前缀，在当前 section 下读取）
+        doLoadIniComponent(pSection, pKey);
+
+        // 方式2：如果方式1未读到数据，尝试将 pKey 的值作为 section 名引用
+        if (!success && pKey && *pKey)
+        {
+            if (parser.ReadString(pSection, pKey))
+            {
+                // 拷贝 section 名，因为后续 ReadString 会覆盖共享 buffer
+                std::string sectionName = parser.value();
+                if (!sectionName.empty())
+                {
+                    doLoadIniComponent(sectionName.c_str(), nullptr);
+                }
             }
         }
     }
