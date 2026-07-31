@@ -29,9 +29,13 @@ var global = global || (function () { return this; }());
     puerts.$unref = unref;
     puerts.$set = setref;
 
+    // Keep registered functions alive: the registry stores raw pointers, so a collected JS wrapper would destroy the underlying C++ object and leave a dangling pointer (see doc/script_function.md §4.4).
+    var persistentScriptFunctions = global.__scriptFunctionPersistentObjs || (global.__scriptFunctionPersistentObjs = []);
+
     // public static void RegisterFunction(char const * category, char const * name, ScriptFunctionBase * func)
     global.RegisterScriptFunction = function (category, name, func) {
         YrExtCore.ScriptFunctionRegister.RegisterFunction(category, name, func);
+        persistentScriptFunctions.push(func);
         return func;
     }
 }(global));

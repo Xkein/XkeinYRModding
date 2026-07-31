@@ -9,7 +9,7 @@
 ScriptFunction 是注册在 `ScriptFunctionRegister` 中的可调用对象（callable object），通过 **category + name** 组合唯一标识。脚本侧可以用 category 和 name 精确地注册、查找并调用某个可调用对象，而无需持有其指针本身。
 
 - 可调用对象：`ScriptFunction<TFunc>` 继承自 `std::function<TFunc>`，因此本质上是一个带签名类型的可调用包装（`src/core/tool/script_function.h:21-26`）。
-- 唯一标识：每个已注册的 ScriptFunction 以 `(category, name)` 为键存放在全局注册表 `GScriptFunctions` 中（`src/core/tool/script_function.cpp:6`、`:18-29`）。
+- 唯一标识：每个已注册的 ScriptFunction 以 `(category, name)` 为键存放在全局注册表 `GScriptFunctions` 中（`src/core/tool/script_function.cpp:6`、`:18-46`）。
 - 使用场景：C++ 侧定义签名并绑定回调，脚本侧按 category/name 引用，两者通过注册表解耦。
 
 > **English:** A ScriptFunction is a callable object registered in the ScriptFunctionRegister, uniquely identified by a category plus a name pair. The ScriptFunction<TFunc> type inherits from std::function<TFunc>, so it is essentially a typed callable wrapper, and the global registry stores each entry keyed by (category, name).
@@ -38,8 +38,8 @@ ScriptFunction 机制由三个核心 C++ 类型构成（均定义于 `src/core/t
 
 注册表提供两种注册方式：
 
-1. **立即注册 `RegisterFunction(category, name, func)`**：调用时直接把 `func` 写入注册表，并同步写入 FuncId 映射（`src/core/tool/script_function.cpp:18-29`）。适合在脚本加载期确定注册的回调。
-2. **惰性注册 `RegisterLoader(category, loader)`**：仅登记 loader（加载器），不立即注册具体函数；当按名查找未命中时，会按顺序调用该 category 下的 loader 补注册，再重新查找（`src/core/tool/script_function.cpp:31-38`、`:40-75`）。适合数量大、按需创建的回调集合。
+1. **立即注册 `RegisterFunction(category, name, func)`**：调用时直接把 `func` 写入注册表，并同步写入 FuncId 映射（`src/core/tool/script_function.cpp:18-46`）。适合在脚本加载期确定注册的回调。**覆盖语义**：同一 `(category, name)` 被不同对象重复注册时，新条目覆盖旧条目，并打印警告（含 category/name/FuncId，检测与警告见 `script_function.cpp:29-40`）；热重载后的重注册是**预期场景**（见 §2.4/§3.6），但每次热重载（模块重执行、新对象指针）都会触发一次该警告——属**预期噪音**，作者借此区分「预期重载」与「误撞名」。
+2. **惰性注册 `RegisterLoader(category, loader)`**：仅登记 loader（加载器），不立即注册具体函数；当按名查找未命中时，会按顺序调用该 category 下的 loader 补注册，再重新查找（`src/core/tool/script_function.cpp:48-55`、`:57-92`）。适合数量大、按需创建的回调集合。
 
 文件地图：
 
@@ -118,7 +118,7 @@ ScriptFunction 机制由三个核心 C++ 类型构成（均定义于 `src/core/t
 
 ## 存档问题（Savegame / Archive）
 
-存档/读档是脚本回调在持久化场景下的核心考验：游戏存档（AutoSavegame 反射标签与 cereal 序列化，见 `doc/meta.md:201-248`、`:347-371`）会把委托的绑定状态写盘、再在下次运行读回。委托的 cereal 序列化对不同类型的绑定采取截然不同的策略——**只有 `BindScriptFunction` / `AddScriptFunction` 绑定的回调能被保存与恢复**，其余绑定（entt 静态绑定、std::function lambda）要么被跳过、要么被静默丢弃。本节对照序列化三态、FuncId 稳定性、注册时机、读档惰性恢复与 GC 危险模型，全部事实可溯源到 `src/core/tool/delegate.h`、`src/core/string/string_name.h` 与 `src/core/tool/script_function.cpp`；`doc/gas.md` §16（第 1678-1762 行）已从「用法」角度给出结论（两种绑定方式对比、注册时机），本节从「机制」角度解释其所以然（FuncId 内容哈希、惰性解析、GC 危险模型），两处可互相参照。
+存档/读档是脚本回调在持久化场景下的核心考验：游戏存档（AutoSavegame 反射标签与 cereal 序列化，见 `doc/meta.md:201-248`、`:347-371`）会把委托的绑定状态写盘、再在下次运行读回。委托的 cereal 序列化对不同类型的绑定采取截然不同的策略——**只有 `BindScriptFunction` / `AddScriptFunction` 绑定的回调能被保存与恢复**，其余绑定（entt 静态绑定、std::function lambda）要么被跳过、要么被静默丢弃。本节对照序列化三态、FuncId 稳定性、注册时机、读档惰性恢复与 GC 危险模型，全部事实可溯源到 `src/core/tool/delegate.h`、`src/core/string/string_name.h` 与 `src/core/tool/script_function.cpp`；`doc/gas.md` §16（第 1707-1795 行）已从「用法」角度给出结论（两种绑定方式对比、注册时机），本节从「机制」角度解释其所以然（FuncId 内容哈希、惰性解析、GC 危险模型），两处可互相参照。
 
 ### 3.1 序列化行为对照
 
@@ -140,9 +140,9 @@ ScriptFunction 机制由三个核心 C++ 类型构成（均定义于 `src/core/t
 
 读档分支：仅当 `Type == "ScriptFunction"` 时才重建 `FScriptFunctionBinding{FuncId}`；`""` / `"Unsupported"` / 未知类型一律落回 monostate（unbound），`src/core/tool/delegate.h:288-297`。
 
-> 对照已有文档：`doc/gas.md:1010`（ASC multicast 存档说明：`AddScriptFunction` 存 FuncId、`AddStdFunction` 静默丢弃、仅单播记录警告）、`doc/gas.md:1678-1762`（§16 委托存档，两种绑定方式对比与注册时机）。
+> 对照已有文档：`doc/gas.md:1029`（ASC multicast 存档说明：`AddScriptFunction` 存 FuncId、`AddStdFunction` 静默丢弃、仅单播记录警告）、`doc/gas.md:1707-1795`（§16 委托存档，两种绑定方式对比与注册时机）。
 
-> **English:** This section compares serialization behavior across binding kinds. Only ScriptFunction bindings are persisted: TDelegate::save writes the FuncId and TMulticastDelegate::save writes the FuncId list. Non-serializable bindings (entt static bindings and std::function lambdas) are dropped: TDelegate logs a warning and writes the "Unsupported" marker so the load becomes unbound (monostate), while TMulticastDelegate silently discards them without any warning, since its save only iterates m_scriptFunctionListeners. The serialization has three states: "" for unbound, "Unsupported" for non-serializable bindings, and "ScriptFunction" plus FuncId for registered ScriptFunction bindings. See also doc/gas.md:1010 and doc/gas.md §16.
+> **English:** This section compares serialization behavior across binding kinds. Only ScriptFunction bindings are persisted: TDelegate::save writes the FuncId and TMulticastDelegate::save writes the FuncId list. Non-serializable bindings (entt static bindings and std::function lambdas) are dropped: TDelegate logs a warning and writes the "Unsupported" marker so the load becomes unbound (monostate), while TMulticastDelegate silently discards them without any warning, since its save only iterates m_scriptFunctionListeners. The serialization has three states: "" for unbound, "Unsupported" for non-serializable bindings, and "ScriptFunction" plus FuncId for registered ScriptFunction bindings. See also doc/gas.md:1029 and doc/gas.md §16.
 
 ### 3.2 FuncId 稳定性
 
@@ -164,9 +164,9 @@ FuncId 能否跨会话恢复，取决于它的派生方式是否确定：
 
 1. **绑定前**：`BindScriptFunction(category, funcName)` 先用 `ScriptFunctionRegister::GetFunctionAs<...>` 校验函数已注册，**未命中则不绑定、保持原状态**（`src/core/tool/delegate.h:141-151`）。函数未注册时，绑定这一步就静默失败了。
 2. **存档前**：函数需已注册——`save` 只把 `FScriptFunctionBinding` 里已存的 FuncId 写盘，**不做任何校验**（`src/core/tool/delegate.h:268-272`）；若绑定建立时函数未注册，这里没有有效 FuncId 可写（见上一条）。
-3. **读档后调用前**：函数必须已注册进注册表的 FuncId 映射 `GFuncIdMap`——`GetFunctionById` 只查该 map（`src/core/tool/script_function.cpp:77-85`），**没有 loader 回退**；**注意**：loader 仅在按名解析（如重新执行 `BindScriptFunction`）时经 `GetFunction` 触发（`src/core/tool/script_function.cpp:40-75`），**不会**自动恢复读档还原出的 FuncId 绑定——读档后不能只依赖 loader，需在启动期（如脚本加载阶段）统一注册，见 `doc/gas.md:1744`。
+3. **读档后调用前**：函数必须已注册进注册表的 FuncId 映射 `GFuncIdMap`——`GetFunctionById` 只查该 map（`src/core/tool/script_function.cpp:94-102`），**没有 loader 回退**；**注意**：loader 仅在按名解析（如重新执行 `BindScriptFunction`）时经 `GetFunction` 触发（`src/core/tool/script_function.cpp:57-92`），**不会**自动恢复读档还原出的 FuncId 绑定——读档后不能只依赖 loader，需在启动期（如脚本加载阶段）统一注册，见 `doc/gas.md:1774`。
 
-> **English:** Registration timing matters at three points. Before binding, BindScriptFunction validates via GetFunctionAs and refuses to bind an unregistered function (delegate.h:141-151). Before saving, the function must be registered, because save only writes the already-stored FuncId without any validation (delegate.h:268-272). After loading and before calling, the function must be registered in the GFuncIdMap, because GetFunctionById only queries that map with no loader fallback (script_function.cpp:77-85); the loader path fires only during by-name resolution such as a fresh BindScriptFunction (script_function.cpp:40-75) and never auto-restores FuncId bindings restored from a savegame, so you cannot rely on loaders alone after loading.
+> **English:** Registration timing matters at three points. Before binding, BindScriptFunction validates via GetFunctionAs and refuses to bind an unregistered function (delegate.h:141-151). Before saving, the function must be registered, because save only writes the already-stored FuncId without any validation (delegate.h:268-272). After loading and before calling, the function must be registered in the GFuncIdMap, because GetFunctionById only queries that map with no loader fallback (script_function.cpp:94-102); the loader path fires only during by-name resolution such as a fresh BindScriptFunction (script_function.cpp:57-92) and never auto-restores FuncId bindings restored from a savegame, so you cannot rely on loaders alone after loading.
 
 ### 3.4 读档恢复（惰性解析）
 
@@ -184,9 +184,10 @@ FuncId 能否跨会话恢复，取决于它的派生方式是否确定：
 
 - **存档序列化仅读写 FuncId 数值，不触碰注册表指针，不存在存档期悬垂风险**：`TDelegate::save` 只写 `FuncId`（`src/core/tool/delegate.h:268-272`）、`TMulticastDelegate::save` 只收集 FuncId 列表（`:637-640`），序列化全程不查询、不解引用任何 ScriptFunction 指针，自然没有悬垂的机会。
 - 悬垂 use-after-free **只可能发生在调用时**：`Execute` 解引用 `GetFunctionById` 返回的指针后调用 `(*sf)(...)`（`src/core/tool/delegate.h:195-216`，解析与守卫 `:198-206`，调用 `:209` / `:214`）；`Broadcast` 同理（`:611-614`）。典型场景：注册表条目指向的对象已被 GC 释放、而注册表未同步清理，调用时拿到悬垂指针再 `(*sf)(...)` 即构成 UAF。
+- **经 `RegisterScriptFunction` 注册的 wrapper 已自动持久化**（`src/scripts/javascript/utilities.js:36-40`，见 §4.2），**无需手动保持引用**；仅裸 `RegisterFunction` 调用与 loader 路径（gas.ts 的 creator 返回路径）仍需按 §4.4 的手动 `persistentObjs` 惯例保持引用。
 - `IsBound` 只做 map 查找 / 容器判空、**不解引用**：`FScriptFunctionBinding::IsBound` 仅 `GetFunctionById(FuncId) != nullptr`（`src/core/tool/delegate.h:93-96`）、`TDelegate::IsBound` 仅 `m_storage.index() != 0`（`:238-241`）、`TMulticastDelegate::IsBound` 仅检查三个容器是否为空（`:621-627`）。它们都不会调用函数指针，**不得把 IsBound 列为 UAF 发生点**。
 
-> **English:** The GC hazard model. Serialization only reads and writes the FuncId numeric value and never touches registry pointers, so there is no dangling-pointer risk during save or load. A use-after-free can only occur at call time: Execute resolves and dereferences the pointer returned by GetFunctionById and then invokes (*sf)(...) (delegate.h:195-216, resolution and guard at 198-206, invocation at 209/214), and Broadcast does the same (delegate.h:611-614). IsBound performs only a map lookup or a container emptiness check and never dereferences (delegate.h:93-96, 238-241, 621-627), so it is not a UAF site.
+> **English:** The GC hazard model. Serialization only reads and writes the FuncId numeric value and never touches registry pointers, so there is no dangling-pointer risk during save or load. A use-after-free can only occur at call time: Execute resolves and dereferences the pointer returned by GetFunctionById and then invokes (*sf)(...) (delegate.h:195-216, resolution and guard at 198-206, invocation at 209/214), and Broadcast does the same (delegate.h:611-614). IsBound performs only a map lookup or a container emptiness check and never dereferences (delegate.h:93-96, 238-241, 621-627), so it is not a UAF site. Wrappers registered through the RegisterScriptFunction helper are persisted automatically (utilities.js:36-40, see §4.2) and need no manual reference keeping; only bare RegisterFunction calls and loader paths (the gas.ts creator-return path) still require the manual persistentObjs convention of §4.4.
 
 ### 3.6 热重载与存档
 
@@ -217,10 +218,23 @@ ScriptFunction 的每个签名都必须在 C++ 侧**显式绑定**后才能在 J
 
 ### 4.2 用 RegisterScriptFunction 简化注册
 
-注册表本身暴露的是 `ScriptFunctionRegister.RegisterFunction(category, name, func)`（`src/scripts/javascript/typings/yr/gen/YrExtCore.d.ts:33-44`），**不返回实例**。全局助手 `RegisterScriptFunction` 把它包成"一步注册 + 返回实例"：
+注册表本身暴露的是 `ScriptFunctionRegister.RegisterFunction(category, name, func)`（`src/scripts/javascript/typings/yr/gen/YrExtCore.d.ts:33-44`），**不返回实例**。全局助手 `RegisterScriptFunction` 把它包成"一步注册 + 返回实例"，并在注册后自动持久化 wrapper、防止其被 GC 回收（防 GC 机制见 §3.5，与 §4.4 的 loader 路径形成对照）：
 
-- 实现：`src/scripts/javascript/utilities.js:33-36`——`global.RegisterScriptFunction = function (category, name, func) { YrExtCore.ScriptFunctionRegister.RegisterFunction(category, name, func); return func; }`
+- 实现：`src/scripts/javascript/utilities.js:36-40`：
+
+```js
+// Keep registered functions alive: the registry stores raw pointers, so a collected JS wrapper would destroy the underlying C++ object and leave a dangling pointer (see doc/script_function.md §4.4).
+var persistentScriptFunctions = global.__scriptFunctionPersistentObjs || (global.__scriptFunctionPersistentObjs = []);
+
+global.RegisterScriptFunction = function (category, name, func) {
+    YrExtCore.ScriptFunctionRegister.RegisterFunction(category, name, func);
+    persistentScriptFunctions.push(func);
+    return func;
+}
+```
+
 - TS 声明：`src/scripts/javascript/typings/yr/scriptable.d.ts:16`——`function RegisterScriptFunction<TScriptFunction extends ScriptFunction<any>>(category : string, name : string, func : TScriptFunction) : TScriptFunction;`（在 `declare global` 内，无需 import）
+- **持久化数组设计上无界**：`persistentScriptFunctions` 只增不减（无注销 API），热重载持续重注册会让它不断增长——这是为防 UAF 接受的取舍（见 §3.5）。
 
 两种写法对比：
 
@@ -235,7 +249,7 @@ ScriptFunctionRegister.RegisterFunction(cat, name, sf);
 // 或改用按 category/name 绑定：ability.m_OnXxx.BindScriptFunction(cat, name)
 ```
 
-> **English:** The registry API ScriptFunctionRegister.RegisterFunction(category, name, func) does not return the instance. The global helper RegisterScriptFunction wraps it as a one-step register-and-return: implemented at utilities.js:33-36 and declared in scriptable.d.ts:16 (inside declare global, so no import is needed). The simplified form binds the delegate by pointer using the returned instance; the unsimplified form must re-query the registry with ScriptFunctionRegister.GetFunction(cat, name), or fall back to by-name binding with BindScriptFunction(cat, name).
+> **English:** The registry API ScriptFunctionRegister.RegisterFunction(category, name, func) does not return the instance. The global helper RegisterScriptFunction wraps it as a one-step register-and-return, pushing the wrapper into a module-level persistent array so it cannot be garbage-collected (anti-GC mechanism in §3.5; compare the manual persistentObjs convention of §4.4): implemented at utilities.js:36-40 and declared in scriptable.d.ts:16 (inside declare global, so no import is needed). The persistent array is unbounded by design and keeps growing across hot reloads, since there is no unregister API; that is an accepted trade-off to prevent use-after-free. The simplified form binds the delegate by pointer using the returned instance; the unsimplified form must re-query the registry with ScriptFunctionRegister.GetFunction(cat, name), or fall back to by-name binding with BindScriptFunction(cat, name).
 
 ### 4.3 完整示例
 
@@ -278,9 +292,9 @@ function abilityLoader(name: StringName) {
 ScriptFunctionRegister.RegisterLoader(category, abilityLoader);   // gas.ts:34
 ```
 
-**`persistentObjs` 防 GC 惯例**：注册表只存裸指针（GC 危险模型见 §3.5）——JS 侧创建的 wrapper 对象被 GC 回收后，C++ 对象随之析构，注册表里的指针变成悬垂指针，**调用时**解引用构成 UAF；用模块级数组持有引用即可阻止 GC 回收。
+**`persistentObjs` 防 GC 惯例**：注册表只存裸指针（GC 危险模型见 §3.5）——JS 侧创建的 wrapper 对象被 GC 回收后，C++ 对象随之析构，注册表里的指针变成悬垂指针，**调用时**解引用构成 UAF；用模块级数组持有引用即可阻止 GC 回收。**注意**：经 `RegisterScriptFunction` 注册的函数已自动持久化（见 §4.2），**无需**再手动保持引用；手动 `persistentObjs` 惯例仍适用于 **loader 返回的 creator**（gas.ts 的 loader 路径直接构造并返回，绕过该助手）与**裸 `RegisterFunction` 调用**。
 
-> **English:** For many signatures created on demand, register a lazy loader with RegisterLoader (registration semantics in §1.3). Following gas.ts:6-37, each loader requires the module, constructs the matching creator class, pushes it into persistentObjs, and returns it, while setupGas wires the loaders via ScriptFunctionRegister.RegisterLoader (gas.ts:34). The persistentObjs module-level array (declared at gas.ts:4, pushed to at :10, :19 and :28) is the anti-GC convention: the registry stores raw pointers (see the GC hazard model in §3.5), so if the JS-created wrapper object is collected, the underlying C++ object is destroyed and the registry pointer dangles into a use-after-free at call time. Holding module-level references prevents collection.
+> **English:** For many signatures created on demand, register a lazy loader with RegisterLoader (registration semantics in §1.3). Following gas.ts:6-37, each loader requires the module, constructs the matching creator class, pushes it into persistentObjs, and returns it, while setupGas wires the loaders via ScriptFunctionRegister.RegisterLoader (gas.ts:34). The persistentObjs module-level array (declared at gas.ts:4, pushed to at :10, :19 and :28) is the anti-GC convention: the registry stores raw pointers (see the GC hazard model in §3.5), so if the JS-created wrapper object is collected, the underlying C++ object is destroyed and the registry pointer dangles into a use-after-free at call time. Holding module-level references prevents collection. Functions registered through the global RegisterScriptFunction helper are persisted automatically (see §4.2) and need no manual reference keeping; this manual convention applies only to creators returned by loaders (the gas.ts loader path constructs and returns the creator directly, bypassing the helper) and to bare RegisterFunction calls.
 
 ### 4.5 选择指南
 
@@ -295,7 +309,7 @@ ScriptFunctionRegister.RegisterLoader(category, abilityLoader);   // gas.ts:34
 
 ## 常见坑（Pitfalls）
 
-本节汇总脚本作者在使用 ScriptFunction 时最容易踩到的五类坑，每条均标注现象、根因与对应机制的详细章节，可回溯定位。
+本节汇总脚本作者在使用 ScriptFunction 时最容易踩到的六类坑，每条均标注现象、根因与对应机制的详细章节，可回溯定位。
 
 ### 5.1 陷阱清单
 
@@ -303,11 +317,12 @@ ScriptFunctionRegister.RegisterLoader(category, abilityLoader);   // gas.ts:34
 | --- | --- | --- | --- | --- |
 | 1 | 用未绑定签名的泛型 `ScriptFunction<TXXX>` 构造 | 运行时构造失败（TS 编译期不报错） | 每个签名必须在 C++ 侧显式绑定后才生成 JS 可构造类；泛型声明无签名限制（`src/scripts/javascript/typings/yr/scriptable.d.ts:11-14`） | §4.1 |
 | 2 | lambda 绑定参与存档 | 读档后回调丢失 | 只有 `BindScriptFunction` / `AddScriptFunction` 可序列化；`TDelegate` 警告 + `"Unsupported"` 标记、`TMulticastDelegate` 静默丢弃 | §3.1 |
-| 3 | 注册后忘记保持 JS 引用 | 调用时 UAF | 注册表只存裸指针；wrapper 对象被 GC 回收后指针悬垂，`Execute` 解引用再调用即构成 UAF（`src/core/tool/delegate.h:195-216`） | §3.5、§4.4 |
+| 3 | 裸 `RegisterFunction` / loader 未配 `persistentObjs` 时注册后忘记保持 JS 引用 | 调用时 UAF | 注册表只存裸指针；wrapper 对象被 GC 回收后指针悬垂，`Execute` 解引用再调用即构成 UAF（`src/core/tool/delegate.h:195-216`）；经 `RegisterScriptFunction` 注册的 wrapper 已自动持久化（§4.2），此风险仅存在于非助手路径 | §3.5、§4.4 |
 | 4 | 改动 category / name 字符串 | 旧存档绑定失效 | FuncId 由字符串内容哈希派生（`src/core/tool/script_function.cpp:13-16`），字符串一变 FuncId 即变，旧 FuncId 无法在注册表命中 | §3.2、§3.6 |
-| 5 | 读档前未注册函数 | 委托静默失效 | `GetFunctionById` 只查 `GFuncIdMap`、无 loader 回退（`src/core/tool/script_function.cpp:77-85`）；`Execute` 警告 + 返回默认值、`Broadcast` 静默跳过 | §3.3、§3.4 |
+| 5 | 读档前未注册函数 | 委托静默失效 | `GetFunctionById` 只查 `GFuncIdMap`、无 loader 回退（`src/core/tool/script_function.cpp:94-102`）；`Execute` 警告 + 返回默认值、`Broadcast` 静默跳过 | §3.3、§3.4 |
+| 6 | 同 `(category, name)` 被不同对象覆盖注册 | C++ 侧打印覆盖警告（含 category/name/FuncId），旧条目被新条目覆盖 | FuncId 由 (category, name) 内容哈希派生，注册表对同键覆盖写（`src/core/tool/script_function.cpp:29-40`）；热重载重注册为预期场景，每次重载都会触发一次该警告（预期噪音） | §1.3、§2.4、§3.6 |
 
-> **English:** This section lists the five pitfalls script authors hit most often, each traced back to its detailed section. (1) Constructing an unbound generic `ScriptFunction<TXXX>` fails at runtime, because every signature must be explicitly bound on the C++ side before a JS-constructible class is generated, and the generic declaration has no signature restriction (scriptable.d.ts:11-14), so TypeScript does not catch it at compile time (§4.1). (2) Lambda bindings are dropped on save, leaving the callback missing after loading: only `BindScriptFunction` and `AddScriptFunction` are serializable, with a warning plus the "Unsupported" marker for TDelegate and silent discard for TMulticastDelegate (§3.1). (3) Forgetting to keep a JS reference after registration causes a use-after-free at call time, because the registry stores raw pointers and the pointer dangles once the wrapper object is garbage-collected, so `Execute` dereferences a dangling pointer and invokes it (delegate.h:195-216) (§3.5, §4.4). (4) Changing the category or name strings changes the FuncId, since FuncId derives from the content hashes (script_function.cpp:13-16), so old savegame bindings can no longer be resolved (§3.2, §3.6). (5) Failing to register before loading leaves the delegate silently broken, because `GetFunctionById` only queries the GFuncIdMap with no loader fallback (script_function.cpp:77-85); `Execute` warns and returns a default value while `Broadcast` silently skips the listener (§3.3, §3.4).
+> **English:** This section lists the six pitfalls script authors hit most often, each traced back to its detailed section. (1) Constructing an unbound generic `ScriptFunction<TXXX>` fails at runtime, because every signature must be explicitly bound on the C++ side before a JS-constructible class is generated, and the generic declaration has no signature restriction (scriptable.d.ts:11-14), so TypeScript does not catch it at compile time (§4.1). (2) Lambda bindings are dropped on save, leaving the callback missing after loading: only `BindScriptFunction` and `AddScriptFunction` are serializable, with a warning plus the "Unsupported" marker for TDelegate and silent discard for TMulticastDelegate (§3.1). (3) Forgetting to keep a JS reference after a bare `RegisterFunction` call or in a loader without persistentObjs causes a use-after-free at call time, because the registry stores raw pointers and the pointer dangles once the wrapper object is garbage-collected, so `Execute` dereferences a dangling pointer and invokes it (delegate.h:195-216); wrappers registered through `RegisterScriptFunction` are persisted automatically (§4.2), so this risk is confined to the non-helper paths (§3.5, §4.4). (4) Changing the category or name strings changes the FuncId, since FuncId derives from the content hashes (script_function.cpp:13-16), so old savegame bindings can no longer be resolved (§3.2, §3.6). (5) Failing to register before loading leaves the delegate silently broken, because `GetFunctionById` only queries the GFuncIdMap with no loader fallback (script_function.cpp:94-102); `Execute` warns and returns a default value while `Broadcast` silently skips the listener (§3.3, §3.4). (6) Registering the same (category, name) with a different object overwrites the old entry and makes the C++ side print an overwrite warning (including category, name and FuncId), because the FuncId derives from the (category, name) content hashes and the registry overwrites the same key (script_function.cpp:29-40); re-registering on hot reload is an expected scenario and triggers the warning each time (§1.3, §2.4, §3.6).
 
 ## 相关文档（Related Docs）
 
@@ -317,8 +332,8 @@ ScriptFunctionRegister.RegisterLoader(category, abilityLoader);   // gas.ts:34
 
 | 文档 | 内容 | 与本文档的关系 |
 | --- | --- | --- |
-| `doc/gas.md` §16（委托存档） | 从用法视角给出两种绑定方式对比、注册时机与选择指南（第 1678-1762 行） | 本文档 §3 从机制角度解释其所以然（FuncId 内容哈希、惰性解析、GC 危险模型），两处可互相参照 |
+| `doc/gas.md` §16（委托存档） | 从用法视角给出两种绑定方式对比、注册时机与选择指南（第 1707-1795 行） | 本文档 §3 从机制角度解释其所以然（FuncId 内容哈希、惰性解析、GC 危险模型），两处可互相参照 |
 | `doc/all_data_binding.md` | JS 绑定体系：puerts 集中类型预注册表，`ScriptFunction<FUNC>` 等绑定类型在此登记 | 说明 ScriptFunction 各签名为何必须显式绑定（对应 §4.1） |
 | `doc/meta.md` | 反射 / Savegame 标签机制（AutoSavegame 反射标签与 cereal 序列化，第 201-248、347-371 行） | 存档链路（§3）依赖的底层机制 |
 
-> **English:** Related documents, indexed by the perspective they take, cross-referencing §3 and §4 of this guide. doc/gas.md §16 covers delegate archiving from the usage perspective, comparing the two binding approaches and when to register (lines 1678-1762); this guide's §3 explains the mechanism behind it, and the two can be read together. doc/all_data_binding.md describes the JS binding system, the puerts centralized type pre-registry where bound types such as ScriptFunction<FUNC> are registered, which explains why every signature must be explicitly bound (§4.1). doc/meta.md documents the reflection and Savegame label mechanism, the AutoSavegame reflection labels and cereal serialization (lines 201-248 and 347-371) that the archiving chain in §3 relies on.
+> **English:** Related documents, indexed by the perspective they take, cross-referencing §3 and §4 of this guide. doc/gas.md §16 covers delegate archiving from the usage perspective, comparing the two binding approaches and when to register (lines 1707-1795); this guide's §3 explains the mechanism behind it, and the two can be read together. doc/all_data_binding.md describes the JS binding system, the puerts centralized type pre-registry where bound types such as ScriptFunction<FUNC> are registered, which explains why every signature must be explicitly bound (§4.1). doc/meta.md documents the reflection and Savegame label mechanism, the AutoSavegame reflection labels and cereal serialization (lines 201-248 and 347-371) that the archiving chain in §3 relies on.

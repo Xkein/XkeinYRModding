@@ -22,10 +22,27 @@ void ScriptFunctionRegister::RegisterFunction_(const StringName& category, const
         return;
     }
 
+    // FuncId is derived from the (category, name) content. Cache it once so the
+    // warning below and the map write below reuse the same value.
+    const uint64_t funcId = GetId(category, name);
+
+    // Detect an existing registration for the same (category, name) slot.
+    // Overwriting silently would make existing delegates/savegame bindings that
+    // reference this FuncId resolve to a different function without any hint.
+    const auto catIt = GScriptFunctions.find(category);
+    if (catIt != GScriptFunctions.end())
+    {
+        const auto it = catIt->second.find(name);
+        if (it != catIt->second.end() && it->second != func)
+        {
+            gLogger->warn("ScriptFunctionRegister::RegisterFunction_: overwriting existing registration (category={}, name={}, FuncId={}). Existing delegates or savegame bindings referencing this FuncId will now resolve to the newly registered function.", category.c_str(), name.c_str(), funcId);
+        }
+    }
+
     func->name = name;
     func->category = category;
     GScriptFunctions[category][func->name] = func;
-    GFuncIdMap[GetId(category, name)] = func;
+    GFuncIdMap[funcId] = func;
 }
 
 void ScriptFunctionRegister::RegisterLoader_(const StringName& category, std::function<ScriptFunctionBase*(const StringName& name)> loader)
