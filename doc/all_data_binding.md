@@ -1,6 +1,7 @@
 # JS 数据绑定体系说明
 
 文件位置：[src/scripting/javascript/all_data_binding.h](file:///d:/Dev/proj/YR/XkeinYRModding/src/scripting/javascript/all_data_binding.h)
+> 脚本作者视角的使用指南见 [ScriptFunction 指南](script_function.md)
 
 ## 一句话总结
 

@@ -1759,6 +1759,7 @@ AbilityTask 现在带有 `AutoSavegame` 标记。任务状态会在存档时保�
 | ASC 事件监听（临时） | `AddStdFunction` | 不需要跨存档 |
 | AbilityTask 回调（需跨存档） | `BindScriptFunction` | 任务自动存档，回调也需可存档 |
 | AbilityTask 回调（不跨存档） | `BindStdFunction` | 任务存档后回调丢失，任务完成时无副作用 |
+> 完整机制见 [ScriptFunction 指南](script_function.md)
 
 ---
 

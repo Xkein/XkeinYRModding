@@ -29,53 +29,18 @@
 - 不允许使用形如`(void)Data;`的代码
 - 不允许删除和优化无关的代码和注释
 - 在理解可能会出现困难的地方写注释
+- 注释用英文写，也可中英双语
+- 文档必须中文双语
 
 ### 帧同步（Deterministic Lockstep）
 
 - 本项目是 Red Alert 2 YR Mod，使用**帧同步**，不需要状态同步。
-2. INI 加载规则
-
-### INI 读取规则
-
-使用现有代码生成管线，禁止手写注册表：
-
-- 通过 `PROPERTY()` / `CLASS()` 宏 + CppHeaderTool 自动生成加载代码。
-- **正确做法**：`CLASS(IniComponent, IniAutoLoad)`。
-
-枚举解析由反射自动处理：
-
-- `ENUM()` 宏声明的枚举被 `parser.h` 中泛型 `Parser<T, is_enum_v<T>>` 自动解析。
-- **禁止**手写枚举 Parser 特化。
-- **例外**：复杂组合类型可以手写 Parser。
-
-### 蓝图/脚本 兼容
-
-这里类比虚幻的概念，但要做出项目自己的风格
-
-1. BlueprintImplementableEvent和BlueprintCallable
-
-BlueprintCallable，也就是专供蓝图的节点，直接给函数添加FUNCTION()，比如
-```code
-    FUNCTION()
-    virtual void K2_EndAbility();
-```
-
-BlueprintImplementableEvent，也就是蓝图可以实现的事件，使用std::function<>（不要套using type）的成员处理，比如
-```code
-    PROPERTY()
-    TDelegate<void()> OnK2_ActivateAbility;
-```
-
-
-## 第三方库
-
-- Wwise — 音频引擎
-- 其他可以在`3rdparty.lua`和`3rdparty/`中观察到
 
 ## 注意事项
 
 - 有不清晰和模糊的地方，询问用户
 - 不需要调用xmake检查编译报错，由用户来手动操作
+- doc文件夹里面存放了项目的说明文档，尽量先看再干活，对理解项目有益处
 
 # 做事方针
 
