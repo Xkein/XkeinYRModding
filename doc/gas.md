@@ -27,7 +27,7 @@
 ```
 AbilitySystemGlobals ([GAS])
          |
-         | 管理全局配置、曲线表、工厂函数
+         | 管理全局配置与曲线表；工厂函数由同文件的 GameplayAbilitySystem 提供
          v
 AbilitySystemComponent (ASC)  [TechnoType] ASC.*
    /        |        \
@@ -95,29 +95,18 @@ const tag = new GameplayTag();
 tag.m_TagName = "Debuff.Fire";
 
 const container = new GameplayTagContainer();
-container.m_GameplayTags.Add(tag);
-
-// 查询
-container.HasTag(tag);          // true, 支持父级匹配
-container.HasTagExact(tag);     // true, 精确匹配
-container.HasAll(otherContainer);
-container.HasAny(otherContainer);
+container.m_GameplayTags.push_back(tag);
 ```
+
+当前 TS 绑定只暴露 `m_TagName` 与 `m_GameplayTags` 两个成员。C++ 侧的集合查询 `HasTag`（父级匹配，`HasTag(other)` 在容器含有 `other` 或其父级标签时为 true）、`HasTagExact`（精确匹配）、`HasAll`、`HasAny` 均未带 `FUNCTION()` 宏、不在 d.ts 中，属于 C++ 内部 API，无法从 TS 调用。`m_GameplayTags` 类型为 `StdVector<GameplayTag>`，添加元素使用 `push_back`（StdVector 无 `Add` 方法）。
 
 ### 2.4 GameplayTagQuery（标签查询表达式）
 
 支持 AND/OR/NOT 组合的表达式树查询：
 
-```typescript
-// 构建查询
-const query = GameplayTagQuery.MakeQuery_MatchAnyTagsMatch(container);
-const allQuery = GameplayTagQuery.MakeQuery_MatchAllTagsMatch(container);
+`GameplayTagQuery` 在 d.ts 中是空类（未暴露任何成员或方法）；查询构建与执行方法 `MakeQuery_MatchAnyTagsMatch`、`MakeQuery_MatchAllTagsMatch`、`Matches` 均为 C++ 内部 API（未带 `FUNCTION()` 宏），未暴露到 TS，无法从 TypeScript 调用。
 
-// 执行查询
-query.Matches(someContainer);
-```
-
-表达式节点类型：`AnyTagsMatch`、`AllTagsMatch`、`NoTagsMatch`、`AnyExprMatch`、`AllExprMatch`、`NoExprMatch`
+表达式节点类型：`AnyTagsMatch`、`AllTagsMatch`、`NoTagsMatch`、`AnyExprMatch`、`AllExprMatch`、`NoExprMatch`（对应 C++ 枚举 `EGameplayTagQueryExprType`，未暴露到 TS）
 
 ### 2.5 GameplayTagRequirements（标签需求）
 
@@ -139,10 +128,10 @@ TargetBlockedTags = Ally.Invincible
 const req = new GameplayTagRequirements();
 req.m_RequireTags = tagContainer;
 req.m_IgnoreTags = otherContainer;
-req.m_TagQuery = GameplayTagQuery.MakeQuery_MatchAnyTagsMatch(container);
-
-req.RequirementsMet(someContainer);  // true/false
+req.m_TagQuery = tagQuery;
 ```
+
+TS 绑定仅暴露 `m_RequireTags`、`m_IgnoreTags`、`m_TagQuery` 三个成员用于赋值；`RequirementsMet` 与 `GameplayTagQuery.MakeQuery_MatchAnyTagsMatch` 均未带 `FUNCTION()` 宏、不在 d.ts 中，属于 C++ 内部 API，未暴露到 TS，无法从 TS 调用。
 
 ### 2.6 标签改变事件（FOnGameplayTagCountChanged）
 
@@ -150,12 +139,12 @@ req.RequirementsMet(someContainer);  // true/false
 
 ```typescript
 // TypeScript: 注册标签计数变化回调
-asc.RegisterGameplayTagEvent(tag);  // 返回 FOnGameplayTagCountChanged
+asc.RegisterGameplayTagEvent(tag);  // 返回 FOnGameplayTagCountChanged；当前未暴露到 TypeScript，属 C++ 内部 API
 ```
 
 ### 2.7 FInheritedTagContainer（可继承标签容器）
 
-支持父子继承的标签容器，计算公式：`Combined = Inherited - Removed + Added`
+支持父子继承的标签容器，计算公式：`Combined = Inherited - Removed + Added`。其中 'Inherited' 为调用 `UpdateCombinedTags(BaseContainer)` 时传入的基础容器，**不是** FInheritedTagContainer 的成员字段（该结构体仅有 `CombinedTags`、`Added`、`Removed` 三个字段）；该函数当前无任何调用点，`CombinedTags` 仅能在 INI 中直接写入。
 
 嵌套结构体支持两种 INI 配置方式（详见 [第 17 节](#17-嵌套结构体-ini-加载)）：
 
@@ -223,16 +212,17 @@ Attributes = HP, SP, OP
 // 在自定义 AttributeSet 中声明属性访问器
 ATTRIBUTE_ACCESSORS(MyAttributeSet, Health);
 // 展开为：
-//   static GameplayAttribute GetHealthAttribute()
+//   static const GameplayAttribute& GetHealthAttribute()
 //   float GetHealth() const
-//   void SetHealth(float NewVal)
-//   void InitHealth(float NewVal)
+//   void SetHealth(float NewVal)   // 仅修改 CurrentValue
+//   void InitHealth(float NewVal)  // 同时设置 BaseValue 和 CurrentValue
 ```
 
 ### 3.5 CustomAttributeSet 脚本回调
 
 ```typescript
 // TypeScript
+// C++ 成员名为 OnK2_xxx，JS 侧自动加上 m_ 前缀（见下方 m_OnK2_xxx 用法）
 const set = CustomAttributeSet.Create();
 
 // 所有回调均为 PROPERTY TDelegate，通过 BindStdFunction 绑定 JS lambda（不可存档）
@@ -247,7 +237,7 @@ set.m_OnK2_PostGameplayEffectExecute.BindStdFunction((data: FGameplayEffectModCa
 });
 
 set.m_OnK2_PreAttributeChange.BindStdFunction((attr: GameplayAttribute, newValue: float) => {
-    // 属性值修改前调用。newValue 可修改（用于钳制）
+    // 属性值修改前调用（仅 C++ 虚函数可钳制 NewValue；JS 委托中 float 参数按值传递、无法修改）
 });
 
 set.m_OnK2_PostAttributeChange.BindStdFunction((attr: GameplayAttribute, oldValue: float, newValue: float) => {
@@ -269,9 +259,9 @@ set.m_OnK2_PostAttributeBaseChange.BindStdFunction((attr: GameplayAttribute, old
 |---|---|---|
 | OnK2_PreGameplayEffectExecute | GE 执行修改前 | 是（返回 false） |
 | OnK2_PostGameplayEffectExecute | GE 修改成功后 | 否 |
-| OnK2_PreAttributeChange | 属性值改变前 | 否（可钳制 NewValue） |
+| OnK2_PreAttributeChange | 属性值改变前 | 否（仅 C++ 虚函数可钳制；JS 委托中 float 参数按值传递、无法钳制） |
 | OnK2_PostAttributeChange | 属性值改变后 | 否 |
-| OnK2_PreAttributeBaseChange | 基础值改变前 | 否（可钳制 NewValue） |
+| OnK2_PreAttributeBaseChange | 基础值改变前 | 否（仅 C++ 虚函数可钳制；JS 委托中 float 参数按值传递、无法钳制） |
 | OnK2_PostAttributeBaseChange | 基础值改变后 | 否 |
 
 ### 3.6 脚本层工厂注册
@@ -405,20 +395,18 @@ AbilityTriggers = Event.Fireball
 
 ```
 CallActivateAbility
-  └─ PreActivate
-       ├─ 创建 AbilityTasks
-       ├─ 设置 CurrentActorInfo/Handle
-       ├─ 应用 ActivationOwnedTags
-       └─ 调用 ActivateAbility
-            └─ K2_OnActivateAbility / K2_OnActivateAbilityFromEvent
+  └─ PreActivate（设置 CurrentActorInfo/Handle、应用 Block/Cancel/ActivationOwnedTags、ActiveCount++）
+       └─ ActivateAbility
+            └─ K2_OnActivateAbility / K2_OnActivateAbilityFromEvent（在回调中创建 AbilityTask）
+                 └─ 任务由 ASC::TickTasks 在下一帧调用 Activate()
 ```
 
 ### 4.7 提交流程
 
 ```
 K2_CommitAbility
-  ├─ CheckCost → ApplyCost
-  ├─ CheckCooldown → ApplyCooldown
+  ├─ CheckCooldown → CheckCost
+  ├─ ApplyCooldown → ApplyCost
   └─ K2_OnCommitExecute
 ```
 
@@ -519,6 +507,8 @@ ModifierMagnitude.ScalableFloatMagnitude = 50.0
     + Sum_AddFinal
 ```
 
+> **说明：** MultiplyAdditive/DivideAdditive 采用 bias=1 累加，即 1+Σ(Magnitude−1)；Divisor 绝对值小于 0.0001 时按 1 处理（除零保护）。
+
 **特殊情况：** 如果有 Override 类型的 Modifier，则直接返回 Override 值，忽略其他所有计算。
 
 ### 5.5 堆叠（Stacking）
@@ -586,7 +576,7 @@ ModifierMagnitude.ScalableFloatMagnitude = -5.0
 Period = 2.0
 ```
 
-> **限制：** `FScalableFloat` 的 `Curve` 成员（`CurveTableRowHandle` 类型）**没有** `PROPERTY()` 标签，`CurveTableRowHandle` 本身也未接入反射系统。因此 `Period.CurveTableName` 和 `Period.RowName` 等点分键写法**不生效**。曲线表功能需要在代码中手动设置 `Curve` 字段，或通过脚本操作。详见 [第 12 节](#12-curvetable曲线表) 和 [第 15 节](#15-已知限制)。
+> **限制：** `FScalableFloat` 的 `Curve` 成员（`CurveTableRowHandle` 类型）**没有** `PROPERTY()` 标签，`CurveTableRowHandle` 本身也未接入反射系统。因此 `Period.CurveTableName` 和 `Period.RowName` 等点分键写法**不生效**。曲线表功能需要在 **C++ 代码**中手动设置 `Curve.CurveTableName` 字段（`FScalableFloat::Curve` 未暴露到脚本）。详见 [第 12 节](#12-curvetable曲线表) 和 [第 15 节](#15-已知限制)。
 
 FScalableFloat 通过 `GetValueAtLevel(int32 Level)` 获取指定等级的值，若有 CurveTable 则线性插值。
 
@@ -642,6 +632,7 @@ GameplayEffect 中部分字段类型为 `IniComponent`（无 Parser 特化），
 | bExecutePeriodicEffectOnApplication | bool | Parser | `bExecutePeriodicEffectOnApplication = yes` |
 | PeriodicInhibitionPolicy | enum | Parser | `PeriodicInhibitionPolicy = NeverReset` |
 | Modifiers | vector\<GameplayModifierInfo*\> | Parser（指针数组，section 名引用） | `Modifiers = Mod_Section1, Mod_Section2` |
+| ModifierMagnitude.CustomMagnitude | CustomCalculationBasedFloat（子字段：Coefficient / PreMultiplyAdditiveValue / PostMultiplyAdditiveValue，均为 FScalableFloat） | **点分键**（IniComponent，无 Parser） | `ModifierMagnitude.CustomMagnitude.Coefficient = 1.0` |
 | GEComponents | vector\<GameplayEffectComponent*\> | Parser（多态指针数组，section 名引用） | `GEComponents = Comp_Section1` |
 | OverflowEffects | vector\<GameplayEffect*\> | Parser（指针数组，section 名引用） | `OverflowEffects = Effect_Overflow1` |
 | StackingType | enum | Parser | `StackingType = AggregateBySource` |
@@ -762,7 +753,6 @@ AssetTags = Effect.Buff, Effect.Physical
 $Type = BlockAbilityTagsGEComponent
 InheritableBlockedAbilityTagsContainer.Added = Ability.Attack, Ability.Special
 ; InheritableBlockedAbilityTagsContainer.Removed = Ability.Safe
-; InheritableBlockedAbilityTagsContainer.Inherited = Ability.Base
 
 ; 方式2：section 引用
 [Comp_BlockAbility]
@@ -816,26 +806,11 @@ IgnoreTags = Dead
 
 #### 6. GrantedAbilitiesGEComponent — 授予能力
 
-GE 激活时向目标授予能力，移除时收回。通过 `GrantAbilityConfigs`（`vector<GameplayAbilitySpecDef>`）配置，每项包含 `Ability`、`LevelScalableFloat`、`InputID`、`RemovalPolicy` 等字段。也支持抑制状态变化时自动暂停/恢复。
-
-```ini
-[Comp_GrantAbility]
-$Type = GrantedAbilitiesGEComponent
-GrantAbilityConfigs = Ability_FireBreath:1:0:CancelAbilityImmediately
-; 格式: AbilityDefine:Level:InputID:RemovalPolicy
-```
+GE 激活时向目标授予能力，移除时收回。通过 `GrantAbilityConfigs`（`vector<GameplayAbilitySpecDef>`）配置。**当前不支持 INI 加载**（无 Parser 特化），需通过 C++/脚本配置；`GameplayAbilitySpecDef` 的字段为 `Ability`、`LevelScalableFloat`、`InputID`、`RemovalPolicy`（RemovalPolicy 值含 `CancelAbilityImmediately`），供脚本/C++ 使用。也支持抑制状态变化时自动暂停/恢复。
 
 #### 7. ImmunityGEComponent — 免疫
 
-使目标免疫匹配的 GameplayEffect。通过 `ImmunityQueries`（`vector<FGameplayEffectQuery>`）配置，每个 query 支持按 EffectDef、SourceTags、TargetTags、EffectTags 等多维度匹配。
-
-```ini
-[Comp_Immunity]
-$Type = ImmunityGEComponent
-ImmunityQueries = Query1, Query2
-; 每个 FGameplayEffectQuery 可配置: EffectDef, SourceTags, TargetTags, EffectTagsToMatch 等
-; 简单用法: 直接指定要免疫的 GE 或标签
-```
+使目标免疫匹配的 GameplayEffect。通过 `ImmunityQueries`（`vector<FGameplayEffectQuery>`）配置，每个 query 支持按 EffectDef、SourceTags、TargetTags、EffectTags 等多维度匹配。**当前不支持 INI 加载**（无 Parser 特化），需脚本/C++ 配置。
 
 #### 8. ChanceToApplyGEComponent — 概率应用
 
@@ -849,14 +824,7 @@ ChanceToApplyToTarget = 0.5  ; 50% 概率
 
 #### 9. RemoveOtherGEComponent — 移除其他 GE
 
-GE 激活时移除其他指定 GE。通过 `RemoveGameplayEffectQueries`（`vector<FGameplayEffectQuery>`）配置，支持多维度匹配。
-
-```ini
-[Comp_RemoveOther]
-$Type = RemoveOtherGEComponent
-RemoveGameplayEffectQueries = Query1, Query2
-; 每个 FGameplayEffectQuery 可配置: EffectDef, SourceTags, TargetTags 等
-```
+GE 激活时移除其他指定 GE。通过 `RemoveGameplayEffectQueries`（`vector<FGameplayEffectQuery>`）配置，支持多维度匹配。**当前不支持 INI 加载**（无 Parser 特化），需脚本/C++ 配置。
 
 #### 10. CustomCanApplyGEComponent — 自定义检查
 
@@ -904,7 +872,7 @@ OnCompletePrematurely = Effect_Knockback
 
 ### 7.1 概念
 
-AbilityTask（能力任务）是 GameplayAbility 内的异步任务单元，管理延迟、等待事件、属性监控等时间相关逻辑。任务在能力 PreActivate 阶段创建，在 EndAbility 时自动清理。
+AbilityTask（能力任务）是 GameplayAbility 内的异步任务单元，管理延迟、等待事件、属性监控等时间相关逻辑。任务在能力激活回调（K2_OnActivateAbility）中创建，在 EndAbility 时自动清理。
 
 **生命周期：** Create → InitTask → Activate → (工作) → EndTask → ReadyForDestroy → 清理
 
@@ -913,7 +881,7 @@ AbilityTask（能力任务）是 GameplayAbility 内的异步任务单元，管�
 | 任务 | 说明 | 使用示例 |
 |---|---|---|
 | WaitDelay | 等待指定时间后触发 | `WaitDelay.Create(ability, 2.0).m_OnFinish.BindStdFunction(cb)` |
-| WaitGameplayEvent | 等待指定标签的 gameplay 事件 | `WaitGameplayEvent.Create(ability, tag, true)` |
+| WaitGameplayEvent | 等待指定标签的 gameplay 事件 | `WaitGameplayEvent.Create(ability, tag, true)`（C++ 第 4 参有默认值；生成的 TS 类型中为必填，TS 调用需补全参数） |
 | WaitGameplayTagAdded | 等待指定标签被添加 | `WaitGameplayTagAdded.Create(ability, tag, true)` |
 | WaitGameplayTagRemoved | 等待指定标签被移除 | `WaitGameplayTagRemoved.Create(ability, tag, true)` |
 | WaitGameplayEffectApplied | 等待匹配 GE 被应用 | `WaitGameplayEffectApplied.Create(ability, query, true)` |
@@ -921,7 +889,7 @@ AbilityTask（能力任务）是 GameplayAbility 内的异步任务单元，管�
 | WaitAttributeChange | 等待属性值变化 | `WaitAttributeChange.Create(ability, attr, true)` |
 | WaitInput | 等待输入按下/释放 | `WaitInput.Create(ability, inputID, true, false)` |
 | WaitTargetData | 等待目标选择完成 | `WaitTargetData.Create(ability)` |
-| SpawnActor | 在指定位置生成单位 | `SpawnActor.Create(ability, type, loc)` |
+| SpawnActor | 在指定位置生成单位 | `SpawnActor.Create(ability, type, loc)`（C++ 第 4 参有默认值；生成的 TS 类型中为必填，TS 调用需补全参数） |
 | Repeat | 重复执行回调 | `Repeat.Create(ability, 5, 1.0)` |
 
 各任务的回调委托：
@@ -957,7 +925,7 @@ ability.m_OnK2ActivateAbility.BindStdFunction(() => {
         console.log("tag received");
     });
 
-    // 创建即可，PreActivate 会自动调用 Activate()
+    // 创建后无需手动调用，ASC::TickTasks 会在下一帧自动调用 Activate()（注意至少 1 帧延迟）
 });
 ```
 
@@ -1023,6 +991,8 @@ ASC.StartupEffects = Effect_BaseStats, Effect_PassiveRegen
 - `AddStdFunction(fn)` — 绑定 JS lambda，不可存档
 - `AddScriptFunction(category, name)` — 绑定已注册的 ScriptFunction，可存档（存档时保存 FuncId，读档时按 FuncId 恢复绑定）
 
+共 11 个委托，如下表所示：
+
 | 委托 | 签名 | 说明 |
 |---|---|---|
 | OnGameplayEffectAppliedDelegateToSelf | (asc, spec, handle) | GE 对自己应用时 |
@@ -1037,7 +1007,7 @@ ASC.StartupEffects = Effect_BaseStats, Effect_PassiveRegen
 | AbilitySpecDirtiedCallbacks | (asc, spec) | 能力 spec 变脏时 |
 | OnImmunityBlockGameplayEffectDelegate | (asc, spec, activeGE) | 免疫阻止 GE 时 |
 
-> **存档说明：** ASC 上的 multicast delegate 现在支持存档。使用 `AddScriptFunction(category, name)` 绑定的回调在存档时会保存 FuncId，读档时按 FuncId 恢复绑定。使用 `AddStdFunction(fn)` 绑定的 JS lambda 不可存档，存档时会记录警告并跳过，读档后该绑定丢失。详见[第 16 节 委托存档](#16-委托存档delegate-savegame)。
+> **存档说明：** ASC 上的 multicast delegate 现在支持存档。使用 `AddScriptFunction` 绑定的回调存档时保存 FuncId、读档按 FuncId 恢复；使用 `AddStdFunction` 绑定的 JS lambda **不可存档，存档时静默丢弃**（TMulticastDelegate 不记录警告；单播 TDelegate 存档时会记录警告并跳过）。读档后 lambda 绑定丢失。详见[第 16 节 委托存档](#16-委托存档delegate-savegame)。
 
 ---
 
@@ -1077,7 +1047,7 @@ params.m_AbilityLevel = 1;
 
 | 类型 | 说明 |
 |---|---|
-| **GameplayCueNotifyDefine_Static** | 无状态，支持 Wwise 音频 + 动画，响应所有事件 |
+| **GameplayCueNotifyDefine_Static** | 无状态，支持 Wwise 音频 + 动画，响应 Executed 与 OnActive 事件（不响应 WhileActive/Removed） |
 | **GameplayCueNotifyDefine_Burst** | 只响应 Executed 事件 |
 | **GameplayCueNotifyDefine_Actor** | 有状态，支持持续性循环动画（LoopingAnim） |
 | **GameplayCueNotifyDefine_BurstLatent** | 有状态，只响应 Executed，带延迟，继承 Actor |
@@ -1116,6 +1086,8 @@ LoopingAnim = ANIM_SHIELD
 bAutoDestroyOnRemove = true
 ```
 
+> **（待确认）** GameplayCueManager::AfterLoadIni/AddCueNotify 当前为空实现，`[GameplayCue.XXX]` 节的加载依赖 Define 的惰性实例化机制，请按实际运行验证。
+
 ### 9.6 脚本触发
 
 ```typescript
@@ -1128,7 +1100,7 @@ asc.AddGameplayCue(tag, params);
 asc.RemoveGameplayCue(tag);
 
 // 检查是否激活
-asc.IsGameplayCueActive(tag);
+asc.IsGameplayCueActive(tag); // 当前未暴露到 TypeScript，属 C++ 内部 API
 ```
 
 ### 9.7 子类型
@@ -1176,6 +1148,8 @@ BaseValue → Channel0 求值 → Channel1 求值 → ... → Channel9 求值 �
     + Sum(AddFinal)
 ```
 
+> **说明：** MultiplyAdditive/DivideAdditive 采用 bias=1 累加，即 1+Σ(Magnitude−1)；Divisor 绝对值小于 0.0001 时按 1 处理（除零保护）。
+
 特殊情况：如果该通道内存在 Override 类型的 modifier，第一个符合条件的 Override modifier 直接返回，忽略其他计算。
 
 ### 10.4 核心组件
@@ -1196,12 +1170,12 @@ BaseValue → Channel0 求值 → Channel1 求值 → ... → Channel9 求值 �
 
 - SourceTagReqs / TargetTagReqs — 来源/目标的标签需求
 - IgnoreHandles — 需要跳过的 GE 句柄
-- AppliedSourceTagFilter / AppliedTargetTagFilter — 应用的来源/目标标签过滤
+- AppliedSourceTagFilter / AppliedTargetTagFilter — 应用的来源/目标标签过滤；当前为桩实现：仅检查过滤容器是否为空，非空则所有 modifier 不通过；按来源标签真实匹配未实现
 - IncludePredictiveMods — 是否包含预测 modifier（帧同步环境下始终为 false）
 
 ### 10.6 属性捕获系统（FGameplayEffectAttributeCaptureSpec）
 
-用于 Execution 类型的 GE，在执行时捕获属性值：
+设计用于 Execution 类型的 GE；当前移植版中 capture spec 容器未被执行路径引用（ExecutionCalculation 仅分发 OnK2_Execute），Snapshot/非 Snapshot 仅保留字段定义、捕获时均存实时引用：
 
 - `CaptureAttributes(ASC, CaptureSource)` — 从 ASC 捕获属性，分 Source/Target 两区
 - `AttemptCalculateAttributeMagnitude()` — 计算属性最终值
@@ -1214,7 +1188,7 @@ BaseValue → Channel0 求值 → Channel1 求值 → ... → Channel9 求值 �
 ### 10.7 快照与依赖跟踪
 
 - `TakeSnapshotOf()` — 深拷贝另一个聚合器的状态（BaseValue + 所有通道 modifier）
-- `AddDependent(handle)` — 注册依赖的 GE 句柄，当聚合器变化时通知依赖方
+- `AddDependent(handle)` — 注册依赖句柄（仅入表，当前未实现变化时主动通知；依赖方需自行订阅 OnDirty）
 - `OnDirty` 委托 — 聚合器变脏时广播，可被 `FScopedAggregatorOnDirtyBatch` 延迟
 
 ### 10.8 计算过程
@@ -1285,7 +1259,7 @@ const handle = asc.ApplyGameplayEffectToTarget(effect, target, context);
 // 按标签设置
 asc.AssignTagSetByCallerMagnitude(handle, tag, 100.0);
 
-// 按名称设置（已废弃）
+// 按名称设置（名称方式整体已废弃——DataName 字段及名称键存储已标记 deprecated；该函数本身在代码中暂无废弃标记，建议新代码使用标签方式）
 asc.AssignSetByCallerMagnitude(handle, name, 100.0);
 ```
 
@@ -1340,7 +1314,7 @@ CurveTable（曲线表）提供等级相关的数值缩放。在 INI 中定义�
 > - `Period.CurveTableName = BuffDuration`（点分键不生效，因为 FScalableFloat 走 Parser 路径）
 > - `ScalableFloatMagnitude.CurveTableName = BuffDuration`（同理，FScalableFloat 在 IniComponent 内部仍走 Parser）
 >
-> 曲线表目前只能通过**代码或脚本**手动设置 `FScalableFloat::Curve.CurveTableName` 字段来使用。INI 中 `FScalableFloat` 字段只能写裸 float 值（如 `Period = 2.0`）。
+> 曲线表目前只能通过 **C++ 代码**手动设置（`FScalableFloat::Curve` 未暴露到脚本）`FScalableFloat::Curve.CurveTableName` 字段来使用。INI 中 `FScalableFloat` 字段只能写裸 float 值（如 `Period = 2.0`）。
 
 ```ini
 ; INI 中只能这样写（裸 float）
@@ -1349,10 +1323,12 @@ DurationPolicy = HasDuration
 Period = 2.0
 ```
 
-```typescript
-// 通过脚本设置曲线表
-const effect = GameplayEffect.FindOrAllocate("Effect_LevelBuff");
-effect.m_Period.m_Curve.m_CurveTableName = new StringName("BuffDuration");
+> `FScalableFloat::Curve` 未暴露到 TypeScript（d.ts 中无 `m_Curve`），曲线表目前**只能通过 C++ 代码**设置 `Curve.CurveTableName`；INI 中仅能写裸 float。
+
+```cpp
+// 通过 C++ 代码设置曲线表
+FScalableFloat Period;
+Period.Curve.CurveTableName = StringName("BuffDuration");
 // RowName 被读取但未实际用于查找（见下方限制）
 ```
 
@@ -1364,7 +1340,7 @@ effect.m_Period.m_Curve.m_CurveTableName = new StringName("BuffDuration");
 FScalableFloat::GetValueAtLevel(int32 Level)
 {
     if (CurveTable 有效) {
-        // 在 CurveTable 中查找 RowName 对应的曲线
+        // 按 CurveTableName 查找曲线表（RowName 仅作非空校验，不参与查找）
         // 如果 Level 在两个关键帧之间，线性插值
         // 如果 Level 超出范围，使用最近的关键帧值
     }
@@ -1376,11 +1352,13 @@ FScalableFloat::GetValueAtLevel(int32 Level)
 
 ## 13. INI 配置完整参考
 
+> `AttributeSet_`/`Ability_`/`Effect_`/`Comp_` 等前缀是**命名约定**；除 `[CurveTable.*]` 与 `[GAS]` 外，系统不按前缀扫描节，节名通过 `ASC.*` 等引用值精确匹配加载（IniAutoLoad 惰性实例化）。
+
 ### 13.1 [GAS] — 全局设置
 
 ```ini
 [GAS]
-DefaultAttributeSets = AttrSet1, AttrSet2
+DefaultAttributeSets = AttributeSet_Base, AttributeSet_Combat
 ActivateFailCanActivateAbilityTag = Ability.ActivateFail
 ```
 
@@ -1389,7 +1367,7 @@ ActivateFailCanActivateAbilityTag = Ability.ActivateFail
 ```ini
 [AttributeSet_Player]
 AttributeSetCreator = xkein/gas/player_attr
-Attributes = Health, MaxHealth, Mana, MaxMana, Attack, Defense
+Attributes = Health, MaxHealth, Mana, MaxMana, Attack, Defense, Speed
 ```
 
 ### 13.3 [Ability_XXX] — 能力定义
@@ -1509,7 +1487,7 @@ Attributes = HP, MaxHP, MP, MaxMP
 ### 步骤 2：创建属性集脚本
 
 ```typescript
-// src/scripts/typescript/xkein/gas/test_attr.ts
+// 示例路径（需自行创建目录）：src/scripts/typescript/xkein/gas/test_attr.ts
 import { CustomAttributeSet, AttributeSet, AttributeSetDefine, AbilitySystemComponent } from "XkeinExt";
 
 export function attribute_set_creator(define: AttributeSetDefine, com: AbilitySystemComponent): AttributeSet {
@@ -1533,23 +1511,19 @@ CostGameplayEffectClass = Effect_HealCost
 ### 步骤 4：创建能力脚本
 
 ```typescript
-// src/scripts/typescript/xkein/gas/abilities/test_heal.ts
+// 示例路径（需自行创建目录）：src/scripts/typescript/xkein/gas/abilities/test_heal.ts
 import {
     CustomGameplayAbility, GameplayAbility, GameplayAbilityDefine,
-    AbilitySystemComponent, GameplayEffect, AbilityTask_WaitDelay,
-    GameplayEffectContextHandle
+    AbilitySystemComponent, AbilityTask_WaitDelay
 } from "XkeinExt";
 
 export function ability_creator(define: GameplayAbilityDefine, com: AbilitySystemComponent): GameplayAbility {
     const ability = CustomGameplayAbility.Create();
 
+    // com 为创建能力实例时传入的 AbilitySystemComponent —— 在回调外部预先取得，回调内无需再查询
     ability.m_OnK2ActivateAbility.BindStdFunction(() => {
-        const targetASC = ability.GetAbilitySystemComponentFromActorInfo();
-        if (!targetASC) return;
-
-        // 应用治疗效果
-        const ctx = targetASC.MakeEffectContext();
-        targetASC.ApplyGameplayEffectToSelf(define.m_CostGameplayEffectClass, ctx);
+        // 提交能力：应用 define.m_CostGameplayEffectClass 定义的消耗并开始冷却
+        ability.K2_CommitAbility();
 
         // 延迟效果
         const delay = AbilityTask_WaitDelay.Create(ability, 0.5);
@@ -1575,16 +1549,27 @@ ASC.StartupTags = Infantry, PlayerControlled
 
 ```typescript
 // src/scripts/typescript/xkein/gas.ts
-import { setupGas } from "./gas";
+import {
+    AbilitySystemComponent, GameplayAbility, GameplayAbilityDefine,
+    GameplayAbilityCreator, GameplayAbilitySystem
+} from "XkeinExt";
+import { ScriptFunctionRegister, StringName } from "YrExtCore";
+
+const persistentObjs: any[] = [];
+
+function abilityLoader(name: StringName) {
+    const m = require(name.c_str());
+    if (m && m.ability_creator) {
+        let creator = new GameplayAbilityCreator(
+            m.ability_creator as (define: GameplayAbilityDefine, com: AbilitySystemComponent) => GameplayAbility
+        );
+        persistentObjs.push(creator);
+        return creator;
+    }
+}
 
 export function setupGas() {
-    ScriptFunctionRegister.RegisterLoader(
-        GameplayAbilitySystem.s_ScriptFunctionCategoryAbility,
-        (name) => {
-            const m = require(name);
-            if (m && m.ability_creator) return new GameplayAbilityCreator(m.ability_creator);
-        }
-    );
+    ScriptFunctionRegister.RegisterLoader(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility.c_str(), abilityLoader);
     // ... 属性集和任务的加载器类似
 }
 ```
@@ -1636,8 +1621,8 @@ FOnActiveGameplayEffectInhibitionChanged* ASC.OnGameplayEffectInhibitionChangedD
 - `FScalableFloat` 的 `operator float()` 允许隐式转换，但需要注意当 CurveTable 设置后，直接使用 float 值会忽略曲线表缩放
 - 命名方式（DataName）的 SetByCaller 已经废弃，请优先使用标签方式（DataTag）
 - `AttributeSetDefine` 的 `AttributeSetCreator` 指向脚本路径，目前通过 `ScriptFunctionRegister` 的 loader 模式加载
-- **FScalableFloat CurveTable 无法从 INI 加载**：`FScalableFloat` 的 `Curve` 成员没有 `PROPERTY()` 标签，且有 `Parser<FScalableFloat>` 特化（只读裸 float）。INI 中 `Period.CurveTableName` 等点分键写法不生效，只能写裸 float（如 `Period = 2.0`）。曲线表需通过代码或脚本手动设置（详见 [第 12 节](#12-curvetable曲线表)）
-- **CurveTable RowName 未实现**：`GetValueAtLevel()` 只使用 `CurveTableName` 查找，`RowName` 被读取但未用于查找。每个 `[CurveTable.XXX]` 节只能定义一条曲线（详见 [第 12 节](#12-curvetable曲线表)）
+- **FScalableFloat CurveTable 无法从 INI 加载**：`FScalableFloat` 的 `Curve` 成员没有 `PROPERTY()` 标签，且有 `Parser<FScalableFloat>` 特化（只读裸 float）。INI 中 `Period.CurveTableName` 等点分键写法不生效，只能写裸 float（如 `Period = 2.0`）。曲线表需通过 **C++ 代码**手动设置 `Curve.CurveTableName`（FScalableFloat::Curve 未暴露到脚本，脚本路径不可行）
+- **CurveTable RowName 未实现**：详见 [第 12 节](#12-curvetable曲线表)
 - **GameplayEffect 的 GameplayCues 字段无法从 INI 加载**：`GameplayEffectCue` 只有 `CLASS(BindJs)`，不是 `IniComponent` / `IniAutoLoad`，也没有 `Parser` 特化。`GameplayCues` 字段（`vector<GameplayEffectCue*>`）的指针解析会失败。Cue 触发应通过 `[GameplayCue.XXX]` INI 定义和 GameplayCueTag 机制实现（详见 [第 9 节](#9-gameplaycue游戏提示)）
 - **GameplayEffect 的 Executions 字段无法从 INI 加载**：`GameplayEffectExecutionDefinition` 只有 `CLASS(BindJs)`，不是 `IniComponent` / `IniAutoLoad`，也没有 `Parser` 特化。`Executions` 字段（`vector<GameplayEffectExecutionDefinition>`）的解析会失败。自定义 Execution 需通过脚本设置
 - `ChanceToApplyGEComponent` 使用 `rand()` 进行概率判定，帧同步环境下可能需要替换为基于种子的确定性随机
@@ -1664,7 +1649,7 @@ delay.m_OnFinish.BindStdFunction(() => { /* ... */ });
 对于 ASC 上的 multicast delegate（见 [8.5 事件委托表](#85-事件委托表)），使用 `AddStdFunction` 代替直接赋值：
 
 ```typescript
-asc.OnAbilityEndedCallbacks.AddStdFunction((ability) => { /* ... */ });
+asc.m_AbilityEndedCallbacks.AddStdFunction((ability) => { /* ... */ });
 ```
 
 **迁移要点：**
@@ -1673,6 +1658,20 @@ asc.OnAbilityEndedCallbacks.AddStdFunction((ability) => { /* ... */ });
 - 多播委托（`TMulticastDelegate`）：`obj.OnXxx = fn` → `obj.OnXxx.AddStdFunction(fn)`
 - 闭包结尾从 `};` 变为 `});`（因为现在是方法调用）
 - 如需存档兼容，改用 `BindScriptFunction` / `AddScriptFunction`，详见[第 16 节](#16-委托存档delegate-savegame)
+
+### 15.6 代码侧待办（不影响本文档正确性，供后续任务参考）
+
+以下 9 项代码侧遗留事项已在前序审查中对照代码确认，不影响本文档上述描述的正确性，供后续任务参考：
+
+1. 无 `Parser<GameplayAbilitySpecDef>` 特化，`GrantedAbilities` 无法通过 INI 配置（见 §6.2）
+2. 无 `Parser<FGameplayEffectQuery>` 特化，`Immunity` / `RemoveOther` 无法通过 INI 配置（见 §6.2）
+3. `FInheritedTagContainer::UpdateCombinedTags` 无调用点（见 §2.7）
+4. `AssignSetByCallerMagnitude` 无 `@deprecated` 标记（见 §11.4）
+5. `IsGameplayCueActive` 未通过 `FUNCTION()` 暴露（见 §9.6）
+6. `GameplayCueManager::AfterLoadIni` / `AddCueNotify` 为空实现，`[GameplayCue.*]` 自动扫描待确认（见 §9.5）
+7. `AppliedSourceTagFilter` / `TargetTagFilter` 为桩实现（见 §10.5）
+8. capture spec 未接入 Execution 路径（见 §10.6）
+9. `TMulticastDelegate` 存档静默丢弃 lambda 绑定，如需警告需补日志（见 §8.5）
 
 ---
 
@@ -1691,7 +1690,7 @@ ability.m_OnK2ActivateAbility.BindStdFunction(() => {
 });
 ```
 
-- **存档时：** 记录一条警告日志，跳过该绑定（不写入任何数据）
+- **存档时：** 记录一条警告日志，跳过该绑定（写入不可恢复标记（Unsupported）并记录警告，绑定数据不保存）
 - **读档后：** 委托处于 unbound 状态，回调不会触发
 - **适用场景：** 临时回调，不需要跨存档存活。大部分游戏内即时逻辑用这种方式即可
 
@@ -1712,16 +1711,16 @@ ability.m_OnK2ActivateAbility.BindScriptFunction(
 
 ### 16.2 Multicast Delegate 的存档
 
-ASC 上的 multicast delegate（见 [8.5 事件委托表](#85-事件委托表)）使用 `AddStdFunction` / `AddScriptFunction`，行为与单播委托一致：
+ASC 上的 multicast delegate（见 [8.5 事件委托表](#85-事件委托表)）使用 `AddStdFunction` / `AddScriptFunction`，存档语义一致（FuncId 保存/恢复、lambda 丢弃），但 multicast 存档时不记录警告、单播会记录：
 
 ```typescript
 // 不可存档 — JS lambda
-asc.OnAbilityEndedCallbacks.AddStdFunction((ability) => {
+asc.m_AbilityEndedCallbacks.AddStdFunction((ability) => {
     console.log("ability ended");
 });
 
 // 可存档 — 已注册 ScriptFunction
-asc.OnAbilityEndedCallbacks.AddScriptFunction(
+asc.m_AbilityEndedCallbacks.AddScriptFunction(
     GameplayAbilitySystem.s_ScriptFunctionCategoryAbility,
     "my_module/OnAbilityEnded"
 );
@@ -1806,9 +1805,11 @@ Removed = Ability.Safe
 
 | 结构体 | 使用场景 | 子字段 |
 |--------|---------|--------|
-| `FInheritedTagContainer` | `BlockAbilityTagsGEComponent.InheritableBlockedAbilityTagsContainer` | `Added`、`Removed`、`CombinedTags` |
+| `FInheritedTagContainer` | `BlockAbilityTagsGEComponent.InheritableBlockedAbilityTagsContainer` | `Added`、`Removed`、`CombinedTags`（无 `Inherited` 字段） |
 | `GameplayTagRequirements` | `TagRequirementsGEComponent.Application/Ongoing/RemovalTagRequirements` | `RequireTags`、`IgnoreTags`、`TagQuery` |
+
+注：`RequireTags`/`IgnoreTags`（`GameplayTagContainer`）与 `TagQuery`（`GameplayTagQuery`）均有 Parser 特化，在嵌套加载中按单字符串值读取；其中 `TagQuery` 的 Parser 将逗号分隔的标签列表解析为 AnyTagsMatch 查询。
 
 ### 17.5 执行顺序
 
-加载时**先尝试方式1**（点分键），如果当前 section 下没有任何 `属性名.*` 的键被读到，**再尝试方式2**（section 引用）。两种方式不会互相干扰，但不能混用——如果方式1已经成功读到了数据，方式2不会执行。
+加载时**先尝试方式1**（点分键），如果当前 section 下没有任何 `属性名.*` 的键被读到，**再尝试方式2**（section 引用）。两种方式不会互相干扰，但不能混用——如果方式1已经成功读到了数据，方式2不会执行。这里的"成功"指方式1下所有子字段（含深层递归）读取结果的或——任一子字段读取成功即视为成功；个别子字段键存在但解析失败时不视为成功。
