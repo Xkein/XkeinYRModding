@@ -28,4 +28,10 @@ var global = global || (function () { return this; }());
     puerts.$ref = ref;
     puerts.$unref = unref;
     puerts.$set = setref;
+
+    // public static void RegisterFunction(char const * category, char const * name, ScriptFunctionBase * func)
+    global.RegisterScriptFunction = function (category, name, func) {
+        YrExtCore.ScriptFunctionRegister.RegisterFunction(category, name, func);
+        return func;
+    }
 }(global));

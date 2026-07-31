@@ -13,6 +13,7 @@ class ScriptFunction<TFunc extends (...args: any[]) => any>
     constructor(func: TFunc | undefined);
 }
 
+function RegisterScriptFunction<TScriptFunction extends ScriptFunction<any>>(category : string, name : string, func : TScriptFunction) : TScriptFunction;
 
 class FDelegateHandle {
     Id: uint64;
