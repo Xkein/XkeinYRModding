@@ -226,36 +226,37 @@ ATTRIBUTE_ACCESSORS(MyAttributeSet, Health);
 // 所有回调均为 PROPERTY(Savegame) TDelegate。只有 ScriptFunction 绑定支持存档（存档保存 FuncId，读档按 FuncId 恢复）；
 // BindStdFunction 绑定的 JS lambda 不可存档（存档时记录警告并跳过）。详见第 16 节。
 // 1) 注册 ScriptFunction（在脚本加载阶段完成；存档和读档前都需保证已注册）
+//    RegisterScriptFunction 返回传入的 ScriptFunction 实例，保存后在绑定阶段直接传入即可，无需重复写 category/name
 
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreGameplayEffectExecute", new ScriptFunction_bool_AttributeSet__FGameplayEffectModCallbackData__((data: FGameplayEffectModCallbackData): boolean => {
+const sf_OnPreGameplayEffectExecute = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreGameplayEffectExecute", new ScriptFunction_bool_AttributeSet__FGameplayEffectModCallbackData__((data: FGameplayEffectModCallbackData): boolean => {
     // GE 执行前调用。返回 false 跳过修改。
     return true;
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostGameplayEffectExecute", new ScriptFunction_void_AttributeSet__const_FGameplayEffectModCallbackData__((data: FGameplayEffectModCallbackData) => {
+const sf_OnPostGameplayEffectExecute = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostGameplayEffectExecute", new ScriptFunction_void_AttributeSet__const_FGameplayEffectModCallbackData__((data: FGameplayEffectModCallbackData) => {
     // GE 成功执行后调用
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreAttributeChange", new ScriptFunction_void_AttributeSet__const_GameplayAttribute__float__((attr: GameplayAttribute, newValue: float) => {
+const sf_OnPreAttributeChange = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreAttributeChange", new ScriptFunction_void_AttributeSet__const_GameplayAttribute__float__((attr: GameplayAttribute, newValue: float) => {
     // 属性值修改前调用（仅 C++ 虚函数可钳制 NewValue；JS 委托中 float 参数按值传递、无法修改）
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostAttributeChange", new ScriptFunction_void_AttributeSet__const_GameplayAttribute__float_float_((attr: GameplayAttribute, oldValue: float, newValue: float) => {
+const sf_OnPostAttributeChange = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostAttributeChange", new ScriptFunction_void_AttributeSet__const_GameplayAttribute__float_float_((attr: GameplayAttribute, oldValue: float, newValue: float) => {
     // 属性值修改后调用
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreAttributeBaseChange", new ScriptFunction_void_AttributeSet__const_GameplayAttribute__float__((attr: GameplayAttribute, newValue: float) => {
+const sf_OnPreAttributeBaseChange = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreAttributeBaseChange", new ScriptFunction_void_AttributeSet__const_GameplayAttribute__float__((attr: GameplayAttribute, newValue: float) => {
     // 基础值修改前调用
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostAttributeBaseChange", new ScriptFunction_void_AttributeSet__const_GameplayAttribute__float_float_((attr: GameplayAttribute, oldValue: float, newValue: float) => {
+const sf_OnPostAttributeBaseChange = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostAttributeBaseChange", new ScriptFunction_void_AttributeSet__const_GameplayAttribute__float_float_((attr: GameplayAttribute, oldValue: float, newValue: float) => {
     // 基础值修改后调用
 }));
 
-// 2) 创建属性集并按 category/name 绑定（可存档）
+// 2) 创建属性集并绑定（直接传入 ScriptFunction 实例，可存档）
 const set = CustomAttributeSet.Create();
 
-set.m_OnK2_PreGameplayEffectExecute.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreGameplayEffectExecute");
-set.m_OnK2_PostGameplayEffectExecute.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostGameplayEffectExecute");
-set.m_OnK2_PreAttributeChange.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreAttributeChange");
-set.m_OnK2_PostAttributeChange.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostAttributeChange");
-set.m_OnK2_PreAttributeBaseChange.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPreAttributeBaseChange");
-set.m_OnK2_PostAttributeBaseChange.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAttributeSet, "test_attr/OnPostAttributeBaseChange");
+set.m_OnK2_PreGameplayEffectExecute.BindScriptFunction(sf_OnPreGameplayEffectExecute);
+set.m_OnK2_PostGameplayEffectExecute.BindScriptFunction(sf_OnPostGameplayEffectExecute);
+set.m_OnK2_PreAttributeChange.BindScriptFunction(sf_OnPreAttributeChange);
+set.m_OnK2_PostAttributeChange.BindScriptFunction(sf_OnPostAttributeChange);
+set.m_OnK2_PreAttributeBaseChange.BindScriptFunction(sf_OnPreAttributeBaseChange);
+set.m_OnK2_PostAttributeBaseChange.BindScriptFunction(sf_OnPostAttributeBaseChange);
 ```
 同一 (category, name) 在多处重复注册（不同对象）会触发 C++ 侧新的覆盖警告，属预期行为（如 §4.4/:343、§7.3/:927、§14/:1542 均注册 `test_heal/OnActivateAbility`），详见 doc/script_function.md 陷阱 #6。
 
@@ -336,31 +337,32 @@ GameplayAbility（游戏能力）是可以被激活的游戏逻辑单元，包�
 // TypeScript
 // 回调均为 PROPERTY(Savegame) TDelegate。只有 ScriptFunction 绑定支持存档；BindStdFunction 绑定的 JS lambda 不可存档。详见第 16 节。
 // 1) 注册 ScriptFunction（在脚本加载阶段完成；存档和读档前都需保证已注册）
+//    RegisterScriptFunction 返回传入的 ScriptFunction 实例，保存后在绑定阶段直接传入即可，无需重复写 category/name
 
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2CanActivateAbility", new ScriptFunction_bool_GameplayAbility__GameplayAbilityActorInfo_GameplayAbilitySpecHandle_GameplayTagContainer__((actorInfo, handle, tags): boolean => {
+const sf_OnK2CanActivateAbility = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2CanActivateAbility", new ScriptFunction_bool_GameplayAbility__GameplayAbilityActorInfo_GameplayAbilitySpecHandle_GameplayTagContainer__((actorInfo, handle, tags): boolean => {
     return true; // 返回 false 阻止激活
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility", new ScriptFunction_void_GameplayAbility__(() => {
+const sf_OnActivateAbility = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility", new ScriptFunction_void_GameplayAbility__(() => {
     // 能力激活时调用
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2ActivateAbilityFromEvent", new ScriptFunction_void_GameplayAbility__const_GameplayEventData__((eventData: GameplayEventData) => {
+const sf_OnK2ActivateAbilityFromEvent = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2ActivateAbilityFromEvent", new ScriptFunction_void_GameplayAbility__const_GameplayEventData__((eventData: GameplayEventData) => {
     // 从事件触发时调用（优先于 OnActivateAbility）
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2CommitExecute", new ScriptFunction_void_GameplayAbility__(() => {
+const sf_OnK2CommitExecute = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2CommitExecute", new ScriptFunction_void_GameplayAbility__(() => {
     // 能力提交后调用（消耗/冷却已应用）
 }));
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2OnEndAbility", new ScriptFunction_void_GameplayAbility__bool_((wasCancelled: boolean) => {
+const sf_OnK2OnEndAbility = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2OnEndAbility", new ScriptFunction_void_GameplayAbility__bool_((wasCancelled: boolean) => {
     // 能力结束时调用
 }));
 
-// 2) 创建能力并按 category/name 绑定（可存档）
+// 2) 创建能力并绑定（直接传入 ScriptFunction 实例，可存档）
 const ability = CustomGameplayAbility.Create();
 
-ability.m_OnK2CanActivateAbility.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2CanActivateAbility");
-ability.m_OnK2ActivateAbility.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility");
-ability.m_OnK2ActivateAbilityFromEvent.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2ActivateAbilityFromEvent");
-ability.m_OnK2CommitExecute.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2CommitExecute");
-ability.m_OnK2OnEndAbility.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnK2OnEndAbility");
+ability.m_OnK2CanActivateAbility.BindScriptFunction(sf_OnK2CanActivateAbility);
+ability.m_OnK2ActivateAbility.BindScriptFunction(sf_OnActivateAbility);
+ability.m_OnK2ActivateAbilityFromEvent.BindScriptFunction(sf_OnK2ActivateAbilityFromEvent);
+ability.m_OnK2CommitExecute.BindScriptFunction(sf_OnK2CommitExecute);
+ability.m_OnK2OnEndAbility.BindScriptFunction(sf_OnK2OnEndAbility);
 
 // 可调用的 FUNCTION 方法
 ability.K2_EndAbility();
@@ -890,7 +892,7 @@ AbilityTask（能力任务）是 GameplayAbility 内的异步任务单元，管�
 
 | 任务 | 说明 | 使用示例 |
 |---|---|---|
-| WaitDelay | 等待指定时间后触发 | `AbilityTask_WaitDelay.Create(ability, 2.0).m_OnFinish.BindScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnDelayFinish")` |
+| WaitDelay | 等待指定时间后触发 | `AbilityTask_WaitDelay.Create(ability, 2.0).m_OnFinish.BindScriptFunction(sf_OnDelayFinish)` |
 | WaitGameplayEvent | 等待指定标签的 gameplay 事件 | `WaitGameplayEvent.Create(ability, tag, true)`（C++ 第 4 参有默认值；生成的 TS 类型中为必填，TS 调用需补全参数） |
 | WaitGameplayTagAdded | 等待指定标签被添加 | `WaitGameplayTagAdded.Create(ability, tag, true)` |
 | WaitGameplayTagRemoved | 等待指定标签被移除 | `WaitGameplayTagRemoved.Create(ability, tag, true)` |
@@ -923,29 +925,30 @@ AbilityTask（能力任务）是 GameplayAbility 内的异步任务单元，管�
 ```typescript
 // 能力激活回调与任务回调均使用 ScriptFunction 绑定（可存档），详见第 16 节
 // 1) 注册 ScriptFunction（在脚本加载阶段完成；存档和读档前都需保证已注册）
+//    RegisterScriptFunction 返回传入的 ScriptFunction 实例，保存后在绑定阶段直接传入即可，无需重复写 category/name
 
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility", new ScriptFunction_void_GameplayAbility__((ability) => {
+const sf_OnActivateAbility = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility", new ScriptFunction_void_GameplayAbility__((ability) => {
     // 在能力激活中创建任务
     // 延迟任务
     const delay = AbilityTask_WaitDelay.Create(ability, 1.5);
-    delay.m_OnFinish.BindScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnDelayFinish");
+    delay.m_OnFinish.BindScriptFunction(sf_OnDelayFinish);
 
     // 等待标签
     const waitTag = AbilityTask_WaitGameplayTagAdded.Create(ability, tag, true);
-    waitTag.m_OnTagAdded.BindScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnTagAdded");
+    waitTag.m_OnTagAdded.BindScriptFunction(sf_OnTagAdded);
 
     // 创建后无需手动调用，ASC::TickTasks 会在下一帧自动调用 Activate()（注意至少 1 帧延迟）
 }));
-RegisterScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnDelayFinish", new ScriptFunction_void_AbilityTask_WaitDelay__(() => {
+const sf_OnDelayFinish = RegisterScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnDelayFinish", new ScriptFunction_void_AbilityTask_WaitDelay__(() => {
     console.log("delayed action");
 }));
-RegisterScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnTagAdded", new ScriptFunction_void_AbilityTask_WaitGameplayTagAdded__(() => {
+const sf_OnTagAdded = RegisterScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnTagAdded", new ScriptFunction_void_AbilityTask_WaitGameplayTagAdded__(() => {
     console.log("tag received");
 }));
 
-// 2) 按 category/name 绑定（可存档）
+// 2) 绑定（直接传入 ScriptFunction 实例，可存档）
 // ability 为本示例上下文中的能力实例变量（与上方回调形参无关，是示例片段外定义的变量）
-ability.m_OnK2ActivateAbility.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility");
+ability.m_OnK2ActivateAbility.BindScriptFunction(sf_OnActivateAbility);
 ```
 
 ---
@@ -1008,7 +1011,7 @@ ASC.StartupEffects = Effect_BaseStats, Effect_PassiveRegen
 所有委托均为 `PROPERTY()` 类型的 `TMulticastDelegate`，可从 TypeScript 绑定：
 
 - `AddStdFunction(fn)` — 绑定 JS lambda，不可存档
-- `AddScriptFunction(category, name)` — 绑定已注册的 ScriptFunction，可存档（存档时保存 FuncId，读档时按 FuncId 恢复绑定）
+- `AddScriptFunction(sf)` — 绑定已注册的 ScriptFunction，可存档（存档时保存 FuncId，读档时按 FuncId 恢复绑定）；sf 为 `RegisterScriptFunction` 的返回值（也支持 `AddScriptFunction(category, name)` 重载）
 
 共 11 个委托，如下表所示：
 
@@ -1538,17 +1541,18 @@ import {
 } from "XkeinExt";
 
 // 注册 ScriptFunction（模块顶层执行；存档和读档前都需保证已注册，见第 16 节）
+// RegisterScriptFunction 返回传入的 ScriptFunction 实例，保存后在绑定阶段直接传入即可，无需重复写 category/name
 
-RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility", new ScriptFunction_void_GameplayAbility__((ability) => {
+const sf_OnActivateAbility = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility", new ScriptFunction_void_GameplayAbility__((ability) => {
     // 提交能力：应用 define.m_CostGameplayEffectClass 定义的消耗并开始冷却
     ability.K2_CommitAbility();
 
     // 延迟效果
     const delay = AbilityTask_WaitDelay.Create(ability, 0.5);
-    delay.m_OnFinish.BindScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnDelayFinish");
+    delay.m_OnFinish.BindScriptFunction(sf_OnDelayFinish);
 }));
 
-RegisterScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnDelayFinish", new ScriptFunction_void_AbilityTask_WaitDelay__((task) => {
+const sf_OnDelayFinish = RegisterScriptFunction(AbilityTask.s_ScriptFunctionCategory, "test_heal/OnDelayFinish", new ScriptFunction_void_AbilityTask_WaitDelay__((task) => {
     // 任务参数即触发回调的 WaitDelay 任务；m_AbilityInstance 是其所属能力实例
     task.m_AbilityInstance.K2_EndAbility();
 }));
@@ -1557,8 +1561,8 @@ export function ability_creator(define: GameplayAbilityDefine, com: AbilitySyste
     const ability = CustomGameplayAbility.Create();
 
     // com 为创建能力实例时传入的 AbilitySystemComponent —— 在回调外部预先取得，回调内无需再查询
-    // 按 category/name 绑定（可存档）
-    ability.m_OnK2ActivateAbility.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "test_heal/OnActivateAbility");
+    // 直接传入 ScriptFunction 实例绑定（可存档）
+    ability.m_OnK2ActivateAbility.BindScriptFunction(sf_OnActivateAbility);
 
     return ability;
 }
@@ -1670,21 +1674,25 @@ delay.m_OnFinish = someCallback;
 **新写法（推荐 ScriptFunction 绑定以支持存档，详见[第 16 节](#16-委托存档delegate-savegame)）：**
 
 ```typescript
-// 回调需先注册为 ScriptFunction（见第 16.3 节），再按 category/name 绑定
-ability.m_OnK2ActivateAbility.BindScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "my_module/OnActivateAbility");
-delay.m_OnFinish.BindScriptFunction(AbilityTask.s_ScriptFunctionCategory, "my_module/OnDelayFinish");
+// 回调需先注册为 ScriptFunction（见第 16.3 节）；RegisterScriptFunction 返回实例，绑定时直接传入即可
+const sf_OnActivateAbility = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "my_module/OnActivateAbility", new ScriptFunction_void_GameplayAbility__(/* ... */));
+const sf_OnDelayFinish = RegisterScriptFunction(AbilityTask.s_ScriptFunctionCategory, "my_module/OnDelayFinish", new ScriptFunction_void_AbilityTask_WaitDelay__(/* ... */));
+
+ability.m_OnK2ActivateAbility.BindScriptFunction(sf_OnActivateAbility);
+delay.m_OnFinish.BindScriptFunction(sf_OnDelayFinish);
 ```
 
 对于 ASC 上的 multicast delegate（见 [8.5 事件委托表](#85-事件委托表)），使用 `AddScriptFunction` 代替直接赋值：
 
 ```typescript
-asc.m_AbilityEndedCallbacks.AddScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "my_module/OnAbilityEnded");
+const sf_OnAbilityEnded = RegisterScriptFunction(GameplayAbilitySystem.s_ScriptFunctionCategoryAbility, "my_module/OnAbilityEnded", new ScriptFunction_void_AbilitySystemComponent__const_GameplayAbility__const_GameplayTagContainer__(/* ... */));
+asc.m_AbilityEndedCallbacks.AddScriptFunction(sf_OnAbilityEnded);
 ```
 
 **迁移要点：**
 
-- 单播委托（`TDelegate`）：`obj.m_OnXxx = fn` → 先将 `fn` 注册为 ScriptFunction（`RegisterScriptFunction`，见第 16.3 节），再 `obj.m_OnXxx.BindScriptFunction(category, name)`
-- 多播委托（`TMulticastDelegate`）：`obj.OnXxx = fn` → 注册后 `obj.OnXxx.AddScriptFunction(category, name)`
+- 单播委托（`TDelegate`）：`obj.m_OnXxx = fn` → 先将 `fn` 注册为 ScriptFunction（`RegisterScriptFunction`，见第 16.3 节），保存返回的实例，再 `obj.m_OnXxx.BindScriptFunction(sf)`
+- 多播委托（`TMulticastDelegate`）：`obj.OnXxx = fn` → 注册后 `obj.OnXxx.AddScriptFunction(sf)`
 - 闭包结尾从 `};` 变为 `});`（因为现在是方法调用）
 - 不跨存档的临时回调仍可用 `BindStdFunction` / `AddStdFunction`（存档时会被丢弃：单播记录警告、多播静默，见[第 16 节](#16-委托存档delegate-savegame)）
 
@@ -1723,14 +1731,12 @@ ability.m_OnK2ActivateAbility.BindStdFunction(() => {
 - **读档后：** 委托处于 unbound 状态，回调不会触发
 - **适用场景：** 临时回调，不需要跨存档存活。大部分游戏内即时逻辑用这种方式即可
 
-#### BindScriptFunction(category, name) — 已注册 ScriptFunction 绑定，可存档
+#### BindScriptFunction(sf) — 已注册 ScriptFunction 绑定，可存档
 
 ```typescript
-// 绑定一个已注册的 ScriptFunction（按 category + name 查找）
-ability.m_OnK2ActivateAbility.BindScriptFunction(
-    GameplayAbilitySystem.s_ScriptFunctionCategoryAbility,
-    "test_heal/OnActivateAbility"
-);
+// sf 为 RegisterScriptFunction 的返回值（见 16.3 节），直接传入即可
+// 也支持 BindScriptFunction(category, name) 重载，但推荐直接传实例，避免重复写 category/name
+ability.m_OnK2ActivateAbility.BindScriptFunction(sf_OnActivateAbility);
 ```
 
 - **存档时：** 保存 ScriptFunction 的 FuncId
@@ -1748,11 +1754,8 @@ asc.m_AbilityEndedCallbacks.AddStdFunction((ability) => {
     console.log("ability ended");
 });
 
-// 可存档 — 已注册 ScriptFunction
-asc.m_AbilityEndedCallbacks.AddScriptFunction(
-    GameplayAbilitySystem.s_ScriptFunctionCategoryAbility,
-    "my_module/OnAbilityEnded"
-);
+// 可存档 — 已注册 ScriptFunction（sf 为 RegisterScriptFunction 的返回值，见 16.3 节）
+asc.m_AbilityEndedCallbacks.AddScriptFunction(sf_OnAbilityEnded);
 ```
 
 ### 16.3 ScriptFunction 注册
@@ -1762,7 +1765,8 @@ asc.m_AbilityEndedCallbacks.AddScriptFunction(
 ```typescript
 // 注册（在脚本加载阶段完成，存档和读档前都需保证已注册）
 // func 参数必须是 ScriptFunction 实例（不能用裸 lambda）；全局助手 RegisterScriptFunction 一步完成"构造 + 注册 + 自动持久化（防 GC）"并返回实例
-RegisterScriptFunction(
+// 保存返回值，绑定时直接传入 BindScriptFunction(sf) / AddScriptFunction(sf)，无需重复写 category/name
+const sf_OnActivateAbility = RegisterScriptFunction(
     GameplayAbilitySystem.s_ScriptFunctionCategoryAbility,
     "test_heal/OnActivateAbility",
     new ScriptFunction_void_GameplayAbility__(() => {
