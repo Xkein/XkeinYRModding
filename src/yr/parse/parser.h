@@ -89,6 +89,21 @@ namespace detail
             }
             return idx == size;
         }
+
+        /// 逗号分割字符串，对每个子串（自动 trim）调用 callback
+        template<typename Callback>
+        static void ReadArray(std::string_view str, Callback&& callback)
+        {
+            auto view = std::ranges::split_view(str, ',');
+            for (const auto word : view)
+            {
+                std::string_view token = boost::trim_copy(std::string_view(word));
+                if (token.empty())
+                    continue;
+                if (!callback(token))
+                    break;
+            }
+        }
     };
 
     template<typename T>

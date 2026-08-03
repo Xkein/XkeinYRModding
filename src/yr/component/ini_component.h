@@ -1,5 +1,6 @@
 #pragma once
 #include "core/reflection/reflection.h"
+#include "core/tool/type_traits.hpp"
 #include "runtime/ecs/entt.h"
 #include "yr/api/yr_entity.h"
 #include "yr/parse/ini_reader.h"
@@ -183,6 +184,38 @@ bool IniComponentLoader::Load(IniReader& parser, const char* pSection, const cha
                 if (!sectionName.empty())
                 {
                     doLoadIniComponent(sectionName.c_str(), nullptr);
+                }
+            }
+        }
+    }
+
+    // std::vector<T> 特殊处理：当元素类型 T 无 Parser 且非指针时，走 section 引用路径
+    // INI 写法：FieldName = Section1, Section2, ...
+    // 然后对每个 Section 递归加载元素（元素类型需要有 IniComponent）
+    if constexpr (is_std_vector_v<T>)
+    {
+        using ElementType = typename T::value_type;
+        if constexpr (!std::is_pointer_v<ElementType> && !IsParserImplemented<ElementType>)
+        {
+            hasLoader = true;
+            if (pKey && *pKey)
+            {
+                std::string sectionList;
+                if (parser.Read(pSection, pKey, sectionList))
+                {
+                    value.clear();
+                    detail::ParserHelper::ReadArray(sectionList, [&](std::string_view token) -> bool {
+                        ElementType element{};
+                        if (Load(parser, std::string(token).c_str(), nullptr, element))
+                        {
+                            value.push_back(std::move(element));
+                        }
+                        return true;
+                    });
+                    if (!value.empty())
+                    {
+                        success = true;
+                    }
                 }
             }
         }

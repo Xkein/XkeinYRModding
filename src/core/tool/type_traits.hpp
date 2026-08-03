@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 
 template<class Lambda, int=(Lambda{}(), 0)>
 constexpr bool is_constexpr_friendly(Lambda) { return true; }
@@ -31,3 +32,11 @@ concept is_deletable = requires(T* p) {
 
 template <typename T>
 inline constexpr bool is_deletable_v = is_deletable<T>;
+
+// Detect std::vector<T>
+template <typename T>
+struct is_std_vector : std::false_type {};
+template <typename T, typename Alloc>
+struct is_std_vector<std::vector<T, Alloc>> : std::true_type {};
+template <typename T>
+inline constexpr bool is_std_vector_v = is_std_vector<std::remove_cv_t<std::remove_reference_t<T>>>::value;
