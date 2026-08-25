@@ -150,4 +150,16 @@ target("make_artifacts")
                 os.cp(src, dst)
             end
         end, {dependfile = output_dir.."/../files.d", files = depend_files})
+
+        -- copy the bundled mcp tool when bundle_mcp is enabled
+        if has_config("bundle_mcp") then
+            local mcp_rel = path.join(output_dir, "tools", "mcp")
+            local mcp_src = path.join(path.absolute("tools/xkein_yr_mcp"), "dist")
+            if os.isfile(path.join(mcp_src, "xkein_yr_mcp.js")) then
+                os.mkdir(mcp_rel)
+                os.cp(path.join(mcp_src, "xkein_yr_mcp.js"), mcp_rel)
+                os.cp(path.join(mcp_src, "package.json"), mcp_rel)
+                os.cp(path.join(mcp_src, "config.json"), mcp_rel)
+            end
+        end
     end)
